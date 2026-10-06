@@ -1,0 +1,959 @@
+{
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "refresh": "15s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "uid": "token-layer",
+  "title": "Token layer (NativeStack2604)",
+  "tags": [
+    "native",
+    "tokens"
+  ],
+  "version": 1,
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Claude tokens",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[$__range]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 2,
+      "title": "Cache-read share",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(claude_code_token_usage_tokens_total{type=\"cacheRead\",instance!=\"unscoped\"}[$__range])) / sum(increase(claude_code_token_usage_tokens_total{type=~\"input|cacheRead|cacheCreation\",instance!=\"unscoped\"}[$__range]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 3,
+      "title": "Cost (USD, client estimate)",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(claude_code_cost_usage_USD_total{instance!=\"unscoped\"}[$__range]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 4,
+      "title": "Tool calls",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "title": "MCP calls",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name != \"\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "title": "GPT tokens (Codex, shared writer)",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(codex_turn_token_usage_sum{token_type=\"total\"}[$__range]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "title": "Tokens per hour by type",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (type) (increase(claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 8,
+      "title": "Tokens per hour by query_source",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (increase(claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 9,
+      "title": "Tokens per hour by model",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model) (increase(claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 10,
+      "title": "Cache-read share per hour",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(claude_code_token_usage_tokens_total{type=\"cacheRead\",instance!=\"unscoped\"}[1h])) / sum(increase(claude_code_token_usage_tokens_total{type=~\"input|cacheRead|cacheCreation\",instance!=\"unscoped\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 11,
+      "title": "Cost per hour by model (USD)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model) (increase(claude_code_cost_usage_USD_total{instance!=\"unscoped\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 12,
+      "title": "Cost per hour by query_source (USD)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (increase(claude_code_cost_usage_USD_total{instance!=\"unscoped\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native scoped counters; the 1m evaluation step retains the [1h] hourly lookback. A counter first observed after work began can undercount increase(); Prometheus created-timestamp-zero-ingestion is a separate service prerequisite."
+    },
+    {
+      "id": 13,
+      "title": "Tool invocations per hour by tool name (MCP split by server)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (tool) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format tool=`{{ if .mcp_server_name }}mcp:{{ regexReplaceAllLiteral \"^plugin_[^_]+_\" .mcp_server_name \"\" }}{{ else }}{{ .tool_name }}{{ end }}` [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 14,
+      "title": "MCP invocations per hour by server",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (mcp_server) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name != \"\" | label_format mcp_server=`{{ regexReplaceAllLiteral \"^plugin_[^_]+_\" .mcp_server_name \"\" }}` [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 15,
+      "title": "MCP calls by server (range)",
+      "type": "bargauge",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (mcp_server) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | mcp_server_name != \"\" | label_format mcp_server=`{{ regexReplaceAllLiteral \"^plugin_[^_]+_\" .mcp_server_name \"\" }}` [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 16,
+      "title": "Bash calls per hour: RTK vs raw",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 56,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (shell_rtk) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | tool_name=\"Bash\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 17,
+      "title": "Skill activations per hour",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (skill_name) (count_over_time({service_name=\"claude-code\"} | event_name=\"skill_activated\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 18,
+      "title": "SDK receipts per hour by status and model",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count by (status, model) (sum by (receipt_id, status, model) (count_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" [1h])))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native SDK receipt IDs, deduplicated within this range. Exercise the native SDK producer in after_sign_in acceptance. Numeric usage is not inferred from cumulative snapshots."
+    },
+    {
+      "id": 19,
+      "title": "SDK receipts by usage_status (range)",
+      "type": "bargauge",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count by (usage_status) (sum by (receipt_id, usage_status) (count_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" [$__range])))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native SDK receipt IDs, deduplicated within this range. Exercise the native SDK producer in after_sign_in acceptance. Numeric usage is not inferred from cumulative snapshots."
+    },
+    {
+      "id": 20,
+      "title": "SDK receipts (range)",
+      "type": "stat",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 72,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(sum by (receipt_id) (count_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" [$__range])))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      },
+      "description": "Native SDK receipt IDs, deduplicated within this range. Exercise the native SDK producer in after_sign_in acceptance. Numeric usage is not inferred from cumulative snapshots."
+    },
+    {
+      "id": 21,
+      "title": "GPT token counters per hour by model (shared writer)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 80,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model) (increase(codex_turn_token_usage_sum{token_type=\"total\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 22,
+      "title": "GPT token types per hour (shared writer; not additive)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 80,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (token_type) (increase(codex_turn_token_usage_sum{token_type=~\"input|cached_input|cache_write_input|output|reasoning_output\"}[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 23,
+      "title": "Codex turn counters per hour by model (shared writer)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 88,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model) (increase(codex_conversation_turn_count_total[1h]))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 24,
+      "title": "Codex SSE events per hour by client",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 88,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, originator) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.sse_event\" | originator != \"\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 25,
+      "title": "API calls per hour by query_source",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 96,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (count_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 26,
+      "title": "Mean context per API call (tokens, hourly)",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 96,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum(sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap cache_read_tokens [1h])) + sum(sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap input_tokens [1h])) + sum(sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap cache_creation_tokens [1h]))) / sum(count_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 27,
+      "title": "GPT-lane tool calls per hour by family",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, tool_family) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 28,
+      "title": "GPT-lane MCP calls per hour by server",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, tool_namespace) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | tool_family=\"mcp\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 29,
+      "title": "GPT-lane tools by name (range)",
+      "type": "bargauge",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 112,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, sum by (service_name, tool_namespace, tool_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" [$__range])))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    }
+  ]
+}

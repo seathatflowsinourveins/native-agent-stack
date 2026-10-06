@@ -1,0 +1,26 @@
+{
+  "_comment": "The new WSL distribution's additions to adoption/mcp/claude-user.json. Only tools/adoption/new_wsl_client_config.py reads this file: it merges the servers below into the shared template (a server both files name is refused) and wires each through adoption/new-wsl/client-config-map.json, so the shared template stays what install_claude_profile.py registers on every other host. semble 0.6.1 is the code-search slot's interim install there (definitive manifest, amendment 3; wave-2 code-search ruling, changes 4 and 5): the uv tool's `semble` console script, with the pinned model's local snapshot as SEMBLE_MODEL_NAME and Claude Code's own absolute SEMBLE_CACHE_LOCATION (Codex's entry, in codex.config.additions.toml beside this file, names semble-codex): a cache shared by two processes can keep serving an index another process rebuilt.",
+  "mcpServers": {
+    "semble": {
+      "type": "stdio",
+      "command": "semble",
+      "args": [],
+      "env": {
+        "SEMBLE_MODEL_NAME": "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c",
+        "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"
+      }
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@1.10.1",
+        "--headless",
+        "--isolated",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ]
+    }
+  }
+}

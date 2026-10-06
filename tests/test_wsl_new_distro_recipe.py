@@ -449,7 +449,9 @@ def plan_rows() -> list[dict]:
 
 def plan_after_sign_in_slots() -> list[str]:
     """The slots of the installed rows whose acceptance has an ``after_sign_in`` stage, in the plan's order."""
-    return [row["slot"] for row in plan_rows() if row.get("installed") and "after_sign_in" in (row.get("acceptance") or {})]
+    return [row["slot"] for row in plan_rows() if (row.get("installed") or row.get("measurement_only") or row.get("acceptance_only")
+                                                or row["slot"] == "mcp-inspector")
+            and "after_sign_in" in (row.get("acceptance") or {})]
 
 
 def plan_collector_ports() -> tuple[int, int]:
@@ -460,6 +462,14 @@ def plan_collector_ports() -> tuple[int, int]:
     if match is None:
         raise AssertionError("the install plan's config/otel.yaml has no OTLP grpc and http endpoints")
     return int(match.group(1)), int(match.group(2))
+
+
+def plan_memory_port():
+    """The port of the install plan's memory-owner service while the plan installs it (its interim install, ai-memory on
+    the host template's AI_MEMORY_URL: wave-2 synthesis X5), else None."""
+    row = next((row for row in plan_rows() if row["slot"] == "memory-owner"), {})
+    service = row.get("service") if row.get("installed") else None
+    return int(service["port"]) if isinstance(service, dict) and service.get("port") is not None else None
 
 
 def plan_loopback_ports() -> set[int]:
@@ -473,7 +483,7 @@ def plan_loopback_ports() -> set[int]:
 
 def host_template_errors(template: str, example: dict, recipe: str, user: str = "example") -> list[str]:
     errors = []
-    collector, plan_used = plan_collector_ports()[1], plan_loopback_ports()
+    collector, memory, plan_used = plan_collector_ports()[1], plan_memory_port(), plan_loopback_ports()
     if "$" in template.replace(PLACEHOLDER, ""):
         errors.append("the host template has a $ other than ${WSL_USER}")
     try:
@@ -495,7 +505,12 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
         if key == "OTEL_ENDPOINT" and port != collector:
             errors.append(f"OTEL_ENDPOINT uses {port}; the install plan's collector listens on {collector} (OTLP/HTTP), "
                           "the port the client-configuration tool renders into both clients")
-        elif key != "OTEL_ENDPOINT" and port in plan_used:
+        elif key == "AI_MEMORY_URL" and memory is not None and port != memory:
+            errors.append(f"AI_MEMORY_URL uses {port}; the install plan's memory-owner serves on {memory}, the port both "
+                          "clients take from this value (wave-2 synthesis X5)")
+        elif key not in ("OTEL_ENDPOINT", "AI_MEMORY_URL") and port in plan_used:
+            errors.append(f"{key} uses {port}, a port the install plan's services use")
+        elif key == "AI_MEMORY_URL" and memory is None and port in plan_used:
             errors.append(f"{key} uses {port}, a port the install plan's services use")
     if len(set(ports)) != len(ports):
         errors.append("two services share a port")
@@ -1308,8 +1323,10 @@ class HostTemplateTests(unittest.TestCase):
         self.assertEqual((grpc, http), tuple(int(port) for port in stated.groups()))
         values = json.loads(string.Template(read(HOST_TEMPLATE)).substitute(WSL_USER="example"))
         self.assertEqual(values["OTEL_ENDPOINT"], f"127.0.0.1:{http}")
+        # AI_MEMORY_URL is the port of the plan's memory-owner service (wave-2 synthesis X5: one port truth).
+        self.assertEqual(values["AI_MEMORY_URL"], f"127.0.0.1:{plan_memory_port()}")
         # None of the template's other ports is one the plan's services or configuration files use.
-        others = {int(values[key].rsplit(":", 1)[1]) for key in URL_KEYS if key != "OTEL_ENDPOINT"}
+        others = {int(values[key].rsplit(":", 1)[1]) for key in URL_KEYS if key not in ("OTEL_ENDPOINT", "AI_MEMORY_URL")}
         self.assertEqual(others & plan_loopback_ports(), set())
         self.assertEqual(others & WORKSTATION_PORTS, set())
 
@@ -1401,8 +1418,11 @@ class StageTwoTests(unittest.TestCase):
 
     def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
         owners = plan_after_sign_in_slots()
-        self.assertEqual(owners, ["codex", "claude-agent-sdk", "codex-sdk-and-codex-exec-app-server",
-                                  "local-model-server", "agent-runtime-worker", "research-harnesses"])
+        # tobi-qmd's after-provisioning check joined with the wave-2 records (2026-10-03; wave-2 qmd ruling, change 16).
+        # command-output's check joined with the Codex hook decision (2026-10-04): a fresh codex exec must run its command through the hook.
+        # Wave 5 (round-2 adoption and repair, this PR) adds the after-sign-in checks of agent-messaging, playwright-cli, harbor-containerized-agent-e2e-runner,
+        # lm-program-optimization, skill-vetting, trajectory-analysis and mcp-protocol-conformance, in plan order.
+        self.assertEqual(owners, ['codex', 'claude-agent-sdk', 'codex-sdk-and-codex-exec-app-server', 'mcp-inspector', 'agent-messaging', 'sandbox-runtime-srt', 'serena', 'tobi-qmd', 'mineru', 'playwright-cli', 'ccusage', 'command-output', 'grafana', 'local-model-server', 'alerting', 'session-analytics', 'inspect-ai', 'harbor-containerized-agent-e2e-runner', 'promptfoo', 'worktrunk', 'difftastic', 'cross-family-review', 'gpt-gateway', 'agent-runtime-worker', 'research-harnesses', 'lm-program-optimization', 'skill-vetting', 'trajectory-analysis', 'mcp-protocol-conformance'])
         script = read(PLAN_DIR / "accept.sh")
         for part in ("--only)", "--stage)", "post_install|service_health|after_sign_in) ;;"):
             self.assertIn(part, script)
@@ -1432,7 +1452,7 @@ class StageTwoTests(unittest.TestCase):
             "no after-sign-in checks": recipe.replace("--stage after_sign_in", "--stage post_install"),
             "the checks before the sign-in": recipe.replace(
                 sign_in_and_checks.group(0), sign_in_and_checks.group(2) + " " + sign_in_and_checks.group(1)),
-            "an owner lost": recipe.replace("`agent-runtime-worker` and ", ""),
+            "an owner lost": recipe.replace("`agent-runtime-worker`, ", ""),
             "an owner without that stage": recipe.replace("`research-harnesses`", "`research-harnesses` and `claude-code`"),
             "an id placeholder": recipe.replace("`--dry-run` shows", "`--dry-run` '<id>' shows"),
             "a second block": recipe.replace("Proof: `accept.sh` exits 0", "```sh\necho again\n```\n\nProof: `accept.sh` exits 0"),
@@ -2820,7 +2840,7 @@ BASELINE_STOP_PARTS = (
 )
 BASELINE_STOP_RE = re.compile(r"^- The workstation's baseline passes.*?(?=^- |^```|\Z)", re.M | re.S)
 LINUX_ENTRIES = (
-    '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass '
+    "'/mnt/c/Program Files/PowerShell/7/pwsh.exe' -NoProfile -NonInteractive -ExecutionPolicy Bypass "
     '-File "$(wslpath -w step.ps1)"',
     "/mnt/c/Windows/System32/wsl.exe -d <Name>",
     "/mnt/c/Windows/System32/wsl.exe -d <Name> -- bash -s < steps.sh",
@@ -2953,10 +2973,10 @@ def linux_entry_errors(recipe: str) -> list[str]:
     errors = [f"the Linux entry lacks its full Windows path: {command}" for command in LINUX_ENTRIES
               if "`" + command + "`" not in recipe]
     inline = re.findall(r"`([^`\n]*)`", recipe)
-    if any(command.startswith("powershell.exe -NoProfile") or (command.startswith("wsl.exe -d <Name>") and
+    if any(command.startswith(("powershell.exe -NoProfile", "pwsh.exe -NoProfile")) or (command.startswith("wsl.exe -d <Name>") and
             ("bash -s" in command or "-u root" in command)) for command in inline):
         errors.append("a Linux entry starts a Windows program by a bare name")
-    if any(shell == "sh" and re.match(r"(?:wsl|powershell)\.exe\b", command)
+    if any(shell == "sh" and re.match(r"(?:wsl|powershell|pwsh)\.exe\b", command)
            for shell, command in fenced_commands(recipe)):
         errors.append("an sh block starts a Windows program by a bare name")
     return errors
@@ -3117,6 +3137,12 @@ class Run2RepairTests(FollowUpCase):
                 self.assertIn("`" + command + "`", recipe)
                 old = recipe.replace("`" + command + "`", "`" + command.rsplit("/", 1)[-1] + "`", 1)
                 self.assertTrue(linux_entry_errors(old))
+        for program in ("powershell.exe", "pwsh.exe"):
+            for launcher, error in (
+                    (f"`{program} -NoProfile -File step.ps1`", "a Linux entry starts a Windows program by a bare name"),
+                    (f"```sh\n{program} -NoProfile -File step.ps1\n```", "an sh block starts a Windows program by a bare name")):
+                with self.subTest(program=program, launcher=launcher):
+                    self.assertIn(error, linux_entry_errors(recipe + "\n" + launcher + "\n"))
 
     def test_f10_quotes_each_path_without_word_splitting(self):
         recipe, record, _, receipt = self.inputs()

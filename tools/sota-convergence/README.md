@@ -167,9 +167,16 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    (with every taxonomy layer it sits in) plus each `trading-pins.json` entry
    (`--trading-pins`, default `<work-dir>/trading-pins.json`). Rows use the
    manifest's own `compute_upstream`/`classify_pin` fields and add a
-   `dormancy` block from `compute_dormancy`. An upstream is dormant when its
-   newest GitHub release and default-branch head commit are both at least 180
-   days before `--checked-at`. `pushed_at` stands in only when the commit date
+   `dormancy` block from `compute_dormancy`. A row is dormant when the newest
+   of `releases/latest`, that row's definitively selected release-stream
+   publication (if any), and the default-branch head commit is at least 180
+   days before `--checked-at`. Known limitation: stable-pinned and tag-declared
+   rows ignore fresh RCs in a `release_list` fetched for another row; unknown
+   or capped selections also supply no extra publication date. The same
+   repository can therefore appear dormant in one row and active in another.
+   This preserves the stable/tag dormancy channel and aligns activity with
+   each row's selected release evidence, excluding unused or withheld stream
+   candidates. `pushed_at` stands in only when the commit date
    is unknown. `dormant` is `null`, never `false`, when the run has no data
    for the repository. The manifest's key layout and rows are unchanged.
    `--runtime-freshness-out PATH` writes the report-only
@@ -192,7 +199,13 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    activity. With no match (a pattern that is missing or does not compile
    counts as none), or no list (never fetched, or the call failed), the row
    keeps every `compute_upstream` field with `latest_source`
-   `tag_pattern_unmatched` or `tag_pattern_unfetched`. When the record carries
+   `tag_pattern_unmatched` or `tag_pattern_unfetched`. For a prerelease-shaped
+   pin, either miss publishes `pin_comparison: "not_compared"`, a null
+   `pin_behind_upstream`, and that `latest_source` as `pin_comparison_reason`.
+   The release fallback stays visible as metadata; it may belong to another
+   package and cannot establish the declared package's currency. Stable pins
+   keep their existing fallback comparison; matched tags keep their numeric
+   comparison. When the record carries
    `matching_tags_truncated`, a higher version may be among the names cut, so
    `latest_source` is `tag_pattern_truncated` in place of `matching_tag` or
    `tag_pattern_unmatched`: the latest is still the tag selected from the
@@ -1551,8 +1564,12 @@ What remains and how it is handled:
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
     (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
-    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
-    blind child without the network or a CLI it cannot resolve. Measured
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://`, `local://`, any scheme containing `unix`
+    (`http+unix://%2F...`) and `https:///` do. A URL reaches nothing from a blind child without the network or a
+    CLI it cannot resolve. Measured 2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), a blind child could
+    create an AF_UNIX socket, but its `connect()` to a probe-owned socket failed with
+    `PermissionError: [Errno 1] Operation not permitted`, while the caller's own connection was accepted.
+    This dated measurement has not been repeated on the current Codex pin. Measured
     2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
     had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
     not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
@@ -1587,7 +1604,17 @@ What remains and how it is handled:
     passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
     child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
     elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
-    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    node by name) with an absolute shell shebang is refused up front as before. An env-style shell launcher,
+    including `#!/usr/bin/env -S bash -e`, is measured with `--version` using `blind_child_argv`, the blind
+    child's environment and PATH, fresh scratch HOME/CODEX_HOME, no stdin and a five-second timeout.
+    Only exits 126 and 127 refuse it, naming the launcher and its last stderr line; a timeout, launch error or
+    another nonzero exit is reported to the console and does not refuse it. One shared shebang helper keeps
+    the check and child argv consistent. The telemetry identity launcher from
+    `observability/collector/codex-identity-launcher.sh.example`, rendered with an absolute target, is accepted;
+    asdf's env-bash shim running `asdf` by name is refused when that command cannot resolve on the blind PATH.
+    The helper retains the existing env/interpreter and standalone `env -S` subset; it does not implement
+    GNU env's full option, quoting or expansion grammar. A failed child's last stderr lines go to the console,
+    not the record.
     A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
     (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
 
@@ -1602,6 +1629,19 @@ What remains and how it is handled:
   lower bound: it reads only the command text. Known gaps include a path a program computes (a
   `python3 -c` that joins path parts, a glob, a variable set in an earlier command) and anything a command
   reads indirectly (a script's own reads, a config file it loads, a symlink under the repository).
+  **PR #216 port, 2026-10-03.** These are the lows from the independent review of #206 at `891ab70f`.
+  The broad quoted-`'://'` and regex-anchor exemptions from `3f456ec286` are dropped: the full
+  `blind_audit` regression cases keep constructed reads such as `'://'[1:]+'etc/passwd'` and
+  `'/etc/passwd$)'[:-2]` flagged. Two exact wave-20260924 shapes remain a disclosed residual:
+  `print(ref, 'EXTERNAL' if '://' in ref else ref)` and
+  `rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\.py$|/runner.py$)'`.
+  In the wave-20260924 re-record these shapes voided 2 of 32 Codex layers, and both passed on rerun with
+  the same code. No broader literal exemption is adopted without a deterministic check that preserves
+  every must-flag case at both audit call sites. The old hold has lapsed: only wave 20260922 is registered
+  in `layer-verdict-waves.json` and sealed in `evidence/artifacts/layer-verdicts-20260922`; #372 moved
+  `lane-prompt.md` from `9b8a8364` to `d3ef2cc0`, and #505 moved `codex_lane.py` from
+  `a4bd8f47` to `5662227f`. Main's existing provenance entries stay unchanged; this port registers
+  its final bytes rather than #216's unlanded hashes.
 - **Claude family (lane and adjudication):** its agents run Read, Glob and Grep only, and those have no path
   limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
   keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py

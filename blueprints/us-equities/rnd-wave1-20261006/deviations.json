@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "kind": "rnd_wave1_preregistration_deviations",
+  "recorded_at_utc": "2026-10-06T06:16:56+00:00",
+  "frozen_commit": "d4601bfcbc4db74e57cd5c387bf48faebe263642",
+  "frozen_sha256": {
+    "PREREGISTRATION.md": "7b7f4ce3f4506abf2370938a36556dbcdb5596bcbcdf792f2a92b494671e4f96",
+    "plan.json": "36e55742ec837809cf6d41ae1b35e22237cc25a0c3abf01d0f36384cee0e1743"
+  },
+  "found_by": "The command center's read of #778 at d4601bfcb: a GPT Sol first-pass read adjudicated by the command center (item task-native-agent-stack-5f-20261006T061530Z). P1 and P2 upheld.",
+  "policy": "The frozen files stay byte-identical. These deviations add constraints before any execution; where they conflict with the frozen text, the deviation governs. Nothing has run. Execution waits for a GPT micro-check of this file and the command center's ACK of the head that adds it.",
+  "deviations": [
+    {
+      "id": "D1",
+      "finding": "P1: model-drafted exposure scope could reach counts and gates",
+      "frozen_text": "PREREGISTRATION.md:42-56 (entries carry identifiers or universe and dates as recorded; a model may draft entries; the builder confirms only path, line and hash)",
+      "rule": {
+        "derivation": "Every count-bearing or gate-bearing field of a registry entry (scope_kind, identifiers_or_universe, date_range, access_kind) is derived by a deterministic per-source extractor from the cited retained record: a JSON field path, or, for prose, an exact span pinned by its sha256 and parsed by a frozen date or identifier pattern. The builder recomputes every such field from the record at the base commit and rejects any entry whose stored value differs.",
+        "model_role": "A model may only propose citations (path and line) and free-text descriptions. The builder never reads a model-supplied scope field.",
+        "unknown": "When the cited record does not determine a field (no machine-readable range, an ambiguous universe, a missing identifier list), the field is recorded as unknown. An entry with an unknown field covers every case whose security or date could fall within its scope; an unbounded unknown covers every case.",
+        "lookup": "lookup(case) returns {inspected: false, registry_hash} only when every entry's scope is resolved and none covers the case, and {inspected: true, registry_hash} when a resolved entry covers it. Otherwise it returns no record, so contract.reserved_access refuses (missing/inspected reserved case registry).",
+        "conservative": "A universe-wide read over a date range covers every case of that universe in that range (unchanged)."
+      },
+      "added_acceptance": {
+        "A1_narrowing": "For each known read, a synthetic narrowed entry is rejected by the builder: date range shortened by one session at either end, one identifier removed, or access_kind weakened from result_inspected to data_read.",
+        "A2_drift": "A synthetic entry whose stored scope field differs from the derivation in any other way is rejected.",
+        "A3_unknown": "A synthetic entry with an unknown field makes contract.reserved_access refuse every case in its potential scope; an unbounded unknown makes it refuse every case.",
+        "A4_missing": "A case the registry cannot resolve (unknown security id or date) is refused by contract.reserved_access.",
+        "A5_reproducible": "Two builder runs at the base commit write byte-identical registry files; the registry sha256 is recorded.",
+        "A6_example": "The broad-universe reserved evaluation, 2024-01-01 to 2026-08-14 (broad-universe/README.md:95), derives to a range containing every 2025 session; a draft narrowed to 2024 is rejected under A1."
+      }
+    },
+    {
+      "id": "D2",
+      "finding": "P2: per-wave acceptance and exit codes were incomplete",
+      "frozen_text": "plan.json:25-31, :60-79, :102",
+      "rule": "Each wave reports exactly one status with its integer exit code from the frozen table below. Every command's native exit code is recorded beside it and never replaced. A wave whose prerequisite fails reports NOT_STARTED and runs nothing.",
+      "tables": {
+        "R1": {
+          "prerequisites": [
+            "the base commit checked out clean",
+            "catalyst-experiment/protocol.json and contract.py byte-identical to the base commit"
+          ],
+          "statuses": [
+            {
+              "status": "ACCEPTED",
+              "exit": 0,
+              "when": "H1.1 with derived entries, H1.2, H1.3 and D1 A1-A6 pass, and scripts/validate.py exits 0"
+            },
+            {
+              "status": "NOT_STARTED",
+              "exit": 30,
+              "when": "a prerequisite is unmet"
+            },
+            {
+              "status": "REJECTED_COMPLETENESS",
+              "exit": 10,
+              "when": "a known read, or a read the completeness critic cites, has no entry; an entry with unknown fields counts as present"
+            },
+            {
+              "status": "REJECTED_DERIVATION",
+              "exit": 11,
+              "when": "a stored scope field differs from its deterministic derivation, or a citation's path, line or hash does not match at the base commit"
+            },
+            {
+              "status": "REJECTED_REFUSAL",
+              "exit": 12,
+              "when": "contract.reserved_access admits an inspected, unknown or unresolvable synthetic case, or refuses a synthetic uninspected case with a valid hash"
+            },
+            {
+              "status": "REJECTED_PROTOCOL_CHANGED",
+              "exit": 13,
+              "when": "protocol.json or contract.py differs from the base commit"
+            },
+            {
+              "status": "ERROR",
+              "exit": 2,
+              "when": "a builder, test or validate command does not reach a verdict"
+            }
+          ],
+          "reported_not_gated": "D1 eligible-session counts per segment"
+        },
+        "R2a": {
+          "prerequisites": [
+            "D3's retained-file check passes",
+            "Arm A runs in a worktree at its refetch_commit (refetch.py sha256 fc6d5415...), Arm B in a worktree at the base commit (cdac9973...), each on its own fresh copy"
+          ],
+          "commands_per_arm": [
+            "refetch.py classify --out-dir <copy>/e2",
+            "refetch.py classify --out-dir <copy>/e2 --verify"
+          ],
+          "note": "classify --verify exits 0 only when its recomputed outputs equal the files the same copy just wrote, and 3 otherwise (refetch.py:1199-1216); it shows repeatability only. Reproduction is judged by the pinned hashes and totals.",
+          "statuses": [
+            {
+              "status": "REPRODUCED",
+              "exit": 0,
+              "when": "all four commands exit 0; Arm A's results.json and labels.json equal the pinned sha256 and its totals equal plan.json R2a.expected; Arm B's outputs are byte-identical to Arm A's"
+            },
+            {
+              "status": "REPRODUCED_WITH_REVISION_EFFECT",
+              "exit": 1,
+              "when": "Arm A as in REPRODUCED; Arm B's commands exit 0 but an output hash or total differs from Arm A, each difference described field by field"
+            },
+            {
+              "status": "NOT_STARTED",
+              "exit": 30,
+              "when": "a prerequisite other than the retained-file check is unmet"
+            },
+            {
+              "status": "INPUT_MISMATCH",
+              "exit": 20,
+              "when": "a retained file's sha256 differs (D3); no command runs"
+            },
+            {
+              "status": "NOT_REPRODUCED",
+              "exit": 21,
+              "when": "Arm A's commands exit 0 but a pinned hash or an expected total differs"
+            },
+            {
+              "status": "COMMAND_FAILED",
+              "exit": 22,
+              "when": "a classify or classify --verify command exits nonzero in either arm; verify exit 3 is a repeatability failure"
+            }
+          ]
+        },
+        "R2b": {
+          "prerequisites": [
+            "R1 status ACCEPTED (exit 0), with E2's events and this profile registered as inspected",
+            "R2a status REPRODUCED or REPRODUCED_WITH_REVISION_EFFECT; the profile reads Arm A's outputs only"
+          ],
+          "population_reconciliation": "The profiled populations are exactly Arm A's events with a close-to-close ratio of at least 3 (97) and at least 2 (261).",
+          "unsupported_values": "A missing or unparseable value goes to an explicit unknown bucket and is counted, never dropped or imputed; catalyst tags are reported as unverified package claims.",
+          "statuses": [
+            {
+              "status": "DESCRIBED",
+              "exit": 0,
+              "when": "populations reconcile, every dimension's buckets sum to its population, and the totals-only publication passes the existing schema scan"
+            },
+            {
+              "status": "NOT_STARTED",
+              "exit": 30,
+              "when": "a prerequisite is unmet"
+            },
+            {
+              "status": "REJECTED_RECONCILIATION",
+              "exit": 31,
+              "when": "a population or a dimension's bucket total does not reconcile"
+            },
+            {
+              "status": "REJECTED_SCHEMA",
+              "exit": 32,
+              "when": "the publication scan finds a path, date, symbol-like or non-share value"
+            },
+            {
+              "status": "ERROR",
+              "exit": 2,
+              "when": "a command does not reach a verdict"
+            }
+          ],
+          "claim_rule": "unchanged: every predictive, recall or precision claim is insufficient_evidence"
+        },
+        "R3_optional": {
+          "statuses": [
+            {
+              "status": "REVIEWED",
+              "exit": 0,
+              "when": "a non-Claude-family review with its findings is written to the mover-v3 draft's review record"
+            },
+            {
+              "status": "ERROR",
+              "exit": 2,
+              "when": "the review does not complete"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "D3",
+      "finding": "Clarification found while writing D2: the frozen text says 9 retained files, the committed summary pins 11, and plan.json lists the 7 inputs",
+      "frozen_text": "PREREGISTRATION.md R2a inputs; plan.json R2a.input_sha256",
+      "rule": "Before any R2a command, all 11 retained files in summary-asof-20260929.json E2.private_files_sha256 and the package zip (package_zip_sha256) must match. The 7 files in plan.json R2a.input_sha256 are the inputs. The other 4 (labels.json, results.json, summary.json, verify.json) are reference outputs: checked, then removed from each arm's fresh copy before classify.",
+      "reference_outputs": [
+        "labels.json",
+        "results.json",
+        "summary.json",
+        "verify.json"
+      ]
+    }
+  ],
+  "execution_gate": "Nothing runs before a GPT micro-check of this file and the command center's ACK of the head that adds it."
+}

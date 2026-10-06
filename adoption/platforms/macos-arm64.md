@@ -113,6 +113,9 @@ plans for is the labelled projection `macos-arm64-64gb-projected` in
 unified memory as the generation budget, `full` semantic-RAG tier, both drawn
 from one shared pool); for this page's embedding choice it follows the 48 GB
 rules. None of these sizes has a real qualification run yet.
+Corrected 2026-10-03 (port of #410): `mac-coordinator-64gb-20260925` ran a descriptive
+co-residency probe on 2026-09-27 that was not accepted as a qualification
+([port record](../../evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md)).
 
 ## Prerequisites
 
@@ -245,7 +248,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `llama-cpp` | b11057 | `llama-b11057-bin-macos-arm64.tar.gz` | `443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1` | `github_release_asset_digest_plus_local_rehash` |
 | `qdrant` | 1.19.1 | `qdrant-aarch64-apple-darwin.tar.gz` | `e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4` | `github_release_asset_digest_plus_local_rehash` |
 | `socraticode` | 1.14.0 | `socraticode-1.14.0.tgz` | `3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46` | `npm_registry_integrity_crosscheck` |
-| `rtk` | 0.50.0 | `rtk-aarch64-apple-darwin.tar.gz` | `fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe` | `publisher_checksum_file` |
+| `rtk` | 0.51.0 | `rtk-aarch64-apple-darwin.tar.gz` | `8817d8b71afc02ac8bf06eb24bcc41c306592ab735b68e8fee9db1ba0de7cb59` | `publisher_checksum_file` |
 | `qmd` | 2.8.3 | `qmd-2.8.3.tgz` | `2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0` | `npm_registry_integrity_crosscheck` |
 | `repomix` | 1.18.1 | `repomix-1.18.1.tgz` | `d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f` | `npm_registry_integrity_crosscheck` |
 | `toon` | 4.1.1 | `cli-4.1.1.tgz` (`@toon-format/cli`) | `93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6` | `npm_registry_integrity_crosscheck` |
@@ -298,7 +301,7 @@ which are not in the `macos-arm64-foundation` component list.
 
 **Context Hub opt-out (0.1.4).** Set `telemetry: false` and `feedback: false` in
 `~/.chub/config.yaml`, as documented in upstream
-[`docs/cli-reference.md:215–229`](https://github.com/andrewyng/context-hub/blob/v0.1.4/docs/cli-reference.md#L215-L229)
+[context-hub's `cli-reference.md:215–229`](https://github.com/andrewyng/context-hub/blob/v0.1.4/docs/cli-reference.md#L215-L229)
 and [`SECURITY.md:28`](https://github.com/andrewyng/context-hub/blob/v0.1.4/SECURITY.md#L28).
 Use the environment form `CHUB_TELEMETRY=0 CHUB_FEEDBACK=0` only where an invocation overrides
 `HOME` or `CHUB_DIR`, such as a worker using another home; upstream
@@ -318,9 +321,9 @@ checks these variables before configuration; the
 records the profile loading check and its limits. This amendment adds no Mac
 execution receipt.
 
-A Mac that runs the Claude RTK hook at the rtk 0.50.0 pin needs the exclusions from
+A Mac that runs the Claude RTK hook at the rtk 0.51.0 pin needs the exclusions from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) in
-`~/Library/Application Support/rtk/config.toml`, the only config file rtk 0.50.0 reads on
+`~/Library/Application Support/rtk/config.toml`, the config file rtk 0.51.0 reads on
 macOS. It reads `dirs::config_dir()/rtk/config.toml`, which on macOS is under
 `$HOME/Library/Application Support` whatever `XDG_CONFIG_HOME` says, and it reads no
 config-path variable of its own, so a file at the Linux location under `~/.config` is never
@@ -359,7 +362,7 @@ At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux from 2026-09-26, 0.159.2 from 2026-09-30; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). Since 2026-09-30 the shared Codex template defaults to `gpt-6.1-sol`, which entered Codex's bundled model catalog in `rust-v0.159.1` and is absent from the Linux 0.155.1 build's catalog (`codex debug models --bundled`, offline): macOS needs its own 0.159.x qualification before the template default applies there, and until then `tools/adoption/render_config.py --platform macos-arm64` renders the template's `CODEX_MODEL` placeholder as `gpt-6-astra` from this 0.155.1 pin. It changed after `v2026.09.25.2`,
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux from 2026-09-26, 0.159.2 from 2026-09-30, 0.159.3 from 2026-10-01 and the repository 0.160.0 pair from 2026-10-03; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). Since 2026-09-30 the shared Codex template defaults to `gpt-6.1-sol`, which entered Codex's bundled model catalog in `rust-v0.159.1` and is absent from the Linux 0.155.1 build's catalog (`codex debug models --bundled`, offline): macOS needs its own qualification of a version carrying the new model before the template default applies there, and until then `tools/adoption/render_config.py --platform macos-arm64` renders the template's `CODEX_MODEL` placeholder as `gpt-6-astra` from this 0.155.1 pin. It changed after `v2026.09.25.2`,
 adding the identical entry there too (same version,
 url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
 coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`
@@ -493,6 +496,13 @@ to its historical `denylist` default
 `resolve_capture_mode`) instead of the allowlist this stack uses, where capture is gated by each project's `.ai-memory.toml` marker.
 
 ## What a hosted run proves
+
+Since the [2026-10-05 advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md),
+the Mac is portable or remote-control only. `validate-macos`, `bootstrap-macos`
+and `bootstrap-macos-brew` skip every pull request and are not required checks.
+They run nightly at 06:47 UTC, on main pushes selected by the workflow's paths
+filter, and on manual dispatch. A failing nightly or main-push run is fixed in
+a follow-up PR.
 
 The `platform_profiles` row for `macos-arm64` names a hosted smoke job
 (`.github/workflows/adoption-bootstrap.yml`, jobs `bootstrap-macos`,
@@ -749,8 +759,14 @@ currently loaded from that same destination path, rename into place,
 confirmed loaded from its own destination path, or not loaded at all with a
 file present to clean up). On the hosted runner (run `35875188590`, "What a
 hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
-`qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
-three has run on a Mac workstation.
+`qdrant` and `llama-embed` agents.
+Corrected 2026-10-03 (port of #410): as of 2026-09-27 the `ai-memory` template
+had not run on that hosted runner. On 2026-09-27 `llama-embed` ran on the
+coordinator Mac and `embed_acceptance.py` returned pass without a discriminating
+control, so this is an observation. As of that date, the `qdrant` and `ai-memory`
+templates had not run on a Mac workstation; the pre-existing `local.agent-ecosystem.*`
+agents served those roles
+([port record](../../evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md)).
 
 **Credential boot receipt (added after `v2026.09.26.2`; documented, not
 run).** On Linux/WSL2 the `credential-boot-receipt.service` oneshot runs
@@ -865,7 +881,15 @@ there; what a Mac's crash reporter keeps of a crashed command's environment
 has not been checked. Key acceptance on a Mac is
 the runner, guard and status test suites on the macOS CI job, then a new Mac
 host receipt that separates the steps run from those not run. WSL receipts
-do not certify the Mac.
+do not certify the Mac. Since 2026-10-05, that macOS CI job
+(`adoption-bootstrap.yml`'s `validate-macos`) skips every pull request and runs
+the full suite on matching main pushes, nightly schedules and manual dispatch
+([advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md)).
+The runner, guard and status suites (`tests/test_credential_run.py`,
+`tests/test_secret_path_guard.py`, `tests/test_effort_default_guard.py`,
+`tests/test_adoption_status.py` and `tests/test_credential_status.py`) are on
+the retained Mac-relevant input list, as is the code they test. Portability
+checks happen after merge or on the nightly schedule; a failure gets a follow-up PR.
 
 ## Qdrant collections
 
@@ -895,3 +919,5 @@ qualification on this platform, not a port:
   (the existing WSL kernel, Windows-mount `PATH` segments, and the WSL vLLM
   0.25.0 GPU pin documented in [the Linux/WSL2 page](linux-wsl2.md)).
 - Every native sign-in, service start, and acceptance test named above.
+
+The 2026-10-04 Darwin RTK 0.51.0 archive is artifact-checked only; no Mac executed it in the retained host records. MCPorter stays at 0.13.13 until a Mac qualifies 0.14.2; the Linux host upgrade does not qualify the Mac. Claude HUD 0.10.0 remains a native plugin from tag v0.10.0. The [RTK](../../evidence/receipts/rtk-051-qualification-20261004.json), [MCPorter](../../evidence/receipts/mcporter-0142-qualification-20261004.json) and [Claude HUD](../../evidence/receipts/claude-hud-0100-qualification-20261004.json) receipts retain the host failures and evidence limits.

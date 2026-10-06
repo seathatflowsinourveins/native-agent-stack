@@ -17,13 +17,18 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 jobs:
   freshness:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # Raised from 30 to 60 on 2026-10-04: the job took 1687 of its 1800 s in run 37104350733 (its test suite step
+    # 1502 s) and 1623 s in run 37116574776, and the suite grows with most merged changes. The limit stays a hang guard;
+    # the suite step below aborts five minutes before it.
+    timeout-minutes: 60
+    permissions:
+      contents: read
     outputs:
       drift: ${{ steps.diff.outputs.drift }}
       upstream_errors: ${{ steps.diff.outputs.upstream_errors }}
@@ -47,6 +52,9 @@ jobs:
         with:
           python-version: '3.13'
           check-latest: false
+      - name: Install the hash-locked session calendar
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
       - name: Extract deterministic working files (no network)
         run: |
           mkdir -p "$RUNNER_TEMP/freshness"
@@ -129,7 +137,24 @@ jobs:
               "grype|anchore/grype|0.119.0" \
               "nautilus_trader|nautechsystems/nautilus_trader|2.0.0rc5"; do
               IFS='|' read -r name repo pinned <<<"$spec"
-              latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unavailable")
+              # Stable pins retain releases/latest; prerelease pins also read at most
+              # three 100-release pages (unknown beyond cap on a full third page).
+              # https://docs.github.com/en/rest/releases/releases#list-releases
+              # https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+              latest=$(python3 - "$repo" "$pinned" <<'PYEOF'
+          import sys
+          sys.path.insert(0, "tools/sota-convergence")
+          from github_freshness import gh_api, fetch_release_list, is_prerelease_pin, select_release_for_pin
+
+          slug, pin = sys.argv[1:]
+          release, error = gh_api(f"repos/{slug}/releases/latest")
+          if is_prerelease_pin(pin):
+              selected, reason = select_release_for_pin(pin, {"release_list": fetch_release_list(slug)})
+              print(reason or selected["tag"])
+          else:
+              print((release or {}).get("tag_name") or "unavailable")
+          PYEOF
+              )
               echo "| $name | $pinned | $latest |"
             done
             echo ""
@@ -148,9 +173,17 @@ jobs:
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Run project test suite
+        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
+        # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with
+        # PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
+        # stopped in. A timeout fails the step with status 124. The steps before this one took 127 to 178 s in the eight
+        # completed runs 35934519434 to 37116574776.
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: |
           set -o pipefail
-          python3 -m unittest 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
+          timeout --signal=ABRT --kill-after=60s 55m \
+            python3 -m unittest --durations 50 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
       - name: Report the test suite's skipped-test count
         if: ${{ !cancelled() }}
         run: |

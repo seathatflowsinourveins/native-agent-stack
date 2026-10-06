@@ -15,10 +15,13 @@ import fcntl
 import json
 import re
 import runpy
+import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
+import urllib.request
 from pathlib import Path
 from unittest.mock import patch
 
@@ -38,6 +41,9 @@ _PINNED = {item["id"]: item["version"]
            for item in json.loads((ROOT / "observability/backends/pins.json").read_text())["components"]}
 PROMTOOL = _TOOLS_ROOT / f"ecosystem-prometheus-{_PINNED['prometheus']}/promtool"
 AMTOOL = _TOOLS_ROOT / f"ecosystem-alertmanager-{_PINNED['alertmanager']}/amtool"
+ALERTMANAGER_BIN = _TOOLS_ROOT / f"ecosystem-alertmanager-{_PINNED['alertmanager']}/alertmanager"
+# The lane routes' own grouping (ecosystem-alertmanager.yml.example); the negative control below removes these lines.
+LANE_GROUP_BY = "      group_by: [alertname, scope, ecosystem_lane]\n"
 
 EXPECTED_ALERTS = {
     "EquitiesOrderStateDivergence",
@@ -109,11 +115,11 @@ class RulesTemplateTests(unittest.TestCase):
         self.assertIn('job!~"acceptance-fixture|adaptive-paper"', match.group(1))
 
     @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
-    def test_rendered_yaml_is_well_formed_and_has_seventeen_rules(self):
+    def test_rendered_yaml_is_well_formed_and_has_twenty_six_rules(self):
         placeholder = self.text.replace("@CONFIG_ROOT@", "/tmp/x").replace("@DATA_ROOT@", "/tmp/y")
         doc = yaml.safe_load(placeholder)
         rule_count = sum(len(group["rules"]) for group in doc["groups"])
-        self.assertEqual(rule_count, 17)
+        self.assertEqual(rule_count, 26)
         names = {rule["alert"] for group in doc["groups"] for rule in group["rules"] if "alert" in rule}
         self.assertTrue(EXPECTED_ALERTS.issubset(names))
 
@@ -206,6 +212,32 @@ class AlertmanagerTemplateTests(unittest.TestCase):
         self.assertEqual(len(matched), 1)
         self.assertEqual(matched[0]["receiver"], "local-ntfy")
 
+    @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
+    def test_both_lane_routes_group_by_lane_and_the_other_routes_inherit(self):
+        # The lane rules sum job away, so the inherited [alertname, job, scope] would put every lane in one group.
+        doc = yaml.safe_load(ALERTMANAGER.read_text())
+        routes = doc["route"]["routes"]
+        lanes = [r for r in routes if r.get("match", {}).get("scope") == "codex-lanes"]
+        self.assertEqual(len(lanes), 2)
+        self.assertEqual([r["group_by"] for r in lanes], [["alertname", "scope", "ecosystem_lane"]] * 2)
+        self.assertEqual(doc["route"]["group_by"], ["alertname", "job", "scope"])
+        self.assertEqual([r for r in routes if r not in lanes and "group_by" in r], [])
+        self.assertEqual(ALERTMANAGER.read_text().count(LANE_GROUP_BY), 2)
+
+    def test_operator_instructions_subscribe_to_and_poll_every_topic(self):
+        # A topic missing from the setup and verification instructions has no subscriber, although Alertmanager
+        # reports a successful delivery (PR #671 review).
+        topics = re.findall(r"url: 'http://127\.0\.0\.1:18080/([a-z-]+)\?template=alertmanager'", ALERTMANAGER.read_text())
+        self.assertEqual(topics, ["ecosystem-alerts", "ecosystem-lanes"])
+        backends = (ROOT / "observability/backends/README.md").read_text()
+        overview = (ROOT / "observability/README.md").read_text()
+        for topic in topics:
+            with self.subTest(topic=topic):
+                poll = f"curl --fail --silent 'http://127.0.0.1:18080/{topic}/json?poll=1&since=all'"
+                self.assertIn(poll, backends)
+                self.assertIn(poll, overview)
+                self.assertIn(f"`http://127.0.0.1:18080/{topic}`", backends)
+
 
 @unittest.skipUnless(PROMTOOL.exists() and AMTOOL.exists(),
                      "promtool/amtool not installed at the documented ecosystem tool paths")
@@ -237,7 +269,7 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("17 rules found", result.stdout)
+        self.assertIn("26 rules found", result.stdout)
 
     def test_promtool_check_config(self):
         result = subprocess.run(
@@ -314,6 +346,373 @@ class PaperMetricsMissingRuleTests(unittest.TestCase):
         result = subprocess.run([str(PROMTOOL), "test", "rules", str(unit_tests)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("SUCCESS", result.stdout + result.stderr)
+
+
+def render_backends(root: Path) -> Path:
+    subprocess.run(
+        ["python3", str(CONFIGURE),
+         "--tools-root", str(root / "tools"), "--config-root", str(root / "config"),
+         "--data-root", str(root / "data"), "--unit-root", str(root / "unit")],
+        check=True, capture_output=True, text=True,
+    )
+    return root / "config"
+
+
+@unittest.skipUnless(PROMTOOL.exists(), "promtool not installed at the documented ecosystem tool path")
+class RootFilesystemRuleTests(unittest.TestCase):
+    """Pinned promtool evaluates the rendered rules over local synthetic filesystem series.
+
+    The three states preserve a fixed total size, including reserved bytes. These
+    are integration fixtures, not upstream tests or evidence of live alert delivery.
+    """
+
+    GIB = 1024 ** 3
+    ALERTS = ("EcosystemRootFilesystemSpaceFillingUp",
+              "EcosystemRootFilesystemAlmostOutOfSpace", "EcosystemRootFilesystemBurstFill")
+    FILESYSTEM = {"device": "root-test", "mode": "rw", "mountpoint": "/", "type": "ext4",
+                  "job": "otelcol", "instance": "host-test"}
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.rules = render_backends(self.root) / "ecosystem-prometheus-rules.yml"
+        group = self.rules.read_text().split("  - name: ecosystem-local\n", 1)[1].split("\n  - name: ", 1)[0]
+        self.by_key = {}
+        for name, block in re.findall(r"- alert: (\w+)\n(.*?)(?=\n      - alert: |\Z)", group, re.S):
+            if name not in self.ALERTS:
+                continue
+            labels = dict(re.findall(r"^          (severity|scope): (\S+)$", block, re.M))
+            annotations = {key: re.search(rf"^ +{key}: '((?:[^']|'')*)'$", block, re.M).group(1).replace("''", "'")
+                           for key in ("summary", "description")}
+            self.by_key[name, labels["severity"]] = {"labels": labels, "annotations": annotations}
+
+    def firing(self, alert, *severities):
+        return [{"exp_labels": {**self.FILESYSTEM, "state": "free", **self.by_key[alert, severity]["labels"]},
+                 "exp_annotations": self.by_key[alert, severity]["annotations"]}
+                for severity in severities]
+
+    def filesystem(self, free_gib, **labels):
+        labels = {**self.FILESYSTEM, **labels}
+        label_text = ",".join(f'{key}="{value}"' for key, value in labels.items())
+        free = [round(value * self.GIB) for value in free_gib]
+        reserved = 50 * self.GIB
+        used = [1000 * self.GIB - reserved - value for value in free]
+        return [{"series": f'ecosystem_system_filesystem_usage_bytes{{{label_text},state="{state}"}}',
+                 "values": " ".join(str(value) for value in values)}
+                for state, values in (("free", free), ("used", used), ("reserved", [reserved] * len(free)))]
+
+    def check(self, cases, *, interval="1m"):
+        document = {"rule_files": [str(self.rules)], "evaluation_interval": interval, "tests": [
+            {"interval": interval, "input_series": inputs,
+             "alert_rule_test": [{"eval_time": at, "alertname": alert, "exp_alerts": expected}
+                                 for at, alert, expected in checks]}
+            for inputs, checks in cases]}
+        path = self.root / "root-filesystem.test.yml"
+        path.write_text(json.dumps(document))  # JSON is valid YAML; no PyYAML dependency.
+        result = subprocess.run([str(PROMTOOL), "test", "rules", str(path)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("SUCCESS", result.stdout + result.stderr)
+
+    def test_space_filling_warning_fires_after_one_hour_and_resolves_at_forty_percent(self):
+        alert = "EcosystemRootFilesystemSpaceFillingUp"
+        # Two samples first establish the negative slope at 1m; the 1h delay ends at 61m.
+        free = [350 - 0.3 * minute for minute in range(361)] + [400] * 10
+        self.check([(self.filesystem(free), [("60m", alert, []),
+                                           ("61m", alert, self.firing(alert, "warning")),
+                                           ("6h", alert, self.firing(alert, "warning")),
+                                           ("6h1m", alert, [])])])
+
+    def test_space_filling_critical_requires_four_hour_prediction_and_resolves(self):
+        alert = "EcosystemRootFilesystemSpaceFillingUp"
+        # 20% is crossed long before the four-hour prediction turns negative at 594m.
+        free = [250 - 0.3 * minute for minute in range(661)] + [500] * 10
+        warning = self.firing(alert, "warning")
+        both = self.firing(alert, "warning", "critical")
+        self.check([(self.filesystem(free), [("60m", alert, []), ("61m", alert, warning),
+                                           ("653m", alert, warning), ("654m", alert, both),
+                                           ("660m", alert, both), ("661m", alert, [])])])
+
+    def test_almost_out_warning_counts_reserved_in_size_and_resolves(self):
+        alert = "EcosystemRootFilesystemAlmostOutOfSpace"
+        # 48 / 1000 < 5%; omitting the 50 GiB reserve would incorrectly suppress it.
+        free = [48] * 32 + [200] * 10
+        self.check([(self.filesystem(free), [("29m", alert, []),
+                                           ("30m", alert, self.firing(alert, "warning")),
+                                           ("31m", alert, self.firing(alert, "warning")),
+                                           ("32m", alert, [])])])
+
+    def test_almost_out_critical_fires_with_warning_and_resolves(self):
+        alert = "EcosystemRootFilesystemAlmostOutOfSpace"
+        # 29 / 1000 < 3%; omitting the reserve or counting it as free changes this result.
+        free = [29] * 32 + [200] * 10
+        both = self.firing(alert, "warning", "critical")
+        self.check([(self.filesystem(free), [("29m", alert, []), ("30m", alert, both),
+                                           ("31m", alert, both), ("32m", alert, [])])])
+
+    def test_runaway_burst_fires_before_four_and_five_minute_exhaustion_and_resolves(self):
+        alert = "EcosystemRootFilesystemBurstFill"
+        baseline = 6 * 60 * 60
+        cases = []
+        for duration, fires_after in ((240, 225), (300, 285)):
+            # Counterfactual 128 GiB loss in four/five minutes, not a measured rate.
+            # Collector observations update every 30s, scraped/evaluated every 15s.
+            # Deliberately lag observations by 60s, exceeding the configured
+            # 1s batch + 15s scrape + 15s evaluation phases. Recovery follows the
+            # physical exhaustion by 30s, so its observation arrives 90s later.
+            free = []
+            for elapsed in range(-baseline, duration + 151, 15):
+                sampled_at = max(0, (elapsed - 60) // 30 * 30)
+                value = max(0, 128 * (1 - sampled_at / duration))
+                free.append(128 if sampled_at >= duration + 30 else value)
+            checks = [(f"{baseline + elapsed}s", alert, [])
+                      for elapsed in range(0, fires_after, 15)]
+            checks += [(f"{baseline + fires_after}s", alert, self.firing(alert, "critical")),
+                       (f"{baseline + duration}s", alert, self.firing(alert, "critical")),
+                       (f"{baseline + fires_after}s", "EcosystemRootFilesystemSpaceFillingUp", []),
+                       (f"{baseline + fires_after}s", "EcosystemRootFilesystemAlmostOutOfSpace", []),
+                       (f"{baseline + duration + 90}s", alert, [])]
+            self.assertLess(fires_after, duration)  # assertion time precedes physical exhaustion
+            cases.append((self.filesystem(free), checks))
+        self.check(cases, interval="15s")
+
+    def test_thirty_gib_legitimate_burst_stays_silent_from_normal_and_recovered_headroom(self):
+        alert = "EcosystemRootFilesystemBurstFill"
+        baseline = 6 * 60 * 60
+        cases = []
+        for initial in (151, 128):
+            # A 30 GiB transfer completes in 60s. Follow the settled gauge for
+            # twenty minutes to catch delayed false positives from older trends.
+            free = [initial - min(30, max(0, (elapsed - 60) // 30 * 15))
+                    for elapsed in range(-baseline, 20 * 60 + 1, 15)]
+            checks = [(f"{baseline + elapsed}s", alert, []) for elapsed in range(0, 20 * 60 + 1, 15)]
+            cases.append((self.filesystem(free), checks))
+        self.check(cases, interval="15s")
+
+    def test_burst_is_silent_below_fifty_gib_without_imminent_exhaustion(self):
+        alert = "EcosystemRootFilesystemBurstFill"
+        # The absolute floor alone must not page: steady and slow writes retain
+        # far more than two minutes of runway. Repeated samples model 30s collection.
+        checks = [(f"{elapsed}s", alert, []) for elapsed in range(0, 20 * 60 + 1, 15)]
+        self.check([(self.filesystem([49] * 81), checks),
+                    (self.filesystem([49 - (tick // 2) * 0.05 for tick in range(81)]), checks)],
+                   interval="15s")
+
+    def test_steady_disk_does_not_fire_any_new_alert(self):
+        # Below both upstream filling thresholds, but no negative prediction.
+        self.check([(self.filesystem([80] * 721), [(at, alert, [])
+                                                 for at in ("1h", "6h", "12h") for alert in self.ALERTS])])
+
+    def test_other_mountpoints_and_readonly_roots_are_excluded(self):
+        free = [128 - 16 * minute for minute in range(9)] + [0] * 120
+        checks = [(at, alert, []) for at in ("8m", "1h", "2h") for alert in self.ALERTS]
+        self.check([(self.filesystem(free, mountpoint="/scratch"), checks),
+                    (self.filesystem(free, mode="ro"), checks)])
+
+
+@unittest.skipUnless(PROMTOOL.exists(), "promtool not installed at the documented ecosystem tool path")
+class CodexLaneRuleTests(unittest.TestCase):
+    """``promtool test rules`` over configure.py's rendered ecosystem-lanes group, with synthetic series.
+
+    A goal event counter reaches Prometheus as a delta point that the Collector's delta_to_cumulative converts: the
+    new series starts at 0 (Prometheus created-timestamp-zero-ingestion), reads 1 while Codex exports it and goes
+    stale five minutes after the last export. native_proven when it runs: the installed promtool evaluates the real
+    rendered rules. Skipped (not failed) when promtool is absent on the host."""
+
+    LANE = 'job="codex_exec",instance="proc-a",ecosystem_lane="root"'
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.rules = render_backends(self.root) / "ecosystem-prometheus-rules.yml"
+        group = self.rules.read_text().split("  - name: ecosystem-lanes\n", 1)[1].split("\n  - name: ", 1)[0]
+        # promtool compares annotations exactly, so take labels and annotations from the rendered rules themselves.
+        self.by_name = {}
+        for name, block in re.findall(r"- alert: (\w+)\n(.*?)(?=\n      - alert: |\Z)", group, re.S):
+            self.by_name[name] = {
+                "labels": dict(re.findall(r"^          (severity|scope): (\S+)$", block, re.M)),
+                "annotations": {key: re.search(rf"^ +{key}: '((?:[^']|'')*)'$", block, re.M).group(1).replace("''", "'")
+                                for key in ("summary", "description")}}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def firing(self, alert, lane="root"):
+        rule = self.by_name[alert]
+        annotations = {k: v.replace("{{ $labels.ecosystem_lane }}", lane) for k, v in rule["annotations"].items()}
+        return [{"exp_labels": {**rule["labels"], "ecosystem_lane": lane}, "exp_annotations": annotations}]
+
+    def check(self, alert, cases):
+        document = {"rule_files": [str(self.rules)], "evaluation_interval": "1m", "tests": [
+            {"interval": "1m", "input_series": [{"series": s, "values": v} for s, v in inputs],
+             "alert_rule_test": [{"eval_time": at, "alertname": alert, "exp_alerts": exp} for at, exp in expected]}
+            for inputs, expected in cases]}
+        path = self.root / f"{alert}.test.yml"
+        path.write_text(json.dumps(document))  # JSON is valid YAML
+        result = subprocess.run([str(PROMTOOL), "test", "rules", str(path)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_every_lane_rule_is_scoped_and_usage_limits_are_critical(self):
+        self.assertEqual(set(self.by_name), {"CodexLaneGoalBlocked", "CodexLaneToolErrorBurst",
+                                             "CodexLaneMcpErrorRatio", "CodexLaneUsageLimited"})
+        self.assertEqual({rule["labels"]["scope"] for rule in self.by_name.values()}, {"codex-lanes"})
+        self.assertEqual({name: rule["labels"]["severity"] for name, rule in self.by_name.items()},
+                         {"CodexLaneGoalBlocked": "warning", "CodexLaneToolErrorBurst": "warning",
+                          "CodexLaneMcpErrorRatio": "warning", "CodexLaneUsageLimited": "critical"})
+
+    def test_goal_events_fire_at_once_and_keep_firing_after_their_series_expires(self):
+        for alert, metric in (("CodexLaneGoalBlocked", "ecosystem_codex_goal_blocked_total"),
+                              ("CodexLaneUsageLimited", "ecosystem_codex_goal_usage_limited_total")):
+            series = f"{metric}{{{self.LANE}}}"
+            fire = self.firing(alert)
+            self.check(alert, [
+                # One event, exported for five minutes and then dropped. The 15-minute window holds it until 14m;
+                # keep_firing_for holds the alert for 30 minutes after that.
+                ([(series, "0 1 1 1 1 1 stale")], [("1m", fire), ("14m", fire), ("40m", fire), ("50m", [])]),
+                ([(series, "0x30")], [("10m", [])]),
+            ])
+
+    def test_tool_errors_fire_above_ten_percent_of_at_least_thirty_calls_after_fifteen_minutes(self):
+        tool = "ecosystem_codex_tool_call_total{" + self.LANE + ',success="%s"}'
+        fire = self.firing("CodexLaneToolErrorBurst")
+        self.check("CodexLaneToolErrorBurst", [
+            # 72 calls an hour, 12 failed (16.7%): 30 calls by 25m, firing 15 minutes later
+            ([(tool % "true", "0+1x90"), (tool % "false", "0+0.2x90")], [("30m", []), ("45m", fire), ("70m", fire)]),
+            # the same share of 18 calls an hour
+            ([(tool % "true", "0+0.25x90"), (tool % "false", "0+0.05x90")], [("70m", [])]),
+            # 61 calls an hour, 1 failed
+            ([(tool % "true", "0+1x90"), (tool % "false", "0+0.0167x90")], [("70m", [])]),
+        ])
+
+    def test_mcp_errors_fire_above_ten_percent_of_at_least_twenty_calls_after_fifteen_minutes(self):
+        calls = "ecosystem_codex_mcp_call_total{" + self.LANE + ',tool="ctx_search",status="%s"}'
+        errors = "ecosystem_codex_mcp_call_error_total{" + self.LANE + ',tool="ctx_search",status="error"}'
+        fire = self.firing("CodexLaneMcpErrorRatio")
+        self.check("CodexLaneMcpErrorRatio", [
+            # 60 calls an hour, 12 errors (20%): 20 calls by 20m, firing 15 minutes later
+            ([(calls % "ok", "0+0.8x90"), (calls % "error", "0+0.2x90"), (errors, "0+0.2x90")],
+             [("30m", []), ("45m", fire)]),
+            # the same share of 15 calls an hour
+            ([(calls % "ok", "0+0.2x90"), (calls % "error", "0+0.05x90"), (errors, "0+0.05x90")], [("70m", [])]),
+        ])
+
+
+def free_port() -> int:
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
+
+@unittest.skipUnless(AMTOOL.exists(), "amtool not installed at the documented ecosystem tool path")
+class CodexLaneRouteTests(unittest.TestCase):
+    """``amtool config routes test`` over configure.py's rendered Alertmanager config: lane warnings go to their own (separate, mutable)
+    topic, critical lane alerts to the alert topic, and the other routes are unchanged. That command prints receivers only
+    (in simple, extended and json output alike), so the grouping test runs the pinned Alertmanager itself on the rendered
+    config, with alerts added by the pinned amtool, and reads its groups API. native_proven when it runs."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.config = render_backends(Path(self.tmp.name)) / "ecosystem-alertmanager.yml"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def assertRoute(self, receiver, *labels):
+        result = subprocess.run([str(AMTOOL), "config", "routes", "test", f"--config.file={self.config}",
+                                 f"--verify.receivers={receiver}", *labels], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_lane_warnings_use_their_own_topic_and_critical_lane_alerts_reach_the_alert_topic(self):
+        self.assertRoute("local-ntfy-lanes", "alertname=CodexLaneGoalBlocked", "scope=codex-lanes", "severity=warning")
+        self.assertRoute("local-ntfy", "alertname=CodexLaneUsageLimited", "scope=codex-lanes", "severity=critical")
+        self.assertRoute("local-ntfy", "scope=equities-broker", "severity=warning")
+        self.assertRoute("local-ntfy", "scope=local-ecosystem", "severity=warning")
+        self.assertIn("/ecosystem-lanes?template=alertmanager'", self.config.read_text())
+        # ntfy 2.28.0 ignores a query priority in template mode (server_template.go L58, L103 at 10cb6506), so none is promised.
+        self.assertNotIn("priority=", self.config.read_text())
+
+    def test_every_lane_routes_alike(self):
+        for lane in ("root", "trading"):
+            with self.subTest(lane=lane):
+                self.assertRoute("local-ntfy-lanes", "alertname=CodexLaneGoalBlocked", "scope=codex-lanes",
+                                 "severity=warning", f"ecosystem_lane={lane}")
+                self.assertRoute("local-ntfy", "alertname=CodexLaneUsageLimited", "scope=codex-lanes",
+                                 "severity=critical", f"ecosystem_lane={lane}")
+
+    @unittest.skipUnless(ALERTMANAGER_BIN.exists(), "alertmanager not installed at the documented ecosystem tool path")
+    def test_two_lanes_form_two_groups_and_without_the_lane_grouping_share_one(self):
+        # A socket that is bound but never listens refuses every connection, so no webhook of these instances can reach
+        # the live ntfy that the rendered receivers name.
+        with socket.socket() as refusing:
+            refusing.bind(("127.0.0.1", 0))
+            text, count = re.subn(r"url: 'http://127\.0\.0\.1:\d+/",
+                                  f"url: 'http://127.0.0.1:{refusing.getsockname()[1]}/", self.config.read_text())
+            self.assertEqual(count, 2)
+
+            def group(alert, lane):
+                return ("alertname", alert), ("ecosystem_lane", lane), ("scope", "codex-lanes")
+
+            self.assertEqual(self.groups(text), [
+                ("local-ntfy", group("CodexLaneUsageLimited", "root"), ("root",)),
+                ("local-ntfy", group("CodexLaneUsageLimited", "trading"), ("trading",)),
+                ("local-ntfy-lanes", group("CodexLaneGoalBlocked", "root"), ("root",)),
+                ("local-ntfy-lanes", group("CodexLaneGoalBlocked", "trading"), ("trading",))])
+            # Negative control: without the override both routes inherit [alertname, job, scope], and the two lanes
+            # share one group (one notification, one status) per alert.
+            inherited, removed = re.subn(re.escape(LANE_GROUP_BY), "", text)
+            self.assertEqual(removed, 2)
+            self.assertEqual(self.groups(inherited), [
+                ("local-ntfy", (("alertname", "CodexLaneUsageLimited"), ("scope", "codex-lanes")), ("root", "trading")),
+                ("local-ntfy-lanes", (("alertname", "CodexLaneGoalBlocked"), ("scope", "codex-lanes")),
+                 ("root", "trading"))])
+
+    def groups(self, text):
+        """Run the pinned Alertmanager on text, add a warning and a critical lane alert for each of two lanes with the
+        pinned amtool, and return /api/v2/alerts/groups as sorted (receiver, group labels, lanes) once all four are in."""
+        root = Path(tempfile.mkdtemp(dir=self.tmp.name))
+        (root / "data").mkdir()
+        config = root / "alertmanager.yml"
+        config.write_text(text)
+        address = f"127.0.0.1:{free_port()}"
+        url = f"http://{address}"
+        with open(root / "alertmanager.log", "w") as log:
+            process = subprocess.Popen(
+                [str(ALERTMANAGER_BIN), f"--config.file={config}", f"--storage.path={root / 'data'}",
+                 f"--web.listen-address={address}", "--cluster.listen-address="],
+                stdout=log, stderr=subprocess.STDOUT)
+            try:
+                deadline = time.time() + 30
+                while True:
+                    try:
+                        urllib.request.urlopen(f"{url}/-/ready", timeout=1).read()
+                        break
+                    except OSError:
+                        if time.time() > deadline or process.poll() is not None:
+                            self.fail((root / "alertmanager.log").read_text())
+                        time.sleep(0.2)
+                for lane in ("root", "trading"):
+                    for alert, severity in (("CodexLaneGoalBlocked", "warning"), ("CodexLaneUsageLimited", "critical")):
+                        result = subprocess.run(
+                            [str(AMTOOL), "alert", "add", f"--alertmanager.url={url}", f"alertname={alert}",
+                             "scope=codex-lanes", f"severity={severity}", f"ecosystem_lane={lane}"],
+                            capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                # The dispatcher groups alerts asynchronously; read until it holds all four.
+                deadline = time.time() + 10
+                while True:
+                    groups = json.loads(urllib.request.urlopen(f"{url}/api/v2/alerts/groups", timeout=5).read())
+                    if sum(len(g["alerts"]) for g in groups) == 4 or time.time() > deadline:
+                        break
+                    time.sleep(0.2)
+            finally:
+                process.terminate()
+                try:
+                    process.wait(timeout=20)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+        return sorted((g["receiver"]["name"], tuple(sorted(g["labels"].items())),
+                       tuple(sorted(a["labels"]["ecosystem_lane"] for a in g["alerts"]))) for g in groups)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "evidence_class": "historical_host_returned_output_and_independent_readback",
+  "boundary": "Sanitized binding of prior destination host observations. No build, provider call, WSL command, restart or account operation ran in fix-wave-g8-base-gateway. This receipt does not accept the newly edited scripts.",
+  "composition": {
+    "version": "3.8.52-canary",
+    "base": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+    "cherry_picks": [
+      "24bbadbad15eec0d598c908416e4b01be4e37671",
+      "6c7990058c4ce9677de79452c8cefb10b4bf1b3d",
+      "0585aba5589d5a1f49243a13a8db249558e7c9e3"
+    ],
+    "recorded_source_head": "720e881a4829",
+    "recorded_build_sha": "720e881a4",
+    "npm_rollback": "3.8.51"
+  },
+  "build_observation": {
+    "started_utc": "2026-10-03T05:17:16Z",
+    "completed_utc": "2026-10-03T05:28:50Z",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "returned_gate_lines": [
+      "cherry-pick exit 0",
+      "npm ci exit 0",
+      "unit tests exit 0",
+      "typecheck exit 0",
+      "build exit 0",
+      "[write-build-sha] Written 720e881a4 -> dist/BUILD_SHA",
+      "pack check exit 0",
+      "pack exit 0"
+    ],
+    "unit_files": [
+      "tests/unit/issue-8674-alpha-search.test.ts",
+      "tests/unit/codex-gpt6-sol-luna.test.ts",
+      "tests/unit/executor-codex.test.ts",
+      "tests/unit/codex-fast-tier.test.ts",
+      "tests/unit/8951-github-gpt56-responses.test.ts"
+    ],
+    "unit_counts": null,
+    "unit_counts_reason": "The original runner exited 0, but the retained output has no test/pass/fail counts. Do not invent counts or rebuild solely to replay this receipt.",
+    "package_sha256": "3959fed7254ca97c2784ff8ce99866b90b9d562ed5b4cc88d4315bc71e32c406"
+  },
+  "independent_readback": {
+    "record": "p2-gateway-readback-21128/receipt.md",
+    "lines": "26-36",
+    "observation": "The installed prefix and source both report BUILD_SHA 720e881a4; PR15167@0585aba5 has the same stable patch identity as the carried commit. Source and compiled Sol effort aliases were observed. This is historical read-back, not a new service operation."
+  },
+  "native_client_observation": {
+    "record": "clients-2-work/s12-headless-codex-session-retry.out",
+    "lines": "3-4,18",
+    "exit_code": 0,
+    "turn_completed": true,
+    "invocation": "OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute",
+    "scope": "Fresh Codex gateway turn accepted in the clients-2 unit. Its task was skill discovery/authorship; it does not replay the newly defined fixed GATEWAY_OK prompt."
+  },
+  "input_bindings": [
+    {
+      "record": "B5a-omniroute-build.sh",
+      "sha256": "0d44964c8a8f5717881ed58e0abf1ae6069466dce8687802d22b4c1a14479528",
+      "lines": "11-19"
+    },
+    {
+      "record": "B5a-omniroute-build.txt",
+      "sha256": "33e1bbde6b0e74dcc421bb484bddce54f01639493fda6a9824a685c7245637b8",
+      "lines": "1-19"
+    },
+    {
+      "record": "p2-gateway-readback-21128/receipt.md",
+      "sha256": "0bc9f63990b99fd147225657fc3aecc9a30d7c15130a7e000da80e56f1120e91",
+      "lines": "26-36"
+    },
+    {
+      "record": "clients-2-work/s12-headless-codex-session-retry.out",
+      "sha256": "e724c499b2c419448776c650f785eeab24df9b66acf0227ea3387f1166b40144",
+      "lines": "3-4,18"
+    }
+  ],
+  "sources": [
+    "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/package.json#L119",
+    "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/scripts/build/validate-pack-artifact.ts#L215",
+    "https://github.com/diegosouzapw/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/tests/unit/issue-8674-alpha-search.test.ts",
+    "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/tests/unit/codex-gpt6-sol-luna.test.ts#L65",
+    "https://developers.openai.com/codex/noninteractive"
+  ],
+  "open_boundaries": [
+    "The revised clean-install and acceptance recipes need target execution by the coordinator.",
+    "Provider priority-tier application remains unverified by the historical read-back.",
+    "The standalone gateway web-search adapter accepts search_query; native web.run open failed in the retained clients-2 turn."
+  ],
+  "reproduction": {
+    "evidence_class": "source_composition_review_and_recipe_only",
+    "source_tree": "19ae3ad7f078a3b3d6bd2ef960cb1ddb6afccd35",
+    "derivation": "Exact base checkout plus the three composition.cherry_picks applied in order with git apply --index, then git write-tree; no commits or build performed in this repair.",
+    "marker_scope": "Historical canary composition marker, mapped to this exact source tree; not the timestamp-dependent HEAD of a new cherry-pick run.",
+    "native_build_marker_option": "OMNIROUTE_BUILD_SHA",
+    "source": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/scripts/build/write-build-sha.mjs#L27"
+  }
+}

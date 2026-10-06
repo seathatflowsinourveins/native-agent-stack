@@ -1,0 +1,1019 @@
+{
+  "codex_hook_check": {
+    "repository_exclusions": [
+      {
+        "command": "git push origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push origin main"
+      },
+      {
+        "command": "git push --force origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push --force origin main"
+      },
+      {
+        "command": "git commit -m x",
+        "exit": 0,
+        "rewritten_to": "rtk git commit -m x"
+      },
+      {
+        "command": "git add -A",
+        "exit": 0,
+        "rewritten_to": "rtk git add -A"
+      },
+      {
+        "command": "git checkout -- .",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -- ."
+      },
+      {
+        "command": "git checkout -b topic",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -b topic"
+      },
+      {
+        "command": "git pull",
+        "exit": 0,
+        "rewritten_to": "rtk git pull"
+      },
+      {
+        "command": "git stash",
+        "exit": 0,
+        "rewritten_to": "rtk git stash"
+      },
+      {
+        "command": "git worktree add ../w",
+        "exit": 0,
+        "rewritten_to": "rtk git worktree add ../w"
+      },
+      {
+        "command": "git reset --hard HEAD~1",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git clean -fd",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rebase main",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git merge topic",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rm -r dir",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "gh pr merge 1",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr merge 1"
+      },
+      {
+        "command": "gh pr create --fill",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr create --fill"
+      },
+      {
+        "command": "gh api -X DELETE repos/o/r",
+        "exit": 0,
+        "rewritten_to": "rtk gh api -X DELETE repos/o/r"
+      },
+      {
+        "command": "gh release create v1",
+        "exit": 0,
+        "rewritten_to": "rtk gh release create v1"
+      },
+      {
+        "command": "docker run --rm alpine sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker run --rm alpine sh"
+      },
+      {
+        "command": "docker exec c sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker exec c sh"
+      },
+      {
+        "command": "docker build .",
+        "exit": 0,
+        "rewritten_to": "rtk docker build ."
+      },
+      {
+        "command": "docker rm c",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "kubectl apply -f x.yaml",
+        "exit": 0,
+        "rewritten_to": "rtk kubectl apply -f x.yaml"
+      },
+      {
+        "command": "kubectl delete pod x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "helm install r chart",
+        "exit": 0,
+        "rewritten_to": "rtk helm install r chart"
+      },
+      {
+        "command": "terraform apply",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "pulumi up",
+        "exit": 0,
+        "rewritten_to": "rtk pulumi up"
+      },
+      {
+        "command": "pip install x",
+        "exit": 0,
+        "rewritten_to": "rtk pip install x"
+      },
+      {
+        "command": "pip uninstall x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm install",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "cargo install x",
+        "exit": 0,
+        "rewritten_to": "rtk cargo install x"
+      },
+      {
+        "command": "cargo publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "make install",
+        "exit": 0,
+        "rewritten_to": "rtk make install"
+      },
+      {
+        "command": "curl -X POST http://x",
+        "exit": 0,
+        "rewritten_to": "rtk curl -X POST http://x"
+      },
+      {
+        "command": "wget http://x",
+        "exit": 0,
+        "rewritten_to": "rtk wget http://x"
+      },
+      {
+        "command": "rsync -a --delete a/ b/",
+        "exit": 0,
+        "rewritten_to": "rtk rsync -a --delete a/ b/"
+      },
+      {
+        "command": "aws s3 rm s3://b/k",
+        "exit": 0,
+        "rewritten_to": "rtk aws s3 rm s3://b/k"
+      },
+      {
+        "command": "systemctl stop x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "iptables -F",
+        "exit": 0,
+        "rewritten_to": "rtk iptables -F"
+      },
+      {
+        "command": "rm -rf build",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "mv a b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "chmod 777 f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "sed -i s/a/b/ f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "tee f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "dd if=a of=b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git status",
+        "exit": 0,
+        "rewritten_to": "rtk git status"
+      },
+      {
+        "command": "git log --oneline -3",
+        "exit": 0,
+        "rewritten_to": "rtk git log --oneline -3"
+      },
+      {
+        "command": "git diff",
+        "exit": 0,
+        "rewritten_to": "rtk git diff"
+      },
+      {
+        "command": "ls -la",
+        "exit": 0,
+        "rewritten_to": "rtk ls -la"
+      },
+      {
+        "command": "cat a/x/util.py",
+        "exit": 0,
+        "rewritten_to": "rtk read a/x/util.py"
+      },
+      {
+        "command": "grep -rn needle .",
+        "exit": 0,
+        "rewritten_to": "rtk grep -rn needle ."
+      },
+      {
+        "command": "find . -name x",
+        "exit": 0,
+        "rewritten_to": "rtk find . -name x"
+      },
+      {
+        "command": "pytest -q",
+        "exit": 0,
+        "rewritten_to": "rtk pytest -q"
+      },
+      {
+        "command": "cargo test",
+        "exit": 0,
+        "rewritten_to": "rtk cargo test"
+      }
+    ],
+    "upstream_defaults": [
+      {
+        "command": "git push origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push origin main"
+      },
+      {
+        "command": "git push --force origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push --force origin main"
+      },
+      {
+        "command": "git commit -m x",
+        "exit": 0,
+        "rewritten_to": "rtk git commit -m x"
+      },
+      {
+        "command": "git add -A",
+        "exit": 0,
+        "rewritten_to": "rtk git add -A"
+      },
+      {
+        "command": "git checkout -- .",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -- ."
+      },
+      {
+        "command": "git checkout -b topic",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -b topic"
+      },
+      {
+        "command": "git pull",
+        "exit": 0,
+        "rewritten_to": "rtk git pull"
+      },
+      {
+        "command": "git stash",
+        "exit": 0,
+        "rewritten_to": "rtk git stash"
+      },
+      {
+        "command": "git worktree add ../w",
+        "exit": 0,
+        "rewritten_to": "rtk git worktree add ../w"
+      },
+      {
+        "command": "git reset --hard HEAD~1",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git clean -fd",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rebase main",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git merge topic",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rm -r dir",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "gh pr merge 1",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr merge 1"
+      },
+      {
+        "command": "gh pr create --fill",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr create --fill"
+      },
+      {
+        "command": "gh api -X DELETE repos/o/r",
+        "exit": 0,
+        "rewritten_to": "rtk gh api -X DELETE repos/o/r"
+      },
+      {
+        "command": "gh release create v1",
+        "exit": 0,
+        "rewritten_to": "rtk gh release create v1"
+      },
+      {
+        "command": "docker run --rm alpine sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker run --rm alpine sh"
+      },
+      {
+        "command": "docker exec c sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker exec c sh"
+      },
+      {
+        "command": "docker build .",
+        "exit": 0,
+        "rewritten_to": "rtk docker build ."
+      },
+      {
+        "command": "docker rm c",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "kubectl apply -f x.yaml",
+        "exit": 0,
+        "rewritten_to": "rtk kubectl apply -f x.yaml"
+      },
+      {
+        "command": "kubectl delete pod x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "helm install r chart",
+        "exit": 0,
+        "rewritten_to": "rtk helm install r chart"
+      },
+      {
+        "command": "terraform apply",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "pulumi up",
+        "exit": 0,
+        "rewritten_to": "rtk pulumi up"
+      },
+      {
+        "command": "pip install x",
+        "exit": 0,
+        "rewritten_to": "rtk pip install x"
+      },
+      {
+        "command": "pip uninstall x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm install",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "cargo install x",
+        "exit": 0,
+        "rewritten_to": "rtk cargo install x"
+      },
+      {
+        "command": "cargo publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "make install",
+        "exit": 0,
+        "rewritten_to": "rtk make install"
+      },
+      {
+        "command": "curl -X POST http://x",
+        "exit": 0,
+        "rewritten_to": "rtk curl -X POST http://x"
+      },
+      {
+        "command": "wget http://x",
+        "exit": 0,
+        "rewritten_to": "rtk wget http://x"
+      },
+      {
+        "command": "rsync -a --delete a/ b/",
+        "exit": 0,
+        "rewritten_to": "rtk rsync -a --delete a/ b/"
+      },
+      {
+        "command": "aws s3 rm s3://b/k",
+        "exit": 0,
+        "rewritten_to": "rtk aws s3 rm s3://b/k"
+      },
+      {
+        "command": "systemctl stop x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "iptables -F",
+        "exit": 0,
+        "rewritten_to": "rtk iptables -F"
+      },
+      {
+        "command": "rm -rf build",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "mv a b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "chmod 777 f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "sed -i s/a/b/ f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "tee f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "dd if=a of=b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git status",
+        "exit": 0,
+        "rewritten_to": "rtk git status"
+      },
+      {
+        "command": "git log --oneline -3",
+        "exit": 0,
+        "rewritten_to": "rtk git log --oneline -3"
+      },
+      {
+        "command": "git diff",
+        "exit": 0,
+        "rewritten_to": "rtk git diff"
+      },
+      {
+        "command": "ls -la",
+        "exit": 0,
+        "rewritten_to": "rtk ls -la"
+      },
+      {
+        "command": "cat a/x/util.py",
+        "exit": 0,
+        "rewritten_to": "rtk read a/x/util.py"
+      },
+      {
+        "command": "grep -rn needle .",
+        "exit": 0,
+        "rewritten_to": "rtk grep -rn needle ."
+      },
+      {
+        "command": "find . -name x",
+        "exit": 0,
+        "rewritten_to": "rtk find . -name x"
+      },
+      {
+        "command": "pytest -q",
+        "exit": 0,
+        "rewritten_to": "rtk pytest -q"
+      },
+      {
+        "command": "cargo test",
+        "exit": 0,
+        "rewritten_to": "rtk cargo test"
+      }
+    ]
+  },
+  "compared": [
+    {
+      "command": "git status --short",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": false,
+        "stdout_lines": 2
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 2
+      }
+    },
+    {
+      "command": "git log",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 10
+      },
+      "shell": {
+        "commit_lines": 66,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 396
+      }
+    },
+    {
+      "command": "git log --stat",
+      "rtk": {
+        "commit_lines": 10,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [
+          "[rtk] capped at 10 commits; pass -n <count> for more"
+        ],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 87
+      },
+      "shell": {
+        "commit_lines": 66,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 592
+      }
+    },
+    {
+      "command": "git log --oneline",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 50
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 66
+      }
+    },
+    {
+      "command": "git log --format=%s",
+      "rtk": {
+        "commit_lines": 49,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 50
+      },
+      "shell": {
+        "commit_lines": 64,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 66
+      }
+    },
+    {
+      "command": "git log --graph --oneline",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 50
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 68
+      }
+    },
+    {
+      "command": "git log -n 16",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 16
+      },
+      "shell": {
+        "commit_lines": 16,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 96
+      }
+    },
+    {
+      "command": "git log --oneline -n 66",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 66
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 66
+      }
+    },
+    {
+      "command": "git log --stat -n 16",
+      "rtk": {
+        "commit_lines": 16,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 141
+      },
+      "shell": {
+        "commit_lines": 16,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 141
+      }
+    },
+    {
+      "command": "ls /nonexistent",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 2,
+        "mentions_usr_bin_ls": true,
+        "merge_lines": 0,
+        "stderr_first_lines": [
+          "/usr/bin/ls: cannot access '/nonexistent': No such file or directory"
+        ],
+        "stdout_ends_with_newline": null,
+        "stdout_lines": 0
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 2,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [
+          "ls: cannot access '/nonexistent': No such file or directory"
+        ],
+        "stdout_ends_with_newline": null,
+        "stdout_lines": 0
+      }
+    },
+    {
+      "command": "find /nonexistent -name x",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 1,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [
+          "find: '/nonexistent': No such file or directory"
+        ],
+        "stdout_ends_with_newline": null,
+        "stdout_lines": 0
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 1,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [
+          "find: \u2018/nonexistent\u2019: No such file or directory"
+        ],
+        "stdout_ends_with_newline": null,
+        "stdout_lines": 0
+      }
+    },
+    {
+      "command": "grep -rl needle .",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 1
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 0,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 1
+      }
+    }
+  ],
+  "evidence_class": "local_integration: one run, one host, a scratch repository",
+  "exclusions_fixture_sha256": "0e788d025386c9a97c0adcda270e3c0ce39c679a22b90462599a31805bd81edd",
+  "fixture": {
+    "commits": 66,
+    "merge_commits": 1
+  },
+  "rewrite": {
+    "repository_exclusions": [
+      {
+        "command": "git status",
+        "exit": 3,
+        "rewritten_to": "rtk git status"
+      },
+      {
+        "command": "git status --short",
+        "exit": 3,
+        "rewritten_to": "rtk git status --short"
+      },
+      {
+        "command": "git log",
+        "exit": 3,
+        "rewritten_to": "rtk git log"
+      },
+      {
+        "command": "git log --oneline -3",
+        "exit": 3,
+        "rewritten_to": "rtk git log --oneline -3"
+      },
+      {
+        "command": "git log --stat",
+        "exit": 3,
+        "rewritten_to": "rtk git log --stat"
+      },
+      {
+        "command": "git diff --exit-code",
+        "exit": 3,
+        "rewritten_to": "rtk git diff --exit-code"
+      },
+      {
+        "command": "ls /nonexistent",
+        "exit": 3,
+        "rewritten_to": "rtk ls /nonexistent"
+      },
+      {
+        "command": "cat a/x/util.py",
+        "exit": 3,
+        "rewritten_to": "rtk read a/x/util.py"
+      },
+      {
+        "command": "grep -rl needle .",
+        "exit": 3,
+        "rewritten_to": "rtk grep -rl needle ."
+      },
+      {
+        "command": "find /nonexistent -name x",
+        "exit": 3,
+        "rewritten_to": "rtk find /nonexistent -name x"
+      },
+      {
+        "command": "git status --short && echo done",
+        "exit": 3,
+        "rewritten_to": "rtk git status --short && echo done"
+      },
+      {
+        "command": "git log --oneline -3 | cat",
+        "exit": 3,
+        "rewritten_to": "rtk git log --oneline -3 | cat"
+      },
+      {
+        "command": "git show HEAD:a/x/util.py",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "diff /nonexistent a/x/util.py",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "jq . data.json",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git branch",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "echo hi",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "bash -c 'git status'",
+        "exit": 1,
+        "rewritten_to": null
+      }
+    ],
+    "upstream_defaults": [
+      {
+        "command": "git status",
+        "exit": 3,
+        "rewritten_to": "rtk git status"
+      },
+      {
+        "command": "git status --short",
+        "exit": 3,
+        "rewritten_to": "rtk git status --short"
+      },
+      {
+        "command": "git log",
+        "exit": 3,
+        "rewritten_to": "rtk git log"
+      },
+      {
+        "command": "git log --oneline -3",
+        "exit": 3,
+        "rewritten_to": "rtk git log --oneline -3"
+      },
+      {
+        "command": "git log --stat",
+        "exit": 3,
+        "rewritten_to": "rtk git log --stat"
+      },
+      {
+        "command": "git diff --exit-code",
+        "exit": 3,
+        "rewritten_to": "rtk git diff --exit-code"
+      },
+      {
+        "command": "ls /nonexistent",
+        "exit": 3,
+        "rewritten_to": "rtk ls /nonexistent"
+      },
+      {
+        "command": "cat a/x/util.py",
+        "exit": 3,
+        "rewritten_to": "rtk read a/x/util.py"
+      },
+      {
+        "command": "grep -rl needle .",
+        "exit": 3,
+        "rewritten_to": "rtk grep -rl needle ."
+      },
+      {
+        "command": "find /nonexistent -name x",
+        "exit": 3,
+        "rewritten_to": "rtk find /nonexistent -name x"
+      },
+      {
+        "command": "git status --short && echo done",
+        "exit": 3,
+        "rewritten_to": "rtk git status --short && echo done"
+      },
+      {
+        "command": "git log --oneline -3 | cat",
+        "exit": 3,
+        "rewritten_to": "rtk git log --oneline -3 | cat"
+      },
+      {
+        "command": "git show HEAD:a/x/util.py",
+        "exit": 3,
+        "rewritten_to": "rtk git show HEAD:a/x/util.py"
+      },
+      {
+        "command": "diff /nonexistent a/x/util.py",
+        "exit": 3,
+        "rewritten_to": "rtk diff /nonexistent a/x/util.py"
+      },
+      {
+        "command": "jq . data.json",
+        "exit": 3,
+        "rewritten_to": "rtk jq . data.json"
+      },
+      {
+        "command": "git branch",
+        "exit": 3,
+        "rewritten_to": "rtk git branch"
+      },
+      {
+        "command": "echo hi",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "bash -c 'git status'",
+        "exit": 1,
+        "rewritten_to": null
+      }
+    ]
+  },
+  "schema": "rtk-behaviour-probe/1",
+  "versions": {
+    "git": "git version 2.43.0",
+    "rtk": "rtk 0.51.0"
+  }
+}

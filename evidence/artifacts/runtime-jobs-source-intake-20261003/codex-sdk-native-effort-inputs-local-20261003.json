@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "classification": "local synthetic integration; native SDK input qualification only",
+  "status": "INPUT_FIXTURES_PASS_LIVE_QUALIFICATION_UNCHANGED",
+  "measured_defaults": 0,
+  "live_route_qualified": false,
+  "live_delivered_effort": null,
+  "active_multi_agent_mode": null,
+  "source_repository": "openai/codex",
+  "source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+  "source_files": [
+    "sdk/python/src/openai_codex/generated/v2_all.py",
+    "sdk/python/src/openai_codex/api.py",
+    "sdk/python/src/openai_codex/client.py",
+    "sdk/python/tests/test_client_rpc_methods.py",
+    "codex-rs/protocol/src/openai_models/reasoning_effort.rs",
+    "codex-rs/core/src/session/multi_agents.rs"
+  ],
+  "gateway_source": {
+    "repository": "diegosouzapw/OmniRoute",
+    "pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "path": "open-sse/executors/codex.ts",
+    "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+    "scope": "checked HTTP carry force rule, then recognized suffix, then body; installed transport remains unqualified"
+  },
+  "inputs": {
+    "flag": "--effort",
+    "choices": [
+      "max",
+      "ultra"
+    ],
+    "compatibility_default": "max",
+    "existing_default_model": "cx/gpt-6.1-sol-max",
+    "prospective_ultra_model_input": "cx/gpt-6.1-sol",
+    "native_launch_configuration": "model_reasoning_effort selected value",
+    "native_turn_argument": "ReasoningEffort(selected value)",
+    "requested_effort_label": "selected value; no inferred effective/delivered effort"
+  },
+  "validation": {
+    "receipt_bindings": [
+      {
+        "name": "00-first-attempt.txt",
+        "bytes": 1766,
+        "sha256": "17ee5820b359100b374366d9d58f8ad8aeb077127a933b013467e5813519f8fd",
+        "class": "native_receipt"
+      },
+      {
+        "name": "02-red-tests.json",
+        "bytes": 4687,
+        "sha256": "8c5d867f830ec9bee63d1e4f196b127be8af12ebedc35cad725bceefef8848b3",
+        "class": "native_receipt"
+      },
+      {
+        "name": "03-green-effort-tests.json",
+        "bytes": 2621,
+        "sha256": "9b701b42e542098fcd26c38c273c092d51629f6a274f280bb47d53e199403f0f",
+        "class": "native_receipt"
+      },
+      {
+        "name": "04-full-worker-fixtures.json",
+        "bytes": 2852,
+        "sha256": "29a8ef22ca4b17b9f7042d246b8de54c62b5e5fd91363e378afa24c68b7d3bd7",
+        "class": "native_receipt"
+      },
+      {
+        "name": "05-suffixless-ultra-effort-tests.json",
+        "bytes": 2353,
+        "sha256": "da4eebf36a97d44c2dfb3d9ebac75a0ee825309de7303dd4dd686c658edef2b0",
+        "class": "native_receipt"
+      }
+    ],
+    "original_native_output_bindings": [
+      {
+        "name": "02-red-tests.json",
+        "native_exit_code": 1,
+        "encoding": "gzip+base64",
+        "streams": [
+          {
+            "name": "stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "stderr",
+            "bytes": 12727,
+            "sha256": "2c0a436e5a671a39dfb2c36e5115f7a1ea671f869eb2c4bcc0c196cd68126cad"
+          }
+        ],
+        "native_test_summary": [
+          "Ran 3 tests in 1.548s",
+          "FAILED (failures=1, errors=4)"
+        ],
+        "resource_warning_count": 0,
+        "expected_parser_error_count": 4
+      },
+      {
+        "name": "03-green-effort-tests.json",
+        "native_exit_code": 0,
+        "encoding": "gzip+base64",
+        "streams": [
+          {
+            "name": "stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "stderr",
+            "bytes": 1305,
+            "sha256": "13f076313da5de78463feed0fd1e7ec8ebcb4c30777c2673f2d43994dc8a09b7"
+          }
+        ],
+        "native_test_summary": [
+          "Ran 4 tests in 4.151s",
+          "OK"
+        ],
+        "resource_warning_count": 2,
+        "expected_parser_error_count": 0
+      },
+      {
+        "name": "04-full-worker-fixtures.json",
+        "native_exit_code": 0,
+        "encoding": "gzip+base64",
+        "streams": [
+          {
+            "name": "stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "stderr",
+            "bytes": 8846,
+            "sha256": "ea3b45ea4bd078564f9fddc1730ca96a116e1c5c9fafca611c37317ee5443a88"
+          }
+        ],
+        "native_test_summary": [
+          "Ran 28 tests in 30.705s",
+          "OK"
+        ],
+        "resource_warning_count": 4,
+        "expected_parser_error_count": 4
+      },
+      {
+        "name": "05-suffixless-ultra-effort-tests.json",
+        "native_exit_code": 0,
+        "encoding": "gzip+base64",
+        "streams": [
+          {
+            "name": "stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "stderr",
+            "bytes": 1007,
+            "sha256": "1f86c2b82dc0a696fd0d3679e7ab8869b3150d418dafe40d48f2e6a99055631c"
+          }
+        ],
+        "native_test_summary": [
+          "Ran 2 tests in 2.945s",
+          "OK"
+        ],
+        "resource_warning_count": 2,
+        "expected_parser_error_count": 0
+      }
+    ],
+    "reuse": "The full module passed28 before suffixless input repair. Two revised effort fixtures passed fresh; the unchanged26 are reused. Never sum overlapping counts.",
+    "baseline_and_repair_failure_retention": true,
+    "initial_offline_setup": {
+      "native_exit_code": 0,
+      "cached_packages_materialized": 8,
+      "reported_setup_ms": 20,
+      "scope": "Recorded despite the worker contract no-install instruction; no further installs."
+    },
+    "source_lookup_failure": {
+      "guessed_path": "sdk/python/src/openai_codex/async_api.py",
+      "status": "failed before correcting to existing api.py; original note retained",
+      "native_exit_code": null
+    },
+    "upstream_acceptance": false,
+    "comparative_performance": false,
+    "provider_usage": null,
+    "billed_cost": null
+  },
+  "independent_root_observation": {
+    "all_sealed_file_bytes_sha256_match": true,
+    "native_original_stdio_independently_decoded_and_hashed": true,
+    "installed_package": {
+      "installed_metadata": [
+        "Name: openai-codex",
+        "Version: 0.160.0",
+        "Requires-Dist: openai-codex-cli-bin==0.160.0"
+      ],
+      "package_source_bindings": [
+        {
+          "path": "sdk/python/src/openai_codex/generated/v2_all.py",
+          "native_source_exit": 0,
+          "bytes": 397501,
+          "sha256": "d91b972a188b8ca766454e877de3986dfbb072789635bb51c2f6a4693f86fd72",
+          "installed_and_pinned_source_bytes_match": true
+        },
+        {
+          "path": "sdk/python/src/openai_codex/api.py",
+          "native_source_exit": 0,
+          "bytes": 33152,
+          "sha256": "bd9cac51820997fa4d3fa4ac5c24894f45b92da8ba481d49c44cb96dcc9af430",
+          "installed_and_pinned_source_bytes_match": true
+        },
+        {
+          "path": "sdk/python/src/openai_codex/client.py",
+          "native_source_exit": 0,
+          "bytes": 33781,
+          "sha256": "8452afbd8148ea212c94e8a6727468054b175acb0daf95002c84b66b604d05a6",
+          "installed_and_pinned_source_bytes_match": true
+        }
+      ]
+    },
+    "source_tests_or_models_rerun": 0
+  },
+  "failure_preservation": {
+    "earlier_sdk5000ms_native_failure": "unchanged FAIL; unrelated to this input fix",
+    "historical_sdk48": "separate historical source-suite scope; not rerun or added to these28 integration fixtures",
+    "warning_scope": "Original fixture output retains ResourceWarnings and expected argparse diagnostics."
+  },
+  "scope": {
+    "live_model_or_provider_run": false,
+    "active_host_client_or_gateway_config_changed": false,
+    "native_auth_store_read_or_copy": false,
+    "native_features_activated": false,
+    "native_signins_preserved": true,
+    "useful_roles_and_complete_lifecycle_qualified": false
+  },
+  "private_seal_binding": {
+    "bytes": 4425,
+    "sha256": "8cc7996988ea5625612a0561d833916e6dbfbb0b2357c261f2da35f14f3da769",
+    "private_host_paths_omitted": true,
+    "complete_original_streams_retained_privately": true
+  }
+}

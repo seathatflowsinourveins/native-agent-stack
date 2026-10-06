@@ -163,7 +163,15 @@ GitHub-hosted macOS runner; see
    store, 2.4.1 migrates it forward-only at the next service start, so take
    the at-rest copy in [the recipe's upgrade steps](../recipes/README.md#upgrading-an-existing-store) first.
    `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.284 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.159.2 (URL, hashes and note; 0.157.1 from 2026-09-26, 0.159.2 from 2026-09-30), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`; 0.159.2 still lists the feature as stable and on, `evidence/receipts/codex-01592-qualification-20260930.json`). It changed again on 2026-09-30 to default to `gpt-6.1-sol`, which Codex's bundled model catalog carries from `rust-v0.159.1` on (0.157.1's has no such entry). The macOS pin stays at 0.155.1: macOS needs its own 0.159.x qualification before the template default applies there.
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.160.0 (URL, hashes and note; 0.157.1 from 2026-09-26, 0.159.2 from 2026-09-30, 0.159.3 from 2026-10-01, and the repository 0.160.0 pair from 2026-10-03), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`; 0.159.2 still lists the feature as stable and on, `evidence/receipts/codex-01592-qualification-20260930.json`). It changed again on 2026-09-30 to default to `gpt-6.1-sol`, which Codex's bundled model catalog carries from `rust-v0.159.1` on (0.157.1's has no such entry). The macOS pin stays at 0.155.1: macOS needs its own qualification of a version carrying the new model before the template default applies there. The [October 3 compatibility record](../evidence/artifacts/runtime-sdk-20261003/receipt.json) retains completed 0.160.0 markers on the existing Linux host; incomplete original invocation/timing evidence prevents native E2E acceptance; its shared launcher and daemon still run 0.159.3 until a coordinated switch.
+   The 2026-10-04 bounded move selects RTK 0.51.0 and Linux MCPorter 0.14.2,
+   and pins the Claude HUD plugin tag v0.10.0. Mac MCPorter stays at 0.13.13
+   until that platform qualifies the newer version.
+   Qualification receipts for [RTK](../evidence/receipts/rtk-051-qualification-20261004.json),
+   [MCPorter](../evidence/receipts/mcporter-0142-qualification-20261004.json) and
+   [Claude HUD](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
+   retain the host failures and limits. Darwin artifacts are
+   artifact-checked only; the Mac host collects its own execution evidence.
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
@@ -187,7 +195,8 @@ GitHub-hosted macOS runner; see
    `install_uv_tool` downloads headroom's `macosx_11_0_arm64` wheel, verifies its sha256 with
    `shasum -a 256` before uv runs and installs that file, as the Linux one above does), and,
    after installing rtk, prints a reminder unless `~/Library/Application Support/rtk/config.toml`,
-   the only config file rtk 0.50.0 reads on macOS (it ignores `XDG_CONFIG_HOME` there;
+   the config file rtk 0.51.0 reads on macOS (its tagged `src/core/config.rs`
+   and `src/core/user_dirs.rs` still use `dirs::config_dir()` and ignore `XDG_CONFIG_HOME` there;
    `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`), holds step
    4a's five-entry `exclude_commands` key exactly once; its `--plan` prints serena's pinned
    commit instead of a sha256. At that tag and every earlier one, the macOS pins file has no entry
@@ -345,7 +354,11 @@ GitHub-hosted macOS runner; see
    installed by the **guard hooks** step of `install_claude_profile.py` below, so
    every non-blind subagent except `semantic-evidence-reviewer` receives the token-lanes block matched to its role
    ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)); while that
-   file is absent the command exits 0 and adds nothing.
+   file is absent the command exits 0 and adds nothing. The same template then also gained a `SessionStart` group
+   (matcher `startup|resume|clear|compact|fork`) that runs `~/.claude/hooks/token-lanes-session-start.py`, which hands the
+   main session its own block before the first prompt
+   ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-10-04-main-session-carrier));
+   it is silent for `blind-*` roles and `semantic-evidence-reviewer`, and while its file is absent the command exits 0 and adds nothing.
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets `MCP_TIMEOUT` to `"120000"`, the startup timeout of every MCP server (default 30 s, [environment variables](https://code.claude.com/docs/en/env-vars)); the value is global because Claude Code 2.1.285 and 2.1.286 have no per-server startup setting (`claude mcp add --help` lists no timeout option, and a server's `timeout` field bounds tool calls only), and 120 s matches the Codex template's slowest `startup_timeout_sec` ([decision](../docs/decisions/2026-09-30-mcp-startup-timeout.md)). It also denies, in every session, the Skills CLI's install, remove and update commands and `Edit(~/.agents/**)`, so skills install only through `tools/adoption/install_skills.py` ([lifecycle](skills/lifecycle.md#install-and-inspect)).
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
@@ -382,13 +395,12 @@ GitHub-hosted macOS runner; see
    Its MCP sub-step registers the template's commands but installs none of
    them, so first install Serena (the MCP sub-step below names where the
    template's other stdio servers come from) and
-   jCodeMunch, which the per-project opt-in below uses, at their pins, with the
+   jCodeMunch, which its user-scope registration below uses, at their pins, with the
    uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
    (`python-tools/` and `bin/` under the ecosystem prefix, on either
    platform). That puts `serena` and `jcodemunch-mcp` in `${ECO_ROOT}/bin`,
    where the template and the opt-in point (changed after `v2026.09.24.1`,
-   whose template names a `serena-context` wrapper instead of `serena` and
-   also registers `jcodemunch` at user scope):
+   whose template names a `serena-context` wrapper instead of `serena`):
    ```sh
    eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
@@ -403,6 +415,7 @@ GitHub-hosted macOS runner; see
    python3 tools/adoption/install_claude_profile.py            # guard + agents + MCP servers
    python3 tools/adoption/install_claude_profile.py --dry-run   # report only, write/register nothing
    python3 tools/adoption/install_claude_profile.py --only mcp  # just the MCP step
+   python3 tools/adoption/install_claude_profile.py --only workflows  # opt-in reviewed saved workflows
    ```
    Both platform bootstrap scripts also accept
    `--configure-claude-user-profile` to run this automatically as their own
@@ -419,7 +432,10 @@ GitHub-hosted macOS runner; see
      and its sibling [`adoption/hooks/claude/token-lanes-block.md`](hooks/claude/token-lanes-block.md)
      with the five role blocks `adoption/hooks/claude/token-lanes-block.<role>.md`
      (`builder`, `researcher`, `reviewer`, `scout`, `verifier`)
-     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`).
+     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`), and the main-session pair
+     [`adoption/hooks/claude/token-lanes-session-start.py`](hooks/claude/token-lanes-session-start.py) and
+     [`adoption/hooks/claude/token-lanes-block.main.md`](hooks/claude/token-lanes-block.main.md) beside them
+     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)).
      The hook supplies token-lane guidance before each non-blind subagent's first prompt
      through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart):
      a shipped role with a `tools:` allowlist receives the role block that names only the lanes it grants,
@@ -441,8 +457,8 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     over http; `serena`, `socraticode`, `headroom`, `codebase-memory` and
-     `qmd` over stdio), renders its `${HOME}` and
+     over http; `serena`, `socraticode`, `headroom`, `codebase-memory`, `qmd`
+     and `jcodemunch` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
@@ -481,16 +497,24 @@ GitHub-hosted macOS runner; see
      installer reports it as matching (same command, arguments and variable
      names) or as differing, and replaces it only with `--replace-mcp`.
 
-   **jCodeMunch, per project.** The template leaves `jcodemunch` out (changed
-   after `v2026.09.24.1`). At user scope its server instruction ("Prefer it
-   over Read/Grep/Glob/Bash for code navigation") loaded into every session
-   and contradicted agent-lab's routing (`rg` for discovery, Serena for
-   symbols). On 2026-09-25 the recording host's 5,076 retained Claude Code
-   transcripts, the oldest from 2026-09-18, held 15 jCodeMunch tool calls
-   (Serena 33, SocratiCode 7), and in a retrieval comparison it scored hit@5
-   0.25 against SocratiCode's 0.85
-   ([addendum](../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)).
-   A project that wants it registers it from the project root, privately:
+   **jCodeMunch, user scope.** The template registers `jcodemunch` at user
+   scope again (changed 2026-10-04, on the user's directive that every fresh
+   session starts with the tools ready; [decision](../docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md)).
+   It had been left out since 2026-09-25 ([addendum](../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)):
+   its server instruction ("Prefer it over Read/Grep/Glob/Bash for code
+   navigation") loads into every session and contradicted agent-lab's routing,
+   and 5,076 retained transcripts held 15 jCodeMunch tool calls (Serena 33,
+   SocratiCode 7). The Harbor E2E of 2026-09-30 measured upstream's faithful
+   adoption, `init` with its hooks and prompt policy, at 1.387 times the lean
+   arm's cost (95% CI 1.230 to 1.553, Holm p = 0.0006; 36 SWE-bench Verified
+   tasks, Sonnet 5.5 at medium effort); this registration runs no `init`, and the
+   command center's A/B at the operating point decides whether the tool stays
+   in the default. The entry is the pinned README's own (`claude mcp add -s user
+   jcodemunch jcodemunch-mcp`) with `JCODEMUNCH_SHARE_SAVINGS=0`, the documented
+   opt-out of its anonymous savings counter, in its env block.
+
+   **jCodeMunch, per project.** A project that wants its own private
+   registration beside the user-scope one registers it from the project root:
    ```sh
    claude mcp add --scope local jcodemunch \
      -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 \
@@ -525,7 +549,9 @@ GitHub-hosted macOS runner; see
    scalars win; nested objects such as `modelSettings`, `env`, `permissions`
    and `enabledPlugins` merge per key and lists union, so host-only rules
    are kept; `hooks` combine per event, de-duplicated across the event by
-   each command's shell words; everything else in the live file that the
+   each command's shell words, with canonical entries kept separate and old
+   mixed entries split into contiguous runs without changing hook values or
+   order; everything else in the live file that the
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store. `tools/adoption/apply_claude_settings.py`
@@ -536,7 +562,7 @@ GitHub-hosted macOS runner; see
    missing entry at the end, so it would put the template's Context Mode
    twins after `Read(!.env.example)` and deny that file again; apply the
    template from a checkout that has both changes.
-   The template registers the `rtk hook claude` Bash hook, so with the rtk 0.50.0 pin also make the `[hooks]` table of rtk's config file (`~/.config/rtk/config.toml` on Linux, or `$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; `~/Library/Application Support/rtk/config.toml` on macOS, where rtk ignores `XDG_CONFIG_HOME`; `rtk config` prints the file on its first line, `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`) hold `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)', "jq"]`: inside the existing `[hooks]` table, **replace** the key's whole value, from `exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add a `[hooks]` header line only when the file has no `[hooks]` table (a second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`); the fifth, plain `"jq"`, keeps a standalone `jq` command native, because rtk's `jq` rewrite truncated structured output (the recipe's fifth-entry paragraph). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires every entry of that value, exactly once, to be present (five since F2 added `"jq"`). It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a`, `git -C . branch` and `jq -r .x f.json`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the five-entry set.
+   The template registers the `rtk hook claude` Bash hook, so with the rtk 0.51.0 pin also make the `[hooks]` table of rtk's config file (`~/.config/rtk/config.toml` on Linux, or `$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; `~/Library/Application Support/rtk/config.toml` on macOS, where rtk ignores `XDG_CONFIG_HOME`; `rtk config` prints the file on its first line, `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`) hold `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)', "jq"]`: inside the existing `[hooks]` table, **replace** the key's whole value, from `exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add a `[hooks]` header line only when the file has no `[hooks]` table (a second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`); the fifth, plain `"jq"`, keeps a standalone `jq` command native, because rtk's `jq` rewrite truncated structured output (the recipe's fifth-entry paragraph). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires every entry of that value, exactly once, to be present (five since F2 added `"jq"`). It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a`, `git -C . branch` and `jq -r .x f.json`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the five-entry set.
    The agent definitions in `adoption/agents/claude/` changed after `v2026.09.26.2` in `blind-adjudicator.md`, whose
    leak check now names the GPT-6 and Claude families (astra, gpt-6-sol, gpt-6-luna, gpt-5.6-terra, fable, mythos);
    a host at that tag installs the earlier list. They changed after `v2026.09.24.1`:
@@ -558,11 +584,9 @@ GitHub-hosted macOS runner; see
    above. On a host already registered from the tag the installer reports
    `serena` as differing; run `claude mcp remove serena -s user`, then
    `python3 tools/adoption/install_claude_profile.py --only mcp`. The tag's
-   template also registers `jcodemunch` at user scope. This one has no
-   `jcodemunch` entry, and the installer only visits the servers the template
-   names, so it neither adds nor removes one: a host registered from the tag
-   runs `claude mcp remove jcodemunch -s user` and opts in per project as
-   above.
+   template also registered `jcodemunch` at user scope, as this one does again
+   (changed 2026-10-04), so a host registered from the tag keeps that entry and
+   the installer reports it as already registered.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude
@@ -578,7 +602,7 @@ GitHub-hosted macOS runner; see
    ```sh
    claude plugin marketplace add mksglu/context-mode --scope user
    claude plugin install context-mode@context-mode --scope user --json
-   claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user
    claude plugin install claude-hud@claude-hud --scope user --json
    claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
    claude plugin install codex@openai-codex --scope user --json
@@ -593,9 +617,9 @@ GitHub-hosted macOS runner; see
    ```sh
    python3 - <<'EOF'
    import json, os, pathlib, re, subprocess
-   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude
+   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.10.0), codex-for-claude
        "context-mode@context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b",
-       "claude-hud@claude-hud": "ef5f1c8b167572ad1443c70629763ea8780af96b",
+       "claude-hud@claude-hud": "75683c6de1ac07f6bbef00d739001679dba0740c",
        "codex@openai-codex": "db52e28f4d9ded852ab3942cea316258ae4ef346",
    }
    by_content = {"context-mode@context-mode": "mksglu/context-mode"}  # default-branch install, no ref

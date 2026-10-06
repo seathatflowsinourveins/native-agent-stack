@@ -887,7 +887,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -1680,8 +1680,8 @@
     },
     {
       "component_id": "claude-hud",
-      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "version": "0.8.0",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "version": "0.10.0",
       "profile": "optional",
       "role": "Claude statusline rendering",
       "installation_assessment": "runtime present at retained native operation date",
@@ -1729,6 +1729,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-hud-0100-qualification-20261004",
+            "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1747,7 +1752,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -1918,7 +1923,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.3",
+      "version": "0.160.0",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2114,6 +2119,11 @@
             "id": "codex-01593-hindsight-native-memory-20261001",
             "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "runtime-sdk-20261003",
+            "path": "evidence/receipts/runtime-sdk-20261003.json",
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [],
@@ -2730,7 +2740,7 @@
           "fresh-dagu-history",
           "fresh-dagu-isolated-native"
         ],
-        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed."
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed. The separate Dagu 2.18.2 compatibility attempt is referenced by the independent new-WSL profile at adoption/new-wsl-profile.json (Dagu and mise evidence_refs), not this stack component; this component and its observed installation remain 2.16.6."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
@@ -2748,7 +2758,7 @@
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Historical Dagu 2.16.6 host availability from the retained September receipts. The separate new-WSL 2.18.2 archive qualification does not establish installation or cutover of this held stack component.",
           "evidence_refs": [
             "blueprints/us-equities/research-runtime/receipt.json",
             "adoption/paired/receipt.json",
@@ -3201,10 +3211,10 @@
     {
       "component_id": "edgartools",
       "repository": "https://github.com/dgunning/edgartools",
-      "version": "5.58.0",
+      "version": "5.60.0",
       "profile": "supporting",
       "role": "Native SEC filing-index acquisition and local parsing; bounded raw-source provenance with historical strategy availability still gated",
-      "installation_assessment": "runtime present at retained native operation date",
+      "installation_assessment": "At 5.58.0: runtime present at retained native operation date. The selected 5.60.0 pin has scoped native SEC acceptance on 2026-10-04 in native-sec-edgartools-5600-20261004 and NativeStack2604 install PASS plus 25/25 offline acceptance on 2026-10-05 in native-trading-runtime-2604-rerun-d02c0827-20261005. Earlier lifecycle stages and artifact baselines below retain their 5.58.0 scopes; this row mirrors the selected stack pin without recertifying the host through this audit. Independent review of the NativeStack2604 rerun remains pending.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/edgartools",
@@ -3253,12 +3263,22 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-sec-edgartools-5600-20261004",
+            "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
+            "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-edgar-markdown"
         ],
-        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+        "scope": "At 5.58.0: Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings. The added 5.60.0 receipts record native SEC network acceptance and destination-host install/offline checks within their stated scopes; they do not establish a new token baseline or independent review."
       },
       "artifact_baselines": [
         {
@@ -3282,7 +3302,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -4990,8 +5010,8 @@
     },
     {
       "component_id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "version": "0.14.1",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "version": "0.14.2",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
       "installation_assessment": "runtime present at retained native operation date",
@@ -5041,6 +5061,11 @@
             "id": "mcporter-0141-qualification-20260925",
             "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "mcporter-0142-qualification-20261004",
+            "path": "evidence/receipts/mcporter-0142-qualification-20261004.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5062,7 +5087,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -5331,15 +5356,15 @@
     {
       "component_id": "omniroute",
       "repository": "https://github.com/diegosouzapw/OmniRoute",
-      "version": "3.8.50",
+      "version": "3.8.51",
       "profile": "optional",
       "role": "Optional authenticated model gateway with scoped compression previews and persisted usage/cache observations",
-      "installation_assessment": "Clean isolated upstream npm installation and local Linux lifecycle accepted; the installed package is retained, with only its acceptance processes stopped and state archived.",
+      "installation_assessment": "At 3.8.50: Clean isolated upstream npm installation and local Linux lifecycle accepted; the installed package is retained, with only its acceptance processes stopped and state archived. The released 3.8.51 npm package has scoped 2026-09-30 isolated install, rebuild and local boot/restart qualification. Earlier lifecycle stages below retain their original fixture/release scopes; this row mirrors the selected stack pin without recertifying the host.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/omniroute",
         "documented_commands": [
-          "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.50",
+          "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.51",
           "omniroute serve --port \"${OMNIROUTE_PORT}\" --no-open --no-tray --daemon",
           "omniroute status",
           "omniroute api compression post-api-compression-preview --body @preview.json"
@@ -5369,6 +5394,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "omniroute-3851-npm-qualification-20260930",
+            "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [],
@@ -5385,7 +5415,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "The optional package is installed. Unresolved gateway-native use, exact-model/effort compatibility and encrypted native restore are functional/recovery limits, not missing package installation.",
-      "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+      "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",
@@ -7378,8 +7408,8 @@
     },
     {
       "component_id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-      "version": "0.50.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "version": "0.51.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
       "installation_assessment": "runtime present at retained native operation date",
@@ -7479,6 +7509,11 @@
             "id": "rtk-050-qualification-20260925",
             "path": "evidence/receipts/rtk-050-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "rtk-051-qualification-20261004",
+            "path": "evidence/receipts/rtk-051-qualification-20261004.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7508,7 +7543,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",

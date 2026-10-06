@@ -143,8 +143,27 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00` |
-| `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |
+| `stack-researcher.toml` | `52620afd5a6ded09adeffcfa652007c04f413c18d200ff0c2ae268b5f310fe52` |
+| `stack-verifier.toml` | `aab3b1f7980344adac583bb74ceb5f7d3b1cb98f75b552d993cb4b77626bfc34` |
+
+### 2026-10-04: RTK pin guidance amendment
+
+The maintained carriers now describe RTK 0.51.0's missing-file diff exit 2 ([bf23cff](https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f)). Both installed versions reject environment assignments and shell builtins after `proxy` with exit 1, so verifier guidance places assignments before the prefix or invokes `env`, and leaves builtins in the calling shell. The upstream v0.50.0 awareness block remains byte-identical; the earlier freeze digests were ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00 (researcher) and 281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd (verifier). The table above carries current carrier digests, not a new frozen E2E or spawned-role acceptance.
+
+### 2026-10-05: Qualified RTK excerpt (superseded by repair round 3)
+
+The [context budget decision](../../docs/decisions/2026-10-05-harness-context-budget.md)
+qualifies the inline [RTK 0.51.0 awareness source](https://github.com/rtk-ai/rtk/blob/v0.51.0/hooks/rtk-awareness-full.md)
+by removing only its blanket prefix-safety and unchanged-behavior assurances.
+All five example roles and their adoption sources carry the same corrected F4
+block; their role, model and delegation instructions stay unchanged. The original
+awareness file remains pinned in the worker-lane fixture. The table above carries
+current digests; the October 4 digests were
+`48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77`
+(researcher) and `18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b`
+(verifier). Historical freeze artifacts remain historical; this is structural
+validation, with no new spawned-role or E2E acceptance.
+
 
 The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here, new rows in `SHA256SUMS` and new rows in the test.
 
@@ -200,3 +219,16 @@ Two things stay open. `codex exec resume --help` at 0.157.1 lists no `-p`, `-s` 
 `resume` reach the resumed session is not verified: read the resumed parent's first `turn_context` for the model, effort, sandbox and working
 directory before relying on R5. And R5's claim that the role is re-applied from disk on resume is not observable without changing the
 installed file, so it is not a pass rule.
+
+### 2026-10-05: Repair round 3, verbatim RTK awareness
+
+The coordinator's repair decision supersedes the qualified excerpt above. All
+five roles and their mirrors now carry the complete upstream awareness file
+[at v0.51.0, commit e001f773](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/hooks/rtk-awareness-full.md)
+verbatim, followed by the separate local exceptions. The existing managed-block
+writer inlines that vendored file for Codex; its native `@RTK.md` reference does
+not expand in Codex. The table above records current carrier hashes; before this
+repair they were `9b8838cf074223e302061e1953f687223b62163b637421801ccd37f8b2633e84`
+(researcher) and `7bc14292b6a4c2a5eb8f9eea7ebd2275309b6008020cd1afe2a745a89404f448`
+(verifier). Historical freeze artifacts remain unchanged. This is a structural
+repair, with no new spawned-role or model acceptance.

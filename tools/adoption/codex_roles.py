@@ -20,7 +20,8 @@ linear scan (a backtracking expression was flagged as a denial-of-service risk h
         what `codex doctor --json` says about the role files, from two reports of one scratch home (counts only)
 
 Sources: openai/codex rust-v0.157.1 (36650394) codex-rs/agent-roles/src/{agent_role_config,loader,discovery}.rs,
-codex-rs/core/src/agent/role.rs, codex-rs/cli/src/doctor.rs; rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md.
+codex-rs/core/src/agent/role.rs, codex-rs/cli/src/doctor.rs; rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md
+(verbatim, e001f773; docs/decisions/2026-10-05-harness-context-budget.md).
 """
 
 from __future__ import annotations
@@ -32,6 +33,8 @@ import os
 import stat
 import tomllib
 from pathlib import Path
+
+import managed_block
 
 ROOT = Path(__file__).resolve().parents[2]
 ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
@@ -67,10 +70,10 @@ ROLE_EFFORT = "max"
 # role's own model would replace both, since the role applies after the spawn's model and the default_subagent_model
 # (openai/codex rust-v0.159.2 core/src/agent/child_config.rs:62-73,204-206; core/src/agent/role.rs:184-186).
 INHERITED_MODEL_ROLES = frozenset({"isolated-builder"})
-UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
-# Byte identity of upstream hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec).
+# Unchanged hooks/rtk-awareness-full.md from rtk-ai/rtk v0.51.0 (e001f773).
 RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 ONE_AGENT_SENTENCE = "You do not spawn, message or follow up with other agents."
 WORKING_DIRECTORY_BULLET = (
@@ -282,8 +285,8 @@ def frozen_denylist() -> tuple:
 
 @functools.lru_cache(maxsize=None)
 def f4_block() -> str:
-    """The F4 block: from the rtk-upstream marker through the shell-builtin line of the Codex AGENTS template."""
-    template = AGENTS_TEMPLATE.read_text(encoding="utf-8")
+    """The rendered F4 block: pinned native awareness plus the separate local exceptions."""
+    template = managed_block.codex_block(AGENTS_TEMPLATE.read_text(encoding="utf-8"))
     return UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(END_MARKER, 1)[0]
 
 
@@ -372,8 +375,8 @@ def _rule_worktree(role, stem, data):
 
 # (rule id, roles it applies to, source, check). Sources are openai/codex at rust-v0.157.1 (36650394) unless a
 # repository path or another tag is given. codex-rs/agent-roles/src/agent_role_config.rs and core/src/agent/role.rs,
-# whose lines the role-file rules cite, are byte-identical at rust-v0.159.2, the lane's Codex pin since unit D4 (sha256
-# 70ba8cf41c7339a0... and 0311e6438eda278a..., both tags read 2026-10-01), so those citations hold at the pin; a check
+# whose lines the role-file rules cite, are byte-identical at rust-v0.159.2 and the selected Linux pin rust-v0.160.0
+# (sha256 70ba8cf41c7339a0... and 0311e6438eda278a..., both tags compared 2026-10-03), so those citations hold at the pin; a check
 # returns True when the rule is violated. The carriers' rules reach the worker roles
 # through ALL_ROLES; exact_shapes stays with the carriers, whose E2E measured it, and the worker roles carry the same six
 # exceptions in their F4 block.
@@ -414,8 +417,9 @@ RULES = (
      "(Sol/Max primary workers, Astra/Max judgment)",
      _rule_effort_pin),
     ("f4_block", ALL_ROLES,
-     "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.50.0 "
-     "hooks/rtk-awareness-full.md (RTK_SHA256); adoption/templates/codex.AGENTS.template.md",
+     "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.51.0 "
+     "hooks/rtk-awareness-full.md (verbatim, RTK_SHA256); adoption/templates/codex.AGENTS.template.md; "
+     "docs/decisions/2026-10-05-harness-context-budget.md",
      _rule_f4_block),
     ("claude_only_name", ALL_ROLES,
      "adoption/agents/claude/stack-*.md and adoption/hooks/claude/token-lanes-block.*.md name tools, frontmatter "

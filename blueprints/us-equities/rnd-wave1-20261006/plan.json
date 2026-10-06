@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "rnd-wave1-20261006",
+  "status": "preregistered_pending_command_center_read",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "north_star_action": "Make the first empirical read of daily/intraday catalyst research, including historical +200% mover discovery, legitimate (an inspection registry) and reproducible on NativeStack2604 (an E2 replay); no strategy, paper or broker claim.",
+  "R1": {
+    "kind": "offline inspection and exposure registry for catalyst v1",
+    "requires": [
+      "blueprints/us-equities/catalyst-experiment/protocol.json chronology.inspection_registry",
+      "blueprints/us-equities/catalyst-experiment/contract.py reserved_access (lines 144-152)"
+    ],
+    "window": ["2021-01-01", "2026-09-30"],
+    "v1_segments": {"development": ["2022-01-01", "2023-12-31"], "validation": ["2024-01-01", "2024-12-31"], "reserved": ["2025-01-01", "2025-12-31"]},
+    "known_reads": [
+      {"name": "broad-universe reserved segment evaluation", "source": "blueprints/us-equities/broad-universe/protocol.json; README.md (reserved segment and its single evaluation)"},
+      {"name": "mover-early-entry 2024-2025 validation", "source": "blueprints/us-equities/mover-early-entry/protocol.json; README.md (validation read)"},
+      {"name": "extreme-gainer price audit, 957 events", "source": "blueprints/us-equities/extreme-gainer-audit/README.md; plan.json; deviations.json"},
+      {"name": "mover-coverage-asof E2, 715 package events 2021-2025", "source": "blueprints/us-equities/mover-coverage-asof/README.md; evidence/summary-asof-20260929.json"},
+      {"name": "inspected 2021Q1 ETF control and the LEAN/AAPL2020, FB/META2022 samples", "source": "blueprints/us-equities/catalyst-experiment/protocol.json chronology.previously_inspected"}
+    ],
+    "entry_fields": ["id", "scope_kind", "identifiers_or_universe", "date_range", "access_kind", "purpose", "source_commit", "source_path_line", "source_sha256"],
+    "access_kinds": ["data_read", "result_inspected", "outcome_selected"],
+    "conservative_rule": "A universe-wide read over a date range marks every case of that universe in that range inspected.",
+    "hypotheses": {
+      "H1.1": "Every known_reads item has at least one entry; misses found after the freeze become dated deviations.",
+      "H1.2": "contract.reserved_access refuses every case covered by an inspected entry in synthetic tests (>=1 per entry kind) and admits a synthetic uninspected case with a valid hash.",
+      "H1.3": "catalyst-experiment/protocol.json and contract.py are byte-identical to base_commit.",
+      "D1": "A v1 session whose eligible universe is covered by an inspected entry is ineligible for reserved evaluation, with no substitute dates; eligible session counts are reported per segment; no performance claim."
+    },
+    "receipts": ["inspection-registry.json and sha256", "builder", "synthetic tests", "summary: entries by kind, eligible sessions per segment", "scripts/validate.py pass"]
+  },
+  "R2a": {
+    "kind": "offline replay of E2 on NativeStack2604",
+    "input_run": "research/asof-20260929 under the private state root, copied from NativeStack into a fresh 0700 directory",
+    "input_sha256": {
+      "control.json": "d7e208414379fb26b03db67b3462e72c6adf717e011deb1ec7f00e8b9605c722",
+      "fetch-status.json": "eaf8e3ad20c9160c68b1e11763e5a39249ebc92f7686cdfa9bdefa7a32c1bddc",
+      "inputs/package/datasets/alias-map.csv": "6a75792c73faa572434346af0f79dbbf87008960d89431cb7fab235f714099da",
+      "inputs/package/datasets/forward-returns-2021-2026.csv": "d4f80668ea33191a955d2b86b125e2d4dfcbe3263421410117920e73fde48ec0",
+      "request-log.json": "efd19b84270287caf91bf86b9bfffda615b63bc1e02ade252868babad72ec8c2",
+      "snapshot-f1.json": "6fd9a1bd34dd498d89d271517e58b2d6bda822c766531b7e17747ff86b9121d2",
+      "snapshot-f2.json": "1854394adbdc7f6787b37c034d1e2de5ed8d7558536db9d9ee1f56d91dac8c97"
+    },
+    "package_zip_sha256": "a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c",
+    "plan_sha256": "5a5937e16f33c69e08034eb9f9bfb02acad05d2f8a929148e4d1c8bb3f2d9951",
+    "arms": {
+      "A_exact": {"refetch_commit": "99dfec7cf6bdd2bc49f0099206ed84fc1d88ebb1", "refetch_sha256": "fc6d5415550198601d1089f92d722026622e41ff2b12758e3a2c0b9e1f99d3e4"},
+      "B_current": {"refetch_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60", "refetch_sha256": "cdac99732694dca24467af3dfb4dc8dc8c80be485c8ef27c995de9c9f9f6f0b9"}
+    },
+    "procedure": "Each arm on its own fresh copy without results.json, labels.json, summary.json and verify.json: refetch.py classify --out-dir <copy>/e2, then classify --out-dir <copy>/e2 --verify. No network, no credential, nice 19, TMPDIR outside /tmp.",
+    "interpreter": "Python 3.12.3 with numpy 2.5.3 (mover-early-entry/README.md:44), 2604 research runtime project",
+    "expected": {
+      "A_results.json": "406f582c484b67c3e352c2a31a69a8cd8eb76dfb66ec1fc2c3386a707cb7fb26",
+      "A_labels.json": "19e276665707e3ec2ba70aad365afaf6d2277240d4619681627ec87dd8993108",
+      "package_events_in_window": 715,
+      "N2": 594,
+      "N2_by_close_to_close_1d_ratio": {"3/2": 507, "2": 261, "3": 97}
+    },
+    "hypotheses": {
+      "H2.1": "Arm A reproduces results.json and labels.json byte for byte and its verify passes.",
+      "H2.2": "Both arms give the expected totals.",
+      "H2.3": "Arm B's output hashes are reported; a difference from Arm A is a code-revision effect, described field by field, not a replay failure."
+    },
+    "fail_rule": "An input-hash mismatch or an Arm A mismatch is a FAIL retained as is; no retry with changed inputs."
+  },
+  "R2b": {
+    "kind": "descriptive profile of the +200% events",
+    "starts_after": "R1 registers E2's events as inspected and adds this profile as an inspection (purpose: descriptive profile)",
+    "populations": {"ratio_3": 97, "ratio_2": 261},
+    "dimensions": ["year", "price bucket", "dollar-volume bucket", "session timing", "package catalyst tag (unverified claim)"],
+    "claim_rule": "Description only; gainers-only, outcome-selected set with no negatives: any recall, precision or predictive claim is insufficient_evidence (catalyst-experiment protocol.json promotion.extreme_label_claim).",
+    "use_rule": "May inform hypothesis generation for a later catalyst design (development only); never selects thresholds for an evaluation segment.",
+    "receipts": ["totals-only bucket counts through the existing schema scan; per-event tables private"]
+  },
+  "R3_optional": {
+    "kind": "cross-family pre-outcome review of the mover-v3 core draft",
+    "source": "blueprints/us-equities/mover-v3/protocol-core-draft.json freeze_preconditions",
+    "synthetic_suite_runtime": "uv-managed CPython 3.13.15 (mover-v3/study/runtime.lock:3-4); read-only review if not installed"
+  },
+  "not_in_wave": [
+    "catalyst v1 on historical data (availability requires separately evidenced original timestamps, protocol.json:21; no historical Item parser or CIK map)",
+    "simulation-research continuation and identity readiness (as-known universe and availability data absent on both hosts)",
+    "advancing the open data gates pre-2020-delisting, dated-security-identity, pit-news-filings (catalogs/us-equities/gates-20260922.json)",
+    "any acquisition, broker or market-data request, or credential on NativeStack2604"
+  ],
+  "refusals_preserved": [
+    "SEC HTTP 403 (blueprints/us-equities/simulation-research/README.md)",
+    "E1 inputs_missing refusal (mover-coverage-asof/evidence/summary-asof-20260929.json E1.gate)",
+    "feed=otc 403 (broad-universe/README.md)",
+    "immutable failed identity receipt (identity-readiness/README.md)",
+    "preregistered audit overturn (extreme-gainer-audit/deviations.json)",
+    "paid-data gates and SSRN 403 (mover-v3/README.md)",
+    "mover-v3 commands refuse before its freeze (mover-v3/README.md)",
+    "the inspected 2021 control segment is never a fresh holdout"
+  ],
+  "execution": {
+    "executors": "co-op Codex lanes (GPT-6.1 Sol) via OmniRoute with an explicit --base-url on the 2604 gateway until the worker default changes; bounded runtime workers",
+    "windows": "nice 19; outside 10:35-13:45Z and 19:50Z-00:10Z",
+    "division": "deterministic code holds every count, hash and decision; models draft registry entries and descriptions only",
+    "review": "GPT-built outputs get a Claude Opus cross-family read before publication",
+    "records": "every attempt, failures included, kept with exit code and time; deviations are dated files beside this plan"
+  }
+}

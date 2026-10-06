@@ -17,6 +17,7 @@ from pathlib import Path
 import socket
 import sys
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/adaptive-paper"
@@ -1191,17 +1192,18 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         self.assertEqual(sorted(events[0]["corporate_action_must_flatten"]), ["AAPL"])
         self.assertEqual(sorted(events[0]["corporate_action_block_entry"]), ["AAPL", "MSFT"])
 
-    # -- finding 6: a session-calendar failure (a clock outside the frozen
-    # calendar's covered years) must block entry and flag needs_attention,
+    # -- finding 6: a session-calendar failure must block entry and flag needs_attention,
     # but must NOT force-flatten a held position -- a calendar gap is not
     # evidence of an actual corporate action.
     def test_calendar_failure_blocks_entry_but_never_force_flattens(self):
-        # 2028-01-04 10:00 ET -- outside sessions.CALENDAR_YEARS (2026, 2027).
+        # XNYS now covers 2028; inject a real calendar failure rather than
+        # relying on the removed hand table's two-year coverage limit.
         out_of_range_clock = lambda: 1830610800.0
         guard_decisions = {}  # never consulted: the ValueError branch short-circuits first
         strategy = self.strategy(held={"AAPL": 3}, targets={"AAPL": 3}, guard_decisions=guard_decisions,
                                  clock=out_of_range_clock)
-        strategy.rebalance()
+        with mock.patch("native_strategy.next_trading_day", side_effect=ValueError("calendar_failed")):
+            strategy.rebalance()
         self.assertEqual(strategy.submitted, [], "a calendar failure alone must never force a flatten sell")
         events = [e for e in strategy.events if e.get("type") == "corporate_action_guard"]
         self.assertEqual(len(events), 1)

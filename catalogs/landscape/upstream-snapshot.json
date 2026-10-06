@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 271,
+    "api_commands": 284,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -52,8 +52,8 @@
         "canonical": "https://github.com/headroomlabs-ai/headroom"
       }
     ],
-    "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 254,
+    "recommendation": "Retain current qualified pins; review the 4 newer stable releases against actual capability gaps before upgrading. Dagu 2.16.6 remains held by the trading lane; the separate new-WSL profile selects 2.18.2. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
+    "selected_component_api_commands": 267,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -596,32 +596,32 @@
     {
       "component_id": "claude-hud",
       "repository": "https://github.com/jarrodwatts/claude-hud",
-      "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "selected_version": "0.8.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "selected_version": "0.10.0",
+      "selected_source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "checks": [
         {
           "endpoint": "repos/jarrodwatts/claude-hud",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:49.299526+00:00",
-          "ended_at": "2026-09-21T22:30:49.703719+00:00",
-          "stdout_sha256": "6e2cbb809f5d65907d9a422b29a2c5723bfe60a92035a81300a397fecd6b7665",
+          "started_at": "2026-10-04T13:59:39.373364+00:00",
+          "ended_at": "2026-10-04T13:59:39.670092+00:00",
+          "stdout_sha256": "8a16cecd2e719e98493f6760effc16224ebe6277c650b8d47b29c4c7e9623c9f",
           "status": "ok"
         },
         {
           "endpoint": "repos/jarrodwatts/claude-hud/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:49.703816+00:00",
-          "ended_at": "2026-09-21T22:30:50.029959+00:00",
-          "stdout_sha256": "292aaa5740254116774836f04a4fb4edc2ca2ddecd1c75d4884eb56485fe4985",
+          "started_at": "2026-10-04T13:59:39.670214+00:00",
+          "ended_at": "2026-10-04T13:59:39.918599+00:00",
+          "stdout_sha256": "6a227a56e88b9680c31a36105086e7bd403a3fe19de83f88c30bacc95e7e1953",
           "status": "ok"
         },
         {
-          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.8.0",
+          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.10.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:50.030138+00:00",
-          "ended_at": "2026-09-21T22:30:50.601153+00:00",
-          "stdout_sha256": "66174593d5a241eac00582b9b17e17d57beed7ab23d107152aa96ac77282b528",
+          "started_at": "2026-10-04T13:59:39.918736+00:00",
+          "ended_at": "2026-10-04T13:59:40.251395+00:00",
+          "stdout_sha256": "91a438d860f1044f8b9e712ef25f81e5081f71c7e07ee27e174a7d692d1275ad",
           "status": "ok"
         }
       ],
@@ -629,27 +629,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-19T21:32:54Z",
+      "pushed_at": "2026-10-03T21:32:41Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.8.0",
-        "published_at": "2026-08-18T14:20:35Z",
-        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+        "tag_name": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.8.0",
-        "sha": "ef5f1c8b167572ad1443c70629763ea8780af96b",
-        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/ef5f1c8b167572ad1443c70629763ea8780af96b",
-        "committed_at": "2026-08-18T14:18:36Z"
+        "ref": "v0.10.0",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/jarrodwatts/claude-hud",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
+      }
     },
     {
       "component_id": "codebase-memory-mcp",
@@ -713,8 +719,8 @@
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
-      "selected_version": "0.159.3",
-      "selected_source_pin": "01fc69f4026735edfdf6789820549727a4867b11",
+      "selected_version": "0.160.0",
+      "selected_source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
       "checks": [
         {
           "endpoint": "repos/openai/codex",
@@ -787,6 +793,30 @@
           "ended_at": "2026-10-01T14:06:21.679064+00:00",
           "stdout_sha256": "fa9bbf0a0042daa551d8172ac057956cf5bf712cb9ddac927cfa301210aebae1",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/tags/rust-v0.160.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T00:21:20.548910+00:00",
+          "ended_at": "2026-10-03T00:21:20.982741+00:00",
+          "stdout_sha256": "e3e23e5d65bbf7f68d945a8803a6ad3e3a8119c581b397f2e64e4e2f16914a20",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T00:21:20.985689+00:00",
+          "ended_at": "2026-10-03T00:21:21.388148+00:00",
+          "stdout_sha256": "e3e23e5d65bbf7f68d945a8803a6ad3e3a8119c581b397f2e64e4e2f16914a20",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/commits/rust-v0.160.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T00:21:21.391289+00:00",
+          "ended_at": "2026-10-03T00:21:21.700478+00:00",
+          "stdout_sha256": "432259f746744f79ad1444261a1f57fb9fdb3a61d9c03cc677ffddd7678ecd48",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/openai/codex",
@@ -796,18 +826,18 @@
       "pushed_at": "2026-10-01T13:58:06Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "rust-v0.159.3",
-        "published_at": "2026-09-30T22:57:34Z",
-        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
-        "target_commitish": "main",
+        "tag_name": "rust-v0.160.0",
+        "published_at": "2026-10-01T20:19:13Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+        "target_commitish": "a956835d020762cb2b570053af06f643a11c0ecc",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "rust-v0.159.3",
-        "sha": "01fc69f4026735edfdf6789820549727a4867b11",
-        "html_url": "https://github.com/openai/codex/commit/01fc69f4026735edfdf6789820549727a4867b11",
-        "committed_at": "2026-09-30T21:46:21Z"
+        "ref": "rust-v0.160.0",
+        "sha": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "html_url": "https://github.com/openai/codex/commit/a956835d020762cb2b570053af06f643a11c0ecc",
+        "committed_at": "2026-10-01T17:13:37Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
@@ -815,10 +845,10 @@
       "primary_repository": "https://github.com/openai/codex",
       "release_relationship": "selected_version_matches_latest_stable",
       "selected_pin_source": {
-        "ref": "01fc69f4026735edfdf6789820549727a4867b11",
-        "sha": "01fc69f4026735edfdf6789820549727a4867b11",
-        "html_url": "https://github.com/openai/codex/commit/01fc69f4026735edfdf6789820549727a4867b11",
-        "committed_at": "2026-09-30T21:46:21Z"
+        "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "sha": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "html_url": "https://github.com/openai/codex/commit/a956835d020762cb2b570053af06f643a11c0ecc",
+        "committed_at": "2026-10-01T17:13:37Z"
       },
       "selected_pin_matches_latest_release_commit": true
     },
@@ -1450,32 +1480,32 @@
     {
       "component_id": "mcporter",
       "repository": "https://github.com/openclaw/mcporter",
-      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "selected_version": "0.14.1",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "selected_version": "0.14.2",
+      "selected_source_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
       "checks": [
         {
           "endpoint": "repos/openclaw/mcporter",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:21.515671+00:00",
-          "ended_at": "2026-09-25T20:59:21.923837+00:00",
-          "stdout_sha256": "b3f524e759af70b735b18ba3265fd11367d905d57137133f3d8b5a0e6e8f6b98",
+          "started_at": "2026-10-04T13:59:37.304076+00:00",
+          "ended_at": "2026-10-04T13:59:37.645309+00:00",
+          "stdout_sha256": "c34fc2c98b2f4984bcc1106b3b77f25780f4610d1126d65f06fc854c4ef54379",
           "status": "ok"
         },
         {
           "endpoint": "repos/openclaw/mcporter/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:21.924008+00:00",
-          "ended_at": "2026-09-25T20:59:22.256453+00:00",
-          "stdout_sha256": "849eaa7722b314c1c79ace3ac1bd374b6a4f6b24a78c3cd24b2077d4fe7f050c",
+          "started_at": "2026-10-04T13:59:37.645474+00:00",
+          "ended_at": "2026-10-04T13:59:37.913634+00:00",
+          "stdout_sha256": "bb15c4f7e49e27e8aa78ebfb4e529206562678ad06606381a216e9883f930a3c",
           "status": "ok"
         },
         {
-          "endpoint": "repos/openclaw/mcporter/commits/v0.14.1",
+          "endpoint": "repos/openclaw/mcporter/commits/v0.14.2",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:22.256612+00:00",
-          "ended_at": "2026-09-25T20:59:22.618318+00:00",
-          "stdout_sha256": "d3d837ff22ae29f38338f6d5fd42009829326f89457a9c7fe73f29970f98904d",
+          "started_at": "2026-10-04T13:59:37.913797+00:00",
+          "ended_at": "2026-10-04T13:59:38.331553+00:00",
+          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
           "status": "ok"
         }
       ],
@@ -1483,27 +1513,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-25T11:19:38Z",
+      "pushed_at": "2026-10-01T18:43:11Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.14.1",
-        "published_at": "2026-09-24T13:16:08Z",
-        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+        "tag_name": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.14.1",
-        "sha": "93e0916cafe2d624b94271e31b75ca681a016514",
-        "html_url": "https://github.com/openclaw/mcporter/commit/93e0916cafe2d624b94271e31b75ca681a016514",
-        "committed_at": "2026-09-24T11:06:02Z"
+        "ref": "v0.14.2",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/openclaw/mcporter",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
+      }
     },
     {
       "component_id": "openresearch",
@@ -1901,32 +1937,32 @@
     {
       "component_id": "rtk",
       "repository": "https://github.com/rtk-ai/rtk",
-      "selected_repository_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-      "selected_version": "0.50.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "selected_version": "0.51.0",
+      "selected_source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
       "checks": [
         {
           "endpoint": "repos/rtk-ai/rtk",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:09:06.688018+00:00",
-          "ended_at": "2026-09-25T20:09:07.077689+00:00",
-          "stdout_sha256": "1743ded3363d2bdcf86ff118d0575a487b8bed71941dcf8fded67b043fa739bf",
+          "started_at": "2026-10-04T13:59:36.402720+00:00",
+          "ended_at": "2026-10-04T13:59:36.753096+00:00",
+          "stdout_sha256": "1d6b0f01162c859e97040449cf67fa81ec59ed685992ea384387884bc3f556bd",
           "status": "ok"
         },
         {
           "endpoint": "repos/rtk-ai/rtk/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:09:07.077794+00:00",
-          "ended_at": "2026-09-25T20:09:07.344426+00:00",
-          "stdout_sha256": "247043896c94397b0ad595b176f21b70b80967c84bcb85ee2bdcb97cf9f104a4",
+          "started_at": "2026-10-04T13:59:36.753258+00:00",
+          "ended_at": "2026-10-04T13:59:37.002034+00:00",
+          "stdout_sha256": "5443d352f9cbbe0b25f8b15ebb6538cbbc5f6cc43ed690cfaac197fd7db8b0bb",
           "status": "ok"
         },
         {
-          "endpoint": "repos/rtk-ai/rtk/commits/v0.50.0",
+          "endpoint": "repos/rtk-ai/rtk/commits/v0.51.0",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:09:07.344600+00:00",
-          "ended_at": "2026-09-25T20:09:07.664062+00:00",
-          "stdout_sha256": "3ed900f60361792b8c8fa84b1be35988bed740390f9b352ac99f31d26c24d1b9",
+          "started_at": "2026-10-04T13:59:37.002234+00:00",
+          "ended_at": "2026-10-04T13:59:37.303596+00:00",
+          "stdout_sha256": "d0136d235bf918c3d9e300bd0371123518db91b63797aba37c450ee285d7616d",
           "status": "ok"
         }
       ],
@@ -1934,27 +1970,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "develop",
-      "pushed_at": "2026-09-25T10:14:06Z",
+      "pushed_at": "2026-10-03T16:10:25Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.50.0",
-        "published_at": "2026-09-24T10:02:31Z",
-        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-        "target_commitish": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+        "tag_name": "v0.51.0",
+        "published_at": "2026-10-02T13:33:54Z",
+        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+        "target_commitish": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.50.0",
-        "sha": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
-        "html_url": "https://github.com/rtk-ai/rtk/commit/1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
-        "committed_at": "2026-09-24T10:01:59Z"
+        "ref": "v0.51.0",
+        "sha": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "html_url": "https://github.com/rtk-ai/rtk/commit/e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "committed_at": "2026-10-02T13:33:07Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/rtk-ai/rtk",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "sha": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "html_url": "https://github.com/rtk-ai/rtk/commit/e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "committed_at": "2026-10-02T13:33:07Z"
+      }
     },
     {
       "component_id": "sandbox-runtime",
@@ -3180,6 +3222,32 @@
           "ended_at": "2026-09-21T22:33:20.357797+00:00",
           "stdout_sha256": "38197a85596834c6bf0f4edc47f83284e9fb567567d5937bd632086dd8d798b3",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/releases/tags/v2.18.2",
+          "exit_code": 0,
+          "started_at": "2026-10-05T08:21:36.735725+00:00",
+          "ended_at": "2026-10-05T08:21:36.908976+00:00",
+          "stdout_sha256": "e5e98b1881c48f4183f5cca0ee2b44b6a6790cde42f0cc25998bf3a8a66b3f25",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/commits/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+          "exit_code": 0,
+          "started_at": "2026-10-05T08:21:36.909141+00:00",
+          "ended_at": "2026-10-05T08:21:37.212245+00:00",
+          "stdout_sha256": "4de427e0447bc20d43379c1df2869ef2876f1f4bbd4c2e22a7ab1ebd14daec90",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-05T09:58:54.132800+00:00",
+          "ended_at": "2026-10-05T09:58:54.343594+00:00",
+          "stdout_sha256": "9b18505341f2b54036fa4f18ee3b160b61fdc912a8ee68e1f8cc6142cb3556b1",
+          "status": "ok",
+          "native_client": "curl; unauthenticated public GET",
+          "hash_scope": "Raw HTTP response body saved directly to the task cache; stdout_sha256 is the snapshot response-digest field."
         }
       ],
       "canonical_repository": "https://github.com/dagucloud/dagu",
@@ -3189,9 +3257,9 @@
       "pushed_at": "2026-09-21T13:05:30Z",
       "license_spdx": "GPL-3.0",
       "latest_stable_release": {
-        "tag_name": "v2.17.0",
-        "published_at": "2026-09-21T13:31:48Z",
-        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.17.0",
+        "tag_name": "v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z",
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
@@ -3203,16 +3271,17 @@
         "committed_at": "2026-09-14T14:09:43Z"
       },
       "latest_release_source": {
-        "ref": "v2.17.0",
-        "sha": "f501e3fefb2e52f9430d56b8ac7a055ec97ce320",
-        "html_url": "https://github.com/dagucloud/dagu/commit/f501e3fefb2e52f9430d56b8ac7a055ec97ce320",
-        "committed_at": "2026-09-21T13:04:58Z"
+        "ref": "v2.18.2",
+        "sha": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "html_url": "https://github.com/dagucloud/dagu/commit/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "committed_at": "2026-10-04T03:12:18Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/dagucloud/dagu",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "newer_stable_release_review_pending",
+      "pin_move_checked_at": "2026-10-05T09:58:54.343594+00:00"
     },
     {
       "component_id": "lean",
@@ -3364,7 +3433,7 @@
       "repository": "https://github.com/alpacahq/alpaca-py",
       "selected_repository_url": "https://github.com/alpacahq/alpaca-py",
       "selected_version": "0.44.0",
-      "selected_source_pin": null,
+      "selected_source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "checks": [
         {
           "endpoint": "repos/alpacahq/alpaca-py",
@@ -3413,7 +3482,7 @@
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/alpacahq/alpaca-py",
       "release_relationship": "selected_version_matches_latest_stable"
     },
@@ -3609,8 +3678,8 @@
       "component_id": "edgartools",
       "repository": "https://github.com/dgunning/edgartools",
       "selected_repository_url": "https://github.com/dgunning/edgartools",
-      "selected_version": "5.58.0",
-      "selected_source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "selected_version": "5.60.0",
+      "selected_source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
       "checks": [
         {
           "endpoint": "repos/dgunning/edgartools",
@@ -3643,33 +3712,51 @@
           "ended_at": "2026-09-21T22:33:34.912551+00:00",
           "stdout_sha256": "8b9b67b5171dde734bd30ebeb3c8afe46222a42fce3030e61cdde09d3dc1c72a",
           "status": "ok"
+        },
+        {
+          "endpoint": "graphql",
+          "method": "POST",
+          "query": "query { repository(owner: \"dgunning\", name: \"edgartools\") { url nameWithOwner isArchived pushedAt defaultBranchRef { name } licenseInfo { spdxId } qualifiedRelease: release(tagName: \"v5.60.0\") { tagName publishedAt url isPrerelease isDraft tagCommit { oid committedDate url } } latestRelease { tagName publishedAt url isPrerelease isDraft tagCommit { oid committedDate url } } selectedCommit: object(oid: \"1e7a61b3a142dbf5d19bc82444f85239c1786348\") { ... on Commit { oid committedDate url } } } }",
+          "exit_code": 0,
+          "started_at": "2026-10-05T06:37:16.434963+00:00",
+          "ended_at": "2026-10-05T06:37:16.859278+00:00",
+          "stdout_sha256": "0f806371cc7c2ae7010bd43b6daa004679839912a6f415daf2997a857c468c76",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/dgunning/edgartools/releases/tags/v5.60.0",
+          "exit_code": 0,
+          "started_at": "2026-10-05T06:40:25.169025+00:00",
+          "ended_at": "2026-10-05T06:40:25.499191+00:00",
+          "stdout_sha256": "36f571cf720b1ed53289026a752baf758f8dd3a8ae332322201cdf8491daa849",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/dgunning/edgartools",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T10:27:25Z",
+      "pushed_at": "2026-10-05T01:21:22Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v5.58.0",
-        "published_at": "2026-09-11T15:41:47Z",
-        "html_url": "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
-        "target_commitish": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+        "tag_name": "v5.60.0",
+        "published_at": "2026-10-02T18:29:57Z",
+        "html_url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0",
+        "target_commitish": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
-        "sha": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
-        "html_url": "https://github.com/dgunning/edgartools/commit/abe44344c56cf4bfb5443e0debca7e39342f6e7a",
-        "committed_at": "2026-09-11T15:33:03Z"
+        "ref": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+        "sha": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+        "html_url": "https://github.com/dgunning/edgartools/commit/1e7a61b3a142dbf5d19bc82444f85239c1786348",
+        "committed_at": "2026-10-02T16:14:43Z"
       },
       "latest_release_source": {
-        "ref": "v5.58.0",
-        "sha": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
-        "html_url": "https://github.com/dgunning/edgartools/commit/abe44344c56cf4bfb5443e0debca7e39342f6e7a",
-        "committed_at": "2026-09-11T15:33:03Z"
+        "ref": "v5.60.0",
+        "sha": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+        "html_url": "https://github.com/dgunning/edgartools/commit/1e7a61b3a142dbf5d19bc82444f85239c1786348",
+        "committed_at": "2026-10-02T16:14:43Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
@@ -4678,8 +4765,8 @@
       "component_id": "omniroute",
       "repository": "https://github.com/diegosouzapw/OmniRoute",
       "selected_repository_url": "https://github.com/diegosouzapw/OmniRoute",
-      "selected_version": "3.8.50",
-      "selected_source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+      "selected_version": "3.8.51",
+      "selected_source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
       "checks": [
         {
           "endpoint": "repos/diegosouzapw/OmniRoute",
@@ -4712,33 +4799,81 @@
           "ended_at": "2026-09-21T22:34:38.087224+00:00",
           "stdout_sha256": "2853efc153b9758b22d675764e9a63854bd31a2f2453492248e3c97a99c8e50e",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:36.986832+00:00",
+          "ended_at": "2026-10-03T03:56:37.296746+00:00",
+          "stdout_sha256": "3aa39e7aa570c91da9d553f3e67955991fd44f08f2f88b56018140a47615ffe1",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:37.297180+00:00",
+          "ended_at": "2026-10-03T03:56:37.627452+00:00",
+          "stdout_sha256": "f7ac7cb7bb1026d82e934bbdd36321c1dcc491f08dd6362919fcc11710537091",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/commits/c1e30b7676975feb298b49eff6ff58923c04b89e",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:37.629036+00:00",
+          "ended_at": "2026-10-03T03:56:38.313072+00:00",
+          "stdout_sha256": "7e2a08c858091abb160f75e637194a6afc700481b8f95fffc069931c6d664267",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/commits/v3.8.51",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:38.321226+00:00",
+          "ended_at": "2026-10-03T03:56:38.959431+00:00",
+          "stdout_sha256": "7e2a08c858091abb160f75e637194a6afc700481b8f95fffc069931c6d664267",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/git/ref/tags/v3.8.51",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:38.967575+00:00",
+          "ended_at": "2026-10-03T03:56:39.219144+00:00",
+          "stdout_sha256": "b1dc972305ec00533bd98e3adee57f72482f0a9e2bc6830a4f9003f513f24588",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/git/tags/770faa7144f58ada625afc6efe572c8335484ec4",
+          "exit_code": 0,
+          "started_at": "2026-10-03T04:00:18.140192+00:00",
+          "ended_at": "2026-10-03T04:00:18.412671+00:00",
+          "stdout_sha256": "1b1bb4b696d8cc780f42bfa8d6b7b7ab13d21fcd8d8116a742d12501c404e3f4",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/diegosouzapw/OmniRoute",
       "archived": false,
       "disabled": false,
-      "default_branch": "release/v3.8.51",
-      "pushed_at": "2026-09-21T22:33:22Z",
+      "default_branch": "release/v3.8.52",
+      "pushed_at": "2026-10-02T18:26:57Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v3.8.50",
-        "published_at": "2026-08-26T19:30:30Z",
-        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
-        "target_commitish": "main",
+        "tag_name": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "target_commitish": "release/v3.8.52",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "sha": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "committed_at": "2026-08-26T19:29:05Z"
+        "ref": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "sha": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "committed_at": "2026-09-29T22:58:13Z"
       },
       "latest_release_source": {
-        "ref": "v3.8.50",
-        "sha": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "committed_at": "2026-08-26T19:29:05Z"
+        "ref": "v3.8.51",
+        "sha": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "committed_at": "2026-09-29T22:58:13Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

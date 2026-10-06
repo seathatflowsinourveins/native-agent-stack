@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "record": "wsl-lock-frozen-rename-20261004",
+  "purpose": "Retains the evidence for storing the retired WSL retrieval lock as package-lock.json.frozen. No dependency scanner reads that name, so the lock leaves the discovery that raised Dependabot alert 17 and Scorecard code-scanning alert 19, and the dedicated OSV-Scanner grant, due to expire on 2026-10-17, is deleted with its scan group.",
+  "fixed_means": "If GitHub reports alert 17 or alert 19 as fixed after this change merges, fixed means the lock was removed from name-based discovery. Nothing was patched: the archived bytes still pin braces 3.0.3, which GHSA-vfj7-8cjw-p6xm (CVE-2026-93687, high) affects and for which no patched release exists.",
+  "checked_commit": "f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5",
+  "observed_utc": "2026-10-04T08:24:12Z",
+  "authorization": "The coordinating session assigned this change on 2026-10-04. It carries out the 2026-10-03 convergence decision to rename both frozen npm locks to .frozen and stop scanning them in a follow-up pull request (docs/decisions/2026-09-22-github-automation-closure.md, alert-16 note, and the indirect_routes field of evidence/receipts/dependabot-alert-16-dismissal-20261003.json), for the WSL lock only, as PR-1 and option (b) of the 2026-10-04 GitHub-automation audit. It writes nothing outward except its pull request and dismisses no alert. Option (a), dismissing alert 17, would need the user's explicit authorization naming alert 17.",
+  "evidence_class": "Native runs of the pinned OSV-Scanner v2.6.0 binary on scratch copies (local, sanitized output retained); one read-only GitHub REST API GET of alert 17; local integration tests and local fault injection for the guard; source review of the cited documentation. No CI run, no live dependency-graph or code-scanning transition and no new-host acceptance is claimed here.",
+  "change": {
+    "from": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+    "to": "blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen",
+    "bytes": 82463,
+    "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+    "git_blob_before_and_after": "d37ec744aa859dc1324697643f6106d7d6bf6e77",
+    "git_rename_summary": "rename blueprints/convergence-practice/wsl-retrieval/{package-lock.json => package-lock.json.frozen} (100%)",
+    "removed": [
+      ".github/osv-scanner-frozen-wsl-retrieval.toml, the dedicated grant (ignoreUntil 2026-10-17)",
+      ".github/osv-scanner-lockfiles.json: the lockfiles entry that named that config, and the covered_by_lockfile entry that pointed package.json at the old lock",
+      ".github/workflows/security-scan.yml: the WSL group's config variable, input list, both non-empty guards, scan invocation, SARIF report, kept-artifact path, upload step and jq -e assignment, the removal list of the closure record's 2026-10-03 note",
+      "tests/test_osv_lockfile_coverage.py: the FROZEN_LOCKS row and the tests of the deleted grant"
+    ],
+    "reclassified": "blueprints/convergence-practice/wsl-retrieval/package.json moves to the inventory's new dependency_free class: a package.json that declares no dependency and has no lockfile beside it, so nothing is scanned for it.",
+    "kept": [
+      "The receipts, install inventory and 2026-10-03 retirement-assessment.json still name the lock package-lock.json; audit.py resolves that name to the archive, and none of them was rewritten.",
+      "experiment.json changes only the lock's path, with the same sha256, and the evaluation digests of audit.py and tests/test_wsl_retrieval.py, which scripts/validate_convergence.py binds and which this change edits.",
+      "The security-scan.yml preflight still runs tests.test_wsl_retrieval.RetiredRunnerTests, whose audit.py run now includes the discovery guard.",
+      "The macOS variant (alert 16's artifact), its OSV config and its tripwire's scope are unchanged; tests/test_frozen_macos_variant_no_use.py re-pins only the edited workflow assignment line, its copy in the coverage test and the edited dependabot.yml comment line."
+    ]
+  },
+  "alert_readback_before_merge": {
+    "command": "gh api repos/{owner}/{repo}/dependabot/alerts/17 --jq '{number, state, fixed_at, dismissed_reason, ghsa_id: .security_advisory.ghsa_id, cve_id: .security_advisory.cve_id, severity: .security_advisory.severity, package: .dependency.package.name, ecosystem: .dependency.package.ecosystem, manifest_path: .dependency.manifest_path, scope: .dependency.scope, relationship: .dependency.relationship, vulnerable_version_range: .security_vulnerability.vulnerable_version_range, first_patched_version: .security_vulnerability.first_patched_version}'",
+    "read_utc": "2026-10-04T08:12:31Z",
+    "exit_code": 0,
+    "result": {
+      "number": 17,
+      "state": "open",
+      "fixed_at": null,
+      "dismissed_reason": null,
+      "ghsa_id": "GHSA-vfj7-8cjw-p6xm",
+      "cve_id": "CVE-2026-93687",
+      "severity": "high",
+      "package": "braces",
+      "ecosystem": "npm",
+      "manifest_path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "scope": "runtime",
+      "relationship": "transitive",
+      "vulnerable_version_range": "<= 3.0.3",
+      "first_patched_version": null
+    },
+    "alert_19": "Not read by this change. The 2026-10-04 audit recorded it as a reused Scorecard code-scanning alert without a location whose only finding is GHSA-vfj7-8cjw-p6xm."
+  },
+  "discovery_sources": [
+    {
+      "source": "GitHub Docs, Dependency graph supported package ecosystems",
+      "url": "https://docs.github.com/en/code-security/reference/supply-chain-security/dependency-graph-supported-package-ecosystems",
+      "read_utc": "2026-10-04T08:03:25Z",
+      "finding": "Manifests are recognized by fixed file names: npm package-lock.json (recommended) and package.json (additional); pnpm pnpm-lock.yaml and package.json; Yarn yarn.lock and package.json; Deno deno.lock, deno.json and deno.jsonc. No .frozen form is listed."
+    },
+    {
+      "source": "OSV-Scanner v2.6.0 docs/supported_languages_and_lockfiles.md",
+      "url": "https://github.com/google/osv-scanner/blob/v2.6.0/docs/supported_languages_and_lockfiles.md",
+      "revision": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+      "sha256": "9af241420144883305f3a1cbf3cf62bbf188fac5ff1dac9462ac97160c8e45bc",
+      "read_utc": "2026-10-04T08:03:34Z",
+      "finding": "scan source extracts JavaScript dependencies from bun.lock, package-lock.json, pnpm-lock.yaml and yarn.lock."
+    },
+    {
+      "source": "OpenSSF Scorecard v5.5.0, the version ossf/scorecard-action v2.4.4 (2d1146689b8cda280b9bc96326124645441f03bc, pinned in .github/workflows/scorecard.yml) builds on",
+      "url": "https://github.com/ossf/scorecard/blob/v5.5.0/clients/osv.go#L78-L93",
+      "sha256": "2e494f8141c353cb558a20b10ee35e4d50798bdea72516681127e0f6e8726925",
+      "read_utc": "2026-10-04T08:12:05Z",
+      "finding": "The Vulnerabilities check calls osvscanner.DoScan with DirectoryPaths and Recursive: true and treats ErrNoPackagesFound as no vulnerabilities; docs/checks.md at v5.5.0 (sha256 ccfc71f01d63507cce12fd604838ababd2c2923dba3bbcd90342ab39cbe817e2) describes the check as OSV-based."
+    },
+    {
+      "source": "GitHub REST API docs, Dependabot alerts",
+      "url": "https://docs.github.com/en/rest/dependabot/alerts",
+      "read_utc": "2026-10-04T08:11:52Z",
+      "finding": "fixed_at is 'The time that the alert was no longer detected and was considered fixed'; state is one of auto_dismissed, dismissed, fixed and open."
+    }
+  ],
+  "osv_controls": {
+    "artifact": "evidence/artifacts/wsl-lock-frozen-rename-20261004/osv-controls.json",
+    "sha256": "f602d64c05934fd610bfbb0247f519b5cd69e098616a1cad44cbefed90fc493a",
+    "scanner_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "results": [
+      {"control": "npm-name", "input": "the lock alone as package-lock.json", "exit_code": 1, "outcome": "170 packages; GHSA-vfj7-8cjw-p6xm on braces 3.0.3 (CVSS 8.7, no fixed version)"},
+      {"control": "frozen-name", "input": "the same bytes alone as package-lock.json.frozen", "exit_code": 128, "outcome": "No package sources found; 0 Extract calls"},
+      {"control": "partition-before", "input": "the whole partition as at the base commit", "exit_code": 1, "outcome": "1 Extract call (the lock); the same advisory"},
+      {"control": "partition-after", "input": "the whole partition after the rename (same file list apart from the lock's name)", "exit_code": 128, "outcome": "No package sources found; 0 Extract calls over 31 inodes, so the dependency-free package.json is not a package source either"}
+    ]
+  },
+  "guard": {
+    "check": "audit_retirement in blueprints/convergence-practice/wsl-retrieval/audit.py, run by python3 blueprints/convergence-practice/wsl-retrieval/audit.py and by tests/test_wsl_retrieval.py",
+    "requires": [
+      "the lock exists only as package-lock.json.frozen, 82,463 bytes at sha256 5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb, tracked in Git, and the retirement assessment's record of it is unchanged",
+      "no package-lock.json, npm-shrinkwrap.json, yarn.lock or pnpm-lock.yaml exists anywhere in the partition, in any letter case, on disk or in the Git index",
+      "the same for bun.lock and deno.lock, a cited extension beyond the four names the brief requires: OSV-Scanner v2.6.0 and GitHub's dependency graph read them by name",
+      "Git can list the partition's tracked files; otherwise the check fails closed"
+    ],
+    "result_fields": "current_retirement_assessment.retained_lock: archive package-lock.json.frozen, scanner_discovered false, dependency_patched false"
+  },
+  "guard_mutation_checks": {
+    "artifact": "evidence/artifacts/wsl-lock-frozen-rename-20261004/guard-mutants.json",
+    "sha256": "40c7f933b28bfa2a20b3eac1d292501a53139cf8e79061c7180da124242d8eb3",
+    "harness": "evidence/artifacts/wsl-lock-frozen-rename-20261004/run-mutants.py.txt",
+    "harness_sha256": "eaa37ac567326a6e7b91fa44d28d43c0ddc61f73e9a03f7ca4c729bb8cace57f",
+    "summary": "M0, the unmutated guard, passes all 11 scenarios. Each of the eight code mutants M1-M8 (archive digest, assessment digest, disk names, npm-shrinkwrap.json, recursive walk, letter case, archive tracking, index names) fails its designated scenario with one failure and no error. N1, a message-only edit, survives as a negative control. LockDiscoveryGuardTests.test_each_requirement_is_enforced_by_a_scenario re-runs M1-M8 in every unittest run."
+  },
+  "post_merge_readback": {
+    "owner": "the coordinating session",
+    "commands": [
+      "gh api repos/{owner}/{repo}/dependabot/alerts/17 --jq '{state, fixed_at, dismissed_reason}'",
+      "gh api repos/{owner}/{repo}/code-scanning/alerts/19 --jq '{state, fixed_at}'"
+    ],
+    "expected": "Alert 17 fixed once the default branch's dependency graph no longer lists the lock; alert 19 fixed after the next Scorecard analysis of main no longer reports the advisory.",
+    "stop_condition": "If alert 17 is still open after the merge, stop and bring option (a) to the user; it needs the user's explicit authorization naming alert 17. Never dismiss alert 19."
+  },
+  "limitations": [
+    "The fixed state is expected from GitHub's documented meaning of fixed_at, not observed: no live dependency-graph or code-scanning transition was seen before merge. The coordinator's read-back is that evidence, and the stop condition governs a different outcome.",
+    "Alert 19 can clear only after a Scorecard run on main, and only if code scanning closes a location-less alert that a new analysis stops reporting; neither was observed.",
+    "The OSV controls are native runs on scratch copies with sanitized paths, not the CI workflow. The workflow's two-group routing is covered by recording-double tests, which are synthetic, and by the pull request's CI run.",
+    "The guard covers name-based discovery in this partition only. It does not prove that nothing restores or installs the archived bytes; the directory offers no supported route, and the 2026-10-03 devEngines guard covers supported npm entry points only.",
+    "braces 3.0.3 remains in the archived bytes. Active QMD 2.8.3 resolves braces 3.0.3 without a tracked lock; that reachability review is a separate item and is not addressed here.",
+    "audit.py fails closed outside a Git checkout, so it cannot pass on an exported tree without Git metadata."
+  ],
+  "overturn": "Restore a reviewed scan of this lock if GitHub's dependency graph, OSV-Scanner or Scorecard starts reading .frozen names, or if the lock's bytes change or an install or replay route for it returns (then it takes its npm name and the normal scan, or a new dated decision, as the 2026-09-25 decision's overturn says). If alert 17 stays open after the merge, apply the stop condition.",
+  "registrations": [
+    "docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md: the 2026-10-04 addendum",
+    "docs/decisions/2026-09-22-github-automation-closure.md: the 2026-10-04 note after the retired WSL partition",
+    ".github/osv-scanner-lockfiles.json: the dependency_free entry's evidence",
+    "blueprints/convergence-practice/wsl-retrieval/README.md: the 2026-10-04 section",
+    "manifests/evidence.json: this receipt, its three artifacts, the renamed lock and every changed file"
+  ]
+}

@@ -1,0 +1,1 @@
+- Normal local observation uses Grafana anonymous Viewer on loopback; native model clients retain their own sign-ins. Keep Dagu operator authentication distinct from the passwordless observation path; auth:none is not a global Viewer role.

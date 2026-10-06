@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-09-30",
+  "checked_at": "2026-10-05",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -35,7 +35,7 @@
     },
     "verdict_boundary": "Trial skills are not verdict winners; catalogs/landscape/foundation.json instructions-skills is unchanged until a sealed re-record."
   },
-  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides, applied by tools/adoption/apply_claude_settings.py (deep merge; a key removed here is never removed from a host, so demotion writes an explicit state).",
+  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides and skillListingBudgetFraction, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays). The new-WSL apply step keeps the 0.05 listing fraction under the user's 2026-09-30 directive; it does not retire this key (2026-10-05 harness-context-budget repair round 3).",
   "skills": [
     {
       "name": "typesafe-ai",
@@ -238,58 +238,6 @@
       "codex_enabled": true
     },
     {
-      "name": "grill-me",
-      "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/grill-me",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
-      "path": "skills/productivity/grill-me",
-      "tree_sha": "3df14e2d3a89459bf300614be9247e3ce74798f8",
-      "skill_md_sha256": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
-      "skill_md_bytes": 157,
-      "description_chars": 51,
-      "upstream_disable_model_invocation": true,
-      "upstream_allow_implicit_invocation": false,
-      "license": "MIT",
-      "official": false,
-      "audits": {
-        "gen_agent_trust_hub": "Pass",
-        "socket": "Pass",
-        "snyk": "Pass",
-        "url": "https://skills.sh/mattpocock/skills/grill-me",
-        "checked_at": "2026-09-25"
-      },
-      "status": "trial",
-      "gap": "User-invoked stress test of a plan before approval. Claude: user-invocable-only because upstream sets disable-model-invocation (SKILL.md frontmatter at c55ee46), so no listing cost; replacement pending the skills sweep (unit D1) and paired benchmark (unit D2). Codex: enabled from 2026-09-30, which restores explicit $grill-me only: upstream agents/openai.yaml sets allow_implicit_invocation: false, and Codex keeps such a skill out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148 at rust-v0.157.1).",
-      "claude_listing": "user-invocable-only",
-      "codex_enabled": true
-    },
-    {
-      "name": "improve-codebase-architecture",
-      "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
-      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
-      "path": "skills/engineering/improve-codebase-architecture",
-      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
-      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
-      "skill_md_bytes": 6000,
-      "description_chars": 125,
-      "upstream_disable_model_invocation": true,
-      "upstream_allow_implicit_invocation": false,
-      "license": "MIT",
-      "official": false,
-      "audits": {
-        "gen_agent_trust_hub": "Pass",
-        "socket": "Pass",
-        "snyk": "Warn",
-        "url": "https://skills.sh/mattpocock/skills/improve-codebase-architecture",
-        "checked_at": "2026-09-25"
-      },
-      "status": "trial",
-      "gap": "User-invoked architecture review of a grown module. Claude: user-invocable-only because upstream sets disable-model-invocation (SKILL.md frontmatter at c55ee46 and still at d81f3a1); replacement pending the skills sweep (unit D1) and paired benchmark (unit D2). Codex: enabled from 2026-09-30, which restores explicit $improve-codebase-architecture only: upstream agents/openai.yaml sets allow_implicit_invocation: false, and Codex keeps such a skill out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148 at rust-v0.157.1).",
-      "claude_listing": "user-invocable-only",
-      "codex_enabled": true
-    },
-    {
       "name": "security-threat-model",
       "source": "openai/skills",
       "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-threat-model",
@@ -336,31 +284,6 @@
       },
       "status": "trial",
       "gap": "The main ruleset requires review-thread resolution; PR review comments are addressed by hand.",
-      "claude_listing": "on",
-      "codex_enabled": true
-    },
-    {
-      "name": "semgrep",
-      "source": "trailofbits/skills",
-      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
-      "ref": "82fe8226252622fa807643bdca1710901198553a",
-      "path": "plugins/static-analysis/skills/semgrep",
-      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
-      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
-      "skill_md_bytes": 15678,
-      "description_chars": 707,
-      "upstream_disable_model_invocation": false,
-      "license": "CC-BY-SA-4.0 (referenced by pin, never vendored)",
-      "official": false,
-      "audits": {
-        "gen_agent_trust_hub": "Pass",
-        "socket": "Pass",
-        "snyk": "Pass",
-        "url": "https://skills.sh/trailofbits/skills/semgrep",
-        "checked_at": "2026-09-25"
-      },
-      "status": "trial",
-      "gap": "No custom static rules exist beyond CodeQL default setup; ad hoc pattern audits (e.g. secret-path guards) are grep-based.",
       "claude_listing": "on",
       "codex_enabled": true
     },
@@ -609,10 +532,11 @@
         "url": "https://skills.sh/vercel-labs/agent-browser/agent-browser",
         "checked_at": "2026-09-25"
       },
-      "status": "trial",
-      "gap": "Browser acceptance uses the pinned agent-browser CLI (adoption/pins-*.json); the skill documents its commands. Listed on and enabled for Codex from 2026-09-30 (docs/decisions/2026-09-30-skills-llm-native-listing.md): its 925-character description, the longest here, is under Claude's 1,536-character per-entry cap and Codex's 1,024-character one.",
+      "status": "held",
+      "gap": "Browser acceptance uses the pinned agent-browser CLI (adoption/pins-*.json); the skill documents its commands. Listed on and enabled for Codex from 2026-09-30 (docs/decisions/2026-09-30-skills-llm-native-listing.md): its 925-character description, the longest here, is under Claude's 1,536-character per-entry cap and Codex's 1,024-character one. Held from 2026-10-03 (wave-2 skills ruling, change 6): tools/adoption/install_skills.py does not install a held skill, with or without --only, and scripts/skills_status.py reports it as held, not missing, until the measurement named in held_for returns.",
       "claude_listing": "on",
-      "codex_enabled": true
+      "codex_enabled": true,
+      "held_for": "the browser-tool measurement (definitive manifest row playwright-cli, measurement_id browser-tool); the owner also wants an LLM-native browser practice such as crawl4ai measured first (2026-10-03)"
     },
     {
       "name": "find-skills",
@@ -738,21 +662,25 @@
         "checked_at": "2026-09-30"
       },
       "status": "trial",
-      "gap": "Skill authoring and evaluation have no installed procedure on Claude since the claude.ai skill sync, which carried anthropic-skills:skill-creator, was turned off on 2026-09-26 (docs/decisions/2026-09-25-skills-trial-and-usage.md:362-379); the M5c bake-off names skill-creator's paired with-skill/without-skill benchmark as its harness (same record, L670). Codex ships its own .system/skill-creator (codex-rs/skills/src/lib.rs L55-69 at rust-v0.157.1), so this copy stays off there. That copy is also named skill-creator, and a name-keyed [[skills.config]] disable matches every skill of the name (codex-rs/config/src/skills_config.rs L109-119 at rust-v0.159.2), so tools/adoption/install_skills.py --print-codex-config disables this copy by its installed ~/.agents/skills/skill-creator/SKILL.md path, which Codex matches against each loaded skill's path_to_skills_md (codex-rs/ext/skills/src/host_service.rs L366-371), and scripts/skills_status.py reports a name-keyed skill-creator table as hiding Codex's own copy.",
+      "gap": "Skill authoring and evaluation have no installed procedure on Claude since the claude.ai skill sync, which carried anthropic-skills:skill-creator, was turned off on 2026-09-26 (docs/decisions/2026-09-25-skills-trial-and-usage.md:362-379); the M5c bake-off names skill-creator's paired with-skill/without-skill benchmark as its harness (same record, L670). Codex ships its own .system/skill-creator (codex-rs/skills/src/lib.rs L55-69 at rust-v0.157.1), so this copy is for Claude Code only: agents [\"claude-code\"] and copy true make tools/adoption/install_skills.py run the add with --copy -a claude-code, which writes the folder into Claude Code's own skills directory and keeps no shared ~/.agents/skills/skill-creator for Codex to load (the layer consensus's skill-authoring row; wave-2 skills ruling, change 6). Codex then needs no rule for it, and --print-codex-config prints none; scripts/skills_status.py checks the copy in Claude Code's folder and fails when a same-name folder sits in ~/.agents/skills.",
       "claude_listing": "on",
       "codex_enabled": false,
-      "added": "2026-09-30"
+      "added": "2026-09-30",
+      "agents": [
+        "claude-code"
+      ],
+      "copy": true
     }
   ],
   "budget": {
-    "claude_on_description_chars": 10191,
+    "claude_on_description_chars": 9484,
     "claude_on_cap": 10500,
-    "codex_enabled_description_chars": 10048,
-    "codex_catalog_description_chars": 9872,
+    "codex_enabled_description_chars": 9165,
+    "codex_catalog_description_chars": 9165,
     "codex_configured_budget_tokens": 6000,
     "codex_fallback_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
-    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05. Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_enabled_description_chars counts grill-me and improve-codebase-architecture, whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation), so Codex keeps them out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148): codex_catalog_description_chars, 9,872 of the 10,048, counts the 25 skills it shows. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 24 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
   },
   "excluded": [
     {
@@ -920,7 +848,7 @@
     {
       "skills": "verification-before-completion",
       "source": "obra/superpowers",
-      "reason": "Removed from the trial on 2026-09-28 under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill that conflicts with CLAUDE.md/AGENTS.md once read in full is removed immediately; that record's 2026-09-28 removal addendum). The full SKILL.md at 8ca22db (sha256 2befe7fc…) says at L20 \"If you haven't run the verification command in this message, you cannot claim it passes\", and its L42 row \"Tests pass | Test command output: 0 failures | Previous run, \\\"should pass\\\"\" puts a previous run under Not Sufficient; AGENTS.md:16 says \"Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap\". Decision: docs/decisions/2026-09-28-delegated-decisions.md (M4); GPT-6 verdict: evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md; Claude readings: evidence/artifacts/delegated-decisions-20260928/coordination.md.",
+      "reason": "Removed from the trial on 2026-09-28 under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill that conflicts with CLAUDE.md/AGENTS.md once read in full is removed immediately; that record's 2026-09-28 removal addendum). The full SKILL.md at 8ca22db (sha256 2befe7fc\u2026) says at L20 \"If you haven't run the verification command in this message, you cannot claim it passes\", and its L42 row \"Tests pass | Test command output: 0 failures | Previous run, \\\"should pass\\\"\" puts a previous run under Not Sufficient; AGENTS.md:16 says \"Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap\". Decision: docs/decisions/2026-09-28-delegated-decisions.md (M4); GPT-6 verdict: evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md; Claude readings: evidence/artifacts/delegated-decisions-20260928/coordination.md.",
       "overturn": "An upstream revision of the skill drops the absolute freshness requirement, is re-read in full and is re-pinned through this manifest."
     },
     {
@@ -929,6 +857,27 @@
       "retired": "2026-09-30",
       "reason": "Retired on 2026-09-30: upstream removed the skill directory in daa01d8 (2026-09-24, 'Remove resolving-merge-conflicts'), so it is absent at d81f3a183412e71a5b1e84ca21bc1a35eea03a60, whose .changeset/remove-resolving-merge-conflicts.md says nothing replaces it (https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md). The historical pin c55ee46073ed923f86ce59a5eb3b6d895095d1b7 (tree 77f0d7de3143abbf03e55a63522d30bff31ae908, SKILL.md sha256 9d8114f8ef0b31f535a265fc05c364bd8cf2e2895a830040e06c22acb11f54b0) stays recoverable. A retired entry keeps an explicit off in the settings template's skillOverrides, because the deep merge never removes a host's earlier on value.",
       "overturn": "Upstream restores a maintained installable directory and it passes a new scoped source review and native activation check."
+    },
+    {
+      "skills": "grill-me",
+      "source": "mattpocock/skills",
+      "retired": "2026-10-03",
+      "reason": "Retired on 2026-10-03 by the wave-2 skills ruling (change 1; evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.skills), together with improve-codebase-architecture, in docs/decisions/2026-09-25-skills-trial-and-usage.md (addendum of 2026-10-03): at its pin its SKILL.md line 7 is only 'Call the Skill tool with \"grilling\"', and grilling is excluded here, so the skill does nothing on its own. The historical pin c55ee46073ed923f86ce59a5eb3b6d895095d1b7 (tree 3df14e2d3a89459bf300614be9247e3ce74798f8, SKILL.md sha256 caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637) stays recoverable. grilling (mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/productivity/grilling) is the named candidate for the user-invoked plan stress-test job, which has no owner now; it is not adopted. A retired entry keeps an explicit off in the settings template's skillOverrides, because the deep merge never removes a host's earlier value.",
+      "overturn": "A dated record reverses the excluded grilling row and admits grilling with Claude skillOverrides user-invocable-only, after the three native evals in both clients (adoption/skills/lifecycle.md, Selection)."
+    },
+    {
+      "skills": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "retired": "2026-10-03",
+      "reason": "Retired on 2026-10-03 by the wave-2 skills ruling (change 1; wave2-records.json, layers.skills), together with grill-me, in docs/decisions/2026-09-25-skills-trial-and-usage.md (addendum of 2026-10-03): at its pin it calls the excluded grilling skill (SKILL.md line 64) and domain-modeling (line 66), and at lines 68-70 writes GLOSSARY.md and offers ADRs in docs/adr/, which this repository does not use. The historical pin d81f3a183412e71a5b1e84ca21bc1a35eea03a60 (tree 39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b, SKILL.md sha256 552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392) stays recoverable. A retired entry keeps an explicit off in the settings template's skillOverrides.",
+      "overturn": "An upstream revision drops the grilling and domain-modeling calls and the GLOSSARY.md and ADR writes, and passes a new scoped source review and the native evals."
+    },
+    {
+      "skills": "semgrep",
+      "source": "trailofbits/skills",
+      "retired": "2026-10-03",
+      "reason": "Retired on 2026-10-03 by the wave-2 skills ruling (change 3; wave2-records.json, layers.skills) under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill whose instructions conflict with AGENTS.md once read in full is removed immediately): at trailofbits/skills@82fe8226252622fa807643bdca1710901198553a its SKILL.md line 24 says 'The original \"scan this codebase\" request is NOT approval', lines 5 and 184 make plan approval a hard gate and line 14 adds AskUserQuestion, so no authorized request satisfies both the skill and AGENTS.md's 'without intake, brainstorming or a separate planning approval for bounded work'. codeql covers SAST for the languages it lists; its pointer to semgrep is optional. The historical pin 82fe8226252622fa807643bdca1710901198553a (tree 32c70e1f8ab600ce747ae84821f987ae05242c60, SKILL.md sha256 52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c) stays recoverable. The custom-ruleset sub-job stays without an owner until a dated record picks the plugin workflow /static-analysis:semgrep-scan or a gate-free upstream revision, with a pinned semgrep CLI row. A retired entry keeps an explicit off in the settings template's skillOverrides.",
+      "overturn": "A dated record picks a gate-free route for custom rulesets (the plugin workflow or an upstream revision without the approval gate), with a pinned semgrep CLI row."
     }
   ]
 }

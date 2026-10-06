@@ -1,0 +1,15 @@
+# Webhook receiver for ntfy.sh (?template=alertmanager) or an on-host destination.
+# Only Alertmanager reads the operator's private 0600 URL file.
+# SOURCE-ONLY. prometheus/alertmanager@v0.34.1:docs/configuration.md:1939.
+# Render the pointer only after the user's owned 0600 destination file exists.
+route:
+  receiver: user
+  group_by: [alertname, job]
+  group_wait: 5s
+  group_interval: 10s
+  repeat_interval: 4h
+receivers:
+  - name: user
+    webhook_configs:
+      - url_file: @URL_FILE@
+        send_resolved: true

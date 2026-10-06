@@ -1,0 +1,1741 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Finish source-backed native selected skills and installed-client lifecycle on this host; test actual activation/outcomes and preserve source, grading and deployment gaps.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-code/blob/v2.1.285/CHANGELOG.md",
+      "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871"
+    },
+    {
+      "url": "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4"
+    },
+    {
+      "url": "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design",
+      "revision": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
+      "revision": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    },
+    {
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
+      "revision": "82fe8226252622fa807643bdca1710901198553a"
+    },
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "revision": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md",
+      "revision": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cc1f6ce1f983721ecb42c7da27e58f0649c132f5/tools/adoption/apply_codex_lane.py",
+      "revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed help/version, native gh stable release/changelog, immutable source directories, official native skills/eval guidance; selected full source review and independent original-capture verification.",
+    "Post-review bounded repair uses current maintained maincc1f6ce1f983721ecb42c7da27e58f0649c132f5; original model-run frozen inputs/base remain historical."
+  ],
+  "license_and_compatibility": "Preserve selected native listing gates and source licenses; architecture MIT, Semgrep CC-BY-SA-4.0 installed from immutable pin without redistributing source. One current Linux/WSL host.",
+  "baseline_and_candidate": {
+    "baseline": "Original selected sources and matched native Claude disabled-skills arm. Only the latter executes the same task; no baseline quality failure.",
+    "candidate": "Source-audited three updates, removed upstream skill retirement, native Codex01592/owned-profile qualification and29 local focused task executions."
+  },
+  "frozen_inputs": {
+    "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "tasks": [
+      "f01_explicit_skill_csv",
+      "f02_native_json",
+      "s02_explicit_csv",
+      "s03_adjacent_copyedit",
+      "w01_explicit_agents",
+      "w02_implicit_agents",
+      "w03_implicit_claude",
+      "w04_conditional_pointer",
+      "w05_completion_branches",
+      "w06_human_readme",
+      "w07_human_newsletter",
+      "w08_human_support",
+      "w09_human_copyedit",
+      "w10_markdown_lookup",
+      "f03_w02_actual_agents",
+      "f04_w04_actual_claude",
+      "s01_implicit_csv",
+      "skill-install-original",
+      "skill-install-repaired",
+      "skill-retirement",
+      "codex-client-qualified",
+      "profile-migration-qualified",
+      "profile-command-original",
+      "profile-command-repaired",
+      "claude-final-review-original",
+      "prior-source-role-oracle",
+      "native-role-fixture-original",
+      "upstream-source-integration-qualified",
+      "complete-source-guard-prepared",
+      "independent-repair-verified"
+    ],
+    "roles": [
+      "native-claude",
+      "native-codex",
+      "native-cli"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json",
+        "sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/source-review.json",
+        "sha256": "531cea77c0e0439e152c9b0d06f7b3dae7ab554794ed79f7bb1cffa033618c52"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json",
+        "sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18"
+      },
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/followup-preregistration.json",
+        "sha256": "ea036dc0c5ca708de353f51d210dffa0127212366e5d62a692ccbc01735b24d7"
+      },
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/edit-followup-preregistration.json",
+        "sha256": "71bab9abe0757ef7cafdc35c5adbeeeb434291c22397579bf2707271404fddbe"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json",
+        "sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Task grades and full selected instruction loads are separate. Initial25 runs keep23 output passes,2 failures,2 misses and3 full-load observation limits; followups separately predeclared. Convergence admits an activation claim only with actual matching full-body observation; outcome-correct but unobservable process claims remain non-passed here.",
+    "usage_rule": "One native cumulative final result per run. Keep advisor/model and cache/reasoning scopes separate; failed tool/commands visible, unknown categories null. No quality or efficiency gain."
+  },
+  "runtime_and_platform": {
+    "platform": "One current Linux/WSL host; user explicitly deferred second machine",
+    "tools": [
+      {
+        "name": "codex",
+        "version": "0.159.2"
+      },
+      {
+        "name": "claude",
+        "version": "2.1.285"
+      },
+      {
+        "name": "skills",
+        "version": "1.7.0"
+      }
+    ],
+    "isolation": "Read-only original probes, separately owned disposable file-edit fixtures, isolated package/config/updater lifecycle. Sign-ins preserved. Production update still guarded by idle state."
+  },
+  "commands": [
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index,mcp__plugin_context-mode_context-mode__ctx_search --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 29292a05cb12685faaf781fd043805e8ff7e68ac9761cfdf2111020ccf083e4c",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index,mcp__plugin_context-mode_context-mode__ctx_search --disallowed-tools Write,Edit,NotebookEdit,Agent --json-schema {\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\"},\"url\":{\"type\":\"string\"}},\"required\":[\"text\",\"url\"],\"additionalProperties\":false} ; frozen prompt sha256 f3b49c3f2dcac6e53ff517d1ed581ad3f0fe5eaecee45f7e64e221bd89faa298",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index,mcp__plugin_context-mode_context-mode__ctx_search --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 04008e8a5179641252c25c229d09558b73c1305ace41609bf71b22301b7e7a2f",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 9b1c7a2cc4ed694e5e55af5c0798cdefe3e732783a033491300c64317ee94caf",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 e864c05fa8542d6dec485d878068eca501b4109887e04ed3ff9ab8792ca60f29",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 fe03e963c7e73be89a4e30640cf41e5ad488e35b921ad552506a1d7fde41023d",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent --disable-slash-commands ; frozen prompt sha256 fe03e963c7e73be89a4e30640cf41e5ad488e35b921ad552506a1d7fde41023d",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 b243a7e3402ca03101cbcd7c2407a994dadc4a533892304d5f4dbf0b58a1268a",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 afe7e4e2ce3f2a069ba2a01bee42c7e29218bd81ca05b284a4874a8244f4a45d",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 27339136c36801e5bbfc2191f21ede8edd0077bd283b43c57b8fd2cfe16c7b95",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 b4fe43e0b26852f703d03cbd2086fc67f383e9455ab531a28973bba85585b5a2",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 00355b45581834111a1d242b95e94245214da38cd79edae441192b2cc476317f",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 47ba0850290c793de09b889aceb1d8ea6b07342daaffbbddaf15b0f328a1f5f9",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 be902a34e9e5aae1c5d8b75b18a2f53f90fc77b95c3fb186afb88feb594c90e0",
+    "claude -p --output-format stream-json --verbose --no-session-persistence --debug-file <private-path> --model opus --effort max --permission-mode dontAsk --tools Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch --allowed-tools Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch --disallowed-tools Write,Edit,NotebookEdit,Agent ; frozen prompt sha256 f3b49c3f2dcac6e53ff517d1ed581ad3f0fe5eaecee45f7e64e221bd89faa298",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s workspace-write --skip-git-repo-check -o <private-path> ; frozen prompt sha256 8ff0e0a9033619d422cc492c33153a67c40a159b571436b195e52426f2f5d450",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s workspace-write --skip-git-repo-check -o <private-path> ; frozen prompt sha256 839a7a3446103db698d50c9c1111a4218910b1633fedc9f8058b4baa7f37685a",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 cec3db7d47bddd26e8fcd67d0cfbe467030d8c3157183f6c321a3e9d81a60737",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 9b1c7a2cc4ed694e5e55af5c0798cdefe3e732783a033491300c64317ee94caf",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 1c2b916838255d34cae3803bbaa8a9caf457fab957b920b6ca1ce9e1de1a64f7",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 fe03e963c7e73be89a4e30640cf41e5ad488e35b921ad552506a1d7fde41023d",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 b243a7e3402ca03101cbcd7c2407a994dadc4a533892304d5f4dbf0b58a1268a",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 afe7e4e2ce3f2a069ba2a01bee42c7e29218bd81ca05b284a4874a8244f4a45d",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 27339136c36801e5bbfc2191f21ede8edd0077bd283b43c57b8fd2cfe16c7b95",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 b4fe43e0b26852f703d03cbd2086fc67f383e9455ab531a28973bba85585b5a2",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 00355b45581834111a1d242b95e94245214da38cd79edae441192b2cc476317f",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 47ba0850290c793de09b889aceb1d8ea6b07342daaffbbddaf15b0f328a1f5f9",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 be902a34e9e5aae1c5d8b75b18a2f53f90fc77b95c3fb186afb88feb594c90e0",
+    "codex exec --json --ephemeral -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" -c approval_policy=\"never\" -s read-only -o <private-path> ; frozen prompt sha256 f3b49c3f2dcac6e53ff517d1ed581ad3f0fe5eaecee45f7e64e221bd89faa298",
+    "Supported selected skill install before URL correction",
+    "Supported selected skill install with reviewed immutable URLs; native tree/link/lock readback",
+    "skills remove resolving-merge-conflicts --global -y; scoped supported Claude off merge/readback",
+    "Pinned-package provenance + native scratch app-server config/version/recovery acceptance",
+    "Native scratch owned profile apply, idempotence, exact mode/bytes rollback; custom/later-writer refusals",
+    "Narrow generated-command regression at previous updater d239f4",
+    "Narrow generated-command regression and actual native rehearsal at corrected73ab2454",
+    "Native claude2.1.285 -p --model opus --effort max --output-format stream-json --json-schema --permission-mode dontAsk; input freeze and full controls in claude-review.json",
+    "Original updater73ab2454 checked against current upstream pinned role-source oracle",
+    "Unchanged role lifecycle oracle with first native executable-only binding",
+    "Preserved current-main role/doctor source plus native config, doctor/link and repaired unchanged lifecycle/migration oracles; exact commands in artifact",
+    "Native sha256sum --check16source/resource inputs; owned timers disarmed; no production application",
+    "Independent original-source/hash comparison, exact generated-command plus two role invariant tests, sixteen checksum inputs and live owned-timer/host-hash observations"
+  ],
+  "observations": [
+    {
+      "id": "claude-f01_explicit_skill_csv-with_skill",
+      "task": "f01_explicit_skill_csv",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 14,
+        "cache_creation": 69519,
+        "cache_read": 371504,
+        "output": 15302,
+        "reasoning_in_output": 12473,
+        "total": 456339,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-f02_native_json-with_skill",
+      "task": "f02_native_json",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 46266,
+        "cache_read": 44555,
+        "output": 1357,
+        "reasoning_in_output": 1080,
+        "total": 92182,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-s02_explicit_csv-with_skill",
+      "task": "s02_explicit_csv",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 18,
+        "cache_creation": 59535,
+        "cache_read": 444052,
+        "output": 10514,
+        "reasoning_in_output": 8183,
+        "total": 514119,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-s03_adjacent_copyedit-with_skill",
+      "task": "s03_adjacent_copyedit",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 37296,
+        "cache_read": 7030,
+        "output": 839,
+        "reasoning_in_output": 827,
+        "total": 45167,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w01_explicit_agents-with_skill",
+      "task": "w01_explicit_agents",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 47451,
+        "cache_read": 41377,
+        "output": 5977,
+        "reasoning_in_output": 5806,
+        "total": 94809,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w02_implicit_agents-with_skill",
+      "task": "w02_implicit_agents",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6,
+        "cache_creation": 56492,
+        "cache_read": 105697,
+        "output": 17299,
+        "reasoning_in_output": 16891,
+        "total": 179494,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w02_implicit_agents-without_all_skills",
+      "task": "w02_implicit_agents",
+      "role": "native-claude",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6,
+        "cache_creation": 41625,
+        "cache_read": 70388,
+        "output": 7382,
+        "reasoning_in_output": 6959,
+        "total": 119401,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w03_implicit_claude-with_skill",
+      "task": "w03_implicit_claude",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 16,
+        "cache_creation": 73792,
+        "cache_read": 499394,
+        "output": 28072,
+        "reasoning_in_output": 26484,
+        "total": 601274,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w04_conditional_pointer-with_skill",
+      "task": "w04_conditional_pointer",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6,
+        "cache_creation": 46202,
+        "cache_read": 101802,
+        "output": 4693,
+        "reasoning_in_output": 4530,
+        "total": 152703,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w05_completion_branches-with_skill",
+      "task": "w05_completion_branches",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 8,
+        "cache_creation": 68963,
+        "cache_read": 161653,
+        "output": 17102,
+        "reasoning_in_output": 16464,
+        "total": 247726,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w06_human_readme-with_skill",
+      "task": "w06_human_readme",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 10,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 37413,
+        "cache_read": 7030,
+        "output": 4956,
+        "reasoning_in_output": 4903,
+        "total": 49401,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w07_human_newsletter-with_skill",
+      "task": "w07_human_newsletter",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 11,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 37436,
+        "cache_read": 7030,
+        "output": 2956,
+        "reasoning_in_output": 2809,
+        "total": 47424,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w08_human_support-with_skill",
+      "task": "w08_human_support",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 12,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 38406,
+        "cache_read": 51386,
+        "output": 1082,
+        "reasoning_in_output": 851,
+        "total": 90878,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w09_human_copyedit-with_skill",
+      "task": "w09_human_copyedit",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 37310,
+        "cache_read": 7030,
+        "output": 1979,
+        "reasoning_in_output": 1961,
+        "total": 46321,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-w10_markdown_lookup-with_skill",
+      "task": "w10_markdown_lookup",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 14,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 37311,
+        "cache_read": 7030,
+        "output": 1020,
+        "reasoning_in_output": 988,
+        "total": 45363,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-f03_w02_actual_agents-with_skill",
+      "task": "f03_w02_actual_agents",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 21702,
+        "cache_creation": 0,
+        "cache_read": 105600,
+        "output": 1147,
+        "reasoning_in_output": 452,
+        "total": 128449,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-f04_w04_actual_claude-with_skill",
+      "task": "f04_w04_actual_claude",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 16,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 18617,
+        "cache_creation": 0,
+        "cache_read": 94592,
+        "output": 893,
+        "reasoning_in_output": 259,
+        "total": 114102,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-s01_implicit_csv-with_skill",
+      "task": "s01_implicit_csv",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 17,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 18150,
+        "cache_creation": 0,
+        "cache_read": 79744,
+        "output": 1255,
+        "reasoning_in_output": 698,
+        "total": 99149,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-s03_adjacent_copyedit-with_skill",
+      "task": "s03_adjacent_copyedit",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 18,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13477,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 42,
+        "reasoning_in_output": 28,
+        "total": 20687,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w01_explicit_agents-with_skill",
+      "task": "w01_explicit_agents",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 19,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 15916,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 555,
+        "reasoning_in_output": 473,
+        "total": 23639,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w02_implicit_agents-with_skill",
+      "task": "w02_implicit_agents",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 20,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 20725,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 962,
+        "reasoning_in_output": 886,
+        "total": 21687,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w03_implicit_claude-with_skill",
+      "task": "w03_implicit_claude",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 21,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 24544,
+        "cache_creation": 0,
+        "cache_read": 67200,
+        "output": 721,
+        "reasoning_in_output": 375,
+        "total": 92465,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w04_conditional_pointer-with_skill",
+      "task": "w04_conditional_pointer",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 22,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13505,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 121,
+        "reasoning_in_output": 97,
+        "total": 20794,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w05_completion_branches-with_skill",
+      "task": "w05_completion_branches",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 23,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 17516,
+        "cache_creation": 0,
+        "cache_read": 27776,
+        "output": 969,
+        "reasoning_in_output": 796,
+        "total": 46261,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w06_human_readme-with_skill",
+      "task": "w06_human_readme",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 24,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 5306,
+        "cache_creation": 0,
+        "cache_read": 15360,
+        "output": 234,
+        "reasoning_in_output": 204,
+        "total": 20900,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w07_human_newsletter-with_skill",
+      "task": "w07_human_newsletter",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 25,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13494,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 314,
+        "reasoning_in_output": 261,
+        "total": 20976,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w08_human_support-with_skill",
+      "task": "w08_human_support",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 26,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13500,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 329,
+        "reasoning_in_output": 266,
+        "total": 20997,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w09_human_copyedit-with_skill",
+      "task": "w09_human_copyedit",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 27,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13483,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 120,
+        "reasoning_in_output": 105,
+        "total": 20771,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-w10_markdown_lookup-with_skill",
+      "task": "w10_markdown_lookup",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 28,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+          "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+          "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+        }
+      ],
+      "usage": {
+        "uncached_input": 175,
+        "cache_creation": 0,
+        "cache_read": 20480,
+        "output": 45,
+        "reasoning_in_output": 26,
+        "total": 20700,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "skill-install-original",
+      "task": "skill-install-original",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 29,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+          "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "skill-install-repaired",
+      "task": "skill-install-repaired",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 30,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+          "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "skill-retirement",
+      "task": "skill-retirement",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 31,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+          "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-client-qualified",
+      "task": "codex-client-qualified",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 32,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+          "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "profile-migration-qualified",
+      "task": "profile-migration-qualified",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 33,
+      "evidence_class": "recovery_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
+          "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "profile-command-original",
+      "task": "profile-command-original",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 34,
+      "evidence_class": "offline_artifact_check",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+          "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "profile-command-repaired",
+      "task": "profile-command-repaired",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 35,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+          "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-final-review-original",
+      "task": "claude-final-review-original",
+      "role": "native-claude",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 36,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/claude-review.json",
+          "sha256": "4b00417ade566d965844476ae66afa3d08db86b5587665045f94ce6f615f186a"
+        }
+      ],
+      "usage": {
+        "uncached_input": 138,
+        "cache_creation": 306376,
+        "cache_read": 13025856,
+        "output": 97173,
+        "reasoning_in_output": 61211,
+        "total": 13429543,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "prior-source-role-oracle",
+      "task": "prior-source-role-oracle",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 37,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+          "sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-role-fixture-original",
+      "task": "native-role-fixture-original",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 38,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+          "sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "upstream-source-integration-qualified",
+      "task": "upstream-source-integration-qualified",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 39,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+          "sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "complete-source-guard-prepared",
+      "task": "complete-source-guard-prepared",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 40,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+          "sha256": "31e18f68af05c84110eda7ea94374285d7e8d7b5571230d7181fa32c9b982b17"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "independent-repair-verified",
+      "task": "independent-repair-verified",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 41,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-qualified-native-source-practice",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/sota-finalization-20260930/repair-verification.json",
+          "sha256": "60c22af21154697bea7749b8caddb3b76ba02e74f33fb07ec0cefe3ec810b844"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "claude-s02_explicit_csv-with_skill",
+      "reason": "Task passed, but full selected-body activation is unobservable; no acceptance of that process claim."
+    },
+    {
+      "run_id": "claude-w01_explicit_agents-with_skill",
+      "reason": "Task passed, but full selected-body activation is unobservable; no acceptance of that process claim."
+    },
+    {
+      "run_id": "claude-w05_completion_branches-with_skill",
+      "reason": "Original frozen output contract failed; retained separately from content correctness."
+    },
+    {
+      "run_id": "claude-w10_markdown_lookup-with_skill",
+      "reason": "Original frozen output contract failed; retained separately from content correctness."
+    },
+    {
+      "run_id": "codex-w01_explicit_agents-with_skill",
+      "reason": "Task passed, but full selected-body activation is unobservable; no acceptance of that process claim."
+    },
+    {
+      "run_id": "codex-w02_implicit_agents-with_skill",
+      "reason": "Correct task outcome, but original implicit selected-skill load was not observed."
+    },
+    {
+      "run_id": "codex-w04_conditional_pointer-with_skill",
+      "reason": "Correct task outcome, but original implicit selected-skill load was not observed."
+    },
+    {
+      "run_id": "skill-install-original",
+      "reason": "Root retained old immutable URLs; native hash oracle rejected installation."
+    },
+    {
+      "run_id": "profile-command-original",
+      "reason": "Broad assertion matched an earlier diagnostic; exact generated command omitted required digest."
+    },
+    {
+      "run_id": "claude-final-review-original",
+      "reason": "Native Claude returned changes_required. Actual source verification confirmed stale-main code and receipt identity collision plus omitted imported idle dependency. Window-W activity remains unknown."
+    },
+    {
+      "run_id": "prior-source-role-oracle",
+      "reason": "Expected negative control: original source lacked current upstream ROLE_FILES. Historical package/config acceptance stays scoped."
+    },
+    {
+      "run_id": "native-role-fixture-original",
+      "reason": "Native profile readback rejected missing synthetic serena command after role writes; existing native config fixture definitions repaired this one bounded gap."
+    }
+  ],
+  "limitations": [
+    "No universal SOTA/broad model superiority/all27 skills implicit activation claim.",
+    "Original frozen inputs have their own worktree hashes; effective full prompt/import path equality was not captured. Main AGENTS differed from frozen worktree; keep native input scope caveat.",
+    "Baseline controls match after diagnostic-path normalization and native disable flag removal; no literal argv byte equality or task quality gain.",
+    "Model/effort requested route and native provider/backend attestation differ; Codex resolved model identifier unknown.",
+    "29-run counter coverage excludes coordinator/worker orchestration and separate final-review call. Main/model/advisor/cache counters are not summed across scopes.",
+    "Only native source/package/config acceptance and local fixtures; no upstream Codex cargo tests, real Semgrep scan, provider-wide/GPU or second-host acceptance.",
+    "Historical profile apply/rollback uses its recorded native updater revision; additive corrected-command acceptance binds current source. Production idle rollout must be observed separately.",
+    "Original Claude changes_required remains. Bounded source/fixture repairs are later local/native integration acceptance, not another model approval.",
+    "Production global config/profile/role activation remains pending; owned timers disarmed. Complete prepared closure does not establish an armed queue.",
+    "Native runner captures retained; passing underlying command streams are consumed by unchanged fixture oracles rather than separately persisted. Independent source observations bound acceptance."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "current-host-qualified-native-source-practice",
+    "qualification_run_ids": [
+      "skill-install-repaired",
+      "skill-retirement",
+      "codex-client-qualified",
+      "profile-migration-qualified",
+      "profile-command-repaired",
+      "upstream-source-integration-qualified",
+      "complete-source-guard-prepared",
+      "independent-repair-verified"
+    ]
+  },
+  "rollback": "Use prior immutable selected manifest sources through native installer; retain private rollback metadata/backups. Existing updater restores only current owned bytes and preserves custom/later writer changes. Stop only owned transient idle timer.",
+  "next_decision_changing_test": "Observe native guarded production activation in a quiet owned window using reviewed current host hashes and complete selected source/resource closure. Timers disarmed. Extend concrete native skill outcome failures; second host deferred.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "claude-f01_explicit_skill_csv-with_skill",
+      "claude-f02_native_json-with_skill",
+      "claude-s02_explicit_csv-with_skill",
+      "claude-s03_adjacent_copyedit-with_skill",
+      "claude-w01_explicit_agents-with_skill",
+      "claude-w02_implicit_agents-with_skill",
+      "claude-w02_implicit_agents-without_all_skills",
+      "claude-w03_implicit_claude-with_skill",
+      "claude-w04_conditional_pointer-with_skill",
+      "claude-w05_completion_branches-with_skill",
+      "claude-w06_human_readme-with_skill",
+      "claude-w07_human_newsletter-with_skill",
+      "claude-w08_human_support-with_skill",
+      "claude-w09_human_copyedit-with_skill",
+      "claude-w10_markdown_lookup-with_skill",
+      "codex-f03_w02_actual_agents-with_skill",
+      "codex-f04_w04_actual_claude-with_skill",
+      "codex-s01_implicit_csv-with_skill",
+      "codex-s03_adjacent_copyedit-with_skill",
+      "codex-w01_explicit_agents-with_skill",
+      "codex-w02_implicit_agents-with_skill",
+      "codex-w03_implicit_claude-with_skill",
+      "codex-w04_conditional_pointer-with_skill",
+      "codex-w05_completion_branches-with_skill",
+      "codex-w06_human_readme-with_skill",
+      "codex-w07_human_newsletter-with_skill",
+      "codex-w08_human_support-with_skill",
+      "codex-w09_human_copyedit-with_skill",
+      "codex-w10_markdown_lookup-with_skill",
+      "skill-install-original",
+      "skill-install-repaired",
+      "skill-retirement",
+      "codex-client-qualified",
+      "profile-migration-qualified",
+      "profile-command-original",
+      "profile-command-repaired",
+      "claude-final-review-original",
+      "prior-source-role-oracle",
+      "native-role-fixture-original",
+      "upstream-source-integration-qualified",
+      "complete-source-guard-prepared",
+      "independent-repair-verified"
+    ],
+    "coverage_artifact": null
+  }
+}

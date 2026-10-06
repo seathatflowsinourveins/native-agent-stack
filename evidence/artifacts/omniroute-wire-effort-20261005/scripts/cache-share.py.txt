@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""Read-only cache-read share of /v1/responses input tokens on the live gateway (counts only; no credential column is read).
+
+    omniroute-cache-share-20261005.py --since 2026-10-05T15:00:00Z [--until ...]      # one window, overall and per connection (anonymised index)
+    omniroute-cache-share-20261005.py --hourly 24                                       # the last N hours, one row per hour
+
+The gateway's call log is read through the database file in read-only mode (sqlite3 URI mode=ro); only path, timestamp, status, tokens_in,
+tokens_cache_read and connection_id (counted, never printed) are selected."""
+import argparse
+import json
+import sqlite3
+from pathlib import Path
+
+DB = Path.home() / ".local/share/omniroute/storage.sqlite"
+BASE = "path='/v1/responses' and status between 200 and 299"
+
+
+def window(con, since, until):
+    clause = f"{BASE} and timestamp >= ?" + (" and timestamp < ?" if until else "")
+    args = [since] + ([until] if until else [])
+    calls, tin, cache = con.execute(f"select count(*), coalesce(sum(tokens_in),0), coalesce(sum(tokens_cache_read),0) from call_logs where {clause}", args).fetchone()
+    per = []
+    for i, (n, a, b) in enumerate(con.execute(f"select count(*), coalesce(sum(tokens_in),0), coalesce(sum(tokens_cache_read),0) from call_logs where {clause} group by connection_id order by 1 desc", args)):
+        per.append({"conn": i, "calls": n, "cache_share_pct": round(100.0 * b / a, 1) if a else None})
+    return {"since": since, "until": until, "calls": calls, "input_tokens": tin, "cache_read_tokens": cache,
+            "cache_share_pct": round(100.0 * cache / tin, 1) if tin else None, "connections": len(per), "per_connection": per}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--since")
+    parser.add_argument("--until")
+    parser.add_argument("--hourly", type=int)
+    opts = parser.parse_args()
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    if opts.hourly:
+        rows = []
+        for h in range(opts.hourly, 0, -1):
+            a = con.execute("select strftime('%Y-%m-%dT%H:00:00.000Z', datetime('now', ?))", (f"-{h} hours",)).fetchone()[0]
+            b = con.execute("select strftime('%Y-%m-%dT%H:00:00.000Z', datetime('now', ?))", (f"-{h - 1} hours",)).fetchone()[0]
+            row = window(con, a, b)
+            rows.append({k: row[k] for k in ("since", "calls", "input_tokens", "cache_share_pct", "connections")})
+        print(json.dumps(rows, indent=1))
+    else:
+        print(json.dumps(window(con, opts.since or "1970-01-01T00:00:00.000Z", opts.until), indent=1))
+
+
+main()

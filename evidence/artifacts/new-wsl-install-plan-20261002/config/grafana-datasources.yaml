@@ -1,0 +1,27 @@
+# grafana/grafana@v13.2.3:docs/sources/administration/provisioning/index.md:113.
+apiVersion: 1
+datasources:
+  - name: NativeStack2604 Prometheus
+    uid: ns2604-prometheus
+    type: prometheus
+    access: proxy
+    url: http://127.0.0.1:21090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 15s
+  - name: NativeStack2604 Loki
+    uid: ns2604-loki
+    type: loki
+    access: proxy
+    url: http://127.0.0.1:21300
+    editable: false
+  - name: NativeStack2604 Alertmanager
+    uid: ns2604-alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://127.0.0.1:21093
+    editable: false
+    jsonData:
+      implementation: prometheus
+      handleGrafanaManagedAlerts: false

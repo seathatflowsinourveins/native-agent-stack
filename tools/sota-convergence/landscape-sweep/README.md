@@ -348,6 +348,69 @@ Before a full run through the gateway, run the lane's parity check on the staged
 - reported usage;
 - whether hosted web search passes through for a custom provider.
 
+#### Automatic native-to-OmniRoute failover (`--gpt6-fallback omniroute`)
+
+Stage a native lane with an explicit fallback to the keyless loopback gateway:
+
+```sh
+python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
+  --gpt6-fallback omniroute --fallback-codex-host 127.0.0.1:20128
+```
+
+The fallback is off unless `staged.json` carries `codex.fallback`. The host flag names the gateway's loopback
+address and port (default `127.0.0.1:20128`). The stager requires a native primary provider and a bare native model
+name whose requested effort has a reasoning alias in the pinned gateway. It records the fallback provider and
+base URL without creating a lane home. Restaging changes no frozen
+templates, `prompts_sha256.txt`, workflow arguments or embedded script when only provider/fallback flags change.
+Stop an active Workflow before updating its staged runtime; an existing work directory needs `--force` to restage.
+
+When the native attempt reports a limit, the runner archives that attempt unchanged under `attempts/<n>/`, writes
+`<W>/LIMIT-native`, and sends the same prompt and schema through OmniRoute in the held slot, within the same total
+deadline, with at least 300 seconds remaining for the gateway launch. Without that reserve, the job ends with
+exit 3 and keeps the native limit as its terminal attempt. A staged native quota gate can take this path before
+making a native model call. `LIMIT-native` holds a
+JSON reason and `reset_time`; a missing reset time stays `null`. New jobs with that marker first run the existing
+`codex_quota.py --json` probe, which calls `account/rateLimits/read` without a model turn. Only a successful report
+with explicit `ordinaryUsageAllowed: true` clears the marker. Otherwise those jobs go directly to the gateway.
+Percentages, a passed reset timestamp and a failed or nullable probe do not establish native recovery. The recovery
+probe and quota gate share the job's absolute deadline: both the helper and parent subprocess timeout are bounded
+by the remaining budget, and an expired budget prevents probe launch. Failed probes remain in `quota.json`.
+
+The fallback keeps the native `CODEX_HOME`, its global `AGENTS.md`, `--ignore-user-config`, read-only sandbox,
+staged effort and web-search mode. Its inline provider has `wire_api = "responses"`, `requires_openai_auth = false`,
+`env_key = "OMNIROUTE_API_KEY"` and `supports_standalone_web_search = true`. It enables standalone web search,
+disables shell snapshots, filters the key out of model-run shells, and requests
+`cx/<native model>-<request_effort>` under the
+[pinned gateway's suffix convention](https://github.com/HouMinXi/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L35).
+For example, `high` requests `-high`; native `ultra` on Astra or 6.1 Sol resolves to `xhigh` and requests `-xhigh`.
+The gateway strips `-max` only for its seven listed models (5.6 Sol/Terra/Luna, 6 Astra/Sol/Luna and 6.1 Sol).
+Unsupported model/effort aliases are refused before staging or launch; the CLI stager requests `max`.
+An unset key variable receives the `local-loopback` placeholder. It loads no new
+lane-local profile or MCP configuration. The supported overrides follow
+[Codex 0.159.3's provider schema](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/model-provider-info/src/lib.rs).
+
+`inputs.json` remains byte-identical to the native attempt. The separate `route.json` records `provider`,
+`fallback_from`, `reason`, `native_model`, `gateway_model`, `gateway_effort`, the sanitized loopback `base_url`,
+`native_attempt` and `search_backend`. The receipt is written only after the gateway process launches. Holds,
+insufficient reserve and failed process launches produce no gateway route in `result` or conversion. A job that goes
+directly to the gateway has `native_attempt: null`, because it has no native attempt of its own. `result` returns
+the route and each archived route; later retries preserve it. `convert.py` reads the original sibling receipt,
+because the Workflow wrapper copies a fixed set of result fields. It retains the route in raw metadata and GPT-6
+fit votes and adds the gateway search limitation to the lane. A successful fallback job is reused only while its
+bound inputs and requested fallback route still match; changing the endpoint or disabling fallback reruns that job
+and archives the earlier result.
+
+The installed gateway's carried
+[search adapter](https://github.com/amsjavan/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts)
+handles `/alpha/search` through its web-search registry with a DuckDuckGo fallback. It supports `search_query` and
+rejects `open`, `click`, `find` and `screenshot`. Prompt equality does not establish tool or search-recall parity.
+Outbound effort and operation-level parity remain unqualified until the gateway's measured parity check passes.
+The implementation never consumes a reset credit or changes the shared gateway's settings, combos or keys.
+
+The [failover decision](../../../docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md) records sources and
+synthetic checks. Native upstream provider failover or a measured parity failure of this gateway route overturns
+the choice.
+
 #### Staging on the framework instance (20129)
 
 The default gateway stays 20128: `--omniroute-base-url` defaults to `http://127.0.0.1:20128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 20128 through its `sharedgw` node:
@@ -431,15 +494,27 @@ provides it.
   (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`. Usage such an
   attempt holds that `by_resolved_model` cannot count (an assistant message without provider usage or without a
   resolved model, or no transcript) is its `usage_issues` and makes the status `incomplete`.
-  `make_result.py` also needs every child and superseded attempt measured at effort `max` alone, or recorded as an
-  `effort_deviation` retained failure, and `measurement.exit_code` 0 (1 only for such recorded deviations). Every
+  Since 2026-10-04, `usage_record.py` also links children whose issues include `no result entry in journal` to
+  later complete attempts with the same label. This requires the sweep's one-logical-call-per-label-per-run
+  precondition; runtime retries can produce multiple attempts, but a label with more than one complete child
+  is ambiguous and links nothing. It uses the tool's journal order, retains `superseded_by` and the observed
+  reason (call keys are not compared), and leaves `by_resolved_model` unchanged. The wrapper's exit code follows the
+  post-processed status and uncovered effort mismatches; `measurement.exit_code` remains the raw tool exit and
+  `raw_output_sha256` remains the hash of its original stdout. `measurement.post_processing` retains
+  `source_status`, `source_reason`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
+  with the linking and coverage counts. `multi_model_children` is recomputed after a move. The printed summary
+  distinguishes `raw_exit_code` from the wrapper's `exit_code`. A linked attempt's `usage_issues` still keep the record incomplete.
+  `make_result.py` also needs every attempt measured at effort `max` alone, covered by its completed same-label
+  max-effort re-run, or recorded as an `effort_deviation` retained failure. It accepts `measurement.exit_code` 0,
+  or 1 explained by recovered superseded attempts or such recorded deviations. Every
   child and attempt must also carry a measured `web_search`, and each one with a capped WebSearch call must be a
   `web_search_capped` retained failure. Both are checked per worker and per layer: a `<role>:<layer>` worker's
   failure in its own layer, the critic's in every layer of the record.
 - **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
   failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
   missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem, and (with
-  `--usage`) a worker measured at another effort than max (`effort_deviation`) or a worker with a WebSearch call
+  `--usage`) a worker measured at another effort than max without a completed same-label max-effort re-run
+  (`effort_deviation`) or a worker with a WebSearch call
   the session's cap refused (`web_search_capped`); the critic's belongs to every layer. It gives
   that layer the reopen entry `{"trigger": "retained_failure", "ref": "<returns_ref>#/failures/<layer>"}`, which
   resets the layer's clean count. `make_result.py` refuses a layer whose failures lack that entry.
@@ -585,12 +660,99 @@ the report and the run; they are added to the `retained_failure` entries `conver
 Record a stopped run by hand, as recipe section 4 describes (`status: stopped`, `lower_bound_usage: true`,
 `votes: not_returned`, `lost_workers`). Retain the smoke's usage record under `$A-attempts/` as a run of its own.
 
+**2026-10-04, step 7 resume recovery.** Run step 7 again after a usage-limit resume, including when changed
+earlier-stage outputs changed the waiting agents' call keys (`wf_7e4cef36-e0c` exposed two critics and one
+follow-up facts refuter in this condition). The wrapper requires `no result entry in journal` in the child's
+issues and links only to a later complete same-label attempt in this run. The sweep issues one logical call
+per label per run; runtime retries may produce several attempts, and more than one complete child for a label
+prevents linking. The record carries journal order, neither keys nor timestamps, so the reason states only
+`no result entry; a later complete attempt with the same label returned; call keys not compared`.
+With no incomplete children or superseded usage-integrity gaps left, it reports complete, states the
+number linked, and can exit 0 while preserving the tool's raw exit 1 in the measurement. Superseded attempts
+whose re-run completed at max remain under `superseded_retained` per layer; they do not reopen a layer for effort.
+Uncovered effort deviations and capped WebSearch calls still retain their failures and reopen entries.
+`measurement.post_processing` preserves the tool's original `source_status` and `source_reason`, the
+`linked_agent_ids`, `covered_agent_ids`, and full `covered_effort_mismatches`. It records the counts alongside
+these details, including when only some attempts link and the status stays incomplete. `multi_model_children`
+reflects the remaining children. The printed `raw_exit_code` names the tool's result; `exit_code` names the wrapper's.
+
+Offline source review extended agent-lab's `summarizeRun` and `effortMismatches` in the unchanged
+[vendored child-usage.mjs](../../../examples/claude-native/workflows/child-usage.mjs), as retained at
+native-agent-stack `8c32a84b246da66e43a6188c973741b09329e223`, SHA256
+`3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4`.
+The selected `search-first`, `diagnosing-bugs` and `tdd` skills informed the bounded integration repair; the
+builder's no-network scope precluded a live registry or upstream search. The regression fixtures cover
+same-key and changed-key resumes, critic and follow-up labels, earlier and unfinished attempts, result-bearing
+failures, ambiguous labels, partial recovery, usage-integrity gaps, provenance, and max-effort qualification.
+The native transcript fixtures execute the unchanged tool locally; they are integration evidence, not a new
+provider/model run or upstream end-to-end qualification. This recovery serves completed foundation landscape
+records and the North Star R&D readiness they support.
+
+**2026-10-04, step 8 project-directory redaction.** Before writing converted artifacts or printing the summary,
+`convert.py` derives encoded local paths from the home, resolved checkout, optional work directory and their
+realpaths, replacing every character outside ASCII letters and digits with `-`, following
+[sweep_common.host_replacements](sweep_common.py). It replaces each whole segment, bare or with a
+project-directory suffix, with `<project-dir>` even without a directory prefix. Local and generic rules run
+over the whole text, including URLs, queries, fragments and assignments. Privacy takes priority over retaining
+an encoded user-profile slug in a source URL. The generic roots and boundary derive from
+[#697](https://github.com/seathatflowsinourveins/native-agent-stack/pull/697) at `0d2a38b2`, now landed in
+`scripts/validate.py` as `encoded home path`: `-home-` is case-sensitive, while `-Users-`,
+`-mnt-<drive>-Users-` and `<drive>--Users-` ignore case, with the `(?<![\w-])` left boundary.
+The converter deliberately covers more tails than the publication rule. A name must start with
+`[A-Za-z0-9_.]`; redaction needs no restricted terminator, so punctuation such as commas, colons, asterisks
+and `&`, and Unicode or control tails, receive redaction in bare text, `projects/` and `claude-<uid>/`
+anchors, URL paths, queries and fragments, assignments, and JSON keys and values. For example, a query's
+`&tab=1` can follow the replaced name directly. The replacement consumes Unicode word characters, dots,
+dashes and project suffixes. In comparison, #697 requires a dash or `/`, backslash, quote, whitespace,
+backtick, `)`, `]` or end after its ASCII username.
+Lowercase `example` followed by a dash, end or a character outside `[A-Za-z0-9_.]` is exempt, including
+`example,`; `ExAmPlE`, `example.person` and `exampleuser` redact. Dots-only names are removed too.
+The converter also covers Windows encodings with more than two separators after the drive letter and
+known local home, checkout and work-directory encodings outside the generic roots or exemption.
+Local continuations consume Unicode-aware `\w`, dots and dashes as part of the same segment, including
+`.smith` followed by non-ASCII word characters, so those name fragments cannot survive a replaced local prefix.
+WSL checkouts under a Windows profile are covered even when the native home is a Linux path; encoded Windows
+segments can begin with the drive letter. Native `projects/` and `claude-<uid>/` anchors use the same generic
+rule as other contexts, including punctuation tails; an anchor is not required. Redaction covers deeper
+strings and nested JSON fields and keys and preserves sentence-ending
+periods. Ordinary words such as `home-assistant` and `my-home-page` remain unchanged; encoded profile forms
+in prose receive the same privacy treatment as paths.
+The implementation follows the recursive string/key traversal of
+[sweep_common.sanitize](sweep_common.py) at the same `8c32a84b2` source baseline; it uses Python's standard-library
+regular expressions and the existing angle-bracket placeholder style. Both the host-path and encoded-path
+stages reject distinct keys that would redact to the same text: exit 3 with a `redaction key collision`
+finding before any converted artifacts or summary are written. Collision locators contain only dictionary-key
+and list indices. Private-content findings replace every matching key with its document-order index, including
+when that key is an ancestor of a matching value; neither diagnostic prints matching key text.
+Fixtures cover notes, nested strings,
+bare local and anchored homes, all four profile forms, WSL checkouts, work directories, dict keys, the printed
+summary, publication-rule username and boundary cases, bare-home terminators, case-sensitive example-user
+exemptions, prose, sentence endings, URL redaction, path line fragments, assignments, all macOS root case
+variants, dots-only names, punctuation tails, complete Unicode local names and key collisions.
+The converter's private-content check uses the selected checkout's own `PRIVATE_CONTENT` patterns on both
+decoded documents and the exact JSON text prepared for emission, returning exit 3 for any retained match
+(including UUIDs) before creating or updating `--out` or printing the summary. Artifacts use the serialization
+shared with [sweep_common.write_json](sweep_common.py): indentation 1, `ensure_ascii=False`, and a final newline,
+written as UTF-8. The summary uses that same text format and keeps Unicode characters unescaped.
+Scanning the serialized text also covers backslashes introduced by JSON's control-character escaping;
+serialized-only findings use a fixed locator and never echo matching text.
+The policy regression loads the actual landed `encoded home path` rule from `scripts/validate.py` by name
+and checks decoded and serialized redactor output. CLI fixtures check written artifact bytes and stdout
+with Unicode and control tails, inject a redaction failure to verify exit 3 without publication, and verify
+`--repo-root` selects the validator without mocking. These are local integration fixtures, not provider runs.
+This repair does not edit `scripts/validate.py`.
+
 Read these fields of `convert.py`'s summary before appending:
 
 - **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
   `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
   `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
   `make_result.py` refuses the record until it is resolved.
+- **`superseded_retained`** (2026-10-04): each layer's superseded attempts whose same-label re-run completed at
+  max, with `round`, `child`, `agent_id` when present, `superseded_by` and `reason`. The same field is retained
+  in `returns.json`. These attempts' usage remains counted, but their earlier effort is covered by the re-run
+  and creates no `effort_deviation`. The critic is listed for every layer; a follow-up worker only in its own
+  layer's follow-up round. `superseded_retained_unmapped` lists a covered attempt whose label names no layer.
 - **`web_search`**, **`web_search_capped`** and **`web_search_capped_unmapped`**: the run's WebSearch calls and
   capped calls, the workers with a capped call (each a retained failure of its layer), and any capped worker whose
   label names no layer of this sweep (`make_result.py` refuses the record until it is resolved). A capped worker
@@ -802,14 +964,18 @@ new run from the latest retained record, and say so when no record exists yet.
   and then returns the job as unfinished. The vote then counts as missing and the layer is reopened, and a job that
   finishes later makes `convert.py` exit 4 (`file_only`). Keep the number of queued GPT-6 jobs small relative to the
   slots.
-- **Usage limit.** A real Codex usage-limit error writes `<W>/LIMIT`. After that no job starts, and jobs still
-  waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
+- **Usage limit.** With the staged native fallback, a native limit writes `<W>/LIMIT-native` and the held job
+  continues over OmniRoute as described above. With no fallback, a real Codex usage-limit error writes `<W>/LIMIT`.
+  After `LIMIT` appears no job starts, and jobs still waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
   `stderr.txt` or its `error` event gives. An HTTP 429 with no usage-limit body counts as a limit too. Codex retries
-  no 429 (`retry_429` is false for every provider, `codex-rs/model-provider-info/src/lib.rs` at rust-v0.157.1), so it
+  no 429 (`retry_429` is false for every provider,
+  [Codex 0.159.3 provider source](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/model-provider-info/src/lib.rs#L447)), so it
   prints `exceeded retry limit, last status: 429 Too Many Requests` for the first one, as an `error` or `turn.failed`
   event (`RetryLimitReachedError`, built in `codex-rs/codex-api/src/api_bridge.rs`). A pooled gateway answers so when
   its accounts are exhausted, and the report cannot tell that from a brief rate limit, so the first such job stops the
-  sweep: `LIMIT` then holds a reason and no reset time. Read the account pool (`scripts/codex_quota.py` for a native
+  sweep: a gateway attempt counts this text only in `error` or `turn.failed` events, never in `item.*` content or
+  stderr quotes. `LIMIT` then holds the reason `gateway pool 429` and no reset time. With staged failover this
+  means the native and gateway paths are exhausted; for a gateway primary it stops that route. Read the account pool (`scripts/codex_quota.py` for a native
   login, the gateway for a pooled route) and remove `LIMIT` when it has capacity; after a usage limit, remove it only
   after the reset. The 2026-09-29 run had no such stop: nine of its twelve follow-up GPT-6 jobs ended in 429 after one
   or two seconds each, the Workflow finished its Claude follow-up stages (the round cost $88 at Claude list price, see
@@ -863,7 +1029,8 @@ new run from the latest retained record, and say so when no record exists yet.
   runs the staged `codex_quota.py --json --gate 95`. That reads the account's usage snapshot through the native
   `codex app-server` method `account/rateLimits/read` (no model turn, no transcript, no credential file) and
   reports the gate when a window's `used_percent` reaches the percent, `rateLimitReachedType` is set or
-  `ordinaryUsageAllowed` is false. The job then ends with exit 3 before codex starts, and `<W>/LIMIT` (when absent)
+  `ordinaryUsageAllowed` is false. With a staged fallback the refused native attempt is archived and the job
+  continues on the gateway. Otherwise the job ends with exit 3 before codex starts, and `<W>/LIMIT` (when absent)
   and the job's `stderr.txt` name the reason, the used percent and the reset time: stop and tell the user, as for
   a usage limit. Every probe is kept in its attempt's `quota.json` (earlier attempts under `attempts/<n>/`), and
   `result` summarizes the current one as `quota`. A probe that
@@ -871,7 +1038,17 @@ new run from the latest retained record, and say so when no record exists yet.
   there and never blocks the job; the usage-limit rule above still catches a real limit. A running sweep keeps the
   runtime it was staged with, so a work directory staged before this gate existed has no gate.
 - **Resume.** `Workflow({scriptPath: "<W>/sweep.embedded.js", resumeFromRunId: "wf_..."})` replays the unchanged
-  agent calls from the cache.
+  agent calls from the cache. This includes a GPT wrapper that returned `failed_exit_3`: it is a completed agent
+  result, so resume does not call `start` again even after capacity returns. After confirming capacity and clearing
+  `LIMIT`, start a **new Workflow run with the provider and frozen templates unchanged**. Successful GPT jobs return
+  `already done` only while their bound inputs are byte-identical and their fallback route still matches.
+  First-round discovery prompts are pre-written and can meet that condition. Claude agents rerun, rebuilding GPT
+  fit and follow-up prompts from their new proposals and critic output. Jobs with changed prompt bytes rerun and
+  move their earlier successful attempts to `attempts/<n>/`, at new GPT cost. Failed GPT jobs also archive the old
+  attempt and rerun. A coordinator can also
+  explicitly start a failed GPT job with `codex_call.sh start`, but a cached Workflow return will not pick up its new
+  result. Restaging the primary provider changes job inputs and reruns finished GPT jobs as well. The automatic
+  fallback avoids caching the intermediate native limit by completing both attempts within the same held job.
 - **WebSearch cap.** Claude Code allows one session at most `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` WebSearch
   calls (default 200, from v2.1.212). The count covers the main conversation and every subagent, workflow children
   included. A capped call returns a notice that tells the worker to go on without searching; nobody sees an error
@@ -983,6 +1160,18 @@ The deliberate changes:
   - `make_result.py` checked failure coverage over all layers at once, so one layer could lose its critic failure
     and its reopen entry (and count as clean) while another layer's `critic` failure satisfied the check. Coverage
     is now checked per worker and per layer.
+- **Usage-limit resume repairs (2026-10-04).** Changed upstream-stage returns changed three waiting agents'
+  call keys, so same-key supersession left a completed run incomplete. Empty effort lists of recovered killed
+  attempts also reopened every layer. The wrapper links only no-journal-result attempts to a later complete
+  attempt in this run under the sweep's one-call-per-label precondition, refusing ambiguous complete labels.
+  It keeps the observed reason, raw measurement provenance and usage-integrity gaps, and the consumers require an identified,
+  complete same-label max-effort re-run before treating an earlier effort mismatch as covered. The attempts
+  remain visible under `superseded_retained`; missing, unfinished or non-max re-runs cover no deviation.
+- **Project-directory redaction repair (2026-10-04).** Literal host-prefix replacement missed the encoded home
+  directory in returned notes, and the publication gate matched only the slash form. Conversion now redacts
+  the local encoded home, bare or suffixed, and other homes anchored in native project directories before writing
+  artifacts or printing the summary. Fixtures cover embedded text, nested fields and keys, the printed summary,
+  prose false positives and preserved sentence endings.
 
 ## Tests
 
@@ -997,5 +1186,6 @@ The suite uses synthetic fixtures and makes no network or model calls:
 - `sweep.js` runs under node with stubbed `agent`, `parallel` and `pipeline`.
 - The converted evidence is appended to a synthetic ledger checkout with `saturation_ledger.py` itself.
 
-Node, `shellcheck` and `BASH32_BINARY` (a real bash 3.2, as on macOS) are optional; each test that needs one is
-skipped without it.
+Node is required by the native changed-key recovery fixture; it fails with a clear message when node is absent.
+The existing validation CI job already runs node workflow contract suites before the Python suite. Other node
+fixtures, `shellcheck` and `BASH32_BINARY` (a real bash 3.2, as on macOS) retain their existing optional skips.

@@ -51,6 +51,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import codex_job  # noqa: E402
 import make_prompt  # noqa: E402
 from sweep_common import REPO_ROOT, load_json, prompts_sha256, sha256_bytes, work_dir, write_json  # noqa: E402
 
@@ -74,11 +75,12 @@ SKILLS_MANIFEST = "adoption/skills/manifest.json"
 # skills_problems scans them all: a pinned skill named in any template must be listed here and in that paragraph. A
 # test keeps this list, the paragraph and the pinned skills manifest in step. skill-creator joined on 2026-09-30 when
 # unit F3 (#553) pinned it: the skills templates name its paired with-skill/without-skill benchmark as the comparison
-# that would overturn a skills-* verdict, and the manifest keeps it off in Codex (codex_enabled false).
+# that would overturn a skills-* verdict, and the manifest keeps it off in Codex (codex_enabled false). semgrep (retired)
+# and agent-browser (held) left on 2026-10-03 with the wave-2 skills ruling (changes 1 and 3; adoption/skills/manifest.json).
 TEMPLATE_SKILLS = ("search-first", "iterative-retrieval",
                    "supply-chain-risk-auditor", "fp-check", "agentic-actions-auditor", "security-threat-model",
-                   "codeql", "semgrep", "sarif-parsing", "property-based-testing", "mcp-builder", "modern-python",
-                   "agent-browser", "skill-creator")
+                   "codeql", "sarif-parsing", "property-based-testing", "mcp-builder", "modern-python",
+                   "skill-creator")
 USABLE_SKILL_STATUS = ("kept", "trial")
 PROBE_PROMPT = ("Use web search. What is the latest release tag of https://github.com/ggml-org/llama.cpp and roughly "
                 "how many GitHub stars does it have? Answer only in the required JSON.")
@@ -253,7 +255,7 @@ def profile_servers_without_base(profile_bytes: bytes, base_servers: list) -> li
 
 def codex_user_instructions(repo_root: Path) -> str:
     """The Codex user instructions a host installs as $CODEX_HOME/AGENTS.md: the managed block of
-    adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk v0.50.0's hooks/rtk-awareness-full.md
+    adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk v0.51.0's hooks/rtk-awareness-full.md
     verbatim, and the RTK exactness exceptions), read through tools/adoption/apply_codex_lane.py's agents_block(),
     never a copy of it. Codex reads $CODEX_HOME/AGENTS.md as global instructions, so a lane home without it gives
     its model neither the top rule nor RTK's instructions, which the native lane's workers get from ~/.codex."""
@@ -512,7 +514,15 @@ def git_state(repo_root: Path) -> dict:
 
 def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: bool, stars, gpt6_model: str,
           slots: int, lock_dir, skills_checked_at: str | None, embed_script: bool, force: bool,
-          repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None, lane: dict | None = None) -> dict:
+          repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None, lane: dict | None = None,
+          fallback: dict | None = None) -> dict:
+    if fallback is not None:
+        if lane is not None or "/" in gpt6_model:
+            raise UsageError("codex.fallback needs the native provider and a model without a provider segment")
+        try:
+            codex_job.fallback_model(gpt6_model, codex_job.request_effort(gpt6_model, "max"))
+        except codex_job.UsageError as error:
+            raise UsageError(str(error)) from error
     jobs = [path.name for path in (work / "gpt6").glob("*") if path.is_dir()] if (work / "gpt6").is_dir() else []
     if jobs and not force:
         raise ValueError(f"{work}/gpt6 already holds {len(jobs)} job(s) from an earlier run; move gpt6/ and prompts/ "
@@ -574,6 +584,8 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         codex["lock_dir"] = str(Path(lock_dir).expanduser().resolve())
     if quota_stop_percent is not None:
         codex["quota_stop_percent"] = quota_stop_percent
+    if fallback is not None:
+        codex["fallback"] = fallback
     if lane is not None:
         codex.update(stage_lane_home(work, model=gpt6_model, base_url=lane["base_url"], host=lane["host"],
                                      profile=lane["profile"], repo_root=repo_root,
@@ -622,6 +634,10 @@ def main(argv=None) -> int:
                         help="native: Codex's own login (default). omniroute: a lane-local CODEX_HOME that routes "
                              f"Codex through the local OmniRoute gateway with the token-stack MCP servers; the key "
                              f"comes from ${OMNIROUTE_KEY_ENV} in the harness's environment")
+    parser.add_argument("--gpt6-fallback", choices=("omniroute",),
+                        help="opt in to transport-only native-limit failover, keeping the native prompt and inputs")
+    parser.add_argument("--fallback-codex-host", metavar="HOST:PORT",
+                        help="keyless loopback fallback gateway (default 127.0.0.1:20128); needs --gpt6-fallback")
     parser.add_argument("--omniroute-base-url", default=OMNIROUTE_DEFAULT_URL,
                         help=f"loopback OmniRoute Responses endpoint (default {OMNIROUTE_DEFAULT_URL})")
     parser.add_argument("--codex-host", metavar="HOST",
@@ -671,6 +687,17 @@ def main(argv=None) -> int:
             raise ValueError("--gpt6-model is not a model name")
         if args.omniroute_header and args.gpt6_provider != "omniroute":
             raise ValueError("--omniroute-header needs --gpt6-provider omniroute: the native lane has no provider block")
+        fallback = None
+        if args.fallback_codex_host and not args.gpt6_fallback:
+            raise ValueError("--fallback-codex-host needs --gpt6-fallback omniroute")
+        if args.gpt6_fallback:
+            if args.gpt6_provider != "native" or slash:
+                raise ValueError("--gpt6-fallback needs the native provider and a model without a provider segment")
+            host = args.fallback_codex_host or "127.0.0.1:20128"
+            match = re.fullmatch(r"(?:127\.0\.0\.1|localhost):([0-9]{1,5})", host)
+            if match is None or not 1 <= int(match[1]) <= 65535:
+                raise ValueError("--fallback-codex-host must be 127.0.0.1:PORT or localhost:PORT (1-65535)")
+            fallback = {"provider": "omniroute", "base_url": f"http://{host}/v1"}
         lane = None
         if args.gpt6_provider == "omniroute":
             if args.quota_stop_percent is not None:
@@ -708,7 +735,8 @@ def main(argv=None) -> int:
         summary = stage(work, sweep_id=args.sweep_id, run_date=args.date, selected=selected, test=bool(args.smoke),
                         stars=stars_path, gpt6_model=gpt6_model, slots=args.slots, lock_dir=args.lock_dir,
                         skills_checked_at=args.skills_checked_at, embed_script=not args.no_embed, force=args.force,
-                        repo_root=args.repo_root.resolve(), quota_stop_percent=args.quota_stop_percent, lane=lane)
+                        repo_root=args.repo_root.resolve(), quota_stop_percent=args.quota_stop_percent, lane=lane,
+                        fallback=fallback)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_args.py: {error}", file=sys.stderr)
         return 2

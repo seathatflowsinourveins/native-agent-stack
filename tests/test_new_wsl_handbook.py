@@ -89,6 +89,220 @@ class NewWslHandbookTests(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value))
 
+    def host_requalification_fixture(self):
+        """Synthetic receipt facts for the projection contract, not host evidence."""
+        decision = "docs/decisions/2026-10-05-fixture-requalification.md"
+        path = self.root / decision
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# Synthetic qualification decision\n\nNo host acceptance is claimed.\n")
+        official = "evidence/receipts/fixture-e2e.json"
+        source_review = "evidence/artifacts/fixture-requalification/review.json"
+        for source in (official, source_review):
+            self.write(source, {"scope": "Synthetic source fixture; no host acceptance is claimed."})
+        return {"schema_version": 1, "id": "ns2604-requalification-20261005", "kind": "historical_inventory",
+                "data": {
+                    "host": "NativeStack2604", "publication_date_utc": "2026-10-05",
+                    "decision_record": decision,
+                    "readiness": {
+                        "provisional": True,
+                        "formula": "(READY + BY_DESIGN) / all 80 slots in scope",
+                        "official_source": official,
+                        "baseline": {"numerator": 30, "denominator": 80, "percent": 37.5},
+                        "current": {"numerator": 27, "denominator": 80, "percent": 33.75,
+                                    "status": "provisional_pending_independent_review"},
+                        "conditional": {"numerator": 29, "denominator": 80, "percent": 36.25,
+                                        "status": "conditional_pending_four_slot_adjudication"}},
+                    "disputed_slot_ids": [f"token-efficiency/{slot}" for slot in
+                                          ("repo-packing", "command-output", "output-compression", "code-index")],
+                    "independent_review": {"status": "pending", "scope": "New dated command-center qualification, independent review and adjudication are required.",
+                                           "recorded_source_review": source_review},
+                    "source_class": "synthetic projection contract, not host or upstream acceptance",
+                    "qualification_scope": "Synthetic lower counts exercise consistency; no independently verified labels are claimed."}}
+
+    def test_host_requalification_absence_keeps_it_out_of_the_book(self):
+        data = handbook.build_data(self.root)
+        self.assertNotIn("host_requalification", data)
+        self.assertNotIn(handbook.HOST_REQUALIFICATION, {source["path"] for source in data["sources"]})
+        self.assertNotIn("host re-qualification", handbook.render_markdown(data).decode())
+
+    def test_host_requalification_projects_scope_and_figures_without_promoting_acceptance(self):
+        before = handbook.build_data(self.root)
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = self.read(handbook.OUTPUTS[1])
+        host = data["host_requalification"]
+        self.assertEqual({key: host[key] for key in receipt["data"]}, receipt["data"])
+        self.assertEqual(host["source"], handbook.HOST_REQUALIFICATION)
+        self.assertEqual(host["receipt_kind"], "historical_inventory")
+        self.assertEqual({key: value for key, value in data.items() if key not in {"host_requalification", "sources"}},
+                         {key: value for key, value in before.items() if key != "sources"})
+        self.assertFalse(data["new_host_acceptance_claimed"])
+        source = next(source for source in data["sources"] if source["path"] == handbook.HOST_REQUALIFICATION)
+        self.assertEqual(source["sha256"], handbook.digest((self.root / handbook.HOST_REQUALIFICATION).read_bytes()))
+        page = (self.root / handbook.OUTPUTS[0]).read_text()
+        for text in ("Official #700-bar readiness (qualified 2026-10-04): **30/80 (37.5%)**",
+                     "Supplied captured-status projection (provisional): **27/80 (33.75%)**",
+                     "Conditional captured-status projection (provisional): **29/80 (36.25%)**",
+                     receipt["data"]["source_class"], receipt["data"]["qualification_scope"],
+                     "without an independently verified 80-slot join", "Independent review: pending",
+                     "Official readiness remains the qualified 2026-10-04 baseline on the #700 bar", receipt["data"]["decision_record"],
+                     "command center's new dated qualification", "followed by independent review and adjudication"):
+            self.assertIn(text, page)
+        decision = next(source for source in data["sources"] if source["path"] == receipt["data"]["decision_record"])
+        self.assertEqual(decision["sha256"], handbook.digest((self.root / decision["path"]).read_bytes()))
+        self.assertNotIn("four-slot adjudication pending", page)
+        for slot in receipt["data"]["disputed_slot_ids"]:
+            self.assertIn(slot, page)
+        self.assertLess(page.index("## NativeStack2604 host re-qualification"), page.index("## Stage 1 and stage 2"))
+        checked = self.public_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    def test_host_requalification_null_scenarios_keep_only_available_figures_and_decision_pointer(self):
+        before = handbook.build_data(self.root)
+        for unavailable in (("current",), ("conditional",), ("current", "conditional")):
+            with self.subTest(unavailable=unavailable):
+                receipt = self.host_requalification_fixture()
+                for key in unavailable:
+                    receipt["data"]["readiness"][key] = None
+                receipt["data"]["qualification_scope"] = (
+                    "Synthetic captured-status30/80 proposal asof11:44Z; excludes custody13:02Z BY_DESIGN. "
+                    "Includes five captured statuses with fresh-session use not evidenced; "
+                    "not measured qualification on the #700 bar. No organic qualification.")
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                result = self.public_cli()
+                self.assertEqual(result.returncode, 0, result.stderr)
+                data = self.read(handbook.OUTPUTS[1])
+                host = data["host_requalification"]
+                for key in unavailable:
+                    self.assertIsNone(host["readiness"][key])
+                page = (self.root / handbook.OUTPUTS[0]).read_text()
+                section = page.split("## NativeStack2604 host re-qualification", 1)[1].split("## Stage 1 and stage 2", 1)[0]
+                expected = [str(receipt["data"]["readiness"][key]["numerator"])
+                            for key in ("baseline", "current", "conditional") if key not in unavailable]
+                self.assertEqual(re.findall(r"\*\*(\d+)/80", section), expected)
+                if unavailable == ("current", "conditional"):
+                    self.assertIn("Official #700-bar readiness (qualified 2026-10-04): **30/80 (37.5%)**", section)
+                    self.assertEqual(re.findall(r"\*\*(\d+)/80", section), ["30"])
+                    self.assertNotIn("37/80", section)
+                    self.assertNotIn("32/80", section)
+                self.assertIn("No aggregate established for: " + ", ".join(unavailable), section)
+                self.assertIn(receipt["data"]["decision_record"], section)
+                self.assertIn(receipt["data"]["qualification_scope"], section)
+                self.assertIn("upstream acceptance, wiring and fresh-session use, with the harness text present", section)
+                self.assertIn("Includes five captured statuses with fresh-session use not evidenced", section)
+                self.assertIn("not measured qualification on the #700 bar", section)
+                self.assertIn("The organic native arm differs in one respect: no harness text names the tool", section)
+                self.assertIn("final verified E2E (S4)", section)
+                self.assertIn("command center's new dated qualification", section)
+                self.assertIn("public review alone does not change the official figure", section)
+                self.assertNotIn("four-slot adjudication pending", section)
+                self.assertFalse(data["new_host_acceptance_claimed"])
+                self.assertEqual({key: value for key, value in data.items() if key not in {"host_requalification", "sources"}},
+                                 {key: value for key, value in before.items() if key != "sources"})
+
+    def test_host_requalification_requires_explicit_scenarios_and_reviewed_baseline(self):
+        for missing in ("baseline", "current", "conditional"):
+            with self.subTest(missing=missing):
+                receipt = self.host_requalification_fixture()
+                del receipt["data"]["readiness"][missing]
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                with self.assertRaisesRegex(ValueError, "explicitly declared " + missing):
+                    handbook.read_host_requalification(handbook.Inputs(self.root))
+
+    def test_host_requalification_requires_a_present_public_decision_record(self):
+        for value in (None, "", 42, "../outside.md", "/outside.md", "docs/README.md", "docs/decisions/missing.md"):
+            with self.subTest(decision=value):
+                receipt = self.host_requalification_fixture()
+                receipt["data"]["decision_record"] = value
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                with self.assertRaisesRegex(ValueError, "host requalification|public repository path"):
+                    handbook.read_host_requalification(handbook.Inputs(self.root))
+
+    def test_host_requalification_requires_and_hashes_official_and_review_sources(self):
+        fields = (("readiness", "official_source", "official source"),
+                  ("independent_review", "recorded_source_review", "recorded source review"))
+        for section, field, label in fields:
+            with self.subTest(missing=field):
+                receipt = self.host_requalification_fixture()
+                (self.root / receipt["data"][section][field]).unlink()
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                failed = self.public_cli()
+                self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+                self.assertIn(f"host requalification {label} must exist", failed.stderr)
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        sources = {source["path"]: source["sha256"] for source in self.read(handbook.OUTPUTS[1])["sources"]}
+        for section, field, _ in fields:
+            source = receipt["data"][section][field]
+            self.assertIn(source, sources)
+            self.assertEqual(sources[source], handbook.digest((self.root / source).read_bytes()))
+
+    def test_host_requalification_rejects_inconsistent_or_promoted_receipt_facts(self):
+        changes = [
+            ("schema_version", True), ("kind", "native_model_e2e"), ("id", "another-receipt"),
+            ("data.host", "another-host"), ("data.publication_date_utc", "2026-10-06"),
+            ("data.readiness.provisional", False), ("data.readiness.formula", ""),
+            ("data.readiness.current.denominator", 81), ("data.readiness.current.numerator", True),
+            ("data.readiness.current.numerator", -1), ("data.readiness.current.percent", 55.0),
+            ("data.readiness.current.percent", True), ("data.readiness.current.status", "accepted"),
+            ("data.readiness.baseline", None),
+            ("data.readiness.baseline", {"numerator": 31, "denominator": 80, "percent": 38.75}),
+            ("data.readiness.conditional", {"numerator": 45, "denominator": 80, "percent": 55.0,
+                                          "status": "conditional_pending_four_slot_adjudication"}),
+            ("data.readiness.conditional", []),
+            ("data.readiness.conditional", {"numerator": 29, "denominator": 80, "percent": 36.25,
+                                          "status": "accepted"}),
+            ("data.disputed_slot_ids", ["token-efficiency/context-supply"] * 4),
+            ("data.disputed_slot_ids", [f"token-efficiency/{slot}" for slot in
+                                       ("context-supply", "command-output", "output-compression", "code-index")]),
+            ("data.independent_review.status", "agreed"), ("data.independent_review.scope", ""),
+            ("data.qualification_scope", ""), ("data.source_class", ""),
+        ]
+        for path, value in changes:
+            with self.subTest(path=path, value=value):
+                receipt = self.host_requalification_fixture()
+                target = receipt
+                keys = path.split(".")
+                for key in keys[:-1]:
+                    target = target[key]
+                target[keys[-1]] = value
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                with self.assertRaisesRegex(ValueError, "host requalification"):
+                    handbook.read_host_requalification(handbook.Inputs(self.root))
+
+    def test_host_requalification_change_invalidates_a_previously_generated_book(self):
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        self.assertEqual(self.public_cli().returncode, 0)
+        receipt["data"]["qualification_scope"] += " A further source gap remains open."
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        stale = self.public_cli("--check")
+        self.assertEqual(stale.returncode, 1)
+        self.assertIn("stale generated output", stale.stderr)
+
+    def test_host_requalification_decision_change_invalidates_a_previously_generated_book(self):
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        self.assertEqual(self.public_cli().returncode, 0)
+        decision = self.root / receipt["data"]["decision_record"]
+        decision.write_text(decision.read_text() + "\nA further adjudication remains required.\n")
+        stale = self.public_cli("--check")
+        self.assertEqual(stale.returncode, 1)
+        self.assertIn("stale generated output", stale.stderr)
+
+    def test_host_requalification_rejects_private_omitted_metadata_before_publication(self):
+        receipt = self.host_requalification_fixture()
+        receipt["private_omitted_metadata"] = "/home/" + "private-user/coordination/source.json"
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("host path", result.stderr)
+        self.assertTrue(all(not (self.root / output).exists() for output in handbook.OUTPUTS))
+
     def profile(self, **changes):
         entry = {
             "name": "Claude Code", "layer_id": "native-clients",
@@ -175,6 +389,31 @@ class NewWslHandbookTests(unittest.TestCase):
         self.write(handbook.PROFILE, profile)
         return profile, [package for _, _, package, _ in packages]
 
+    def test_a_re_pin_leaves_the_adoption_manifest_digest_unchanged(self):
+        """The handbook is a new-machine file: hashing the release pointer would make every re-pin stale it."""
+        manifest = {"schema_version": 1, "updated_at": "2026-10-04",
+                    "source": {"repository": "example/repo", "release_tag": "v1", "release_commit": "a" * 40},
+                    "profiles": {"workstation": ["step"]}}
+        digests = []
+        for change in (None, "repin", "content"):
+            data = deepcopy(manifest)
+            if change == "repin":
+                data["updated_at"] = "2026-10-05"
+                data["source"].update(release_tag="v2", release_commit="b" * 40)
+            elif change == "content":
+                data["profiles"]["workstation"].append("new step")
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "adoption").mkdir()
+                (root / handbook.ADOPTION).write_text(json.dumps(data, indent=2) + "\n")
+                inputs = handbook.Inputs(root)
+                inputs.read(handbook.ADOPTION)
+                record = inputs.sources[handbook.ADOPTION]
+                self.assertEqual(record["excludes"], list(handbook.ADOPTION_POINTER_FIELDS))
+                digests.append(record["sha256"])
+        self.assertEqual(digests[0], digests[1])
+        self.assertNotEqual(digests[0], digests[2])
+
     def test_cli_separates_installable_packages_in_one_repository(self):
         profile, packages = self.package_profile()
         result = self.public_cli()
@@ -214,6 +453,28 @@ class NewWslHandbookTests(unittest.TestCase):
                           if tool["name"] == "Codex SDK and codex exec/app-server")
         self.assertNotIn("package_id", unresolved)
         self.assertTrue(any("package identity" in gap for gap in unresolved["blocking_gaps"]))
+
+    def test_owner_browser_replacement_has_one_pick_and_a_complete_checksum(self):
+        self.real_tree()
+        data = handbook.build_data(self.root)
+        self.assertFalse(any(tool["name"] == "Playwright CLI" and tool["status"] == "picked"
+                             for tool in data["tools"]))
+        chrome, = [tool for tool in data["tools"] if tool["name"] == "Chrome DevTools MCP"]
+        self.assertEqual(chrome["status"], "picked")
+        self.assertEqual(chrome["checksum"]["algorithm"], "sha256")
+        self.assertRegex(chrome["checksum"]["value"], r"^[0-9a-f]{64}$")
+        self.assertTrue(chrome["checksum"]["integrity"].startswith("sha512-"))
+        self.assertFalse(any("checksum" in gap.lower() for gap in chrome["blocking_gaps"]))
+
+        # A profile without the explicit historical-name binding must still
+        # surface the unfulfilled old pick; this is not a global name filter.
+        profile = self.read(handbook.PROFILE)
+        entry, = [entry for entry in profile["entries"] if entry["name"] == "Chrome DevTools MCP"]
+        entry.pop("source_selection_name")
+        self.write(handbook.PROFILE, profile)
+        control = handbook.build_data(self.root)
+        self.assertTrue(any(tool["name"] == "Playwright CLI" and tool["status"] == "picked"
+                            and tool["blocking_gaps"] for tool in control["tools"]))
 
     def test_cli_same_package_checksum_conflicts_still_reject(self):
         variants = [
@@ -386,7 +647,19 @@ class NewWslHandbookTests(unittest.TestCase):
                  for state in ("definitive", "resolved", "split", "measurement", "open")}
         self.assertEqual({state: count for state, count in shown.items() if count}, manifest["counts"]["by_state"])
         self.assertEqual(data["default_decisions"]["inventory"]["by_state"], manifest["counts"]["by_state"])
-        self.assertEqual(data["tools"], before["tools"])
+        # The published owner amendment replaces the historical browser pick.
+        # All other tools retain exactly their previous inventory and metadata.
+        old_tools = {tool["tool_id"]: tool for tool in before["tools"]}
+        new_tools = {tool["tool_id"]: tool for tool in data["tools"]}
+        removed, = old_tools.keys() - new_tools.keys()
+        self.assertEqual(old_tools[removed]["name"], "Playwright CLI")
+        self.assertFalse(new_tools.keys() - old_tools.keys())
+        for identity, tool in new_tools.items():
+            self.assertEqual(tool, old_tools[identity], identity)
+        chrome, = [tool for tool in data["tools"] if tool["name"] == "Chrome DevTools MCP"]
+        browser = next(slot for slot in manifest["slots"] if slot["slot_id"] == "playwright-cli")
+        self.assertIn(chrome["name"], browser["default"])
+        self.assertEqual(browser["resolution"]["outcome"], "owner_default")
         self.assertEqual([row["status"] for row in data["layers"]],
                          [row["status"] for row in before["layers"]])
         self.assertFalse(data["new_host_acceptance_claimed"])
@@ -394,6 +667,24 @@ class NewWslHandbookTests(unittest.TestCase):
         memory = next(slot for slot in manifest["slots"] if slot["slot_id"] == "memory-owner")
         self.assertIn(memory["default"], markdown)
         self.assertIn(memory["label"], markdown)
+
+    def test_code_navigation_current_defaults_replace_the_historical_client_split(self):
+        data = handbook.build_data(ROOT)
+        layer = next(row for row in data["layers"] if row["layer_id"] == "code-navigation")
+        self.assertIn("Serena (symbol navigation and references for both clients)", layer["owns"])
+        self.assertFalse(any("LSP" in owner or "Codex sessions" in owner for owner in layer["owns"]))
+        self.assertEqual(layer["ownership_source"], handbook.DEFAULTS_MANIFEST)
+        slots = {slot["record"]["slot_id"]: slot for slot in layer["default_slots"]}
+        self.assertTrue(slots["serena"]["installed"])
+        self.assertFalse(slots["claude-plugins-official-code-intelligence-lsp-pl"]["installed"])
+        markdown = handbook.render_markdown(data).decode()
+        navigation = markdown.split("## code-navigation:", 1)[1].split("\n## ", 1)[0]
+        self.assertNotIn("Serena (Codex sessions)", navigation)
+        lsp = next(line for line in navigation.splitlines()
+                   if "| claude-plugins-official-code-intelligence-lsp-pl |" in line)
+        self.assertIn("not installed:", lsp)
+        self.assertIn("Historical recommendation packet tools", navigation)
+        self.assertFalse(data["new_host_acceptance_claimed"])
 
     def test_defaults_manifest_rejects_invalid_states_layers_and_ownership(self):
         def changed_slot(data, field, value):
@@ -984,15 +1275,18 @@ class NewWslHandbookTests(unittest.TestCase):
                 rows[cells[0]] = cells
         return rows
 
-    def test_inventory_holds_all_89_manifest_rows_the_ten_added_and_the_five_consensus_ones(self):
+    def test_inventory_holds_all_104_manifest_rows_the_ten_added_the_six_consensus_and_the_fourteen_owner_ones(self):
+        # The sixth consensus row, statusline, comes from the layer consensus's wave-2 batch (2026-10-03), and the ten owner
+        # rows from wave 3 and four round-2 rows from wave 5 (amendment 4).
         data, markdown = self.generated()
         manifest = self.read(DEFAULTS_SOURCE)
-        self.assertEqual(len(manifest["slots"]), 89)
+        self.assertEqual(len(manifest["slots"]), 104)
         self.assertEqual(sum(row["row_kind"] == "added" for row in manifest["slots"]), 10)
-        self.assertEqual(sum(row["row_kind"] == "consensus" for row in manifest["slots"]), 5)
+        self.assertEqual(sum(row["row_kind"] == "consensus" for row in manifest["slots"]), 6)
+        self.assertEqual(sum(row["row_kind"] == "owner_decision" for row in manifest["slots"]), 14)
         rows = {slot["record"]["slot_id"]: (layer["layer_id"], slot)
                 for layer in data["layers"] for slot in layer.get("default_slots", [])}
-        self.assertEqual(len(rows), 89)
+        self.assertEqual(len(rows), 104)
         lines = self.slot_lines(markdown)
         self.assertEqual(set(lines), set(rows))
         for row in manifest["slots"]:
@@ -1012,10 +1306,15 @@ class NewWslHandbookTests(unittest.TestCase):
         # Counts come from the rows and agree with the manifest's own.
         inventory = data["default_decisions"]["inventory"]
         self.assertEqual({key: inventory[key] for key in manifest["counts"]}, manifest["counts"])
-        self.assertEqual(inventory["installed"] + inventory["not_installed"], 89)
-        self.assertIn("The manifest holds 89 slots in 37 layers.", markdown)
+        self.assertEqual(inventory["installed"] + inventory["not_installed"], 104)
+        self.assertIn("The manifest holds 104 slots in 37 layers.", markdown)
         self.assertIn("added 10", markdown)
-        self.assertIn("consensus 5", markdown)
+        self.assertIn("consensus 6", markdown)
+        self.assertIn("owner_decision 14", markdown)
+        # The interim installs of amendment 3 are counted apart from the decided installs, as the producer counts them.
+        self.assertEqual(inventory["interim"], sum(1 for row in manifest["slots"] if row.get("interim")))
+        self.assertIn(f"{inventory['interim']} of the slots that install nothing by their decided default carry an "
+                      "interim install", markdown)
 
     def test_consensus_rows_and_amendments_come_from_the_manifest_and_its_consensus_record(self):
         """A consensus row is shown as the manifest gives it; an amendment is listed under its layer and changes no cell."""
@@ -1023,8 +1322,10 @@ class NewWslHandbookTests(unittest.TestCase):
         manifest = self.read(DEFAULTS_SOURCE)
         consensus = self.read(manifest["sources"]["consensus"]["path"])
         lines = self.slot_lines(markdown)
-        added = {row["slot_id"]: row for row in consensus["add_rows"]}
+        wave2 = consensus.get("wave2") or {}
+        added = {row["slot_id"]: row for row in consensus["add_rows"] + wave2.get("add_rows", [])}
         self.assertEqual({row["slot_id"] for row in manifest["slots"] if row["row_kind"] == "consensus"}, set(added))
+        self.assertIn("statusline", added)          # the wave-2 batch's row (2026-10-03)
         for slot_id, row in added.items():
             with self.subTest(slot=slot_id):
                 cells = lines[slot_id]
@@ -1034,7 +1335,7 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / consensus", cells[9])
                 self.assertFalse(row["definitive"])
         amendments = [(row["slot_id"], item) for row in manifest["slots"] for item in row.get("amendments", [])]
-        self.assertEqual(len(amendments), len(consensus["amend_rows"]))
+        self.assertEqual(len(amendments), len(consensus["amend_rows"]) + len(wave2.get("amend_rows", [])))
         self.assertEqual(data["default_decisions"]["inventory"]["amendments"], len(amendments))
         self.assertIn(f"Rows of kind consensus: {len(added)}; amendments: {len(amendments)}.", markdown)
         for slot_id, item in amendments:
@@ -1086,6 +1387,81 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 1, result.stdout)
                 self.assertIn(message, result.stderr)
 
+    def test_owner_rows_and_owner_defaults_come_from_the_owner_batch_and_list_what_they_replace(self):
+        """Amendment 4 (wave 3, 2026-10-04): a row the owner added is shown as the batch gives it, an owner default with the
+        owner's outcome, and what each owner decision replaced is listed under its layer's table."""
+        data, markdown = self.generated()
+        manifest = self.read(DEFAULTS_SOURCE)
+        consensus = self.read(manifest["sources"]["consensus"]["path"])
+        lines = self.slot_lines(markdown)
+        added = {row["slot_id"]: row for batch in (consensus["wave3"], consensus["wave5"])
+                 for row in batch["add_rows"]}
+        self.assertEqual({row["slot_id"] for row in manifest["slots"] if row["row_kind"] == "owner_decision"}, set(added))
+        self.assertEqual(len(added), 14)
+        for slot_id, row in added.items():
+            with self.subTest(owner_row=slot_id):
+                cells = lines[slot_id]
+                self.assertEqual((cells[1], cells[4], cells[6], cells[7]),
+                                 (row["state"], "installed", "added_by_owner_decision", row["label"]))
+                self.assertIn(f"{row['catalog']} / {row['layer_id']} / owner_decision", cells[9])
+        overturned = [row for row in manifest["slots"] if row.get("overturned")]
+        self.assertEqual(sorted(row["slot_id"] for row in overturned),
+                         ["agent-messaging", "ccusage", "code-search", "context-supply", "playwright-cli",
+                          "promptfoo", "session-analytics"])
+        for row in overturned:
+            item = row["overturned"]["amendment"]
+            with self.subTest(owner_amendment=row["slot_id"]):
+                self.assertIn(f"- Owner decision on `{row['slot_id']}` ({item['date_utc']}; {item['by']}): {item['decision']}.",
+                              markdown)
+                if row["overturned"].get("fields"):
+                    self.assertEqual(lines[row["slot_id"]][6], "owner_default")
+                    self.assertEqual(lines[row["slot_id"]][4], "installed")
+        inventory = data["default_decisions"]["inventory"]
+        self.assertEqual(inventory["owner_amendments"], len(overturned))
+        self.assertIn(f"Rows of kind owner_decision: {len(added)}; owner amendments: {len(overturned)}.", markdown)
+
+    def test_an_owner_row_or_owner_default_must_match_the_owner_batch(self):
+        """Negative controls: a row of the owner batch relabelled, a decided row that calls itself an owner row, an owner row
+        with an outcome of the rounds or definitive, and an owner default without the outcome it replaced are refused."""
+        self.real_tree()
+        original = self.read(DEFAULTS_SOURCE)
+
+        def slot(manifest, slot_id):
+            return next(row for row in manifest["slots"] if row["slot_id"] == slot_id)
+
+        def relabel_owner_row(manifest):
+            slot(manifest, "command-output")["row_kind"] = "consensus"
+
+        def claim_owner_row(manifest):
+            slot(manifest, "codex")["row_kind"] = "owner_decision"
+
+        def round_outcome(manifest):
+            slot(manifest, "command-output")["resolution"]["outcome"] = "final"
+
+        def definitive(manifest):
+            slot(manifest, "command-output").update(definitive=True, state="definitive")
+
+        def lost_replaced_outcome(manifest):
+            slot(manifest, "ccusage")["overturned"]["fields"]["resolution"]["outcome"] = "unknown"
+
+        def bare_owner_amendment(manifest):
+            del slot(manifest, "ccusage")["overturned"]["amendment"]["decision"]
+
+        for mutate, message in (
+                (relabel_owner_row, "consensus row differs from the layer-consensus record: command-output"),
+                (claim_owner_row, "consensus row differs from the layer-consensus record: codex"),
+                (round_outcome, "owner row is never definitive and carries the owner's outcome: command-output"),
+                (definitive, "owner row is never definitive and carries the owner's outcome: command-output"),
+                (lost_replaced_outcome, "owner default needs the owner's outcome and the rounds' outcome it replaced: ccusage"),
+                (bare_owner_amendment, "owner amendment needs its date, its author and its decision: ccusage")):
+            with self.subTest(mutation=mutate.__name__):
+                manifest = deepcopy(original)
+                mutate(manifest)
+                self.write(DEFAULTS_SOURCE, manifest)
+                result = self.public_cli()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(message, result.stderr)
+
     def test_a_split_row_is_shown_as_not_installed_with_the_manifests_reason(self):
         """A measurement row whose measurement returned installs its settled default, as the manifest counts it."""
         data, markdown = self.generated()
@@ -1103,10 +1479,29 @@ class NewWslHandbookTests(unittest.TestCase):
                 reason = record["resolution"]["reason"]
                 self.assertFalse(slot["installed"])
                 self.assertEqual(slot["not_installed_reason"], reason)
-                self.assertEqual(lines[record["slot_id"]][4], "not installed: " + reason)
+                interim = record.get("interim")
+                # A waiting row that carries an interim install (amendment 3) shows it beside its decided default's reason;
+                # an interim of several repositories (amendment 4 widened code-search's) names them all, not as one link.
+                if interim:
+                    repositories = [part.strip() for part in interim["repository"].split(";")]
+                    named = (f"[{interim['default']}]({repositories[0]})" if len(repositories) == 1
+                             else f"{interim['default']} ({', '.join(repositories)})")
+                expected = ("not installed: " + reason if not interim else
+                            f"interim install ({interim['date_utc']}, amendment 3): {named}"
+                            f"; its decided default is not installed: {reason}")
+                self.assertEqual(lines[record["slot_id"]][4], expected)
+        self.assertEqual(sorted(slot["record"]["slot_id"] for slot in waiting if slot["record"].get("interim")),
+                         ["code-search", "memory-owner"])
         messaging = next(slot for slot in rows if slot["record"]["slot_id"] == "agent-messaging")
-        self.assertEqual(messaging["state"], "split")
-        self.assertTrue(lines["agent-messaging"][4].startswith("not installed: native facilities do not cover"))
+        consensus = self.read("evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json")
+        owner = next(e["owner_default"] for e in consensus["wave5"]["amend_rows"]
+                     if e["slot_id"] == "agent-messaging")
+        self.assertEqual(messaging["state"], "resolved")
+        self.assertEqual(messaging["record"]["default"], owner["default"])
+        self.assertEqual(lines["agent-messaging"][4], "installed")
+        self.assertEqual(messaging["record"]["overturned"]["fields"]["state"], "split")
+        self.assertTrue(messaging["record"]["overturned"]["fields"]["resolution"]["reason"].startswith(
+            "native facilities do not cover"))
         returned = [slot for slot in rows
                     if slot["record"]["measurement"] and slot["record"]["measurement"]["returned"]]
         self.assertTrue(returned)
@@ -1155,7 +1550,15 @@ class NewWslHandbookTests(unittest.TestCase):
         commands = page_commands()
         self.assertIn("readlink /proc/self/ns/cgroup", commands)
         generator = self.committed("scripts/build_new_wsl_handbook.py")
-        profile = "\n".join(all_strings(json.loads(self.committed(handbook.PROFILE))))
+        profile_data = json.loads(self.committed(handbook.PROFILE))
+        promptfoo = next(row for row in profile_data["entries"] if row["name"] == "promptfoo")
+        # A tool recipe may point at its canonical plan row; it does not duplicate F9's stage block.
+        plan_path = "evidence/artifacts/new-wsl-install-plan-20261002"
+        self.assertTrue(promptfoo["default_install"])
+        self.assertEqual(promptfoo["install"]["command"], f"bash {plan_path}/install.sh --only promptfoo")
+        self.assertEqual(promptfoo["install"]["source"], f"{plan_path}/install-plan.json")
+        promptfoo["install"]["command"] = ""
+        profile = "\n".join(all_strings(profile_data))
         profile += "\n" + self.committed("adoption/new-wsl-profile.md")
         for command in sorted(commands):
             with self.subTest(command=command):

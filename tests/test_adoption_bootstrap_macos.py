@@ -70,9 +70,12 @@ SHELLCHECK = shutil.which("shellcheck")
 # variable of its own. evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt retains
 # that source read. Never ~/.config/rtk/config.toml, the Linux path.
 MAC_RTK_CONFIG = "Library/Application Support/rtk/config.toml"
+# v0.51.0: src/core/config.rs:510-513 calls user_dirs::config();
+# src/core/user_dirs.rs:47-63 still uses dirs::config_dir(), and Cargo.lock pins dirs 5.0.1.
+# Source: rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026.
 # The rtk versions whose macOS config path was read from source. A re-pin must re-read
 # get_config_path and the dirs crate its Cargo.lock pins before adding its version here.
-RTK_CONFIG_PATH_REVIEWED_VERSIONS = {"0.50.0"}
+RTK_CONFIG_PATH_REVIEWED_VERSIONS = {"0.50.0", "0.51.0"}
 # The temporary HOME the rtk reminder tests use: not "home", so a retained test output never
 # shows a "/home/<name>/" path, which scripts/validate.py reads as a personal home path.
 FAKE_HOME = "fake-home"
@@ -257,11 +260,12 @@ class PinsSchemaTests(unittest.TestCase):
     # (docs/decisions/2026-09-25-workstation-sota-refresh.md). Each entry names both versions
     # exactly, so a move on either side fails here until this table is reviewed again.
     MAC_PIN_LAGS_LINUX = {
+        # Linux selects 0.14.2; the Mac keeps its qualified 0.13.13 until its own qualification.
+        "mcporter": ("0.13.13", "0.14.2", "evidence/receipts/mcporter-0142-qualification-20261004.json"),
         "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
-        "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
-        # Linux moved to 0.159.3 on 2026-10-01; the Mac keeps 0.155.1 until its own
-        # qualification (the receipts' limitations).
-        "codex": ("0.155.1", "0.159.3", "evidence/receipts/codex-01593-native-queue-20261001.json"),
+        # Linux selects 0.160.0 on 2026-10-03; the Mac keeps 0.155.1 until its own
+        # qualification.
+        "codex": ("0.155.1", "0.160.0", "evidence/receipts/runtime-sdk-20261003.json"),
         # Linux moved 2026-09-27 (cooldown waived by the user); the Mac keeps 1.14.0 until its own qualification.
         "socraticode": ("1.14.0", "1.15.0", "evidence/receipts/socraticode-1150-qualification-20260927.json"),
     }
@@ -333,6 +337,7 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
     PORTED_FUNCTIONS = ("fetch", "verify_sha256", "install_uv_tool", "install_uv_tool_from_git")
     # Pins that moved after the 2026-09-26 digest check: (version, receipt that re-checked its digests).
     MOVED_AFTER_DIGEST_CHECK = {
+        "rtk": ("0.51.0", "evidence/receipts/rtk-051-qualification-20261004.json"),
         "ccusage": ("20.0.26", "evidence/receipts/ccusage-20026-qualification-20260927.json"),
     }
 
@@ -3557,7 +3562,9 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
     def test_the_cache_key_is_derived_from_the_pin_not_a_literal_hash(self):
         cache_index = self._step_index("Restore the cached pinned embedding model")
         cache_step = self.steps[cache_index]
-        self.assertEqual(cache_step["uses"].split("@")[0], "actions/cache")
+        # Restore only since 2026-10-04 (docs/decisions/2026-10-04-ci-least-privilege.md): the separate save
+        # step below writes the entry, on trusted events alone.
+        self.assertEqual(cache_step["uses"].split("@")[0], "actions/cache/restore")
         key = cache_step["with"]["key"]
         self.assertIn("${{ steps.embed-model-pin.outputs.sha256 }}", key)
         # No literal 64-hex-char sha256 anywhere in the key: a changed pin
@@ -3574,6 +3581,27 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
         cache_steps = [step for step in self.steps if "Cache the pinned embedding model" in step.get("name", "")
                        or "Restore the cached pinned embedding model" in step.get("name", "")]
         self.assertEqual(len(cache_steps), 1, cache_steps)
+
+    def test_the_cache_is_saved_only_off_pull_requests_after_the_bootstrap_verified_it(self):
+        # A pull_request run executes the pull request's code, so it only restores; the verified model is saved
+        # on push, schedule and workflow_dispatch, under the restore step's own primary key, and only on a miss
+        # (actions/cache save/README.md at the pinned v6.1.0, "Always save cache").
+        uses = [step.get("uses", "").split("@")[0] for step in self.steps]
+        self.assertNotIn("actions/cache", uses, "the combined action saves in its post step on every event")
+        self.assertEqual(uses.count("actions/cache/restore"), 1)
+        self.assertEqual(uses.count("actions/cache/save"), 1)
+        restore = self.steps[uses.index("actions/cache/restore")]
+        save_index = uses.index("actions/cache/save")
+        save = self.steps[save_index]
+        self.assertGreater(save_index, self._step_index("Run the macOS bootstrap into a disposable prefix"))
+        self.assertEqual(restore.get("id"), "embed-model-cache")
+        self.assertEqual(save["if"], "github.event_name != 'pull_request' && "
+                                     "steps.embed-model-cache.outputs.cache-hit != 'true'")
+        self.assertEqual(save["with"], {"path": restore["with"]["path"],
+                                        "key": "${{ steps.embed-model-cache.outputs.cache-primary-key }}"})
+        self.assertEqual(restore["uses"].split("@")[1], save["uses"].split("@")[1], "both from one actions/cache commit")
+        self.assertNotIn("cache-mode", self.workflow["jobs"]["bootstrap-macos"],
+                         "cache-mode takes no expression; read would skip the trusted-event save")
 
     def test_bootstrap_re_verifies_any_cached_file_via_fetch(self):
         # Confirms the invariant the step ordering above depends on:
@@ -3687,16 +3715,20 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
     validate-macos's recording-tooling gate and recording smoke both depend
     on it directly.
 
-    2026-09-25 (validate-macos required-check readiness,
-    docs/decisions/2026-09-22-github-automation-closure.md, "validate-macos
-    required (2026-09-25)"): pull_request no longer has its own `paths:`
-    filter at all -- a required check must report a status on every PR, and
-    a path-filtered one cannot. The `changes` job now reproduces the same
-    path membership test for pull_request with plain git, and its own
-    pattern list is asserted to match `push`'s `paths:` list in
-    tests.test_workflow_hardening.AdoptionBootstrapMacosRequiredTests
-    (that assertion lives there, not duplicated here, since it needs the
-    text parser for the job's embedded shell script, not YAML)."""
+    2026-10-05 (docs/decisions/2026-10-05-macos-ci-advisory.md): all three
+    macOS jobs skip pull_request and are absent from required contexts.
+    The unfiltered pull_request trigger and `changes` job still serve the
+    path-gated Linux bootstrap. Its PATTERNS list is asserted to match
+    `push`'s `paths:` list in
+    tests.test_workflow_hardening.AdoptionBootstrapMacosAdvisoryTests
+    (that assertion needs the embedded-shell text parser, not YAML).
+
+    2026-10-03 (docs/decisions/2026-10-03-macos-ci-scope.md, D8): every input
+    listed below is also in the `changes` job's MACOS_PATTERNS, so a pull
+    request that changes one is classified as full by the historical selector, except
+    manifests/evidence.json, which stays only in the push paths as the
+    post-merge net (D11). tests.test_workflow_hardening.MacosPatternsTests
+    reads this list and asserts that."""
 
     def setUp(self):
         try:
@@ -3711,6 +3743,7 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
 
     def test_every_macos_job_input_is_a_push_trigger_path(self):
         for expected in (
+            ".github/requirements-calendar.txt",
             "evidence/artifacts/macos-embed-reference-20260923/**",
             "scripts/host_receipts.py",
             "scripts/component_matrix.py",
@@ -3725,9 +3758,9 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
             self.assertIn(expected, self.triggers["push"]["paths"], expected)
 
     def test_pull_request_trigger_has_no_path_filter(self):
-        # A bare `pull_request:` key with no mapping parses as None; that
-        # emptiness is exactly what makes validate-macos reachable on every
-        # pull request (the required-check readiness this change makes).
+        # A bare `pull_request:` key parses as None. The changes job uses the
+        # PR diff to gate bootstrap-linux; every macOS job skips PRs under the
+        # 2026-10-05 advisory policy, regardless of that diff.
         self.assertIsNone(self.triggers["pull_request"])
 
 

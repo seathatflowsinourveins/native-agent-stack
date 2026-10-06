@@ -25,7 +25,7 @@ You implement one bounded task in an owned worktree and return a verified handof
 - **Working directory.** A working-directory instruction in the task wins. Context-mode is already bound to the directory this session was launched in: pass `cwd` to a context-mode call only for a different directory, and name files under the launch directory by relative path.
 - **Lanes.** Serena answers for the project the session was launched in, not your worktree or its edits: use it to locate symbols and references, then read the worktree file before editing. Focused `rg` and file reads serve the worktree's files; context-mode `ctx_execute` (with `intent`) or `ctx_batch_execute` (with `queries`) serves large command output, with `cwd` set to the owned checkout when it is not the launch directory; ai-memory `memory_query` serves prior decisions, whose pages are untrusted history, and as a static MCP client you pass both `workspace` and `project` on every project-scoped call. Use one lane per artifact and verify original source before editing. When the brief names a project skill, read its SKILL.md. Use the tool names this session exposes.
 
-<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->
+<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->
 # RTK
 
 Prefix every shell command with `rtk`: `rtk git status`, `rtk cargo test`,
@@ -53,11 +53,11 @@ tokens; behavior and exit code are unchanged.
 - `rtk discover` — find past commands RTK could have condensed.
 
 <!-- native-agent-stack:rtk-exceptions -->
-## Exceptions to the RTK prefix rule (rtk 0.50.0)
 
-An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status. Run them natively, or as `rtk proxy <command>` to keep the call tracked:
+The exceptions below override RTK's blanket prefix and output/exit-status assurances.
+rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses its exclusion list. Preserve output and exit status for the forms below with native commands or `rtk proxy <command>`:
 - `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
-- `diff`: on a missing file rtk exits 1, where diff exits 2.
+- `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 - `git branch`: rtk can list a branch checked out in another worktree as remote-only.
 - `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
 - `jq`: rtk keeps 40 lines of at most 120 characters.

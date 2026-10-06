@@ -305,7 +305,13 @@ class CodexTemplateTests(unittest.TestCase):
                 tui = self.render(host)["tui"]
                 # Codex does not validate keys inside [tui] (an unknown key loads cleanly), so a new setting needs its own
                 # upstream check before it joins this set; [tui.model_availability_nux] is a table Codex keeps for itself.
-                self.assertEqual({key for key, value in tui.items() if not isinstance(value, dict)}, {"notifications"})
+                # status_line joined on 2026-10-03 (the wave-2 statusline row): Tui.properties.status_line, "Ordered list of
+                # status line item identifiers", in codex-rs/core/config.schema.json at rust-v0.160.0, and the six ids are
+                # StatusLineItem variants (kebab-case) of codex-rs/tui/src/bottom_pane/status_line_setup.rs at that tag.
+                self.assertEqual({key for key, value in tui.items() if not isinstance(value, dict)},
+                                 {"notifications", "status_line"})
+                self.assertEqual(tui["status_line"], ["model-with-reasoning", "project-name", "git-branch", "context-used",
+                                                      "five-hour-limit", "weekly-limit"])
                 kinds = tui["notifications"]
                 self.assertIsInstance(kinds, list)
                 self.assertTrue(all(isinstance(kind, str) for kind in kinds))

@@ -17,7 +17,7 @@ Static checks (no model call):
                 through ${ECO_ROOT}/bin/node, "cwd": null, env keys CONTEXT_MODE_PLATFORM, PATH and
                 RTK_TELEMETRY_DISABLED, no forwarded variables; `codex mcp list --json` names context-mode once
   profile       `codex -p stack-worker debug prompt-input` carries max effort's "do not spawn sub-agents unless
-                asked" and the markers; `codex -p stack-worker mcp get` shows the template's tool lists
+                asked" and the markers after required Serena starts; `codex -p stack-worker mcp get` shows the template's tool lists
   roles         the two role carriers under $CODEX_HOME/agents equal their rows in adoption/agents/codex/SHA256SUMS, the
                 agents folder holds exactly two *.toml files, and the live config.toml, the worker profile and the
                 system layer (/etc/codex) declare no other role: counts and booleans only, no model call. There is no
@@ -492,7 +492,7 @@ def skill_prompt(skill: Path) -> str:
     """Request a native file read without supplying the expected first line.
 
     Codex's user skill directory: https://developers.openai.com/codex/skills/
-    Shell fallback follows rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md and
+    Shell fallback follows rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md and
     context-mode v1.0.169's project containment policy, not a permission override.
     """
     return (f"Read the installed skill file {str(skill)!r}. Prefer the context-mode tool ctx_execute_file with "

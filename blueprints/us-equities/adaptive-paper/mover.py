@@ -38,7 +38,7 @@ if _HERE not in sys.path:
 from feeds import is_qualified_feed  # noqa: E402
 from leverage import validate_leverage_policy  # noqa: E402
 from safety import RiskLimits, SafetyError, symbol_name  # noqa: E402
-from sessions import NY, _rth_close_time, validate_session_policy  # noqa: E402
+from sessions import NY, _rth_close_time, is_trading_day, validate_session_policy  # noqa: E402
 
 D = Decimal
 ZERO = D(0)
@@ -801,7 +801,10 @@ def plan_timing(settings, limits, *, t0, session_date):
     if settings.exit_rule == "X1":
         # C26: the study's close is the session's regular close (13:00 on early closes); X1 fires two
         # minutes before it, and a plan whose hard flatten comes first can never reach X1.
-        close = _rth_close_time(date.fromisoformat(session_date) if isinstance(session_date, str) else session_date)
+        day = date.fromisoformat(session_date) if isinstance(session_date, str) else session_date
+        if not is_trading_day(day):
+            raise MoverRefusal("mover_x1_non_session")
+        close = _rth_close_time(day)
         x1_at = et_epoch(session_date, dtime(close.hour, close.minute)) - (_seconds_of_day(RTH_CLOSE_ET) - _seconds_of_day(X1_FLATTEN_AT_ET))
         if hard_flatten <= x1_at:
             raise MoverRefusal("mover_x1_unreachable")

@@ -1,4 +1,4 @@
-"""Unit tests for tools/adoption/install_claude_profile.py's guard/agents
+"""Unit tests for tools/adoption/install_claude_profile.py's guard/agents/workflows
 steps (sha256-checked, idempotent) and the MCP registration matcher used to
 decide whether an existing `claude mcp get` entry already matches the
 template (so registration is skipped rather than repeated). The `claude`
@@ -25,28 +25,28 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import install_claude_profile as icp  # noqa: E402
+import managed_block  # noqa: E402
 
 # The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
 # repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
 CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
-# Every SubagentStart carrier block: the general block above and the five role blocks the hook picks by agent type
-# (adoption/hooks/claude/token-lanes-subagent-start.py). The user-scope template is checked against all of them.
-CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "token-lanes-block.researcher.md",
-                       "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
+# Every carrier block: the general block above and the five role blocks the SubagentStart hook picks by agent type
+# (adoption/hooks/claude/token-lanes-subagent-start.py), and the main-session block of the SessionStart hook
+# (adoption/hooks/claude/token-lanes-session-start.py). The user-scope template is checked against all of them.
+CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.main.md", "token-lanes-block.md",
+                       "token-lanes-block.researcher.md", "token-lanes-block.reviewer.md", "token-lanes-block.scout.md",
+                       "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
-USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd", "jcodemunch"}
 # A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
-# it out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md;
-# its user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
-# accepted routing record on main says the same for Claude Code: "registered per project, not at user scope"
-# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph). The first phrase is Claude
-# Code's per-project registration command, so the exception holds only while a project can still register the server
-# the carrier names; the second is the Codex user template's statement of the same scope.
-CARRIER_EXCEPTIONS = {
-    "jcodemunch": (("adoption/bootstrap.md", "claude mcp add --scope local jcodemunch"),
-                   ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)")),
-}
+# it out. None now: jCodeMunch was the one (registered per project since the 2026-09-25 addendum of
+# docs/decisions/2026-09-23-claude-user-profile.md) until the user's directive of 2026-10-04 put it back at user scope
+# in both user templates (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
+CARRIER_EXCEPTIONS: dict = {}
+# A sourced exception as the mechanism takes it, for the controls below: a server the template leaves out, and a file
+# that holds the phrase that says why.
+SAMPLE_EXCEPTION = {"qmd": (("adoption/bootstrap.md", "jCodeMunch recipe"),)}
 # Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
 # entry has carried neither since 2026-09-23.
 CODEX_ONLY_ENV = {"PATH", "RTK_TELEMETRY_DISABLED"}
@@ -132,9 +132,9 @@ def codex_parity_errors(claude: dict, codex: dict, values: dict) -> list[str]:
             errors.append(f"{name}: env values differ")
     return errors
 
-# The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25, when jCodeMunch moved
-# to a per-project opt-in (adoption/bootstrap.md step 4a). It stays here, inline, as the fixture for
-# a stdio server with ${HOME} in an env value and env names to match: no template entry has either now.
+# The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25 (with CODE_INDEX_PATH; the template's
+# entry since 2026-10-04 carries only JCODEMUNCH_SHARE_SAVINGS). It stays here, inline, as the fixture for
+# a stdio server with ${HOME} in an env value and env names to match: no template entry has one now.
 JCODEMUNCH_SPEC = {
     "type": "stdio",
     "command": "${ECO_ROOT}/bin/jcodemunch-mcp",
@@ -150,13 +150,16 @@ def template_server_names() -> list[str]:
 class GuardInstallTests(unittest.TestCase):
     def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
         script = "token-lanes-subagent-start.py"
+        session_script = "token-lanes-session-start.py"
         names = ("token-lanes-block.md", "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
                  "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md",
-                 script)
+                 script, "token-lanes-block.main.md", session_script)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
+            # The carriers are held out of the default (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md):
+            # they install only when --hook names them.
             command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
-                       "--only", "guard"]
+                       "--only", "guard", *(arg for name in names for arg in ("--hook", name))]
             env = {**os.environ, "HOME": tmp}
             planned = subprocess.run(command + ["--dry-run"], env=env, cwd=ROOT,
                                      capture_output=True, text=True, timeout=30)
@@ -181,6 +184,35 @@ class GuardInstallTests(unittest.TestCase):
                     self.assertEqual(injected.returncode, 0, injected.stderr)
                     self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
                                      (home / ".claude/hooks" / block).read_text(encoding="utf-8"))
+            # The installed SessionStart script resolves the installed main-session block the same way.
+            with self.subTest(event="SessionStart"):
+                injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / session_script)],
+                                          input=json.dumps({"hook_event_name": "SessionStart", "source": "startup"}),
+                                          env=env, cwd=home, capture_output=True, text=True, timeout=30)
+                self.assertEqual(injected.returncode, 0, injected.stderr)
+                self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"],
+                                 {"hookEventName": "SessionStart", "additionalContext":
+                                  (home / ".claude/hooks/token-lanes-block.main.md").read_text(encoding="utf-8")})
+
+    def test_the_default_guard_step_installs_no_held_out_carrier_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            env = {**os.environ, "HOME": tmp}
+            command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"), "--only", "guard"]
+            planned = subprocess.run(command + ["--dry-run"], env=env, cwd=ROOT, capture_output=True, text=True,
+                                     timeout=30)
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertNotIn("token-lanes", planned.stdout)
+            for name in icp.HOOKS:
+                self.assertIn(f"would install {Path(tmp) / '.claude/hooks' / name}", planned.stdout)
+            installed = subprocess.run(command, env=env, cwd=ROOT, capture_output=True, text=True, timeout=30)
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            self.assertEqual(sorted(path.name for path in (Path(tmp) / ".claude/hooks").iterdir()), sorted(icp.HOOKS))
+
+    def test_a_name_outside_both_hook_maps_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(icp.InstallError):
+                icp.install_guards(Path(tmp), dry_run=False, names=["token-lanes-block.nonexistent.md"])
+            self.assertFalse((Path(tmp) / ".claude").exists())
 
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -206,6 +238,286 @@ class GuardInstallTests(unittest.TestCase):
             self.assertFalse((home / ".claude" / "hooks" / "effort-default-guard.py").exists())
 
 
+class WorkflowInstallTests(unittest.TestCase):
+    """Local integration checks for native saved-script files, without model calls."""
+
+    NAMES = ("readiness-audit.js", "review-changes.js", "layer-verdict-lane.js")
+
+    def cli(self, home, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
+             "--home", str(home), *args],
+            cwd=ROOT, capture_output=True, text=True, timeout=30,
+        )
+
+    def install(self, home):
+        with mock.patch("sys.stdout", new_callable=io.StringIO):
+            return icp.install_workflows(home, dry_run=False)
+
+    def test_cli_clean_install_readback_and_idempotence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            planned = self.cli(home, "--only", "workflows", "--dry-run")
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertFalse((home / ".claude").exists())
+            for name in self.NAMES:
+                self.assertIn(f"would install {home / '.claude/workflows' / name}", planned.stdout)
+            installed = self.cli(home, "--only", "workflows")
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            dest_dir = home / ".claude/workflows"
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, set(self.NAMES))
+            before = {}
+            for name in self.NAMES:
+                dest = dest_dir / name
+                self.assertEqual(dest.read_bytes(), (icp.WORKFLOWS_SRC_DIR / name).read_bytes())
+                before[name] = (dest.stat().st_ino, dest.stat().st_mtime_ns)
+            repeated = self.cli(home, "--only", "workflows")
+            self.assertEqual(repeated.returncode, 0, repeated.stderr)
+            self.assertEqual(repeated.stdout.count("already matches; skipped"), 3)
+            for name in self.NAMES:
+                dest = dest_dir / name
+                self.assertEqual((dest.stat().st_ino, dest.stat().st_mtime_ns), before[name])
+
+    def test_explicit_profile_selection_installs_saved_workflows(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(icp, "install_guards") as guards, \
+             mock.patch.object(icp, "install_agents") as agents, \
+             mock.patch.object(icp, "install_mcp_servers") as mcp, \
+             mock.patch("sys.stdout", new_callable=io.StringIO):
+            home = Path(tmp)
+            self.assertEqual(icp.main(["--home", tmp, "--only", "workflows"]), 0)
+            self.assertEqual({p.name for p in (home / ".claude/workflows").iterdir()}, set(self.NAMES))
+            guards.assert_not_called()
+            agents.assert_not_called()
+            mcp.assert_not_called()
+
+    def test_default_profile_never_reads_or_creates_workflows(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(icp, "install_guards") as guards, \
+             mock.patch.object(icp, "install_agents") as agents, \
+             mock.patch.object(icp, "install_mcp_servers") as mcp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+
+            def forbid_workflow_access(method):
+                def checked(path, *args, **kwargs):
+                    if path.is_relative_to(dest_dir) or path.is_relative_to(icp.WORKFLOWS_SRC_DIR):
+                        raise AssertionError(f"default run accessed workflows: {path}")
+                    return method(path, *args, **kwargs)
+                return checked
+
+            with mock.patch.object(Path, "open", forbid_workflow_access(Path.open)), \
+                 mock.patch.object(Path, "stat", forbid_workflow_access(Path.stat)), \
+                 mock.patch.object(Path, "iterdir", forbid_workflow_access(Path.iterdir)), \
+                 mock.patch.object(Path, "mkdir", forbid_workflow_access(Path.mkdir)):
+                self.assertEqual(icp.main(["--home", tmp]), 0)
+            self.assertFalse(dest_dir.exists())
+            guards.assert_called_once_with(home, False, None)
+            agents.assert_called_once_with(home, False, None)
+            mcp.assert_called_once()
+
+    def test_source_corruption_or_missing_manifest_entry_refuses_before_writes(self):
+        for failure in ("corruption", "missing-entry"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as tmp:
+                scratch = Path(tmp)
+                sources = scratch / "sources"
+                sources.mkdir()
+                for name in self.NAMES:
+                    shutil.copy2(icp.WORKFLOWS_SRC_DIR / name, sources / name)
+                sums = sources / "SHA256SUMS"
+                sums.write_bytes(icp.WORKFLOWS_SHA256SUMS.read_bytes())
+                if failure == "corruption":
+                    with (sources / self.NAMES[-1]).open("ab") as stream:
+                        stream.write(b"\n// unreviewed mutation\n")
+                else:
+                    sums.write_text("\n".join(line for line in sums.read_text().splitlines()
+                                              if not line.endswith(self.NAMES[-1])) + "\n")
+                home = scratch / "home"
+                home.mkdir()
+                with mock.patch.object(icp, "WORKFLOWS_SRC_DIR", sources), \
+                     mock.patch.object(icp, "WORKFLOWS_SHA256SUMS", sums):
+                    with self.assertRaises(icp.InstallError):
+                        self.install(home)
+                self.assertFalse((home / ".claude").exists())
+
+    def test_conflicting_last_target_refuses_every_write_including_dry_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+            dest_dir.mkdir(parents=True)
+            conflict = dest_dir / self.NAMES[-1]
+            conflict.write_bytes(b"personalized workflow\n")
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+            for extra in ((), ("--dry-run",)):
+                result = self.cli(home, "--only", "workflows", *extra)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("differs; left unchanged", result.stderr)
+                self.assertEqual(conflict.read_bytes(), b"personalized workflow\n")
+                self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+                self.assertEqual({p.name for p in dest_dir.iterdir()}, {conflict.name, custom.name})
+
+    def test_matching_or_dangling_target_symlink_is_refused(self):
+        for target_exists in (True, False):
+            with self.subTest(target_exists=target_exists), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                dest_dir = home / ".claude/workflows"
+                dest_dir.mkdir(parents=True)
+                target = home / "outside.js"
+                if target_exists:
+                    target.write_bytes((icp.WORKFLOWS_SRC_DIR / self.NAMES[-1]).read_bytes())
+                dest = dest_dir / self.NAMES[-1]
+                dest.symlink_to(target)
+                result = self.cli(home, "--only", "workflows")
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("refusing target symlink", result.stderr)
+                self.assertTrue(dest.is_symlink())
+                self.assertEqual({p.name for p in dest_dir.iterdir()}, {dest.name})
+                self.assertEqual(target.exists(), target_exists)
+                if target_exists:
+                    self.assertEqual(target.read_bytes(), (icp.WORKFLOWS_SRC_DIR / dest.name).read_bytes())
+
+    def test_nonfile_target_is_preserved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest = home / ".claude/workflows" / self.NAMES[-1]
+            dest.mkdir(parents=True)
+            result = self.cli(home, "--only", "workflows")
+            self.assertEqual(result.returncode, 1, result.stdout)
+            self.assertTrue(dest.is_dir())
+            self.assertEqual({p.name for p in dest.parent.iterdir()}, {dest.name})
+
+    def test_personal_dotfiles_directory_symlink_is_supported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dotfiles = home / "dotfiles-claude"
+            dotfiles.mkdir()
+            (home / ".claude").symlink_to(dotfiles, target_is_directory=True)
+            result = self.cli(home, "--only", "workflows")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((home / ".claude").is_symlink())
+            for name in self.NAMES:
+                self.assertEqual((dotfiles / "workflows" / name).read_bytes(),
+                                 (icp.WORKFLOWS_SRC_DIR / name).read_bytes())
+
+    def test_write_failure_cleans_new_files_and_empty_directories_then_recovers(self):
+        original_open = Path.open
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+
+            def fail_open(path, mode="r", *args, **kwargs):
+                if path.name == self.NAMES[-1] and mode == "xb":
+                    raise OSError("injected write failure")
+                return original_open(path, mode, *args, **kwargs)
+
+            with mock.patch.object(Path, "open", fail_open):
+                with self.assertRaisesRegex(icp.InstallError, "new files rolled back"):
+                    self.install(home)
+            self.assertFalse((home / ".claude").exists())
+            self.assertEqual(self.install(home), dict.fromkeys(self.NAMES, "installed"))
+
+    def test_readback_failure_rolls_back_new_files_and_preserves_reused_and_custom(self):
+        original_read = Path.read_bytes
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+            dest_dir.mkdir(parents=True)
+            reused = dest_dir / self.NAMES[0]
+            reused.write_bytes((icp.WORKFLOWS_SRC_DIR / reused.name).read_bytes())
+            reused_identity = (reused.stat().st_ino, reused.stat().st_mtime_ns)
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+
+            def fail_readback(path):
+                if path.parent == dest_dir and path.name == self.NAMES[-1]:
+                    return b"injected readback mismatch"
+                return original_read(path)
+
+            with mock.patch.object(Path, "read_bytes", fail_readback):
+                with self.assertRaisesRegex(icp.InstallError, "installed readback differs"):
+                    self.install(home)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {reused.name, custom.name})
+            self.assertEqual((reused.stat().st_ino, reused.stat().st_mtime_ns), reused_identity)
+            self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+            result = self.install(home)
+            self.assertEqual(result, {self.NAMES[0]: "skipped", self.NAMES[1]: "installed", self.NAMES[2]: "installed"})
+
+    def test_target_created_after_preflight_is_preserved_and_earlier_write_rolled_back(self):
+        original_open = Path.open
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+
+            def competing_open(path, mode="r", *args, **kwargs):
+                if path.parent == dest_dir and path.name == self.NAMES[1] and mode == "xb":
+                    with original_open(path, "wb") as stream:
+                        stream.write(b"another writer's workflow\n")
+                return original_open(path, mode, *args, **kwargs)
+
+            with mock.patch.object(Path, "open", competing_open):
+                with self.assertRaises(icp.InstallError):
+                    self.install(home)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {self.NAMES[1]})
+            self.assertEqual((dest_dir / self.NAMES[1]).read_bytes(), b"another writer's workflow\n")
+
+    def test_scoped_remove_dry_run_then_preserves_edited_and_custom_entries(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            dest_dir = home / ".claude/workflows"
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+            planned = self.cli(home, "--only", "workflows", "--remove-workflows", "--dry-run")
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertEqual(planned.stdout.count("would remove"), 3)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {*self.NAMES, custom.name})
+            edited = dest_dir / self.NAMES[-1]
+            edited.write_bytes(b"personalized workflow\n")
+            removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+            self.assertEqual(removed.returncode, 1, removed.stdout)
+            self.assertIn("differs; left unchanged", removed.stderr)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {edited.name, custom.name})
+            self.assertEqual(edited.read_bytes(), b"personalized workflow\n")
+            self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+
+    def test_scoped_remove_preserves_target_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            dest_dir = home / ".claude/workflows"
+            target = home / "outside.js"
+            dest = dest_dir / self.NAMES[-1]
+            dest.rename(target)
+            dest.symlink_to(target)
+            removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+            self.assertEqual(removed.returncode, 1, removed.stdout)
+            self.assertIn("is a symlink; left unchanged", removed.stderr)
+            self.assertTrue(dest.is_symlink())
+            self.assertEqual(target.read_bytes(), (icp.WORKFLOWS_SRC_DIR / dest.name).read_bytes())
+
+    def test_complete_scoped_remove_is_idempotent_and_reinstall_recovers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            for attempt in range(2):
+                removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+                self.assertEqual(removed.returncode, 0, removed.stderr)
+                self.assertEqual(list((home / ".claude/workflows").iterdir()), [])
+                self.assertEqual(removed.stdout.count("removed" if attempt == 0 else "already absent"), 3)
+            self.assertEqual(self.install(home), dict.fromkeys(self.NAMES, "installed"))
+
+    def test_remove_rejects_mixed_mutation_options_before_writes(self):
+        for options in (("--remove-workflows",),
+                        ("--only", "workflows", "--only", "guard", "--remove-workflows"),
+                        ("--only", "workflows", "--replace-mcp", "--remove-workflows")):
+            with self.subTest(options=options), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                result = self.cli(home, *options)
+                self.assertEqual(result.returncode, 2, result.stdout)
+                self.assertIn("requires exactly --only workflows", result.stderr)
+                self.assertFalse((home / ".claude").exists())
+
+
 class SecretGuardProfileTests(unittest.TestCase):
     """The secret-path guard and its deny rules ship in the user profile for every new host."""
 
@@ -221,12 +533,24 @@ class SecretGuardProfileTests(unittest.TestCase):
             self.assertEqual(icp.install_guards(home, dry_run=False),
                              {name: "skipped" for name in icp.HOOKS})
 
-    def test_token_lanes_template_merges_once_alongside_existing_ai_memory(self):
-        import apply_claude_settings as acs
+    def test_a_held_out_carrier_file_installs_only_when_named(self):
+        self.assertFalse(set(icp.HOOKS) & set(icp.HELD_OUT_HOOKS))
+        self.assertEqual(len(icp.HELD_OUT_HOOKS), 9)
         with tempfile.TemporaryDirectory() as tmp:
-            template = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
+            home = Path(tmp)
+            self.assertEqual(icp.install_guards(home, dry_run=False, names=list(icp.HELD_OUT_HOOKS)),
+                             {name: "installed" for name in icp.HELD_OUT_HOOKS})
+            for name, source in icp.HELD_OUT_HOOKS.items():
+                self.assertEqual((home / ".claude" / "hooks" / name).read_bytes(), source.read_bytes())
+
+    def test_the_held_out_entries_merge_once_alongside_existing_ai_memory(self):
+        import apply_claude_settings as acs
+        entries_file = ROOT / "adoption" / "hooks" / "claude" / "held-out-hook-entries.json"
+        with tempfile.TemporaryDirectory() as tmp:
+            template = json.loads(string.Template(entries_file.read_text()).safe_substitute(HOME=tmp))
+            default = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
             incoming = template["hooks"]["SubagentStart"]
-            memory = next(hook for group in incoming for hook in group["hooks"]
+            memory = next(hook for group in default["hooks"]["SubagentStart"] for hook in group["hooks"]
                           if "--event subagent-start" in hook["command"])
             # The current live shape already carries ai-memory under the empty matcher.
             base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [memory]}]}}
@@ -246,13 +570,13 @@ class SecretGuardProfileTests(unittest.TestCase):
                             for group in merged["hooks"]["SubagentStart"] for hook in group["hooks"]]
                     with self.subTest(existing=bool(initial), application=application):
                         self.assertEqual(keys.count(acs.command_key(wanted)), 1)
-                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1)
+                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1 if initial else 0)
                         if application == 2:
                             self.assertEqual(merged, previous)
 
     def test_sha256sums_verifies_like_sha256sum_c(self):
         entries = icp.sha256sums_entries()
-        self.assertEqual(set(entries), {src.resolve() for src in icp.HOOKS.values()})
+        self.assertEqual(set(entries), {src.resolve() for src in icp.ALL_HOOKS.values()})
         for source, digest in entries.items():
             with self.subTest(source=source.name):
                 self.assertEqual(icp.sha256_of(source), digest)
@@ -313,9 +637,10 @@ class SecretGuardProfileTests(unittest.TestCase):
         merged = acs.merge_settings(base, template)
         self.assertEqual(merged["permissions"]["deny"][0], "Bash(rm -rf /)")
         self.assertIn("Read(~/.config/native-agent-stack/**)", merged["permissions"]["deny"])
-        commands = [h["command"] for h in merged["hooks"]["PreToolUse"][0]["hooks"]]
+        commands = [h["command"] for group in merged["hooks"]["PreToolUse"]
+                    if group.get("matcher") == "Bash" for h in group["hooks"]]
         self.assertEqual(commands.count("rtk hook claude"), 1)
-        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
+        self.assertEqual(sum("secret_path_guard.py" in c for c in commands), 1)
 
 
 class ProfileTemplateSettingsTests(unittest.TestCase):
@@ -511,16 +836,16 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         self.assertNotIn("BASH_DEFAULT_TIMEOUT_MS", settings["env"])
         self.assertEqual(settings["statusLine"]["refreshInterval"], 5)
 
-    def test_the_advisor_is_fable_and_accepted_for_the_main_model(self):
-        # docs/decisions/2026-09-27-model-currency.md. https://code.claude.com/docs/en/settings-reference#advisormodel
+    def test_the_advisor_is_opus_and_accepted_for_the_main_model(self):
+        # docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md. https://code.claude.com/docs/en/settings-reference#advisormodel
         # (fetched 2026-09-27): scope "Any file"; "fable", "opus", "sonnet" or a full model ID; unset turns the advisor
         # off. https://code.claude.com/docs/en/advisor, "Choose an advisor model": an Opus 5.5 main model accepts "Fable,
         # and Opus 5 or later". The advisor needs feature-flag fetching, which DISABLE_GROWTHBOOK, DISABLE_TELEMETRY,
         # DO_NOT_TRACK and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC turn off (env-vars, "Features that need feature-flag
         # fetching"), and CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 makes Claude Code ignore advisorModel.
         settings = self.settings()
-        self.assertEqual(settings.get("advisorModel"), "fable")
-        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Fable for an Opus main model")
+        self.assertEqual(settings.get("advisorModel"), "opus")
+        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Opus for an Opus main model")
         for name in ("DISABLE_GROWTHBOOK", "DISABLE_TELEMETRY", "DO_NOT_TRACK", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
                      "CLAUDE_CODE_DISABLE_ADVISOR_TOOL"):
             with self.subTest(env=name):
@@ -914,7 +1239,7 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                     if ":" in skill:
                         self.assertRegex(skill, r"^[^:\s]+:[^:\s]+$")
                     else:
-                        self.assertIn(listing.get(skill), {"on", "name-only"},
+                        self.assertEqual(listing.get(skill), "on",
                                       f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
         for agent, expected in {
             "isolated-builder": ["context-mode:context-mode"],
@@ -1076,8 +1401,8 @@ class McpMatchTests(unittest.TestCase):
 
 class McpTemplateShapeTests(unittest.TestCase):
     def test_template_names_the_expected_servers(self):
-        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in; socraticode, headroom,
-        # codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
+        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in and came back on 2026-10-04;
+        # socraticode, headroom, codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
         self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
@@ -1085,11 +1410,15 @@ class McpTemplateShapeTests(unittest.TestCase):
             self.assertEqual(data["mcpServers"][name]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
-    def test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off(self):
-        # The template no longer carries JCODEMUNCH_SHARE_SAVINGS=0, so the two documented opt-in
-        # forms in adoption/bootstrap.md step 4a are where it ships: the local command and the
-        # checked-in .mcp.json entry must both keep it.
+    def test_every_jcodemunch_registration_keeps_savings_sharing_off(self):
+        # The user-scope entry of the template carries JCODEMUNCH_SHARE_SAVINGS=0, the documented opt-out of upstream's
+        # anonymous savings counter (CONFIGURATION.md and SECURITY.md of jcodemunch-mcp 1.108.319), and so do the two
+        # per-project forms in adoption/bootstrap.md step 4a: the local command and the checked-in .mcp.json entry.
+        self.assertEqual(json.loads(icp.MCP_TEMPLATE.read_text())["mcpServers"]["jcodemunch"]["env"],
+                         {"JCODEMUNCH_SHARE_SAVINGS": "0"})
         text = (ROOT / "adoption" / "bootstrap.md").read_text()
+        user = text[text.index("**jCodeMunch, user scope.**"):text.index("**jCodeMunch, per project.**")]
+        self.assertEqual(user.count("JCODEMUNCH_SHARE_SAVINGS"), 1)       # the prose names the template's opt-out once
         start = text.index("**jCodeMunch, per project.**")
         paragraph = text[start:text.index("Then apply the settings template itself", start)]
         self.assertIn("-e JCODEMUNCH_SHARE_SAVINGS=0", paragraph)
@@ -1098,8 +1427,8 @@ class McpTemplateShapeTests(unittest.TestCase):
 
 
 class McpCarrierCoverageTests(unittest.TestCase):
-    """The user-scope template registers exactly the servers the SubagentStart carrier blocks name (every
-    token-lanes-block*.md, the general block and the five role blocks), less the exceptions whose reason is still
+    """The user-scope template registers exactly the servers the carrier blocks name (every token-lanes-block*.md:
+    the general block, the five role blocks and the main-session block), less the exceptions whose reason is still
     written in the file each cites. Structural validation of repository files; no client runs."""
 
     BLOCKS = ROOT / "adoption" / "hooks" / "claude"
@@ -1111,7 +1440,8 @@ class McpCarrierCoverageTests(unittest.TestCase):
 
     def test_the_carrier_names_the_lane_servers(self):
         # Control for the parser: the carrier blocks' own ids, context-mode's plugin server left out. The role blocks
-        # name a subset of the general block's servers today, so the union is the general block's set.
+        # name a subset of the general block's servers today and the main-session block names servers by plain name
+        # only (no mcp__ ids), so the union is the general block's set.
         self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
                          sorted(CARRIER_BLOCK_NAMES))
         lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
@@ -1148,18 +1478,16 @@ class McpCarrierCoverageTests(unittest.TestCase):
         cases = {
             "a lane server left unregistered": (carrier, registered - {"qmd"}, CARRIER_EXCEPTIONS, self.read),
             "a new lane server": (carrier + "\nmcp__newserver__tool", registered, CARRIER_EXCEPTIONS, self.read),
-            "the exception's reason removed": (carrier, registered, CARRIER_EXCEPTIONS,
-                                               lambda path: (self.read(path) or "").replace(
-                                                   "jcodemunch stays project-scoped (#240)", "")),
-            "the per-project registration removed": (carrier, registered, CARRIER_EXCEPTIONS,
-                                                     lambda path: (self.read(path) or "").replace(
-                                                         "claude mcp add --scope local jcodemunch", "")),
-            "an exception for a registered server": (carrier, registered | {"jcodemunch"}, CARRIER_EXCEPTIONS,
-                                                     self.read),
+            "the exception's reason removed": (carrier, registered - {"qmd"}, SAMPLE_EXCEPTION,
+                                               lambda path: (self.read(path) or "").replace("jCodeMunch recipe", "")),
+            "the exception's file missing": (carrier, registered - {"qmd"}, SAMPLE_EXCEPTION, lambda path: None),
+            "an exception for a registered server": (carrier, registered, SAMPLE_EXCEPTION, self.read),
         }
         for label, args in cases.items():
             with self.subTest(mutant=label):
                 self.assertEqual(len(carrier_coverage_errors(*args)), 1)
+        # Control: a sourced exception whose reason is written in its file excuses the server it names.
+        self.assertEqual(carrier_coverage_errors(carrier, registered - {"qmd"}, SAMPLE_EXCEPTION, self.read), [])
 
 
 class McpCodexParityTests(unittest.TestCase):
@@ -1211,7 +1539,8 @@ class McpCodexParityTests(unittest.TestCase):
 
     def test_qmd_serves_the_named_catalog_index(self):
         self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog", "mcp"])
-        self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertIn("docs/token-session-handbook.md#catalog-lookup", (ROOT / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "docs/token-session-handbook.md").read_text(encoding="utf-8"))
 
 
 class McpRenderAndCommandTests(unittest.TestCase):
@@ -1254,7 +1583,7 @@ class McpRenderAndCommandTests(unittest.TestCase):
         self.assertEqual(calls, [])
 
     def test_registers_only_the_servers_the_template_names(self):
-        # A jcodemunch registration left by an earlier template is neither re-added nor removed.
+        # The installer visits exactly the template's servers (jcodemunch among them since 2026-10-04) and removes none.
         asked, ran = [], []
 
         def fake_get(claude_bin, name):
@@ -1272,7 +1601,11 @@ class McpRenderAndCommandTests(unittest.TestCase):
         self.assertEqual(asked, names)
         self.assertEqual(results, ["installed"] * len(names))
         self.assertEqual(ran, [icp.mcp_add_command("claude", name, rendered[name]) for name in names])
-        self.assertNotIn("jcodemunch", json.dumps(ran))
+        self.assertFalse([cmd for cmd in ran if "remove" in cmd])
+        add = next(cmd for cmd in ran if "jcodemunch" in cmd)
+        self.assertEqual(add[:6], ["claude", "mcp", "add", "--scope", "user", "jcodemunch"])
+        self.assertIn("JCODEMUNCH_SHARE_SAVINGS=0", add)
+        self.assertEqual(add[-2:], ["--", "/e/bin/jcodemunch-mcp"])
 
 
 class McpGetOutputTests(unittest.TestCase):
@@ -1402,8 +1735,13 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     SURFACES = {"AGENTS.md": ROOT / "AGENTS.md", "portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
                 "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
     SHARED = (
+        "Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) "
+        "and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a "
+        "demonstrated gap, cited at a pin.",
         "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
-        "listed skill fits the task, it discovers one with `find-skills` and verifies or A/B-tests it with `skill-creator`.",
+        "skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; "
+        "check client exposure and the skills lifecycle.",
+        "Prompts fix the objective, scope and authorization; improve the approach from current evidence.",
         "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
         "benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.",
         "A coordinator ends every substantive research or adoption unit with a completeness critic (missed modality, "
@@ -1420,6 +1758,8 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
         "delegated child, starts a cross-family lane.",
         # AGENTS.md follows this clause with the path of its decision record.
+        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
+        "delegated child, starts a cross-family lane.",
         "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
     )
     CODEX_VARIANT = ("A coordinator, not a delegated child,", "A coordinator, not a bounded worker,")
@@ -1431,39 +1771,38 @@ class StandingRuleSurfacesTests(unittest.TestCase):
             for sentence in self.SHARED:
                 expected = sentence.replace(*self.CODEX_VARIANT) if name == "codex" else sentence
                 with self.subTest(surface=name, sentence=sentence[:48]):
-                    self.assertIn(expected, text)
+                    if sentence.startswith("Codex CLI") and name == "portable":
+                        self.assertIn("Codex instruction block", text)
+                        self.assertNotIn(sentence, text)
+                        self.assertIn(sentence, self.SURFACES["codex"].read_text(encoding="utf-8"))
+                    else:
+                        self.assertIn(expected, text)
             for phrase in self.DROPPED:
                 with self.subTest(surface=name, dropped=phrase):
                     self.assertNotIn(phrase, text)
 
 
 class PortableTopRuleTests(unittest.TestCase):
-    """The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level
-    ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an
-    upstream-verification procedure. It was added on 2026-09-26, after a docs subagent's "no native
-    advisor" claim was relayed although the installed client's upstream CHANGELOG documents
-    `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the
-    procedure replaced text instead of adding to it: the file stayed within 5% of the 881 words
-    (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the
-    four dispatch modes of the user-approved global instructions and the documented named-spawn
-    behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could
-    not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
-    Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
-    default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
-    Re-baselined on 2026-09-30 to 1,750 words (Python str.split()): the file became the single managed source of the
-    operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
-    routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
-    (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
-    docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
-    `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
-    its own anti-pattern log."""
+    """Portable procedure and fixed rendered startup bytes (2026-10-05).
+
+    The native /doctor prompt-audit is interactive; claude doctor --help on
+    2.1.289 exposes only -h/--help, and the upstream 2.1.283 changelog adds the
+    slash command. These are local integration checks, not an upstream audit.
+    A budget change needs a dated comparison and review, never an automatic
+    re-baseline: docs/decisions/2026-10-05-harness-context-budget.md.
+    """
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    # Fixed UTF-8 ceilings: repaired scope + 5%, rounded upward. The dated PR #726
+    # addendum records 23062/19102 -> 24458/20103 and the required restorations.
+    STARTUP_BUDGET_BYTES = {"claude": 24458, "codex": 20103}
+    MECHANICS = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
+    ROUTING = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
         "never self-write without a SOTA source",
+        "never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin",
         "source of truth",
         "orchestration patterns",
         "installed client",
@@ -1491,7 +1830,7 @@ class PortableTopRuleTests(unittest.TestCase):
         "`SKILL.md`",
         "completeness critic", "next landscape sweep", "lifecycle task",
         "`search-first`", "`find-skills`", "`skill-creator`", "A coordinator, not a delegated child, invokes",
-        "when no listed skill fits the task", "children inherit that pin", "a spawn call names neither",
+        "when no skill fits", "children inherit that pin", "a spawn call names neither",
         "never a delegated child, starts a cross-family lane", "each coordinator unit names the north-star action",
         "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
         "audits, trials or network at startup", "due-file line",
@@ -1511,34 +1850,262 @@ class PortableTopRuleTests(unittest.TestCase):
         return text[start:end] if 0 <= start < end else ""
 
     @classmethod
-    def ceiling(cls) -> int:
-        return int(cls.BASELINE_WORDS * 1.05)
-
-    @classmethod
     def errors(cls, text: str) -> list[str]:
         rule = cls.top_rule(text)
         errors = [f"the top rule lacks {phrase!r}" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]
         errors += [f"the top rule names this repository's {path}, which other projects lack"
                    for path in dict.fromkeys(cls.RELATIVE_PATH.findall(rule)) if (ROOT / path).exists()]
-        words = len(text.split())  # the same whitespace-separated count as `wc -w`
-        if words > cls.ceiling():
-            errors.append(f"{words} words, over {cls.ceiling()} ({cls.BASELINE_WORDS} + 5%)")
         return errors
 
-    def test_the_template_states_the_procedure_within_the_word_budget(self):
+    def test_the_template_states_the_upstream_verification_procedure(self):
         self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
 
-    def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
+    def test_the_ab_backed_schema_rule_and_cross_family_dispatch_are_in_the_user_block(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn("When you return through StructuredOutput, put the schema fields at the top level of the call arguments; never wrap them in an input, output or result key.", text)
+        self.assertIn("Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a delegated child, starts a cross-family lane.", text)
+
+    def scratch_startup(self, root):
+        (root / "AGENTS.md").write_text("repository instructions\n")
+        (root / "CLAUDE.md").write_text("@AGENTS.md\n")
+        carriers = root / "adoption/new-wsl"
+        carriers.mkdir(parents=True)
+        (carriers / "claude-user-instructions.md").write_text("# Synthetic user instructions\n")
+        (carriers / "codex-user-instructions.md").write_bytes((ROOT / "adoption/new-wsl/codex-user-instructions.md").read_bytes())
+
+    def test_imports_outside_code_are_counted_once_and_resolve_from_the_importing_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            self.scratch_startup(root)
+            (root / "reference.md").write_text("imported context\n")
+            with mock.patch(__name__ + ".ROOT", root):
+                before = sum(map(len, self.startup_files("claude").values()))
+                (root / "CLAUDE.md").write_text("@AGENTS.md\n@reference.md\n")
+                after = sum(map(len, self.startup_files("claude").values()))
+            self.assertEqual(after - before, len("@reference.md\n".encode()) + len("imported context\n".encode()))
+
+    def test_unfiltered_rules_are_counted_and_codex_prefers_the_root_override(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            self.scratch_startup(root)
+            rules = root / ".claude/rules"
+            rules.mkdir(parents=True)
+            with mock.patch(__name__ + ".ROOT", root):
+                before = sum(map(len, self.startup_files("claude").values()))
+                (rules / "always.md").write_text("always loaded\n")
+                after = sum(map(len, self.startup_files("claude").values()))
+                self.assertEqual(after - before, len("always loaded\n".encode()))
+                (root / "AGENTS.override.md").write_text("preferred override\n")
+                files = self.startup_files("codex")
+            self.assertNotIn("AGENTS.md", files)
+            self.assertEqual(files["AGENTS.override.md"], b"preferred override\n")
+
+    def test_import_discovery_skips_code_and_quotes_and_handles_nested_duplicate_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            self.scratch_startup(root)
+            (root / "nested").mkdir()
+            (root / "Design Docs").mkdir()
+            (root / "nested/one.md").write_text("@two.md\n")
+            (root / "nested/two.md").write_text("@one.md\n")  # cycle, counted once
+            (root / "Design Docs/brief.md").write_text("design reference\n")
+            (root / "CLAUDE.md").write_text(
+                '@AGENTS.md @nested/one.md @nested/one.md\n@Design\\ Docs/brief.md\n'
+                '`@not-loaded.md` ``@also-not-loaded.md``\n'
+                '```text\n@fenced.md\n```\n~~~\n@tilde-fenced.md\n~~~\n'
+                '@"quoted.md" user@example.com repo@pin:path\n')
+            with mock.patch(__name__ + ".ROOT", root):
+                files = self.startup_files("claude")
+                self.assertEqual(set(files), {"claude-block", "AGENTS.md", "CLAUDE.md", "nested/one.md",
+                                              "nested/two.md", "Design Docs/brief.md"})
+                (root / "CLAUDE.md").write_text("@missing.md\n")
+                with self.assertRaises(FileNotFoundError):
+                    self.startup_files("claude")
+
+    def test_imports_are_bounded_to_four_hops_and_codex_leaves_them_literal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            self.scratch_startup(root)
+            (root / "CLAUDE.md").write_text("@hop1.md\n")
+            for hop in range(1, 5):
+                (root / f"hop{hop}.md").write_text(f"@hop{hop + 1}.md\n")
+            with mock.patch(__name__ + ".ROOT", root):
+                files = self.startup_files("claude")
+                self.assertIn("hop4.md", files)
+                self.assertNotIn("hop5.md", files)
+                (root / "AGENTS.md").write_text("@missing.md\n")
+                self.assertEqual(set(self.startup_files("codex")), {"codex-block", "AGENTS.md"})
+
+    def test_only_nonempty_frontmatter_paths_filters_exempt_rules(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            self.scratch_startup(root)
+            rules = root / ".claude/rules/nested"
+            rules.mkdir(parents=True)
+            content = {"plain.md": "always loaded\npaths: [example]\n",
+                       "empty.md": "---\npaths: []\n---\nalways loaded\n",
+                       "other.md": "---\ntitle: unscoped\n---\nalways loaded\n",
+                       "scoped.md": '---\npaths:\n  - "src/**/*.py"\n---\n@unloaded.md\n',
+                       "inline.md": '---\npaths: ["src/**/*.py"]\n---\n@unloaded.md\n'}
+            for name, text in content.items():
+                (rules / name).write_text(text)
+            with mock.patch(__name__ + ".ROOT", root):
+                files = self.startup_files("claude")
+            loaded = {path.removeprefix(".claude/rules/nested/") for path in files if path.startswith(".claude/rules/")}
+            self.assertEqual(loaded, {"plain.md", "empty.md", "other.md"})
+
+    def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
+        # Relocated mechanics stay verbatim and reachable; dispatch rules stay in the template.
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn("workflows/README.md#native-workflow-mechanics-relocated-2026-10-05", text)
+        self.assertIn("Codex instruction block", text)
+        for mode in ("**Solo coordinator:**", "**One subagent:**", "**Ultracode workflow:**", "**Agent team**"):
+            self.assertIn(mode, text)
+        text += self.section(self.MECHANICS.read_bytes(), "## Native workflow mechanics relocated (2026-10-05)").decode()
+        text += self.ROUTING.read_text(encoding="utf-8").split("<!-- native-agent-stack:session-lanes -->")[0]
         self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in text], [])
 
-    def test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template(self):
+    @staticmethod
+    def section(content: bytes, heading: str) -> bytes:
+        """Bound a passage check to its destination heading and child headings."""
+        marker = heading.encode()
+        start = content.index(marker + b"\n")
+        level = len(heading.split(" ", 1)[0])
+        end = re.search(rb"(?m)^#{1," + str(level).encode() + rb"} ", content[start + len(marker) + 1:])
+        return content[start:start + len(marker) + 1 + end.start()] if end else content[start:]
+
+    def test_each_relocated_passage_is_byte_bound_to_its_destination_section(self):
+        fixtures = ROOT / "tests/fixtures/harness-context-moves"
+        contracts = json.loads((fixtures / "contracts.json").read_text())
+        for contract in contracts:
+            with self.subTest(passage=contract["fixture"], destination=contract["to"]):
+                passage = (fixtures / contract["fixture"]).read_bytes()
+                content = (ROOT / contract["to"]).read_bytes()
+                if contract["heading"].startswith("<!--"):
+                    content = content.split(contract["heading"].encode(), 1)[1].split(b"<!-- native-agent-stack:session-lanes -->", 1)[0]
+                else:
+                    content = self.section(content, contract["heading"])
+                self.assertEqual(len(passage), contract["bytes"])
+                self.assertIn(passage, content)
+
+    def test_the_check_rejects_a_missing_step_and_a_repository_path(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
         self.assertEqual(len(self.errors(text.replace("upstream citation", "citation"))), 1)
         self.assertEqual(len(self.errors(text.replace("same turn", "same turn (docs/harness-defaults.md)"))), 1)
-        padded = text + " word" * max(1, self.ceiling() + 1 - len(text.split()))
-        self.assertEqual(len(self.errors(padded)), 1)
         self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
+
+
+    @staticmethod
+    def imports(text: str) -> list[str]:
+        """Native memory docs: imports outside code, escaped spaces, four hops.
+
+        This budget check only discovers files; it does not render client prompts.
+        """
+        lines = []
+        fence = None
+        for line in text.splitlines(keepends=True):
+            mark = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+            if fence:
+                if mark and mark[1][0] == fence[0] and len(mark[1]) >= len(fence) and not line[mark.end():].strip():
+                    fence = None
+                lines.append("\n")
+            elif mark:
+                fence = mark[1]
+                lines.append("\n")
+            else:
+                lines.append(line)
+        text = "".join(lines)
+        text = re.sub(r"(?<!`)(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)", "", text)
+        return [path.replace("\\ ", " ").replace("\\\t", "\t") for path in
+                re.findall(r'''(?<![\w@\\"'])@((?:\\[ \t]|[^\s`<>"'(),;])+)''', text)]
+
+    @staticmethod
+    def path_filtered(content: str) -> bool:
+        """Exempt only a clear nonempty paths list; ambiguous YAML still counts."""
+        frontmatter = re.match(r"\A---\r?\n(.*?)\r?\n---(?:\r?\n|$)", content, re.S)
+        if not frontmatter:
+            return False
+        field = re.search(r"(?m)^paths:[ \t]*(.*)$", frontmatter[1])
+        if not field:
+            return False
+        value = field[1].split(" #", 1)[0].strip()
+        if value:
+            try:
+                paths = json.loads(value)
+            except ValueError:
+                return False
+            return isinstance(paths, list) and bool(paths) and all(isinstance(p, str) and p.strip() for p in paths)
+        tail = frontmatter[1][field.end():]
+        tail = re.split(r"\n\S", tail, maxsplit=1)[0]
+        items = [line.strip()[2:].split(" #", 1)[0].strip().strip("\"'")
+                 for line in tail.splitlines() if re.match(r"^[ \t]+-[ \t]+", line)]
+        return bool(items) and all(item and item not in ("null", "~", "[]", "{}") for item in items)
+
+    @classmethod
+    def startup_files(cls, client: str) -> dict[str, bytes]:
+        """The renderer's committed carriers, wrapped by its actual native block merger.
+        Count raw UTF-8 bytes including markers; Claude's @AGENTS.md import loads the
+        repository AGENTS once, alongside CLAUDE.md and unconditional rules. Codex
+        prefers a root override and does not expand imports. Plugin blocks, native
+        Claude RTK imports and the named SubagentStart child carrier are separate
+        measured scopes; Codex's inline native RTK awareness is counted here.
+        """
+        root = ROOT.resolve()
+        files = {}
+        visited = {}
+
+        def add(path: Path, depth: int = 0) -> None:
+            path = path.resolve()
+            key = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
+            content = path.read_bytes()  # A missing import fails; it cannot hide context.
+            files[key] = content
+            if client == "claude" and depth < 4 and visited.get(path, 5) > depth:
+                visited[path] = depth
+                for imported in cls.imports(content.decode("utf-8")):
+                    add(path.parent / Path(imported).expanduser(), depth + 1)
+
+        if client == "claude":
+            carrier = (root / "adoption/new-wsl/claude-user-instructions.md").read_text(encoding="utf-8")
+            files["claude-block"] = managed_block.merged_claude_md("", carrier).encode("utf-8")
+            # Project the user block's relative imports from its native .claude directory.
+            for imported in cls.imports(carrier):
+                add(root / ".claude" / Path(imported).expanduser(), 1)
+            add(root / "AGENTS.md")
+            add(root / "CLAUDE.md")
+            for rule in sorted((root / ".claude/rules").rglob("*.md")):
+                if not cls.path_filtered(rule.read_text(encoding="utf-8")):
+                    add(rule)
+        else:
+            carrier = (root / "adoption/new-wsl/codex-user-instructions.md").read_text(encoding="utf-8")
+            files["codex-block"] = managed_block.merged_codex_md("", carrier).encode("utf-8")
+            add(root / ("AGENTS.override.md" if (root / "AGENTS.override.md").is_file() else "AGENTS.md"))
+        return files
+
+    @classmethod
+    def budget_errors(cls, client: str, files: dict[str, bytes]) -> list[str]:
+        size = sum(len(content) for content in files.values())
+        limit = cls.STARTUP_BUDGET_BYTES[client]
+        return ([f"{client}: {size} startup bytes exceeds fixed {limit}; a dated budget decision is required"]
+                if size > limit else [])
+
+    def test_rendered_startup_files_fit_each_clients_fixed_byte_budget(self):
+        for client in self.STARTUP_BUDGET_BYTES:
+            with self.subTest(client=client):
+                self.assertEqual(self.budget_errors(client, self.startup_files(client)), [])
+
+    def test_growth_in_any_loaded_file_crosses_the_fixed_budget(self):
+        for client, limit in self.STARTUP_BUDGET_BYTES.items():
+            files = self.startup_files(client)
+            room = limit - sum(len(content) for content in files.values())
+            self.assertGreaterEqual(room, 0)
+            for path in files:
+                with self.subTest(client=client, path=path):
+                    padded = dict(files)
+                    padded[path] += b"x" * room
+                    self.assertEqual(self.budget_errors(client, padded), [])
+                    padded[path] += "é".encode("utf-8")  # bytes, not words or Unicode code points
+                    self.assertEqual(len(self.budget_errors(client, padded)), 1)
+
 
 
 class McpStartupTimeoutTemplateTests(unittest.TestCase):

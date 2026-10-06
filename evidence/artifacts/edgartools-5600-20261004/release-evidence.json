@@ -1,0 +1,316 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-04T22:47:43.984571+00:00",
+  "tag": "v5.60.0",
+  "tag_sha": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+  "tag_url": "https://github.com/dgunning/edgartools/tree/1e7a61b3a142dbf5d19bc82444f85239c1786348",
+  "release_notes": [
+    {
+      "tag": "v5.59.0",
+      "published_at": "2026-09-26T11:14:38Z",
+      "url": "https://github.com/dgunning/edgartools/releases/tag/v5.59.0"
+    },
+    {
+      "tag": "v5.59.1",
+      "published_at": "2026-09-26T13:11:28Z",
+      "url": "https://github.com/dgunning/edgartools/releases/tag/v5.59.1"
+    },
+    {
+      "tag": "v5.60.0",
+      "published_at": "2026-10-02T18:29:57Z",
+      "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"
+    }
+  ],
+  "pypi_source": "https://pypi.org/pypi/edgartools/5.60.0/json",
+  "pypi_files": [
+    {
+      "file": "edgartools-5.60.0-py3-none-any.whl",
+      "sha256": "4db917f3833f6b105fe78d22639172410c800ad6da260432884d86b53b88439b",
+      "uploaded": "2026-10-02T18:28:56.985693Z",
+      "yanked": false
+    },
+    {
+      "file": "edgartools-5.60.0.tar.gz",
+      "sha256": "0ce57d5b08484313e564af6c0f40b1bc43a8b90b68b96d017a62b62d80836677",
+      "uploaded": "2026-10-02T18:28:58.846406Z",
+      "yanked": false
+    }
+  ],
+  "tag_status_check_rollup": "SUCCESS",
+  "ci_suites_at_tag": [
+    {
+      "id": 100309686046,
+      "status": "QUEUED",
+      "conclusion": null,
+      "workflow_run": null,
+      "checks": []
+    },
+    {
+      "id": 100309692403,
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "workflow_run": {
+        "databaseId": 37032606429,
+        "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429",
+        "workflow": {
+          "name": "Build and Test Edgartools"
+        }
+      },
+      "checks": [
+        {
+          "name": "Cassette safety gate",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110937732917"
+        },
+        {
+          "name": "test-strict-errors",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110938070909"
+        },
+        {
+          "name": "test-network",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110938070912"
+        },
+        {
+          "name": "test-slow",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110938070981"
+        },
+        {
+          "name": "test-fast (3.10)",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110938071021"
+        },
+        {
+          "name": "test-fast (3.13)",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110938071108"
+        },
+        {
+          "name": "Combine Coverage",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110950565514"
+        },
+        {
+          "name": "Report red main (build)",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606429/job/110951076887"
+        }
+      ]
+    },
+    {
+      "id": 100309692657,
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "workflow_run": {
+        "databaseId": 37032606490,
+        "url": "https://github.com/dgunning/edgartools/actions/runs/37032606490",
+        "workflow": {
+          "name": "Regression Tests"
+        }
+      },
+      "checks": [
+        {
+          "name": "Cassette safety gate (regression)",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606490/job/110923061038"
+        },
+        {
+          "name": "regression (3.12)",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606490/job/110923388460"
+        },
+        {
+          "name": "Report red main",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37032606490/job/110940922254"
+        }
+      ]
+    },
+    {
+      "id": 100551594344,
+      "status": "COMPLETED",
+      "conclusion": "FAILURE",
+      "workflow_run": {
+        "databaseId": 37122012086,
+        "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086",
+        "workflow": {
+          "name": "Build and Test Edgartools"
+        }
+      },
+      "checks": [
+        {
+          "name": "Cassette safety gate",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111199824720"
+        },
+        {
+          "name": "test-network",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111199954312"
+        },
+        {
+          "name": "test-slow",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111199954348"
+        },
+        {
+          "name": "test-fast (3.13)",
+          "status": "COMPLETED",
+          "conclusion": "FAILURE",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111199954353"
+        },
+        {
+          "name": "test-strict-errors",
+          "status": "COMPLETED",
+          "conclusion": "FAILURE",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111199954358"
+        },
+        {
+          "name": "test-fast (3.10)",
+          "status": "COMPLETED",
+          "conclusion": "FAILURE",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111199954388"
+        },
+        {
+          "name": "Report red main (build)",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111207357698"
+        },
+        {
+          "name": "Combine Coverage",
+          "status": "COMPLETED",
+          "conclusion": "SKIPPED",
+          "url": "https://github.com/dgunning/edgartools/actions/runs/37122012086/job/111207358471"
+        }
+      ]
+    }
+  ],
+  "failed_run_assessment": {
+    "run": "https://github.com/dgunning/edgartools/actions/runs/37122012086",
+    "same_tag_commit": true,
+    "tests": [
+      "tests/issues/regression/test_issue_893_ttm_staleness.py::test_goog_ttm_revenue_tracks_recent_window",
+      "tests/issues/regression/test_issue_893_ttm_staleness.py::test_amzn_ttm_revenue_matches_reference"
+    ],
+    "strict_error_job": "test-strict-errors: assert ttm.is_stale is False failed; returned periods end at Q1 2026.",
+    "offline_audit_jobs": "test-fast (3.10) and test-fast (3.13): the offline audit reports 2 tests needing the SEC while marked fast; the same two test names appear in both job logs.",
+    "cause": "The cassettes were recorded 2026-07-09 and their newest quarter ends 2026-03-31. The default TTM staleness check reads the live clock, crossing its age threshold by the October 3 scheduled run.",
+    "scope": "Company.get_facts().get_ttm_revenue() staleness, outside this runtime's filing index/documents, SGML headers, company/CIK lookup and XBRL fact-extraction paths.",
+    "coordinator_assessment": "Clock-dependent cassette test failures, not a library regression in these runtime paths; the coordinator explicitly authorized proceeding after this diagnosis."
+  },
+  "test_only_fixes": [
+    {
+      "sha": "9ea5def31b73816a12fe6ce1a2f3ff68cbdbb33b",
+      "url": "https://github.com/dgunning/edgartools/commit/9ea5def31b73816a12fe6ce1a2f3ff68cbdbb33b",
+      "files": [
+        "tests/issues/regression/test_issue_893_ttm_staleness.py"
+      ]
+    },
+    {
+      "sha": "156c45b327a65e4c86ebfc7652edb778de5cecd8",
+      "url": "https://github.com/dgunning/edgartools/commit/156c45b327a65e4c86ebfc7652edb778de5cecd8",
+      "files": [
+        "tests/issues/regression/test_issue_893_ttm_staleness.py"
+      ]
+    }
+  ],
+  "main_scheduled_success": {
+    "sha": "237e866a80ab3013cf5aa25a2557cf73c4eb61e4",
+    "run": "https://github.com/dgunning/edgartools/actions/runs/37204026582",
+    "date": "2026-10-04",
+    "conclusion": "SUCCESS",
+    "is_tag_ci": false
+  },
+  "library_files_changed_after_tag": [
+    "edgar/documents/utils/section_slicer.py",
+    "edgar/httprequests.py"
+  ],
+  "post_tag_code_in_release": false,
+  "open_issue_searches": {
+    "recent": {
+      "query": "repo:dgunning/edgartools is:issue is:open created:>=2026-10-02",
+      "count": 1,
+      "has_next_page": false,
+      "items": [
+        {
+          "number": 1413,
+          "title": "Incomplete schema in the Official MCP Registry",
+          "url": "https://github.com/dgunning/edgartools/issues/1413",
+          "created_at": "2026-10-04T17:18:14Z"
+        }
+      ]
+    },
+    "bug559": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:bug \"5.59\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "bug560": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:bug \"5.60.0\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "regression559": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:regression \"5.59\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "regression560": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:regression \"5.60.0\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "bug5590": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:bug \"5.59.0\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "bug5591": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:bug \"5.59.1\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "regression5590": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:regression \"5.59.0\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    },
+    "regression5591": {
+      "query": "repo:dgunning/edgartools is:issue is:open label:regression \"5.59.1\" in:title,body,comments",
+      "count": 0,
+      "has_next_page": false,
+      "items": []
+    }
+  },
+  "relevant_requested_version_regressions_found": 0,
+  "ci_pagination_complete": true,
+  "sources": {
+    "commit_file_verification": "gh api repos/dgunning/edgartools/commits/<sha> --jq .files[].filename (exit 0 for both commits)",
+    "tag_to_main_comparison": "https://github.com/dgunning/edgartools/compare/1e7a61b3a142dbf5d19bc82444f85239c1786348...237e866a80ab3013cf5aa25a2557cf73c4eb61e4",
+    "failed_jobs": "gh run view 37122012086 --repo dgunning/edgartools --log-failed (exit 0)"
+  }
+}

@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "pins": [
+    "dagucloud/dagu@v2.16.6",
+    "dagucloud/dagu@v2.18.2"
+  ],
+  "pin_changed": false,
+  "release_notes": [
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+      "published_at": "2026-09-14T14:45:57Z",
+      "body_sha256": "a00e5099faf6b190893c04c3a5c56bca956d214b75e573b845a0efbc39664f9b",
+      "selected_body_lines": [
+        {
+          "line": 7,
+          "text": "- fix(scheduler): reload inherited base defaults (#2770) @yohamta0"
+        }
+      ]
+    },
+    {
+      "pin": "dagucloud/dagu@v2.17.0",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.17.0",
+      "published_at": "2026-09-21T13:31:48Z",
+      "body_sha256": "5ef6e38dd9a8f3a7998404e7f67bafb55f57141b481a4783e4aa20b258adaedd",
+      "selected_body_lines": [
+        {
+          "line": 7,
+          "text": "- feat: move default suspend flags directory under data_dir (#2784) @LouisDeconinck"
+        },
+        {
+          "line": 8,
+          "text": "- feat: add retry --bypass-preconditions flag (#2785) @LouisDeconinck"
+        },
+        {
+          "line": 30,
+          "text": "- Pace every run with the DAG's queue, and stop dropping queued retries (#2775) @yohamta0"
+        }
+      ]
+    },
+    {
+      "pin": "dagucloud/dagu@v2.17.2",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.17.2",
+      "published_at": "2026-09-25T06:05:53Z",
+      "body_sha256": "408945419fe63f4d3789a0f98aaaf63bb0aa74f6cbe067809e545234fc3bfa65",
+      "selected_body_lines": []
+    },
+    {
+      "pin": "dagucloud/dagu@v2.18.0",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.0",
+      "published_at": "2026-09-29T09:26:53Z",
+      "body_sha256": "166dc38184cfa8a7c0845ce5b94acd138946e89dce8c7139f2969191ae29fc70",
+      "selected_body_lines": [
+        {
+          "line": 5,
+          "text": "- feat(scheduler): support cron descriptors like @daily (#2876) @LouisDeconinck"
+        },
+        {
+          "line": 7,
+          "text": "- feat: expose step precondition bypass in retry API and UI (#2880) @LouisDeconinck"
+        },
+        {
+          "line": 32,
+          "text": "- fix(coordinator): preserve queue identity for distributed starts (#2895) @yoyooyooo"
+        },
+        {
+          "line": 43,
+          "text": "- fix: load dotenv for scheduler-triggered runs (#2937) @yohamta0"
+        },
+        {
+          "line": 44,
+          "text": "- fix: clear worker ownership when re-queuing a retry (#2940) @yohamta0"
+        }
+      ]
+    },
+    {
+      "pin": "dagucloud/dagu@v2.18.1",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1",
+      "published_at": "2026-09-29T15:24:51Z",
+      "body_sha256": "ce0d480bcfe9337d36b070e895fa60c91edbc9c22edd98d589dd783c689f233b",
+      "selected_body_lines": []
+    },
+    {
+      "pin": "dagucloud/dagu@v2.18.2",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
+      "published_at": "2026-10-04T03:54:02Z",
+      "body_sha256": "27ee9708436cff45baf7e71a1d8f35a1abd97460f3f7f9773e236586d907d3e3",
+      "selected_body_lines": [
+        {
+          "line": 5,
+          "text": "- feat: optional signal propagation to running DAG processes (#2885) @LouisDeconinck"
+        },
+        {
+          "line": 32,
+          "text": "- fix: keep SIGTERM handled during supervisor shutdown (#2966) @yohamta0"
+        },
+        {
+          "line": 35,
+          "text": "- fix: run coordinator shutdown on SIGINT and SIGTERM (#2972) @ReguiguiMohamed"
+        },
+        {
+          "line": 37,
+          "text": "- fix(scheduler): log scheduled slots skipped while the DAG is busy (#2980) @ReguiguiMohamed"
+        }
+      ]
+    }
+  ],
+  "missing_release_metadata": [
+    {
+      "tag": "v2.17.1",
+      "http_status": 404
+    }
+  ],
+  "scheduler_changed_files": [
+    {
+      "path": "internal/service/scheduler/dag_executor.go",
+      "test": false,
+      "v2166_sha256": "a441c4dd1f2ba49d44fa883a3b239d54ee60ce837758ba8b57478690465c0816",
+      "v2182_sha256": "c7efc1c87ecbc7f634b68db0d020a2d2e21af0e03b432a3598ec109aaed32ad3"
+    },
+    {
+      "path": "internal/service/scheduler/dag_executor_internal_test.go",
+      "test": true,
+      "v2166_sha256": "cf877c6483f1ee4c85e976157c69bbb8b29a1ae6542623079271f20cb59bc0f1",
+      "v2182_sha256": "72a2b089b2f718f6be8602672db4267921fd9a86153412f0ab99d42ff3c81d08"
+    },
+    {
+      "path": "internal/service/scheduler/dag_executor_test.go",
+      "test": true,
+      "v2166_sha256": "260466a640e62a742e12d025c8fd349fbe049dc771e2458bfbe7e2694c20a4ec",
+      "v2182_sha256": "12fa8280e7ed8bfce0cfdfad7793fe88c9a8597c2d13e0ac669c00c26244c45d"
+    },
+    {
+      "path": "internal/service/scheduler/queue_conditions_external_test.go",
+      "test": true,
+      "v2166_sha256": "95acd34fc8d4022b1cd74e2d903e25b07ec45248b6d75c46eb2ddfcfce7b30e2",
+      "v2182_sha256": "12cf897c239ee90172f1cc963041137e4f7f0d6d4a29adb6824e722670d25fd9"
+    },
+    {
+      "path": "internal/service/scheduler/queue_dispatcher.go",
+      "test": false,
+      "v2166_sha256": "82139da472ed271fb78a54aaf2fbcfbbe9b3714894afb903baf063b9ff6d6639",
+      "v2182_sha256": "9fdd8b4d0a1c7b5f01e1fdebd69c20ff2d9904a40426cc62526fb50225092e28"
+    },
+    {
+      "path": "internal/service/scheduler/queue_processor_test.go",
+      "test": true,
+      "v2166_sha256": "2251d6a3714443669b5eb549bd381ac7caefb131a81914e6c93d071a76d79e1a",
+      "v2182_sha256": "4363e2924922a4355bedeb1c9f115d4fb4b1a180ab2a3893a2735c0b2d1daa41"
+    },
+    {
+      "path": "internal/service/scheduler/retry_scanner.go",
+      "test": false,
+      "v2166_sha256": "fcfee9d8e6afc073bb45655c6ceacb80199785af5bece7d1614c43f5bfbe73da",
+      "v2182_sha256": "115a1a4007ed4dbf5d04c5c987027b9d7b8c3d9c89a8452ee91dc8570a5586cc"
+    },
+    {
+      "path": "internal/service/scheduler/retry_scanner_test.go",
+      "test": true,
+      "v2166_sha256": "309b01f2393dd1606ed002926d5a2a0d62ec6d0ebc6083eb929234583e320065",
+      "v2182_sha256": "07bbd1df690fe990652d9d8f1673fb562b13c67276152501251f81e8833b26a0"
+    },
+    {
+      "path": "internal/service/scheduler/scheduler.go",
+      "test": false,
+      "v2166_sha256": "5168e578098e1b946c62d5e1b94f9ccf8d5d1f97a9b4d0f027fed3d773dea589",
+      "v2182_sha256": "d3e563afe194ff02a686a1d0a817384868ebd0af69318f10a60714d7a684c392"
+    },
+    {
+      "path": "internal/service/scheduler/scheduler_test.go",
+      "test": true,
+      "v2166_sha256": "8488172e46bff82ffcbebc263f6f9c4e088b35a01623757f3e179d6c86f57c6b",
+      "v2182_sha256": "13ba7dcbea603aecd88df29cf7c8506a809b7904a6803beaa4b0e0d30d655753"
+    },
+    {
+      "path": "internal/service/scheduler/signal_unix_test.go",
+      "test": true,
+      "v2166_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "v2182_sha256": "f189c93c8153c6f9befa1e872fa66cf48121800f3265dd147a2c3b83c3ddb79d"
+    },
+    {
+      "path": "internal/service/scheduler/tick_planner.go",
+      "test": false,
+      "v2166_sha256": "29fe525164af68e474b9439348b936030dc5d8714fd710f0d6c5dfac333b1496",
+      "v2182_sha256": "19a05a2e22cdf1a8f5d327213055c0b75cc2a64cb892dd8bb482e3f1ea304e95"
+    },
+    {
+      "path": "internal/service/scheduler/tick_planner_test.go",
+      "test": true,
+      "v2166_sha256": "c1684a1a4eebda4969985643ce0fa6370f76d5911421751897329c73dee28c1f",
+      "v2182_sha256": "ba4b2c7c0e4da129afdb756b2f351e58a0b3a9320df3b2bbaca2ee9d937c7f40"
+    },
+    {
+      "path": "internal/service/scheduler/wait_for_tick_test.go",
+      "test": true,
+      "v2166_sha256": "ba1be905f04f67e493ecd4a21278567f581701644a3652b38c6a8d30812b040e",
+      "v2182_sha256": "fbba473ee320532d9b09c87a907e1bd8e2a3e5fef8e1635cfbb2dd4ec2d93104"
+    },
+    {
+      "path": "internal/service/scheduler/zombie_detector_test.go",
+      "test": true,
+      "v2166_sha256": "e1cfd1e59dc3a166cc7ac9efe3f8b7e02d3a8660236cfaa57940962484f7a47a",
+      "v2182_sha256": "e4a90d8e26ec2c1bbc15fc10a7185e4de8f8d7a0039ba9fc420890139fd86a36"
+    }
+  ],
+  "production_changed_files": 5,
+  "additional_compared_files": [
+    {
+      "path": "internal/ir/schedule.go",
+      "changed": true,
+      "v2166_sha256": "7cfd64bc483ae2017a00a93cd79f92b28be10d7f0fe852fea430c091cc327929",
+      "v2182_sha256": "7f100ed084941929b5a2f866585823e7fc9546cfd20afb56d47a57d49af4986b"
+    },
+    {
+      "path": "internal/runtime/condition.go",
+      "changed": true,
+      "v2166_sha256": "91fc4dc27767578461b77d1c9cd1fa6f8406e4d9440596a5205fd5da3f826713",
+      "v2182_sha256": "858ae6e3f58d6fcaffcdf2887f33f6d85cac786e03a4b3f56f999e39194f9f40"
+    },
+    {
+      "path": "internal/runtime/runner.go",
+      "changed": true,
+      "v2166_sha256": "95ec2ba0e869bc1fc3d2d25feb5b1af0371602d0af7073d4852381faaf5d7948",
+      "v2182_sha256": "b1a208bebd86fabb25bbc0144bbb41e65851fe6e0ef0f20688b9bb1bddccc848"
+    },
+    {
+      "path": "internal/service/scheduler/catchup.go",
+      "changed": false,
+      "v2166_sha256": "02ee33c9ff6e61a291ae5a3e3854c7bad38ef798fdcebfe60b951b33b305891e",
+      "v2182_sha256": "02ee33c9ff6e61a291ae5a3e3854c7bad38ef798fdcebfe60b951b33b305891e"
+    },
+    {
+      "path": "internal/service/scheduler/schedule_state.go",
+      "changed": false,
+      "v2166_sha256": "c3a037ff59d1bec14acaef048204c972475532929781711bc39711d206e47e89",
+      "v2182_sha256": "c3a037ff59d1bec14acaef048204c972475532929781711bc39711d206e47e89"
+    },
+    {
+      "path": "internal/runctx/context_env.go",
+      "changed": false,
+      "v2166_sha256": "6d0c3049cc3c0b1d3400a19c041f859354789e3ba88e0f3e1f73e4f166038a4f",
+      "v2182_sha256": "6d0c3049cc3c0b1d3400a19c041f859354789e3ba88e0f3e1f73e4f166038a4f"
+    }
+  ],
+  "findings": [
+    {
+      "what": "global queue pacing / retry admission",
+      "locator": "dagucloud/dagu@v2.18.2:internal/service/scheduler/tick_planner.go:1560-1568,1658-1661",
+      "depends": false,
+      "reason": "No configured global queue and no retry policy in this research job."
+    },
+    {
+      "what": "scheduler dotenv fix",
+      "locator": "dagucloud/dagu@v2.18.2:internal/service/scheduler/dag_executor.go:468-475",
+      "depends": false,
+      "reason": "Four job variables are literal DAG env; no dotenv."
+    },
+    {
+      "what": "busy scheduled-slot logging",
+      "locator": "dagucloud/dagu@v2.18.2:internal/service/scheduler/tick_planner.go:758-784",
+      "depends": false,
+      "reason": "Logging added around unchanged busy skip guards."
+    },
+    {
+      "what": "suspension migration and signal propagation",
+      "locator": "dagucloud/dagu@v2.18.2:internal/service/scheduler/scheduler.go:607-614,842-855",
+      "depends": false,
+      "reason": "No suspension migration requirement; process-restart drill uses SIGKILL, with graceful propagation unaccepted."
+    },
+    {
+      "what": "retry liveness and queued-state failures",
+      "locator": "dagucloud/dagu@v2.18.2:internal/service/scheduler/retry_scanner.go:165-181;internal/service/scheduler/queue_dispatcher.go:929-950",
+      "depends": false,
+      "reason": "No DAG retry or global/distributed queue in this job."
+    },
+    {
+      "what": "cron descriptors and timezone-prefixed descriptor normalization",
+      "locator": "dagucloud/dagu@v2.18.2:internal/ir/schedule.go:17-19,281-345",
+      "depends": false,
+      "reason": "Explicit five-field CRON_TZ cron, not an @ descriptor or @every interval."
+    },
+    {
+      "what": "precondition abort/timeout and evaluation error precedence",
+      "locator": "dagucloud/dagu@v2.18.2:internal/runtime/condition.go:19-82",
+      "depends": false,
+      "reason": "One scalar token comparison; calendar runs as a normal command so missing package and calendar errors fail there. No interrupted-precondition acceptance claimed."
+    }
+  ],
+  "result": "No compared fix is required by the defined research schedule; retain 2.16.6 provisionally. Source comparison only; operating-host slot/restart acceptance remains open.",
+  "corrections": [
+    "Initial internal/scheduler lookup was empty because the original path is internal/service/scheduler; it was not an empty-diff verdict.",
+    "Calendar tag v4.13.2 returned HTTP 404; corrected to 4.13.2 against the original source and calendar receipt."
+  ]
+}

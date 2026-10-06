@@ -1,0 +1,35 @@
+#!/bin/bash
+# Boot smoke of an OmniRoute install prefix on a scratch port with an EMPTY scratch data dir (no credentials, no live unit touched).
+# usage: omniroute-smoke-20261005.sh <prefix directory name under tools/>   e.g. omniroute-3.8.51-npm
+set -u
+NAME="${1:?prefix name}"
+TOOLS="$HOME/.local/share/codex-ecosystem/tools"
+PREFIX="$TOOLS/$NAME"
+S="$(mktemp -d "$HOME/.cache/omniroute-smoke-XXXXXX")"
+PORT=29999
+export PATH="$PREFIX/shim:$TOOLS/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+export DATA_DIR="$S/data"
+export HOST=127.0.0.1
+export HOSTNAME=127.0.0.1
+export OMNIROUTE_MEMORY_MB=4096
+export CLI_ALLOW_CONFIG_WRITES=false
+export TMPDIR="$S/tmp"
+mkdir -p "$DATA_DIR" "$TMPDIR"
+cd "$S" || exit 2
+"$PREFIX/bin/omniroute" serve --port "$PORT" --no-open --no-tray > "$S/serve.log" 2>&1 &
+PID=$!
+ok=no
+for _ in $(seq 1 60); do
+  sleep 2
+  if body=$(curl -s -m 3 "http://127.0.0.1:$PORT/api/health"); then
+    case "$body" in *ok*|*healthy*) ok=yes; break;; esac
+  fi
+  kill -0 "$PID" 2>/dev/null || break
+done
+echo "prefix=$NAME health_ok=$ok body=${body:-none} pid_alive=$(kill -0 "$PID" 2>/dev/null && echo yes || echo no)"
+echo "--- first log lines:"
+head -c 1500 "$S/serve.log" | head -14
+kill "$PID" 2>/dev/null; sleep 2; kill -9 "$PID" 2>/dev/null
+pkill -f "omniroute.*--port $PORT" 2>/dev/null
+echo "scratch dir: $S (remove with rm -rf after reading)"
+[ "$ok" = yes ]

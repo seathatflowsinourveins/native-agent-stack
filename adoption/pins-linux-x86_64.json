@@ -2,7 +2,7 @@
   "schema_version": 1,
   "reviewed_at": "2026-09-22",
   "platform": "linux-x86_64",
-  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly.",
+  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly. 2026-10-04 bounded token pin move: RTK 0.51.0 and mcporter 0.14.2 follow their bounded host receipts; earlier paragraphs describe dated checks. NativeStack WSL2 host execution is distinct from new-host acceptance. claude-hud 0.10.0 has no release asset and remains a native Claude plugin, installed from tag v0.10.0 through the settings template and recipe rather than an unsupported bootstrap pin kind.",
   "tools": [
     {
       "id": "node",
@@ -51,18 +51,55 @@
     },
     {
       "id": "codex",
-      "version": "0.159.3",
+      "version": "0.160.0",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz",
-      "sha256": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
-      "install_note": "npm registry tarball for @openai/codex@0.159.3 (thin wrapper package, 4,904 bytes); the downloaded bytes match npm dist.integrity sha512-hg4nlqCwRb87GocxNnHvz4sadOrdJ71mO0a4CUYWXjAozJe2gtuAdRFldKGSQXw9m7SgR4ydis12KDVVPgzDkQ== and this row's SHA256. Registry signature and attestation metadata are present, but signature/attestation verification was not run for this promotion; the npm platform dependency was not separately downloaded or compared here. The qualified host instead installed the complete native package with upstream scripts/install/install.sh at rust-v0.159.3, commit 01fc69f4026735edfdf6789820549727a4867b11, then passed native queue and synthetic Hindsight capture/recollection checks (evidence/receipts/codex-01593-native-queue-20261001.json and evidence/receipts/codex-01593-hindsight-native-memory-20261001.json). The portable Linux bootstrap still supports `npm install --global --prefix tools/codex-0.159.3 <verified codex-0.159.3.tgz>` and relinks its bin entry; applying that bootstrap to an existing identity wrapper needs the host's serialized launcher ownership. The qualified host's daemon_auto_start is enabled and its 0.159.3 daemon updater is disabled and pinned from the native CLI; adoption/templates/codex.config.template.toml remains an opt-in portable baseline with daemon_auto_start false.",
+      "ignore_scripts": true,
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz",
+      "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
+      "install_note": "npm registry tarball for @openai/codex@0.160.0 (thin wrapper package, 4,902 bytes); the downloaded bytes match npm dist.integrity sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg== and this row's SHA256. Registry signature and attestation metadata are present, but verification was not recorded for this promotion. A private-prefix npm install selected @openai/codex@0.160.0-linux-x64; its native binary SHA256 is 12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad, matching the SDK's bundled binary. The coordinator recorded strict-hash SDK/CLI 0.160.0 installation facts and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The upstream scripts/install/install.sh and app-server-daemon/README.md at rust-v0.160.0, commit a956835d020762cb2b570053af06f643a11c0ecc, are unchanged from rust-v0.159.3. The portable Linux bootstrap supports `npm install --global --prefix tools/codex-0.160.0 <verified codex-0.160.0.tgz>` and relinks its bin entry; applying that bootstrap to an existing identity wrapper needs the host's serialized launcher ownership. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch. The host's existing daemon_auto_start is enabled and its 0.159.3 daemon updater is disabled and pinned; adoption/templates/codex.config.template.toml remains an opt-in portable baseline with daemon_auto_start false. The earlier queue and Hindsight receipts qualify only 0.159.3; this 0.160.0 evidence is a same-host compatibility attempt with retained outputs and discriminating controls; original SDK invocation/source and process timing evidence is incomplete, so native_cli_e2e, new-host and model-quality acceptance remain unestablished. bootstrap-linux.sh verifies the platform_dependency archive by SHA-256/SHA-512 before npm install. ignore_scripts=true keeps lifecycle scripts disabled: the 0.160.0 wrapper and platform package have no scripts or dependencies. It requires the installed wrapper optionalDependencies alias to equal the pin, rejects unexpected nested/global packages, replaces only the contained Node-resolved package or a new contained alias, and checks package identity/version and the installed executable SHA-256. A fresh versioned tree is atomically published; failed unpublished trees are cleaned up and successful publication clears migration recovery before pruning. Pins that allow a rebuild must retain the complete verified platform tree byte for byte. A mismatch fails closed before publication.",
       "version_probe": {
         "method": "exec",
         "command": "codex",
         "args": [
           "--version"
         ]
-      }
+      },
+      "platform_dependency": {
+        "name": "@openai/codex-linux-x64",
+        "resolved_package": "@openai/codex",
+        "version": "0.160.0-linux-x64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0-linux-x64.tgz",
+        "sha256": "37a41d61c3399182b8c727b77090cc7a1566bd849d0f09070a0bbc6fec4c58dc",
+        "integrity": "sha512-KI/73OqGrHmR18s7ya7E1NqV6rT0y3lxr0s8S1qR2m6zU6QRF/HlR529jALLh5vjdUnsRT4Ahoxt0axb4kY99g==",
+        "checksum_ref": "npm view @openai/codex@0.160.0 optionalDependencies maps this alias to npm:@openai/codex@0.160.0-linux-x64; evidence/artifacts/runtime-sdk-20261003/npm-dist-linux-x64.json retains the registry URL and integrity (2026-10-03). The coordinator downloaded 163273896 bytes and independently matched SHA-256 and SHA-512; the archive executable SHA-256 matches the recorded installed and bundled CLI.",
+        "installed_binary_check": {
+          "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+          "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+        }
+      },
+      "holds": [
+        {
+          "version": "0.159.3",
+          "until": "2026-11-04",
+          "reason": "X18: hosts not yet switched stay on 0.159.3 until retired (#626 landing exception)",
+          "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz",
+          "sha256": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
+          "checksum_ref": "URL and SHA-256 are this row's 0.159.3 values before f77a35eb2 (#626), introduced by 85543efe5 (#580). Re-verified 2026-10-04: npm view @openai/codex@0.159.3 dist.integrity = sha512-hg4nlqCwRb87GocxNnHvz4sadOrdJ71mO0a4CUYWXjAozJe2gtuAdRFldKGSQXw9m7SgR4ydis12KDVVPgzDkQ== and dist.shasum = b49833a850e61217e62b7992e251a385462a6dac, and the 4,904-byte tarball downloaded from the registry matched both and this SHA-256. A hold records what a host not yet switched runs; the bootstrap installs only the row's version, and scripts/adoption_status.py --pinned-versions reports a probe that names this version as held before the until date and as drift on or after it (docs/decisions/2026-10-04-codex-dated-holds.md).",
+          "platform_dependency": {
+            "name": "@openai/codex-linux-x64",
+            "resolved_package": "@openai/codex",
+            "version": "0.159.3-linux-x64",
+            "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3-linux-x64.tgz",
+            "sha256": "0719027cfe326e248971a2dff0a391c3532a3d838b4e3cc660bf93b2a606d2ce",
+            "integrity": "sha512-xlHydfOksnNt/qz4BEVFvjMWunweaVSNtha/DkVUwWZnVZxbqiJwsXSl2iZDk04b6k/g0OI7jU06XqzHB2s5og==",
+            "checksum_ref": "npm view @openai/codex@0.159.3 optionalDependencies maps this alias to npm:@openai/codex@0.159.3-linux-x64, and npm view @openai/codex@0.159.3-linux-x64 gives the integrity above and dist.shasum = 62a9c71b5086d6aea6cd0cde61178a6d39f0eeba (2026-10-04). The 162,464,331-byte archive downloaded from the registry matched SHA-512, SHA-1 and this SHA-256; its package.json names @openai/codex 0.159.3-linux-x64 with no scripts or dependencies, and the executable SHA-256 is read from the same archive. First recorded here: no earlier repository record carries this archive's hashes, and no held host's installed executable was compared with it.",
+            "installed_binary_check": {
+              "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+              "sha256": "8bf204b36a2f6dd0dab73aa2f639892e67ef9ac8befccb4a05b1496ebf25c479"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "claude-code",
@@ -99,18 +136,20 @@
     },
     {
       "id": "rtk",
-      "version": "0.50.0",
+      "version": "0.51.0",
       "kind": "tarball",
-      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz",
-      "sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
-      "install_note": "Verified against the v0.50.0 release's checksums.txt fetched 2026-09-25 (`sha256sum --check --strict`: OK; the checksums.txt sha256 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 equals the GitHub API asset digest), matching recipes/README.md's rtk 0.50.0 row; qualified against 0.49.0 and switched on nativestack-5975wx-20260925 (evidence/receipts/rtk-050-qualification-20260925.json). The bootstrap installs the binary only: a host that runs the Claude hook also needs the ~/.config/rtk/config.toml exclude_commands in recipes/README.md, or 0.50.0's `git show <rev>:<path> | tail` blob window is live. 2026-09-26: that recipe's exclusions grew to four entries (#318), because the 2026-09-25 `^git show [^ ]*:` missed global-option forms such as `git -C . show HEAD:x` and rtk's `git branch -a` compaction misreports branches; the bootstrap reminder also asks the installed `rtk hook check` (#314).",
+      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5",
+      "install_note": "Official rtk-ai/rtk v0.51.0 at e001f773f80b22b7dc4c7a79521b30e35aaef026; the existing single-binary tarball installer applies. NativeStack WSL2 installed and verified this Linux asset on 2026-10-04; this is historical host execution, not acceptance for another host. BREAKING: scripts relying on implicit shell expansion in executable positional arguments must use --shell, for example rtk test --shell sh 'cargo test && cargo clippy'. Direct argv, rtk proxy and hook-check inspection strings remain direct calls. For the Claude hook, keep the five-entry [hooks] exclude_commands value from recipes/README.md#native-context-mode-and-hooks in ~/.config/rtk/config.toml (or the absolute XDG_CONFIG_HOME equivalent). Replace the existing key rather than adding duplicate TOML tables. Bootstrap prints a reminder and does not write this configuration. rtk init was not re-run in the host upgrade. evidence/receipts/rtk-051-qualification-20261004.json",
       "version_probe": {
         "method": "exec",
         "command": "rtk",
         "args": [
           "--version"
         ]
-      }
+      },
+      "checksum_source": "publisher_checksum_file",
+      "checksum_ref": "rtk-ai/rtk v0.51.0 checksums.txt, rtk-x86_64-unknown-linux-musl.tar.gz; publisher SHA-256 matches. See evidence/receipts/rtk-051-qualification-20261004.json data.artifact_checks."
     },
     {
       "id": "ai-memory",
@@ -129,18 +168,20 @@
     },
     {
       "id": "mcporter",
-      "version": "0.14.1",
+      "version": "0.14.2",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
-      "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
-      "install_note": "npm dist.integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== matched, and the sha256 above equals the GitHub release v0.14.1 asset digest and its checksums.txt (checked 2026-09-25); `npm audit signatures` verified the registry signatures and mcporter's SLSA provenance (release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514). `npm install --global --prefix tools/mcporter-0.14.1 mcporter@0.14.1`, matching recipes/README.md. Requires Node >=24, and `ps` on the PATH of whatever launches the mcporter daemon: 0.14.x runs `ps` from PATH (0.13.13 ran /bin/ps), and without it the daemon cannot connect keep-alive servers and `mcporter daemon stop` refuses. Qualified against 0.13.13 and switched on nativestack-5975wx-20260925 (evidence/receipts/mcporter-0141-qualification-20260925.json); that is one host's state, not evidence about any other Linux host.",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
+      "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+      "install_note": "npm install --global --prefix tools/mcporter-0.14.2 mcporter@0.14.2; Node >=24 and ps on the daemon launch PATH are required. NativeStack WSL2 returned version 0.14.2 and two successful ad-hoc stdio calls on 2026-10-04. The host configured-daemon calls failed on a stale rendezvous; ad-hoc --stdio calls succeeded. No daemon recovery was attempted. evidence/receipts/mcporter-0142-qualification-20261004.json",
       "version_probe": {
         "method": "exec",
         "command": "mcporter",
         "args": [
           "--version"
         ]
-      }
+      },
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "Fresh mcporter@0.14.2 registry tarball (3,585,823 bytes) SHA-256 was computed on 2026-10-04; SHA-512 matches dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== and SHA-1 matches dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd. SLSA provenance attestation is present. See evidence/receipts/mcporter-0142-qualification-20261004.json data.artifact_checks."
     },
     {
       "id": "context-hub",

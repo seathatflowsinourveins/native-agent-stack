@@ -225,16 +225,27 @@ checks the resolved notification. Never put a production service into this
 fixture or deliberately stop one. The renderer preserves an existing fixture
 file; leave it empty outside acceptance.
 
- Alertmanager sends
-its native webhook directly to
-`http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager`.
-ntfy's bundled `alertmanager` template formats firing and resolved payloads. No
+Alertmanager sends its native webhook directly to two local ntfy topics:
+
+- `http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager` receives
+  every alert except the non-critical Codex lane alerts. The critical lane
+  alert, `CodexLaneUsageLimited`, arrives here.
+- `http://127.0.0.1:18080/ecosystem-lanes?template=alertmanager` receives the
+  other `scope: codex-lanes` alerts: `CodexLaneGoalBlocked`,
+  `CodexLaneToolErrorBurst` and `CodexLaneMcpErrorRatio`. It is a separate
+  topic so that it can be muted on its own.
+
+Both lane routes group by lane, so each notification covers one lane. ntfy's
+bundled `alertmanager` template formats firing and resolved payloads. No
 custom bridge, SMTP, hosted relay, Firebase, or browser Web Push credentials are
-configured. Open `http://127.0.0.1:18080/ecosystem-alerts` locally to subscribe, or
-poll stored notifications:
+configured. Subscribe to both topics: open `http://127.0.0.1:18080/ecosystem-alerts`
+and `http://127.0.0.1:18080/ecosystem-lanes` locally. A subscriber to only the
+first misses the lane warnings, although Alertmanager reports them delivered.
+To verify, poll the stored notifications of both:
 
 ```bash
 curl --fail --silent 'http://127.0.0.1:18080/ecosystem-alerts/json?poll=1&since=all'
+curl --fail --silent 'http://127.0.0.1:18080/ecosystem-lanes/json?poll=1&since=all'
 ```
 
 Sign-up is disabled; anonymous Viewer access is enabled on loopback (see

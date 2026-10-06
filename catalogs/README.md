@@ -15,6 +15,8 @@ live gates.
 
 The [skills lifecycle catalog](landscape/skills-lifecycle.json) lists the lifecycle tasks that the landscape sweep's skills modality sweeps, the installed skills serving each task and the pinned skill sources it searches.
 
+The [upstream-surface baseline](foundation/upstream-surface-baseline.json) and [dispositions](foundation/upstream-surface-dispositions.json) catalogs hold the Claude Code and Codex switch names the [upstream-surface watch](../docs/upstream-surface-watch.md) observed and the decisions on new ones.
+
 | Catalog | Purpose | Start here |
 | --- | --- | --- |
 | Foundation | Native Codex/Claude runtimes, rules, skills, workers, isolation, retrieval, memory, research, efficiency, evaluation, CI, scheduling, hosting, recovery and observation | [Foundation guide](foundation/README.md) · [Layer manifest](foundation/manifest.json) · [Harness defaults](../docs/harness-defaults.md) |

@@ -34,14 +34,25 @@ default_subagent_reasoning_effort = "max"
 # 272,000-token window of gpt-6.1-sol and gpt-6-astra in models-manager/models.json) and at 8,000 characters only when
 # the window is unknown; a set value is capped at 10,000 tokens (codex-rs/ext/skills/src/render.rs L19-22 and L126-152
 # at rust-v0.159.2, L17-20 and L123-149 at rust-v0.157.1; the key is core/config.schema.json L4122-4127 at
-# rust-v0.159.2). The manifest's 25 catalog-visible skills render to about 11,900 bytes with a 28-character skills
-# root, which render.rs charges at about 2,990 tokens (each line and its newline at ceil(bytes / 4), L154-160 and L25),
+# rust-v0.159.2). The manifest's 24 catalog-visible skills render to about 11,100 bytes with a 28-character skills
+# root, which render.rs charges at about 2,790 tokens (each line and its newline at ceil(bytes / 4), L154-160 and L25),
 # so a fixed 6,000 leaves room for Codex's five .system skills and plugin skills on any model a child runs
-# (docs/decisions/2026-09-30-skills-llm-native-listing.md). Per-skill [[skills.config]] disables stay out of this
-# template: tools/adoption/install_skills.py --print-codex-config prints the manifest's, each keyed by the installed
-# SKILL.md path (adoption/skills/lifecycle.md).
+# (docs/decisions/2026-09-30-skills-llm-native-listing.md). Per-skill [[skills.config]] disables of manifest skills
+# stay out of this template: tools/adoption/install_skills.py --print-codex-config prints the manifest's, each keyed by
+# the installed SKILL.md path (adoption/skills/lifecycle.md). The one rule below turns off Codex's bundled
+# skill-installer by its path, so skills reach a host only through that installer (wave-2 skills ruling, 2026-10-03;
+# a path rule names one skill, a name rule every skill of the name: codex-rs/config/src/skills_config.rs at
+# rust-v0.160.0). Rules for an account's remote plugin skills are per account and are not in this template.
+# The path is relative on purpose: Codex installs its bundled skills in <Codex home>/skills/.system
+# (codex-rs/skills/src/lib.rs L62-69) and resolves a relative path in config.toml against the folder that file is in,
+# which for this file is the Codex home, CODEX_HOME or else ~/.codex (config/src/loader/mod.rs L557, L573-582 and
+# L1424-1445; utils/absolute-path/src/lib.rs L392-405; the same functions at rust-v0.159.3 and rust-v0.155.1).
 [skills]
 max_context_tokens = 6000
+
+[[skills.config]]
+path = "skills/.system/skill-installer/SKILL.md"
+enabled = false
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local
 # .codex/config.toml (docs/decisions/2026-09-25-codex-mcp-scope.md). serena and socraticode take no
@@ -49,7 +60,8 @@ max_context_tokens = 6000
 # ai-memory's registration carries no project: its workspace/project scoping is a per-call argument.
 # headroom, codebase-memory and qmd mirror the Claude user-scope set: headroom's dead proxy URL means
 # it reroutes no model traffic, codebase-memory indexes only on an explicit index_repository call,
-# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240). context-mode's plugin
+# and qmd serves the named catalog index. jcodemunch is registered below at user scope (the user's directive of 2026-10-04,
+# docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md). context-mode's plugin
 # supplies its hooks and skills, while its MCP server is registered below, bound to each session's own
 # directory; see project.codex.config.template.toml.
 [mcp_servers.serena]
@@ -66,7 +78,9 @@ PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 # (codex-rs/core/src/mcp_tool_call.rs L2436-2466 and L1610-1614 at rust-v0.157.1). ai-memory, SocratiCode and
 # Headroom declare none, so every call to them is refused unless configuration approves it: the stack-worker profile
 # (codex.stack-worker.config.toml) approves their read tools for workers, and sessions without that profile keep the
-# refusals (docs/decisions/2026-09-26-codex-worker-lane.md, decision 5).
+# refusals (docs/decisions/2026-09-26-codex-worker-lane.md, decision 5). The new WSL distribution's approval of
+# ai-memory's tools is not in this shared template: adoption/new-wsl/templates/codex.config.additions.toml carries it,
+# and only tools/adoption/new_wsl_client_config.py reads that file, with --with-authorization-settings.
 [mcp_servers.ai-memory]
 url = "http://${AI_MEMORY_URL}/mcp"
 
@@ -141,6 +155,27 @@ RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 CONTEXT_MODE_PLATFORM = "codex"
 
+# jgravelle/jcodemunch-mcp 1.108.319, README.md at 8f7b34abe16fb459e0bf1c04747d584216dfe32e (L119-122: `claude mcp add -s user
+# jcodemunch jcodemunch-mcp`): the native MCP registration at user scope, on the user's directive of 2026-10-04 that every fresh
+# session starts with the tools ready (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md; it overturns the project scope
+# of 2026-09-25 for NativeStack and NativeStack2604). JCODEMUNCH_SHARE_SAVINGS=0 in the env block is the documented opt-out of its
+# anonymous savings counter (CONFIGURATION.md L231 and SECURITY.md L311 at the same revision). `jcodemunch-mcp init`, which writes a
+# prompt policy and hooks, is not run. The entry is the one project.codex.config.template.toml registers per project: the tools
+# carry no MCP annotations, so under approval_policy = "never" Codex refuses every unapproved call, and
+# default_tools_approval_mode = "approve" auto-approves even then (codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1);
+# enabled_tools names the three verbs of its front door (counter.py FRONT_DOOR at 1.108.319). CODE_INDEX_PATH stays unset:
+# upstream's default is ~/.code-index (README.md L225).
+[mcp_servers.jcodemunch]
+command = "${ECO_ROOT}/bin/jcodemunch-mcp"
+startup_timeout_sec = 60
+enabled_tools = ["route", "menu", "order"]
+default_tools_approval_mode = "approve"
+
+[mcp_servers.jcodemunch.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+JCODEMUNCH_SHARE_SAVINGS = "0"
+
 # Trust lets Codex load a project's own .codex/config.toml, which is otherwise loaded but disabled; for a linked
 # worktree Codex looks the trust up under its main checkout (codex-rs/config/src/loader/mod.rs L131-133 and
 # L1041-1084; git-utils/src/trust.rs L9-16). Four dated validation directories this list used to trust were removed:
@@ -151,8 +186,16 @@ trust_level = "trusted"
 [projects."${HOME}/code/native-agent-stack-publication"]
 trust_level = "trusted"
 
+# Codex's startup notice for a newly available model, seeded as already shown its maximum number of times so a host set
+# up from this template does not show it. At openai/codex rust-v0.160.0 (a956835d020762cb2b570053af06f643a11c0ecc) the
+# table is a map of model slug to a u32 show count (codex-rs/config/src/types.rs L789-795, the [tui] field at L940-942);
+# the TUI shows a model's notice only while its count is below MODEL_AVAILABILITY_NUX_MAX_SHOW_COUNT = 4
+# (tui/src/app/startup_prompts.rs L242 and L250-266) and writes the count back one higher per showing (L281-305). At
+# that tag the bundled catalog's one notice is gpt-6.1-sol's (models-manager/models.json L178 and L245-247). The slug
+# has a dot, so its key is quoted.
 [tui.model_availability_nux]
 gpt-6-astra = 4
+"gpt-6.1-sol" = 4
 
 [hooks.state]
 
@@ -223,6 +266,11 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+# Experimental and off by default (`codex features list`): adds the seven-day five-hour and weekly allowance history to
+# /analytics through one ChatGPT-backend request, not a model call (codex-rs/features/src/lib.rs at rust-v0.160.0). On
+# both hosts on the user's directive of 2026-10-04 to enable the latest changelog features; the history stays empty
+# (the request returns nothing) on an account whose plan has none.
+analytics_plan_history = true
 
 # Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
 # reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question
@@ -231,6 +279,9 @@ shell_snapshot = false
 # codex-rs/tui/src/chatwidget/notifications.rs. The channel stays Codex's own per-terminal `auto` (docs/decisions/2026-09-28-terminal-experience.md).
 [tui]
 notifications = ["approval-requested", "plan-mode-prompt", "async-question"]
+# The footer's items, set explicitly because Codex's default footer shows no usage (wave-2 usage ruling, the statusline
+# row of the definitive manifest; item names from codex-rs/tui/src/bottom_pane/status_line_setup.rs at rust-v0.160.0).
+status_line = ["model-with-reasoning", "project-name", "git-branch", "context-used", "five-hour-limit", "weekly-limit"]
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]
@@ -247,7 +298,9 @@ max_bytes = 0
 [analytics]
 enabled = true
 
-# Native WSL defaults; regenerate PATH when adopting another host/runtime.
+# Native WSL defaults; regenerate PATH when adopting another host/runtime. The new WSL distribution's
+# `inherit = "none"` and the rest of its set table are in adoption/new-wsl/templates/codex.config.additions.toml, which
+# only tools/adoption/new_wsl_client_config.py reads (docs/secret-storage.md, Codex, describes the practice for any host).
 [shell_environment_policy.set]
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 RTK_TELEMETRY_DISABLED = "1"
