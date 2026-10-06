@@ -26,6 +26,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
+from collections.abc import Mapping
 
 try:
     import fcntl
@@ -66,13 +67,36 @@ def stamp(path: Path) -> list[int] | None:
     return [info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns, info.st_ino]
 
 
-def bounded_read(path: Path, limit: int) -> bytes:
-    # Do not follow a final-component link into an authentication/sensitive file.
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
-    fd = os.open(path, flags)
-    with os.fdopen(fd, "rb") as stream:
-        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+@contextmanager
+def regular_stream(path: Path, flags: int, mode: str) -> Iterator[Any]:
+    """Validate a nonblocking, final-component no-follow FD before any I/O.
+
+    The directory must be trusted and writers must cooperate through flock.
+    Regular-file I/O/fsync latency and power-loss durability are not guaranteed.
+    """
+    nofollow = getattr(os, "O_NOFOLLOW", None)
+    nonblock = getattr(os, "O_NONBLOCK", None)
+    if not isinstance(nofollow, int) or not nofollow or not isinstance(nonblock, int) or not nonblock:
+        raise NotImplementedError("required_file_flags_unavailable")
+    if flags & os.O_TRUNC:
+        raise ValueError("truncate_before_validation")
+    fd = os.open(path, flags | nofollow | nonblock, 0o600)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
             raise ValueError("not_regular_file")
+        stream = os.fdopen(fd, mode)
+        fd = None  # The stream now owns the descriptor.
+        try:
+            yield stream
+        finally:
+            stream.close()
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
+def bounded_read(path: Path, limit: int) -> bytes:
+    with regular_stream(path, os.O_RDONLY, "rb") as stream:
         data = stream.read(limit + 1)
     if len(data) > limit:
         raise ValueError("file_size_limit")
@@ -80,8 +104,7 @@ def bounded_read(path: Path, limit: int) -> bytes:
 
 
 def private_append(path: Path, row: dict) -> None:
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND | getattr(os, "O_NOFOLLOW", 0), 0o600)
-    with os.fdopen(fd, "ab") as stream:
+    with regular_stream(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, "ab") as stream:
         stream.write(json.dumps(row, sort_keys=True, separators=(",", ":")).encode() + b"\n")
         stream.flush()
         os.fsync(stream.fileno())
@@ -89,8 +112,8 @@ def private_append(path: Path, row: dict) -> None:
 
 def atomic_json(path: Path, value: dict) -> None:
     temporary = path.with_name(path.name + ".next")
-    fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0), 0o600)
-    with os.fdopen(fd, "w") as stream:
+    with regular_stream(temporary, os.O_WRONLY | os.O_CREAT, "w") as stream:
+        os.ftruncate(stream.fileno(), 0)
         json.dump(value, stream, sort_keys=True, separators=(",", ":"))
         stream.flush()
         os.fsync(stream.fileno())
@@ -115,13 +138,32 @@ def project_root(cwd: Path) -> Path:
     return current
 
 
-def roots(home: Path, project: Path) -> list[tuple[str, str, Path]]:
+def native_config_root(home: Path, variable: str, default: str, environment: Mapping[str, str]) -> Path:
+    """Select only a public root locator, without reading native configuration.
+
+    CODEX_HOME: openai/codex@a956835d:codex-rs/utils/home-dir/src/lib.rs:13-49.
+    CLAUDE_CONFIG_DIR: https://code.claude.com/docs/en/env-vars#environment-variables.
+    Redirected or relative overrides remain unsupported observations, not a
+    license to inspect their targets or silently substitute the default profile.
+    """
+    value = environment.get(variable)
+    path = Path(value) if value else home / default
+    if not path.is_absolute() or ".." in path.parts or path.resolve() != path:
+        raise ValueError("unsupported_native_config_root")
+    if path.exists() and not path.is_dir():
+        raise ValueError("native_config_directory_required")
+    if value and variable == "CODEX_HOME" and not path.is_dir():
+        raise ValueError("unavailable_native_codex_home")
+    return path
+
+
+def roots(home: Path, project: Path, claude_root: Path, codex_root: Path) -> list[tuple[str, str, Path]]:
     entries = [
         ("global", "home_agents", home / ".agents/skills"),
-        ("global", "home_claude", home / ".claude/skills"),
-        ("global", "home_codex", home / ".codex/skills"),
-        ("global", "claude_plugin", home / ".claude/plugins/cache"),
-        ("global", "codex_plugin", home / ".codex/plugins/cache"),
+        ("global", "home_claude", claude_root / "skills"),
+        ("global", "home_codex", codex_root / "skills"),
+        ("global", "claude_plugin", claude_root / "plugins/cache"),
+        ("global", "codex_plugin", codex_root / "plugins/cache"),
         ("project", "project_agents", project / ".agents/skills"),
         ("project", "project_claude", project / ".claude/skills"),
     ]
@@ -153,7 +195,8 @@ def source_metadata(entry: Any) -> dict:
 
 
 class Recorder:
-    def __init__(self, home: Path, project: Path, state_dir: Path, *, status_timeout: float = 2.0, scan_timeout: float = 5.0):
+    def __init__(self, home: Path, project: Path, state_dir: Path, *, status_timeout: float = 2.0, scan_timeout: float = 5.0,
+                 environment: Mapping[str, str] | None = None):
         self.home = home.resolve()
         self.project = project_root(project)
         self.state_dir = state_dir
@@ -161,6 +204,20 @@ class Recorder:
         self.ledger = state_dir / "ledger.jsonl"
         self.status_timeout = status_timeout
         self.scan_timeout = scan_timeout
+        # Read only these named public path overrides; no settings/auth stores.
+        self.native_roots_error = None
+        try:
+            selected = os.environ if environment is None else environment
+            self.claude_root = native_config_root(self.home, "CLAUDE_CONFIG_DIR", ".claude", selected)
+            self.codex_root = native_config_root(self.home, "CODEX_HOME", ".codex", selected)
+        except (ValueError, OSError) as error:
+            self.claude_root = self.codex_root = None
+            self.native_roots_error = error
+
+    def root_specs(self) -> list[tuple[str, str, Path]]:
+        if self.native_roots_error is not None:
+            raise ValueError("native_root_scope_unknown") from self.native_roots_error
+        return roots(self.home, self.project, self.claude_root, self.codex_root)
 
     @contextmanager
     def locked(self) -> Iterator[None]:
@@ -169,8 +226,7 @@ class Recorder:
         if any(path.is_symlink() for path in (self.state_dir, *self.state_dir.parents)):
             raise ValueError("state_directory_symlink")
         self.state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-        fd = os.open(self.state_dir / "recorder.lock", os.O_RDWR | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0), 0o600)
-        with os.fdopen(fd, "a+b") as lock:
+        with regular_stream(self.state_dir / "recorder.lock", os.O_RDWR | os.O_CREAT, "a+b") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             try:
                 yield
@@ -190,7 +246,14 @@ class Recorder:
         except Exception:
             pass
 
-    def locator(self, path: Path) -> str:
+    def locator(self, path: Path, scope: str | None = None) -> str:
+        if scope is not None:
+            for _, label, root in self.root_specs():
+                if label == scope:
+                    try:
+                        return "<" + label + ">/" + path.relative_to(root).as_posix()
+                    except ValueError:
+                        pass
         for root, prefix in [(self.project, "<project>"), (self.home, "<home>")]:
             try:
                 return prefix + "/" + path.relative_to(root).as_posix()
@@ -200,8 +263,11 @@ class Recorder:
 
     def snapshot(self, group: str, deadline: float | None = None) -> dict:
         deadline = deadline or time.monotonic() + self.scan_timeout
-        selected = [(scope, path) for kind, scope, path in roots(self.home, self.project) if kind == group]
-        allowed = [path.resolve() for _, _, path in roots(self.home, self.project)]
+        specs = self.root_specs()
+        selected = [(scope, path) for kind, scope, path in specs if kind == group]
+        # Only an explicitly named, nonredirected root can allow an alias target.
+        # A symlink never registers its arbitrary destination as a trusted root.
+        allowed = [path for _, _, path in specs if path.is_dir() and path.resolve() == path]
         watches: dict[str, list[int] | None] = {}
         discovered: dict[Path, str] = {}
         metadata: dict[Path, list] = {}
@@ -212,7 +278,10 @@ class Recorder:
             if not root.exists():
                 continue
             if root.is_symlink():
-                raise ValueError("skill_root_symlink")
+                if root.resolve() not in allowed:
+                    raise ValueError("unknown_skill_root_alias")
+            elif root.resolve() != root:
+                raise ValueError("redirected_skill_root_parent")
             pending = [root]
             while pending:
                 folder = pending.pop()
@@ -240,6 +309,8 @@ class Recorder:
                         if item.name == "SKILL.md":
                             discovered.setdefault(item.resolve(), scope)
         lock = self.home / ".agents/.skill-lock.json" if group == "global" else self.project / "skills-lock.json"
+        if lock.parent.resolve() != lock.parent:
+            raise ValueError("redirected_public_lock_parent")
         watches[str(lock)] = stamp(lock)
         lock_data = json.loads(bounded_read(lock, MAX_LOCK)) if lock.exists() else {}
         lock_skills = lock_data.get("skills", {}) if isinstance(lock_data, dict) else {}
@@ -250,7 +321,7 @@ class Recorder:
             if time.monotonic() > deadline:
                 raise TimeoutError("scan_limit")
             # Resolve aliases to the canonical root's identity, across sessions.
-            scope = next((label for _, label, root in roots(self.home, self.project) if path.is_relative_to(root.resolve())), nominal_scope)
+            scope = next((label for _, label, root in specs if root in allowed and path.is_relative_to(root)), nominal_scope)
             if scope.startswith("project_") != (group == "project"):
                 continue
             content = bounded_read(path, MAX_SKILL)
@@ -267,7 +338,7 @@ class Recorder:
             key = digest([str(path)])
             observations[key] = {
                 "skill_name": name, "scope": scope, "state_key": key,
-                "locator": self.locator(path), "source": source,
+                "locator": self.locator(path, scope), "source": source,
                 "skill_md_sha256": hashlib.sha256(content).hexdigest(), "skill_md_bytes": len(content),
                 "frontmatter_sha256": header_hash, "folder_fingerprint": digest(sorted(files)),
                 "folder_fingerprint_method": "supporting_file_stat_metadata_bytecode_excluded",
@@ -277,17 +348,15 @@ class Recorder:
     def append_missing(self, rows: list[dict]) -> None:
         ids = set()
         try:
-            fd = os.open(self.ledger, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
-        except FileNotFoundError:
-            fd = None
-        if fd is not None:
-            with os.fdopen(fd, "rb") as stream:
+            with regular_stream(self.ledger, os.O_RDONLY, "rb") as stream:
                 for line in stream:
                     if len(line) > 2 * MAX_SKILL:
                         raise ValueError("ledger_row_limit")
                     entry = json.loads(line)
                     if isinstance(entry, dict):
                         ids.add(entry.get("id"))
+        except FileNotFoundError:
+            pass
         for row in rows:
             if row["id"] not in ids:
                 private_append(self.ledger, row)
@@ -310,20 +379,36 @@ class Recorder:
             changes = []
             rescanned = False
             deadline = time.monotonic() + self.scan_timeout
-            for group, identity in [("global", self.home), ("project", self.project)]:
-                group_key = group + ":" + digest(str(identity))
+            specs = self.root_specs()
+            global_identity = [[label, str(path)] for group, label, path in specs if group == "global"]
+            for group, identity in [("global", global_identity), ("project", str(self.project))]:
+                group_key = group + ":" + digest(identity)
                 previous = groups.get(group_key)
                 if previous and all(stamp(Path(path)) == value for path, value in previous["watches"].items()):
                     continue
                 rescanned = True
                 current = self.snapshot(group, deadline)
+                current["observed_generation"] = state["generation"] + 1
                 old_skills = previous["skills"] if previous else {}
                 new_skills = current["skills"]
                 for key in sorted(old_skills.keys() | new_skills.keys()):
                     before, after = old_skills.get(key), new_skills.get(key)
+                    covered = bool(previous)
+                    if group == "global":
+                        visible = after or before
+                        owning_root = next((path for kind, label, path in specs
+                                            if kind == "global" and label == visible["scope"]), None)
+                        # Other profile views may contain this same physical root.
+                        # Their latest absence is a removal; an older presence must
+                        # not create duplicate changes or resurrection observations.
+                        views = [view for name, view in groups.items() if name.startswith("global:")
+                                 and owning_root is not None and str(owning_root) in view["watches"]]
+                        if views:
+                            latest = max(views, key=lambda view: view.get("observed_generation", 0))
+                            before, covered = latest["skills"].get(key), True
                     if before == after:
                         continue
-                    action = "remove" if after is None else "change" if before else "add" if previous else "observed"
+                    action = "remove" if after is None else "change" if before else "add" if covered else "observed"
                     visible = after or before
                     changes.append({
                         "schema_version": 1, "kind": "skill_state_change",
@@ -352,7 +437,9 @@ class Recorder:
                 sys.executable, str(ROOT / "scripts/skills_status.py"),
                 "--metadata-only", "--ledger", str(self.ledger), "--json", "--home", str(self.home),
             ], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                timeout=self.status_timeout, check=False, cwd=self.project)
+                timeout=self.status_timeout, check=False, cwd=self.project,
+                env={"PATH": os.defpath, "PYTHONDONTWRITEBYTECODE": "1",
+                     "CLAUDE_CONFIG_DIR": str(self.claude_root), "CODEX_HOME": str(self.codex_root)})
             if result.returncode:
                 private_append(self.state_dir / "errors.jsonl", {
                     "schema_version": 1, "kind": "skill_recorder_error", "occurred_at_utc": utc_now(),
@@ -366,7 +453,13 @@ class Recorder:
         if not isinstance(raw_path, str):
             raise ValueError("instruction_path_required")
         path = Path(raw_path).absolute()
-        permitted = path.is_relative_to(self.project) or path.is_relative_to(self.home / ".claude")
+        self.root_specs()  # Unsupported native roots stay unknown rather than fall back.
+        project_file = path.is_relative_to(self.project)
+        if self.project == self.home and any(path.is_relative_to(self.home / name) for name in (".claude", ".codex")):
+            project_file = False  # A home launch does not re-enable an inactive profile.
+        claude_file = path == self.claude_root / "CLAUDE.md" or path.is_relative_to(self.claude_root / "rules")
+        codex_file = path in {self.codex_root / "AGENTS.md", self.codex_root / "AGENTS.override.md"}
+        permitted = project_file or claude_file or codex_file
         safe_name = path.suffix == ".md" and not any(excluded(part) for part in path.parts)
         body_hash = None
         if permitted and safe_name and not path.is_symlink() and path.resolve() == path:
@@ -377,7 +470,7 @@ class Recorder:
             private_append(self.state_dir / "instructions-loaded.jsonl", {
                 "schema_version": 1, "kind": "instructions_loaded_observation", "occurred_at_utc": utc_now(),
                 "session_id_sha256": digest(payload.get("session_id")) if isinstance(payload.get("session_id"), str) else None,
-                "locator": self.locator(path), "instruction_sha256": body_hash,
+                 "locator": self.locator(path), "instruction_sha256": body_hash,
                 "load_reason": reason if reason in {"session_start", "nested_traversal", "path_glob_match", "include", "compact"} else "unknown",
                 "memory_type": memory if memory in {"User", "Project", "Local", "Managed"} else "unknown",
                 "scope_status": "known" if body_hash else "unknown",
@@ -390,7 +483,7 @@ class FailOpenParser(argparse.ArgumentParser):
         raise ValueError("invalid_arguments")
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, environment: Mapping[str, str] | None = None) -> int:
     recorder = None
     try:
         parser = FailOpenParser(description=__doc__)
@@ -405,7 +498,7 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"watchPaths": [str(args.home / ".agents/.skill-lock.json")]}))
             return 0
         state_dir = args.state_dir or args.home / ".local/state/native-agent-stack/skills"
-        recorder = Recorder(args.home, args.project_dir or Path.cwd(), state_dir, status_timeout=args.status_timeout)
+        recorder = Recorder(args.home, args.project_dir or Path.cwd(), state_dir, status_timeout=args.status_timeout, environment=environment)
         data = sys.stdin.buffer.read(MAX_INPUT + 1)
         if len(data) > MAX_INPUT:
             raise ValueError("input_size_limit")
@@ -413,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
         if not isinstance(payload, dict):
             raise ValueError("hook_object_required")
         cwd = args.project_dir or Path(payload.get("cwd", os.getcwd()))
-        recorder = Recorder(args.home, cwd, state_dir, status_timeout=args.status_timeout)
+        recorder = Recorder(args.home, cwd, state_dir, status_timeout=args.status_timeout, environment=environment)
         event = payload.get("hook_event_name", "unknown")
         if args.mode == "instructions":
             if event == "InstructionsLoaded":

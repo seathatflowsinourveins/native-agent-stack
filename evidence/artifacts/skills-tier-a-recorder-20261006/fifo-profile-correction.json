@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "id": "skills-tier-a-recorder-fifo-profile-correction-20261006",
+  "kind": "local_integration_check",
+  "evidence_class": "local_integration_check",
+  "checked_at": "2026-10-06",
+  "scope": "Required regular-descriptor validation and retained native-profile observation groups. Repository fixtures only; no hook registration, host apply, trust, installation or model acceptance.",
+  "sources": [
+    "https://code.claude.com/docs/en/hooks-guide#audit-configuration-changes",
+    "https://code.claude.com/docs/en/hooks",
+    "https://code.claude.com/docs/en/env-vars",
+    "https://developers.openai.com/codex/guides/agents-md",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/utils/home-dir/src/lib.rs:13-49",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/ext/skills/src/host_roots.rs:103-112",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core-plugins/src/store.rs:87-94",
+    "https://docs.python.org/3/library/os.html#os.open",
+    "https://docs.python.org/3/library/fcntl.html#fcntl.flock"
+  ],
+  "original_evidence_retained": {
+    "receipts": [
+      "evidence/artifacts/skills-tier-a-recorder-20261006/source-review.json",
+      "evidence/artifacts/skills-tier-a-recorder-20261006/alias-correction.json"
+    ],
+    "prior_registered_head": "8ff46d904fc532c8c431efe9de778cbadd983942",
+    "boundary": "Earlier failed/passing attempts and original source hashes remain immutable; this receipt describes the corrected source."
+  },
+  "findings_and_repairs": [
+    "A prior FIFO guard covered instruction reads but left state, ledger, staging, error and lock paths vulnerable to blocking opens. A common required O_NOFOLLOW|O_NONBLOCK opener verifies a regular descriptor before flock/content, rejects pre-validation truncation and closes rejected or failed fdopen descriptors.",
+    "Native CLAUDE_CONFIG_DIR/CODEX_HOME roots were omitted. Only named public root overrides are selected; unsupported roots remain unknown without default-profile substitution.",
+    "Profile visits must not remove prior views or duplicate shared canonical aliases. Root-set-keyed views retain their observed generation; latest exact-root coverage, including absence, deduplicates physical transitions.",
+    "The first updated fixture run retained one obsolete locator assertion. Scope-stable locators were already the documented contract; correcting that assertion changed no runtime source or passing result."
+  ],
+  "local_artifacts": [
+    {
+      "path": "tools/adoption/skill_state_recorder.py",
+      "sha256": "78b27bf27c6de9bbee5b061abe3204acdd1c4a1e8235aa9235a699c697a4369d",
+      "bytes": 25740
+    },
+    {
+      "path": "tests/test_skill_state_recorder.py",
+      "sha256": "581825d66770db16cfd3423ce7b0464b8d8c657da0b700f2f16173ac8c528c1e",
+      "bytes": 27543
+    },
+    {
+      "path": "adoption/hooks/claude/skill-state-recorder-proposal.md",
+      "sha256": "402e030a7bf6d1a1d4b0441865c83f2e62c27d9c0c510ba8e565276428a17a45",
+      "bytes": 12446
+    },
+    {
+      "path": "docs/decisions/2026-10-06-tier-a-skill-state-recorder.md",
+      "sha256": "ad116ef5ebd69e72828fc92ccfd85bce41b0d41846d10af55626d29847a9fd57",
+      "bytes": 6135
+    }
+  ],
+  "local_test_attempts": [
+    {
+      "attempt": 5,
+      "command": "python3 -m unittest tests.test_skill_state_recorder -v",
+      "exit_code": 1,
+      "tests": 36,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "duration_seconds": 2.379,
+      "actual_failure": "Expected the old home-relative locator instead of the documented scope-stable locator.",
+      "private_log": {
+        "name": "focused-tests-5.log",
+        "sha256": "c27769f7952c1673ee146ae747d1d9c4d2313cd1b9bbc86851d3e648aa063a00",
+        "bytes": 7416
+      }
+    },
+    {
+      "attempt": 6,
+      "command": "python3 -m unittest tests.test_skill_state_recorder -v",
+      "exit_code": 0,
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "duration_seconds": 2.496,
+      "private_log": {
+        "name": "focused-tests-6.log",
+        "sha256": "728bf1f7882c23d6d50150e524ad10a76a61afa9ba03f77e59024f01f988ebfe",
+        "bytes": 6487
+      }
+    }
+  ],
+  "native_source_judgment_attempt": {
+    "evidence_class": "native_execution_attempt",
+    "runner": "examples/omniroute-codex-sdk/worker.py",
+    "runner_sdk_cli_pin": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc (0.160.0)",
+    "requested_model": "cx/gpt-6-astra-max",
+    "requested_effort": "max",
+    "exit_code": 2,
+    "status": "deadline_exceeded",
+    "phase": "turn_run",
+    "deadline_seconds": 600,
+    "model_inference_submitted": true,
+    "cleanup_status": "closed",
+    "returned_judgment": null,
+    "usage_status": "unknown",
+    "usage": null,
+    "backend_identity": "unknown",
+    "prompt": {
+      "name": "recorder-view-judgment.prompt.txt",
+      "sha256": "884370e7ff2abe99cb83f3accdda36a95687415254aa5e9b04e927f1ded16241",
+      "bytes": 65294
+    },
+    "private_result": {
+      "name": "native-result.json",
+      "sha256": "217f21913ef63c654bef77312714ee1069f2ac762a32d945db52aa6b798ef2b7",
+      "bytes": 616
+    },
+    "boundary": "The parent executed this native attempt. Submission is not a returned or accepted judgment; no model answer or usage is guessed."
+  },
+  "verified_local_controls": [
+    "Real FIFO subprocess timeout controls cover state, ledger, .next, lock, instruction/error logs, reader-present rejection, malformed input and error-log poisoning.",
+    "Sentinel/descriptor controls cover validation before truncation, failed fdopen cleanup, mandatory flags and pending-journal recovery.",
+    "Two native profile roots preserve distinct same-name hashes; shared aliases produce one observed/change/removal stream.",
+    "Selected plain instruction roots are hashed without default-profile borrowing; arbitrary/external instruction sources stay unknown.",
+    "Metadata-only status uses only supported arguments, selected public roots and a bounded subprocess; the status subprocess is mocked in this unit."
+  ],
+  "limits": [
+    "No fresh native hook-firing, trust positive/skipped control, unchanged upstream installation/removal or representative process-latency acceptance is claimed.",
+    "Source/on-disk metadata and local fixtures cannot establish model discovery, invocation, effective client permissions, provider identity or organic loads.",
+    "Trusted/cooperating state directories remain required. Final-component no-follow does not sandbox ancestors; regular-file/fsync latency is unbounded and power-loss durability is not promised.",
+    "Supporting-file fingerprints are stat-only, not reconstructed source integrity. Unknown source, plugin activation and usage stay unknown.",
+    "Official-main registry reconstruction used register_file for seven owned paths; the validator passed. Its result is integrity and scope evidence only, not native-client acceptance."
+  ],
+  "publication_validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "base": "0d5e6506434fab598dee861c749a22e628beb75a",
+    "registry_method": "Take main's registry, then scripts.host_receipts.register_file for seven owned paths; registry committed last.",
+    "private_log": {
+      "name": "validate-final.log",
+      "sha256": "2e8050b72c4a65a7f1ea64c3f336e34c27fd1b36a62e5011b08a58559749f17d"
+    },
+    "components": 69,
+    "hashed_files": 10343,
+    "profiles": 4,
+    "receipts": 214,
+    "scope": "Integrity and scope checks only; no live provider or GPU execution."
+  },
+  "sanitization": "Only compact outcomes, source locators and hashes are public. Raw logs, task prompt/result, personal host paths, credentials and active client configuration are not copied.",
+  "model_usage": null
+}

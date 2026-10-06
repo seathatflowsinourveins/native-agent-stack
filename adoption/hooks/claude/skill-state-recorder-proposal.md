@@ -29,6 +29,19 @@ global `.agents/.skill-lock.json`, project `skills-lock.json`, global/client/pro
 skill directories, and both clients' plugin caches. ConfigChange is a signal;
 the recorder never reads settings.json, config.toml or authentication stores.
 
+The native public root overrides `CLAUDE_CONFIG_DIR` and `CODEX_HOME` select
+their skill and plugin-cache directories. They never relocate `HOME/.agents` or
+project roots. Scope labels remain `home_claude`, `home_codex` and the existing
+plugin/project labels. Explicit relative, redirected or unavailable native
+roots fail open with unknown scope; the recorder does not silently substitute
+the default profile. Only explicitly named nonredirected roots allow canonical
+Claude skill aliases; an unknown redirected parent is never whitelisted.
+Sources: [Claude configuration root](https://code.claude.com/docs/en/env-vars),
+[Codex state location](https://developers.openai.com/codex/config-advanced#config-and-state-locations),
+and `openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/utils/home-dir/src/lib.rs:13-49`,
+`codex-rs/ext/skills/src/host_roots.rs:103-112`,
+`codex-rs/core-plugins/src/store.rs:87-94`.
+
 Only SKILL.md bytes and selected public lock fields are read. Rows contain
 sanitized locators, hashes, bytes, safe names, and nullable source metadata.
 Supporting files contribute stat metadata only, without content reads. This is
@@ -41,8 +54,13 @@ and directory stat stamps; an unchanged call reads neither SKILL bodies nor the
 public lock and invokes no status process. Changes produce one row per changed
 canonical skill identity; global Claude symlink aliases do not produce duplicate
 identities. Distinct plugin/version paths retain distinct `state_key` values.
-Project state is separated from global state, so visiting another project does
-not declare the previous project's skills removed.
+Project and native-profile observation groups are separate, so visiting another
+project/profile does not declare files in its prior view removed. Prior views
+remain retained and can become unobserved. Shared canonical `HOME/.agents`
+identities use the latest root-covering observation across profile views, including
+the latest absence, to avoid duplicate physical changes through two aliases.
+The canonical locator hash plus the current SKILL hash bind the S4 identity;
+another profile's same-named skill cannot supply that binding.
 
 A pending journal precedes ledger appends. Recovery checks recorded IDs before
 retrying append and commits the next snapshot afterward. Add/remove/add remains
@@ -55,6 +73,17 @@ never exception text or hook payloads. Stdout stays empty and the command return
 zero. If configured state itself is unavailable, no error row can be guaranteed.
 The timer and later triggers provide an eventual-observation backstop after
 contention; this is not an atomic transaction with an upstream installer.
+
+All managed state/log/lock files use one POSIX opener with `O_NOFOLLOW` and
+`O_NONBLOCK`, then `fstat(S_ISREG)` before flock or any content operation.
+Required flags are never replaced by zero. Rejecting a special file or failing
+`fdopen` closes its descriptor. The atomic `.next` file is opened without
+`O_TRUNC`; only a validated regular descriptor is truncated and written.
+Error logging is terminal best-effort, including when errors.jsonl is poisoned.
+These checks require a trusted state directory and cooperating writers.
+No-follow protects the final path component; it does not sandbox ancestors.
+Regular-file I/O and fsync latency remain unbounded, and the journal's replay
+sequence is not a promise of power-loss durability.
 
 The ledger interface for S4 is `schema_version: 1`, `kind: skill_state_change`:
 
@@ -74,7 +103,7 @@ The ledger interface for S4 is `schema_version: 1`, `kind: skill_state_change`:
     "skill_md_bytes": 100,
     "frontmatter_sha256": "<header hash>",
     "folder_fingerprint": "<stat-only fingerprint>",
-    "locator": "<home>/.agents/skills/example/SKILL.md"
+    "locator": "<home_agents>/example/SKILL.md"
   },
   "usage": "unknown"
 }
@@ -97,6 +126,8 @@ This S4 interface must exist before activation. Its output is discarded; a
 nonzero exit or timeout is an observer error, never a blocking hook result.
 The two-second timeout bounds that process. No native client or model job is
 started. Full live-catalog checks remain outside the hot path.
+The child receives only selected public root locators, a fixed PATH and bytecode
+off; no inherited authentication values or client configuration are copied.
 
 ## Passive registration proposals
 
@@ -126,6 +157,11 @@ InstructionsLoaded is audit-only; Claude discards its decision output. The logge
 retains an allowed instruction file's hash and sanitized locator, never its body.
 Unsupported/external paths get a null hash and unknown scope. The native event
 does not certify that a named skill was subsequently invoked.
+Global plain sources use the selected Claude root's `CLAUDE.md`/rules and the
+selected Codex root's `AGENTS.md` or `AGENTS.override.md`. Arbitrary profile
+Markdown is not hashed. This is the audit reader's allowed-source policy; it
+does not invent an InstructionsLoaded event on Codex. Managed, extra-directory
+and custom instruction sources outside this explicit scope remain unknown.
 
 Codex addition:
 

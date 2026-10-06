@@ -7,6 +7,9 @@ import importlib.util
 import io
 import json
 import os
+import stat
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -31,7 +34,7 @@ class SkillStateRecorderTests(unittest.TestCase):
         self.home.mkdir()
         self.project.mkdir()
         self.state = self.base / "state"
-        self.recorder = RECORDER.Recorder(self.home, self.project, self.state)
+        self.recorder = RECORDER.Recorder(self.home, self.project, self.state, environment={})
         self.status = mock.patch.object(RECORDER.Recorder, "run_status")
         self.status_mock = self.status.start()
         self.addCleanup(self.status.stop)
@@ -46,14 +49,14 @@ class SkillStateRecorderTests(unittest.TestCase):
         file = self.state / filename
         return [json.loads(line) for line in file.read_text().splitlines()] if file.exists() else []
 
-    def main(self, payload, mode="record"):
+    def main(self, payload, mode="record", environment=None):
         content = json.dumps(payload).encode() if isinstance(payload, dict) else payload
         stdin = io.TextIOWrapper(io.BytesIO(content))
         output = io.StringIO()
         with mock.patch.object(RECORDER.sys, "stdin", stdin), contextlib.redirect_stdout(output):
             result = RECORDER.main([
                 "--home", str(self.home), "--project-dir", str(self.project), "--state-dir", str(self.state), "--mode", mode,
-            ])
+            ], environment={} if environment is None else environment)
         return result, output.getvalue()
 
     def test_first_observation_is_not_install_or_adoption(self):
@@ -65,7 +68,7 @@ class SkillStateRecorderTests(unittest.TestCase):
         self.assertEqual(row["source"]["status"], "unknown")
         self.assertEqual(row["usage"], "unknown")
         self.assertNotIn("decision", row)
-        self.assertEqual(row["after"]["locator"], "<home>/.agents/skills/example/SKILL.md")
+        self.assertEqual(row["after"]["locator"], "<home_agents>/example/SKILL.md")
 
     def test_add_remove_add_is_three_transitions(self):
         self.recorder.record("SessionStart")
@@ -129,7 +132,7 @@ class SkillStateRecorderTests(unittest.TestCase):
 
     def test_launch_from_home_does_not_duplicate_project_root(self):
         self.skill()
-        recorder = RECORDER.Recorder(self.home, self.home, self.state)
+        recorder = RECORDER.Recorder(self.home, self.home, self.state, environment={})
         recorder.record("SessionStart")
         self.assertEqual(len(self.rows()), 1)
 
@@ -152,9 +155,94 @@ class SkillStateRecorderTests(unittest.TestCase):
         self.recorder.record("SessionStart")
         second = self.base / "second-project"
         second.mkdir()
-        recorder = RECORDER.Recorder(self.home, second, self.state)
+        recorder = RECORDER.Recorder(self.home, second, self.state, environment={})
         recorder.record("SessionStart")
         self.assertEqual([row["event"] for row in self.rows()], ["observed"])
+
+    def profile(self, label):
+        claude_root = self.base / (label + "-claude")
+        codex_root = self.base / (label + "-codex")
+        claude_root.mkdir()
+        codex_root.mkdir()
+        environment = {"CLAUDE_CONFIG_DIR": str(claude_root), "CODEX_HOME": str(codex_root)}
+        recorder = RECORDER.Recorder(self.home, self.project, self.state, environment=environment)
+        return recorder, claude_root, codex_root, environment
+
+    def test_selected_native_roots_include_skills_and_plugin_caches_without_default_fallback(self):
+        recorder, claude_root, codex_root, _ = self.profile("custom")
+        self.skill("default-claude", root=self.home / ".claude/skills")
+        self.skill("default-codex", root=self.home / ".codex/skills")
+        self.skill("custom-claude", root=claude_root / "skills")
+        self.skill("custom-codex", root=codex_root / "skills")
+        self.skill("custom-claude-plugin", root=claude_root / "plugins/cache/vendor/plugin/1.0/skills")
+        self.skill("custom-codex-plugin", root=codex_root / "plugins/cache/vendor/plugin/1.0/skills")
+        recorder.record("SessionStart")
+        self.assertEqual({row["skill_name"] for row in self.rows()},
+                         {"custom-claude", "custom-codex", "custom-claude-plugin", "custom-codex-plugin"})
+        self.assertEqual({row["scope"] for row in self.rows()}, {"home_claude", "home_codex", "claude_plugin", "codex_plugin"})
+
+    def test_two_profile_hashes_survive_visits_without_physical_removals(self):
+        first, first_claude, _, _ = self.profile("one")
+        second, second_claude, _, _ = self.profile("two")
+        self.skill(root=first_claude / "skills", body="Profile one public fixture.\n")
+        self.skill(root=second_claude / "skills", body="Profile two public fixture.\n")
+        first.record("SessionStart")
+        second.record("SessionStart")
+        self.assertFalse(first.record("SessionStart"))
+        rows = self.rows()
+        self.assertEqual([row["event"] for row in rows], ["observed", "observed"])
+        self.assertEqual(len({row["after"]["skill_md_sha256"] for row in rows}), 2)
+        self.assertEqual(len({row["state_key"] for row in rows}), 2)
+        self.assertNotIn(str(self.base), json.dumps(rows))
+
+    def test_two_profile_aliases_share_one_physical_transition_stream(self):
+        first, first_claude, _, _ = self.profile("one")
+        second, second_claude, _, _ = self.profile("two")
+        directory = self.skill()
+        for root in (first_claude, second_claude):
+            alias = root / "skills/example"
+            alias.parent.mkdir()
+            alias.symlink_to(directory, target_is_directory=True)
+        first.record("SessionStart")
+        self.assertFalse(second.record("SessionStart"))
+        self.assertEqual(len(self.rows()), 1)
+        (directory / "SKILL.md").write_text("---\nname: example\n---\nChanged public fixture.\n")
+        self.assertTrue(second.record("FileChanged"))
+        self.assertFalse(first.record("FileChanged"))
+        (directory / "SKILL.md").unlink()
+        self.assertTrue(first.record("FileChanged"))
+        self.assertFalse(second.record("FileChanged"))
+        self.assertEqual([row["event"] for row in self.rows()], ["observed", "changed", "removed"])
+        self.assertEqual(len({row["state_key"] for row in self.rows()}), 1)
+
+    def test_redirected_or_relative_native_roots_fail_open_as_unknown_without_fallback(self):
+        public = self.base / "public-other"
+        public.mkdir()
+        alias = self.base / "redirected-profile"
+        alias.symlink_to(public, target_is_directory=True)
+        self.skill(root=self.home / ".claude/skills")
+        for environment in ({"CLAUDE_CONFIG_DIR": "relative-profile"}, {"CODEX_HOME": str(alias)},
+                            {"CODEX_HOME": str(self.base / "missing-profile")}):
+            with self.subTest(environment=environment):
+                code, output = self.main({"hook_event_name": "SessionStart"}, environment=environment)
+                self.assertEqual((code, output), (0, ""))
+                self.assertFalse(self.rows())
+        self.assertTrue(self.rows("errors.jsonl"))
+
+    def test_selected_native_instruction_roots_hash_only_plain_sources(self):
+        _, claude_root, codex_root, environment = self.profile("custom")
+        user_claude = claude_root / "CLAUDE.md"
+        user_agents = codex_root / "AGENTS.md"
+        other = codex_root / "public-other.md"
+        default = self.home / ".claude/CLAUDE.md"
+        default.parent.mkdir()
+        for path in (user_claude, user_agents, other, default):
+            path.write_text("Unretained public instruction fixture.\n")
+        for path in (user_claude, user_agents, other, default):
+            self.main({"hook_event_name": "InstructionsLoaded", "file_path": str(path)}, "instructions", environment=environment)
+        rows = self.rows("instructions-loaded.jsonl")
+        self.assertEqual([row["scope_status"] for row in rows], ["known", "known", "unknown", "unknown"])
+        self.assertTrue(all(str(self.base) not in json.dumps(row) for row in rows))
 
     def test_plugin_versions_are_distinct_and_activation_is_not_claimed(self):
         root = self.home / ".claude/plugins/cache/vendor/plugin"
@@ -265,6 +353,8 @@ class SkillStateRecorderTests(unittest.TestCase):
         self.assertEqual(args[2:], ["--metadata-only", "--ledger", str(self.recorder.ledger), "--json", "--home", str(self.home)])
         self.assertEqual(run.call_args.kwargs["timeout"], 2.0)
         self.assertEqual(run.call_args.kwargs["cwd"], self.project)
+        self.assertEqual(run.call_args.kwargs["env"], {"PATH": os.defpath, "PYTHONDONTWRITEBYTECODE": "1",
+                         "CLAUDE_CONFIG_DIR": str(self.home / ".claude"), "CODEX_HOME": str(self.home / ".codex")})
         self.assertEqual(self.rows("errors.jsonl")[0]["exit_code"], 1)
 
     def test_instructions_audit_keeps_only_hash_and_sanitized_locator(self):
@@ -309,6 +399,120 @@ class SkillStateRecorderTests(unittest.TestCase):
         code, output = self.main({"hook_event_name": "SessionStart"})
         self.assertEqual((code, output), (0, ""))
         self.assertEqual(list(destination.iterdir()), [])
+
+    def run_fixture_hook(self, payload, *, state_dir, mode="record"):
+        content = json.dumps(payload).encode() if isinstance(payload, dict) else payload
+        result = subprocess.run([
+            sys.executable, str(ROOT / "tools/adoption/skill_state_recorder.py"),
+            "--home", str(self.home), "--project-dir", str(self.project),
+            "--state-dir", str(state_dir), "--mode", mode,
+        ], input=content, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            timeout=2, cwd=self.project,
+            env={"PATH": os.defpath, "PYTHONDONTWRITEBYTECODE": "1", "TMPDIR": str(self.base)})
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, b"")
+        self.assertEqual(result.stderr, b"")
+
+    def test_real_fifo_state_paths_fail_open_under_subprocess_timeout(self):
+        self.skill()
+        instruction = self.project / "CLAUDE.md"
+        instruction.write_text("Public fixture instruction.\n")
+        cases = [
+            ("ledger.jsonl", "record", {"hook_event_name": "SessionStart"}),
+            ("state.json", "record", {"hook_event_name": "SessionStart"}),
+            ("state.json.next", "record", {"hook_event_name": "SessionStart"}),
+            ("recorder.lock", "record", {"hook_event_name": "SessionStart"}),
+            ("instructions-loaded.jsonl", "instructions", {"hook_event_name": "InstructionsLoaded", "file_path": str(instruction)}),
+            ("errors.jsonl", "record", b"MALFORMED_FIXTURE_INPUT"),
+        ]
+        for number, (filename, mode, payload) in enumerate(cases):
+            for reader_present in (False, True):
+                with self.subTest(filename=filename, reader_present=reader_present):
+                    case_dir = self.base / f"fifo-{number}-{reader_present}"
+                    case_dir.mkdir()
+                    poisoned = case_dir / filename
+                    os.mkfifo(poisoned)
+                    reader = os.open(poisoned, os.O_RDONLY | os.O_NONBLOCK) if reader_present else None
+                    try:
+                        self.run_fixture_hook(payload, state_dir=case_dir, mode=mode)
+                        self.assertTrue(stat.S_ISFIFO(poisoned.lstat().st_mode))
+                        if reader is not None:
+                            self.assertEqual(os.read(reader, 1024), b"")
+                        error_file = case_dir / "errors.jsonl"
+                        if filename != "errors.jsonl":
+                            rows = [json.loads(line) for line in error_file.read_text().splitlines()]
+                            self.assertTrue(rows)
+                            self.assertIn(rows[-1]["error_type"], {"ValueError", "OSError"})
+                    finally:
+                        if reader is not None:
+                            os.close(reader)
+
+    def test_real_instruction_fifo_is_rejected_in_subprocess(self):
+        instruction = self.project / "named-pipe.md"
+        os.mkfifo(instruction)
+        self.run_fixture_hook({"hook_event_name": "InstructionsLoaded", "file_path": str(instruction)}, state_dir=self.state, mode="instructions")
+        self.assertEqual(self.rows("errors.jsonl")[0]["error_type"], "ValueError")
+
+    def test_prevalidation_rejection_preserves_atomic_sentinel_and_closes_fd(self):
+        self.state.mkdir()
+        target = self.state / "state.json"
+        temporary = self.state / "state.json.next"
+        temporary.write_bytes(b"UNTRUNCATED_FIXTURE_SENTINEL")
+        original_open = os.open
+        descriptors = []
+
+        def tracked_open(*args, **kwargs):
+            self.assertFalse(args[1] & os.O_TRUNC)
+            descriptor = original_open(*args, **kwargs)
+            descriptors.append(descriptor)
+            return descriptor
+
+        with mock.patch.object(RECORDER.os, "open", side_effect=tracked_open), mock.patch.object(RECORDER.os, "fstat", return_value=SimpleNamespace(st_mode=stat.S_IFIFO)), mock.patch.object(RECORDER.os, "fdopen") as fdopen, mock.patch.object(RECORDER.os, "ftruncate") as truncate:
+            with self.assertRaises(ValueError):
+                RECORDER.atomic_json(target, {"fixture": True})
+        fdopen.assert_not_called()
+        truncate.assert_not_called()
+        self.assertEqual(temporary.read_bytes(), b"UNTRUNCATED_FIXTURE_SENTINEL")
+        self.assertFalse(target.exists())
+        self.assertEqual(len(descriptors), 1)
+        with self.assertRaises(OSError):
+            os.fstat(descriptors[0])
+
+    def test_fdopen_failure_closes_validated_descriptor(self):
+        file = self.base / "regular.txt"
+        file.write_text("Public fixture.\n")
+        original_open = os.open
+        descriptors = []
+
+        def tracked_open(*args, **kwargs):
+            descriptor = original_open(*args, **kwargs)
+            descriptors.append(descriptor)
+            return descriptor
+
+        with mock.patch.object(RECORDER.os, "open", side_effect=tracked_open), mock.patch.object(RECORDER.os, "fdopen", side_effect=ValueError("synthetic fdopen failure")):
+            with self.assertRaises(ValueError):
+                RECORDER.bounded_read(file, 1024)
+        self.assertEqual(len(descriptors), 1)
+        with self.assertRaises(OSError):
+            os.fstat(descriptors[0])
+
+    def test_missing_required_flag_never_falls_back_to_zero(self):
+        with mock.patch.object(RECORDER.os, "O_NOFOLLOW", 0), mock.patch.object(RECORDER.os, "open") as opened:
+            with self.assertRaises(NotImplementedError):
+                RECORDER.bounded_read(self.base / "fixture", 1)
+        opened.assert_not_called()
+
+    def test_fifo_ledger_failure_recovers_pending_without_duplicate_rows(self):
+        self.recorder.record("SessionStart")
+        self.skill()
+        os.mkfifo(self.recorder.ledger)
+        self.run_fixture_hook({"hook_event_name": "PostToolUse"}, state_dir=self.state)
+        self.assertIn("pending", json.loads(self.recorder.state_file.read_text()))
+        self.recorder.ledger.unlink()
+        self.run_fixture_hook({"hook_event_name": "PostToolUse"}, state_dir=self.state)
+        self.run_fixture_hook({"hook_event_name": "PostToolUse"}, state_dir=self.state)
+        self.assertEqual([row["action"] for row in self.rows()], ["add"])
+        self.assertNotIn("pending", json.loads(self.recorder.state_file.read_text()))
 
 
 if __name__ == "__main__":
