@@ -27,6 +27,12 @@ PLAN = REPO / 'evidence/artifacts/new-wsl-install-plan-20261002'
 DATASOURCES = {'ecosystem-loki': 'ns2604-loki', 'ecosystem-prometheus': 'ns2604-prometheus'}
 PROMETHEUS_UIDS = {'ecosystem-prometheus', 'ns2604-prometheus'}
 METRIC_PREFIX = re.compile(r'(?<![A-Za-z0-9_:])ecosystem_(?!lane\b)')
+CODEX_TOKEN_DESCRIPTION = (
+    'Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn '
+    'counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. '
+    'Prometheus edge extrapolation can overcount; it does not prove complete first samples. '
+    'Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage.'
+)
 # DAGs in NativeStack2604's DAGU_HOME on 2026-10-06; the emitter unit (plan config/ns2604-research-progress.service)
 # passes the same list to observability/grand-dashboard/progress.py.
 DAGS = ('restic-backup', 'restic-restore-check', 'tz-currency-check')
@@ -72,10 +78,16 @@ def retarget(board):
 
     for panel in panels(board.get('panels', [])):
         source = panel.get('datasource') or {}
+        codex_tokens = False
         for target in panel.get('targets', []):
             effective = target.get('datasource') or source
             if 'expr' in target and (effective.get('uid') in PROMETHEUS_UIDS or effective.get('type') == 'prometheus'):
                 target['expr'] = METRIC_PREFIX.sub('', target['expr'])
+                codex_tokens |= bool(re.search(r'\bcodex_turn_token_usage_sum\b', target['expr']))
+        if codex_tokens:
+            if 'lower bound' not in panel.get('title', '').lower():
+                panel['title'] += ' — lower bound until step 7 read-back'
+            panel['description'] = CODEX_TOKEN_DESCRIPTION
 
     def walk(value):
         if isinstance(value, dict):
@@ -108,7 +120,7 @@ def dashboards():
         'grafana-research-grand.json': retarget(research),
         'grafana-ecosystem-native.json': native,
         'grafana-native-foundation-data.json': retarget(foundation),
-        'grafana-lanes.json': lanes,
+        'grafana-lanes.json': retarget(lanes),
     }
 
 

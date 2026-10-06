@@ -65,7 +65,7 @@
         "w": 24,
         "h": 9
       },
-      "description": "Recorded status JSON from hcom list; registry roots missing from hcom remain unknown. Observation time and native status age are separate. Inspect observation time: an old active record is historical, not live liveness. Automatic freshness masking remains open.",
+      "description": "Recorded status JSON from hcom list; registry roots missing from hcom remain unknown. The latest complete JSON row per identity supplies every field, including null age/unread. Observation time and native status age are separate. Inspect observation time: an old active record is historical, not live liveness. Automatic freshness masking remains open.",
       "targets": [
         {
           "refId": "A",
@@ -98,6 +98,17 @@
           }
         },
         {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": false
+              }
+            ]
+          }
+        },
+        {
           "id": "groupBy",
           "options": {
             "fields": {
@@ -107,55 +118,55 @@
               "Time": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "lane": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "name": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "client": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "status": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "status_context": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "status_age_seconds": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "unread_count": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               },
               "observed_unix": {
                 "operation": "aggregate",
                 "aggregations": [
-                  "lastNotNull"
+                  "last"
                 ]
               }
             }
@@ -259,7 +270,7 @@
         "w": 24,
         "h": 9
       },
-      "description": "exec_command only; write_stdin is not another command. RTK prefix is not hook firing/rewrite. Claude RTK-first and Codex SKILL.md read counts remain unknown in this live stream; the native-record baseline keeps those separate, rather than inferring them from MCP calls.",
+      "description": "exec_command only; write_stdin is not another command. RTK prefix is not hook firing/rewrite. A classified denominator with no RTK-first results gives 0%; no classified denominator stays UNKNOWN. Claude RTK-first and Codex SKILL.md read counts remain unknown in this live stream; the native-record baseline keeps those separate, rather than inferring them from MCP calls.",
       "targets": [
         {
           "refId": "A",
@@ -283,7 +294,7 @@
         },
         {
           "refId": "C",
-          "expr": "100 * (sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=\"true\" [${window}]))) / (sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=~\"true|false\" [${window}])))",
+          "expr": "100 * ((sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=\"true\" [${window}]))) or on (identity) (0 * ((sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=~\"true|false\" [${window}]))) > 0))) / ((sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=~\"true|false\" [${window}]))) > 0)",
           "queryType": "instant",
           "legendFormat": "Codex RTK prefix % of classified shells",
           "datasource": {
@@ -971,7 +982,7 @@
         "w": 24,
         "h": 9
       },
-      "description": "Start-timestamp ingestion still needs deployed flag and a newly born single-turn series read-back. Never add this total to Loki usage.",
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage.",
       "targets": [
         {
           "refId": "A",
@@ -1137,7 +1148,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**UNKNOWN / pending:** effective per-role tool exposure and exact organic prompt exclusions; Claude RTK rewrites and Codex skill loads; GitHub newest-complete snapshot (step 12, github-ci-finalize); unit failures (alerting PR and lm-qmd); GPU exporter (vllm-embed owner); clock offset; SDK task attribution and gateway optional OTLP span sink (CC environment and restart). OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink; no claim that it lacks export until v3.9. A newly wired zero-call tool remains unmeasured until exposure and a complete 24 h organic window are qualified."
+        "content": "**UNKNOWN / pending:** effective per-role tool exposure and exact organic prompt exclusions; Claude RTK rewrites and Codex skill loads; GitHub newest-complete snapshot (step 12, github-ci-finalize); unit failures (alerting PR and lm-qmd); GPU exporter (vllm-embed owner); clock offset; storage size-retention COUNT and oldest-sample AGE (CC read-back owner; deferred during paper, pending deployed Prometheus flag/effective-limit evidence and restart qualification); SDK task attribution and gateway optional OTLP span sink (CC environment and restart). OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink; no claim that it lacks export until v3.9. A newly wired zero-call tool remains unmeasured until exposure and a complete 24 h organic window are qualified."
       }
     },
     {
@@ -1218,6 +1229,403 @@
           }
         }
       ]
+    },
+    {
+      "id": 20,
+      "title": "Clock: latest native state and signed offset",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 171,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native clock-offset-check rows. Latest state/availability use a 3m UI freshness contract for the verified 60s timer; earlier curves are historical. OK/WARN/CRIT come from the printed state, not offset classification. Native defaults: WARN bound >0.050s or reference age >1200s, plus reference/leap/trigger reasons; CRIT |offset| >0.100s. Equality alone does not cross a native threshold. The 50ms line applies to error bound, not signed offset. A failed row still shows CRIT while offset availability shows No data. Missing/stale current rows show No data; the -1 UI marker is not a native sample. Threshold environment overrides and full native render/export acceptance remain separate.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_s | __error__=\"\" [3m]) by (service_name)) and on(service_name) (last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_present | __error__=\"\" [3m]) by (service_name) == 1)",
+          "queryType": "range",
+          "legendFormat": "Offset history (s)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap bound_s | __error__=\"\" [3m]) by (service_name)) and on(service_name) (last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_present | __error__=\"\" [3m]) by (service_name) == 1)",
+          "queryType": "range",
+          "legendFormat": "Error-bound history (s)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "last_over_time({service_name=\"clock-offset-check\"} | unwrap state_code | __error__=\"\" [3m]) by (service_name)",
+          "queryType": "range",
+          "legendFormat": "Native state history",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap state_code | __error__=\"\" [3m]) by (service_name)) or (label_replace(vector(-1),\"service_name\",\"clock-offset-check\",\"\",\"\"))",
+          "queryType": "instant",
+          "legendFormat": "Latest native state (3m)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "E",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_present | __error__=\"\" [3m]) by (service_name)) or (label_replace(vector(-1),\"service_name\",\"clock-offset-check\",\"\",\"\"))",
+          "queryType": "instant",
+          "legendFormat": "Latest offset availability (3m)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No data",
+          "unit": "s",
+          "decimals": 6,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "lineWidth": 2,
+            "axisPlacement": "left"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Offset history (s)"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error-bound history (s)"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Native state history"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Native state history"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 3
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "0": {
+                        "text": "OK",
+                        "color": "green"
+                      },
+                      "1": {
+                        "text": "WARN",
+                        "color": "yellow"
+                      },
+                      "2": {
+                        "text": "CRIT",
+                        "color": "red"
+                      },
+                      "3": {
+                        "text": "UNKNOWN",
+                        "color": "gray"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Native state"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "stepAfter"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest native state (3m)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "0": {
+                        "text": "OK",
+                        "color": "green"
+                      },
+                      "1": {
+                        "text": "WARN",
+                        "color": "yellow"
+                      },
+                      "2": {
+                        "text": "CRIT",
+                        "color": "red"
+                      },
+                      "3": {
+                        "text": "UNKNOWN",
+                        "color": "gray"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest offset availability (3m)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "0": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "1": {
+                        "text": "Sample available",
+                        "color": "green"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Offset history (s)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": -0.1
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.thresholdsStyle",
+                "value": {
+                  "mode": "dashed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error-bound history (s)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "yellow"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.05
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.thresholdsStyle",
+                "value": {
+                  "mode": "dashed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
     }
   ],
   "templating": {

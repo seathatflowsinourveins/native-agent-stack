@@ -107,6 +107,21 @@ and the interrupted full-suite comparison. These remain follow-up gates.
 
 ## Combined monitoring steps 6, 7 and 8 — 2026-10-06
 
+The clock addition uses the existing native clock-offset-check output and
+Collector0.162 journald/OTTL/Loki export. Sanitized rows retain only bounded
+state, reason, presence and numeric offset/bound/reference age; raw journal,
+resource, scope and body metadata are removed. Counts and clock log rows remain
+separate. One Lanes panel shows historical signed offsets/error bounds and a
+fresh latest state/offset availability. Missing/error offsets are not zero.
+The3-minute freshness contract covers three expected60-second timer samples;
+it is distinct from the native1,200-second reference-age warning. WARN compares
+the50ms error bound; CRIT compares100ms absolute offset. A UI-only-1 marker
+means No data and is never an emitted state or native offset. Latest failed
+samples suppress preceding offsets as current while preserving history.
+Pinned Loki3.7.8 last_over_time/filter/vector/on-label behavior and Grafana13.2.3
+axis/value-mapping forms follow the native documentation/source. Config, query,
+browser and threshold-override read-backs remain unverified until deployment.
+
 The Lanes dashboard uses uid `cc-lanes`, the existing file provider, and native
 conversation/session identities with the hcom name lookup. An `ecosystem_lane`
 environment label is not authoritative identity: a historical sampled label
@@ -127,9 +142,12 @@ Native `systemctl --user show ns2604-prometheus.service -p ExecStart` confirmed
 the deployed unit has the OTLP receiver and no created-timestamp flag. The exact
 argument-preserving proposed drop-in is
 `observability/collector/ns2604-prometheus-start-timestamps.conf.example`.
-The shared install-plan has no ExecStart text today; fixwave-defects owns its
-concurrent edit, so that mirror awaits the named handoff rather than overwriting
-it. No experimental anchored-query flag is added to the ns2604 proposal.
+The install-plan now mirrors that exact argument-preserving startup proposal
+under its Prometheus row. The co-op's ownership ruling keeps these monitoring
+hunks in this PR; #723 retains its model/MinerU/QMD/code-index contracts and
+rows. Landing order is #771, then #723, then this PR. Rebase after #723, keeping
+its lines and handing any incompatible same-line requirement to the co-op.
+No experimental anchored-query flag is added to the ns2604 proposal.
 
 Correction: OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink
 (`diegosouzapw/OmniRoute@v3.8.51`, `open-sse/services/routing/otel.ts:1–32`).
@@ -151,3 +169,78 @@ the vllm-embed owner, unit failures with alerting/lm-qmd, client limit headroom 
 gateway environment with CC, and the newest-complete GitHub feed with
 github-ci-finalize (step12). Clock source pipeline is distinct from invocation
 counts. Live panel query/browser read-back waits for CC ACK and host apply.
+
+## J775 renderer corrections and accountable gates
+
+The source-only J775 response to findings P2-5, P2-6, P2-7 and P3-8 keeps
+deployment and acceptance pending. No local tests, render/build, validator,
+model run or native scan was executed during paper operation. The parent
+integrator owns regenerated dashboard copies, the registry-last commit and
+one new head's CI. Local fixtures are source edits awaiting that CI, not
+upstream Grafana or Loki acceptance.
+
+All NativeStack2604 Prometheus panels that query `codex_turn_token_usage_sum`
+receive a lower-bound title and description in `ns2604_dashboards.retarget`,
+including the ecosystem per-minute/range panels and foundation token panel.
+The already-qualified Lanes token panel follows the same renderer rule.
+Qualification remains until the deployed start-timestamp flag and newly born
+single-turn reconciliation pass; a range-edge extrapolation warning does not
+replace this gate. No anchored-query flag is proposed for this host.
+
+HCOM emits complete JSON rows, including explicit null age/unread fields for
+a missing registered root. The table extracts each row, sorts native log Time
+ascending, and groups identity using Grafana's `last` reducer for every field.
+Every selected field therefore belongs to the same newest row, including its
+nulls. It does not select each field's last non-null historical value.
+Native sources fetched through `gh api --cache 1h`, exit 0, on 2026-10-06:
+[Grafana v13.2.3 sortBy.ts:16](https://github.com/grafana/grafana/blob/v13.2.3/packages/grafana-data/src/transformations/transformers/sortBy.ts#L16)
+defines `options.sort`, and
+[fieldReducer.ts:622](https://github.com/grafana/grafana/blob/v13.2.3/packages/grafana-data/src/transformations/fieldReducer.ts#L622)
+returns the final array element for `last`, including null. `lastNotNull` at
+line 627 searches backwards and is intentionally excluded here. A source-level
+sentinel was rejected because native nulls can be preserved directly.
+Read-back must show present → missing-root and valid-number → unknown
+transitions: latest status unknown, age/unread UNKNOWN, and a newer observation
+time, without old numeric cells. The renderer contract fixtures and native
+emitter transition fixtures do not replace this browser acceptance.
+
+The RTK share zero-fills its numerator only from identities with a positive
+observed classified-shell denominator, using LogQL `or on (identity)` and
+`0 * denominator`. An all-non-RTK classified cohort has a measured zero share;
+no classified denominator retains no value/UNKNOWN. A global `vector(0)` is
+rejected because it invents an identity without classified observation.
+Read-back must compare a non-RTK-only identity, a mixed identity and an identity
+with no classified events in the same selected window. Native LogQL source:
+[Loki v3.7.8 metric_queries.md](https://github.com/grafana/loki/blob/v3.7.8/docs/sources/query/metric_queries.md).
+
+Folded storage finding 2 remains explicitly deferred to **CC as read-back
+owner**. Reason: source-only work during paper operation cannot establish the
+deployed retention limits, storage deletions or oldest retained sample age.
+The completion gate requires sanitized, timestamped native read-back of:
+
+- **Size-retention COUNT:** native `prometheus_tsdb_size_retentions_total`,
+  whose counter counts block deletions due to the maximum-byte limit in
+  [Prometheus v3.15.0 tsdb/db.go:478](https://github.com/prometheus/prometheus/blob/v3.15.0/tsdb/db.go#L478)
+  (primary source read, exit 0). Record the counter and effective size/time
+  retention limits; absence is UNKNOWN and the count is not invocation usage.
+- **Oldest-sample AGE:** qualify the native source for the oldest retained
+  sample timestamp, record that timestamp and observation time, and calculate
+  their difference in seconds. A head-only timestamp is insufficient for a
+  claim about all retained samples. Keep AGE UNKNOWN until this source is
+  verified, including restart/persisted-block coverage and its relationship to
+  the effective retention limits.
+
+The pending-source panel names both COUNT and AGE, owner, deferral reason and
+gate. A stream-count ceiling does not establish bounded retained TSDB storage.
+Remaining folded work keeps accountable deferrals: unit failures are owned by
+alerting/lm-qmd, pending integration and native unit-state read-back; GPU export
+by vllm-embed, pending exporter sample and panel read-back; clock by CC's
+CLOCK-PANEL worker, pending its separate source and numeric panel read-back;
+SDK task attribution and the optional gateway OTLP sink by CC, pending native
+identity qualification and environment/restart application. Client limit
+headroom is owned by CC pending a native provider-status contract. No clock
+panel is claimed implemented by this worker.
+
+Overturn this renderer choice if native Grafana read-back loses a newest row's
+nulls or a native LogQL read-back fails the observed-denominator zero/unknown
+contract. Retain failed conditions rather than relabeling them accepted.

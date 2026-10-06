@@ -1,6 +1,7 @@
 # grafana/grafana@v13.2.3:docs/sources/administration/provisioning/index.md:324 and 337-368 (one entry per provider).
 apiVersion: 1
 providers:
+  # token-layer.json and lanes.json (UID cc-lanes) share the planned Token efficiency provider.
   - name: nativestack2604-token-layer
     orgId: 1
     folder: Token efficiency

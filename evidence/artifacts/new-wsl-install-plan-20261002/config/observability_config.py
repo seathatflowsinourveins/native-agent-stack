@@ -35,11 +35,13 @@ GRAFANA_FILES = (
     ("grafana-research-grand.json", "ecosystem-grafana-dashboards/research-grand.json"),
     ("grafana-ecosystem-native.json", "ecosystem-grafana-dashboards/ecosystem-native.json"),
     ("grafana-native-foundation-data.json", "ecosystem-grafana-dashboards/native-foundation-data.json"),
-    ("grafana-lanes.json", "ecosystem-grafana-dashboards/lanes.json"),
+    ("grafana-lanes.json", "grafana-dashboards/lanes.json"),
     ("ns2604-research-progress.service", "systemd/ns2604-research-progress.service"),
     ("ns2604-research-progress.timer", "systemd/ns2604-research-progress.timer"),
 )
-ECOSYSTEM_DASHBOARDS = ("research-grand", "ecosystem-native", "native-foundation-data", "lanes")
+# Filename stems and provisioned UIDs are separate native Grafana identifiers.
+DASHBOARD_UIDS = {"research-grand": "research-grand", "ecosystem-native": "ecosystem-native",
+                  "native-foundation-data": "native-foundation-data", "lanes": "cc-lanes"}
 EMITTER_UNITS = ("ns2604-research-progress.service", "ns2604-research-progress.timer")
 UNIT_PATH_UNSAFE = re.compile(r"[\s%\"'\\$]")
 
@@ -296,8 +298,11 @@ def main():
         providers = (root / "grafana-provisioning/dashboards/native-stack.yaml").read_text()
         if json.dumps(str(root / "ecosystem-grafana-dashboards")) not in providers:
             raise ValueError("missing the Ecosystem dashboard provider")
-        for uid in ECOSYSTEM_DASHBOARDS:
-            text = (root / f"ecosystem-grafana-dashboards/{uid}.json").read_text()
+        if json.dumps(str(root / "grafana-dashboards")) not in providers or "folder: Token efficiency" not in providers:
+            raise ValueError("missing the Token efficiency dashboard provider")
+        for stem, uid in DASHBOARD_UIDS.items():
+            directory = "grafana-dashboards" if stem == "lanes" else "ecosystem-grafana-dashboards"
+            text = (root / directory / f"{stem}.json").read_text()
             board = json.loads(text)
             if board["uid"] != uid or not board["panels"]:
                 raise ValueError(f"missing {uid} dashboard")

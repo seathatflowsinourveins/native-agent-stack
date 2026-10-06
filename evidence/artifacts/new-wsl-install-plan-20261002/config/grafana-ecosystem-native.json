@@ -26,7 +26,7 @@
   "panels": [
     {
       "id": 1,
-      "title": "Codex turn tokens per minute",
+      "title": "Codex turn tokens per minute \u2014 lower bound until step 7 read-back",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -45,7 +45,7 @@
         }
       ],
       "options": {},
-      "description": "Per-minute rate of the native per-turn histogram sums by token_type. A turn is recorded when it ends. Cached input is an input subset; reasoning output is an output subset; do not add all lines together. One series per writer: Claude sessions (session.id) and Codex processes (service.instance.id from the identity launcher) are summed at query time. Writers without an identity (instance=\"unscoped\") are excluded; the integrity panel counts them."
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 2,
@@ -456,8 +456,8 @@
     {
       "id": 26,
       "type": "stat",
-      "title": "Codex turn tokens (selected range)",
-      "description": "Prometheus increase over the selected range by token_type; subsets are not additive. One series per writer: Claude sessions (session.id) and Codex processes (service.instance.id from the identity launcher) are summed at query time. Writers without an identity (instance=\"unscoped\") are excluded; the integrity panel counts them. increase() extrapolates at the range edges, a few percent high for short-lived writers; the exact difference is increase(...[$__range] anchored) on a Prometheus started with promql-extended-range-selectors. Loki keeps the per-request events.",
+      "title": "Codex turn tokens (selected range) \u2014 lower bound until step 7 read-back",
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage.",
       "gridPos": {
         "x": 8,
         "y": 50,

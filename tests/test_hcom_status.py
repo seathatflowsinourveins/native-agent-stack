@@ -40,6 +40,31 @@ class HcomStatusTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             H.snapshot({'unexpected': []})
 
+    def test_present_then_missing_root_keeps_latest_complete_null_row(self):
+        identity = str(UUID(int=1))
+        registry = {'canonical_roots': [{'root_id': identity, 'lane': 'one', 'name': 'one-abcd'}]}
+        present = H.snapshot([{'session_id': identity, 'name': 'one-abcd', 'tool': 'codex',
+                              'status': 'active', 'status_age_seconds': 4, 'unread_count': 7}], registry)
+        missing = H.snapshot([], registry)
+        import json
+        old = json.loads(H.payload(present, 1_000_000_000)['streams'][0]['values'][0][1])
+        latest = json.loads(H.payload(missing, 2_000_000_000)['streams'][0]['values'][0][1])
+        self.assertEqual(set(old), set(latest))
+        self.assertGreater(latest['observed_unix'], old['observed_unix'])
+        self.assertEqual('unknown', latest['status'])
+        self.assertIsNone(latest['status_age_seconds'])
+        self.assertIsNone(latest['unread_count'])
+
+    def test_valid_number_then_unknown_native_number_stays_null(self):
+        identity = str(UUID(int=1))
+        observed = H.snapshot([{'session_id': identity, 'status': 'active',
+                               'status_age_seconds': 0, 'unread_count': 0}])[0]
+        unknown = H.snapshot([{'session_id': identity, 'status': 'unknown',
+                              'status_age_seconds': None, 'unread_count': None}])[0]
+        self.assertEqual(0, observed['unread_count'])
+        self.assertIsNone(unknown['unread_count'])
+        self.assertIsNone(unknown['status_age_seconds'])
+
 
 if __name__ == '__main__':
     unittest.main()

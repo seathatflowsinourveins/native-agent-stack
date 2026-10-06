@@ -70,15 +70,19 @@ def dashboard():
     status = panel('Latest recorded hcom status and root-name lookup',
                    [('Status', '{service_name="agent-stack-lanes",record_kind="hcom"} | json')],
                    'Recorded status JSON from hcom list; registry roots missing from hcom remain unknown. '
+                   'The latest complete JSON row per identity supplies every field, including null age/unread. '
                    'Observation time and native status age are separate. Inspect observation time: an old '
                    'active record is historical, not live liveness. Automatic freshness masking remains open.')
     status['targets'][0]['queryType'] = 'range'
     status['transformations'] = [
         {'id': 'extractFields', 'options': {'source': 'Line', 'format': 'json', 'replace': True,
                                            'keepTime': True}},
+        # Grafana v13.2.3 sortBy.ts:16 and fieldReducer.ts:622: sort complete
+        # rows, then Last selects that row's value even when it is null.
+        {'id': 'sortBy', 'options': {'sort': [{'field': 'Time', 'desc': False}]}},
         {'id': 'groupBy', 'options': {'fields': {
             'identity': {'operation': 'groupby'},
-            **{key: {'operation': 'aggregate', 'aggregations': ['lastNotNull']}
+            **{key: {'operation': 'aggregate', 'aggregations': ['last']}
                for key in ('Time', 'lane', 'name', 'client', 'status', 'status_context',
                            'status_age_seconds', 'unread_count', 'observed_unix')}}}}]
 
@@ -95,12 +99,15 @@ def dashboard():
                           '| tool_name="exec_command" | shell_rtk=~"true|false"')
     rtk = records(CODEX, 'codex.tool_result', 'conversation_id',
                   '| tool_name="exec_command" | shell_rtk="true"')
+    classified = f'({known_shell}) > 0'
     panel('Per-session shells, RTK prefix share and Claude skills', [
         ('Codex shell results', shell), ('Codex RTK-first results', rtk),
-        ('Codex RTK prefix % of classified shells', f'100 * ({rtk}) / ({known_shell})'),
+        ('Codex RTK prefix % of classified shells',
+         f'100 * (({rtk}) or on (identity) (0 * ({classified}))) / ({classified})'),
         ('Claude Bash results', records(CLAUDE, 'tool_result', 'session_id', '| tool_name="Bash"')),
         ('Claude Skill results', records(CLAUDE, 'tool_result', 'session_id', '| tool_name="Skill"'))],
         'exec_command only; write_stdin is not another command. RTK prefix is not hook firing/rewrite. '
+        'A classified denominator with no RTK-first results gives 0%; no classified denominator stays UNKNOWN. '
         'Claude RTK-first and Codex SKILL.md read counts remain unknown in this live stream; '
         'the native-record baseline keeps those separate, rather than inferring them from MCP calls.')
     panel('Per-session native tools', [
@@ -141,7 +148,7 @@ def dashboard():
         ('Backends up', 'up', 'Prometheus scrape health; this is not coverage of every user unit.'),
         ('Gateway health — waits on collector step 6', 'httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx"}', 'Only the model-free health route is probed. Native http_url label observed on existing targets. Gateway settings and database routes are excluded.'),
         ('Collector streams against limit', 'max_over_time(otelcol_deltatocumulative_streams_tracked[1h])', 'Watch the 8,000 review threshold against the configured 10,000 stream limit.'),
-        ('Codex tokens — lower bound until step 7 read-back', f'sum by (ecosystem_lane,token_type) (increase(codex_turn_token_usage_sum[{WINDOW}]))', 'Start-timestamp ingestion still needs deployed flag and a newly born single-turn series read-back. Never add this total to Loki usage.'),
+        ('Codex tokens — lower bound until step 7 read-back', f'sum by (ecosystem_lane,token_type) (increase(codex_turn_token_usage_sum[{WINDOW}]))', 'Lower bound until start-timestamp ingestion has the deployed flag and a newly born single-turn series read-back. Never add this total to Loki usage.'),
         ('Host CPU — collector observed sample', 'system_cpu_load_average_1m', 'Native hostmetrics sample; no GPU or clock-offset coverage is implied.'),
         ('Host memory — collector observed sample', 'system_memory_usage_bytes', 'Native hostmetrics sample. Unit health, clock and GPU collectors remain separately owned gates.')]:
         item = panel(title, [('Value', expr)], description)
@@ -152,6 +159,8 @@ def dashboard():
         '**UNKNOWN / pending:** effective per-role tool exposure and exact organic prompt exclusions; '
         'Claude RTK rewrites and Codex skill loads; GitHub newest-complete snapshot (step 12, github-ci-finalize); '
         'unit failures (alerting PR and lm-qmd); GPU exporter (vllm-embed owner); clock offset; '
+        'storage size-retention COUNT and oldest-sample AGE (CC read-back owner; deferred during paper, '
+        'pending deployed Prometheus flag/effective-limit evidence and restart qualification); '
         'SDK task attribution and gateway optional OTLP span sink (CC environment and restart). '
         'OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink; no claim that it lacks export until v3.9. '
         'A newly wired zero-call tool remains unmeasured until exposure and a complete 24 h organic window are qualified.')}
@@ -175,4 +184,105 @@ def dashboard():
         'matcher': {'id': 'byType', 'options': 'number'},
         'properties': [{'id': 'custom.cellOptions', 'value': {'type': 'color-background'}},
                        {'id': 'color', 'value': {'mode': 'thresholds'}}]}]
+    # Clock rows are journal-derived, privacy-filtered logs, not invented host gauges.
+    # New state/presence attributes are bounded derivatives of native printed rows.
+    clock_selector = '{service_name="clock-offset-check"}'
+    clock_freshness = '3m'
+
+    def clock_last(field):
+        return (f'last_over_time({clock_selector} | unwrap {field} '
+                f'| __error__="" [{clock_freshness}]) by (service_name)')
+
+    clock_present = clock_last('offset_present')
+    clock_offset = f'({clock_last("offset_s")}) and on(service_name) ({clock_present} == 1)'
+    clock_bound = f'({clock_last("bound_s")}) and on(service_name) ({clock_present} == 1)'
+    # Fixed matching labels make this a fallback only when the native vector is empty.
+    clock_no_data = 'label_replace(vector(-1),"service_name","clock-offset-check","","")'
+    clock_latest_state = f'({clock_last("state_code")}) or ({clock_no_data})'
+    clock_latest_presence = f'({clock_present}) or ({clock_no_data})'
+
+    clock_panel = panel('Clock: latest native state and signed offset', [
+        ('Offset history (s)', clock_offset),
+        ('Error-bound history (s)', clock_bound),
+        ('Native state history', clock_last('state_code')),
+        ('Latest native state (3m)', clock_latest_state),
+        ('Latest offset availability (3m)', clock_latest_presence),
+    ],
+        'Native clock-offset-check rows. Latest state/availability use a 3m UI freshness '
+        'contract for the verified 60s timer; earlier curves are historical. '
+        'OK/WARN/CRIT come from the printed state, not offset classification. '
+        'Native defaults: WARN bound >0.050s or reference age >1200s, plus reference/leap/trigger '
+        'reasons; CRIT |offset| >0.100s. Equality alone does not cross a native threshold. '
+        'The 50ms line applies to error bound, not signed offset. '
+        'A failed row still shows CRIT while offset availability shows No data. '
+        'Missing/stale current rows show No data; the -1 UI marker is not a native sample. '
+        'Threshold environment overrides and full native render/export acceptance remain separate.',
+        'timeseries')
+
+    for target in clock_panel['targets'][:3]:
+        target['queryType'] = 'range'
+    # Leave the last two targets instant; never use a historical Last-not-null as current.
+    clock_panel['options'] = {
+        'legend': {'displayMode': 'table', 'placement': 'bottom', 'calcs': ['last']},
+        'tooltip': {'mode': 'multi', 'sort': 'none'},
+    }
+    clock_panel['fieldConfig'] = {
+        'defaults': {
+            'noValue': 'No data', 'unit': 's', 'decimals': 6,
+            'custom': {'drawStyle': 'line', 'lineInterpolation': 'linear',
+                       'spanNulls': False, 'lineWidth': 2, 'axisPlacement': 'left'},
+        },
+        'overrides': [],
+    }
+
+    def clock_override(name, properties):
+        clock_panel['fieldConfig']['overrides'].append({
+            'matcher': {'id': 'byName', 'options': name},
+            'properties': [{'id': key, 'value': value} for key, value in properties],
+        })
+
+    clock_state_mapping = [{
+        'type': 'value', 'options': {
+            '-1': {'text': 'No data', 'color': 'gray'},
+            '0': {'text': 'OK', 'color': 'green'},
+            '1': {'text': 'WARN', 'color': 'yellow'},
+            '2': {'text': 'CRIT', 'color': 'red'},
+            '3': {'text': 'UNKNOWN', 'color': 'gray'},
+        },
+    }]
+    for name in ('Offset history (s)', 'Error-bound history (s)', 'Native state history'):
+        clock_override(name, [('custom.hideFrom', {'legend': True, 'tooltip': False, 'viz': False})])
+    clock_override('Native state history', [
+        ('unit', 'none'), ('decimals', 0), ('min', 0), ('max', 3),
+        ('mappings', clock_state_mapping), ('custom.axisPlacement', 'right'),
+        ('custom.axisLabel', 'Native state'), ('custom.lineInterpolation', 'stepAfter'),
+    ])
+    clock_override('Latest native state (3m)', [
+        ('unit', 'none'), ('decimals', 0), ('mappings', clock_state_mapping),
+        ('custom.axisPlacement', 'hidden'),
+        ('custom.hideFrom', {'legend': False, 'tooltip': True, 'viz': True}),
+    ])
+    clock_override('Latest offset availability (3m)', [
+        ('unit', 'none'), ('decimals', 0),
+        ('mappings', [{'type': 'value', 'options': {
+            '-1': {'text': 'No data', 'color': 'gray'},
+            '0': {'text': 'No data', 'color': 'gray'},
+            '1': {'text': 'Sample available', 'color': 'green'},
+        }}]),
+        ('custom.axisPlacement', 'hidden'),
+        ('custom.hideFrom', {'legend': False, 'tooltip': True, 'viz': True}),
+    ])
+    clock_override('Offset history (s)', [
+        ('color', {'mode': 'fixed', 'fixedColor': 'blue'}),
+        ('thresholds', {'mode': 'absolute', 'steps': [
+            {'color': 'red', 'value': None}, {'color': 'green', 'value': -0.100},
+            {'color': 'red', 'value': 0.100},
+        ]}), ('custom.thresholdsStyle', {'mode': 'dashed'}),
+    ])
+    clock_override('Error-bound history (s)', [
+        ('color', {'mode': 'fixed', 'fixedColor': 'yellow'}),
+        ('thresholds', {'mode': 'absolute', 'steps': [
+            {'color': 'green', 'value': None}, {'color': 'yellow', 'value': 0.050},
+        ]}), ('custom.thresholdsStyle', {'mode': 'dashed'}),
+    ])
     return base

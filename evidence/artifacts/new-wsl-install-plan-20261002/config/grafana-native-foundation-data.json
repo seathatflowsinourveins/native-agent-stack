@@ -730,7 +730,7 @@
     },
     {
       "id": 9,
-      "title": "Codex provider telemetry \u00b7 turn tokens per minute",
+      "title": "Codex provider telemetry \u00b7 turn tokens per minute \u2014 lower bound until step 7 read-back",
       "type": "timeseries",
       "gridPos": {
         "x": 0,
@@ -749,7 +749,7 @@
           "instant": false
         }
       ],
-      "description": "Native per-turn histogram sums by token_type, one series per Codex process summed at query time; a turn is recorded when it ends. Overlapping cache/input/total fields must not be added. Not a counterfactual saving. Writers without a per-process identity (instance=\"unscoped\": a Claude session without session.id, or a Codex process started without the identity launcher) are excluded, because concurrent writers of one series make its increase meaningless; see the native-telemetry-integrity alert rules."
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 10,

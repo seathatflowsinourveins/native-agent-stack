@@ -123,6 +123,9 @@ class Ns2604DashboardTests(unittest.TestCase):
             config = root / "config"
             for uid in ("research-grand", "ecosystem-native", "native-foundation-data"):
                 self.assertEqual(uid, json.loads((config / f"ecosystem-grafana-dashboards/{uid}.json").read_text())["uid"])
+            lanes = config / "grafana-dashboards/lanes.json"
+            self.assertEqual("cc-lanes", json.loads(lanes.read_text())["uid"])
+            self.assertFalse((config / "ecosystem-grafana-dashboards/lanes.json").exists())
             providers = (config / "grafana-provisioning/dashboards/native-stack.yaml").read_text()
             self.assertIn(f'path: {json.dumps(str(config / "ecosystem-grafana-dashboards"))}', providers)
             self.assertIn(f'path: {json.dumps(str(config / "grafana-dashboards"))}', providers)
@@ -142,10 +145,33 @@ class Ns2604DashboardTests(unittest.TestCase):
                 shutil.copy(config / "systemd" / name, units / name)
             result = run("grafana-check")
             self.assertEqual(0, result.returncode, result.stderr)
+            # A filename stem is not a provisioned UID: reject the exact earlier checker mismatch.
+            correct_lanes = lanes.read_text()
+            wrong_uid = json.loads(correct_lanes)
+            wrong_uid["uid"] = "lanes"
+            lanes.write_text(json.dumps(wrong_uid))
+            result = run("grafana-check")
+            self.assertEqual(1, result.returncode)
+            self.assertIn("missing cc-lanes dashboard", result.stderr)
+            lanes.write_text(correct_lanes)
             # A dashboard that still points at the workstation fails the check.
             stale = config / "ecosystem-grafana-dashboards/ecosystem-native.json"
             stale.write_text(stale.read_text().replace("ns2604-prometheus", "ecosystem-prometheus"))
             self.assertEqual(1, run("grafana-check").returncode)
+
+    def test_grafana_render_preserves_the_operator_private_lane_registry(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            registry = root / "config/lanes-registry.json"
+            registry.parent.mkdir(parents=True)
+            private = '{"canonical_roots":[{"lane":"fixture-lane","session_id":"fixture-native-root"}]}\n'
+            registry.write_text(private)
+            result = self.render(root)("grafana", "--source-root", str(PLAN / "config"))
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(private, registry.read_text())
+            ledger = json.loads((registry.parent / ".g4-source-digests.json").read_text())
+            self.assertNotIn("lanes-registry.json", ledger)
+            self.assertEqual({"canonical_roots": []}, json.loads((PLAN / "config/lanes-registry.json").read_text()))
 
     def test_grafana_action_refuses_a_source_outside_a_checkout(self):
         with tempfile.TemporaryDirectory() as d:
