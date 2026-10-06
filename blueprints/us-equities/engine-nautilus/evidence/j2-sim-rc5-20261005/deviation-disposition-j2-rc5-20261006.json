@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "kind": "deviation_disposition",
+  "case": "SPY one_zero",
+  "run": {
+    "pr": 760,
+    "commit": "5271c87dbf8ebbc745afe3b9ee22c4d8528c4770",
+    "host": "NativeStack2604",
+    "launcher_equivalent_receipt": "blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json",
+    "published_native_receipt_sha256": "bebba33c0a1dd6eabc6570ca00c0acd3517fcf4397ae6f0874e24f325537871d",
+    "published_native_verdict_sha256": "5c788e43f6bcaf2596f586a597e615338406f3b8483045f32c25796ff903d44e",
+    "attempts": [
+      {
+        "id": "runtime-env",
+        "started": "2026-10-06T04:40:32Z",
+        "checks": {
+          "PASS": 134,
+          "FAIL": 2
+        },
+        "failing": [
+          "precondition_review.no_prior_replay_ran_the_reviewed_harness#35",
+          "precondition_engine.environment_beyond_cleared_set#53"
+        ]
+      },
+      {
+        "id": "documented-env",
+        "started": "2026-10-06T04:41:27Z",
+        "checks": {
+          "PASS": 135,
+          "FAIL": 1
+        },
+        "failing": [
+          "precondition_review.no_prior_replay_ran_the_reviewed_harness#35"
+        ]
+      }
+    ]
+  },
+  "check": "precondition_review.no_prior_replay_ran_the_reviewed_harness#35",
+  "disposition": "declined",
+  "classification": "host reproduction, not qualifying",
+  "decided_by": "native-agent-stack-5f, the trading-custody gate-owner Claude session for the NautilusTrader destination qualification, acting on the command center's 2026-10-06 relay (task-native-agent-stack-5f-20261006T053021Z) under the user's standing trading-lane authorization; not a user signature",
+  "decided_utc": "2026-10-06T05:35:35+00:00",
+  "statement": "Declined. The SPY one_zero rc5 qualification already exists: replay bwrap-cc4503f-qualifying ran nautilus_trader 2.0.0rc5 (receipt-v2.json; the same extension sha256 as this run) under deviation-acceptance-v2.json, which admits only the first replay from the reviewed harness cc4503f, and replay-history-v2.json records that no retry from cc4503f can qualify. This run is the same reviewed harness on the same engine binary on another host, the class that history already records for bwrap-cc4503f-host-nativestack-5975wx-20260925 as a host reproduction, not qualifying. Check #35 is the sealed guard against selecting among repeated runs; waiving it after the result is known would make it unfalsifiable, and this was the second attempt on NativeStack2604 (the first also failed #53 on five extra environment names). Disposition: retained as a host reproduction. It establishes that rc5 economic parity reproduces on NativeStack2604: 106/106 execution checks in both attempts, byte-identical replay output, and native end cash 90734.08 USD including 428.64 USD distributions, equal to the retained reference. The preregistered verdict of this run stays FAIL (#35); the v2 qualification is unchanged. A new engine identity qualifies prospectively through a separately frozen candidate with its own acceptance issued before its first run (deviation-acceptance-rc6.json)."
+}
