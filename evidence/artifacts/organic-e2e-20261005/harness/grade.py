@@ -1336,6 +1336,10 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
               # GPT read of 5aa2bfdc, finding 7: the calls whose record holds no forwarded effort value, exposed or not.
               "gateway_calls_missing_forwarded_effort": [c.get("id") for c in calls if not any(_forwarded_efforts(c))],
               "gateway_service_tier": sorted({str(c.get("received_service_tier")) for c in calls}),
+              # CC item task-ns2604-coop-20261006T144256Z: the tier the gateway forwarded (pipeline details only).
+              "gateway_forwarded_service_tier": sorted({str(c.get("forwarded_service_tier")) for c in exposed}),
+              # CC item task-ns2604-coop-20261006T143846Z, (a): calls the gateway's semantic cache answered.
+              "gateway_semantic_cache_calls": [c.get("id") for c in calls if c.get("cache_source") == "semantic"],
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
               "gateway_calls": len(calls), "gateway_build": ledger_rows.get("pre-launch", {}).get("gateway_build")
               or ledger_rows.get("launched", {}).get("gateway_build")}
@@ -1814,6 +1818,178 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixture
     return found
 
 
+# Round 5 (CC item task-ns2604-coop-20261006T143846Z, (a)). ai-memory stays in the treatment with one scope per trial
+# (isolation.AI_MEMORY_WORKSPACE / <trial_id>, from the marker the wrapper binds above the fixture). Its server is
+# reached over a socket, outside the mount namespace, so the grader checks every ai-memory call: a global query is
+# a tag, and a call that returned a page of another trial's scope makes the trial invalid. User systemd, Docker and
+# direct HTTP to the ai-memory server are tags, like G13's other categories.
+AI_MEMORY_SERVER = "ai-memory"
+AI_MEMORY_HTTP = re.compile(r"(?:127\.0\.0\.1|localhost):(?:29374|49374)\b")
+HOST_SERVICE_PROGRAMS = {"docker": "docker", "docker-compose": "docker", "podman": "docker"}
+# GPT read of 2044b2ab, residual channels: services outside the namespace that the shared network or WSL reaches.
+# Diagnostic tags only. A Windows program started through WSL interop runs outside the trial's namespace and reads the
+# distribution through \\wsl.localhost\<distro>. The gateway's management routes (/api/..., its call logs among them)
+# answer without credentials. Every other loopback service (Dagu, Serena's MCP servers, agentsview, Loki, Grafana) is
+# reached over the shared network.
+GATEWAY_MANAGEMENT = re.compile(r"(?:127\.0\.0\.1|localhost):(?:20128|21128)/api/")
+LOCAL_HTTP = re.compile(r"(?:https?://)?(?:127\.0\.0\.1|localhost|0\.0\.0\.0|\[::1\]):(\d{2,5})")
+SERVICE_TIER_FLAG = re.compile(r"(?:^|\s)-c\s+service_tier=(['\"]?)([A-Za-z_-]+)\1(?=\s|$)")
+
+
+def ai_memory_calls(graded: dict, client: str) -> list[dict]:
+    """Every ai-memory MCP call of a trial, with its arguments and the text it returned."""
+    out = []
+    if client == "claude":
+        for call in graded.get("calls") or []:
+            parts = (call.get("name") or "").split("__")
+            if len(parts) >= 3 and parts[0] == "mcp" and parts[1].endswith(AI_MEMORY_SERVER):
+                out.append({"id": call.get("id"), "tool": parts[-1], "args": call.get("input") or {},
+                            "result": ((call.get("result") or {}).get("text")) or "", "ok": call.get("status") == "ok"})
+    else:
+        for item in graded.get("all_items") or graded.get("items") or []:
+            if item.get("type") in ("mcp_tool_call", "McpToolCall") and str(item.get("server") or "").endswith(AI_MEMORY_SERVER):
+                out.append({"id": item.get("id"), "tool": item.get("tool"), "args": _json_arg(item.get("arguments")),
+                            "result": codex_item_output(item) or "", "ok": item.get("status") == "completed"})
+    return out
+
+
+def _scope_pairs(value, out: list | None = None) -> list[tuple]:
+    """Every (workspace, project) pair a result names: global hits carry theirs, and so may other pages."""
+    out = [] if out is None else out
+    if isinstance(value, dict):
+        workspace, project = value.get("workspace"), value.get("project")
+        if isinstance(workspace, str) and isinstance(project, str):
+            out.append((workspace, project))
+        for item in value.values():
+            _scope_pairs(item, out)
+    elif isinstance(value, list):
+        for item in value:
+            _scope_pairs(item, out)
+    return out
+
+
+def _mcp_payload(text: str):
+    """The JSON an ai-memory tool returned: the text itself (Claude's transcripts keep the tool's text), or the JSON in
+    the text blocks of an MCP result envelope (Codex's mcp_tool_call items keep the envelope)."""
+    try:
+        data = json.loads(text) if text else None
+    except ValueError:
+        return None
+    if isinstance(data, dict) and isinstance(data.get("content"), list):
+        payloads = []
+        for block in data["content"]:
+            if isinstance(block, dict) and isinstance(block.get("text"), str):
+                try:
+                    payloads.append(json.loads(block["text"]))
+                except ValueError:
+                    continue
+        return payloads or data
+    return data
+
+
+def _returned_anything(value) -> bool:
+    """A result that holds at least one page, hit or observation (a non-empty list anywhere in it)."""
+    if isinstance(value, list):
+        return bool(value)
+    if isinstance(value, dict):
+        return any(_returned_anything(item) for item in value.values())
+    return False
+
+
+def ai_memory_check(calls: list[dict], trial_id: str, other_fixtures: set[str]) -> dict:
+    """Global queries (tags), calls without an explicit scope (the static-client rule asks for workspace + project on
+    every project-scoped call), and calls that returned a page of another trial's scope: organic-e2e/<another trial>,
+    or a project named after another trial's fixture folder (hook captures before the per-trial scope)."""
+    def foreign(pair) -> bool:
+        workspace, project = pair
+        if workspace == isolation.AI_MEMORY_WORKSPACE and project != trial_id:
+            return True
+        return project in other_fixtures
+
+    global_queries, implicit, bad, unverifiable = [], [], [], []
+    for call in calls:
+        args = call["args"] if isinstance(call["args"], dict) else {}
+        if args.get("global") in (True, "true", 1) or str(args.get("scope") or "").lower() == "global":
+            global_queries.append(call["id"])
+        pair = (args.get("workspace"), args.get("project")) if args.get("workspace") and args.get("project") else None
+        scopes = [pair] if pair else [(s.get("workspace"), s.get("project")) for s in args.get("scopes") or []
+                                      if isinstance(s, dict)]
+        is_implicit = not scopes and not args.get("global")
+        if is_implicit:
+            implicit.append(call["id"])
+        data = _mcp_payload(call["result"])
+        if not call["ok"] or data is None:
+            continue
+        found = [p for p in _scope_pairs(data) if foreign(p)]
+        if _returned_anything(data):
+            found += [p for p in scopes if p[0] and p[1] and foreign(p)]
+            if is_implicit and not _scope_pairs(data):
+                # A call without workspace + project reads the server's active-project pointer, which every other
+                # session's hooks move; its pages carry no scope (ai-memory 2.5.2), so whose they are cannot be
+                # checked. The static-client rule asks for the explicit pair, so such a call that returned pages counts
+                # as reading another scope.
+                unverifiable.append({"call_id": call["id"], "tool": call["tool"]})
+        if found:
+            bad.append({"call_id": call["id"], "tool": call["tool"], "scopes": sorted({f"{w}/{p}" for w, p in found})[:5]})
+    return {"calls": len(calls), "global_queries": global_queries, "implicit_scope_calls": implicit,
+            "foreign_scope_pages": bad, "unverifiable_scope_pages": unverifiable}
+
+
+def _shell_texts(graded: dict, client: str) -> list[tuple]:
+    """(call id, shell text) for every shell command a trial ran: Claude's Bash and context-mode's nested shells,
+    Codex's command executions."""
+    out = []
+    if client == "claude":
+        for call in graded.get("calls") or []:
+            name, args = call.get("name") or "", call.get("input") or {}
+            if name == "Bash":
+                out.append((call.get("id"), args.get("command") or ""))
+            elif name.startswith("mcp__") and "ctx_" in name:
+                out += [(call.get("id"), n["text"]) for n in ctx_nested(name.split("__", 2)[-1], args) if n["kind"] == "shell"]
+    else:
+        for item in graded.get("all_items") or graded.get("items") or []:
+            if item.get("type") in ("command_execution", "CommandExecution"):
+                out.append((item.get("id"), unwrap_command(item.get("command"))))
+    return out
+
+
+def host_service_tags(graded: dict, client: str) -> dict:
+    """Tags for a trial's use of host services outside its mount namespace: the user's systemd (systemctl, journalctl
+    or systemd-run with --user; systemd-run without it is `systemd`), Docker or Podman, a Windows program through WSL
+    interop, the ai-memory server's HTTP port called directly instead of through MCP, the gateway's management routes,
+    and any other loopback HTTP service. Diagnostic only: validity is structural (G13)."""
+    tags: dict = {}
+    for call_id, text in _shell_texts(graded, client):
+        for tokens in segments(text):
+            program = os.path.basename(tokens[0])
+            tag = None
+            if program in ("systemctl", "journalctl") and "--user" in tokens:
+                tag = "user-systemd"
+            elif program == "systemd-run":
+                tag = "user-systemd" if "--user" in tokens else "systemd"
+            elif program in HOST_SERVICE_PROGRAMS:
+                tag = HOST_SERVICE_PROGRAMS[program]
+            elif program.lower().endswith(".exe") or tokens[0].startswith("/mnt/c/Windows/"):
+                tag = "wsl-interop"
+            if tag:
+                tags.setdefault(tag, []).append(call_id)
+        if AI_MEMORY_HTTP.search(text):
+            tags.setdefault("ai-memory-http", []).append(call_id)
+        if GATEWAY_MANAGEMENT.search(text):
+            tags.setdefault("gateway-management-api", []).append(call_id)
+        elif any(not AI_MEMORY_HTTP.search(m.group(0)) for m in LOCAL_HTTP.finditer(text)):
+            tags.setdefault("local-service-http", []).append(call_id)
+    return {tag: sorted(set(ids), key=str) for tag, ids in tags.items()}
+
+
+def recorded_service_tier(launched: dict) -> str | None:
+    """The tier a Codex trial's launched row records (round 5), else the one its CLI line shape sets."""
+    if launched.get("service_tier"):
+        return launched["service_tier"]
+    match = SERVICE_TIER_FLAG.search(launched.get("line_shape") or "")
+    return match.group(2) if match else None
+
+
 def watcher(graded: dict, client: str, reaches: list[dict] | None = None) -> list[dict]:
     """§8.4 after-the-fact detector over every model-initiated call, nested ctx_* and code mode included. R8 hits halt
     (got_past); reads of host checkouts and user-level harness files are logged without halting (finding 9)."""
@@ -2018,8 +2194,25 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     record["answer_source_reads"] = [entry["call_id"] for entry in record["reach"] if entry.get("answer_source")]
     record["answer_source_reasons"] = sorted({r for entry in record["reach"] for r in entry.get("answer_source_reasons") or []})
     record["isolation"] = isolation.check(cfg, root, tid, trial.get("client"), rows)
+    served = (graded.get("effort") or {}).get("gateway_semantic_cache_calls") if trial.get("client") == "codex" else None
+    if served:
+        # The gateway's call log marks these responses as served by its semantic cache, not the provider.
+        record["isolation"]["ok"] = False
+        record["isolation"]["failures"] = record["isolation"]["failures"] + [
+            f"the gateway's semantic cache answered {len(served)} call(s) of this trial: {served[:5]}"]
+    record["isolation_receipt"] = isolation.public_receipt((rows.get("launched") or {}).get("isolation"))
+    # Round 5 (CC item task-ns2604-coop-20261006T143846Z, (a)): ai-memory's per-trial scope and the host services.
+    other_fixtures = {fid for by_trial in (fixtures_by_task or {}).values() for other, fid in by_trial.items()
+                      if other != tid and fid}
+    record["ai_memory"] = ai_memory_check(ai_memory_calls(graded, trial.get("client")), tid, other_fixtures)
+    record["host_service_tags"] = host_service_tags(graded, trial.get("client"))
+    record["tagged"] = sorted(set(record["tagged"]) | set(record["host_service_tags"])
+                              | ({"ai-memory-global"} if record["ai_memory"]["global_queries"] else set()))
+    if trial.get("client") == "codex":
+        record["service_tier"] = recorded_service_tier(rows.get("launched") or {})
     record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored")
-                           and record["isolation"]["ok"])
+                           and record["isolation"]["ok"] and not record["ai_memory"]["foreign_scope_pages"]
+                           and not record["ai_memory"]["unverifiable_scope_pages"])
     record["watcher"] = watcher(graded, trial.get("client"), record["reach"])
     record["target_exposure"] = cli_exposure(task.get("item"), trial.get("client"), graded) \
         if task.get("kind") in CLI_TASK_KINDS else None
@@ -2219,9 +2412,19 @@ def gate0(root: Path) -> dict:
         selftest = load_json(root / isolation.SELFTEST_FILE) if (root / isolation.SELFTEST_FILE).exists() else None
         checks["isolation-selftest"] = {"pass": bool(selftest and selftest.get("pass")),
                                         "probes": (selftest or {}).get("probes"), "version": (selftest or {}).get("version")}
+        # CC item task-ns2604-coop-20261006T143846Z, (a): no gateway cache enabled that could serve one trial's output to
+        # another. OmniRoute's semantic cache is its only response cache, so this check passes only while it is off
+        # (stage 1's GET /api/cache reading). Turning it off is the co-op's gateway setting; a ruling that accepts it on
+        # needs an amendment. Each Codex trial's call logs and hit counts are checked as well (G13).
+        reading = cfg.get("gateway_cache") or {}
+        checks["gateway-cache"] = {"pass": reading.get("verdict") == "semantic cache off",
+                                   "verdict": reading.get("verdict"), "cache_config": reading.get("cache_config"),
+                                   "semantic_cache": reading.get("semantic_cache")}
     canary_keys = ("canary-gh-auth", "canary-gh-auth-ctx", "canary-gh-auth-ctx-env", "canary-exec-rules")
     canaries = {k: checks.get(k, {}).get("pass") for k in canary_keys}
     report = {"at": utc_now(), "run_id": cfg["run_id"], "checks": checks, "trials": records, "canaries": canaries,
+              # GPT read of 2044b2ab: residual channels recorded for the command center, never a pass condition.
+              "residuals": {"gateway_logs": cfg.get("gateway_logs")},
               "pass": bool(checks) and all(c["pass"] for c in checks.values()),
               "missing": [k for k in ("probe-codex-native", "probe-codex-env", *canary_keys, "gate0-G1") if k not in checks]}
     if report["missing"]:
@@ -2353,7 +2556,8 @@ def grade_run(root: Path) -> dict:
                              "calls": effort["gateway_calls_missing_forwarded_effort"][:20]})
         # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every listed answer source stayed hidden from the
         # trial's mount namespace for its whole lifetime; the command classifier's reads are diagnostic tags.
-        gate_rows["G13"].append(record["isolation"]["ok"])
+        gate_rows["G13"].append(record["isolation"]["ok"] and not record["ai_memory"]["foreign_scope_pages"]
+                                and not record["ai_memory"]["unverifiable_scope_pages"])
         gate_rows["G14"].append(all(u.get("tag") for u in uses))
         if record["valid"] and trial.get("lane") == cfg.get("lane", "organic-e2e") and task.get("kind") != "prompted" \
                 and not (cfg.get("tests_by_ref") or {}).get(trial.get("ref") or "", {}).get("gate_trial"):
@@ -2453,6 +2657,24 @@ def grade_run(root: Path) -> dict:
         "declared": (cfg.get("gateway_pipeline_details") or {}).get("declared"),
         "observed": ("on" if with_pipeline == calls_seen else "partly on") if with_pipeline else ("off" if calls_seen else "no calls"),
         "calls": calls_seen, "calls_with_pipeline": with_pipeline}
+    # CC item task-ns2604-coop-20261006T144256Z: every Codex cell runs on the normal tier, set explicitly; a recorded
+    # tier other than default fails G11 (runs before round 5 recorded it only in the CLI line's shape).
+    tiers = {r["trial_id"]: r.get("service_tier") for r in table if r.get("launched") and r.get("client") == "codex"}
+    gates["G11"]["service_tier"] = {
+        "rule": "task-ns2604-coop-20261006T144256Z: service_tier=default set explicitly on every Codex cell",
+        "default": sum(1 for tier in tiers.values() if tier == "default"),
+        "unrecorded": sorted(tid for tid, tier in tiers.items() if tier is None),
+        "other": {tid: tier for tid, tier in tiers.items() if tier not in (None, "default")},
+        "stage1_check": cfg.get("service_tier_check"),
+        # codex-cli 0.160.0 omits service_tier when it is "default", so OmniRoute's own Codex tier settings decide the
+        # outbound tier; the forwarded tier (pipeline details) is the effective one.
+        "forwarded": {r["trial_id"]: (g.get("effort") or {}).get("gateway_forwarded_service_tier")
+                      for r, g in graded_by.values() if r.get("client") == "codex" and g
+                      and (g.get("effort") or {}).get("gateway_forwarded_service_tier")}}
+    fast = {tid: tiers_ for tid, tiers_ in gates["G11"]["service_tier"]["forwarded"].items() if "priority" in tiers_}
+    gates["G11"]["service_tier"]["forwarded_priority"] = fast
+    if gates["G11"]["service_tier"]["other"] or fast:
+        gates["G11"]["pass"] = False
     # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every launched trial's receipt shows each listed
     # answer source hidden from its mount namespace for its whole lifetime, and stage 1's wrapper-only self-test
     # passed. The command classifier (decision 3's tags and answer-source reads) is reported as a diagnostic only.
@@ -2470,7 +2692,28 @@ def grade_run(root: Path) -> dict:
                          "classifier_diagnostic": {
                              "tagged_trials": sorted(r["trial_id"] for r in table if r.get("tagged")),
                              "tag_categories": _count([c for r in table for c in r.get("tagged") or []]),
-                             "answer_source_trials": sorted(r["trial_id"] for r in table if r.get("answer_source_reads"))}})
+                             "answer_source_trials": sorted(r["trial_id"] for r in table if r.get("answer_source_reads"))},
+                         # Round 5 (CC item task-ns2604-coop-20261006T143846Z, (a)): ai-memory's per-trial scope (a page
+                         # of another trial's scope invalidates the trial and fails G13), the host services a trial
+                         # used (tags), and the gateway's cache reading at stage 1.
+                         "ai_memory": {
+                             "rule": "workspace organic-e2e, project <trial_id>, from the marker bound above the fixture",
+                             "calls": sum((r.get("ai_memory") or {}).get("calls") or 0 for r in table),
+                             "global_query_trials": sorted(r["trial_id"] for r in table
+                                                           if (r.get("ai_memory") or {}).get("global_queries")),
+                             "implicit_scope_calls": sum(len((r.get("ai_memory") or {}).get("implicit_scope_calls") or [])
+                                                         for r in table),
+                             "foreign_scope_trials": {r["trial_id"]: r["ai_memory"]["foreign_scope_pages"] for r in table
+                                                      if (r.get("ai_memory") or {}).get("foreign_scope_pages")},
+                             "unverifiable_scope_trials": {r["trial_id"]: r["ai_memory"]["unverifiable_scope_pages"]
+                                                           for r in table
+                                                           if (r.get("ai_memory") or {}).get("unverifiable_scope_pages")}},
+                         "host_service_tags": _count([tag for r in table for tag in r.get("host_service_tags") or {}]),
+                         "gateway_cache_stage1": {k: (cfg.get("gateway_cache") or {}).get(k)
+                                                  for k in ("verdict", "cache_config", "semantic_cache", "idempotency")},
+                         # GPT read of 2044b2ab: a documented residual for the command center, never a pass condition.
+                         "gateway_logs_stage1": cfg.get("gateway_logs"),
+                         "gateway_from_namespace": (selftest or {}).get("gateway_from_namespace")})
     if gates["G13"].get("pass") is not None:
         gates["G13"]["pass"] = bool(gates["G13"]["pass"] and cfg.get("isolation") and (selftest or {}).get("pass"))
     g12 = cfg.get("oracles_reproduce") or {}

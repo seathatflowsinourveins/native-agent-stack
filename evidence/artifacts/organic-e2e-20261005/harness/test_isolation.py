@@ -10,6 +10,14 @@
   codex app-server through the CL7b wrapper).
 - The GPT micro-check of 1f81d645, P3: the deadline and completion decisions read the unrounded offsets, so a result
   that arrived before T is never held.
+- Round 5 (CC items task-ns2604-coop-20261006T143846Z, 144256Z and 151719Z):
+  - private /tmp, /var/tmp, /dev/shm and IPC;
+  - the per-trial ai-memory scope and the grader's scope checks;
+  - the gateway's cache and log readings, from allowlisted routes only;
+  - the normal service tier;
+  - G13's bind triples, ordering and options checks, with their negative cases;
+  - the public receipt;
+  - CL7b's census.
 These are local integration checks of this harness, not upstream acceptance."""
 from __future__ import annotations
 
@@ -85,10 +93,42 @@ class StructuralG13(unittest.TestCase):
             self.assertTrue(writes["last_write_in_private_folder"], writes)
             self.assertTrue(writes["pid1_argv_shows_no_option_or_hidden_path"], writes)
 
+    def test_tmp_and_shm_are_private(self):
+        """Round 5 (CC item task-ns2604-coop-20261006T143846Z, (a)): another trial's scratch file in the host's /tmp,
+        /var/tmp or /dev/shm cannot be read, the trial's own writes there never reach the host, and Claude's /tmp area
+        still lands in the trial's own folder."""
+        for client in ("claude", "codex"):
+            scratch = [h for h in self.report["hidden"] if h["client"] == client and "scratch file" in h["location"]]
+            self.assertEqual(len(scratch), 3, scratch)
+            self.assertTrue(all(h["inside"] in ("ENOENT", "EACCES") for h in scratch), scratch)
+            writes = self.report["writes"][client]
+            self.assertTrue(writes["tmp_shm_writes_stay_in_the_namespace"], writes)
+            self.assertTrue(writes["claude_tmp_write_in_private_folder"], writes)
+
+    def test_ai_memory_scope_is_the_trials(self):
+        """Round 5: the marker above the fixture names workspace organic-e2e and the trial's own id, in the namespace
+        only."""
+        for client in ("claude", "codex"):
+            memory = self.report["ai_memory"][client]
+            self.assertTrue(memory["ok"], memory)
+            self.assertFalse(memory["marker_on_host"], memory)
+            self.assertIn(f'project = "{self.report["trial_id"]}"', memory["marker_in_namespace"])
+
     def test_namespace_is_the_trials_own(self):
         for client, ns in self.report["namespaces"].items():
             self.assertTrue(ns["namespace"], ns)
             self.assertNotEqual(ns["namespace"], ns["host_namespace"], ns)
+            # GPT read of 2044b2ab, residual channels: an IPC namespace of its own (--unshare-ipc).
+            self.assertTrue(ns["ipc_namespace"], ns)
+            self.assertNotEqual(ns["ipc_namespace"], ns["host_ipc_namespace"], ns)
+
+    def test_the_gateway_reachability_is_recorded(self):
+        """A documented residual, never a pass condition: the HTTP status of two allowlisted gateway routes asked
+        from the namespace without credentials."""
+        reach = self.report["gateway_from_namespace"]
+        self.assertFalse(reach.get("credentials_sent", True), reach)
+        self.assertIn("GET /api/health", reach)
+        self.assertIn("GET /api/usage/call-logs?limit=1", reach)
 
     def test_launch_paths_start_under_the_wrapper(self):
         if os.environ.get("ISOLATION_SKIP_CLIENTS") == "1":
@@ -127,7 +167,67 @@ class Receipt(unittest.TestCase):
         for root in isolation.HIDDEN_ROOTS:
             self.assertIn(f"--tmpfs {isolation.tilde(root)}", argv)
         self.assertIn(f"--bind {isolation.tilde(plan['private'] / 'codex-sessions')} {isolation.tilde(isolation.CODEX_SESSIONS)}", argv)
+        for folder in isolation.PRIVATE_TMP:
+            self.assertIn(f"--tmpfs {folder}", argv)
+        self.assertIn(f"--ro-bind {isolation.tilde(plan['private'] / 'ai-memory.toml')} "
+                      f"{isolation.tilde(isolation.NEUTRAL_ROOT / '.ai-memory.toml')}", argv)
+        self.assertEqual(rec["ai_memory_scope"]["project"], trial_id)
+        self.assertEqual(rec["ai_memory_scope"]["workspace"], "organic-e2e")
         json.dumps(rec)   # the launched row is written with plain json.dumps
+
+    def test_a_published_receipt_keeps_only_the_count_and_hash_of_kept_projects(self):
+        """Round 5, (b): a published receipt names no project folder (a name encodes its cwd, the home path included);
+        the projects outside the experiment become their count and the sha256 of their sorted names."""
+        isolation, cfg, plan, trial_id, fixture, work = _synthetic_plan("claude")
+        rec = isolation.receipt(plan, ["bash", "-lc", "<line>"])
+        public = isolation.public_receipt(rec)
+        text = json.dumps(public)
+        for name in plan["kept_projects"]:
+            self.assertNotIn(f"~/.claude/projects/{name}", text)
+        self.assertNotIn(isolation.claude_slug(isolation.HOME), text)
+        self.assertEqual(public["kept_projects"], len(plan["kept_projects"]))
+        self.assertEqual(public["kept_projects_sha256"], isolation.sha256_json(plan["kept_projects"]))
+        if plan["kept_projects"]:
+            self.assertIn(rec["kept_projects_sha256"], text)
+        self.assertTrue(public["own_project"].startswith("~/.claude/projects/sha256-"), public["own_project"])
+        self.assertTrue(public["public"])
+
+    def test_a_published_receipt_hashes_every_home_derived_name(self):
+        """GPT read of 2044b2ab, P3: tilde() alone leaves Claude's `-home-<user>-...` slugs; the public representation
+        hashes them wherever they sit (argv, operations, the visible argv, the hidden list), and leaves no home path."""
+        import isolation
+        slug = isolation.claude_slug(isolation.HOME / "code" / "some-project")
+        rec = {"ops": [["bind-try", f"~/.claude/projects/{slug}", f"~/.claude/projects/{slug}"],
+                       ["bind", f"~/.cache/x/{slug}.jsonl", "/tmp/y"]],
+               "argv": [isolation.BWRAP, "--bind", f"~/.cache/x/{slug}.jsonl", "/tmp/y"],
+               "argv_visible": [isolation.BWRAP, "--args", "<fd>", "--", "cat", f"{isolation.HOME}/notes/{slug}"],
+               "hidden": [{"location": "x", "path": f"~/.claude/projects/{slug}/a.jsonl", "path_sha256": "0"}],
+               "own_project": f"~/.claude/projects/{slug}", "kept_projects": 0, "kept_projects_sha256": "h"}
+        text = json.dumps(isolation.public_receipt(rec))
+        self.assertNotIn(isolation.HOME_SLUG, text)
+        self.assertNotIn(str(isolation.HOME), text)
+        self.assertIn("sha256-", text)
+
+    def test_the_exact_mount_operations_stay_private(self):
+        """P3: the raw receipt sits in the ledger, appended with mode 0600; CL7b's options file is 0600 in a 0700
+        folder."""
+        import common
+        import isolation
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = Path(tmp) / "ledger.jsonl"
+            common.append_jsonl(ledger, {"isolation": {"ops": []}})
+            self.assertEqual(ledger.stat().st_mode & 0o777, 0o600)
+        if not HOST_READY:
+            self.skipTest("the CL7b wrapper needs the experiment's roots")
+        isolation_, cfg, plan, trial_id, fixture, work = _synthetic_plan("codex")
+        try:
+            wrapper = isolation.write_app_server_wrapper(plan, "/usr/bin/true")
+            self.assertEqual((plan["private"] / "args").stat().st_mode & 0o777, 0o600)
+            self.assertEqual(plan["private"].stat().st_mode & 0o777, 0o700)
+            self.assertTrue(os.access(wrapper, os.X_OK))
+        finally:
+            import shutil
+            shutil.rmtree(work, ignore_errors=True)
 
     def test_finish_moves_the_answer_file_and_publishes_rollouts(self):
         """finish() after the client exits, against a temporary sessions folder (never the real one), twice."""
@@ -175,16 +275,121 @@ class Receipt(unittest.TestCase):
 
 
 class G13Check(unittest.TestCase):
-    def _rows(self, client="claude"):
+    def _rows(self, client="claude", cfg_extra=None):
         isolation, cfg, plan, trial_id, fixture, work = _synthetic_plan(client)
+        if cfg_extra:
+            cfg.update(cfg_extra)
+            plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, client, fixture,
+                                  clone=plan["clone"], settings=plan["settings"], prompt=plan["prompt"])
         rec = isolation.receipt(plan, ["bash", "-lc", "<line>"])
         rows = {"prepared": {"fixture_private": str(fixture)}, "launched": {"isolation": rec},
                 "exit": {"isolation_runtime": {"namespace": "mnt:[1]", "host_namespace": "mnt:[2]",
+                                               "info": {"mnt-namespace": 1, "ipc-namespace": 11},
+                                               "host_ipc_namespace": "ipc:[12]",
                                                "tree": {"processes_seen": 4, "in_trial_namespace": 4, "outside": []}}}}
         return isolation, cfg, trial_id, rows
 
     def _check(self, isolation, cfg, trial_id, rows, client="claude"):
         return isolation.check(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, client, rows)
+
+    def _reseal(self, isolation, rows):
+        """Recompute the options sha256 after a test edits the operations, so only the edit itself is judged."""
+        rec = rows["launched"]["isolation"]
+        ops = [(op, isolation.untilde(src), isolation.untilde(dest)) for op, src, dest in rec["ops"]]
+        rec["options_sha256"] = isolation.sha256_text("\0".join(isolation.options(
+            {"ops": ops, "fixture": rows["prepared"]["fixture_private"]})))
+
+    def _swap_source(self, isolation, rows, dest, new_src):
+        rec = rows["launched"]["isolation"]
+        hits = [op for op in rec["ops"] if op[2] == isolation.tilde(dest)]
+        self.assertEqual(len(hits), 1, hits)
+        hits[0][1] = isolation.tilde(new_src)
+        self._reseal(isolation, rows)
+
+    def test_a_permitted_destination_from_a_shared_source_fails(self):
+        """GPT read of 2044b2ab, P2-1: the shared -o folder bound onto the trial's own -o destination."""
+        isolation, cfg, trial_id, rows = self._rows("codex")
+        work = isolation.trial_dir(cfg, isolation.RUNS_ROOT / "unit-run")
+        self._swap_source(isolation, rows, work / "last", work / "last")
+        result = self._check(isolation, cfg, trial_id, rows, "codex")
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("onto" in f and "/last" in f and "the plan binds it only as" in f for f in result["failures"]),
+                        result["failures"])
+
+    def test_a_private_store_from_the_shared_store_fails(self):
+        isolation, cfg, trial_id, rows = self._rows("codex")
+        self._swap_source(isolation, rows, isolation.CODEX_SESSIONS, isolation.CODEX_SESSIONS)
+        result = self._check(isolation, cfg, trial_id, rows, "codex")
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("no private folder over" in f for f in result["failures"]), result["failures"])
+
+    def test_a_receipt_naming_another_private_folder_fails(self):
+        """The private folder comes from the trial id: a receipt that names the trial root as its private folder (so
+        its -o bind would read work/last onto work/last) fails."""
+        isolation, cfg, trial_id, rows = self._rows("codex")
+        rec = rows["launched"]["isolation"]
+        work = isolation.trial_dir(cfg, isolation.RUNS_ROOT / "unit-run")
+        private = isolation.tilde(isolation.private_dir(cfg, isolation.RUNS_ROOT / "unit-run", trial_id))
+        rec["private_dir"] = isolation.tilde(work)
+        for op in rec["ops"]:
+            if op[1] and op[1].startswith(private):
+                op[1] = isolation.tilde(work) + op[1][len(private):]
+        self._reseal(isolation, rows)
+        result = self._check(isolation, cfg, trial_id, rows, "codex")
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("private folder is not the trial's" in f for f in result["failures"]), result["failures"])
+
+    def test_a_declared_answer_source_keeps_its_cover(self):
+        """P2-1: a declared answer source outside the hidden roots gets the inaccessible file; the same destination
+        bound from the file itself, or a parent bound after the cover, fails."""
+        with tempfile.TemporaryDirectory(dir=Path.home() / ".cache") as tmp:
+            answer = Path(tmp) / "answers" / "key.txt"
+            answer.parent.mkdir()
+            answer.write_text("the answer\n")
+            extra = {"answer_source_paths": [str(answer)]}
+            isolation, cfg, trial_id, rows = self._rows("claude", extra)
+            self.assertTrue(self._check(isolation, cfg, trial_id, rows)["ok"])
+            # The inaccessible destination bound from the answer itself.
+            isolation, cfg, trial_id, rows = self._rows("claude", extra)
+            self._swap_source(isolation, rows, answer, answer)
+            result = self._check(isolation, cfg, trial_id, rows)
+            self.assertFalse(result["ok"])
+            self.assertTrue(any("no inaccessible bind" in f for f in result["failures"]), result["failures"])
+            # A parent of the declared source bound back after its cover.
+            isolation, cfg, trial_id, rows = self._rows("claude", extra)
+            parent = isolation.tilde(answer.parent)
+            rows["launched"]["isolation"]["ops"].append(["bind", parent, parent])
+            self._reseal(isolation, rows)
+            result = self._check(isolation, cfg, trial_id, rows)
+            self.assertFalse(result["ok"])
+            self.assertTrue(any("re-exposes" in f and "key.txt" in f for f in result["failures"]), result["failures"])
+
+    def test_a_permitted_bind_in_the_wrong_place_fails(self):
+        """P2-1, ordering: the home's own bind is permitted, but after the covers it would put the host's view back."""
+        isolation, cfg, trial_id, rows = self._rows()
+        rec = rows["launched"]["isolation"]
+        home = [op for op in rec["ops"] if op == ["bind-try", "~", "~"]]
+        self.assertEqual(len(home), 1)
+        rec["ops"] = [op for op in rec["ops"] if op != ["bind-try", "~", "~"]] + home
+        self._reseal(isolation, rows)
+        result = self._check(isolation, cfg, trial_id, rows)
+        self.assertFalse(result["ok"])
+        self.assertTrue(any(f.startswith("bind-try ~ after the cover") for f in result["failures"]), result["failures"])
+
+    def test_options_that_differ_from_the_operations_fail(self):
+        isolation, cfg, trial_id, rows = self._rows()
+        rows["launched"]["isolation"]["options_sha256"] = "0" * 64
+        result = self._check(isolation, cfg, trial_id, rows)
+        self.assertFalse(result["ok"])
+        self.assertIn("the receipt's options sha256 is not the one its operations give", result["failures"])
+
+    def test_the_ipc_namespace_must_be_the_trials_own(self):
+        isolation, cfg, trial_id, rows = self._rows()
+        runtime = rows["exit"]["isolation_runtime"]
+        runtime["info"] = {"mnt-namespace": 1}
+        self.assertIn("no IPC namespace of its own (--unshare-ipc)", self._check(isolation, cfg, trial_id, rows)["failures"])
+        runtime["info"] = {"mnt-namespace": 1, "ipc-namespace": 12}
+        self.assertIn("the client shared the host's IPC namespace", self._check(isolation, cfg, trial_id, rows)["failures"])
 
     def test_a_complete_receipt_passes(self):
         for client in ("claude", "codex"):
@@ -235,6 +440,193 @@ class G13Check(unittest.TestCase):
         isolation, cfg, trial_id, rows = self._rows()
         rows["launched"].pop("isolation")
         self.assertFalse(self._check(isolation, cfg, trial_id, rows)["ok"])
+
+    def test_a_missing_ai_memory_marker_fails(self):
+        isolation, cfg, trial_id, rows = self._rows()
+        marker = isolation.tilde(isolation.NEUTRAL_ROOT / ".ai-memory.toml")
+        rows["launched"]["isolation"]["ops"] = [op for op in rows["launched"]["isolation"]["ops"] if op[2] != marker]
+        self.assertFalse(self._check(isolation, cfg, trial_id, rows)["ok"])
+
+    def test_a_shared_tmp_fails(self):
+        isolation, cfg, trial_id, rows = self._rows()
+        ops = rows["launched"]["isolation"]["ops"]
+        rows["launched"]["isolation"]["ops"] = [op for op in ops if not (op[0] == "tmpfs" and op[2] == "/tmp")]
+        self.assertFalse(self._check(isolation, cfg, trial_id, rows)["ok"])
+
+    def test_a_semantic_cache_hit_during_a_codex_trial_fails(self):
+        isolation, cfg, trial_id, rows = self._rows("codex")
+        reading = {"semantic_cache": {"hits": 0}}
+        rows["launched"]["gateway_cache"] = reading
+        rows["exit"]["gateway_cache"] = reading
+        self.assertTrue(self._check(isolation, cfg, trial_id, rows, "codex")["ok"])
+        rows["exit"]["gateway_cache"] = {"semantic_cache": {"hits": 1}}
+        result = self._check(isolation, cfg, trial_id, rows, "codex")
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["gateway_semantic_cache_hits"], 1)
+
+
+class Round5Grading(unittest.TestCase):
+    """CC item task-ns2604-coop-20261006T143846Z, (a), and item task-ns2604-coop-20261006T144256Z."""
+
+    @classmethod
+    def setUpClass(cls):
+        import grade
+        grade.skill_usage()   # the shell-text rules (tools/skill-usage) for segments()
+
+    def _claude_call(self, cid, args, result):
+        return {"id": cid, "name": "mcp__ai-memory__memory_query", "input": args, "status": "ok",
+                "result": {"text": json.dumps(result)}}
+
+    def test_ai_memory_scopes(self):
+        import grade
+        own, other, fixture = str(uuid.uuid4()), str(uuid.uuid4()), "0a1b2c3d"
+        calls = [self._claude_call("own", {"query": "x", "workspace": "organic-e2e", "project": own},
+                                   {"hits": [{"path": "notes/a.md"}]}),
+                 self._claude_call("global", {"query": "x", "global": True},
+                                   {"hits": [{"workspace": "organic-e2e", "project": other, "path": "b.md"}]}),
+                 self._claude_call("asked", {"query": "x", "workspace": "organic-e2e", "project": other},
+                                   {"hits": [{"path": "c.md"}]}),
+                 self._claude_call("legacy", {"query": "x", "global": True},
+                                   {"hits": [{"workspace": "default", "project": fixture, "path": "d.md"}]}),
+                 self._claude_call("empty", {"query": "x", "workspace": "organic-e2e", "project": other}, {"hits": []}),
+                 self._claude_call("implicit", {"query": "x"}, {"hits": []}),
+                 # ai-memory 2.5.2 returns an implicit query's hits without their scope (id, path, title, snippet, rank).
+                 self._claude_call("implicit-hits", {"query": "x"},
+                                   {"hits": [{"id": "p1", "path": "sessions/s.md", "title": "t", "snippet": "s", "rank": -1}]})]
+        result = grade.ai_memory_check(grade.ai_memory_calls({"calls": calls}, "claude"), own, {fixture})
+        self.assertEqual(sorted(result["global_queries"]), ["global", "legacy"])
+        self.assertEqual(sorted(result["implicit_scope_calls"]), ["implicit", "implicit-hits"])
+        self.assertEqual(sorted(b["call_id"] for b in result["foreign_scope_pages"]), ["asked", "global", "legacy"])
+        self.assertEqual([u["call_id"] for u in result["unverifiable_scope_pages"]], ["implicit-hits"])
+
+    def test_ai_memory_codex_items(self):
+        import grade
+        own, other = str(uuid.uuid4()), str(uuid.uuid4())
+        items = [{"id": "i1", "type": "mcp_tool_call", "server": "ai-memory", "tool": "memory_query", "status": "completed",
+                  "arguments": json.dumps({"query": "x", "global": True}),
+                  "result": {"content": [{"type": "text", "text": json.dumps(
+                      {"hits": [{"workspace": "organic-e2e", "project": other}]})}]}}]
+        calls = grade.ai_memory_calls({"all_items": items}, "codex")
+        self.assertEqual(len(calls), 1)
+        result = grade.ai_memory_check(calls, own, set())
+        self.assertEqual(result["global_queries"], ["i1"])
+        self.assertEqual([b["call_id"] for b in result["foreign_scope_pages"]], ["i1"])
+
+    def test_host_service_tags(self):
+        import grade
+        calls = [{"id": "a", "name": "Bash", "input": {"command": "systemctl --user status app.service"}},
+                 {"id": "b", "name": "Bash", "input": {"command": "systemd-run --user --scope true"}},
+                 {"id": "c", "name": "Bash", "input": {"command": "docker ps && podman images"}},
+                 {"id": "d", "name": "Bash", "input": {"command": "curl -s http://127.0.0.1:29374/api/health"}},
+                 {"id": "e", "name": "Bash", "input": {"command": "systemctl status ssh"}}]
+        tags = grade.host_service_tags({"calls": calls}, "claude")
+        self.assertEqual(tags, {"user-systemd": ["a", "b"], "docker": ["c"], "ai-memory-http": ["d"]})
+
+    def test_residual_channel_tags(self):
+        """GPT read of 2044b2ab: WSL interop, the gateway's management routes and other loopback services are tagged
+        (diagnostic only); the ai-memory server keeps its own tag."""
+        import grade
+        calls = [{"id": "w", "name": "Bash", "input": {"command": "/mnt/c/Windows/System32/cmd.exe /c type x"}},
+                 {"id": "p", "name": "Bash", "input": {"command": "powershell.exe -c Get-Content y"}},
+                 {"id": "g", "name": "Bash", "input": {"command": "curl -s http://127.0.0.1:21128/api/usage/call-logs"}},
+                 {"id": "l", "name": "Bash", "input": {"command": "curl -s localhost:21808/api/sessions"}},
+                 {"id": "m", "name": "Bash", "input": {"command": "curl -s http://127.0.0.1:29374/api/health"}},
+                 {"id": "n", "name": "Bash", "input": {"command": "ls -la"}}]
+        tags = grade.host_service_tags({"calls": calls}, "claude")
+        self.assertEqual(tags, {"wsl-interop": ["p", "w"], "gateway-management-api": ["g"], "local-service-http": ["l"],
+                                "ai-memory-http": ["m"]})
+
+    def test_every_codex_launch_sets_the_normal_tier(self):
+        import common
+        import launcher
+        import prepare
+        cfg = {"binaries": {"codex": {"path": "/x/codex"}, "node": "/x/node", "codex_sdk_dir": "/x/sdk"},
+               "gh_config_dir": "/x/gh", "codex_profile_layer": {"file": "/x/c.json", "config": {}}}
+        line = launcher.codex_line(cfg, "tid", Path("/f"), Path("/c"), Path("/p"), Path("/l"), "read-only", "max",
+                                   "organic-e2e", 1800)
+        self.assertEqual(launcher.codex_service_tier(cfg, "cli", line), "default")
+        self.assertIsNone(launcher.codex_service_tier(cfg, "cli", line.replace("-c service_tier=default ", "")))
+        self.assertEqual(launcher.codex_service_tier(cfg, "sdk", ""), "default")   # sdk_codex.mjs's configOverrides
+        test = {"lane": "organic-e2e", "sandbox": "read-only", "ref": "r1", "task_text": "t"}
+        text = prepare.app_server_config("c", "tid", test, Path("/f"), Path("/c"), Path("/gh"), "/usr/bin", 1800, {},
+                                         "/x/wrapper")
+        self.assertEqual(common.app_server_service_tier(text), "default")
+        self.assertIn("codex_path_override: '/x/wrapper'", text.replace('"', "'"))
+
+
+class GatewayCacheReading(unittest.TestCase):
+    def _read(self, payload):
+        """gateway_cache_state() against a stand-in gateway that answers only the allowlisted GET /api/cache; any
+        other route (the secret-bearing settings routes among them) fails the test."""
+        import common
+        asked = []
+
+        def fake(path, timeout=30):
+            asked.append(path)
+            if path != "/api/cache":
+                raise AssertionError(f"a route outside the guard's allowlist was read: {path}")
+            return payload
+
+        saved = common.gateway_get
+        common.gateway_get = fake
+        try:
+            return common.gateway_cache_state(), asked
+        finally:
+            common.gateway_get = saved
+
+    def test_only_the_allowlisted_route_and_named_keys(self):
+        """Round 5, (a): the reading keeps the cache switch and counters from GET /api/cache, and nothing else."""
+        state, asked = self._read({"config": {"semanticCacheEnabled": True, "other": "x"},
+                                   "semanticCache": {"hits": 0, "misses": 0, "dbEntries": 0, "memoryEntries": 0},
+                                   "idempotency": {"windowMs": 5000, "activeKeys": 0},
+                                   "promptCache": {"tokensSaved": 1}})
+        self.assertEqual(asked, ["/api/cache"])
+        self.assertEqual(state["verdict"], "semantic cache on")
+        self.assertEqual(state["cache_config"], {"semanticCacheEnabled": True})
+        self.assertNotIn("promptCache", json.dumps(state))
+        off, _ = self._read({"config": {"semanticCacheEnabled": False}, "semanticCache": {"hits": 0}})
+        self.assertEqual(off["verdict"], "semantic cache off")
+
+    def test_gate0_passes_only_with_the_semantic_cache_off(self):
+        import grade
+        self.assertTrue(callable(grade.gate0))
+        import inspect
+        source = inspect.getsource(grade.gate0)
+        self.assertIn('reading.get("verdict") == "semantic cache off"', source)
+
+    def test_the_log_exposure_reading_keeps_only_flag_counts(self):
+        """GPT read of 2044b2ab: whether call-log payloads are stored, from the allowlisted list route (limit only);
+        no payload field reaches the record."""
+        import common
+        asked = []
+        rows = [{"id": "a", "hasRequestBody": True, "hasResponseBody": True, "hasPipelineDetails": False,
+                 "requestBody": {"input": "a trial's prompt"}},
+                {"id": "b", "hasRequestBody": True, "hasResponseBody": False, "hasPipelineDetails": True}]
+
+        def fake(path, timeout=30):
+            asked.append(path)
+            if path != "/api/usage/call-logs?limit=20":
+                raise AssertionError(f"unexpected route: {path}")
+            return rows
+
+        saved = common.gateway_get
+        common.gateway_get = fake
+        try:
+            state = common.gateway_log_exposure()
+        finally:
+            common.gateway_get = saved
+        self.assertEqual(asked, ["/api/usage/call-logs?limit=20"])
+        self.assertEqual((state["rows"], state["with_request_body"], state["with_response_body"],
+                          state["with_pipeline_details"]), (2, 2, 1, 1))
+        self.assertFalse(state["credentials_sent"])
+        self.assertNotIn("a trial's prompt", json.dumps(state))
+
+    def test_a_call_answered_by_the_semantic_cache_is_counted(self):
+        import common
+        pipeline = {"providerRequest": {"service_tier": "priority", "reasoning": {"effort": "max"}}}
+        self.assertEqual(common.forwarded_service_tier(pipeline), "priority")
+        self.assertEqual(common.forwarded_service_tier({"providerRequest": {"model": "m"}}), "(unset)")
+        self.assertIsNone(common.forwarded_service_tier(None))
 
 
 @unittest.skipUnless(HOST_READY, "needs /usr/bin/bwrap and the experiment's roots on this host")
@@ -308,6 +700,46 @@ class WrappedLaunch(unittest.TestCase):
             self.assertEqual(runtime["tree"]["outside"], [], runtime)
             self.assertIsInstance(outcome["duration_exact_s"], float)
             self.assertIsNotNone(outcome["time_to_result_exact_s"])
+        finally:
+            import shutil
+            shutil.rmtree(fixture, ignore_errors=True)
+            shutil.rmtree(work, ignore_errors=True)
+
+    def test_the_cl7b_census_sees_the_tree_in_the_namespace(self):
+        """GPT read of 2044b2ab (verification gap): CL7b's wrapper, run as promptfoo runs it, is sampled while it runs;
+        its tree is in the trial's namespace, none outside, and G13 passes on the runtime record."""
+        import isolation
+        isolation_, cfg, plan, trial_id, fixture, work = _synthetic_plan("codex")
+        try:
+            fixture.mkdir(parents=True)
+            (work / "prompts").mkdir(parents=True)
+            (work / "prompts" / f"{trial_id}.txt").write_text("prompt\n")
+            (work / "clones" / trial_id).mkdir(parents=True)
+            plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, "codex", fixture,
+                                  clone=work / "clones" / trial_id, prompt=work / "prompts" / f"{trial_id}.txt")
+            wrapper = isolation.write_app_server_wrapper(plan, "/usr/bin/sleep")
+            census = isolation.AppServerCensus(plan, interval=0.5).start()
+            try:
+                subprocess.run([str(wrapper), "3"], timeout=60, stdin=subprocess.DEVNULL, check=True)
+            finally:
+                tree = census.stop()
+            self.assertGreaterEqual(tree["processes_seen"], 1, tree)
+            self.assertEqual(tree["in_trial_namespace"], tree["processes_seen"], tree)
+            self.assertEqual(tree["outside"], [], tree)
+            self.assertGreaterEqual(tree["samples"], 2, tree)
+            with tempfile.TemporaryDirectory() as tmp:
+                saved = isolation.CODEX_SESSIONS
+                isolation.CODEX_SESSIONS = Path(tmp)
+                try:
+                    runtime = isolation.app_server_runtime(plan, tree)
+                finally:
+                    isolation.CODEX_SESSIONS = saved
+            rows = {"prepared": {"fixture_private": str(fixture)},
+                    "launched": {"isolation": isolation.receipt(plan, ["/usr/bin/sleep", "app-server"])},
+                    "exit": {"isolation_runtime": runtime}}
+            result = isolation.check(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, "codex", rows)
+            self.assertTrue(result["ok"], result["failures"])
+            self.assertTrue(result["ipc_namespace"])
         finally:
             import shutil
             shutil.rmtree(fixture, ignore_errors=True)

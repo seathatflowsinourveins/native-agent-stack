@@ -43,7 +43,8 @@ sys.path.insert(0, str(HERE))
 
 from common import (CC_V11_DECISIONS, CLAUDE_COMPLETION_DEFAULT, CLAUDE_SESSION_CAP, CODEX_HOME_REAL,  # noqa: E402
                     EXPECTED_TRIAL_USAGE, FREEZE_COMMIT, HOME, LANE, LANE_PROMPTED, METER_CEILING, NEUTRAL_ROOT,
-                    POST_RESULT_GRACE_S, PROTOCOL_ID, RUNS_ROOT, T_SECONDS, TRIAL_ROOT_BASE, append_jsonl, gateway_build,
+                    POST_RESULT_GRACE_S, PROTOCOL_ID, RUNS_ROOT, T_SECONDS, TRIAL_ROOT_BASE, app_server_service_tier,
+                    append_jsonl, gateway_build, gateway_cache_state, gateway_log_exposure,
                     headroom_allows, load_json, login_path, newest_meter_reading, parse_stream_text, read_jsonl, run,
                     s7_snapshot, sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
 import arms  # noqa: E402
@@ -698,6 +699,22 @@ def main(argv=None) -> int:
                         "rule": "the co-op turns the gateway's pipeline details on only for pilot runs and off again; "
                                 "receipts keep only the forwarded effort fields; the grader reports what the call "
                                 "logs showed"}
+    # CC item task-ns2604-coop-20261006T144256Z: every Codex cell runs on the normal tier, set explicitly in its launch
+    # (the CLI line's -c, the SDK runner's configOverrides, CL7b's cli_config). Checked here on what the cells will run.
+    import launcher as launcher_module
+    tier_cfg = {"binaries": bins, "gh_config_dir": str(GH_EMPTY), "codex_profile_layer": profile_layer,
+                "trial_root": str(work)}
+    sample_line = launcher_module.codex_line(tier_cfg, "<trial_id>", work / "f", work / "c", work / "p", work / "l",
+                                             "read-only", "max", LANE, args.claude_t_seconds)
+    service_tier_check = {
+        "cli": launcher_module.codex_service_tier(tier_cfg, "cli", sample_line),
+        "sdk": launcher_module.codex_service_tier(tier_cfg, "sdk", ""),
+        "app_server": {t["trial_id"]: app_server_service_tier(Path(t["config_neutral"]).read_text(encoding="utf-8"))
+                       for c in cells.values() for t in c.get("trials", [])}}
+    tiers = [service_tier_check["cli"], service_tier_check["sdk"], *service_tier_check["app_server"].values()]
+    if any(tier != "default" for tier in tiers):
+        print(json.dumps({"refused": "a Codex cell does not set service_tier=default", "check": service_tier_check}))
+        return 2
     run_json = {
         "run_id": args.run_id, "protocol": PROTOCOL_ID, "created_at": utc_now(), "seed": seed, "lane": args.lane,
         "repo": str(repo), "repo_head": fixture.git(repo, "rev-parse", "HEAD").decode().strip(),
@@ -737,6 +754,13 @@ def main(argv=None) -> int:
                        "version": isolation.bwrap_version(), "selftest": isolation.SELFTEST_FILE}
                       if args.isolation == "bwrap" else None),
         "isolation_off_amendment": args.amendment_ref if args.isolation == "off" else None,
+        # CC item task-ns2604-coop-20261006T143846Z, (a): the gateway's cache switch and counters at stage 1 (GET
+        # /api/cache, named keys only; every Codex trial's rows add a reading before and after it).
+        "gateway_cache": gateway_cache_state(),
+        # GPT read of 2044b2ab, residual channels: whether the gateway's call logs keep payloads its log API returns
+        # without credentials (counts of the latest rows' flags only). A documented residual for the command center.
+        "gateway_logs": gateway_log_exposure(),
+        "service_tier_check": service_tier_check,
         "claude_session_cap": CLAUDE_SESSION_CAP, "claude_completion": completion, "claude_meter": claude_meter,
         "cells": cells, "cell_codes": cell_codes, "tests_by_ref": tests_by_ref, "schedule": str(root / "schedule.json"),
         "unavailable_cells": suite.UNAVAILABLE_CELLS, "label_vector_sha256": None,

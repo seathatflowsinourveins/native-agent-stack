@@ -42,7 +42,7 @@ sys.path.insert(0, str(HERE))
 
 from common import (CLAUDE_COMPLETION_DEFAULT, CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, LANE, LOCK_WAIT_S,  # noqa: E402
                     POST_RESULT_GRACE_S, PROTOCOL_T_SECONDS, T_SECONDS, append_jsonl, clean_login_env,
-                    current_s7_baseline, deadline_without_result, decision_times, gateway_build, headroom_allows,
+                    current_s7_baseline, deadline_without_result, decision_times, gateway_build, gateway_cache_state, headroom_allows,
                     load_json, manifest_digest,
                     newest_meter_reading, rate_limit_hit, rate_limit_readings, read_jsonl, rebaseline_cost_ok,
                     rebaselines_between, resume_after, run_expected_usage, s7_persistent_change, sha256_bytes,
@@ -321,6 +321,25 @@ def codex_line(cfg: dict, trial_id: str, fixture: Path, clone: Path, prompt_file
             f"-o {q(str(last_file))} - < {q(str(prompt_file))}")
 
 
+SERVICE_TIER_FLAG = re.compile(r"(?:^|\s)-c\s+service_tier=(['\"]?)([A-Za-z_-]+)\1(?=\s|$)")
+SERVICE_TIER_OVERRIDE = re.compile(r"""['"]service_tier=\\?"?([A-Za-z_-]+)""")
+
+
+def codex_service_tier(cfg: dict, kind: str, line: str) -> str | None:
+    """The service tier a Codex cell's launch sets explicitly (CC item task-ns2604-coop-20261006T144256Z): the CLI line's
+    `-c service_tier=...`, or, for the SDK cell, the runner's configOverrides entry (codex-sdk 0.160.0 passes each as
+    `--config`, dist/index.js CodexExec.run). None when the launch does not set it."""
+    if kind == "cli":
+        match = SERVICE_TIER_FLAG.search(line)
+        return match.group(2) if match else None
+    runner = Path(_neutral_bin(cfg, "run.mjs", str(HERE / "sdk_codex.mjs")))
+    try:
+        match = SERVICE_TIER_OVERRIDE.search(runner.read_text(encoding="utf-8"))
+    except OSError:
+        return None
+    return match.group(1) if match else None
+
+
 def _neutral_bin(cfg: dict, name: str, fallback: str) -> str:
     """A neutral path in the run's trial root (bin/run.py, bin/run.mjs, bin/sdk), so a process listing shows no
     experiment or arm word; runs prepared before trial_root existed use the original path."""
@@ -597,10 +616,12 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
         # namespace would be one that escaped, and no process of the tree can join that namespace without privilege.
         seen = {pid: ns for pid, ns in census.items() if ns[0]}
         runtime = {"info": iso_info, "namespace": trial_ns, "host_namespace": host_ns,
+                   "host_ipc_namespace": isolation.ipc_namespace("self"),
                    "tree": {"processes_seen": len(seen),
                             "in_trial_namespace": sum(1 for ns, _ in seen.values() if ns == trial_ns),
                             "in_nested_namespaces": sum(1 for ns, _ in seen.values() if ns not in (trial_ns, host_ns)),
-                            "outside": [{"exe": exe, "namespace": ns} for ns, exe in seen.values() if ns == host_ns][:20]}}
+                            "outside": [{"exe": exe, "namespace": ns} for ns, exe in seen.values() if ns == host_ns][:20],
+                            "sampling": "every 2 s while the client ran"}}
     # GPT micro-check of 1f81d645, P3: the deadline and completion decisions read the unrounded offsets
     # (common.decision_times); the one-decimal fields are presentation only.
     return {"rc": rc, "kill_reason": kill_reason, "kill_at": iso_ms(kill_at) if kill_at else None,
@@ -812,6 +833,15 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             line = codex_sdk_line(cfg, trial_id, fixture, clone, prompt_file, sandbox, cell_cfg["effort"], lane, t_seconds)
         else:
             raise Censored(f"unsupported_cell_kind:{kind}")
+        service_tier, gateway_cache = None, None
+        if client == "codex":
+            # CC item task-ns2604-coop-20261006T144256Z: every Codex cell runs on the normal tier, set explicitly (an
+            # unset tier falls back to the catalog's default_service_tier, "priority"). A launch without it is refused.
+            service_tier = codex_service_tier(cfg, kind, line)
+            if service_tier != "default":
+                raise Censored("service_tier_not_default")
+            # CC item task-ns2604-coop-20261006T143846Z, (a): the gateway's cache settings and counters before the trial.
+            gateway_cache = gateway_cache_state()
         iso_plan, iso_receipt = None, None
         if cfg.get("isolation"):
             # The structural G13 (CC item task-ns2604-coop-20261006T132948Z): the client's process tree runs in a mount
@@ -825,7 +855,8 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
         launched_at = utc_now()
         ledger(root, {**base, "phase": "launched", "at": launched_at, "line_sha256": sha256_bytes(line.encode()),
                       "line_shape": line.replace(trial_id, "<trial_id>").replace(str(Path.home()), "~"),
-                      "host_argv_exposure_at_launch": exposure, "isolation": iso_receipt})
+                      "host_argv_exposure_at_launch": exposure, "isolation": iso_receipt,
+                      "service_tier": service_tier, "gateway_cache": gateway_cache})
         outcome = run_client(root, cfg, client, line, fixture, stream_path, err_path, meter_source, iso_plan)
         if iso_plan:
             outcome["isolation_runtime"] = {**(outcome.get("isolation_runtime") or {}), **isolation.safe_finish(iso_plan)}
@@ -840,6 +871,7 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                     "result_at": outcome["result_at"], "time_to_result_s": outcome["time_to_result_s"],
                     "duration_exact_s": outcome["duration_exact_s"], "time_to_result_exact_s": outcome["time_to_result_exact_s"],
                     "isolation_runtime": outcome.get("isolation_runtime"),
+                    "gateway_cache": gateway_cache_state() if client == "codex" else None,
                     "final_turn_end_s": outcome["final_turn_end_s"], "final_turn_end_at": outcome["final_turn_end_at"],
                     "result_event": outcome["result_event"], "no_result_diagnosis": outcome["no_result_diagnosis"],
                     "post_result_s": outcome["post_result_s"], "post_result_terminated": post_result_terminated,

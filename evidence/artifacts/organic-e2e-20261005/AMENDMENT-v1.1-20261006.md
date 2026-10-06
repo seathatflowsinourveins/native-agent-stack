@@ -4,6 +4,10 @@
 - **Confirmations:** command-center item `task-ns2604-coop-20261006T114319Z`, sent at 11:43Z, settles the five points this file had marked for confirmation. Each is recorded below as "Confirmed (CC 11:43Z)", with its point number.
 - **Rulings of 12:30Z:** command-center item `task-ns2604-coop-20261006T123036Z` confirms one interpretation and extends decision 1's timing record to every cell. Both are recorded below as "Confirmed (CC 12:30Z)".
 - **Structural G13 of 13:29Z:** command-center item `task-ns2604-coop-20261006T132948Z` replaces decision 3's classifier-based invalidation with a structural G13: the answer sources are hidden from every trial's mount namespace, and the command classifier becomes a diagnostic tag. It is recorded first below, and it governs wherever earlier sections describe G13's invalidation.
+- **Round 5, 14:38Z, 14:42Z and 15:17Z:** three command-center items, all recorded in "Round 5" below.
+  - `task-ns2604-coop-20261006T143846Z` rules on the residual channels, receipt privacy and fanotify.
+  - `task-ns2604-coop-20261006T144256Z` puts Codex cells on the normal service tier.
+  - `task-ns2604-coop-20261006T151719Z`, section C1, rules on the GPT read of 2044b2ab. It accepts P2-1 (bind triples) and P3 (the public receipt), and upholds P2-2 (host execution brokers) in a commit of its own. It returns the gateway's residual to the command center with this round's read-only probe.
 - **Applies to:** PROTOCOL-v1.1.md (organic-e2e-v1.1-20261005), which stays verbatim, and PILOT-SPEC-v1.1.md. Where they differ from this file, this file governs from 2026-10-06 10:55Z.
 - **Harness:** each decision's code is in `harness/`, in the commit that adds this file.
   - `CC_V11_DECISIONS` in `harness/common.py` names the item.
@@ -69,9 +73,176 @@ Item `task-ns2604-coop-20261006T132948Z` decided that a classifier of the comman
    The one-decimal fields are presentation only. So a result at 1799.96 s, in a session that ran 1800.02 s, is complete, not held.
 
 **Limits:**
-- Services reached over a socket run outside the namespace: the ai-memory server, MCP servers configured by URL, the OmniRoute gateway, and a user systemd or Docker daemon. A file such a service reads for a trial is not hidden by the mount namespace; R10's per-trial scoping of those stores still applies.
-- `/tmp` and `/dev/shm` stay shared outside Claude's own area.
+- Services reached over a socket run outside the namespace: the ai-memory server, MCP servers configured by URL, the OmniRoute gateway, and a user systemd or Docker daemon. A file such a service reads for a trial is not hidden by the mount namespace; R10's per-trial scoping of those stores still applies. Round 5, below, narrows this.
+- `/tmp` and `/dev/shm` stay shared outside Claude's own area (made private in round 5, below).
 - A setuid helper (sudo) does not work inside the user namespace.
+
+## Round 5 (CC 14:38Z, 14:42Z and 15:17Z)
+
+### The gateway's response cache: not confirmed off
+
+The 14:38Z item asked for a read-only confirmation that OmniRoute on 21128 has no response or semantic cache enabled that could serve one trial's output to another. It is **not confirmed**: the semantic cache is on. By source, it cannot answer a Codex trial.
+- **Readings at 14:56Z and 15:30Z** (GET `/api/cache`, named keys only): `semanticCacheEnabled: true`. The semantic cache had 0 hits, 0 misses, 0 database entries and 0 memory entries. The idempotency window was 5,000 ms, with 0 active keys.
+- **The semantic cache is OmniRoute v3.8.51's only response cache.** A hit is logged with `cacheSource: "semantic"` (`open-sse/handlers/chatCore/semanticCache.ts`).
+- **It cannot answer a Codex trial, by source:**
+  - v3.8.51 reads a cached response only for a request with an explicit numeric `temperature: 0`, and stores one only for such a request. The `semanticCacheRequireZeroTemp` switch does not change that (`src/lib/semanticCache.ts`, `isCacheableForRead` and `isCacheableForWrite`; `checkSemanticCache` calls the first before any lookup).
+  - codex-cli 0.160.0's Responses request has no temperature field (`codex-rs/codex-api/src/common.rs`, `ResponsesApiRequest`, lines 279 to 304 at rust-v0.160.0).
+  - This is source evidence, not an observed run. The per-trial checks below would catch a hit.
+  - The switch itself read `true` in the read the correction below describes.
+- **The other caches cannot serve another trial's output:**
+  - The idempotency window is keyed only by a client's `Idempotency-Key` or `X-Request-Id` header, never by the request body (`src/lib/idempotencyLayer.ts`).
+  - The provider-side prompt cache reuses input prefixes and never returns a stored output.
+- **Correction:** I read `/api/settings` and `/api/settings/cache-config` through script files. Neither route is on the repository command guard's allowlist (`scripts/hooks/secret_path_guard.py`, `K4_GW_ROWS`), and both also return decrypted secrets. A script file hides the URL from the guard, so those reads went around its policy. Only cache keys and key names were printed, and nothing was stored. The harness now reads only the allowlisted GET `/api/cache`.
+- **In the harness:**
+  - run.json records the stage-1 reading.
+  - Gate 0's `gateway-cache` check passes only while the semantic cache is off.
+  - Each Codex trial's launched and exit rows record the hit counts.
+  - G13 fails a trial during which the cache counted a hit, or whose call logs show a `cacheSource: "semantic"` response.
+- **The decision this needs:** either the co-op switches the semantic cache off on 21128 (a gateway setting), or the CC accepts the source evidence by a ruling, with an amendment that relaxes the gate-0 check.
+
+### The gateway's logs and management routes: returned to the CC (15:17Z)
+
+The GPT read of 2044b2ab named the gateway's log and dashboard APIs as a channel. A trial needs the gateway for inference, and its logs can return other trials' payloads. The retained probe `evidence/artifacts/omniroute-gateway-20260927/scripts/probe_lane.py.txt` lists the logs and fetches payloads at lines 101 and 112. This round's probe is read-only. It uses only routes the repository's command guard allowlists, and changes no gateway configuration.
+- **The response cache:** on, as recorded above.
+- **Call-log payloads are stored.** At 15:30Z, GET `/api/usage/call-logs?limit=20` answered without credentials. Of the latest 20 rows:
+  - 1 carries a stored request body and a stored response body;
+  - none carries pipeline details.
+
+  The harness keeps only these counts (`common.gateway_log_exposure`, in run.json as `gateway_logs`). It fetched no payload.
+- **The APIs answer without credentials from a trial's namespace.** The stage-1 self-test asks two allowlisted routes from inside the namespace with no credentials, and discards the bodies (`isolation.gateway_reachability`, in the self-test as `gateway_from_namespace`):
+  - GET `/api/health` answered 200;
+  - GET `/api/usage/call-logs?limit=1` answered 200.
+
+  The network is the host's, so the dashboard and every other management route on port 21128 are as reachable. Only those two routes were asked.
+- **What this allows:** a trial could list the call logs and read another trial's stored request and response. This was not exercised on a trial's payload.
+- **Minimal closure, proposed for the CC (nothing changed):**
+  1. **A per-trial network namespace with explicit forwards.** Run each trial under `bwrap --unshare-net`, so its network leaves only through forwards outside the namespace for the endpoints the treatment needs: the gateway's inference path, the OTLP collector, the ai-memory server, and any other MCP server the treatment configures by URL. The upstream pattern is Anthropic's sandbox-runtime (anthropics/sandbox-runtime at v0.0.78, `README.md`):
+     - on Linux it runs bubblewrap with the sandboxed process's network namespace removed (lines 108 and 124);
+     - all traffic goes through proxies on the host, reached over Unix sockets bound into the sandbox, which `socat` bridges (lines 124 and 553);
+     - the proxies enforce a host allowlist that may name an IP literal such as `127.0.0.1:3000` (line 365).
+
+     socat 1.8.1.1 is installed here; passt (pasta) and slirp4netns are not.
+  2. **The gateway's port needs a path rule.** `/v1` and `/api` share port 21128, so a host-and-port allowlist alone still admits the management routes. Either the forward for the gateway admits only `/v1/...`, or OmniRoute's management routes require authentication during trial runs. The second is a gateway setting the co-op owns, and the harness's own call-log reads would then go through the operator.
+  3. **Until then, tags.** The grader tags a trial command that addresses the gateway's management routes (`gateway-management-api`) or any other loopback HTTP service (`local-service-http`). The tags are diagnostics.
+
+### Other loopback services (completeness check)
+
+The same shared network reaches every service listening on the host. At 15:47Z, 110 TCP ports listened (`ss -ltnp`: ports and process names only; none was asked anything). They include:
+- **Dagu** (21080 and 21081): it runs workflows on request, an execution broker over TCP.
+- **Serena's MCP servers** (24 ports, 24282 to 24305): their tools include `execute_shell_command`.
+- **hcom** (30 ports): messaging between live agent sessions.
+- **The codebase-memory daemon** (9749): the host's index. A trial's own codebase-memory server starts a private daemon (above), but this port stays reachable.
+- **agentsview** (21808): it serves the native session folders, where finished trials' rollouts are published.
+- **Loki** (21300 and 21396) and **Grafana** (21301): earlier trials' telemetry, which the grader joins.
+- The other named services:
+  - **ai-memory** (29374);
+  - **vLLM** (28231, and 6 engine ports);
+  - the OTLP collector (5 ports);
+  - **Prometheus** and **Alertmanager** (21090 and 21093);
+  - rootlesskit port forwards (4002, 5900 and 21633).
+- **28 ports whose owner `ss` does not name for this user.** Among them are the older gateway's ports (20128 to 20134) and the WSL DNS resolver's port 53.
+
+Their authentication was not probed. The closure is the network namespace above, which forwards only what the treatment needs.
+
+### Bind triples, ordering and options (P2-1, accepted at 15:17Z)
+
+G13 now checks each bind in the receipt as an exact (operation, source, destination) triple of the trial's plan (`isolation.permitted_binds`).
+- **The private folder is derived.** The trial's private folder comes from its trial id (`isolation.private_dir`), never from the receipt.
+  - Binding the shared `work/last` onto the trial's own `work/last` now fails.
+  - So does any private store bound from the shared store, and a receipt that names another folder as its private one.
+- **Kept projects:** a project outside the experiment is permitted only bound onto itself, one level under the projects folder.
+- **Declared answer sources:** the inaccessible file over a declared answer source must come from the trial's private `blocked` file.
+- **Ordering.** No bind of host content may come after a cover whose path is its own destination or below it. A cover is a tmpfs, a private folder or the inaccessible file, declared answer sources included. So a permitted bind in the wrong place, such as the home's own bind moved after the covers, fails.
+- **Options.** The options sha256 in the receipt must be the one its operations give.
+- **Negative cases** (`test_isolation.G13Check`):
+  - a permitted destination from a shared source;
+  - a private store from the shared store;
+  - a receipt naming another private folder;
+  - a declared source bound from itself, and its parent bound back after the cover;
+  - the home's bind after the covers;
+  - options that differ from the operations.
+
+### The normal service tier (14:42Z)
+
+- **Every Codex cell sets `service_tier=default` explicitly:**
+  - CL3, CL4 and the prompted cells: `-c service_tier=default` on the line;
+  - CL7: the runner's `configOverrides`;
+  - CL7b: the provider's `cli_config`.
+- **Checks:**
+  - Stage 1 checks every cell kind and refuses the run if any lacks it (`service_tier_check` in run.json).
+  - The launcher and block.py refuse a launch without it, and record the tier in each Codex trial's launched row.
+  - G11 reports the tiers and fails on any other.
+- **The client setting does not decide the effective tier through OmniRoute.** codex-cli 0.160.0 omits `service_tier` from the request when it is `default` (`protocol/src/openai_models.rs`, `service_tier_for_request`, and its test `service_tier_for_request_omits_explicit_default_tier`). OmniRoute v3.8.51 then decides the outbound tier: a request's own tier first, else its global Codex mode (`codexServiceTier`, "priority" when enabled without a tier), else the connection's default (`src/lib/providers/codexFastTier.ts`).
+- **The effective tier is the forwarded one.** The call-log join keeps the tier the gateway forwarded (pipeline details, on only for pilot runs), and G11 fails on a forwarded `priority`.
+- **Unread:** the gateway's `codexServiceTier` value lives in `/api/settings`, which the guard does not allowlist. So it is unread here: the operator can read it in a terminal, or the pilot's pipeline details show it.
+
+### ai-memory: one scope per trial
+
+- **Kept in the treatment, scoped per trial.** ai-memory stays in the treatment, with workspace `organic-e2e` and project `<trial_id>`.
+- **How the scope reaches the trial.** ai-memory 2.5.2 documents one carrier for both its lifecycle hooks and static MCP clients: the `.ai-memory.toml` marker (`docs/marker-file.md` at v2.5.2).
+  - Hooks walk up from the cwd to the first marker.
+  - A static client passes the marker's workspace and project on every project-scoped call.
+  - The hook has no flag or environment variable for the scope (`ai-memory hook --help`).
+- **Where the marker lives.** The wrapper binds a per-trial marker at `~/.cache/ws/.ai-memory.toml`. That file exists only in the trial's namespace, above its fixture: the fixture is unchanged, and no other trial or host process sees it.
+  - The self-test reads it back in the namespace.
+  - ai-memory's own `hook --check-capture`, run from the fixture in the namespace, reports `marker_present: true` and `admits_capture: true`.
+  - That command reports the marker, not the scope values a hook would send. The values sent are as documented, not observed.
+- **The grader checks every ai-memory call** (Claude's `mcp__ai-memory__*` calls and Codex's `ai-memory` MCP items):
+  - A `global=true` query, or a write to the `_global` scope, is a tag (`ai-memory-global`).
+  - A call that returned a page of another trial's scope makes the trial invalid and fails G13. Another trial's scope is `organic-e2e/<another trial>`, or a project named after another trial's fixture folder (hook captures from before this round).
+  - A call with no explicit scope reads the server's active-project pointer, which every other session's hooks move. Its pages carry no scope (an implicit `memory_query` returns `id`, `path`, `title`, `snippet` and `rank` only). So such a call that returned pages is unverifiable, and is counted the same way.
+- **Re-grade of smoke-20261006c:** one Codex env trial made a global query and an implicit query that returned pages. Under this rule that trial would be invalid on this count alone.
+- **Why files alone cannot close it.** Masking files cannot close ai-memory: its server answers over HTTP from outside the namespace. The closure is the one the 14:38Z item ruled: the per-trial scope, plus the grader's invalidation of any trial that received another scope's page or an unverifiable one.
+- **R2 lint:** the marker's `organic-e2e` hits checks e and f, with the same tokens the OTel lane tag already carries in every launch line. It is a disclosed residue, which the item's scope name requires.
+
+### Private /tmp, /var/tmp, /dev/shm and IPC
+
+- **Each trial gets an empty tmpfs** over `/tmp`, `/var/tmp` and `/dev/shm`. `/dev` stays the host's (`--dev-bind`), with only `/dev/shm` replaced.
+- **And an IPC namespace of its own** (`--unshare-ipc`), the extension the GPT read proposed: no System V IPC object or POSIX message queue passes between trials.
+  - bwrap's `--info-fd` record then names the IPC namespace.
+  - G13 fails a trial without one, or one that shared the host's.
+- **What stays bound in:**
+  - Claude's area, `/tmp/claude-<uid>`, is bound into the private `/tmp` from the trial's own folder.
+  - The X11 socket folder is bound back when it exists. It holds sockets only.
+- **Sockets found in the host's `/tmp`:**
+  - Grafana's plugin sockets, which no trial tool uses.
+  - Chrome's singleton sockets. A trial's browser starts its own, unshared.
+  - The codebase-memory MCP daemon's socket (`/tmp/cbm-daemon-<uid>`). Under the wrapper, `codebase-memory-mcp` started its own daemon in the private `/tmp` and listed its 17 tools. Its index is then the trial's own: the host daemon's indexes, other trials' fixtures among them, are out of reach. Its tools are unchanged.
+
+### Host services, receipts, the CL7b census, fanotify
+
+- **Host services are tagged, as diagnostics:**
+  - `systemctl` or `journalctl` with `--user`, and `systemd-run`: `user-systemd`;
+  - `docker`, `docker-compose` and `podman`: `docker`;
+  - a Windows program (`*.exe`, or a path under `/mnt/c/Windows/`): `wsl-interop`;
+  - direct HTTP to the ai-memory server's port: `ai-memory-http`;
+  - the gateway's `/api` routes: `gateway-management-api`;
+  - any other loopback HTTP service: `local-service-http`.
+- **Receipt privacy (the 14:38Z ruling, and P3 accepted at 15:17Z).** A published receipt (`isolation.public_receipt`, which the grade embeds) carries:
+  - only the count and the sha256 of the sorted names of the projects bound back;
+  - every other string through `public_text`: the home path becomes `~`, a project folder name becomes its hash, and so does any other token that carries the home path in Claude's slug form (`-home-<user>-...`), wherever it sits (argv, operations, the visible argv, the hidden list).
+
+  The exact mount operations stay private:
+  - the raw receipt is in the run's ledger, appended with mode 0600;
+  - CL7b's options file is 0600 in the trial's 0700 private folder;
+  - the self-test's own report is written 0600.
+- **CL7b's census.** The verification gap the read noted is closed: block.py samples the tree of CL7b's wrapper while the eval runs, as the launcher does for the other cells (`isolation.AppServerCensus`).
+  - Every 2 s it reads bwrap's namespace record and records the mount namespace of the child and each descendant.
+  - It skips a child that started before the census, so a reused pid is never sampled, and the wrapper removes an earlier attempt's record first.
+  - The exit row's `isolation_runtime.tree` carries it, and G13 reads it as it reads the launcher's.
+- **The sampling limit, stated.** Both censuses sample every 2 s, so a process that starts and ends between two samples is not seen. The namespace record and the locked mounts do not depend on the census: a process below bwrap cannot join the host's mount namespace, which needs CAP_SYS_ADMIN in the user namespace that owns it (setns(2)).
+- **fanotify** stays a documented optional audit and is never a gate. There is no sudo.
+
+**Residual channels after round 5:**
+- **Services on the host's loopback**, reached over the shared network:
+  - the gateway's management routes, whose call logs keep payloads and answer without credentials (returned to the CC above);
+  - the execution brokers and stores listed under "Other loopback services";
+  - the ai-memory server (checked by scope).
+
+  The proposed closure is a per-trial network namespace with explicit forwards.
+- **Host execution brokers over local sockets** (the user manager, the session bus, rootless Docker, WSL interop): tagged.
+- **ai-memory's `_global` scope:** its pages carry no trial ownership, so a page another trial wrote there is not caught (a write to it is tagged).
+- **The Windows drives** (`/mnt/c`, `/mnt/e`, `/mnt/f`, `/mnt/z`) are visible read-only. They hold no hidden root, but a copy of one there, such as a backup, would not be hidden. They were not searched.
 
 ## Confirmed (CC 11:43Z)
 
@@ -357,6 +528,24 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **Round 5 (the 14:38Z, 14:42Z and 15:17Z items, without P2-2's commit):** the focused module (`nice -n 19 python3 -B -m unittest test_isolation`) passes 52 of 52 tests, client starts included.
+  - **Red run.** The same 52 tests on the harness at 2044b2ab (round 4): 11 fail and 16 error, and the remaining 25 pass. The harness was exported with `tools/skill-usage`, which the grader loads.
+  - **Checks the new tests add:**
+    - private `/tmp`, `/var/tmp`, `/dev/shm` and IPC;
+    - the ai-memory marker and the grader's scope rules, unverifiable pages included;
+    - the gateway readings from allowlisted routes only;
+    - the normal tier on every Codex launch path;
+    - the bind-triple, ordering and options negatives;
+    - the public receipt and the private modes;
+    - CL7b's census on a wrapper run as promptfoo runs it;
+    - the diagnostic tags.
+  - **Stage-1 self-test** (`isolation.py selftest --clients`, no model call):
+    - 49 probes hidden, all with ENOENT, and all 7 client checks pass;
+    - the IPC namespaces differ from the host's;
+    - the gateway's two allowlisted routes answered 200 from the namespace, with no credentials;
+    - no home path or home slug is in the report.
+  - **Read-only re-grade of smoke-20261006c** with this grader: the run root is unchanged (modification times before and after), and no gate's pass changes against its 10:48Z grade. G13 now lists the Codex env trial's unverifiable ai-memory page.
+  - **Static checks:** every harness module parses and imports.
 - **The structural G13 and the P3 (13:29Z item):** `harness/test_isolation.py`, the harness's own focused module (`nice -n 19 python3 -B -m unittest -v test_isolation`), passes 26 of 26 tests on this harness. On the harness at 1f81d645, 3 of its 20 runnable tests fail and 16 error: there is no isolation module, and the decisions read the rounded fields. It covers:
   - in a synthetic trial's namespace (claude-like and codex-like), `cat` on a real file in each hidden location fails with ENOENT. The same files read outside the wrapper. The test fails if any is readable inside. The locations are:
     - this run's sibling trial's -o answer, settings, prompt, clone history, promptfoo output and fixture draft;

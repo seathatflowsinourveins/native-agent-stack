@@ -33,8 +33,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (append_jsonl, classify_provider_error, clean_login_env, clone_trust_view,  # noqa: E402
-                    current_s7_baseline, gateway_build, gateway_get, load_json, read_jsonl, rebaseline_cost_ok,
+from common import (app_server_service_tier, append_jsonl, classify_provider_error, clean_login_env, clone_trust_view,  # noqa: E402
+                    current_s7_baseline, gateway_build, gateway_cache_state, gateway_get, load_json, read_jsonl, rebaseline_cost_ok,
                     rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change, sha256_file,
                     stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp, write_json)
 import isolation  # noqa: E402
@@ -270,6 +270,17 @@ def main(argv=None) -> int:
             # Finding 1: the attempt's clone trust (hooks_state, projects, trusted set) before and after, as the
             # launcher's S7 snapshot judges the other Codex cells.
             clone_before = clone_trust_view(work / "clones" / trial["trial_id"])
+            # CC item task-ns2604-coop-20261006T144256Z: the attempt's provider config sets the normal tier explicitly.
+            service_tier = app_server_service_tier(config.read_text(encoding="utf-8")) if config.exists() else None
+            if service_tier != "default":
+                append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
+                                                     "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
+                                                     "test_key": trial["test_key"], "phase": "exit", "at": started,
+                                                     "rc": None, "censored": True, "reason": "service_tier_not_default",
+                                                     "service_tier": service_tier, "launched": False})
+                outcomes.append({"trial_id": trial["trial_id"], "refused": "service_tier_not_default"})
+                continue
+            gateway_before = gateway_cache_state()
             iso_plan = iso_receipt = None
             if cfg.get("isolation"):
                 # The structural G13 (CC item task-ns2604-coop-20261006T132948Z): promptfoo's provider runs the
@@ -289,9 +300,15 @@ def main(argv=None) -> int:
                                                  "gateway_build": row.get("gateway_build"), "config_name": config.name,
                                                  "attempt": trial.get("attempt", 1), "isolation": iso_receipt,
                                                  "fixture_private": trial.get("fixture_private"),
+                                                 "service_tier": service_tier, "gateway_cache": gateway_before,
                                                  "launched_by": "block.py (CL7b: promptfoo's own provider, no launcher)"})
-        with open(log, "wb") as handle:
-            proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)
+        # GPT read of 2044b2ab (verification gap): CL7b's tree gets the launcher's census, taken here while the eval runs.
+        census = isolation.AppServerCensus(iso_plan).start() if trial and iso_plan else None
+        try:
+            with open(log, "wb") as handle:
+                proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)
+        finally:
+            tree = census.stop() if census else None
         ended = utc_now()
         kept = root / "cells" / cell_name / results.name
         if results.exists():
@@ -320,7 +337,8 @@ def main(argv=None) -> int:
                                                  "provider_error_class": error_class, "rate_limited": reason == "rate_limited",
                                                  "host_s7_clone_trust_changed": [f"/clone_config/{k}" for k in clone_changed],
                                                  "attempt": trial.get("attempt", 1),
-                                                 "isolation_runtime": isolation.app_server_runtime(iso_plan) if iso_plan else None,
+                                                 "isolation_runtime": isolation.app_server_runtime(iso_plan, tree) if iso_plan else None,
+                                                 "gateway_cache": gateway_cache_state(),
                                                  "provider_output_sha256": provider[0].get("provider_output_sha256")})
             if reason == "rate_limited":
                 (root / "STOP.codex").write_text(f"{utc_now()} rate_limit_error_from_provider {trial['trial_id']}\n")

@@ -866,6 +866,78 @@ def gateway_get(path: str, timeout: int = 30):
         return json.load(response)
 
 
+# CC item task-ns2604-coop-20261006T143846Z, (a): whether the gateway could serve one trial's output to another. The
+# harness reads only GET /api/cache, a route the repository's command guard allowlists (scripts/hooks/secret_path_guard.py
+# K4_GW_ROWS). /api/settings and /api/settings/cache-config also return decrypted secrets
+# (docs/decisions/2026-09-29-key-management.md) and are not allowlisted, so they are never read here.
+
+
+def app_server_service_tier(config_text: str) -> str | None:
+    """CL7b's service tier (CC item task-ns2604-coop-20261006T144256Z): the provider config's cli_config, which
+    prepare.app_server_config writes as one JSON flow mapping and promptfoo passes as `-c key=value` pairs."""
+    match = re.search(r"^\s*cli_config:\s*(\{.*\})\s*$", config_text or "", re.M)
+    if not match:
+        return None
+    try:
+        value = json.loads(match.group(1))
+    except ValueError:
+        return None
+    return value.get("service_tier") if isinstance(value, dict) else None
+
+
+def gateway_cache_state() -> dict:
+    """The gateway's response-cache switch and counters from GET /api/cache, read-only. OmniRoute v3.8.51 has one
+    response cache, the semantic cache (memory and database layers; a hit is logged with cacheSource "semantic",
+    open-sse/handlers/chatCore/semanticCache.ts). The provider's prompt cache reuses input prefixes and never returns a
+    stored output. Only the named keys are kept."""
+    out: dict = {"at": utc_now(), "gateway": GATEWAY, "route": "GET /api/cache"}
+    try:
+        stats = gateway_get("/api/cache")
+        stats = stats if isinstance(stats, dict) else {}
+        config = stats.get("config") if isinstance(stats.get("config"), dict) else {}
+        out["cache_config"] = {k: config.get(k) for k in ("semanticCacheEnabled",) if k in config}
+        semantic = stats.get("semanticCache") if isinstance(stats.get("semanticCache"), dict) else {}
+        out["semantic_cache"] = {k: semantic.get(k) for k in ("hits", "misses", "dbEntries", "memoryEntries") if k in semantic}
+        idempotency = stats.get("idempotency") if isinstance(stats.get("idempotency"), dict) else {}
+        out["idempotency"] = {k: idempotency.get(k) for k in ("windowMs", "activeKeys") if k in idempotency}
+    except Exception as error:  # noqa: BLE001 - recorded, never raised: the reading is evidence, not a launch step
+        out["error"] = type(error).__name__
+    enabled = (out.get("cache_config") or {}).get("semanticCacheEnabled")
+    out["verdict"] = "unread" if "error" in out else "semantic cache off" if enabled is False else \
+        "semantic cache on" if enabled else "semantic cache state not reported"
+    return out
+
+
+def gateway_log_exposure(rows: int = 20) -> dict:
+    """GPT read of 2044b2ab, residual channels: whether the gateway keeps call-log payloads that its log API returns,
+    and whether that API answers without credentials (this reading sends none). It reads only the allowlisted
+    GET /api/usage/call-logs?limit=N and keeps counts of the latest rows' payload flags; no payload is fetched."""
+    out: dict = {"at": utc_now(), "gateway": GATEWAY, "route": f"GET /api/usage/call-logs?limit={rows}",
+                 "credentials_sent": False}
+    try:
+        latest = gateway_get(f"/api/usage/call-logs?limit={rows}")
+        latest = latest if isinstance(latest, list) else []
+        out.update({"answered": True, "rows": len(latest),
+                    "with_request_body": sum(1 for r in latest if isinstance(r, dict) and r.get("hasRequestBody")),
+                    "with_response_body": sum(1 for r in latest if isinstance(r, dict) and r.get("hasResponseBody")),
+                    "with_pipeline_details": sum(1 for r in latest if isinstance(r, dict) and r.get("hasPipelineDetails"))})
+    except Exception as error:  # noqa: BLE001 - recorded, never raised
+        out.update({"answered": False, "error": type(error).__name__})
+    return out
+
+
+def forwarded_service_tier(pipeline) -> str | None:
+    """CC item task-ns2604-coop-20261006T144256Z: the service tier of the request the gateway forwarded (pipeline details,
+    on only for pilot runs), the one field kept besides the effort. codex-cli 0.160.0 omits service_tier when it is
+    set to "default" (protocol/src/openai_models.rs, service_tier_for_request), so OmniRoute's own Codex tier settings
+    decide what goes out (body tier, else its global mode, else the connection default: codexFastTier.ts)."""
+    if not isinstance(pipeline, dict):
+        return None
+    request = pipeline.get("providerRequest") or {}
+    tier = request.get("service_tier") if isinstance(request, dict) else None
+    return tier if isinstance(tier, str) else ("(unset)" if isinstance(request, dict) and request else None)
+
+
 def forwarded_effort_fields(pipeline) -> dict | None:
     """Decision 8 (RP4, G11): from a call log's pipeline details keep only the effort fields of the request the gateway
     forwarded, never the rest of the payload. None when the gateway exposed no pipeline details for the row."""
@@ -911,6 +983,10 @@ def gateway_calls_for_threads(thread_ids: set[str], since_iso: str, until_iso: s
                     "provider": row.get("provider"), "received_effort": (body.get("reasoning") or {}).get("effort"),
                     "received_service_tier": body.get("service_tier"),
                     "forwarded_effort": forwarded_effort_fields(pipeline),
+                    "forwarded_service_tier": forwarded_service_tier(pipeline),
+                    # CC item task-ns2604-coop-20261006T143846Z, (a): "semantic" marks a response the gateway's
+                    # cache served instead of the provider.
+                    "cache_source": row.get("cacheSource"),
                     "pipeline_exposed": pipeline is not None, "error": bool(row.get("error")),
                     "tokens": row.get("tokens")})
         if (rows[-1].get("timestamp") or "") < since_iso:
