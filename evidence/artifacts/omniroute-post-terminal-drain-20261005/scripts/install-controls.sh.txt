@@ -1,0 +1,57 @@
+#!/bin/bash
+# Controls and positive runs for scripts/install-drain.sh.txt, VERSION 3 (the install script of the drain build). Raw output goes to the file named by $1; every run prints its exit code.
+# (1)-(2) the identity check of an installed prefix; (3) a corrupted tarball; (4) the dependency-graph hash; (5)-(7) inputs missing BEFORE npm install (no shim source, a shim source with the wrong hash, no node): each must stop with exit 3
+# and create no prefix; (8) a full positive run into a SCRATCH tools directory that has no NativeStack prefix layout (the situation on 2604: no prefix under the tools directory, the node directory elsewhere), taking the shim from the
+# repository's committed copy; (9) the same positive run's installed prefix verified with --verify-prefix.
+set -u
+S=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-install-drain-b7c68690-20261006.sh
+TOOLS=$HOME/.local/share/codex-ecosystem/tools
+NEWP=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690
+OLDP=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
+ART=$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005
+OUTF=${1:?output file}
+SCRATCH=$(mktemp -d "$HOME/.cache/omniroute-install-v3-XXXXXX")
+chmod 700 "$SCRATCH"
+mkdir -p "$SCRATCH/tools" "$SCRATCH/artifacts"
+cp "$ART/omniroute-3.8.51-drain-b7c68690.tgz" "$SCRATCH/artifacts/"
+{
+  echo "## (1) --verify-prefix on the installed drain prefix (must pass)"
+  bash "$S" --verify-prefix $NEWP; echo "exit=$?"
+  echo
+  echo "## (2) --verify-prefix on the earlier live build, which has no drain (must fail: BUILD_SHA differs, and the marker count shows 0)"
+  bash "$S" --verify-prefix $OLDP; echo "exit=$?"
+  echo
+  echo "## (3) a one-byte-corrupted copy of the tarball (must fail at the pinned sha256, before any npm install)"
+  mkdir -p "$SCRATCH/corrupt"
+  cp "$ART/omniroute-3.8.51-drain-b7c68690.tgz" "$SCRATCH/corrupt/"
+  printf 'X' | dd of="$SCRATCH/corrupt/omniroute-3.8.51-drain-b7c68690.tgz" bs=1 seek=1000 conv=notrunc 2> /dev/null
+  TOOLS_DIR=$SCRATCH/tools ARTIFACT_DIR=$SCRATCH/corrupt PREFIX_NAME_OVERRIDE=ctl-corrupt NODE_BIN_DIR=$TOOLS/node-24.21.0/bin bash "$S"; echo "exit=$?"
+  echo "prefix created by the corrupted run: $([ -e "$SCRATCH/tools/ctl-corrupt" ] && echo yes || echo no)"
+  echo
+  echo "## (4) dependency-graph hash of the installed drain prefix (the 21:29Z install of 2026-10-05)"
+  bash "$S" --deps-hash $NEWP; echo "exit=$?"
+  echo
+  echo "## (5) no shim source (SHIM_SOURCE points to a file that does not exist): must stop with exit 3 BEFORE npm install and create no prefix (version 2 failed at the shim copy after npm install)"
+  TOOLS_DIR=$SCRATCH/tools ARTIFACT_DIR=$SCRATCH/artifacts PREFIX_NAME_OVERRIDE=ctl-noshim NODE_BIN_DIR=$TOOLS/node-24.21.0/bin SHIM_SOURCE=$SCRATCH/no-such-shim bash "$S"; echo "exit=$?"
+  echo "prefix created: $([ -e "$SCRATCH/tools/ctl-noshim" ] && echo yes || echo no)"
+  echo
+  echo "## (6) a shim source with the wrong sha256: must stop with exit 3 before npm install and create no prefix"
+  echo "not the reviewed shim" > "$SCRATCH/wrong-shim"
+  TOOLS_DIR=$SCRATCH/tools ARTIFACT_DIR=$SCRATCH/artifacts PREFIX_NAME_OVERRIDE=ctl-wrongshim NODE_BIN_DIR=$TOOLS/node-24.21.0/bin SHIM_SOURCE=$SCRATCH/wrong-shim bash "$S"; echo "exit=$?"
+  echo "prefix created: $([ -e "$SCRATCH/tools/ctl-wrongshim" ] && echo yes || echo no)"
+  echo
+  echo "## (7) no node in NODE_BIN_DIR: must stop with exit 3 before npm install and create no prefix"
+  TOOLS_DIR=$SCRATCH/tools ARTIFACT_DIR=$SCRATCH/artifacts PREFIX_NAME_OVERRIDE=ctl-nonode NODE_BIN_DIR=$SCRATCH/no-node-here bash "$S"; echo "exit=$?"
+  echo "prefix created: $([ -e "$SCRATCH/tools/ctl-nonode" ] && echo yes || echo no)"
+  echo
+  echo "## (8) a full positive run into a scratch tools directory with NO NativeStack prefix layout (as on 2604): TOOLS_DIR, NODE_BIN_DIR and ARTIFACT_DIR overridden, the shim taken from the repository's committed copy; every pinned check passes"
+  TOOLS_DIR=$SCRATCH/tools ARTIFACT_DIR=$SCRATCH/artifacts PREFIX_NAME_OVERRIDE=ctl-2604-style NODE_BIN_DIR=$TOOLS/node-24.21.0/bin bash "$S"; echo "exit=$?"
+  echo
+  echo "## (9) --verify-prefix of that scratch prefix (the pinned BUILD_SHA, shim hash and drain marker)"
+  TOOLS_DIR=$SCRATCH/tools bash "$S" --verify-prefix ctl-2604-style; echo "exit=$?"
+  echo
+  echo "## (10) the dependency-graph hash of that scratch install, next to the NativeStack install's from (4): the tarball does not pin it"
+  TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$TOOLS/node-24.21.0/bin bash "$S" --deps-hash ctl-2604-style; echo "exit=$?"
+} > "$OUTF" 2>&1
+echo "scratch directory (remove with rm -rf after reading): $SCRATCH" >> "$OUTF"
+echo "written $OUTF"

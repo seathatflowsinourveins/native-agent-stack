@@ -1,3 +1,4 @@
+# Produced by version 1 of the acceptance scripts (superseded; see superseded/README.md). Its observations of the unpatched build cf6748d04 stand; its verdict logic does not.
 # native codex exec two-request (tool call) shape, observed only, on the UNPATCHED gateway (20128 build cf6748d04), same-day, frozen script, quiet window; started 2026-10-06T00:05:31Z
 FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', '--quiet-timeout', '900', 'two-request'] cwd=/tmp start=2026-10-06T00:05:31.624Z expect=observe wait1=12.0 wait2=60.0 quiet_timeout=900.0
 RESULT shape=two-request quiet=True exec_exit=0 elapsed_s=12.7 expected_each=2 read1_call_logs=2 read1_usage=2 verdict=OBSERVED

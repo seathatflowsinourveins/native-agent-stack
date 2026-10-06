@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+"""Stub gateway: a TEST FIXTURE for the offline controls of the live-acceptance scripts. It is not OmniRoute and proves nothing about OmniRoute.
+
+It serves POST /v1/responses and POST /v1/chat/completions as a streamed response (SSE) on a loopback port and writes call_logs and usage_history rows into a scratch SQLite database
+that has the live gateway store's real table definitions (loaded from a schema file dumped, without data, from the live store). How rows are written is set by a JSON mode file that is re-read
+for every request, so a control driver can switch behaviour between runs:
+
+  {"mode": "...", "tail_s": 3.0, "row_delay_s": 0.4, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
+  (responses_corr_header: send X-Correlation-Id on /v1/responses too, as the real gateway does on some responses; by default only Chat Completions responses carry it, so a Responses client attributes rows by the response id)
+
+  mode "normal"            rows are written row_delay_s after the terminal event, whether or not the client is still connected (what the patched gateway does)
+  mode "lose-on-early"     rows are written only when the client stayed connected until the stream ended; a client that closes after the terminal event leaves NO row (the unpatched gateway's drop)
+  mode "double-row"        the normal rows plus a second identical call_logs row dup_s (default 4) seconds later (a late duplicate)
+  mode "status-flip"       the normal rows, then flip_s (default 3) seconds later the call_logs row's status becomes 499 (a row that changes after the first read)
+  mode "dup-usage"         the normal rows plus a second usage_history row with the same model and token counts within the 3 s match window (an ambiguous usage match)
+  mode "no-terminal"       the stream ends without a terminal event (an error event instead); rows are written as for "normal"
+  mode "http-error"        the response is http_status (default 500) with no stream and no row
+  mode "unrelated-only"    the request writes NO row of its own; an unrelated request's rows (other model, other tag, other tokens) are written instead
+
+Rows carry the correlation id (chat) or response id (responses) the client can see, the session tag from the X-OmniRoute-Session-Id request header (as the real gateway stores it), tokens_in/out and effort columns.
+Every request's header names (lower-cased) and the value of x-omniroute-session-id are appended to <db>.requests.jsonl (no other header value is kept).
+usage: stub-gateway.py --db PATH --schema FILE --mode-file FILE [--port N] [--port-file FILE]
+"""
+import argparse
+import datetime as dt
+import json
+import os
+import sqlite3
+import sys
+import threading
+import time
+import uuid
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+ARGS = None
+LOCK = threading.Lock()
+
+
+def now():
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def mode():
+    try:
+        return json.load(open(ARGS.mode_file))
+    except Exception:
+        return {"mode": "normal"}
+
+
+def db():
+    return sqlite3.connect(ARGS.db, timeout=30)
+
+
+def insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, status=200, with_usage=True, effort_up=None):
+    row_id = str(uuid.uuid4())
+    with LOCK:
+        con = db()
+        ts = now()
+        con.execute(
+            "insert into call_logs (id, timestamp, method, path, status, model, requested_model, provider, tokens_in, tokens_out, detail_state, correlation_id, response_id, session_tag, "
+            "reasoning_effort_requested, reasoning_effort_upstream) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (row_id, ts, "POST", path, status, model, "codex/" + model, "codex", tin, tout, "ready", corr, resp_id, tag, effort, effort_up if effort_up is not None else effort),
+        )
+        if with_usage:
+            con.execute(
+                "insert into usage_history (provider, model, tokens_input, tokens_output, status, success, timestamp) values (?,?,?,?,?,?,?)",
+                ("codex", model, tin, tout, str(status), 1 if status == 200 else 0, ts),
+            )
+        con.commit()
+        con.close()
+    return row_id
+
+
+def flip_status_later(row_id, delay):
+    def run():
+        time.sleep(delay)
+        with LOCK:
+            con = db()
+            con.execute("update call_logs set status = 499 where id = ?", (row_id,))
+            con.commit()
+            con.close()
+    threading.Thread(target=run, daemon=True).start()
+
+
+class Handler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+
+    def log_message(self, *a):
+        pass
+
+    def do_GET(self):
+        # the two read-only endpoints the scripts use: health, and the pending-request counter
+        if self.path.startswith("/api/health"):
+            body = json.dumps({"status": "ok"}).encode()
+        elif self.path.startswith("/api/usage/history"):
+            body = json.dumps({"pending": {"byModel": {}, "byAccount": {}}, "activeRequests": []}).encode()
+        else:
+            self.send_response(404)
+            self.send_header("Content-Length", "0")
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.close_connection = True
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Connection", "close")
+        self.end_headers()
+        self.wfile.write(body)
+        self.close_connection = True
+
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        body = json.loads(self.rfile.read(length) or b"{}")
+        cfg = mode()
+        m = cfg.get("mode", "normal")
+        tail = float(cfg.get("tail_s", 3.0))
+        delay = float(cfg.get("row_delay_s", 0.4))
+        tag = self.headers.get("X-OmniRoute-Session-Id")
+        with open(ARGS.db + ".requests.jsonl", "a", encoding="utf-8") as f:
+            f.write(json.dumps({"path": self.path, "header_names": sorted(k.lower() for k in self.headers.keys()), "x-omniroute-session-id": tag, "stream": bool(body.get("stream"))}) + "\n")
+        if m == "http-error":
+            payload = b'{"error":{"message":"stub error"}}'
+            self.send_response(int(cfg.get("http_status", 500)))
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(payload)
+            self.close_connection = True
+            return
+        model = str(body.get("model", "cx/gpt-6-astra")).split("/")[-1]
+        effort = (body.get("reasoning") or {}).get("effort") if isinstance(body.get("reasoning"), dict) else None
+        responses = self.path.endswith("/responses")
+        corr = None if (responses and not cfg.get("responses_corr_header")) else (self.headers.get("X-Correlation-Id") or str(uuid.uuid4()))
+        resp_id = "resp_" + uuid.uuid4().hex[:24] if responses else None
+        tin, tout = (22, 19) if responses else (21, 5)
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Transfer-Encoding", "chunked")
+        self.send_header("Connection", "close")
+        self.close_connection = True
+        if corr:
+            self.send_header("X-Correlation-Id", corr)
+        self.end_headers()
+
+        def chunk(data: bytes):
+            self.wfile.write(b"%x\r\n" % len(data) + data + b"\r\n")
+            self.wfile.flush()
+
+        try:
+            if responses:
+                chunk(b'event: response.created\ndata: ' + json.dumps({"type": "response.created", "response": {"id": resp_id, "status": "in_progress"}}).encode() + b"\n\n")
+                chunk(b'event: response.output_item.done\ndata: ' + json.dumps({"type": "response.output_item.done", "item": {"type": "message", "role": "assistant", "id": "msg_stub", "content": [{"type": "output_text", "text": "ok"}]}}).encode() + b"\n\n")
+                if m == "no-terminal":
+                    chunk(b'event: error\ndata: {"type":"error","error":{"message":"stub: no terminal event"}}\n\n')
+                else:
+                    usage = {"input_tokens": tin, "input_tokens_details": {"cached_tokens": 0}, "output_tokens": tout, "output_tokens_details": {"reasoning_tokens": 0}, "total_tokens": tin + tout}
+                    chunk(b'event: response.completed\ndata: ' + json.dumps({"type": "response.completed", "response": {"id": resp_id, "status": "completed", "usage": usage}}).encode() + b"\n\n")
+            else:
+                chunk(b"data: " + json.dumps({"id": "chatcmpl-stub", "choices": [{"delta": {"content": "ok"}, "index": 0}]}).encode() + b"\n\n")
+                if m == "no-terminal":
+                    chunk(b'data: {"error":{"message":"stub: no terminal event"}}\n\n')
+                else:
+                    chunk(b"data: [DONE]\n\n")
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        # the rows: written when the response completes (delay after the terminal event), unless this mode loses them for an early-closing client
+        stayed = True
+        end = time.time() + tail
+        try:
+            while time.time() < end:
+                time.sleep(0.2)
+                chunk(b": keep-alive\n\n")  # a write to a closed peer raises within a couple of writes: that is how an early-closing client is detected
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            stayed = False
+        path = self.path
+        write_own = m != "unrelated-only"
+        if m == "lose-on-early" and not stayed:
+            write_own = False
+        if write_own:
+            effort_up = cfg.get("effort_upstream_override")
+            row_id = insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, effort_up=effort_up)
+            if m == "dup-usage":
+                with LOCK:
+                    con = db()
+                    con.execute("insert into usage_history (provider, model, tokens_input, tokens_output, status, success, timestamp) values (?,?,?,?,?,?,?)", ("codex", model, tin, tout, "200", 1, now()))
+                    con.commit()
+                    con.close()
+            if m == "double-row":
+                time.sleep(float(cfg.get("dup_s", 4)))
+                insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, with_usage=False, effort_up=effort_up)
+            if m == "status-flip":
+                flip_status_later(row_id, float(cfg.get("flip_s", 3)))
+        elif m == "unrelated-only":
+            insert_rows(path, "gpt-6.1-sol", 4711, 42, str(uuid.uuid4()), "resp_" + uuid.uuid4().hex[:24], "someone-else", "xhigh")
+        try:
+            chunk(b"")
+        except Exception:
+            pass
+
+
+def main():
+    global ARGS
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--db", required=True)
+    ap.add_argument("--schema", required=True)
+    ap.add_argument("--mode-file", required=True)
+    ap.add_argument("--port", type=int, default=0)
+    ap.add_argument("--port-file")
+    ARGS = ap.parse_args()
+    os.makedirs(os.path.dirname(ARGS.db), exist_ok=True)
+    if not os.path.exists(ARGS.db):
+        con = sqlite3.connect(ARGS.db)
+        con.executescript(open(ARGS.schema, encoding="utf-8").read())
+        con.commit()
+        con.close()
+    server = ThreadingHTTPServer(("127.0.0.1", ARGS.port), Handler)
+    port = server.server_address[1]
+    if ARGS.port_file:
+        open(ARGS.port_file, "w").write(str(port))
+    print(f"stub gateway on 127.0.0.1:{port} db={ARGS.db}", flush=True)
+    server.serve_forever()
+
+
+main()

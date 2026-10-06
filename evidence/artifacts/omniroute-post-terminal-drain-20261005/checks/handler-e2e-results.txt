@@ -1,4 +1,4 @@
-# Handler-level end-to-end check of the post-terminal client disconnect (2026-10-06, node 24.21.0; nothing deployed)
+# Handler-level end-to-end check of the post-terminal client disconnect (2026-10-06 UTC, node 24.21.0; nothing deployed)
 # The test (scripts/handler-e2e-terminal-close.test.ts.txt, sha256 pinned in the script) calls the real handleChat -> chatCore -> stream pipeline -> call-log and usage writers with a stubbed upstream fetch and a temporary database, in the style of upstream's tests/integration/chat-pipeline.test.ts.
 # A client reads until its terminal event and closes (reader.cancel(); in three scenarios after aborting the request signal first, as a server does when the socket closes) while the upstream body stays open for 150 ms more. Five scenarios: Responses clients (plain, Codex-originated) and one Chat Completions client (a non-Responses format).
 # composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch under test is patches/drain-after-terminal.patch (sha256 74c0f449...), applied to C it gives tree b7c68690...

@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""Identity read-back of a NativeStack OmniRoute gateway unit (frozen with checks/live-acceptance-protocol.md): which build answers, read with the same reads as the committed switch tool
+(evidence/artifacts/omniroute-sol-max-20260930/scripts/switch_gateways.py.txt): `systemctl --user show` for MainPID and the start timestamp, `ps -o args=` for the running install prefix
+(the `/tools/omniroute-...` segment of the server's command line), `dist/BUILD_SHA` of that prefix, and GET /api/health.
+
+Prints one line:
+  IDENTITY label=<label> time=<utc> unit=<unit> MainPID=<pid> ExecMainStartTimestamp=<ts> NRestarts=<n> running_prefix=<name> BUILD_SHA=<sha> health=<status> pending_total=<n>
+and, when expectations are given, `expect_prefix_ok=<bool>` / `expect_build_ok=<bool>`. pending_total is informational (never part of the identity comparison): the sum of the counts in the gateway's own
+pending-request counter (GET /api/usage/history, counts only); on the unpatched build it keeps an entry for every request whose stream was cancelled before it finished (294 on the idle unpatched 20128 at 2026-10-06 01:40Z).
+Exit status: 0 when the unit is active, health is ok and every given expectation holds; 5 otherwise (an identity or health mismatch); 3 on a usage error.
+Only unit metadata, the process command line's prefix segment, one file (dist/BUILD_SHA) and the health endpoint are read. Values are never printed beyond those fields.
+
+usage: gateway-identity-20261006.py [--label TEXT] [--unit omniroute.service] [--port 20128] [--tools DIR] [--expect-prefix NAME] [--expect-build SHA] [--pid N]
+  --pid N   use this process instead of the unit's MainPID (the offline controls use it with a dummy process; a live run never does)
+"""
+import argparse
+import datetime as dt
+import json
+import re
+import subprocess
+import sys
+import urllib.request
+from pathlib import Path
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        print(f"ERROR usage: {message}", file=sys.stderr)
+        sys.exit(3)
+
+
+def sh(*args):
+    return subprocess.run(args, capture_output=True, text=True)
+
+
+def unit_state(unit):
+    props = sh("systemctl", "--user", "show", unit, "-p", "ActiveState", "-p", "SubState", "-p", "MainPID", "-p", "NRestarts", "-p", "ExecMainStartTimestamp").stdout
+    return dict(line.split("=", 1) for line in props.splitlines() if "=" in line)
+
+
+def running_prefix(pid):
+    args = sh("ps", "-o", "args=", "-p", str(pid)).stdout
+    match = re.search(r"/tools/(omniroute-[A-Za-z0-9._-]+)/", args)
+    return match.group(1) if match else ""
+
+
+def build_sha(tools, prefix):
+    path = Path(tools) / prefix / "lib/node_modules/omniroute/dist/BUILD_SHA"
+    return path.read_text().strip() if prefix and path.exists() else ""
+
+
+def health(port):
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=5) as response:
+            body = json.loads(response.read())
+            if response.status == 200 and body.get("status") in ("ok", "healthy", "up", "pass", "passed", "OK"):
+                return True, body.get("status")
+            return False, f"status {response.status} {body.get('status')}"
+    except Exception as error:
+        return False, type(error).__name__
+
+
+def pending_total(port):
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/usage/history", timeout=20) as response:
+            body = json.loads(response.read())
+        return sum(int(c) for models in (body.get("pending") or {}).get("byAccount", {}).values() for c in models.values())
+    except Exception:
+        return None
+
+
+def main():
+    ap = Parser()
+    ap.add_argument("--label", default="identity")
+    ap.add_argument("--unit", default="omniroute.service")
+    ap.add_argument("--port", type=int, default=20128)
+    ap.add_argument("--tools", default=str(Path.home() / ".local/share/codex-ecosystem/tools"))
+    ap.add_argument("--expect-prefix")
+    ap.add_argument("--expect-build")
+    ap.add_argument("--pid")
+    args = ap.parse_args()
+    state = unit_state(args.unit)
+    pid = args.pid or state.get("MainPID", "0")
+    prefix = running_prefix(pid)
+    sha = build_sha(args.tools, prefix)
+    ok, detail = health(args.port)
+    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    line = (f"IDENTITY label={args.label} time={now} unit={args.unit} MainPID={pid} ExecMainStartTimestamp={state.get('ExecMainStartTimestamp', '').replace(' ', '_')} "
+            f"NRestarts={state.get('NRestarts')} running_prefix={prefix or 'none'} BUILD_SHA={sha or 'none'} health={detail} pending_total={pending_total(args.port)}")
+    good = ok and (args.pid is not None or state.get("ActiveState") == "active")
+    if args.expect_prefix is not None:
+        match = prefix == args.expect_prefix
+        line += f" expect_prefix_ok={match}"
+        good = good and match
+    if args.expect_build is not None:
+        match = sha == args.expect_build
+        line += f" expect_build_ok={match}"
+        good = good and match
+    print(line)
+    sys.exit(0 if good else 5)
+
+
+try:
+    main()
+except SystemExit:
+    raise
+except Exception as error:
+    print(f"ERROR {type(error).__name__}: {str(error)[:200]}", file=sys.stderr)
+    sys.exit(3)

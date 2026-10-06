@@ -1,17 +1,31 @@
-# Stage logs of the validation and handler-e2e runs (2026-10-06): what each log is, its size, its sha256 and where it is kept.
-# Every log is kept gzipped in the first host's private artifact directory (0700, with the tarball: <artifact directory>/test-logs/<name>.gz); a log up to 64 KiB is also committed here as plain text.
+# Stage logs of the validation and handler-e2e runs (validation 2026-10-06 UTC, handler e2e 2026-10-06 UTC) and the unshortened raw outputs: what each is, its size, its sha256 and where it is kept.
+# Every stage log is kept gzipped in the first host's private artifact directory (0700, with the tarball: <artifact directory>/test-logs/<name>.gz); a log up to 64 KiB is also committed here as plain text.
 # The three large logs (about 1.5 MB of runner output) stay in the private directory only, because this repository's publication check reads UTF-8 text and the runner's output is not compact evidence;
 # their stage summaries are in checks/drain-prototype-results.txt and the failing test's output is checks/failing-test-output-A.txt.
 # retained = the text kept and committed: the home directory written $HOME and UUID-shaped strings shortened to their first 8 hex digits and an ellipsis. raw = the runner's output before that.
 # The raw logs were scratch files of the runs (deleted with the scratch trees at handover); the retained gzip is what a reviewer can verify against `retained_sha256` after `gunzip`.
 
+## Stage logs
+
 | log | bytes (retained) | lines | raw_sha256 | retained_sha256 | committed copy |
 | --- | --- | --- | --- | --- | --- |
-| `validation-A-baseline.log` | 608133 | 9577 | `c6feb7f00dcce6ce626634f1465c44cf76c02ec53b77e35503f6c960b480e2a6` | `433be94a7977cfc07d3c23e687f6808045b6a5931b5cb3b3c927cbb7d1b821ab` | private only |
-| `validation-A2-stream-tests-patched.log` | 610718 | 9611 | `f817c5ef94da38f83703506a46afa0f67980944d605302a9009a48411e808821` | `70466d642ffb78e17146e14017f4323431a41cf8e5ec0d1b08074c517dce0962` | private only |
-| `validation-B2-calllog-usage-chat-pipeline.log` | 275608 | 4995 | `dc4d7adae7850cb64362d7e03a7a1bef1952c5dcdd27862df918e6f4df3d4982` | `9e6cef6a8dd097384b8955d32c282b1c47602460febc9aef675935bbf07fbda1` | private only |
-| `validation-N-new-test-unpatched.log` | 4920 | 94 | `505e357d6ae895f76a049c3bbded01847785d72f872f0f530107a81773cc2032` | `84df3da89a9fe2d313857179115d6a0cf2ffda775a00b26d5d324dbd949efd54` | `checks/logs/validation-N-new-test-unpatched.log` |
-| `validation-N2-new-test-first-version.log` | 4230 | 78 | `f8a0d130517038139ecdb71a5d1f54ec28c18e53c82facd2b9dd637cc1ad8667` | `55227ed13b0f32a80b6c18fc727c78c647a386d642d9e33c617acec31b4492f8` | `checks/logs/validation-N2-new-test-first-version.log` |
-| `validation-P-new-test-patched.log` | 2681 | 42 | `1efba6ee2b86a752e0e67480a5933e5c397fb61fa4a633a92ce8765c7e4e54f0` | `1efba6ee2b86a752e0e67480a5933e5c397fb61fa4a633a92ce8765c7e4e54f0` | `checks/logs/validation-P-new-test-patched.log` |
-| `handler-e2e-P-e2e-patched.log` | 28813 | 509 | `edb61b3a4a3e0255ae57540e3c8d9fa72ca1a5944a49c40f2dd722bb37e5940d` | `eff3f7cf8d095a7c71fc1ad5e0b009dc8d82393108dfe40bbf59a57eda63b6e4` | `checks/logs/handler-e2e-P-e2e-patched.log` |
-| `handler-e2e-U-e2e-unpatched.log` | 32034 | 576 | `05ee9a1ee32afbc54204fdf492b4216ec950142f804b72483260cca7a9485a99` | `d8ddfabd0379b06baf6678330db8d2ee476e07f276b8c0df5f200b734486e737` | `checks/logs/handler-e2e-U-e2e-unpatched.log` |
+| `validation-A-baseline.log` | 580658 | 9576 | `b00065497900407e55c7a25ebd2ac5ddac6678bcb597b42aa348328b8276619f` | `45fb6c6afffc7efd7b1dee769574adf4b7efca92fdf08ba3d5c379b1f10f77a2` | private only |
+| `validation-A2-stream-tests-patched.log` | 583276 | 9611 | `723ad5304b5342ac0e695075531616c63301778207d809ced79b07dd37b7c982` | `c8b840828b2f28ee9bc4981ed30434121755af799499cef7d07e5170dd389636` | private only |
+| `validation-B2-calllog-usage-chat-pipeline.log` | 237702 | 4994 | `6a9bb95eb457236b974d875edcfea9bc70879ebd2cf5b6a74e8fb4b1fdbd33a3` | `646a4b6acc4df62bfbffab7b1583bd3e058bcf77642fdc9b9f8e3179c3dd44ae` | private only |
+| `validation-N-new-test-unpatched.log` | 4911 | 94 | `3e45e63bff3b112bb523e202da3e1400619fdae2e0355d9c1137601b251e94fc` | `d6704d187e676ecfa0a1435be6c355b60851ae429d2b65d3d904fdc5506d9133` | `checks/logs/validation-N-new-test-unpatched.log` |
+| `validation-N2-new-test-first-version.log` | 4210 | 78 | `a822b69cbd8fff8db78f2671792eeb927fcfd50497c7fc5006775cc38284516a` | `11ee23e5b2711cb71794b708a266d2d89d02bdbd7a76e39f75da835d081cb820` | `checks/logs/validation-N2-new-test-first-version.log` |
+| `validation-P-new-test-patched.log` | 2662 | 42 | `8e42a3247e139b8f67e6c068f207487b817a6dc43e1918adc7e9e5fafa22f688` | `a25eca62ec133663c0deca6405f6eab84e09ebff472572f1c3bef196995530a6` | `checks/logs/validation-P-new-test-patched.log` |
+| `handler-e2e-P-e2e-patched.log` | 24108 | 509 | `edb61b3a4a3e0255ae57540e3c8d9fa72ca1a5944a49c40f2dd722bb37e5940d` | `9c1e130ef4089258515d438a1ade981f66163305673751b89ae6d0d6f13a1400` | `checks/logs/handler-e2e-P-e2e-patched.log` |
+| `handler-e2e-U-e2e-unpatched.log` | 27365 | 576 | `05ee9a1ee32afbc54204fdf492b4216ec950142f804b72483260cca7a9485a99` | `60b340ee26a01eddeb437c0771dd158e70b0525dcc8d41ce88016a65cb5adef0` | `checks/logs/handler-e2e-U-e2e-unpatched.log` |
+
+## Unshortened raw outputs
+
+Each file below was committed with its UUID-shaped strings (the gateway's correlation ids) shortened; the unshortened text is kept gzipped in the first host's private artifact directory (raw-outputs/<name>) and `sha256` is the sha256 of that text
+(the same value is in the first line of the committed file). The canary's outputs are kept the same way when they exist.
+
+| committed file | bytes (unshortened) | sha256 (unshortened) | private copy |
+| --- | --- | --- | --- |
+| `checks/acceptance-controls.txt` | 132676 | `dd8648aa15689c13c2e0d671d89a07892afa72fd32e7582a01fac9a8b60c8520` | `raw-outputs/checks__acceptance-controls.txt.gz` |
+| `checks/live-acceptance-baseline-v1-race.txt` | 3137 | `4c4dd15ce3a3f2f9a0adc21ec05202eea344e3091c25699002adcf633e917e9e` | `raw-outputs/checks__live-acceptance-baseline-v1-race.txt.gz` |
+| `checks/live-acceptance-baseline-v1-raw.txt` | 7189 | `958f880b96a7753eceb908dd77a4bedbacce7e467b5b019834dbfbf75dca66d9` | `raw-outputs/checks__live-acceptance-baseline-v1-raw.txt.gz` |
+| `superseded/live-acceptance-baseline-attempt1-output.txt` | 6739 | `49203ff64f2f8f783b7889fcafd5388f03daf0fa3dfd81855789415c8546d3c2` | `raw-outputs/superseded__live-acceptance-baseline-attempt1-output.txt.gz` |

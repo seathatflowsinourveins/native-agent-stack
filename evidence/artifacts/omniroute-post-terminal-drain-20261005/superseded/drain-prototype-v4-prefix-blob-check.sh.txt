@@ -1,5 +1,5 @@
 #!/bin/bash
-# Validation of the post-terminal client-disconnect drain patch in a scratch tree built from public refs (nothing is deployed). Version 5 (2026-10-06): the blob id parsed from the patch's index line must be a hex id (a vacuous prefix match is no longer possible).
+# Validation of the post-terminal client-disconnect drain patch in a scratch tree built from public refs (nothing is deployed).
 # Patch under test: $DRAIN_DIR/drain-after-terminal.patch (one commit: the streamHandler.ts change plus tests/unit/stream-terminal-seen-client-disconnect.test.ts).
 # The unit test file is EXTRACTED from that patch (git apply --include) for the negative controls, and its git blob id is checked against the patch's own index line: no standalone copy exists to drift.
 # Reference implementation: drainCompletedToolHandoff in open-sse/utils/streamHandler.ts at upstream 0585aba5589d5a1f49243a13a8db249558e7c9e3 (L665-688), reused from cancel() for the terminal-seen case.
@@ -76,8 +76,6 @@ run A-baseline $STREAM_TESTS
 expect_counts A-baseline 1746 1745 1
 expect_failing A-baseline "$UNRELATED_FAILURE"
 PATCH_BLOB=$(awk '/^diff --git a\/tests\/unit\/stream-terminal-seen-client-disconnect.test.ts/{f=1} f&&/^index /{print $2; exit}' "$D/drain-after-terminal.patch" | sed 's/.*\.\.//')
-# version 5: the prefix check below passes vacuously for an empty PATCH_BLOB, so the parsed id must be a hex blob id of 7 to 40 digits (a missing or reformatted index line stops the script with exit 3)
-printf '%s' "$PATCH_BLOB" | grep -Eq '^[0-9a-f]{7,40}$' || { log "the patch's index line for the new test file did not parse to a blob id (got '$PATCH_BLOB'): stopping"; exit 3; }
 step "extract the new test file from the patch" G apply --include=$NEWTEST "$D/drain-after-terminal.patch"
 ACTUAL_BLOB=$(G hash-object $NEWTEST)
 case "$ACTUAL_BLOB" in "$PATCH_BLOB"*) log "new test file blob $ACTUAL_BLOB matches the patch's index line ($PATCH_BLOB)";; *) log "new test file blob $ACTUAL_BLOB does not match the patch's index line ($PATCH_BLOB): stopping"; exit 3;; esac

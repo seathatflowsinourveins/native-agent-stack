@@ -1,0 +1,53 @@
+# native codex exec --json calibration on the UNPATCHED NativeStack 20128 (build cf6748d04), 2026-10-06T01:22:05Z: script calibrate-native-json-20261006.py (sha256 361ffd370ce18d87b8956149c5c3a5506ac70ecb06e9f13b34e593eb1a6095c2)
+# Each block: the client's JSONL event types, the number of completed command executions, the turn.completed usage, then the call_logs rows stored under the turn's session id and their token sums.
+
+tag=calibration-20261006T012205-twoA shape=two-request exit=0 elapsed_s=5.6
+event types: ['thread.started', 'item.completed(error)', 'turn.started', 'item.started(command_execution)', 'item.completed(command_execution)', 'item.completed(reasoning)', 'item.completed(agent_message)', 'turn.completed']
+command executions completed: 1
+turn.completed usage: {'input_tokens': 30145, 'cached_input_tokens': 14848, 'cache_write_input_tokens': 0, 'output_tokens': 65, 'reasoning_output_tokens': 8}
+call_logs rows with the tag: 1
+    ('2026-10-06T01:22:08.955Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15042, 50, 0, 'calibration-20261006T012205-twoA')
+sum of rows: tokens_in = 15042 tokens_out = 50 tokens_cache_read = 0
+
+tag=calibration-20261006T012225-twoB shape=two-request exit=0 elapsed_s=6.9
+event types: ['thread.started', 'item.completed(error)', 'turn.started', 'item.started(command_execution)', 'item.completed(command_execution)', 'item.completed(agent_message)', 'turn.completed']
+command executions completed: 1
+turn.completed usage: {'input_tokens': 30145, 'cached_input_tokens': 29824, 'cache_write_input_tokens': 0, 'output_tokens': 80, 'reasoning_output_tokens': 21}
+call_logs rows with the tag: 2
+    ('2026-10-06T01:22:28.740Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15042, 52, 14848, 'calibration-20261006T012225-twoB')
+    ('2026-10-06T01:22:32.344Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15103, 28, 14976, 'calibration-20261006T012225-twoB')
+sum of rows: tokens_in = 30145 tokens_out = 80 tokens_cache_read = 29824
+
+tag=calibration-20261006T012246-twoC shape=two-request exit=0 elapsed_s=7.4
+event types: ['thread.started', 'item.completed(error)', 'turn.started', 'item.started(command_execution)', 'item.completed(command_execution)', 'item.completed(agent_message)', 'turn.completed']
+command executions completed: 1
+turn.completed usage: {'input_tokens': 30143, 'cached_input_tokens': 29696, 'cache_write_input_tokens': 0, 'output_tokens': 78, 'reasoning_output_tokens': 23}
+call_logs rows with the tag: 2
+    ('2026-10-06T01:22:49.905Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15042, 48, 14848, 'calibration-20261006T012246-twoC')
+    ('2026-10-06T01:22:53.825Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15101, 30, 14848, 'calibration-20261006T012246-twoC')
+sum of rows: tokens_in = 30143 tokens_out = 78 tokens_cache_read = 29696
+
+tag=calibration-20261006T012308-twoD shape=two-request exit=0 elapsed_s=10.9
+event types: ['thread.started', 'item.completed(error)', 'turn.started', 'item.started(command_execution)', 'item.completed(command_execution)', 'item.completed(agent_message)', 'turn.completed']
+command executions completed: 1
+turn.completed usage: {'input_tokens': 30169, 'cached_input_tokens': 29696, 'cache_write_input_tokens': 0, 'output_tokens': 74, 'reasoning_output_tokens': 23}
+call_logs rows with the tag: 2
+    ('2026-10-06T01:23:11.186Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15042, 44, 14848, 'calibration-20261006T012308-twoD')
+    ('2026-10-06T01:23:18.721Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15127, 30, 14848, 'calibration-20261006T012308-twoD')
+sum of rows: tokens_in = 30169 tokens_out = 74 tokens_cache_read = 29696
+
+tag=calibration-20261006T012332-oneA shape=astra-max exit=0 elapsed_s=2.3
+event types: ['thread.started', 'item.completed(error)', 'turn.started', 'item.completed(agent_message)', 'turn.completed']
+command executions completed: 0
+turn.completed usage: {'input_tokens': 15033, 'cached_input_tokens': 14848, 'cache_write_input_tokens': 0, 'output_tokens': 5, 'reasoning_output_tokens': 0}
+call_logs rows with the tag: 1
+    ('2026-10-06T01:23:35.018Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15033, 5, 14848, 'calibration-20261006T012332-oneA')
+sum of rows: tokens_in = 15033 tokens_out = 5 tokens_cache_read = 14848
+
+tag=calibration-20261006T012349-oneB shape=astra-max exit=0 elapsed_s=3.1
+event types: ['thread.started', 'item.completed(error)', 'turn.started', 'item.completed(agent_message)', 'turn.completed']
+command executions completed: 0
+turn.completed usage: {'input_tokens': 15033, 'cached_input_tokens': 14848, 'cache_write_input_tokens': 0, 'output_tokens': 5, 'reasoning_output_tokens': 0}
+call_logs rows with the tag: 0
+
+# finished 2026-10-06T01:24:06Z

@@ -1,8 +1,5 @@
 #!/bin/bash
 # Install the drain-patched tarball (patch v2, patched tree b7c6869001ce, BUILD_SHA 2a41147b7) into its own prefix next to the live ones; no live unit is touched.
-# Version 3 (2026-10-06): usable on another host. The tools directory (TOOLS_DIR), the node directory (NODE_BIN_DIR) and the source of the lsof shim are overridable; the shim now comes by default from the repository's
-# committed copy (evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt, sha256 checked against the pinned value BEFORE anything is installed) instead of from a live prefix, and every one of these inputs is checked
-# before `npm install` creates the prefix, so a missing input cannot leave a half-made prefix behind (version 2 failed at the shim copy AFTER npm install on a host without the NativeStack prefix layout).
 # Every identity check is pinned HERE, from the PR's record (checks/build-results.txt), not from a file beside the tarball; a failed check stops the script with exit 3.
 # 1. The build output (what scripts/build-drain.sh.txt packs: omniroute-3.8.51.tgz, the same base name as the first composition tarball) is COPIED to a distinct name,
 #    omniroute-3.8.51-drain-b7c68690.tgz, in the artifact directory, and SHA256SUMS there is updated (the committed copy step).
@@ -25,13 +22,11 @@ EXPECTED_SHIM_SHA256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e
 MARKER_RE='abort\(\),[A-Za-z_$]+\.clearPendingRequest\?\.\(\),Promise\.allSettled'
 TGZ_NAME=omniroute-3.8.51-drain-b7c68690.tgz
 PREFIX_NAME=${PREFIX_NAME_OVERRIDE:-omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690}   # the override is only for a verification install beside the real prefix
-TOOLS=${TOOLS_DIR:-$HOME/.local/share/codex-ecosystem/tools}
-REPO=${REPO_DIR:-$HOME/code/native-agent-stack}
-SHIM_SOURCE=${SHIM_SOURCE:-$REPO/evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt}
+TOOLS=$HOME/.local/share/codex-ecosystem/tools
+LIVE=$TOOLS/omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
 A=${ARTIFACT_DIR:-$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005}
 BUILD_OUT=${BUILD_OUT:-$HOME/.cache/omniroute-drain-build-out/omniroute-3.8.51.tgz}
-NODE_BIN=${NODE_BIN_DIR:-$TOOLS/node-24.21.0/bin}
-export PATH="$NODE_BIN:/usr/local/bin:/usr/bin:/bin"
+export PATH="$TOOLS/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
 fail() { echo "FAILED: $*" >&2; exit 3; }
 verify_prefix() { # directory name under tools/
   local p=$TOOLS/$1 sha shim marker
@@ -67,10 +62,6 @@ if [ "${1:-}" = "--verify-prefix" ]; then
 fi
 P=$TOOLS/$PREFIX_NAME
 [ -e "$P" ] && fail "$P exists; refusing to overwrite"
-[ -f "$SHIM_SOURCE" ] || fail "no lsof shim source at $SHIM_SOURCE (set SHIM_SOURCE or REPO_DIR)"
-[ "$(sha256sum "$SHIM_SOURCE" | cut -d' ' -f1)" = "$EXPECTED_SHIM_SHA256" ] || fail "the shim source $SHIM_SOURCE does not have the pinned sha256 $EXPECTED_SHIM_SHA256"
-[ -x "$NODE_BIN/node" ] || fail "no node at $NODE_BIN/node (set NODE_BIN_DIR)"
-command -v npm > /dev/null || fail "no npm on PATH ($PATH)"
 mkdir -p "$A" || fail "artifact directory"
 if [ ! -e "$A/$TGZ_NAME" ]; then
   [ -f "$BUILD_OUT" ] || fail "no build output at $BUILD_OUT"
@@ -87,7 +78,7 @@ echo "tarball verified: sha256, npm integrity and $ENTRIES entries equal the pin
 OUT=$HOME/.cache/omniroute-drain-install-out; mkdir -p "$OUT"
 nice -n 19 npm install -g --prefix "$P" --no-audit --no-fund "$A/$TGZ_NAME" > "$OUT/install.log" 2>&1 || { tail -5 "$OUT/install.log"; fail "npm install"; }
 echo "$(date -u +%H:%M:%SZ) npm install exit=0"
-mkdir -p "$P/shim" && cp "$SHIM_SOURCE" "$P/shim/lsof" && chmod 755 "$P/shim/lsof" || fail "copy of the lsof shim from $SHIM_SOURCE"
+cp -a "$LIVE/shim" "$P/shim" || fail "copy of the lsof shim from $LIVE"
 verify_prefix "$PREFIX_NAME"
 DEPS=$(deps_hash "$P")
 echo "installed dependency graph: packages and sha256 of the sorted name@version list: $DEPS"

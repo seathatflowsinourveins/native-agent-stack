@@ -1,4 +1,4 @@
-# Boot smoke of the installed drain prefix (version 4 of the smoke script, 2026-10-06 ~00:00Z), with controls for its own checks. Raw output, ANSI colour codes removed and the home directory written $HOME.
+# Boot smoke of the installed drain prefix (version 4 of the smoke script, run 2026-10-05 UTC), with controls for its own checks. Raw output, ANSI colour codes removed and the home directory written $HOME.
 # (1) the smoke with an UNRELATED healthy process on the port it is told to use (scripts/smoke-control.sh.txt): health_ok=no, listener_owned_by_child=no, exit 1, and the unrelated process is still alive afterwards.
 # (2) the smoke on a free port: the child is alive, the health body's status is exactly ok, the listener belongs to the child's process group, the listening address is 127.0.0.1 only, the server prints no exposure warning,
 #     the group held 3 processes before cleanup and none after (members selected on the PGID column), exit 0. The server is started with OMNIROUTE_SERVER_HOST=127.0.0.1 and REQUIRE_API_KEY=true (on Linux it ignores HOST and HOSTNAME).

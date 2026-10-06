@@ -1,0 +1,225 @@
+#!/usr/bin/env python3
+"""Pre-switch guard for the 20128 canary (frozen with checks/live-acceptance-protocol.md): run it IMMEDIATELY before `switch_gateways.py --only 20128 ... --apply`, chained with `&&` so that nothing separates the
+two; do not switch unless it exits 0. It answers the questions the command center's round-3 ruling asked for, one `CHECK` line each (value-free: counts, process names, hashes of files, build ids):
+
+ 1. Is the switch tool the pinned one? sha256 of the copy that will be run equals the committed evidence copy's (97d1b87b...).
+ 2. Is the first-hop rollback target intact? The prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 has bin/omniroute, dist/BUILD_SHA cf6748d04 and shim/lsof with sha256 b6ae9002... (the reviewed shim v2), and the
+    unit currently runs it (identity read-back: gateway-identity-20261006.py, health ok). Is the target intact? bin/omniroute, dist/BUILD_SHA 2a41147b7, the same shim, and the drain's marker in its compiled chunks.
+ 3. Is nothing in flight? For --clean-for seconds (default 30), sampled every --interval seconds (default 5), ALL of:
+    - no worker process of another lane (omniroute-codex-sdk/worker.py, `codex exec`, or an interactive `codex` that names the omniroute profile or the gateway port);
+    - no call_logs row in the last 120 s;
+    - no ACTIVE client connection to the gateway port: every established connection (ss) must be idle across the window: empty receive and send queues at every sample and unchanged bytes_received and bytes_sent between
+      the first and the last sample; a connection that appears during the window counts as active. The command center asked for "no established client connection"; that cannot hold literally on this host, because idle
+      keep-alive connections from a periodic poller exist at rest (9 at 2026-10-06 01:36Z, all last active within the same 50 ms, none with queued data, owners in other PID namespaces: the other WSL distro shares the network
+      namespace). They are counted and reported (`connections_total`) but only ACTIVE ones fail the check.
+    Informational only (never a failure): the gateway's own pending-request counter (GET /api/usage/history, counts only; on the unpatched build it keeps entries of requests whose stream was cancelled before it finished,
+    so it does not return to zero), whether it changed during the window, and the running hindsight processes (a known 20128 client, to be paused by the protocol).
+ The guard cannot see an interactive client that holds no connection at the moment, or a request that is silent on the wire (waiting for the upstream); announcing the restart time to 5f, c5 and the command center first,
+ and their holds, are protocol steps, not checks here.
+
+Exit status: 0 all checks hold (GUARD-RESULT clean=True), 4 any check fails (clean=False), 3 usage error. It writes nothing and restarts nothing.
+usage: pre-switch-guard-20261006.py --switch-tool FILE [--port 20128] [--tools DIR] [--db FILE] [--unit omniroute.service] [--clean-for 30] [--interval 5]
+       [--rollback-prefix NAME] [--rollback-build SHA] [--target-prefix NAME] [--target-build SHA] [--shim-sha256 HEX] [--switch-sha256 HEX] [--pid N] [--identity-script FILE] [--worker-pattern REGEX]
+(every default below is the frozen value; the offline controls override them with scratch values, a live run passes none of them except --switch-tool)
+"""
+import argparse
+import datetime as dt
+import hashlib
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+MARKER = re.compile(rb"abort\(\),[A-Za-z_$]+\.clearPendingRequest\?\.\(\),Promise\.allSettled")
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        print(f"ERROR usage: {message}", file=sys.stderr)
+        sys.exit(3)
+
+
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def sh(*args):
+    return subprocess.run(args, capture_output=True, text=True)
+
+
+def utc(ts=None):
+    return (ts or dt.datetime.now(dt.timezone.utc)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def build_sha(tools, prefix):
+    p = Path(tools) / prefix / "lib/node_modules/omniroute/dist/BUILD_SHA"
+    return p.read_text().strip() if p.exists() else ""
+
+
+def check_prefix(tools, name, build, shim_sha, marker):
+    """Problems of one install prefix, as strings (empty list: intact)."""
+    base = Path(tools) / name
+    problems = []
+    if not base.is_dir():
+        return [f"prefix {name} does not exist"]
+    if not (base / "bin/omniroute").exists():
+        problems.append("missing bin/omniroute")
+    got = build_sha(tools, name)
+    if got != build:
+        problems.append(f"dist/BUILD_SHA is {got or 'missing'}, expected {build}")
+    shim = base / "shim/lsof"
+    if not shim.exists():
+        problems.append("missing shim/lsof")
+    elif sha256(shim) != shim_sha:
+        problems.append("shim/lsof sha256 is not the reviewed shim v2")
+    if marker:
+        chunks = base / "lib/node_modules/omniroute/dist/.build/next/server/chunks"
+        hits = 0
+        if chunks.is_dir():
+            for f in chunks.rglob("*.js"):
+                try:
+                    if MARKER.search(f.read_bytes()):
+                        hits += 1
+                except OSError:
+                    pass
+        if hits < 1:
+            problems.append("the drain marker is absent from the compiled server chunks")
+    return problems
+
+
+def connections(port):
+    """Established connections whose server side is the gateway port: {peer: (recv_q, send_q, bytes_received, bytes_sent)} from `ss -tni` (an address line, then an indented info line)."""
+    lines = sh("ss", "-Htni", "state", "established", f"( sport = :{port} )").stdout.splitlines()
+    out, i = {}, 0
+    while i < len(lines):
+        addr = lines[i].split()
+        info = lines[i + 1] if i + 1 < len(lines) else ""
+        i += 2
+        if len(addr) < 4:
+            continue
+
+        def num(key):
+            m = re.search(key + r":(\d+)", info)
+            return int(m.group(1)) if m else 0
+
+        out[addr[3]] = (int(addr[0]), int(addr[1]), num("bytes_received"), num("bytes_sent"))
+    return out
+
+
+WORKER_PATTERN = "omniroute-codex-sdk/worker.py|codex exec|codex .*omniroute|codex .*20128"
+
+
+def workers(pattern=WORKER_PATTERN):
+    mine = str(os.getpid())
+    return [l for l in sh("pgrep", "-af", pattern).stdout.splitlines()
+            if not l.startswith(mine + " ") and "pgrep" not in l and "pre-switch-guard" not in l and "run-acceptance" not in l and "gateway-identity" not in l]
+
+
+def last_row_age(db):
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    last = con.execute("select max(timestamp) from call_logs").fetchone()[0]
+    con.close()
+    if not last:
+        return None
+    return (dt.datetime.now(dt.timezone.utc) - dt.datetime.strptime(last, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)).total_seconds()
+
+
+def pending_total(port):
+    """The gateway's own pending-request counter (informational): the sum of the counts in pending.byAccount; None when the endpoint does not answer."""
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/usage/history", timeout=20) as r:
+            body = json.loads(r.read())
+        return sum(int(c) for models in (body.get("pending") or {}).get("byAccount", {}).values() for c in models.values())
+    except Exception:
+        return None
+
+
+def hindsight_count():
+    return len([l for l in sh("pgrep", "-af", "hindsight").stdout.splitlines() if "pgrep" not in l and "pre-switch-guard" not in l])
+
+
+def main():
+    ap = Parser()
+    ap.add_argument("--switch-tool", required=True)
+    ap.add_argument("--port", type=int, default=20128)
+    ap.add_argument("--tools", default=str(Path.home() / ".local/share/codex-ecosystem/tools"))
+    ap.add_argument("--db", default=str(Path.home() / ".local/share/omniroute/storage.sqlite"))
+    ap.add_argument("--unit", default="omniroute.service")
+    ap.add_argument("--clean-for", type=float, default=30.0)
+    ap.add_argument("--interval", type=float, default=5.0)
+    ap.add_argument("--rollback-prefix", default="omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167")
+    ap.add_argument("--rollback-build", default="cf6748d04")
+    ap.add_argument("--target-prefix", default="omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690")
+    ap.add_argument("--target-build", default="2a41147b7")
+    ap.add_argument("--shim-sha256", default="b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854")
+    ap.add_argument("--switch-sha256", default="97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3")
+    ap.add_argument("--pid")
+    ap.add_argument("--worker-pattern", default=WORKER_PATTERN, help="pgrep -f pattern of another lane's client processes (the offline controls narrow it to isolate from other sessions; a live run never passes it)")
+    ap.add_argument("--identity-script", default=str(HERE / "gateway-identity-20261006.py"))
+    args = ap.parse_args()
+    me = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    print(f"GUARD version=2 script_sha256={me} start={utc()} port={args.port} unit={args.unit} clean_for={args.clean_for} interval={args.interval}")
+    failed = []
+
+    def check(name, problems, detail=""):
+        ok = not problems
+        print(f"CHECK {name}: {'ok' if ok else 'FAIL'}" + (f" ({detail})" if detail and ok else "") + ("" if ok else f" {problems}"))
+        if not ok:
+            failed.append(name)
+
+    tool_sha = sha256(args.switch_tool)
+    check("switch tool sha256", [] if tool_sha == args.switch_sha256 else [f"{tool_sha} is not the pinned {args.switch_sha256}"], tool_sha[:12])
+    check("rollback prefix intact", check_prefix(args.tools, args.rollback_prefix, args.rollback_build, args.shim_sha256, False), f"{args.rollback_prefix}: bin/omniroute, BUILD_SHA {args.rollback_build}, shim v2")
+    check("target prefix intact", check_prefix(args.tools, args.target_prefix, args.target_build, args.shim_sha256, True), f"{args.target_prefix}: bin/omniroute, BUILD_SHA {args.target_build}, shim v2, drain marker")
+    ident = [sys.executable, args.identity_script, "--label", "pre-switch", "--unit", args.unit, "--port", str(args.port), "--tools", args.tools, "--expect-prefix", args.rollback_prefix, "--expect-build", args.rollback_build]
+    if args.pid:
+        ident += ["--pid", args.pid]
+    proc = subprocess.run(ident, capture_output=True, text=True)
+    print("   " + (proc.stdout.strip() or proc.stderr.strip()))
+    check("unit runs the rollback prefix, health ok", [] if proc.returncode == 0 else [f"identity read-back exit {proc.returncode}"])
+
+    first, active, problems, samples = None, set(), [], 0
+    pend0 = pending_total(args.port)
+    end = time.time() + args.clean_for
+    while True:
+        conns, w, age = connections(args.port), workers(args.worker_pattern), last_row_age(args.db)
+        samples += 1
+        if first is None:
+            first = dict(conns)
+        for peer, (rq, sq, rb, sb) in conns.items():
+            if rq or sq:
+                active.add(peer)
+            if peer not in first or first[peer][2:] != (rb, sb):
+                active.add(peer)
+        now_problems = []
+        if w:
+            now_problems.append(f"{len(w)} worker or codex process(es) of another lane")
+        if age is not None and age < 120:
+            now_problems.append(f"the last call_logs row is {age:.0f} s old (< 120 s)")
+        print(f"   sample {samples} at {utc()}: connections={len(conns)} active_so_far={len(active)} workers={len(w)} last_call_log_age_s={'none' if age is None else f'{age:.0f}'}")
+        problems += now_problems
+        if time.time() >= end:
+            break
+        time.sleep(args.interval)
+    pend1 = pending_total(args.port)
+    if active:
+        problems.append(f"{len(active)} ACTIVE connection(s) to port {args.port} (traffic or queued data during the window), of {len(first)} established")
+    check(f"nothing in flight for {args.clean_for:.0f} s ({samples} samples)", sorted(set(problems)), f"{len(first)} idle established connections tolerated")
+    print(f"INFO connections_total={len(first)} connections_active={len(active)} pending_total_before={pend0} pending_total_after={pend1} pending_changed={pend0 != pend1} hindsight_processes={hindsight_count()}")
+    print(f"GUARD-RESULT clean={not failed} failed_checks={failed} end={utc()}")
+    sys.exit(0 if not failed else 4)
+
+
+try:
+    main()
+except SystemExit:
+    raise
+except Exception as error:
+    print(f"ERROR {type(error).__name__}: {str(error)[:200]}", file=sys.stderr)
+    sys.exit(3)

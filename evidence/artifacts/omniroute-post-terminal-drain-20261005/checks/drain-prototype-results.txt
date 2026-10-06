@@ -1,43 +1,44 @@
-# The post-terminal client-disconnect drain: validation results from a scratch tree built from public refs (2026-10-05/06, node 24.21.0; nothing deployed)
+# The post-terminal client-disconnect drain: validation results from a scratch tree built from public refs (2026-10-06 UTC, node 24.21.0; nothing deployed; script version 5)
 # composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch under test is patches/drain-after-terminal.patch (sha256 74c0f449...), applied to C it gives tree b7c68690...
-# test runner: upstream's flags (tsx loader, setupPolyfill, isolateDataDir) with --test --test-force-exit --test-concurrency=4; the stream set is every tests/unit/*stream*, *sse* file, the Codex tool-handoff and empty-stream files, and every unit test file that mentions streamHandler (239 files, listed in checks/test-file-list.txt)
-# script: scripts/drain-prototype.sh.txt. The unit test file is extracted from the patch and its git blob id is checked against the patch's own index line; every stage's expectation (counts and failing test names) is enforced by the script. The block below is its progress log, byte for byte except that the home directory is written $HOME.
+# test runner: upstream's flags (tsx loader, setupPolyfill, isolateDataDir) with --test --test-force-exit --test-concurrency=4; the stream set is every tests/unit/*stream*, *sse* file, the Codex tool-handoff and empty-stream files, and every unit test file that mentions streamHandler
+# script: scripts/drain-prototype.sh.txt (version 5). The unit test file is extracted from the patch and its git blob id is checked against the patch's own index line (which must parse to a hex blob id); every stage's expectation (counts and failing test names) is enforced by the script.
+# The block below is its progress log, byte for byte except that the home directory is written $HOME.
 
-23:55:48Z clone exit=0
-23:55:48Z fetch pr15167 exit=0
-23:55:52Z checkout tag exit=0
-23:57:00Z npm ci exit=0
-23:57:00Z apply affinity patch exit=0
-23:57:00Z apply pr15167 diff exit=0
-23:57:00Z commit composition exit=0
-23:57:00Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
-23:57:00Z stream-related test files: 239
-23:58:14Z A-baseline exit=1 tests=1746 suites=43 pass=1745 fail=1 cancelled=0 skipped=0 todo=0
-23:58:14Z A-baseline expectation met: tests=1746 pass=1745 fail=1
-23:58:14Z A-baseline failing tests are as expected: 1 name(s)
-23:58:14Z extract the new test file from the patch exit=0
-23:58:14Z new test file blob d2f94e21222b273e81368f011035b99add6de3e5 matches the patch's index line (d2f94e212)
-23:58:15Z N-new-test-unpatched exit=1 tests=6 suites=0 pass=3 fail=3 cancelled=0 skipped=0 todo=0
-23:58:15Z N-new-test-unpatched expectation met: tests=6 pass=3 fail=3
-23:58:15Z N-new-test-unpatched failing tests are as expected: 3 name(s)
-23:58:15Z apply the first version's streamHandler.ts hunk exit=0
-23:58:17Z N2-new-test-first-version exit=1 tests=6 suites=0 pass=4 fail=2 cancelled=0 skipped=0 todo=0
-23:58:17Z N2-new-test-first-version expectation met: tests=6 pass=4 fail=2
-23:58:17Z N2-new-test-first-version failing tests are as expected: 2 name(s)
-23:58:17Z restore streamHandler.ts exit=0
-23:58:17Z apply patch under test exit=0
-23:58:17Z commit patch under test exit=0
-23:58:17Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
-23:58:18Z P-new-test-patched exit=0 tests=6 suites=0 pass=6 fail=0 cancelled=0 skipped=0 todo=0
-23:58:18Z P-new-test-patched expectation met: tests=6 pass=6 fail=0
-23:58:18Z P-new-test-patched failing tests are as expected: 0 name(s)
-23:59:25Z A2-stream-tests-patched exit=1 tests=1752 suites=43 pass=1751 fail=1 cancelled=0 skipped=0 todo=0
-23:59:25Z A2-stream-tests-patched expectation met: tests=1752 pass=1751 fail=1
-23:59:25Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
-23:59:59Z B2-calllog-usage-chat-pipeline exit=0 tests=126 suites=9 pass=126 fail=0 cancelled=0 skipped=0 todo=0
-23:59:59Z B2-calllog-usage-chat-pipeline expectation met: tests=126 pass=126 fail=0
-23:59:59Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
-23:59:59Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-validate-X7OSps (remove it with rm -rf after reading)
+01:47:07Z clone exit=0
+01:47:07Z fetch pr15167 exit=0
+01:47:11Z checkout tag exit=0
+01:48:18Z npm ci exit=0
+01:48:20Z apply affinity patch exit=0
+01:48:20Z apply pr15167 diff exit=0
+01:48:20Z commit composition exit=0
+01:48:20Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+01:48:20Z stream-related test files: 239
+01:49:31Z A-baseline exit=1 tests=1746 suites=43 pass=1745 fail=1 cancelled=0 skipped=0 todo=0
+01:49:31Z A-baseline expectation met: tests=1746 pass=1745 fail=1
+01:49:31Z A-baseline failing tests are as expected: 1 name(s)
+01:49:31Z extract the new test file from the patch exit=0
+01:49:31Z new test file blob d2f94e21222b273e81368f011035b99add6de3e5 matches the patch's index line (d2f94e212)
+01:49:33Z N-new-test-unpatched exit=1 tests=6 suites=0 pass=3 fail=3 cancelled=0 skipped=0 todo=0
+01:49:33Z N-new-test-unpatched expectation met: tests=6 pass=3 fail=3
+01:49:33Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+01:49:33Z apply the first version's streamHandler.ts hunk exit=0
+01:49:34Z N2-new-test-first-version exit=1 tests=6 suites=0 pass=4 fail=2 cancelled=0 skipped=0 todo=0
+01:49:34Z N2-new-test-first-version expectation met: tests=6 pass=4 fail=2
+01:49:34Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+01:49:34Z restore streamHandler.ts exit=0
+01:49:34Z apply patch under test exit=0
+01:49:34Z commit patch under test exit=0
+01:49:34Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+01:49:36Z P-new-test-patched exit=0 tests=6 suites=0 pass=6 fail=0 cancelled=0 skipped=0 todo=0
+01:49:36Z P-new-test-patched expectation met: tests=6 pass=6 fail=0
+01:49:36Z P-new-test-patched failing tests are as expected: 0 name(s)
+01:50:40Z A2-stream-tests-patched exit=1 tests=1752 suites=43 pass=1751 fail=1 cancelled=0 skipped=0 todo=0
+01:50:40Z A2-stream-tests-patched expectation met: tests=1752 pass=1751 fail=1
+01:50:40Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+01:51:12Z B2-calllog-usage-chat-pipeline exit=0 tests=126 suites=9 pass=126 fail=0 cancelled=0 skipped=0 todo=0
+01:51:12Z B2-calllog-usage-chat-pipeline expectation met: tests=126 pass=126 fail=0
+01:51:12Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+01:51:12Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-validate-y3mwwP (remove it with rm -rf after reading)
 
 ## Runner summaries of every stage (all counters; the stage logs, their sizes and sha256 are in checks/logs/MANIFEST.txt: the small ones are committed there, the three large ones are kept in the private artifact directory)
 | stage | exit | tests | suites | pass | fail | cancelled | skipped | todo |

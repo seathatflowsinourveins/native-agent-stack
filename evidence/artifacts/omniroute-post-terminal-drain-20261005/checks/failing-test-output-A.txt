@@ -1,10 +1,9 @@
-# Output of the one failing test of the baseline stage A (tests/unit/check-provider-asset-provenance.test.ts), copied from the runner's log with $HOME masked (2026-10-05/06).
+# Output of the one failing test of the baseline stage A (tests/unit/check-provider-asset-provenance.test.ts), copied from the runner's log with $HOME masked (2026-10-06 UTC).
 # It fails because its audited commit object is not in the scratch clone's object store (the bare mirror the trees are cloned from does not hold it), so it fails on any tree cloned from that mirror, the plain v3.8.51 tag included; it is not about streams.
-
 ✖ failing tests:
 
 test at tests/unit/check-provider-asset-provenance.test.ts:36:186
-✖ repository provider asset manifest covers the audited 141-file snapshot (115.19582ms)
+✖ repository provider asset manifest covers the audited 141-file snapshot (104.306672ms)
   AssertionError [ERR_ASSERTION]: 
   Provider asset provenance failed:
   - auditedCommit object does not exist: ccb024cfa9a7612fa65b1f1795740572369d58f5
@@ -12,7 +11,7 @@ test at tests/unit/check-provider-asset-provenance.test.ts:36:186
   
   1 !== 0
   
-      at TestContext.<anonymous> ($HOME/.cache/omniroute-drain-validate-X7OSps/tree/tests/unit/check-provider-asset-provenance.test.ts:556:10)
+      at TestContext.<anonymous> ($HOME/.cache/omniroute-drain-validate-y3mwwP/tree/tests/unit/check-provider-asset-provenance.test.ts:556:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
