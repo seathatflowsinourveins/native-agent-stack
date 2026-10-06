@@ -15,6 +15,37 @@ ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh"
 
 
+
+class ConformanceTargetBoundaryTests(unittest.TestCase):
+    """The unqualified URL boundary runs before any namespace, tool or model."""
+    def test_external_url_is_owner_pending_without_startup_adapter(self):
+        for stage in ("after_sign_in", "__isolated_after"):
+            for client in ("", "owner-client --stdio"):
+                with self.subTest(stage=stage,client=client), tempfile.TemporaryDirectory(prefix="ns-conformance-url-") as temp:
+                    root = Path(temp)
+                    env = {"PATH":"/usr/bin:/bin", "HOME":str(root), "tool_root":str(root/"tools"),
+                           "XDG_STATE_HOME":str(root/"state"),
+                           "MCP_CONFORMANCE_SERVER_URL":"http://127.0.0.1:12345/mcp",
+                           "MCP_CONFORMANCE_CLIENT_COMMAND":client}
+                    result = subprocess.run(["bash",str(HELPER),stage],env=env,text=True,
+                                            capture_output=True,timeout=10)
+                    self.assertEqual(result.returncode,78,result.stderr)
+                    self.assertIn("needs_owner:",result.stderr)
+                    self.assertIn("inside the isolated loopback namespace",result.stderr)
+                    self.assertFalse((root/"state").exists())
+
+    def test_missing_target_stays_needs_user(self):
+        with tempfile.TemporaryDirectory(prefix="ns-conformance-target-") as temp:
+            root = Path(temp)
+            result = subprocess.run(["bash",str(HELPER),"after_sign_in"],
+                                    env={"PATH":"/usr/bin:/bin","HOME":str(root),"tool_root":str(root/"tools"),
+                                         "XDG_STATE_HOME":str(root/"state")},
+                                    capture_output=True,text=True,timeout=10)
+            self.assertEqual(result.returncode,78,result.stderr)
+            self.assertIn("needs_user:",result.stderr)
+            self.assertFalse((root/"state").exists())
+
+
 class ConformanceLifecycleTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

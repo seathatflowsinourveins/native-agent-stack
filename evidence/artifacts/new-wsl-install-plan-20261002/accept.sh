@@ -301,8 +301,8 @@ agent-messaging() {
   # Client wiring is separate; unchanged upstream suite acceptance is not claimed.
   case "$stage" in
     post_install)
-      # Kind: upstream smoke; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
-      check agent-messaging 'upstream smoke' 'smoke="$(mktemp -d)"
+      # Kind: upstream smoke + native integration; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
+      check agent-messaging 'upstream smoke + native integration' 'smoke="$(mktemp -d)"
 trap '"'"'rm -rf -- "$smoke"'"'"' EXIT
 mkdir -p -- "$smoke/home"
 hcom_binary="$(command -v hcom)"
@@ -911,15 +911,15 @@ session-analytics() {
   # G5 plan repair 2026-10-04; upstream operations with local artifact assertions.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/cli.go#L870
+      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/cli.go#L831
       check session-analytics smoke 'a="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
 v="$("$a" --version)"
-[[ "$v" == "agentsview v0.43.0 "* ]]
-cmp -s "$plan_dir/config/agentsview.sh" "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/agentsview-0.43.0/launcher"
+[[ "$v" == "agentsview v0.44.0 "* ]]
+cmp -s "$plan_dir/config/agentsview.sh" "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/agentsview-0.44.0/launcher"
 [[ "$(readlink -f "$HOME/.local/bin/agentsview")" == "$(readlink -f "$a")" ]]'
       ;;
     service_health)
-      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md#L40
+      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/README.md#L53
       check session-analytics smoke 'a="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
 umask 077
 state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/session-analytics"
@@ -937,7 +937,7 @@ for agent in claude codex; do
 done'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/session_get.go#L21
+      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/session_get.go#L21
       check session-analytics smoke 'a="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
 : "${AGENTSVIEW_ACCEPT_CLAUDE_ID:?Supply the canonical ID of the fresh Claude session}"
 : "${AGENTSVIEW_ACCEPT_CODEX_ID:?Supply the canonical ID of the fresh Codex session}"
@@ -2416,7 +2416,7 @@ for client in claude codex; do
   deer_marker="native-stage-complete:$client:$session:deerflow"
   printf -v gpt_command '"'"'XDG_STATE_HOME=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month" "$client_state/gptr.stdout" "$client_state/gptr.stderr" "$gpt_marker"
   printf -v deer_command '"'"'XDG_STATE_HOME=%q DEER_FLOW_CONFIG_PATH=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$plan_dir/config/deer-flow-config.yaml" "$plan_dir/config/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs." "$client_state/deerflow.stdout" "$client_state/deerflow.stderr" "$deer_marker"
-  execution="foreground shell calls with 600000 ms timeouts, waiting for each to finish"
+  execution="foreground shell calls with 1560000 ms timeouts, waiting for each to finish"
   if [[ "$client" == codex ]]; then
     execution="native exec_command with yield_time_ms=30000, polling each returned session_id with write_stdin (empty chars, yield_time_ms=30000) until its final exit before inspecting output or starting the next command. Do not run these long commands through an MCP tool; their large stdout/stderr are already redirected to private files"
   fi
@@ -2424,7 +2424,7 @@ for client in claude codex; do
 $gpt_command
 $deer_command"
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 3300 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt Execute each supplied command once. If a call fails, inspect its retained receipt/stdout/stderr, report the actual failure and stop; do not retry or switch providers." --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model opus --effort max --permission-mode bypassPermissions --output-format stream-json --verbose) >"$session/claude.jsonl" </dev/null
+    (cd "$session" && flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" timeout 3300 env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 claude -p "$prompt Execute each supplied command once. If a call fails, inspect its retained receipt/stdout/stderr, report the actual failure and stop; do not retry or switch providers." --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model opus --effort max --permission-mode bypassPermissions --output-format stream-json --verbose) >"$session/claude.jsonl" </dev/null
   else
     timeout 3300 codex exec -m gpt-6.1-sol -c model_provider='"'"'"openai"'"'"' -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \

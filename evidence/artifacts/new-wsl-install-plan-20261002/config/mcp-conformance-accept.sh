@@ -7,6 +7,13 @@ helper="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/$(basename -- "${BAS
 stage="${1:-post_install}"
 package='@modelcontextprotocol/conformance@0.2.0-alpha.11'
 source_dir="${tool_root:?}/mcp-conformance-source-0.2.0-alpha.11"
+# External URL targets are unqualified in the private network namespace.
+# Source: docs/decisions/2026-10-06-native-plan-gate1-repairs.md:23;
+# conformance@c321dd3:src/sdk-runner/index.ts:70-126; util-linux@5305e6c:sys-utils/unshare.1.adoc:81-91.
+if [[ ( "$stage" == after_sign_in || "$stage" == __isolated_after ) && -n "${MCP_CONFORMANCE_SERVER_URL:-}" ]]; then
+  printf 'needs_owner: MCP_CONFORMANCE_SERVER_URL requires an owner-qualified startup adapter or fixture inside the isolated loopback namespace; external targets remain unqualified.\n' >&2
+  exit 78
+fi
 snapshot_namespace() {
   if ss -ltnH > "$run_dir/namespace-listeners.pending"; then
     mv -- "$run_dir/namespace-listeners.pending" "$run_dir/namespace-listeners.txt"
@@ -30,7 +37,7 @@ case "$stage" in
       npx --offline --yes --ignore-scripts "$package" list --requirements 2026-07-28
     else
 if [[ -z "${MCP_CONFORMANCE_SERVER_URL:-}" && -z "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
-  printf 'Select MCP_CONFORMANCE_SERVER_URL and/or MCP_CONFORMANCE_CLIENT_COMMAND for on-demand conformance acceptance.\n' >&2
+  printf 'Select an owner-qualified MCP_CONFORMANCE_CLIENT_COMMAND or fixture that runs inside the isolated loopback namespace. External server URLs remain unqualified.\n' >&2
   exit 78
 fi
 extra=()

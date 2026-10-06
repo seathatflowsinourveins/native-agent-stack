@@ -346,7 +346,7 @@ The rows the wave-3 batch of the layer consensus added or changed, on the owner'
 
 ### Departures from the recorded upstream commands
 
-`docs/token-efficiency-stack.json` (`upstream_commands.install`) records `gh release download` for RTK, codebase-memory-mcp and otel-tui, `gh release view --json assets` for agentsview, and plain `npm install --global --prefix` for the npm packages. The plan downloads the same release assets and registry tarballs with `fetch_verified` against the recorded sha256 instead, so it needs no GitHub sign-in and refuses a changed artifact before anything is extracted or installed. The agentsview asset and its digest come from the v0.43.0 release (the GitHub asset digest, read 2026-10-04).
+`docs/token-efficiency-stack.json` (`upstream_commands.install`) records `gh release download` for RTK, codebase-memory-mcp and otel-tui, `gh release view --json assets` for agentsview, and plain `npm install --global --prefix` for the npm packages. The plan downloads the same release assets and registry tarballs with `fetch_verified` against the recorded sha256 instead, so it needs no GitHub sign-in and refuses a changed artifact before anything is extracted or installed. The session-analytics operational asset and its digest now come from published v0.44.0; see the dated B2 source preparation below. The earlier v0.43.0 asset metadata (read 2026-10-04) remains G5 historical evidence.
 
 ### Added rows
 
@@ -574,8 +574,10 @@ with the clean 3.8.51 pin: its
 [max-alias set and suffix parser](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11)
 do not include `gpt-6.1-sol` in that set. The
 [unlisted-model cap](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L315)
-is xhigh. Keep the unsuffixed smart/strategic route and explicit xhigh request
-from #637's record; an alias label supplies no delivered-effort evidence.
+is xhigh for the unsuffixed smart/strategic routes in that dated record.
+FAST uses cx/gpt-6.1-sol-high and requests high through the pinned suffix parser;
+it does not request xhigh. Keep the historical #637 configuration record; neither
+an alias label nor that source reading supplies delivered-effort evidence.
 
 The per-run correlation header remains `x-omniroute-session-id`, as the pinned
 [chat handler reads](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts#L1084)
@@ -1133,7 +1135,7 @@ At frozen source b3969b21a1079f7bb441f003123acb1d07a9e29c, the existing native a
 
 Betterleaks first ran the old installed helper0; that result does not qualify candidate output retention. The subsequent existing XDG_CONFIG_HOME binding selected an exact candidate helper copy in an ignored private tool root, and the same native stage returned0 with unchanged upstream make test output retained. Go result lines include nested subtests; they are not independently enumerated tests. Shared helper and gitleaks/P1 gates are unchanged. Sources remain the pinned upstream commands cited above.
 
-The followup receipt's post713_serial_native_stage_followup binds current command/helper hashes to sanitized outcomes and private raw-artifact digests. Inspector post_install and AgentsView post_install command hashes still match their prior passed execution; those are historical reuse, not new runs. Full local316-test success and native host acceptance remain separate. Actual cross/research whole-stage failures, successful local replays and the owner's next retry/apply boundary remain distinct. No shared host plan apply was performed by this lane.
+The followup receipt's post713_serial_native_stage_followup binds the then-current command/helper hashes to sanitized outcomes and private raw-artifact digests. At that receipt's earlier head, Inspector post_install and AgentsView v0.43.0 post_install hashes matched their prior passed execution; those were historical reuse, not new runs. The operational v0.44.0 version/launcher gate now has different inputs and does not inherit that v0.43.0 acceptance. Full local316-test success and native host acceptance remain separate. Actual cross/research whole-stage failures, successful local replays and the owner's next retry/apply boundary remain distinct. No shared host plan apply was performed by this lane.
 
 ## Exact legacy Grafana path custody (A30, 2026-10-05)
 
@@ -1161,10 +1163,47 @@ The [dated decision](../../../docs/decisions/2026-10-06-native-plan-gate1-repair
 - hcom 0.7.27: aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/commands/start.rs:840 repeats the marker; tests/support/mod.rs:949 selects its first line; src/identity.rs:14 supplies the base-name grammar.
 - Independent environments follow astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/tools.md:38,177. Inspect's OpenAI3 requirements conflict with the pinned Harbor/LiteLLM OpenAI2 range. The three verified published wheel installs use --no-build. Scout's historical owner identity remains; its interpreter and alias resolve separately. Required Harbor Trajectory import prevents ATIF importorskip from hiding missing coverage. Sources: UKGovernmentBEIS/inspect_ai@9e44f1b77ed7c912bf58baf30db8560937e7ce53:requirements.txt:12; meridianlabs-ai/inspect_scout@0e8fc055a3cebba1a14c11bc35856767b6405173:pyproject.toml:24; laude-institute/harbor@1e5c5c6db929a10a140d05e606882c671ae20729:pyproject.toml:20; BerriAI/litellm@b3086ccd74553565c9a39716e72303ae985555f9:pyproject.toml:19.
 - SkillSpector model forwarding follows [the resolver:90](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/providers/_agent_cli_base.py#L90) and [native Codex argv:319](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/providers/_agent_cli.py#L319). It ignores user config; no gateway-profile or effort qualification follows from the model carrier.
-- DeerFlow metadata aligns [landed #744:36](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L36): cx/gpt-6.1-sol-max, supports_reasoning_effort=false, no explicit reasoning_effort. Keyless DDG stays; metadata does not prove delivered effort.
+- The cx/gpt-6.1-sol-max suffix choice follows [landed #744:36](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L36). DeerFlow's supports_reasoning_effort=false and omitted reasoning_effort are this plan's configuration choices through [DeerFlow v2.1.0's explicit false configuration](https://github.com/bytedance/deer-flow/blob/v2.1.0/config.example.yaml#L225); #744 does not mention DeerFlow. Keyless DDG stays; metadata does not prove delivered effort.
 - MCP conformance@c321dd32035556e6769d3724a8ee97d87c3faaac:package.json:13 supplies the release executable; npm/cli@bfacd33ccbcd908480610703b60455d2da5b57a9:workspaces/libnpmexec/lib/index.js:49 explains same-package local resolution. Resolve exact release npx from neutral plan_dir, disable scripts and keep unchanged npm ci/check/test with no runtime source build.
 - All six TypeScript examples expose PORT only. Three bind 127.0.0.1; everything-server.ts:2465, sep-2549-no-caching-hints.ts:99 and sep-2322-mrtr-broken-server.ts:168 omit host. Full-suite test mocks also omit host. Preserve upstream files and contain full tests/release CLI with private network loopback. Native util-linux@5305e6c70b274f679329b79c0e1ef5a07e9dc1a6:sys-utils/unshare.1.adoc:81,118 and sys-utils/setsid.1.adoc:21 supply user/PID/network namespace and owned session cleanup. The SDK's src/sdk-runner/index.ts:102 supplies bounded TERM/KILL. Node@v24.21.0:doc/api/net.md:46 explains the short Linux Unix-IPC path requirement.
 
-The initial uncontained 524-test pass leaked 18 processes and three wildcard listeners, so its lifecycle failed. The first contained run failed on a 161-byte IPC path. The corrected native plan post-install passes 44 upstream files/524 unchanged tests, with independent zero owned namespace/group processes and run listeners. These upstream results are distinct from LOCAL INTEGRATION environment/alias/namespace fixtures and from full host/provider acceptance. All attempts remain. External on-demand after targets are unqualified; missing target 78 is needs_user, never protocol acceptance. A45 requires an owner-supplied in-namespace native SDK startup command or fixture; no host-network fallback or outside bridge.
+The initial uncontained 524-test pass leaked 18 processes and three wildcard listeners, so its lifecycle failed. The first contained run failed on a 161-byte IPC path. The corrected native plan post-install passes 44 upstream files/524 unchanged tests, with helper-derived zero owned namespace/group processes and run listeners. The cleanup observation is LOCAL INTEGRATION; it is not an independent observer receipt. These upstream results are distinct from LOCAL INTEGRATION environment/alias/namespace fixtures and from full host/provider acceptance. All attempts remain. External on-demand after targets are unqualified; missing target 78 is needs_user, never protocol acceptance. A45 requires an owner-supplied in-namespace native SDK startup command or fixture; no host-network fallback or outside bridge.
 
 SkillSpector native follow-up: [report.py:1334](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1334) emits issues. [meta_analyzer.py:616](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/meta_analyzer.py#L616) skips zero findings; [report.py:1173](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1173) says this is not failure. [native counters:1124,1240](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1124) distinguish actual successful semantic calls from static-only or degraded output. The actual whole stage exits0 after the canonical plan-path, native-field and safe-completion fixes; all three intermediate native1 attempts remain.
+
+- Required P2-6 owner-custody alternative: [native-agent-stack@84c79f7f:install.sh:82-126](https://github.com/seathatflowsinourveins/native-agent-stack/blob/84c79f7f92f61972a46aa470a4f299017bc82768/evidence/artifacts/new-wsl-install-plan-20261002/install.sh#L82) supplies regular-example retention. [systemd/systemd@v259:man/systemctl.xml:1317-1327](https://github.com/systemd/systemd/blob/v259/man/systemctl.xml#L1317) and [restart:421-433](https://github.com/systemd/systemd/blob/v259/man/systemctl.xml#L421) supply native reload and restart. The [dated owner-custody runbook](../../../docs/decisions/2026-10-06-native-plan-gate1-repairs.md#after-landing-gateway-custody-on-nativestack2604) keeps actual prior bytes and prefix without fabricating a historical known digest. Its filesystem fixtures and host recipe are UNRUN; these source contracts are not new host/provider acceptance.
+
+## B2 AgentsView v0.44.0 source preparation (2026-10-06)
+
+- Official [kenn-io/agentsview v0.44.0 release](https://github.com/kenn-io/agentsview/releases/tag/v0.44.0),
+  published 2026-09-21T13:56:12Z, stable/non-draft. Native gh api --cache 120s
+  metadata peels tag 24ac704b3468386dbddc333853f81bc1cdb3a1b9 to commit
+  413a87f7bfbd67b2815b1119ac51abc1efbeeaba.
+- Published [Linux amd64 archive](https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz)
+  SHA256: 037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3.
+  SHA256SUMS, signature, provenance and SPDX are separate release assets;
+  publication metadata is distinct from an actual download/hash observation.
+- At kenn-io/agentsview@413a87f7bfbd67b2815b1119ac51abc1efbeeaba,
+  [scripts/install.sh:142](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142)
+  verifies checksum before extraction/placement at 151-160. Standard directories
+  are selected at 35-41 and latest at 121; no version/private-prefix selector
+  exists. The plan retains owned placement glue and the explicit release archive.
+- The same pin's [internal/config/config.go:2051](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051),
+  2136 and 2139 support data directory, disabled updates and archive-content
+  policy. [cmd/agentsview/cli.go:831](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/cli.go#L831)
+  supplies native version output; session_get.go:21 retains the existing interface.
+- Counter sources at that pin:
+  [internal/db/usage.go:1802](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/db/usage.go#L1802)
+  and 1879 define daily token/cache/cost totals.
+  [internal/service/direct.go:377](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/service/direct.go#L377)
+  and service.go:440 flatten named-session recorded calls and define count/name/category.
+  internal/parser/codex.go:627 preserves native names; taxonomy.go:172 maps generic
+  exec to Bash and 318-325 maps unmatched names to Other. These are not a
+  dedicated code-mode/savings counter. cmd/agentsview/session_usage.go:37-50
+  distinguishes descendant-inclusive usage, --own-only and archived --no-sync.
+- Tagged docs/changelog.md:6 still labels 0.43.0 latest/Unreleased; published
+  v0.44.0 release notes govern. Earlier G5 v0.43.0 records remain historical.
+  Local migration fixtures are integration evidence; native host observations,
+  whole-host acceptance and measured code-mode improvement remain separate.
+
+This #723 source integration reuses the prior B2 metadata and preserves its failed attempts and code-mode attribution gap at native-stack@946158c163d6cb17ee1c0e3c653f7b869262215b:evidence/artifacts/agentsview-044-b2-20261006/receipt.json. It runs no new CLI probe or whole acceptance. Shared stack/profile pin alignment remains the separate monitoring pin PR #807; this change updates only the operational install-plan artifact and keeps the historical G5 owner identity.

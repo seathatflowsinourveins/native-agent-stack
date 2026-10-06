@@ -2503,6 +2503,61 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
     def row(self, slot):
         return next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == slot)
 
+    def test_gateway_example_retention_and_nonregular_preflight(self):
+        # Independent filesystem control of the preflight seam and copy_config:
+        # native-agent-stack@84c79f7f:install.sh:82-126.
+        command = self.row("gpt-gateway")["commands"][0]
+        loop_start = command.index('for gateway_name in "gpt-gateway-topology.json"')
+        loop_end = command.index('; for gateway_name in omniroute-serve.sh', loop_start)
+        staged_loop = command[loop_start:loop_end]
+        install_text = (PLAN / "install.sh").read_text()
+        copy_start = install_text.index("copy_config() {")
+        copy_end = install_text.index("\n}\n", copy_start) + 3
+        copy_function = install_text[copy_start:copy_end]
+        guard = 'gateway_asset_known() { return 1; }; gateway_needs_owner() { printf "needs_owner: %s\\n" "$1" >&2; exit 1; }; '
+        for mode in ("regular", "symlink", "dangling", "directory", "unknown_asset"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                plan_dir, config_root = root / "plan", root / "config"
+                (plan_dir / "config").mkdir(parents=True)
+                config_root.mkdir()
+                (plan_dir / "config/omniroute.env.example").write_bytes(b"approved example\n")
+                target = config_root / "omniroute.env.example"
+                retained = b"operator example bytes\n"
+                external = root / "outside-example"
+                if mode in ("regular", "unknown_asset"):
+                    target.write_bytes(retained)
+                elif mode in ("symlink", "dangling"):
+                    if mode == "symlink":
+                        external.write_bytes(retained)
+                    target.symlink_to(external)
+                else:
+                    target.mkdir()
+                if mode == "unknown_asset":
+                    (config_root / "gpt-gateway-topology.json").write_bytes(retained)
+                env = {"PATH": os.environ["PATH"], "plan_dir": str(plan_dir), "config_root": str(config_root)}
+                result = subprocess.run(
+                    ["bash", "-euo", "pipefail", "-c", copy_function + "\n" + guard + staged_loop + "; copy_config omniroute.env.example"],
+                    env=env, capture_output=True, text=True, timeout=10,
+                )
+                if mode == "regular":
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("retained", result.stderr)
+                    self.assertEqual(target.read_bytes(), retained)
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn("needs_owner", result.stderr)
+                    if mode in ("symlink", "dangling"):
+                        self.assertTrue(target.is_symlink())
+                        self.assertEqual(os.readlink(target), str(external))
+                        if mode == "symlink":
+                            self.assertEqual(external.read_bytes(), retained)
+                    elif mode == "directory":
+                        self.assertTrue(target.is_dir())
+                    else:
+                        self.assertEqual(target.read_bytes(), retained)
+                        self.assertEqual((config_root / "gpt-gateway-topology.json").read_bytes(), retained)
+
     def test_hcom_start_capture_selects_one_native_base_name(self):
         # hcom@2c5f343: start.rs:843-848 deliberately repeats the marker;
         # tests/support/mod.rs:949-959 selects its first occurrence.
@@ -2864,7 +2919,21 @@ exec(sys.stdin.read())
                 native = tool_root / "deer-flow/backend/.venv/bin/deerflow"
                 native.parent.mkdir(parents=True)
                 config = root / "config with spaces.yaml"
-                native.with_name("python").symlink_to(sys.executable)
+                # Same ModuleType/exec(stdin) seam as the adjacent metadata fixture.
+                # CPython 3.13 json docs: default JSON is a YAML 1.0/1.1/1.2 subset.
+                # This synthetic codec tests the unchanged header mutation, not PyYAML.
+                reader = native.with_name("python")
+                reader.write_text(
+                    f"#!{sys.executable}\n"
+                    "import json, sys, types\n"
+                    "assert sys.argv[1] == '-'\n"
+                    "sys.argv = sys.argv[1:]\n"
+                    "yaml = types.ModuleType('yaml')\n"
+                    "yaml.safe_load = json.loads\n"
+                    "yaml.safe_dump = json.dumps\n"
+                    "sys.modules['yaml'] = yaml\n"
+                    "exec(sys.stdin.read())\n")
+                reader.chmod(0o755)
                 config.write_text(json.dumps({"models": [{"name": "gpt-runtime",
                     "model": "cx/gpt-6.1-sol", "reasoning_effort": "xhigh",
                     "base_url": "http://127.0.0.1:21128/v1", "fixture_option": "preserved"}]}))
@@ -2908,8 +2977,7 @@ exec(sys.stdin.read())
                     "HOME": str(run / "home"), "TMPDIR": str(temporary),
                     "DEER_FLOW_PROJECT_ROOT": str(tool_root / "deer-flow"),
                     "DEER_FLOW_HOME": str(run / "state"), "DEER_FLOW_CONFIG_PATH": str(run / "config.yaml")})
-                import yaml
-                observed = yaml.safe_load((run / "config.yaml").read_text())["models"][0]
+                observed = json.loads((run / "config.yaml").read_text())["models"][0]
                 self.assertEqual(observed["default_headers"],
                                  {"x-omniroute-session-id": "deerflow-" + run.name})
                 self.assertEqual(observed["model"], "cx/gpt-6.1-sol")
@@ -3092,7 +3160,7 @@ exec(sys.stdin.read())
         block = "  gpt_marker=" + program.split("  gpt_marker=", 1)[1].split(
             '  if [[ "$client" == claude ]]; then', 1)[0]
         legacy = ("Use native-stack-research to complete BOTH real gatherers using foreground shell calls "
-                  "with 600000 ms timeouts, waiting for each to finish. Execute each supplied command once. "
+                  "with 1560000 ms timeouts, waiting for each to finish. Execute each supplied command once. "
                   "If a call fails, inspect its retained receipt/stdout/stderr, report the actual failure and stop; "
                   "do not retry or switch providers. Run these exact commands with their supplied keyless public "
                   "config and isolated state. Inspect the retained call stdout/stderr in the supplied per-client "
@@ -3121,6 +3189,59 @@ exec(sys.stdin.read())
                 self.assertIn("until its final exit", prefix)
                 self.assertIn("Do not run these long commands through an MCP tool", prefix)
                 self.assertNotIn("600000 ms", prefix)
+
+
+    def test_research_claude_queue_is_outside_execution_budget_and_background_is_disabled(self):
+        import shlex
+        program = self.row("research-harnesses")["acceptance"]["after_sign_in"]["command"]
+        line = next(x.strip() for x in program.splitlines() if "claude -p" in x)
+        launch = line.split("&& ", 1)[1].split(") >", 1)[0]
+        self.assertNotIn("timeout 3300 flock", launch)
+        with tempfile.TemporaryDirectory(prefix="ns-research-argv-") as temp:
+            root = Path(temp)
+            binaries = root / "bin"
+            binaries.mkdir()
+            fixture = ("#!"+sys.executable+"\n"
+                       "import json,os,sys\nfrom pathlib import Path\n"
+                       "name=Path(sys.argv[0]).name; args=sys.argv[1:]\n"
+                       "chain=json.loads(os.environ.get('FIXTURE_CHAIN','[]')); chain.append([name,*args])\n"
+                       "if name == 'claude':\n"
+                       " print(json.dumps({'chain':chain,'argv':args,'background':os.environ.get('CLAUDE_CODE_DISABLE_BACKGROUND_TASKS')}))\n"
+                       "else:\n"
+                       " os.environ['FIXTURE_CHAIN']=json.dumps(chain)\n"
+                       " command=args[3:] if name == 'flock' else args[1:]\n"
+                       " os.execvpe(command[0],command,os.environ)\n")
+            for name in ("flock", "timeout", "claude"):
+                path = binaries / name
+                path.write_text(fixture)
+                path.chmod(0o755)
+            lock = root / "private.lock"
+            env = {"PATH":str(binaries)+os.pathsep+os.environ["PATH"],
+                   "HOME":str(root), "NATIVE_STACK_CLAUDE_SESSION_LOCK":str(lock),
+                   "plan_dir":str(PLAN), "prompt":"frozen supplied commands"}
+            result = subprocess.run(["bash","-euo","pipefail","-c",launch],
+                                    env=env,text=True,capture_output=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr)
+            observed = json.loads(result.stdout)
+            queue, execution, client = observed["chain"]
+            self.assertEqual(queue[:4],["flock","-w","3600",str(lock)])
+            self.assertEqual(queue[4:6],["timeout","3300"])
+            self.assertEqual(execution[:4],["timeout","3300","env","CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1"])
+            self.assertEqual(client[0],"claude")
+            self.assertEqual(observed["background"],"1")
+            self.assertEqual(observed["argv"][0],"-p")
+            self.assertEqual(observed["argv"][observed["argv"].index("--max-turns")+1],"48")
+
+    def test_research_skill_uses_working_native_default_and_long_foreground_wait(self):
+        skill = (PLAN / "config/research-harnesses-skill.md").read_text()
+        self.assertNotIn("/absolute/path/",skill)
+        self.assertNotIn("DEER_FLOW_CONFIG_PATH=",skill)
+        self.assertNotIn("configuration supplied by the coordinator",skill)
+        self.assertNotIn("Tavily",skill)
+        self.assertIn("1500 seconds per call",skill)
+        self.assertIn("1560000 ms",skill)
+        self.assertIn("wait for its final exit",skill)
+        self.assertIn("two independent research outputs",skill)
 
     def test_foreground_native_completion_rejects_background_and_partial_results(self):
         import ast
@@ -4043,29 +4164,62 @@ sys.exit(42 if fail else 0)
             self.assertEqual(child.stdout.strip(), str(allowed))
 
     def test_owned_old_agentsview_links_migrate_but_foreign_aliases_are_retained(self):
-        for foreign in (False, True):
-            with self.subTest(foreign=foreign), tempfile.TemporaryDirectory() as directory:
+        cases = (
+            ("old binary", "0.43.0", "agentsview", False),
+            ("old launcher", "0.43.0", "launcher", False),
+            ("current binary", "0.44.0", "agentsview", False),
+            ("current launcher", "0.44.0", "launcher", False),
+            ("foreign symlink", None, None, False),
+            ("regular aliases", None, None, True),
+        )
+        row = self.row("session-analytics")
+        self.assertEqual(row["release"], "v0.44.0")
+        self.assertIn("agentsview_0.44.0_linux_amd64.tar.gz", row["commands"][0])
+        self.assertIn("037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+                      row["commands"][0])
+        for name, version, executable, regular in cases:
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 eco = root / "eco"
-                owned = eco / "tools/agentsview-0.43.0"
-                owned.mkdir(parents=True)
-                (owned / "agentsview").write_text("binary fixture")
-                target = root / "foreign" if foreign else owned / "agentsview"
-                target.write_text("foreign fixture" if foreign else "binary fixture")
+                current = eco / "tools/agentsview-0.44.0"
+                foreign = version is None
+                target = root / "foreign" if foreign else eco / f"tools/agentsview-{version}" / executable
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("retained fixture")
                 aliases = (eco / "bin/agentsview", root / ".local/bin/agentsview")
                 for alias in aliases:
                     alias.parent.mkdir(parents=True, exist_ok=True)
-                    alias.symlink_to(target)
-                archive = eco / "downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz"
+                    if regular:
+                        alias.write_text("regular fixture")
+                    else:
+                        alias.symlink_to(target)
+                package = root / "release"
+                package.mkdir()
+                (package / "agentsview").write_text("current archive fixture")
+                (package / "agentsview").chmod(0o755)
+                archive = eco / "downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz"
                 archive.parent.mkdir(parents=True)
-                (owned / "agentsview").chmod(0o755)
-                subprocess.run(["tar", "-czf", str(archive), "-C", str(owned), "agentsview"], check=True)
-                result = subprocess.run(["bash", "-euo", "pipefail", "-c", self.row("session-analytics")["commands"][1]],
-                                        env={**os.environ, "HOME": str(root), "ECO_ROOT": str(eco), "plan_dir": str(PLAN)},
+                subprocess.run(["tar", "-czf", str(archive), "-C", str(package), "agentsview"], check=True)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", row["commands"][1]],
+                                        env={"PATH": os.environ["PATH"], "TMPDIR": str(root),
+                                             "HOME": str(root), "ECO_ROOT": str(eco), "plan_dir": str(PLAN)},
                                         capture_output=True, text=True, timeout=20)
                 self.assertEqual(result.returncode, 1 if foreign else 0, result.stderr)
                 for alias in aliases:
-                    self.assertEqual(alias.resolve(), target if foreign else owned / "launcher")
+                    if regular:
+                        self.assertFalse(alias.is_symlink())
+                        self.assertEqual(alias.read_text(), "regular fixture")
+                    else:
+                        self.assertEqual(alias.resolve(), target if foreign else current / "launcher")
+                if foreign:
+                    self.assertEqual(target.read_text(), "retained fixture")
+                    self.assertFalse((current / "agentsview").exists(), "Foreign refusal extracted the archive")
+                else:
+                    self.assertEqual((current / "agentsview").read_text(), "current archive fixture")
+                    self.assertEqual((current / "launcher").read_bytes(),
+                                     (PLAN / "config/agentsview.sh").read_bytes())
+                    if version == "0.43.0":
+                        self.assertEqual(target.read_text(), "retained fixture")
 
 
     def test_inspector_probe_rejects_env_drift_and_port_collision_and_cleans_up(self):
