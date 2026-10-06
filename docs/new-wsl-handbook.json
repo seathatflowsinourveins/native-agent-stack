@@ -3020,7 +3020,7 @@
         "c5b338e36ff85e30",
         "d84254df4394d981",
         "241665cdd8a01f24",
-        "857277b3c0a29324",
+        "4870207283d44346",
         "249bdf3269fe042a",
         "23a366ec99f1a56c",
         "0e3bccb32f167d87",
@@ -7834,7 +7834,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04"
+      "sha256": "bf96a1d0b9d7610a4e5ca7f52a9d57c3f3a50c14a5f1cae2e0d08a7becb8fde0"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -7842,7 +7842,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "3a8081049976785e320cfd99bc93bd3dcefa0a8a351fcc4f3cab1d8022a6b1cd"
+      "sha256": "791f1a75f077e735ef5e6acd37595cf6e65baf52dc6dbac09d9a4103325ce0a8"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9000,8 +9000,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://pypi.org/pypi/semble/0.6.1/json",
-        "value": "fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256"
+        "source": "https://pypi.org/pypi/semble/0.6.2/json",
+        "value": "94110c12da424a676cdec5a32adb1faee00ffcd3f494ea9fb88b4cd7efabac9a"
       },
       "documented_install": [
         {
@@ -9014,17 +9014,18 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md"
+        "https://github.com/MinishLab/semble/blob/f1daa42a7dd42fa765eb7ef47862fc0c116fa2b0/README.md",
+        "https://github.com/MinishLab/semble/blob/f1daa42a7dd42fa765eb7ef47862fc0c116fa2b0/pyproject.toml"
       ],
       "install": {
-        "command": "uv tool install semble==0.6.1 && semble install",
-        "source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md"
+        "command": "uv tool install --python 3.13 'semble[mcp]==0.6.2'",
+        "source": "https://github.com/MinishLab/semble/blob/f1daa42a7dd42fa765eb7ef47862fc0c116fa2b0/README.md"
       },
       "name": "semble",
       "owner_layer_id": "semantic-rag",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "pypi:semble",
-      "pin": "0.6.1",
+      "pin": "0.6.2",
       "position": 2,
       "provisioning_status": "unprovisioned_comparison_arm",
       "repository": "https://github.com/MinishLab/semble",
@@ -12082,21 +12083,19 @@
           "A project-scoped registration and an index of the selected code."
         ],
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L141"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/README.md"
       },
       "aliases": [
         "jcodemunch-mcp"
       ],
       "blocking_gaps": [
-        "No artifact digest is recorded for this pin: the checksum is the source commit (manifests/stack.json), and uv's index hashes are the only artifact check.",
-        "checksum: real SHA-256 and its source pending in W-PROF",
-        "checksum: source identity does not verify an install artifact or lockfile"
+        "Functional acceptance at 1.108.330 remains separate from installation and the older retained native receipts."
       ],
       "checksum": {
-        "algorithm": "git-sha1",
-        "kind": "source",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
-        "value": "8f7b34abe16fb459e0bf1c04747d584216dfe32e"
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://pypi.org/pypi/jcodemunch-mcp/1.108.330/json",
+        "value": "7d482669aa19a3b70319b6a8b61d4b061e223eb5bb0aea97aa62d2f7e6a0db9f"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -12104,21 +12103,23 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/README.md",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/pyproject.toml"
       ],
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.319",
+        "command": "uv tool install --python 3.13 'jcodemunch-mcp[watch]==1.108.330'",
         "execution_status": "UNRUN",
         "prerequisites": [
           "uv with CPython 3.13."
         ],
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/README.md"
       },
       "name": "jcodemunch-mcp",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.108.319",
+      "package_id": "pypi:jcodemunch-mcp",
+      "pin": "1.108.330",
       "position": 17,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
@@ -12131,7 +12132,7 @@
       ],
       "stage": "native-extensions",
       "status": "picked",
-      "tool_id": "857277b3c0a29324",
+      "tool_id": "4870207283d44346",
       "used_by": [
         "token-efficiency"
       ]
@@ -12171,7 +12172,7 @@
         "prerequisites": [
           "tar."
         ],
-        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. Neither the archive's install.sh nor the binary's install subcommand runs: both configure the detected clients. Indexes only on an explicit index_repository call.",
+        "scope": "Binary-only release archive recipe: the install plan downloads the same checksum-verified asset, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links ${ECO_ROOT}/bin. This command runs neither archive install.sh nor client setup. Separate upstream agent-setup phases use codebase-memory-mcp install --skip-binary --dir=\"${ECO_ROOT}/bin\" --clients=codex or --clients=claude (README at v0.11.0, native client installation). NativeStack2604's 2026-10-06 windows performed those separate phases on its existing binary; the receipt records each client's MCP key, hook, skill and agent readbacks, not graph-use acceptance. Claude's applied effort:max overlay is a CC operation, not an upstream default; its separate instruction-pointer marker is not independently asserted here. Index only through an explicit index_repository call.",
         "source": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88"
       },
       "name": "codebase-memory-mcp",

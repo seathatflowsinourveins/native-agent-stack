@@ -4797,8 +4797,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9ea67939f6e5443576cdc2aad3ff997cc554aca3292e877afbe0c000d7d9e6ae",
-      "bytes": 65967
+      "sha256": "996aeb455c1a7ca39e5438d15f4430c0aa3ccfe04cee5ba70b88c2309256ef06",
+      "bytes": 65976
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4822,13 +4822,13 @@
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.main.md",
-      "sha256": "9fdb10a34f2c2e313ca5c986d7682f30c934329e820e0b29cb3950f109b51b15",
-      "bytes": 1842
+      "sha256": "8446eac8e0c72905c42a393ebf12e6fe148aa5af986e5bd46496c047ef5f028f",
+      "bytes": 1846
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "dcd6996e9247f3c8f3d543545eb958518236b21449492ddf92721590aa3f60c8",
-      "bytes": 4099
+      "sha256": "9ae1b7af7878ac7731f1e3d0a09f8b8098e86a962a0906afe3692a1b2c9eb758",
+      "bytes": 4090
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
@@ -4912,8 +4912,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
-      "bytes": 257549
+      "sha256": "bf96a1d0b9d7610a4e5ca7f52a9d57c3f3a50c14a5f1cae2e0d08a7becb8fde0",
+      "bytes": 258253
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -4927,8 +4927,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "dec100f075d8e0fe5ddaea4b07af505f2ece92a39e25ab96fa4faa7544044074",
-      "bytes": 55553
+      "sha256": "27814bf458810874c9447a08126a5b80ffda411c7d35ac5da19019c500fda188",
+      "bytes": 56931
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -4937,8 +4937,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
-      "sha256": "90b5a85c1c89e682dcd1f373c26b4461fe8fb31d4e40e6f5938480132c718a2c",
-      "bytes": 1413
+      "sha256": "02ba75a17dbf13892bded09eab8aee7ba8aa98c6a4c0352c0d1d9e89e8b428c4",
+      "bytes": 1482
     },
     {
       "path": "adoption/new-wsl/templates/claude.settings.additions.json",
@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "16a2942d0538d7a3ffbf5fbe8a57db3aaefb036253350fae229cb824ade6dc6b",
-      "bytes": 4579
+      "sha256": "6a947f9b9ab06f43cbb43ad0ec2e13b5d82295f74c5562021c689a2784eed893",
+      "bytes": 4591
     },
     {
       "path": "adoption/paired/README.md",
@@ -5067,8 +5067,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
-      "bytes": 19129
+      "sha256": "7efe5d4063718ba26f67d498de5ca3fe36befed6d996b83caa5777224ccfeee9",
+      "bytes": 19608
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -5077,8 +5077,8 @@
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "8e5fc36343b9db548aeadd15578342a59eb22f955f591e5086cdf7e7fa848462",
-      "bytes": 5451
+      "sha256": "e03951dd2101f1f465ad4318b2c96f33bc310c770ed6224c6e1126215e894ad0",
+      "bytes": 5455
     },
     {
       "path": "adoption/templates/decision-routing.md",
@@ -16318,8 +16318,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "3a8081049976785e320cfd99bc93bd3dcefa0a8a351fcc4f3cab1d8022a6b1cd",
-      "bytes": 325006
+      "sha256": "791f1a75f077e735ef5e6acd37595cf6e65baf52dc6dbac09d9a4103325ce0a8",
+      "bytes": 325015
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -16433,8 +16433,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "85a1715168203fef8f201672d3f284ff3021797c0576a974ef05ed4b6af7446c",
-      "bytes": 258289
+      "sha256": "13197e2f9c487669b2b52b7265bd4536342e3da64baf7eaf03277e72d04af585",
+      "bytes": 259322
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17578,8 +17578,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c7333423ba0e6ee597341ed6a23e2f00a98969b98f4f28283a99abd51b6bae5f",
-      "bytes": 229655
+      "sha256": "f1ee04214fa9d884686cedf1cde6be0ee7a8e6c42c6c2926bef1135ccf0bb781",
+      "bytes": 230337
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -17708,13 +17708,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f",
-      "bytes": 690227
+      "sha256": "50acc8c9ba8c85ff7eab810e64a05275d6fe56ac69aa2d6ebacd30edb02d6489",
+      "bytes": 690699
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
-      "bytes": 366880
+      "sha256": "c6cf822f7033ebdd47e6aee04ef277d3334b4b355f4aa9c8ea168a0a140e07b4",
+      "bytes": 367091
     },
     {
       "path": "docs/next-host-stages.md",
@@ -17808,8 +17808,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "172d1d75458d9af2c24f1a1f63615fbaa34dc6abaf9428c58d6cacee3ec58b95",
-      "bytes": 592422
+      "sha256": "6fe187b226ae2661070ea09ea1548929db37c2e28fa8812a445b442823b66d08",
+      "bytes": 593211
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -17828,8 +17828,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "3e80098715b4c87fa6278847b18ea868a10db1971d780adc7511b410ff4fff7b",
-      "bytes": 107979
+      "sha256": "a5de672e0f608fde79c0cef7d4f0fd15074bb896a4d42ab26e95c69839168ab5",
+      "bytes": 110198
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -40967,6 +40967,26 @@
       "bytes": 114093
     },
     {
+      "path": "evidence/artifacts/ns2604-tools-window-20261006/README.md",
+      "sha256": "47a507075a69649c1154a3e4f66ceceffe089dc5bc994d9cc613a34e41e6191f",
+      "bytes": 6589
+    },
+    {
+      "path": "evidence/artifacts/ns2604-tools-window-20261006/handbook-receipt.json",
+      "sha256": "dbd37f4ea0fff1c820d65e0b6d1db0b7f1fb370adc9570b07b062cc7a0d8b2d6",
+      "bytes": 4785
+    },
+    {
+      "path": "evidence/artifacts/ns2604-tools-window-20261006/jcodemunch-selection-before.json",
+      "sha256": "c06a871626441069b4cdd4d4122fcf1d7c407f7bed85ee65ab17bef52bbd39f6",
+      "bytes": 3300
+    },
+    {
+      "path": "evidence/artifacts/ns2604-tools-window-20261006/receipt.json",
+      "sha256": "d27d06c4237616852131480a6497ce3665e0044f38766df40375113c13ed055c",
+      "bytes": 15900
+    },
+    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -53893,8 +53913,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "3ca8f36178c4e61c9f8241fd6eb045172a9e66c38da5f4943b4532fc42f94a72",
-      "bytes": 103027
+      "sha256": "8e7683b40b0290a288be01e9aa15a79d580d030b84c8c0c7b3109c1245c69e8b",
+      "bytes": 103196
     },
     {
       "path": "observability/README.md",
@@ -54178,8 +54198,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "ad750498ace3022cdaab34bc6cafb42300379d9a9e0f9e76f00414916c9d8a96",
-      "bytes": 128978
+      "sha256": "25c96370eeb0b9fd42a1a514820eef8cf5552764786317e0133c6852f470c5f2",
+      "bytes": 129364
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -55273,18 +55293,18 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "c1cc6558b8533394401eb60ddfef73b9f08332439be2d90ba45f7615a965d63d",
-      "bytes": 303733
+      "sha256": "c5dc48bd6fcb9b0d0753a72984aa2e99aa5ad379da53e5e46e69240d7494745a",
+      "bytes": 304168
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "82ade12e1e2522fb69404c9a84eb7f6b0d206f77c055c51bbfc136b98942dae5",
-      "bytes": 163353
+      "sha256": "7833a70cb25511d39e5e04723cba4407c7a7f452923f461b1a144cc950bb22af",
+      "bytes": 163532
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "7a151c05cccf4a0b0f96ae27302497be6035850fbe0272c35a3438a58d5ab0b9",
-      "bytes": 104637
+      "sha256": "64b8a2f4f04e89b67419a441cb1ab18a0bbb6133cfaa29d48f36b62a76dea88e",
+      "bytes": 104940
     },
     {
       "path": "tests/test_new_wsl_profile.py",
@@ -55588,8 +55608,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "8d2ed091ed91928e88b74806f38eb146c30dd5fde3faf6fb43e52381163e7ae7",
-      "bytes": 24974
+      "sha256": "08c4197383718f7bde65a3d41b686f0bd7fa55ae2fed3078f785c25d6de078dc",
+      "bytes": 24994
     },
     {
       "path": "tests/test_token_measurement.py",
@@ -56263,8 +56283,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "20c8f4f0b757860b0d9960809dcee36e0c4425489550df31b7c0a940798615b2",
-      "bytes": 25833
+      "sha256": "640556d0e3128176865e0cb6fdfb9defa65125273f0899de1e2acfd8eb28b0a9",
+      "bytes": 26274
     },
     {
       "path": "tools/token-report/config.example.json",
