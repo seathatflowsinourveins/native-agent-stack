@@ -34,8 +34,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (append_jsonl, clean_login_env, current_s7_baseline, gateway_build, gateway_get, load_json,  # noqa: E402
-                    rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change, sha256_file,
-                    stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp, write_json)
+                    rebaseline_cost_ok, rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change,
+                    sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp,
+                    write_json)
 
 
 def stop_flags(root: Path, client: str, cell: str | None = None) -> list[str]:
@@ -254,14 +255,18 @@ def main(argv=None) -> int:
             failed = proc.returncode not in (0, 100) or not kept.exists() or any(t.get("error") for t in provider)
             reason = "app_server_provider_error" if failed else None
             rebaselined = straddled_rebaseline(root, started, ended)
+            cost_ok, cost = rebaseline_cost_ok(root, {"client": "codex", "cell": cell_name, "arm": cell["arm"],
+                                                      "trial_id": trial["trial_id"]}) if rebaselined else (True, None)
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
                                                  "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
                                                  "test_key": trial["test_key"], "phase": "exit", "at": ended,
                                                  "rc": proc.returncode, "censored": bool(failed or rebaselined),
                                                  "reason": "host_change_rebaselined" if rebaselined else reason,
                                                  "reason_before_rebaseline": reason if rebaselined else None,
-                                                 "rebaseline": rebaselined,
+                                                 "rebaseline": rebaselined, "rebaseline_cost": cost,
                                                  "provider_output_sha256": provider[0].get("provider_output_sha256")})
+            if not cost_ok:
+                (root / "STOP").write_text(f"{utc_now()} in-run re-baseline cost exceeded at {trial['trial_id']}: {cost}\n")
         if client == "codex":
             outcome["gateway_window"] = gateway_window(started, ended)
         outcomes.append(outcome)

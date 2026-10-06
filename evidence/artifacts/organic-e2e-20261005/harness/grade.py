@@ -4,6 +4,7 @@
   python3 -B grade.py trials --run-root <root>          per-trial table, OIR with Wilson intervals, gates -> grades/
   python3 -B grade.py gate0 --run-root <root>           stage-2 probes, canaries, gate-0 trial, Claude probe -> gate0.json
   python3 -B grade.py replay --out <file>               stage-0 reconciliations (a)-(f) over the v1 captures
+  python3 -B grade.py meter-calibration --run-root <root> [--write]   the p90 usage per Claude trial (expected usage)
 
 Native sources only: Claude stream-json pairs (tool_use with tool_result) and transcripts (main and child, with their
 hook attachments and agent meta files), Codex exec --json items (item.completed only) and rollouts, Loki rows saved by
@@ -29,9 +30,10 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,  # noqa: E402
-                    CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS, REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows,
-                    load_json, parse_stream_text, read_jsonl, run_expected_usage, sha256_bytes, sha256_file, trial_dir,
-                    utc_now, write_json)
+                    CLI_VENDOR_SKILL_SURFACES, CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS, METER_CALIBRATION,
+                    REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows, load_json, meter_calibration,
+                    parse_stream_text, read_jsonl, run_expected_usage, sha256_bytes, sha256_file, trial_dir, utc_now,
+                    write_json)
 
 HARNESS_SKILLS = {"native-stack-research", "native-stack-worker", "standing-delegation"}
 READ_PROGRAMS = {"cat", "sed", "head", "tail", "nl", "less", "rg", "grep", "bat", "more"}
@@ -72,6 +74,23 @@ REACH = {
     "other-fixture": re.compile(rf"{_H}/\.cache/ws/[0-9a-f]{{8}}|\.claude/projects/-[^/\s\"']*-cache-ws-[0-9a-f]{{8}}"),
 }
 FIXTURE_ID = re.compile(r"(?:\.cache/ws/|-cache-ws-)([0-9a-f]{8})")
+# Answer sources, as confirmed at 11:43Z (CC item task-ns2604-coop-20261006T114319Z, point 3). Reading a source is
+# legitimate work; reading an oracle's output or a graded result is not.
+# - The harness's stores: every run root (oracle runs, other trials' drafts, grades, gate0.json, run.json's
+#   oracles_reproduce), the suite cards, the earlier v1 and v1.1 smoke and pilot captures, prompted and stage-0 outputs
+#   (all under the coordination state directory), and the fixture cache (oracles.json, oracle-work/, the template).
+# - Grader expected-output files elsewhere: any published file of this experiment other than its sources (the harness,
+#   the protocol, the pilot spec, the amendment notes, a README), such as a later grade or receipt in the repository,
+#   and any path run.json's answer_source_paths declares (prepare.py --answer-source-path).
+# - Another trial of the same task: its fixture, Claude transcript, or trial-root files, by fixture id or trial id.
+# A host checkout's copy of an oracle input stays a tag. So do the 2026-10-04 foundation E2E receipts in the repository
+# (evidence/artifacts/ns2604-e2e-20261004/): they grade another E2E, and three suite tasks use slots.json and
+# summary.json as their input.
+ANSWER_STORES = re.compile(r"\.local/state/native-agent-stack/coordination|ns2604-organic-fixtures")
+EXPERIMENT_PATH = re.compile(r"[^\s\"'`=]*organic-e2e[^\s\"'`]*")
+EXPERIMENT_SOURCE = re.compile(r"evidence/artifacts/organic-e2e-[^/\s\"'`]+/?(harness(/[^\s\"'`]*)?|(PROTOCOL|PILOT-SPEC|AMENDMENT)-[^/\s\"'`]*"
+                               r"|README[^/\s\"'`]*)?$")
+TRIAL_ID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 # The chrome-devtools MCP server joined both clients' MCP lists after the protocol was written (the #713 plan rows). It
 # runs outside the Codex sandbox and reaches the network. Decision 4 of CC item 105529Z: the watcher logs every call
 # (never a halt) and the report shows it; there is no pre-execution deny, because a deny would change the treatment.
@@ -1427,15 +1446,36 @@ def _call_texts(graded: dict, client: str) -> list[tuple[str, str]]:
             for item in graded.get("all_items") or graded["items"]]
 
 
-def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixtures: set[str] | None = None) -> list[dict]:
+def answer_source_reasons(text: str, same_task_fixtures: set[str], same_task_trials: set[str],
+                          declared: list[str]) -> list[str]:
+    """Why a call's input reads an answer source (decision 3 as confirmed at 11:43Z), or [] for a source or a tag."""
+    reasons = []
+    if ANSWER_STORES.search(text):
+        reasons.append("harness store")
+    if any("/" in token and not ANSWER_STORES.search(token) and not EXPERIMENT_SOURCE.search(token)
+           for token in EXPERIMENT_PATH.findall(text)):
+        reasons.append("experiment output")
+    if set(FIXTURE_ID.findall(text)) & same_task_fixtures:
+        reasons.append("same-task fixture")
+    if set(TRIAL_ID.findall(text)) & same_task_trials:
+        reasons.append("same-task trial")
+    if any(prefix and prefix in text for prefix in declared):
+        reasons.append("declared grader output")
+    return reasons
+
+
+def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixtures: set[str] | None = None,
+          same_task_trials: set[str] | None = None) -> list[dict]:
     """G13 (extended by finding 9): calls whose input reaches coordination paths, other sessions' transcripts, host
     checkouts (~/code, ~/projects), user-level harness files, harness trial roots or another trial's fixture. The
     trial's own fixture, clone, trial files and project directory (its auto memory, exempt and logged under §8.4) are
-    not counted. Decision 3: each entry is a tag; answer_source marks the reads that make the trial invalid (the
-    harness's stores, or the fixture or Claude transcript of another trial of the same task)."""
+    not counted. Decision 3: each entry is a tag; answer_source marks the reads that make the trial invalid
+    (answer_source_reasons: the harness's stores, this experiment's published outputs, a declared grader-output path,
+    or the fixture, transcript or trial-root files of another trial of the same task)."""
     cwd = graded.get("cwd") or ""
     own = [p for p in (cwd, f"{HOME}/.claude/projects/{_claude_slug(cwd)}" if cwd else None) if p]
     work = cfg.get("trial_root")
+    declared = [str(p).replace("~/", f"{HOME}/", 1) for p in cfg.get("answer_source_paths") or []]
     found = []
     for call_id, text in _call_texts(graded, client):
         text = text.replace("~/", f"{HOME}/").replace('"~"', f'"{HOME}"')
@@ -1444,10 +1484,10 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixture
         if work:
             text = re.sub(re.escape(work) + r"/[a-z]+/" + re.escape(trial_id) + r"[^\s\"']*", "<own-trial-file>", text)
         cats = sorted(name for name, pattern in REACH.items() if pattern.search(text))
-        if cats:
-            same_task = bool(set(FIXTURE_ID.findall(text)) & (same_task_fixtures or set())) if "other-fixture" in cats else False
-            found.append({"call_id": call_id, "categories": cats,
-                          "answer_source": "coordination" in cats or same_task, "same_task_fixture": same_task})
+        reasons = answer_source_reasons(text, same_task_fixtures or set(), same_task_trials or set(), declared)
+        if cats or reasons:
+            found.append({"call_id": call_id, "categories": cats or ["answer-source"], "answer_source": bool(reasons),
+                          "answer_source_reasons": reasons, "same_task_fixture": "same-task fixture" in reasons})
     return found
 
 
@@ -1548,8 +1588,12 @@ def cli_exposure(item: str, client: str, graded: dict) -> dict:
         skills = {skill_item(s) for s in names} | set(names)
     surfaces = [f"{kind}:{name}" for kind, name in CLI_NATIVE_SURFACES.get(item, ())
                 if name in (plugins if kind == "plugin" else skills)]
+    # Point 2 of the 11:43Z confirmations: a PATH-only CLI that a client vendor's official skills repository reaches
+    # through a skill loaded in this session stays not exposed, in its own reported stratum.
+    vendor = [f"{repo}:{name}" for repo, name in CLI_VENDOR_SKILL_SURFACES.get(item, ()) if name in skills]
     return {"item": item, "exposed": bool(surfaces), "class": "native-surface" if surfaces else "PATH-only",
-            "surfaces": surfaces}
+            "stratum": "native-surface" if surfaces else ("vendor-skill surface" if vendor else "PATH-only"),
+            "surfaces": surfaces, "vendor_skill_surfaces": vendor}
 
 
 def effective_exit(exit_row: dict) -> dict:
@@ -1619,11 +1663,12 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     marker_ok = (not graded["markers"]) if trial.get("arm") == "native" else bool(graded["markers"])
     record["marker_ok"] = marker_ok
     key = (trial.get("task"), trial.get("instance"))
-    same_task = {fid for other, fid in ((fixtures_by_task or {}).get(key) or {}).items() if other != tid and fid}
-    record["reach"] = reach(graded, trial.get("client"), cfg, tid, same_task)
+    others = {other: fid for other, fid in ((fixtures_by_task or {}).get(key) or {}).items() if other != tid}
+    record["reach"] = reach(graded, trial.get("client"), cfg, tid, {fid for fid in others.values() if fid}, set(others))
     # Decision 3: reach entries are tags (reported as their own stratum); only a gold or answer-source read invalidates.
     record["tagged"] = sorted({c for entry in record["reach"] for c in entry["categories"]})
     record["answer_source_reads"] = [entry["call_id"] for entry in record["reach"] if entry.get("answer_source")]
+    record["answer_source_reasons"] = sorted({r for entry in record["reach"] for r in entry.get("answer_source_reasons") or []})
     record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored")
                            and not record["answer_source_reads"])
     record["watcher"] = watcher(graded, trial.get("client"), record["reach"])
@@ -1654,7 +1699,9 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
         # Decision 6: the trial's own first reading, judged when the trial launched, left headroom for its expected
         # usage (the amended §9.1 start rule; it replaces the protocol's 0.50 / 0.75 prior).
         launched_ns = _ts_ns(rows.get("launched", {}).get("at"))
-        expected = exit_row.get("meter_expected_usage") or run_expected_usage(cfg)
+        # The value the launcher used for this trial (point 5 of the 11:43Z confirmations: recorded per trial), else the
+        # run's value for a trial recorded before that field existed.
+        expected = exit_row.get("meter_expected_usage") or run_expected_usage(cfg, root)
         started_with_headroom = first.get("five_hour") is not None and headroom_allows(
             first, expected, now=launched_ns / 1e9 if launched_ns else None)[0]
         delta = {w: round(exit_row["meter_last"][w] - first[w], 4) for w in ("five_hour", "seven_day")
@@ -1824,6 +1871,39 @@ def gate0(root: Path) -> dict:
 # ---------------------------------------------------------------------------------------------------------------------
 # The run.
 
+def new_item_entry(arm: str | None) -> dict:
+    """One OIR row (target item, cell) before any trial is counted."""
+    return {"n": 0, "used": 0, "used_excl_fixture_mentioned": 0, "n_excl_process_table_trials": 0,
+            "used_excl_process_table_trials": 0, "n_untagged": 0, "used_untagged": 0, "n_tagged": 0, "used_tagged": 0,
+            "not_exposed_path_only": 0, "n_vendor_skill_surface": 0, "used_vendor_skill_surface": 0, "arm": arm}
+
+
+def count_trial(entry: dict, record: dict, target: str | None, arm: str | None) -> None:
+    """One valid organic trial's contribution to its item's OIR row. Decision 2: a CLI target only on PATH was not
+    exposed, so the trial is counted apart, never as a miss; point 2 of the 11:43Z confirmations: such trials reached by
+    a client vendor's official skill form the reported vendor-skill surface stratum. Decision 3: tagged trials (a reach
+    outside the fixture that is not an answer source) form their own stratum beside the untagged ones."""
+    pool = record.get("native_U_items") if arm == "native" else record.get("U_env_items")
+    used = target in (pool or [])
+    exposure = record.get("target_exposure")
+    if exposure is not None and not exposure["exposed"]:
+        entry["not_exposed_path_only"] += 1
+        if exposure.get("vendor_skill_surfaces"):
+            entry["n_vendor_skill_surface"] += 1
+            entry["used_vendor_skill_surface"] += used
+        return
+    entry["n"] += 1
+    entry["used"] += used
+    stratum = "tagged" if record.get("tagged") else "untagged"
+    entry[f"n_{stratum}"] += 1
+    entry[f"used_{stratum}"] += used
+    if target in (record.get("native_U_items_excl_fixture_mentioned") or []):
+        entry["used_excl_fixture_mentioned"] += 1
+    if not record.get("process_table_reads"):
+        entry["n_excl_process_table_trials"] += 1
+        entry["used_excl_process_table_trials"] += used
+
+
 def grade_run(root: Path) -> dict:
     cfg = load_json(root / "run.json")
     skill_usage(Path(cfg["repo"]))   # the shell-text rules of the repository the run was prepared from (run.json repo_head)
@@ -1836,11 +1916,11 @@ def grade_run(root: Path) -> dict:
     run_tools: dict = dict(cfg.get("tools_by_server") or {})
     gate_rows = {g: [] for g in ("G2", "G3", "G5", "G6", "G7", "G8", "G9", "G11", "G13", "G14")}
     gaps, carried_forward = [], []
-    fixtures_by_task: dict = {}
+    fixtures_by_task: dict = {}   # (task, instance) -> {trial_id: fixture id or None}, for decision 3's same-task rule
     for tid, trial in ledger.items():
         fixture_dir = (trial["rows"].get("prepared", {}) or {}).get("fixture_private")
-        if fixture_dir:
-            fixtures_by_task.setdefault((trial.get("task"), trial.get("instance")), {})[tid] = Path(fixture_dir).name
+        fixtures_by_task.setdefault((trial.get("task"), trial.get("instance")), {})[tid] = \
+            Path(fixture_dir).name if fixture_dir else None
     for tid, trial in sorted(ledger.items(), key=lambda kv: (kv[1].get("client") != "claude",
                                                              kv[1]["rows"].get("pre-launch", {}).get("at", ""))):
         rows = trial["rows"]
@@ -1887,30 +1967,8 @@ def grade_run(root: Path) -> dict:
         if record["valid"] and trial.get("lane") == cfg.get("lane", "organic-e2e") and task.get("kind") != "prompted" \
                 and not (cfg.get("tests_by_ref") or {}).get(trial.get("ref") or "", {}).get("gate_trial"):
             target = task.get("item")
-            entry = per_item.setdefault((target, trial.get("cell")), {"n": 0, "used": 0, "used_excl_fixture_mentioned": 0,
-                                                                     "n_excl_process_table_trials": 0,
-                                                                     "used_excl_process_table_trials": 0,
-                                                                     "n_untagged": 0, "used_untagged": 0,
-                                                                     "n_tagged": 0, "used_tagged": 0,
-                                                                     "not_exposed_path_only": 0, "arm": trial.get("arm")})
-            pool = record["native_U_items"] if trial.get("arm") == "native" else record["U_env_items"]
-            if record["target_exposure"] is not None and not record["target_exposure"]["exposed"]:
-                # Decision 2: a CLI only on PATH was not exposed; its trial is counted apart, never as a miss.
-                entry["not_exposed_path_only"] += 1
-                continue
-            entry["n"] += 1
-            if target in (pool or []):
-                entry["used"] += 1
-            stratum = "tagged" if record["tagged"] else "untagged"
-            entry[f"n_{stratum}"] += 1
-            if target in (pool or []):
-                entry[f"used_{stratum}"] += 1
-            if target in (record.get("native_U_items_excl_fixture_mentioned") or []):
-                entry["used_excl_fixture_mentioned"] += 1
-            if not record["process_table_reads"]:
-                entry["n_excl_process_table_trials"] += 1
-                if target in (pool or []):
-                    entry["used_excl_process_table_trials"] += 1
+            entry = per_item.setdefault((target, trial.get("cell")), new_item_entry(trial.get("arm")))
+            count_trial(entry, record, target, trial.get("arm"))
     ids = [r["trial_id"] for r in table]
     attempts_ok = True
     for block in blocks:
@@ -1930,7 +1988,10 @@ def grade_run(root: Path) -> dict:
                               "wilson95_untagged": wilson(v["used_untagged"], v["n_untagged"]),
                               "oir_tagged": rate(v["used_tagged"], v["n_tagged"]),
                               "wilson95_tagged": wilson(v["used_tagged"], v["n_tagged"]),
-                              "exposure": "not exposed (PATH-only)" if v["not_exposed_path_only"] and not v["n"] else None}
+                              "use_rate_vendor_skill_surface": rate(v["used_vendor_skill_surface"], v["n_vendor_skill_surface"]),
+                              "wilson95_vendor_skill_surface": wilson(v["used_vendor_skill_surface"], v["n_vendor_skill_surface"]),
+                              "exposure": ("not exposed (PATH-only" + ("; vendor-skill surface stratum)" if v["n_vendor_skill_surface"]
+                                                                       else ")")) if v["not_exposed_path_only"] and not v["n"] else None}
            for (item, cell), v in per_item.items()}
     # A verified negative (G15): a valid trial on a control task (R4: G1-G6' are should_not for every item) whose joins
     # and stream-Loki agreement hold, so its non-use of each item is checked against the raw sources. Items it did use
@@ -1967,6 +2028,15 @@ def grade_run(root: Path) -> dict:
                    "rebaselines": [{k: r.get(k) for k in ("at", "trigger", "trial_id", "cell", "arm", "changed", "baseline_sha256")}
                                    for r in rebaselines],
                    "rebaselined_trials": sorted(rebaselined)}
+    # Point 4 of the 11:43Z confirmations: the re-runs a re-baseline cost (CL7b included), checked against one Claude
+    # trial plus one Codex cell, the arm's concurrency unit (else one trial per arm).
+    reruns = [r for r in table if r.get("reason") == "host_change_rebaselined"]
+    rerun_arms = _count([r.get("arm") for r in reruns])
+    codex_cells = sorted({str(r.get("cell")) for r in reruns if r.get("client") == "codex"})
+    claude_reruns = sum(1 for r in reruns if r.get("client") == "claude")
+    gates["G4"]["rebaseline_cost"] = {
+        "claude_trials": claude_reruns, "codex_cells": codex_cells, "trials_per_arm": rerun_arms,
+        "within_confirmed_cost": (claude_reruns <= 1 and len(codex_cells) <= 1) or all(n <= 1 for n in rerun_arms.values())}
     # G7 also needs the stage-2 canaries (finding 11): the exec-rules canary refused, gh showing no identity (or the
     # read-only one) through the shell and through ctx_*.
     g0 = load_json(root / "gate0.json") if (root / "gate0.json").exists() else None
@@ -1998,11 +2068,19 @@ def grade_run(root: Path) -> dict:
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v], "negatives": negatives}
     exposure = [{"trial_id": r["trial_id"], "cell": r.get("cell"), **r["target_exposure"]}
                 for r in table if r.get("target_exposure")]
+    # Point 5 of the 11:43Z confirmations: the expected usage each Claude trial was started with, the run's
+    # recalibration (if the pilot or the operator wrote one) and what the p90 over this run's trials is now.
+    meter = {"default_or_run_value": (cfg.get("claude_meter") or {}).get("expected_usage"),
+             "calibration": load_json(root / METER_CALIBRATION) if (root / METER_CALIBRATION).exists() else None,
+             "values_used": sorted({json.dumps((r.get("claude") or {}).get("meter_expected_usage"), sort_keys=True)
+                                    for r in table if r.get("claude")}),
+             "p90_now": {k: v for k, v in meter_calibration(root).items() if k != "deltas"}}
     return {"graded_at": utc_now(), "run_id": cfg["run_id"], "grader_sha256": sha256_file(Path(__file__)),
             "common_sha256": sha256_file(HERE / "common.py"), "cc_decisions": CC_V11_DECISIONS, "trials": table,
             "oir": oir, "gates": gates, "gaps": gaps,
             "carried_forward": carried_forward, "registry_status": (cfg.get("registry") or {}).get("status"),
             "claude_completion": cfg.get("claude_completion"), "claude_meter": cfg.get("claude_meter"),
+            "meter_expected_usage": meter, "cli_exposure_strata": _count([e.get("stratum") for e in exposure]),
             "completion_times": [{k: r.get(k) for k in ("trial_id", "cell", "reason", "final_turn_end_s", "time_to_result_s",
                                                         "turn_times_source")}
                                  for r in table if r.get("client") == "claude" and r.get("launched")],
@@ -2021,7 +2099,11 @@ def grade_run(root: Path) -> dict:
                       "beside the protocol: completion at the result event with T = 1,800 s (1), CLI exposure by native "
                       "surface (2), tagged host reads with gold-only invalidation (3), watcher-only chrome-devtools (4), "
                       "best-effort G10 gateway entry (5), the headroom meter rule (6), one in-run re-baseline (7) and "
-                      "effort-only pipeline receipts (8)."]}
+                      "effort-only pipeline receipts (8).",
+                      "Confirmed at 11:43Z (task-ns2604-coop-20261006T114319Z): the hold for every Claude cell, gh as "
+                      "PATH-only with a vendor-skill surface stratum, the answer-source list with grader outputs and "
+                      "earlier graded receipts added, the re-baseline cost of one Claude trial plus one Codex cell, and "
+                      "0.15 of a window per trial until the first pilot block's p90 recalibrates it."]}
 
 
 def host_unchanged(row: dict, block: bool = False) -> bool:
@@ -2328,7 +2410,24 @@ def main(argv=None) -> int:
     p_gate0.add_argument("--run-root", required=True)
     p_replay = sub.add_parser("replay")
     p_replay.add_argument("--out", default=None)
+    p_meter = sub.add_parser("meter-calibration", help="the run's measured p90 usage per Claude trial (point 5 of the "
+                             "11:43Z confirmations); --write records it as the run's expected usage")
+    p_meter.add_argument("--run-root", required=True)
+    p_meter.add_argument("--write", action="store_true")
     args = parser.parse_args(argv)
+    if args.cmd == "meter-calibration":
+        # The operator step beside pilot.py's automatic one: print the p90; with --write, record it for later starts.
+        root = Path(args.run_root)
+        calibration = meter_calibration(root)
+        if args.write and calibration["expected_usage"]:
+            write_json(root / METER_CALIBRATION, {**calibration, "at": utc_now(), "source": "operator: grade.py "
+                                                  "meter-calibration --write", "previous": run_expected_usage(
+                                                      load_json(root / "run.json"), root),
+                                                  "decision": f"{CC_V11_DECISIONS} #6; confirmed by "
+                                                              "task-ns2604-coop-20261006T114319Z point 5"}, 0o600)
+        print(json.dumps({"expected_usage": calibration["expected_usage"], "trials": calibration["trials"],
+                          "written": bool(args.write and calibration["expected_usage"])}))
+        return 0
     if args.cmd == "replay":
         report = replay(Path(args.out) if args.out else None)
         print(json.dumps({k: (v.get("pass") if isinstance(v, dict) else v) for k, v in report.items() if k in ("a", "b", "c", "d", "e", "f", "G1")}))

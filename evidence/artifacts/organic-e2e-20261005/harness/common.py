@@ -153,6 +153,13 @@ CLI_NATIVE_SURFACES = {
     "worktrunk": (("plugin", "worktrunk"), ("skill", "worktrunk")),
 }
 CLI_TASK_KINDS = ("cli", "cli+skill")
+# Decision 2 as confirmed at 11:43Z (CC item task-ns2604-coop-20261006T114319Z): such a CLI stays PATH-only, and the
+# trials where a client vendor's official skills repository put a skill for it in the session form their own reported
+# stratum, the vendor-skill surface. First case: gh through openai/skills@49f948fa (gh-fix-ci, gh-address-comments;
+# adoption/skills/manifest.json).
+CLI_VENDOR_SKILL_SURFACES = {
+    "gh": (("openai/skills", "gh-fix-ci"), ("openai/skills", "gh-address-comments")),
+}
 
 # MCP server names as the clients spell them, mapped to the suite's item names.
 MCP_SERVER_ITEMS = {
@@ -507,7 +514,9 @@ def s7_compare(before: dict, after: dict) -> dict:
 # project, becomes the run's new S7 baseline, and the trials that were running when it happened are carried forward
 # and re-run: at most the Claude chain's one trial and the Codex block in flight (up to its -j trials, 3 for
 # codex-native and codex-env in the pilot). A change found between blocks costs no trial. A second persistent change in
-# the same run, or a refused key, still stops the run, as before.
+# the same run, or a refused key, still stops the run, as before. The 11:43Z confirmation (CC item
+# task-ns2604-coop-20261006T114319Z, point 4) accepts that cost because the Codex trials in flight form one cell, the
+# arm's concurrency unit; rebaseline_cost_ok() checks it at every re-run and stops the run if it would be exceeded.
 
 REBASELINE_LOG = "rebaselines.jsonl"
 REBASELINES_PER_RUN = 1
@@ -526,6 +535,26 @@ def current_s7_baseline(cfg: dict, root: Path) -> tuple[dict, str]:
     rows = [r for r in read_jsonl(Path(root) / REBASELINE_LOG) if r.get("baseline")]
     path = rows[-1]["baseline"] if rows else cfg["s7_baseline"]
     return load_json(path), path
+
+
+def rebaseline_cost_ok(root: Path, new: dict) -> tuple[bool, str]:
+    """Point 4 of the 11:43Z confirmations: a re-baseline may re-run one Claude trial and the trials in flight of one
+    Codex cell (the arm's concurrency unit, up to its -j). The pilot runs one Codex cell at a time, so its in-flight
+    trials always form one cell; were the Codex re-runs ever to span two cells, the cap falls back to one trial per arm.
+    `new` is the trial about to be marked (client, cell, arm, trial_id)."""
+    rows = [r for r in read_jsonl(Path(root) / "ledger.jsonl")
+            if r.get("phase") == "exit" and r.get("reason") == "host_change_rebaselined" and r.get("trial_id") != new.get("trial_id")]
+    rows.append(new)
+    claude = [r for r in rows if r.get("client") == "claude"]
+    codex_cells = sorted({str(r.get("cell")) for r in rows if r.get("client") == "codex"})
+    if len(claude) <= 1 and len(codex_cells) <= 1:
+        return True, f"one Claude trial at most ({len(claude)}) and one Codex cell ({codex_cells})"
+    per_arm: dict[str, int] = {}
+    for row in rows:
+        per_arm[str(row.get("arm"))] = per_arm.get(str(row.get("arm")), 0) + 1
+    if all(n <= 1 for n in per_arm.values()):
+        return True, f"one trial per arm ({per_arm})"
+    return False, f"re-runs exceed the confirmed cost: {len(claude)} Claude trials, Codex cells {codex_cells}, per arm {per_arm}"
 
 
 def rebaselines_between(root: Path, since_iso: str | None, until_iso: str | None) -> list[dict]:
@@ -643,37 +672,91 @@ def window_utilization(reading: dict, window: str, now: float | None = None) -> 
     return value
 
 
-def run_expected_usage(cfg: dict | None) -> float:
-    """The run's expected per-trial usage of each window (run.json claude_meter.expected_usage), else the default."""
+METER_WINDOWS = ("five_hour", "seven_day")
+METER_CALIBRATION = "meter-calibration.json"   # in the run root, written by pilot.py or grade.py meter-calibration
+METER_RESOLUTION = 0.01                        # rate_limit_event reports utilization in hundredths
+
+
+def window_expected(expected, window: str) -> float:
+    """A trial's expected usage of one window: one number for both windows, or a per-window mapping (a calibration)."""
+    if isinstance(expected, dict):
+        value = expected.get(window)
+        return float(value) if isinstance(value, (int, float)) else EXPECTED_TRIAL_USAGE
+    return float(expected)
+
+
+def run_expected_usage(cfg: dict | None, root: Path | str | None = None):
+    """The expected per-trial usage a start is checked against (decision 6). 0.15 of a window is the starting default
+    (confirmed at 11:43Z by CC item task-ns2604-coop-20261006T114319Z, point 5), recalibrated after the first pilot block
+    to the measured p90 per trial: <run root>/meter-calibration.json when present, else run.json
+    claude_meter.expected_usage, else the default. A calibration is per window."""
+    if root is not None and (Path(root) / METER_CALIBRATION).exists():
+        try:
+            calibrated = load_json(Path(root) / METER_CALIBRATION).get("expected_usage")
+        except (OSError, ValueError, AttributeError):
+            calibrated = None
+        if isinstance(calibrated, dict):
+            values = {w: float(calibrated[w]) for w in METER_WINDOWS if isinstance(calibrated.get(w), (int, float))}
+            if values:
+                return values
     value = ((cfg or {}).get("claude_meter") or {}).get("expected_usage")
     return float(value) if isinstance(value, (int, float)) else EXPECTED_TRIAL_USAGE
 
 
-def headroom_allows(reading: dict | None, expected: float = EXPECTED_TRIAL_USAGE, now: float | None = None) -> tuple[bool, str]:
+def headroom_allows(reading: dict | None, expected=EXPECTED_TRIAL_USAGE, now: float | None = None) -> tuple[bool, str]:
     """Decision 6: start when the trial's expected usage fits in the remaining headroom of both windows. Another
     session's use only matters through the headroom it leaves; the account need not be quiet."""
     if not reading:
         return True, "no-recent-stream: the trial's own first event decides"
-    five, seven = window_utilization(reading, "five_hour", now), window_utilization(reading, "seven_day", now)
-    if five is None or seven is None:
+    use = {w: window_utilization(reading, w, now) for w in METER_WINDOWS}
+    if any(v is None for v in use.values()):
         return True, "reading-incomplete: the trial's own first event decides"
-    head_five, head_seven = round(METER_CEILING - five, 4), round(METER_CEILING - seven, 4)
-    state = f"five_hour={five} seven_day={seven} headroom={head_five}/{head_seven} expected={expected}"
-    if expected <= head_five and expected <= head_seven:
+    head = {w: round(METER_CEILING - use[w], 4) for w in METER_WINDOWS}
+    need = {w: window_expected(expected, w) for w in METER_WINDOWS}
+    state = (f"five_hour={use['five_hour']} seven_day={use['seven_day']} headroom={head['five_hour']}/{head['seven_day']} "
+             f"expected={need['five_hour']}/{need['seven_day']}")
+    if all(need[w] <= head[w] for w in METER_WINDOWS):
         return True, f"headroom-ok {state}"
     return False, f"headroom-short {state}"
 
 
-def resume_after(reading: dict | None, expected: float = EXPECTED_TRIAL_USAGE) -> str | None:
+def resume_after(reading: dict | None, expected=EXPECTED_TRIAL_USAGE) -> str | None:
     """When a deferred start fits again: the latest resetsAt among the windows short of headroom (ISO), or None. Limits
     never gate for good: pilot.py clears DEFER.claude on resume once the newest reading allows a start."""
     stamps = []
-    for window in ("five_hour", "seven_day"):
+    for window in METER_WINDOWS:
         value, resets = (reading or {}).get(window), (reading or {}).get(f"{window}_resets_at")
         if value is not None and isinstance(resets, (int, float)) and resets > time.time() \
-                and expected > round(METER_CEILING - value, 4):
+                and window_expected(expected, window) > round(METER_CEILING - value, 4):
             stamps.append(resets)
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(max(stamps))) if stamps else None
+
+
+def meter_calibration(root: Path | str) -> dict:
+    """Point 5 of the 11:43Z confirmations: the measured p90 of each window's per-trial meter delta (the protocol's
+    m_p90, §9.1) over the run's organic Claude trials so far. The deltas are account-wide, so another session's use can
+    only raise them; trials carried forward, never launched or without both readings are left out; a p90 below the
+    meter's resolution is raised to it. Nearest-rank p90."""
+    deltas: dict[str, list[float]] = {w: [] for w in METER_WINDOWS}
+    trial_ids = []
+    for row in read_jsonl(Path(root) / "ledger.jsonl"):
+        if row.get("phase") != "exit" or row.get("client") != "claude" or row.get("launched") is False \
+                or row.get("lane") != LANE or row.get("reason") in CARRY_FORWARD_REASONS:
+            continue
+        first, last = row.get("meter_first") or {}, row.get("meter_last") or {}
+        windows = [w for w in METER_WINDOWS if isinstance(first.get(w), (int, float)) and isinstance(last.get(w), (int, float))]
+        for window in windows:
+            deltas[window].append(round(max(0.0, last[window] - first[window]), 4))
+        if windows:
+            trial_ids.append(row.get("trial_id"))
+
+    def p90(values: list[float]) -> float:
+        ordered = sorted(values)
+        return max(METER_RESOLUTION, ordered[max(0, -(-9 * len(ordered) // 10) - 1)])
+
+    return {"expected_usage": {w: p90(v) for w, v in deltas.items() if v}, "trials": len(trial_ids),
+            "trial_ids": trial_ids, "deltas": deltas,
+            "method": "nearest-rank p90 of meter_last - meter_first per window over the run's organic Claude trials"}
 
 
 def rate_limit_hit(event: dict) -> bool:

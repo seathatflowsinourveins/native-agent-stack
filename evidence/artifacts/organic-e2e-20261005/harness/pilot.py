@@ -24,7 +24,9 @@ or experiment word while sessions run.
    test at -j 1 under the shared lock. Needs gate0.json passing and a reviewed routing-file registry (or a recorded
    development allowance); the Claude chain also needs the run's completion policy decided by a CC amendment. Stage 1
    records decision 1 of CC item task-ns2604-coop-20261006T105529Z by default (complete-at-result, T = 1,800 s); another
-   policy or T goes in through prepare.py --claude-completion ... --claude-t-seconds ... --amendment-ref ....
+   policy or T goes in through prepare.py --claude-completion ... --claude-t-seconds ... --amendment-ref .... After the
+   first Claude block with usable meter readings, the expected usage per trial (0.15 of a window to start) becomes the
+   measured p90 per trial, written to meter-calibration.json in the run root (recalibrate_meter; confirmed at 11:43Z).
 5  collect.py.  6  grade.py trials.
 Resume: --from-stage 2, 3 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
 launch (meter, lock, DEFER, HOLD), or a trial carried forward (common.CARRY_FORWARD_REASONS: killed at its own first
@@ -48,8 +50,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CARRY_FORWARD_REASONS, HOME, RUNS_ROOT, headroom_allows, load_json, newest_meter_reading,  # noqa: E402
-                    read_jsonl, run_expected_usage, sha256_file, utc_now)
+from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, HOME, METER_CALIBRATION, RUNS_ROOT,  # noqa: E402
+                    headroom_allows, load_json, meter_calibration, newest_meter_reading, read_jsonl,
+                    run_expected_usage, sha256_file, utc_now, write_json)
 
 PROTOCOL_PREFIXES = {HOME / ".claude/CLAUDE.md": "b86ea2c4655637fa", HOME / ".claude/settings.json": "861959ff0e49803f"}
 CLAUDE_PROBE = {"key": "probe-claude-native", "cell": "claude-native", "prompt": "Reply with the single word: ready."}
@@ -81,6 +84,29 @@ def launched_by_ref(root: Path) -> dict:
     return counts
 
 
+def recalibrate_meter(root: Path, cfg: dict, log: list, after: str) -> dict | None:
+    """Point 5 of the 11:43Z confirmations (CC item task-ns2604-coop-20261006T114319Z): 0.15 of a window is the
+    starting expected usage per trial; after the first pilot block that yields an organic Claude trial with two meter
+    readings, the measured p90 per trial (common.meter_calibration) replaces it. The value goes to
+    <run root>/meter-calibration.json, which the launcher reads for every later start and records, as the value used, in
+    each trial's ledger rows. Runs once; the operator can recompute with grade.py meter-calibration."""
+    path = root / METER_CALIBRATION
+    if path.exists():
+        return None
+    calibration = meter_calibration(root)
+    if not calibration["expected_usage"]:
+        log.append({"at": utc_now(), "step": "meter calibration", "after": after,
+                    "skipped": "no organic Claude trial with two meter readings yet; tried again after the next block"})
+        return None
+    record = {**calibration, "at": utc_now(), "after_block": after, "previous": run_expected_usage(cfg),
+              "source": "pilot.py, after the first stage-4 Claude block with usable readings",
+              "decision": f"{CC_V11_DECISIONS} #6; confirmed by task-ns2604-coop-20261006T114319Z point 5"}
+    write_json(path, record, 0o600)
+    log.append({"at": utc_now(), "step": "meter calibration", "after": after,
+                "expected_usage": record["expected_usage"], "trials": record["trials"], "previous": record["previous"]})
+    return record
+
+
 def cell_plan(cfg: dict, cell: str, launched: dict) -> list[tuple[str | None, int]]:
     """[(ref or None for the whole cell, repeat)]: the whole cell when nothing ran, else each test still short of its
     repeat (resume never relaunches a completed test; a test refused before launch counts as not run)."""
@@ -110,6 +136,8 @@ def main(argv=None) -> int:
         parser.add_argument(flag, default=None)
     for switch in PREPARE_SWITCHES:
         parser.add_argument(switch, action="store_true")
+    parser.add_argument("--answer-source-path", action="append", default=[],
+                        help="passed to prepare.py: a further grader expected-output path (decision 3, confirmed at 11:43Z)")
     args = parser.parse_args(argv)
     py = [sys.executable, "-B"]
     root = RUNS_ROOT / args.run_id
@@ -143,6 +171,8 @@ def main(argv=None) -> int:
         for switch in PREPARE_SWITCHES:
             if getattr(args, switch[2:].replace("-", "_")):
                 cmd.append(switch)
+        for path in args.answer_source_path:
+            cmd += ["--answer-source-path", path]
         if skip:
             cmd += ["--skip-tests", ",".join(skip)]
         if args.cells:
@@ -182,7 +212,7 @@ def main(argv=None) -> int:
 
     def clear_defer() -> None:
         if not args.keep_defer and (root / "DEFER.claude").exists():
-            allowed, why = headroom_allows(newest_meter_reading(), run_expected_usage(cfg))
+            allowed, why = headroom_allows(newest_meter_reading(), run_expected_usage(cfg, root))
             log.append({"at": utc_now(), "step": "DEFER.claude", "cleared": allowed, "why": why})
             if allowed:
                 (root / "DEFER.claude").unlink()
@@ -262,6 +292,7 @@ def main(argv=None) -> int:
                 if step(f"stage 4 {entry['test_key']}", block(entry["cell"], entry["ref"]), log):
                     failures.append(entry["test_key"])
                     return
+                recalibrate_meter(root, cfg, log, f"stage 4 {entry['test_key']}")
 
         threads = [threading.Thread(target=codex_chain), threading.Thread(target=claude_chain)]
         for thread in threads:

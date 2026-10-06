@@ -286,8 +286,12 @@ def main(argv=None) -> int:
     parser.add_argument("--amendment-ref", default=None, help="the CC amendment a policy or T other than decision 1's rests "
                         f"on (the defaults rest on {CC_V11_DECISIONS})")
     parser.add_argument("--claude-expected-usage", type=float, default=EXPECTED_TRIAL_USAGE,
-                        help="decision 6: a Claude trial's expected usage of each meter window; a start needs that much "
-                        "headroom")
+                        help="decision 6: a Claude trial's expected usage of each meter window, a start needs that much "
+                        "headroom (0.15 to start, confirmed at 11:43Z; pilot.py recalibrates it to the measured p90 after "
+                        "the first pilot block)")
+    parser.add_argument("--answer-source-path", action="append", default=[],
+                        help="decision 3 as confirmed at 11:43Z: a further grader expected-output path outside the run "
+                        "roots and the fixture cache (repeatable); a trial that reads it is invalid")
     parser.add_argument("--gateway-pipeline-details", choices=("on", "off"), default=None,
                         help="decision 8 (RP4, G11): whether the co-op turned the gateway's pipeline details on for this "
                         "run; recorded only (the harness never switches them, and keeps only their effort fields)")
@@ -662,6 +666,7 @@ def main(argv=None) -> int:
         "meter_stage1": {k: v for k, v in (meter or {}).items() if k != "source_private"} or None,
         "meter_stage1_allows": headroom_allows(meter, args.claude_expected_usage), "quota_stage1": quota,
         "gateway_build": gateway_build(), "gateway_pipeline_details": pipeline_details,
+        "answer_source_paths": [str(Path(p).expanduser()).replace(str(HOME), "~", 1) for p in args.answer_source_path],
         "claude_session_cap": CLAUDE_SESSION_CAP, "claude_completion": completion, "claude_meter": claude_meter,
         "cells": cells, "cell_codes": cell_codes, "tests_by_ref": tests_by_ref, "schedule": str(root / "schedule.json"),
         "unavailable_cells": suite.UNAVAILABLE_CELLS, "label_vector_sha256": None,

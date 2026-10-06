@@ -43,9 +43,10 @@ sys.path.insert(0, str(HERE))
 from common import (CLAUDE_COMPLETION_DEFAULT, CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, LANE, LOCK_WAIT_S,  # noqa: E402
                     POST_RESULT_GRACE_S, PROTOCOL_T_SECONDS, T_SECONDS, append_jsonl, clean_login_env,
                     current_s7_baseline, gateway_build, headroom_allows, load_json, manifest_digest,
-                    newest_meter_reading, rate_limit_hit, rate_limit_readings, read_jsonl, rebaselines_between,
-                    resume_after, run_expected_usage, s7_persistent_change, sha256_bytes, sha256_file,
-                    stable_s7_snapshot, stop_flag_names, trial_dir, tree_manifest, try_rebaseline, utc_now, write_json)
+                    newest_meter_reading, rate_limit_hit, rate_limit_readings, read_jsonl, rebaseline_cost_ok,
+                    rebaselines_between, resume_after, run_expected_usage, s7_persistent_change, sha256_bytes,
+                    sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir, tree_manifest, try_rebaseline, utc_now,
+                    write_json)
 
 RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many requests", "quota")
 # Kill reasons after which the client's remaining tests wait for headroom (DEFER.<client>, cleared by pilot.py on
@@ -53,6 +54,13 @@ RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many 
 DEFER_REASONS = ("meter_headroom_first_event", "rate_limited")
 # Censoring reasons that mean no result event arrived before T: the trial's cell is held for diagnosis (decision 1).
 HOLD_REASONS = ("timeout", "timeout_after_result", "wall_guard")
+
+
+def holds_cell(client: str, reason: str | None) -> bool:
+    """Decision 1, confirmed at 11:43Z for every Claude cell (CC item task-ns2604-coop-20261006T114319Z, point 1): one
+    rule for all of them, whatever the arm, kind (CLI or SDK) or stage, so the arms stay symmetric. It depends on the
+    client and the censoring reason only."""
+    return client == "claude" and reason in HOLD_REASONS
 BACKGROUND_SUBTYPES = ("background_tasks_changed", "task_started", "task_progress", "task_notification")
 
 
@@ -394,7 +402,7 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
     observations, and for a Claude trial without a result event before T a no_result_diagnosis."""
     env = clean_login_env()
     policy = completion_policy(cfg)
-    expected = run_expected_usage(cfg)
+    expected = run_expected_usage(cfg, root)
     claude_bin, codex_bin = cfg["binaries"]["claude"]["realpath"], cfg["binaries"]["codex"]["realpath"]
     with open(stream_path, "wb") as out, open(err_path, "wb") as err:
         proc = subprocess.Popen(["bash", "-lc", line], cwd=str(fixture), env=env, stdout=out, stderr=err,
@@ -706,7 +714,7 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                 (root / "STOP.claude").write_text(f"{utc_now()} claude session cap {cap} reached\n")
                 raise Censored("claude_cap")
             meter_source = newest_meter_reading()
-            expected = run_expected_usage(cfg)
+            expected = run_expected_usage(cfg, root)
             allowed, why = headroom_allows(meter_source, expected)
             ledger(root, {**base, "phase": "meter", "at": utc_now(), "allowed": allowed, "why": why,
                           "expected_usage": expected, "claude_sessions_launched_before": len(launched), "cap": cap,
@@ -757,7 +765,7 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                     "nested_clients": outcome["nested"], "tree_exes": outcome["tree_exes"],
                     "rate_limit_error": outcome["rate_limit_error"], "rate_limited": outcome["rate_limited"],
                     "stream_sha256": sha256_file(stream_path), "stream_bytes": stream_path.stat().st_size}
-        if client == "claude" and reason in HOLD_REASONS:
+        if holds_cell(client, reason):
             # Decision 1: no result event by T. The cell waits until the operator has read this trial's
             # no_result_diagnosis (for example a background Workflow that never ends) and removed the flag.
             (root / f"HOLD.{cell}").write_text(f"{utc_now()} {trial_id}: no result event by T = {t_seconds} s ({reason}); "
@@ -786,8 +794,14 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             if during and not rebaselined:
                 rebaselined = f"re-baselined during the trial ({str(during[-1].get('baseline', '')).rsplit('/', 1)[-1]})"
             if rebaselined:
+                # Point 4 of the 11:43Z confirmations: the re-runs stay within one Claude trial and one Codex cell (else
+                # one trial per arm); past that the run stops, as before decision 7.
+                cost_ok, cost = rebaseline_cost_ok(root, {"client": client, "cell": cell, "arm": arm, "trial_id": trial_id})
                 result.update({"censored": True, "reason": "host_change_rebaselined"})
-                exit_row.update({**result, "reason_before_rebaseline": reason, "rebaseline": rebaselined})
+                exit_row.update({**result, "reason_before_rebaseline": reason, "rebaseline": rebaselined,
+                                 "rebaseline_cost": cost})
+                if not cost_ok:
+                    (root / "STOP").write_text(f"{utc_now()} in-run re-baseline cost exceeded at {trial_id}: {cost}\n")
             host_compare = judged["within"]
             fixture_manifest = tree_manifest(fixture)
             write_json(root / "manifests" / f"{trial_id}.fixture.json", fixture_manifest, 0o600)
