@@ -14396,6 +14396,11 @@
       "bytes": 10844
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-rc6.json",
+      "sha256": "a59062bcea9013f3b25584adc0d11be411b4aa046f82ea08f4fa70413e84a311",
+      "bytes": 3133
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-v2-cc4503f.json",
       "sha256": "7fdf6d104f7e75b07718b33873fd2d32f06113e3cc42a14adfa934aeb0fb01f6",
       "bytes": 2475
@@ -54892,8 +54897,8 @@
     },
     {
       "path": "tests/test_nautilus_rc6_candidate.py",
-      "sha256": "daab9f0e090631e2cd97aeede8404657ef99a46cd5acf05523e7b5514346c537",
-      "bytes": 6804
+      "sha256": "cabac73859e7c79e27bed180dbe84de8f5ef7bf110fd30d976a8a96af27edf4c",
+      "bytes": 6933
     },
     {
       "path": "tests/test_new_host_grand_list.py",
