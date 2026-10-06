@@ -1,6 +1,7 @@
 """Local synthetic transport failure tests; no credentials or broker requests."""
 import asyncio
 import importlib.util
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -1413,6 +1414,26 @@ class DataFeedSelection(unittest.TestCase):
             asyncio.run(stream._connect())
 
 
+class QuoteStreamDataTimeout(unittest.TestCase):
+    """The SDK's mute-stream reconnect is opted into for regular-session runs only."""
+
+    def test_regular_session_opts_into_the_watchdog_at_the_quote_timeout(self):
+        for quote_timeout in (3, 30):
+            with self.subTest(quote_timeout=quote_timeout):
+                self.assertEqual(t.quote_stream_data_timeout(quote_timeout, False), quote_timeout)
+
+    def test_extended_hours_keep_the_sdk_default(self):
+        for quote_timeout in (3, 30):
+            with self.subTest(quote_timeout=quote_timeout):
+                self.assertIsNone(t.quote_stream_data_timeout(quote_timeout, True))
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_the_pinned_sdk_default_is_off(self):
+        from alpaca.data.live.stock import StockDataStream
+        default = inspect.signature(StockDataStream.__init__).parameters["data_timeout"].default
+        self.assertIsNone(default)
+
+
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
 class ConfiguredQuoteFeed(unittest.TestCase):
     """No broker request is made; only the constructed stream arguments are read."""
@@ -1454,6 +1475,19 @@ class ConfiguredQuoteFeed(unittest.TestCase):
         port, _, quotes = self.build()
         self.assertEqual(port.feed, "iex")
         self.assertEqual(quotes["url_override"], "wss://stream.data.alpaca.markets/v2/iex")
+
+    def test_regular_session_quote_stream_keeps_the_data_timeout_watchdog(self):
+        _, _, quotes = self.build(feed="sip", quote_timeout=30)
+        self.assertEqual(quotes["data_timeout"], 30)
+
+    def test_extended_hours_quote_stream_keeps_the_sdk_default_data_timeout(self):
+        # A quiet thin-session subscription must not make the SDK close the socket itself:
+        # each such close freezes health as quotes_disconnected, which stops the runners.
+        port, _, quotes = self.build(feed="sip", quote_timeout=30, extended_hours_allowed=True)
+        self.assertTrue(port.extended_hours_allowed)
+        self.assertIn("data_timeout", quotes)
+        self.assertIsNone(quotes["data_timeout"])
+        self.assertEqual(port.quote_timeout, 30)  # the engine's own quote_stale watchdog is unchanged
 
     def test_unqualified_feed_refused_before_any_stream_is_constructed(self):
         with self.assertRaises(t.UnsupportedDataFeed):

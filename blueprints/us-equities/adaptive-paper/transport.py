@@ -318,6 +318,23 @@ def halt_statuses_supported(feed):
     return feed == "sip"
 
 
+def quote_stream_data_timeout(quote_timeout, extended_hours_allowed):
+    """The quote stream's alpaca-py `data_timeout`: seconds without market data before the SDK
+    closes the connection itself and reconnects. The pinned SDK (alpaca-py 0.44.0,
+    DataStream.__init__) leaves it off by default, because a legitimately quiet subscription
+    would otherwise reconnect periodically. Here every such close reaches _connection as
+    quotes_disconnected, and both runners stop on any freeze reason other than stale quotes.
+    A run that allows extended hours trades thin sessions, where the whole subscription can
+    stay quiet longer than quote_timeout (trial 20260923-post-extended-hours; Account 2's
+    ext-20261006 recovery, 2026-10-06), so it keeps the SDK default. The cost: such a run,
+    its regular-session part included, no longer reconnects a connected-but-mute socket,
+    which websocket ping/pong cannot detect (ping/pong still closes half-open sockets). It
+    stays frozen on quote_stale, with no entry and no quote-priced exit, until the run ends
+    and recovery connects anew. Freshness gating is unchanged: the quote_stale watchdog and
+    the order-time quote age still apply. A regular-session run keeps the watchdog."""
+    return None if extended_hours_allowed else quote_timeout
+
+
 def decimal_string(value, *, positive=False):
     try:
         number = Decimal(str(value))
@@ -1225,7 +1242,8 @@ class AlpacaPaperTransport:
         self._quotes_stream = Quotes(api_key, secret_key, feed=DataFeed(self.feed), raw_data=True,
                                      url_override=self.data_ws, websocket_params=dict(parameters,
                                      create_protocol=_protocol_factory(self.data_ws)),
-                                     data_timeout=quote_timeout)
+                                     data_timeout=quote_stream_data_timeout(
+                                         quote_timeout, self.extended_hours_allowed))
         self._orders_stream.owner = self
         self._quotes_stream.owner = self
 
