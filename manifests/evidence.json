@@ -4816,6 +4816,31 @@
       "bytes": 1137
     },
     {
+      "path": "adoption/hooks/claude/skill-routing/.claude-plugin/plugin.json",
+      "sha256": "d228b6e80858bd2b69d038083efb08bcfb9e6dcdb0cd083b1c7b7a6707978057",
+      "bytes": 205
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/README.md",
+      "sha256": "a5ff6e45b543561e99ef7a9cf9a69c06e927b2f147070d55942af27b35afaf8d",
+      "bytes": 9371
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/codex-hooks-proposal.json",
+      "sha256": "48ae8181f5c0f0a40753b846dd8cac25ef5127405be660d282096ce996327200",
+      "bytes": 585
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/hooks/hooks.json",
+      "sha256": "858448e0a13f1e1ecbbe84c8a8789b961ac3506b645f2117f74d65d36481ee42",
+      "bytes": 635
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/hooks/skill-routing.py",
+      "sha256": "2b7d470fbbdba229361075a6a229f2c45d2e80078b406ca275d334635220e3a8",
+      "bytes": 23648
+    },
+    {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
       "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
       "bytes": 2888
@@ -17355,6 +17380,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-held-skill-routing-prototype.md",
+      "sha256": "64c276dd73cfdfdfb53cfe0c81bf917ac14f5abb6ece1a46bf8ec694330db24f",
+      "bytes": 8970
     },
     {
       "path": "docs/direct-results.md",
@@ -46182,6 +46212,11 @@
       "bytes": 6747
     },
     {
+      "path": "evidence/artifacts/skills-held-routing-20261006/source-review.json",
+      "sha256": "237e6087e8d4715defa63333474a51ab2d6773854c8395eb4b7f8145e7d25ee9",
+      "bytes": 10420
+    },
+    {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
       "sha256": "13dc826b75e8160c11b31a2d7afef22754b6f5660fe6db9a1af721dff9cd3fd0",
       "bytes": 12541
@@ -55397,6 +55432,11 @@
       "bytes": 103131
     },
     {
+      "path": "tests/test_skill_routing_hook.py",
+      "sha256": "42fff0b29bb771b9fd682f42de0d4002ac08afec43db1da2ef23e0d7f9a0efb7",
+      "bytes": 22634
+    },
+    {
       "path": "tests/test_skill_usage.py",
       "sha256": "994cc7796bf7995137a1cb117f96705e38fcf10fb9b43d970eca0292b93bc85f",
       "bytes": 249557
@@ -55780,6 +55820,61 @@
       "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
       "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
       "bytes": 5277
+    },
+    {
+      "path": "tools/skill-routing-b13/README.md",
+      "sha256": "eaef9c3a28d0f6d936d9bc43c22a989af83dac6024e053cbdb8a4b5d2cf16dc3",
+      "bytes": 6344
+    },
+    {
+      "path": "tools/skill-routing-b13/cases.json",
+      "sha256": "0e8377d63b452f7dd24e7526aaa82bd09dc9a47a7c1b37d794649937f4f78759",
+      "bytes": 2530
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/checks.json",
+      "sha256": "22277c0f17ce3fe5f9234085c7fef1ee38d6f803bae7588d0b3239ce0e2f7df8",
+      "bytes": 155
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/ci-failed.log",
+      "sha256": "ba973ce12429ffcb75cf11a836007e6827cfbe56bf64631be9eb93b3ed1d996b",
+      "bytes": 417
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/AGENTS.md",
+      "sha256": "6acaf0a46dfcba9bbd60b419cfafea0d86cb04bb9a883eb2cb591f159ce811e3",
+      "bytes": 158
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/CLAUDE.md",
+      "sha256": "fbf7cd4fff740fb54aff9f4eb5269940ba138c0b54e6fdde5e9071d490b8ae04",
+      "bytes": 137
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/package.json",
+      "sha256": "382d195c20ee3996679d0f31693cb1d9b07457464e63d7b13cab8702a7babe30",
+      "bytes": 190
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/pr-status.json",
+      "sha256": "76613ba2e603da7f60143561f7b4c3b97581e7fcf0469ba07a1ba6bedb3753c4",
+      "bytes": 121
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/review-threads.json",
+      "sha256": "94d396c5384a6e770d831f65d76d2602c032574cd7f65c0ac98f40417f39aeea",
+      "bytes": 569
+    },
+    {
+      "path": "tools/skill-routing-b13/harbor-keyless-smoke.md",
+      "sha256": "8fd1148de43fe4a650bd27b7082f157d491b3b61601c6697915321529a9881cd",
+      "bytes": 5264
+    },
+    {
+      "path": "tools/skill-routing-b13/promptfoo.codex.json",
+      "sha256": "90c5ba0ec8ac3520886625c3fe07e5fef523864b5c868f32e8ffa463d4b9a4ef",
+      "bytes": 2605
     },
     {
       "path": "tools/skill-usage/README.md",
