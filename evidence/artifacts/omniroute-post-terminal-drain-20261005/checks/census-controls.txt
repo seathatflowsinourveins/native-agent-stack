@@ -1,13 +1,13 @@
-# Offline controls of the window census gate (scripts/window-census.py.txt, version 1, sha256 e6bcf75da93e61eeb5f05b8935a16a47a718a2ae55db45141abc940478924944; new in this round, not frozen), 2026-10-06 UTC: scripts/acceptance-controls/census-controls.py.txt, run with `uv run --with scipy==1.18.1 --with numpy==2.5.3` so that the cross-check X3 runs.
+# Offline controls of the window census gate (scripts/window-census.py.txt, version 1, sha256 29fe758004e1e580ffade5a223d39967affa1360afbca7dfde9d01e00180e76a; new in this round, not frozen), 2026-10-06 UTC: scripts/acceptance-controls/census-controls.py.txt, run with `uv run --with scipy==1.18.1 --with numpy==2.5.3` so that the cross-check X3 runs.
 # Synthetic fixtures (a scratch store with the gateway's table definitions, arm outputs in the frozen scripts' formats, guard receipts): evidence class `local_integration`; no gateway request was sent. Scenarios: P1-P4 exact matches (the wrapper's lines, a direct run with the journal line a runner adds, a unique 2x2, the canary's four arms in the canary's order with the default `--require-arms 4`), R1-R3 the replacement case (R3 is the RESIDUAL and is expected to PASS), R4-R5 a wrong number of arms, K1-K2 a wrong canary shape and a baseline header,
-# I1-I7 (one row short, a foreign call row, the provider-test rows, two candidates, a complete 2x2, an orphan, a restart between the idle receipt and an arm), U1-U4 an unreadable store, G1-G10c the guard receipt (missing, stale, after the first arm, not clean, version 4, full mode, a 10 s observation, whole-second stamps, `--diagnostic` with and without a receipt, another port, unit or tolerated unit), A1-A12 the inputs, C1-C7 clocks, tiling and the window's edges, F1 the timestamp format, N1-N3 NULL token counts, an own row without milliseconds and a non-numeric latency; X1 the predicates of the census against the frozen scripts' source (by AST: those scripts run main at import and are never imported),
+# I1-I7 (one row short, a foreign call row, the provider-test rows, two candidates, a complete 2x2, an orphan, a restart between the idle receipt and an arm), U1-U4 an unreadable store, G1-G10c the guard receipt (missing, stale, after the first arm, not clean, version 4, full mode, a 10 s observation, whole-second stamps, `--diagnostic` with and without a receipt, another port, unit or tolerated unit), A1-A12 the inputs, C1-C7 clocks, tiling and the window's edges, F1 the timestamp format, N1-N3 NULL token counts, an own row without milliseconds and a non-numeric latency, Y1-Y10b the reproductions of an adversarial fuzz review (a replacement through the 3 s pad, off-format timestamps, a duplicated usage row, an unparsable RESULT line, a hand-concatenated file, identity fields in another order, NULL columns, a stamp of year 9999, clean_for=nan, a path with a space); X1 the predicates of the census against the frozen scripts' source (by AST: those scripts run main at import and are never imported),
 # X2 `associated()` against raw script 2.2's own on 40,000 pairs, X3 the matching functions against a brute force over all permutations and against scipy's maximum_bipartite_matching (with the edge-removal uniqueness test) on 8,000 random graphs. Raw output, home directory written $HOME.
 
 # Offline controls of the window census gate, version 1 (new, not frozen); python 3.14.7; scipy 1.18.1, numpy 2.5.3
-# census: sha256 e6bcf75da93e61eeb5f05b8935a16a47a718a2ae55db45141abc940478924944
-# this controls script: sha256 c1503efe9be4849dbc7ab40d90d0a967aef2ea22123a04c1b11dda1d33368141
+# census: sha256 29fe758004e1e580ffade5a223d39967affa1360afbca7dfde9d01e00180e76a
+# this controls script: sha256 a07ca324142702dd146418c3023b6381fa089187629efb550e83abf887d57d7f
 # raw script 2.2 (frozen, parsed never imported): sha256 52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75; native script 2.1: sha256 db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd
-# started 2026-10-06T18:33:05Z
+# started 2026-10-06T18:51:46Z
 
 CONTROL-RESULT P1 expected_exit=0 observed_exit=0 OK :: exact match: 3 raw requests and 3 native call rows, each with its usage row, guard clean, no foreign row: PASS, and the receipt holds the exact queries, the window, the clocks, the counts and no full id
     CENSUS-RESULT PASS exit=0 problems=0
@@ -28,21 +28,23 @@ CONTROL-RESULT I1 expected_exit=2 observed_exit=2 OK :: one row short: request 2
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
 
 CONTROL-RESULT I2 expected_exit=2 observed_exit=2 OK :: one foreign call row (with its usage row) in the window
-    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT I3 expected_exit=2 observed_exit=2 OK :: the gateway's own /api/providers/test rows in the window (no exemption)
-    PROBLEM 7 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 7 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
 
 CONTROL-RESULT I4 expected_exit=2 observed_exit=2 OK :: two candidates: a second usage row with the identical metadata exists for own call 1 (no call row for it)
     PROBLEM a component of 1 own call row(s) and 2 usage row(s) has no unique perfect matching (status unequal): the usage rows of these calls cannot be established one to one
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+    PROBLEM 1 group(s) of usage rows with identical metadata (model, counts, account, endpoint, latency, time to first token): a duplicated row, or requests the association cannot tell apart
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT I5 expected_exit=2 observed_exit=2 OK :: complete 2x2: two own calls with identical metadata 1 s apart, both usage rows associate with both: not unique
     PROBLEM a component of 2 own call row(s) and 2 usage row(s) has no unique perfect matching (status multiple): the usage rows of these calls cannot be established one to one
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+    PROBLEM 1 group(s) of usage rows with identical metadata (model, counts, account, endpoint, latency, time to first token): a duplicated row, or requests the association cannot tell apart
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT I6 expected_exit=2 observed_exit=2 OK :: an orphan usage row (no call row, distinguishable metadata) in the window
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
@@ -54,7 +56,7 @@ CONTROL-RESULT R1 expected_exit=2 observed_exit=2 OK :: replacement, distinguish
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT R2 expected_exit=2 observed_exit=2 OK :: replacement, identical metadata, the foreign request's call row EXISTS: the foreign usage row would stand in for the own one (a per-request script passes); the census sees the foreign call row
-    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
 
 CONTROL-RESULT U1 expected_exit=2 observed_exit=2 OK :: unreadable store: the database file does not exist
@@ -118,7 +120,8 @@ CONTROL-RESULT P4 expected_exit=0 observed_exit=0 OK :: four arms in the canary'
 
 CONTROL-RESULT K1 expected_exit=2 observed_exit=2 OK :: four arms, but the last one is a raw arm (not the canary's shape): INCONCLUSIVE
     PROBLEM the arms in time order are ['raw', 'raw', 'native', 'raw']; the canary's are ['raw', 'raw', 'native', 'native']
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+    PROBLEM 1 group(s) of usage rows with identical metadata (model, counts, account, endpoint, latency, time to first token): a duplicated row, or requests the association cannot tell apart
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT K2 expected_exit=2 observed_exit=2 OK :: four arms whose wrapper header says `baseline` (the baseline's outputs fed to a canary census): INCONCLUSIVE
     PROBLEM arm k2-arm-2-race.txt is a wrapper `baseline` run, not a canary run
@@ -174,7 +177,7 @@ CONTROL-RESULT A1 expected_exit=2 observed_exit=2 OK :: a shortened correlation 
 
 CONTROL-RESULT A2 expected_exit=2 observed_exit=2 OK :: a request with neither id (corr=None response_id=None) cannot be attributed
     PROBLEM arm 1 (a2-arm-1-raw.txt): request 2 (chat:eof) carries neither a correlation id nor a response id: its rows cannot be attributed
-    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=3
 
@@ -249,28 +252,29 @@ CONTROL-RESULT C4b expected_exit=0 observed_exit=0 OK :: arms overlap by 1 s of 
     CENSUS-RESULT PASS exit=0 problems=0
 
 CONTROL-RESULT C5 expected_exit=2 observed_exit=2 OK :: a foreign call row in the gap between the two arms (tiled window)
-    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT C6 expected_exit=2 observed_exit=2 OK :: a foreign call row 3 s after the last arm's end (inside the 5 s settle)
-    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT C6b expected_exit=0 observed_exit=0 OK :: a foreign call row 10 s after the last arm's end (outside the window): not counted
     CENSUS-RESULT PASS exit=0 problems=0
 
-CONTROL-RESULT C7 expected_exit=2 observed_exit=2 OK :: a foreign request 2 s BEFORE the window (before the guard's end): its call row is outside the window and not counted, but its usage row lies in the 3 s pad that is read, and is an orphan
+CONTROL-RESULT C7 expected_exit=2 observed_exit=2 OK :: a foreign request 2 s BEFORE the window (before the guard's end): its call row and its usage row both lie in the 3 s pad that is read: a foreign call row and an orphan
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT C7b expected_exit=0 observed_exit=0 OK :: a foreign call row 20 s before the window (its usage row too): not counted
     CENSUS-RESULT PASS exit=0 problems=0
 
 CONTROL-RESULT F1 expected_exit=2 observed_exit=2 OK :: a call_logs row on the window's date whose timestamp lacks the milliseconds (a string bound would skip it silently)
-    PROBLEM 1 call_logs and 0 usage_history row(s) on the window's dates have a timestamp that is not ????-??-??T??:??:??.???Z: the window's string bounds would skip them silently
-    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 call_logs and 0 usage_history row(s) have a timestamp that is not ????-??-??T??:??:??.???Z (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
 
 CONTROL-RESULT N1 expected_exit=2 observed_exit=2 OK :: an own call row with NULL token counts (the candidate query cannot match it)
@@ -283,11 +287,80 @@ CONTROL-RESULT A12 expected_exit=2 observed_exit=2 OK :: the FROZEN line names n
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
 
 CONTROL-RESULT N2 expected_exit=2 observed_exit=2 OK :: an own call row whose timestamp lacks the milliseconds: INCONCLUSIVE (exit 2), not a crash (exit 3)
-    PROBLEM 1 call_logs and 0 usage_history row(s) on the window's dates have a timestamp that is not ????-??-??T??:??:??.???Z: the window's string bounds would skip them silently
+    PROBLEM 1 call_logs and 0 usage_history row(s) have a timestamp that is not ????-??-??T??:??:??.???Z (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently
     PROBLEM own call row 1b3a0437 has a timestamp '2026-10-06T20:00:20Z' that is not ????-??-??T??:??:??.???Z: its candidate usage rows cannot be looked up
     PROBLEM own call row 1b3a0437 (/v1/responses, status 200, tokens 22/21) has no associated usage row (same model and token counts within 3 s, and provider, account, endpoint, latency, time to first token)
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=4
+
+CONTROL-RESULT Y1 expected_exit=2 observed_exit=2 OK :: replacement through the pad: a foreign request finished 10 ms before the window (its call row and its identical usage row lie in the 3 s pad), the own usage row dropped: INCONCLUSIVE (the foreign call row is read)
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y2a expected_exit=2 observed_exit=2 OK :: a foreign call row whose timestamp is epoch text (it does not start with the window's date)
+    PROBLEM 1 call_logs and 0 usage_history row(s) have a timestamp that is not ????-??-??T??:??:??.???Z (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y2b expected_exit=2 observed_exit=2 OK :: a foreign call row whose timestamp has a leading space
+    PROBLEM 1 call_logs and 0 usage_history row(s) have a timestamp that is not ????-??-??T??:??:??.???Z (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y2c expected_exit=2 observed_exit=2 OK :: a foreign call row whose timestamp has another offset
+    PROBLEM 1 call_logs and 0 usage_history row(s) have a timestamp that is not ????-??-??T??:??:??.???Z (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y2d expected_exit=2 observed_exit=2 OK :: a foreign call row whose timestamp is a BLOB
+    PROBLEM 1 call_logs and 0 usage_history row(s) have a timestamp that is not ????-??-??T??:??:??.???Z (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y3 expected_exit=2 observed_exit=2 OK :: a duplicated own usage row standing in for the next identical call's dropped one (3.5 s apart): INCONCLUSIVE (groups of identical usage rows)
+    PROBLEM 1 group(s) of usage rows with identical metadata (model, counts, account, endpoint, latency, time to first token): a duplicated row, or requests the association cannot tell apart
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y4 expected_exit=2 observed_exit=2 OK :: a RESULT line the census cannot parse (a double space): INCONCLUSIVE, never skipped
+    PROBLEM arm 1 (y4-arm-1-raw.txt): a RESULT line the census cannot parse (its request would go unattributed): 'RESULT  mode=chat:eof http=200 terminal=True closed_early=False stream'
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
+    PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=3
+
+CONTROL-RESULT Y5a expected_exit=2 observed_exit=2 OK :: a second FROZEN line in one arm file (a hand-concatenated output)
+    PROBLEM arm 1 (y5a-arm-1-raw.txt): 2 FROZEN lines: one run per file is expected (a hand-concatenated output is refused)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y5b expected_exit=2 observed_exit=2 OK :: a VOID earlier in the file followed by a real status 0
+    PROBLEM arm 1 (y5b-arm-1-raw.txt): the wrapper marked this run VOID (RUN-STATUS status=4)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y5c expected_exit=2 observed_exit=2 OK :: two journal lines in one arm file
+    PROBLEM arm 1 (y5c-arm-1-raw.txt): 2 journal_failed_to_save_call_log lines: one run per file is expected (a hand-concatenated output is refused)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y6 expected_exit=2 observed_exit=2 OK :: a wrapper identity line with another MainPID and the fields not adjacent (NRestarts between them): compared, not skipped: INCONCLUSIVE
+    PROBLEM arm 1 (y6-arm-1-raw.txt): the gateway was MainPID 999 started Tue_2026-10-06_09:52:00_EDT, the idle receipt saw MainPID 1 started Tue_2026-10-06_09:51:19_EDT: a restart between them voids the idle claim
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y7a expected_exit=0 observed_exit=0 OK :: an own call row with a NULL path whose usage row has a NULL endpoint (they associate): no crash, PASS
+    CENSUS-RESULT PASS exit=0 problems=0
+
+CONTROL-RESULT Y7b expected_exit=2 observed_exit=2 OK :: a foreign call row with NULL path, model and status: INCONCLUSIVE with the receipt, no crash
+    PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y9 expected_exit=2 observed_exit=2 OK :: a SUMMARY end of year 9999: an unparsable stamp (INCONCLUSIVE), not an overflow (exit 3)
+    PROBLEM arm 2 (y9-arm-2-native.txt): unparsable wrapper finish stamp '9999-12-31T23:59:59Z'
+    PROBLEM arm 2 (y9-arm-2-native.txt): no end time (neither SUMMARY end= nor the wrapper's # finished stamp)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2
+
+CONTROL-RESULT Y10a expected_exit=2 observed_exit=2 OK :: a guard receipt with clean_for=nan
+    PROBLEM guard receipt: the idle observation lasted nan s (clean_for), shorter than the 30 s the protocol requires
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y10b expected_exit=2 observed_exit=2 OK :: an unparsable FROZEN start= while the wrapper's stamp is present
+    PROBLEM arm 1 (y10b-arm-1-raw.txt): unparsable FROZEN start= 'garbage'
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1
+
+CONTROL-RESULT Y8 expected_exit=0 observed_exit=0 OK :: the store path contains a space (the FROZEN line's db= field is read up to the next field): PASS
+    CENSUS-RESULT PASS exit=0 problems=0
 
 CONTROL-RESULT X1 OK :: associated() identical to raw 2.2
 CONTROL-RESULT X1 OK :: shift() identical to raw 2.2
@@ -307,4 +380,4 @@ CONTROL-RESULT X2 OK :: associated() of the census and of raw 2.2 (executed from
 
 CONTROL-RESULT X3 OK :: matching_status() against a brute force over all permutations on 8000 random bipartite graphs (components of up to 7+7 nodes), outcomes seen {'multiple': 2181, 'none': 775, 'unequal': 6340, 'unique': 3876}; scipy cross-check RAN (maximum_bipartite_matching with the edge-removal uniqueness test agrees with the brute force on every component); disagreements: []
 
-# finished 2026-10-06T18:33:32Z; scenarios not as expected: none
+# finished 2026-10-06T18:52:18Z; scenarios not as expected: none

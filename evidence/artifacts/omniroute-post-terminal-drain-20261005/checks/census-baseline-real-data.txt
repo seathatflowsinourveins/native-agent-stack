@@ -3,7 +3,7 @@
 # So on the unpatched build every usage row of the window belonged to an own call row and there was no foreign row (the wrapper's identity reads between the arms wrote no call row; the gateway's hourly provider-test rows did not fall inside these 32 minutes). The 17 problems besides the diagnostic one are the dropped requests the patch is for: 17 requests or turns whose own call row(s) are missing (their usage rows are missing too: a dropped request lost BOTH rows).
 # INCONCLUSIVE, 18 problems, exit 2. Raw output, home directory written $HOME. Request and session ids appear as 8 hex characters of their sha256.
 
-CENSUS version=1 script_sha256=e6bcf75da93e61eeb5f05b8935a16a47a718a2ae55db45141abc940478924944 db=~/.local/share/omniroute/storage.sqlite arms=4 required_arms=4 guard_receipt=none (diagnostic run) diagnostic=True
+CENSUS version=1 script_sha256=29fe758004e1e580ffade5a223d39967affa1360afbca7dfde9d01e00180e76a db=~/.local/share/omniroute/storage.sqlite arms=4 required_arms=4 guard_receipt=none (diagnostic run) diagnostic=True
 INPUT arm=1 file=live-acceptance-baseline-raw.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=17 start=2026-10-06T11:50:17.000Z end=2026-10-06T11:59:42.322Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
 INPUT arm=2 file=live-acceptance-baseline-race.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=6 start=2026-10-06T11:59:42.000Z end=2026-10-06T12:02:09.000Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
 INPUT arm=3 file=live-acceptance-baseline-native.txt kind=native script_version=2.1 script_sha256=db2a4d42d6ca requests=4 start=2026-10-06T12:02:09.000Z end=2026-10-06T12:04:43.211Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
@@ -18,11 +18,11 @@ QUERY own-native: select id, timestamp, path, status, model, requested_model, to
 QUERY window-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id
 QUERY window-usage: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? order by timestamp, id
 QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp
-QUERY odd-calls: select count(*) from call_logs where timestamp like ? and timestamp not glob ?
-QUERY odd-usage: select count(*) from usage_history where timestamp like ? and timestamp not glob ?
-BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T11:50:17.000Z, 2026-10-06T12:22:31.271Z); window-usage: (2026-10-06T11:50:14.000Z, 2026-10-06T12:22:34.271Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; odd-*: (the date + '%', '????-??-??T??:??:??.???Z') for each date of the padded window
+QUERY odd-calls: select count(*) from call_logs where typeof(timestamp) != 'text' or timestamp not glob ?
+QUERY odd-usage: select count(*) from usage_history where typeof(timestamp) != 'text' or timestamp not glob ?
+BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T11:50:14.000Z, 2026-10-06T12:22:31.271Z) (the window's start padded by the same 3 s as the usage rows); window-usage: (2026-10-06T11:50:14.000Z, 2026-10-06T12:22:34.271Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; odd-*: ('????-??-??T??:??:??.???Z') over the WHOLE tables (a row of any other type or format)
 STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro)
-FORMAT dates=['2026-10-06'] call_logs_rows_with_another_timestamp_format=0 usage_history_rows_with_another_timestamp_format=0
+FORMAT scope=whole tables call_logs_rows_with_another_timestamp_format=0 usage_history_rows_with_another_timestamp_format=0
 PROBLEM arm 1 request 2 (responses:early:0, corr 0ac46bc0, response 4506420a): 0 own call row(s) (exactly 1 is needed)
 PROBLEM arm 1 request 3 (responses:early:0, corr 1541e6ab, response ea09a72f): 0 own call row(s) (exactly 1 is needed)
 PROBLEM arm 2 request 1 (responses:early:0, corr None, response 5e75680e): 0 own call row(s) (exactly 1 is needed)
@@ -47,6 +47,7 @@ CLOCK arm=3 own_rows=1 min_s_after_arm_start=94.1 min_s_before_arm_end=60.2
 CLOCK arm=4 own_rows=9 min_s_after_arm_start=63.7 min_s_before_arm_end=64.1
 WINDOW-ROWS call_logs=26 own=26 foreign=0; usage_history=26
 MATCHING own_call_rows=26 components=26 statuses={'unique': 26} own_call_rows_without_usage_row=0 look_alike_usage_rows_that_do_not_associate=0
+DUPLICATES groups_of_usage_rows_with_identical_metadata=0 rows=0
 ORPHANS usage_rows_in_window=26 associated_with_an_own_call_row=26 orphans=0
 COUNTS own call rows by (connection, path, model): [(('567355f3', '/v1/responses', 'gpt-6-astra'), 2), (('c598365c', '/v1/chat/completions', 'gpt-6-astra'), 3), (('c598365c', '/v1/responses', 'gpt-6-astra'), 7), (('db9a398d', '/v1/responses', 'gpt-6-astra'), 2), (('e773910a', '/v1/responses', 'gpt-6-astra'), 5), (('e773910a', '/v1/responses', 'gpt-6.1-sol'), 3), (('e773910a', '/v1/responses', 'gpt-6.1-sol-max'), 3), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
 COUNTS usage rows of the window by (connection, endpoint, model): [(('567355f3', '/v1/responses', 'gpt-6-astra'), 2), (('c598365c', '/v1/chat/completions', 'gpt-6-astra'), 3), (('c598365c', '/v1/responses', 'gpt-6-astra'), 7), (('db9a398d', '/v1/responses', 'gpt-6-astra'), 2), (('e773910a', '/v1/responses', 'gpt-6-astra'), 5), (('e773910a', '/v1/responses', 'gpt-6.1-sol'), 3), (('e773910a', '/v1/responses', 'gpt-6.1-sol-max'), 3), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
@@ -54,5 +55,5 @@ TILE 1: foreign_calls=0, orphans=0, own_calls=15, usage=15
 TILE 2: foreign_calls=0, orphans=0, own_calls=1, usage=1
 TILE 3: foreign_calls=0, orphans=0, own_calls=1, usage=1
 TILE 4: foreign_calls=0, orphans=0, own_calls=9, usage=9
-NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata equal to an own request's, standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)
+NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata the association cannot tell from an own request's (same model, counts, account and endpoint; latency within 100 ms, time to first token within 1 ms, within 3 s), standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)
 CENSUS-RESULT INCONCLUSIVE exit=2 problems=18

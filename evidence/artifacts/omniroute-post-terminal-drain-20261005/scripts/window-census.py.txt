@@ -8,15 +8,15 @@ The census closes that over the whole window, on the gateway's own rows, read-on
         (no exemption: the gateway's own hourly /api/providers/test rows are listed and make the window INCONCLUSIVE); a request that carries no full id (None, or a shortened id of a committed copy) cannot be attributed and is INCONCLUSIVE;
   (ii)  completeness: exactly one own call row per raw request, at least the printed min_rows per judged native turn; and the own call rows and the usage rows of the window form connected components, each with as many usage rows as call rows and a UNIQUE PERFECT MATCHING
         (the candidate query and `associated()` are the scripts' own, copied byte for byte; unique perfect matching: a perfect matching M exists and no edge of M can be left out without losing perfection);
-  (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row;
+  (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad;
   (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an observation of at least 30 s (clean_for), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier; the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
         no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
   (v)   the clocks agree: every own call row lies inside its arm's recorded interval with a margin of 2 s (the arm's interval is taken from the output's own lines: the wrapper's `started`/`# finished` stamps when present and the frozen script's FROZEN start= / SUMMARY end=; those are the host clock, the rows' timestamps are the gateway process's own clock, on the same machine); the arms must not overlap (the wrapper's stamps are whole seconds, so 1 s of overlap is tolerated);
   (vi)  the gateway is the same process throughout: the MainPID and ExecMainStartTimestamp of the guard receipt's identity line equal those of every arm's first identity line (the wrapper's; a direct run carries none and is not compared);
-  (vii) the inputs are the frozen scripts' outputs (a frozen script run directly prints no `journal_failed_to_save_call_log=` line, the wrapper's: add it to the output, as scripts/census-live-trial.sh.txt does, or the arm is INCONCLUSIVE; with the default four arms the shape raw, raw, native, native and a wrapper header that says `canary` are required) (FROZEN version and script_sha256 equal the frozen values, the store path equals --db, a SUMMARY line exists, a wrapper VOID is refused), every timestamp on the window's dates has the gateway's format (otherwise a string bound would skip a row silently), and
+  (vii) the inputs are the frozen scripts' outputs (a frozen script run directly prints no `journal_failed_to_save_call_log=` line, the wrapper's: add it to the output, as scripts/census-live-trial.sh.txt does, or the arm is INCONCLUSIVE; with the default four arms the shape raw, raw, native, native and a wrapper header that says `canary` are required) (FROZEN version and script_sha256 equal the frozen values, the store path equals --db, a SUMMARY line exists, a wrapper VOID is refused), every timestamp of the two tables has the gateway's format (otherwise a string bound would skip a row silently), and
         the journal scan of every arm (`journal_failed_to_save_call_log=0`, the wrapper's own line) is clean: it is the named check for the one thing the census cannot exclude.
 The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE.
-What it cannot exclude: a usage row of a foreign request whose own call_logs row was never written and whose metadata equals an own request's (the four-fault coincidence: foreign traffic in the window, its call row dropped, an own usage row dropped, identical metadata); the journal scan for `Failed to save call log` is the named check for the usual cause.
+What it cannot exclude: a usage row of a foreign request whose own call_logs row was never written and whose metadata the association cannot tell from an own request's (the same model, token counts, provider, account and endpoint, a latency within 100 ms and a time to first token within 1 ms, within 3 s: the four-fault coincidence: foreign traffic in the window, its call row dropped, an own usage row dropped, such a look-alike); the same blindness covers an own call row that was never written while another row stands in for it; the journal scan for `Failed to save call log` is the named check for the usual cause.
 --require-arms N (default 4, the canary's four arms: raw, race, native, native tool-call): the number of arm outputs that must be given; fewer or more is INCONCLUSIVE, so that an omitted arm cannot pass unnoticed (a live trial of fewer arms states its own number).
 --diagnostic: measure and print without a guard receipt (for windows that had none, e.g. the baseline arms); the result can then only be INCONCLUSIVE.
 Exit status: 0 PASS, 2 INCONCLUSIVE, 3 usage error (bad arguments, an input file that cannot be read). The receipt on stdout holds the exact queries with their bounds, the window and its clock sources, the measured margins, all counts (own and foreign call rows, usage rows, components, orphans; per account (hashed), endpoint and model) and the verdict; ids appear only as 8 hex characters of their sha256.
@@ -25,6 +25,7 @@ import argparse
 import collections
 import datetime as dt
 import hashlib
+import math
 import os
 import re
 import sqlite3
@@ -62,8 +63,8 @@ SQL_OWN_NATIVE = _CALL_SELECT + "where session_tag = ? order by timestamp"
 SQL_CANDIDATES = "select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp"
 SQL_WINDOW_CALLS = _CALL_SELECT + "where timestamp >= ? and timestamp <= ? order by timestamp, id"
 SQL_WINDOW_USAGE = _USAGE_SELECT + "where timestamp >= ? and timestamp <= ? order by timestamp, id"
-SQL_ODD_CALLS = "select count(*) from call_logs where timestamp like ? and timestamp not glob ?"
-SQL_ODD_USAGE = "select count(*) from usage_history where timestamp like ? and timestamp not glob ?"
+SQL_ODD_CALLS = "select count(*) from call_logs where typeof(timestamp) != 'text' or timestamp not glob ?"
+SQL_ODD_USAGE = "select count(*) from usage_history where typeof(timestamp) != 'text' or timestamp not glob ?"
 
 
 class UsageError(Exception):
@@ -90,12 +91,16 @@ def id8(value):
 
 def parse_ts(text):
     """The UTC datetime of `2026-10-06T11:50:17Z` or `2026-10-06T11:50:17.123Z`; None for anything else."""
-    m = re.fullmatch(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,6}))?Z", text or "")
+    if not isinstance(text, str):
+        return None
+    m = re.fullmatch(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,6}))?Z", text)
     if not m:
         return None
     try:
         base = dt.datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=dt.timezone.utc)
     except ValueError:
+        return None
+    if not 2000 <= base.year <= 2100:   # a stamp that far out is not a stamp of this run (and would overflow the window arithmetic)
         return None
     return base + dt.timedelta(microseconds=int((m.group(2) or "0").ljust(6, "0")))
 
@@ -188,8 +193,11 @@ def parse_arm(path):
     arm = {"name": os.path.basename(path), "kind": None, "version": None, "script_sha": None, "db": None, "requests": [], "journal": "missing", "problems": [], "source": "", "run_status": None, "pid": None, "unit_started": None, "wrapper_kind": None}
     wrapper_start = wrapper_end = script_start = script_end = None
     summary_seen = False
+    counts, void_seen = collections.Counter(), False
     for line in read_text(path, "arm output").splitlines():
         m = re.match(r"^# .*; started (\S+); wrapper kind=(\S+)\s*$", line)
+        if m:
+            counts["header"] += 1
         if m and wrapper_start is None:
             arm["wrapper_kind"] = m.group(2)
             wrapper_start = parse_ts(m.group(1))
@@ -198,15 +206,21 @@ def parse_arm(path):
             continue
         m = re.match(r"^# finished (\S+)\s*$", line)
         if m:
+            counts["finished"] += 1
             wrapper_end = parse_ts(m.group(1))
             if wrapper_end is None:
                 arm["problems"].append(f"unparsable wrapper finish stamp {m.group(1)!r}")
             continue
-        if line.startswith("FROZEN ") and arm["version"] is None:
-            arm["version"] = (re.search(r"\bversion=(\S+)", line) or [None, None])[1]
-            arm["script_sha"] = (re.search(r"\bscript_sha256=([0-9a-f]{64})\b", line) or [None, None])[1]
-            script_start = parse_ts((re.search(r"\bstart=(\S+)", line) or [None, None])[1])
-            arm["db"] = (re.search(r"\bdb=(\S+)", line) or [None, None])[1]
+        if line.startswith("FROZEN "):
+            counts["frozen"] += 1
+            if counts["frozen"] == 1:
+                arm["version"] = (re.search(r"\bversion=(\S+)", line) or [None, None])[1]
+                arm["script_sha"] = (re.search(r"\bscript_sha256=([0-9a-f]{64})\b", line) or [None, None])[1]
+                start_token = (re.search(r"\bstart=(\S+)", line) or [None, None])[1]
+                script_start = parse_ts(start_token)
+                if start_token is not None and script_start is None:
+                    arm["problems"].append(f"unparsable FROZEN start= {start_token!r}")
+                arm["db"] = (re.search(r"\bdb=(.+?)(?= effort_close_after=| run_id=| baseline=| wait1=| wait2=|$)", line) or [None, None])[1]   # the path may contain spaces
             continue
         m = re.match(r"^RESULT mode=(\S+) http=(\S+) .*? corr=(\S+) response_id=(\S+) read1_call_logs=", line)
         if m:
@@ -216,22 +230,33 @@ def parse_arm(path):
         if m:
             arm["requests"].append({"kind": "native", "shape": m.group(1), "tag": m.group(2), "min_rows": int(m.group(3)), "exec_exit": m.group(4), "judged": " read1_call_logs=" in line})
             continue
+        if line.startswith("RESULT "):
+            arm["problems"].append(f"a RESULT line the census cannot parse (its request would go unattributed): {line[:70]!r}")
+            continue
         m = re.match(r"^SUMMARY .* end=(\S+) exit=(\d+)\s*$", line)
         if m:
+            counts["summary"] += 1
             summary_seen = True
             script_end = parse_ts(m.group(1))
             continue
         m = re.match(r"^journal_failed_to_save_call_log=(\S+)", line)
         if m:
+            counts["journal"] += 1
             arm["journal"] = m.group(1)
             continue
-        m = re.match(r"^IDENTITY .*?\bMainPID=(\d+) ExecMainStartTimestamp=(\S+)", line)
-        if m and arm["pid"] is None:
-            arm["pid"], arm["unit_started"] = m.group(1), m.group(2)
+        if line.startswith("IDENTITY ") and counts["identity"] == 0:
+            counts["identity"] += 1
+            pid_m, started_m = re.search(r"\bMainPID=(\d+)", line), re.search(r"\bExecMainStartTimestamp=(\S+)", line)
+            if pid_m and started_m:
+                arm["pid"], arm["unit_started"] = pid_m.group(1), started_m.group(1)
+            else:
+                arm["problems"].append("the wrapper's identity line has no MainPID or no ExecMainStartTimestamp: the process cannot be compared with the idle receipt")
             continue
         m = re.match(r"^RUN-STATUS \S+ status=(\d)", line)
         if m:
             arm["run_status"] = int(m.group(1))
+            if arm["run_status"] == 4:
+                void_seen = True
     if arm["version"] not in FROZEN_SCRIPT_SHA:
         arm["problems"].append(f"no FROZEN line of a frozen script (version {arm['version']!r}): not an output of raw script 2.2 or native script 2.1")
     else:
@@ -240,8 +265,11 @@ def parse_arm(path):
             arm["problems"].append(f"the script of version {arm['version']} had sha256 {str(arm['script_sha'])[:12]}, not the frozen {FROZEN_SCRIPT_SHA[arm['version']][:12]}")
     if not summary_seen:
         arm["problems"].append("no SUMMARY line: a run without one is not a verdict")
-    if arm["run_status"] == 4:
+    if void_seen or arm["run_status"] == 4:
         arm["problems"].append("the wrapper marked this run VOID (RUN-STATUS status=4)")
+    for key, label in (("frozen", "FROZEN"), ("summary", "SUMMARY"), ("journal", "journal_failed_to_save_call_log"), ("header", "wrapper header"), ("finished", "`# finished`")):
+        if counts[key] > 1:
+            arm["problems"].append(f"{counts[key]} {label} lines: one run per file is expected (a hand-concatenated output is refused)")
     if script_start is None and wrapper_start is None:
         arm["problems"].append("no start time (neither FROZEN start= nor the wrapper's started stamp)")
     if script_end is None and wrapper_end is None:
@@ -281,9 +309,13 @@ def parse_guard(path):
             g["unit"] = (re.search(r"\bunit=(\S+)", line) or [None, None])[1]
             g["tolerated"] = (re.search(r"\btolerate_units=(\[[^\]]*\])", line) or [None, None])[1]
             continue
-        m = re.match(r"^\s+IDENTITY .*?\bMainPID=(\d+) ExecMainStartTimestamp=(\S+)", line)
-        if m and g["pid"] is None:
-            g["pid"], g["unit_started"] = m.group(1), m.group(2)
+        if re.match(r"^\s+IDENTITY ", line) and not g.get("identity_seen"):
+            g["identity_seen"] = True
+            pid_m, started_m = re.search(r"\bMainPID=(\d+)", line), re.search(r"\bExecMainStartTimestamp=(\S+)", line)
+            if pid_m and started_m:
+                g["pid"], g["unit_started"] = pid_m.group(1), started_m.group(1)
+            else:
+                g["problems"].append("the receipt's identity line has no MainPID or no ExecMainStartTimestamp")
             continue
         m = re.match(r"^IDLE-RESULT clean=(True|False) failed_checks=(\[.*\]) end=(\S+)\s*$", line)
         if m:
@@ -299,7 +331,7 @@ def parse_guard(path):
     for key, label in (("port", "port"), ("unit", "unit"), ("tolerated", "tolerated units")):
         if g.get(key) != GUARD_EXPECT[key]:
             g["problems"].append(f"the receipt's {label} is {g.get(key)!r}, not the standard {GUARD_EXPECT[key]!r} of the 20128 canary")
-    if observed is None or observed < GUARD_MIN_CLEAN_FOR_S:
+    if observed is None or not math.isfinite(observed) or observed < GUARD_MIN_CLEAN_FOR_S:
         g["problems"].append(f"the idle observation lasted {g['clean_for']} s (clean_for), shorter than the {GUARD_MIN_CLEAN_FOR_S:.0f} s the protocol requires")
     if len(results) != 1:
         g["problems"].append(f"{len(results)} IDLE-RESULT line(s) (exactly one is needed)")
@@ -429,8 +461,8 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
     # ---- queries (printed first, so a failure below still leaves them in the receipt)
     for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("odd-calls", SQL_ODD_CALLS), ("odd-usage", SQL_ODD_USAGE)):
         rep.say(f"QUERY {name}: {sql}")
-    rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({w0s}, {w1s}); window-usage: ({u0s}, {u1s}); "
-            f"candidates: (shift(call row timestamp, -{CANDIDATE_SECONDS}), shift(call row timestamp, {CANDIDATE_SECONDS}), model, tokens_in, tokens_out) per own call row; odd-*: (the date + '%', '{TS_GLOB}') for each date of the padded window")
+    rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({u0s}, {w1s}) (the window's start padded by the same {CANDIDATE_SECONDS} s as the usage rows); window-usage: ({u0s}, {u1s}); "
+            f"candidates: (shift(call row timestamp, -{CANDIDATE_SECONDS}), shift(call row timestamp, {CANDIDATE_SECONDS}), model, tokens_in, tokens_out) per own call row; odd-*: ('{TS_GLOB}') over the WHOLE tables (a row of any other type or format)")
     try:
         con = open_store(db)
     except (sqlite3.Error, OSError) as error:
@@ -445,19 +477,18 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
         rep.bad(f"the measurement failed ({type(error).__name__}: {str(error)[:80]}): the rest was not measured, so nothing here is a PASS")
     finally:
         con.close()
-    rep.say("NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata equal to an own request's, standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)")
+    rep.say("NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata the association cannot tell from an own request's (same model, counts, account and endpoint; latency within 100 ms, time to first token within 1 ms, within 3 s), standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)")
     rep.say(f"CENSUS-RESULT {rep.state} exit={0 if rep.state == 'PASS' else 2} problems={len(rep.reasons)}")
     return rep
 
 
 def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
     # ---- timestamp format: a row whose timestamp has another format would be skipped by the string bounds, silently
-    dates = sorted({u0s[:10], u1s[:10], w0s[:10], w1s[:10]})
-    odd_calls = sum(con.execute(SQL_ODD_CALLS, (d + "%", TS_GLOB)).fetchone()[0] for d in dates)
-    odd_usage = sum(con.execute(SQL_ODD_USAGE, (d + "%", TS_GLOB)).fetchone()[0] for d in dates)
-    rep.say(f"FORMAT dates={dates} call_logs_rows_with_another_timestamp_format={odd_calls} usage_history_rows_with_another_timestamp_format={odd_usage}")
+    odd_calls = con.execute(SQL_ODD_CALLS, (TS_GLOB,)).fetchone()[0]
+    odd_usage = con.execute(SQL_ODD_USAGE, (TS_GLOB,)).fetchone()[0]
+    rep.say(f"FORMAT scope=whole tables call_logs_rows_with_another_timestamp_format={odd_calls} usage_history_rows_with_another_timestamp_format={odd_usage}")
     if odd_calls or odd_usage:
-        rep.bad(f"{odd_calls} call_logs and {odd_usage} usage_history row(s) on the window's dates have a timestamp that is not {TS_GLOB}: the window's string bounds would skip them silently")
+        rep.bad(f"{odd_calls} call_logs and {odd_usage} usage_history row(s) have a timestamp that is not {TS_GLOB} (not text, no milliseconds, another offset or a leading space): the window's string bounds would skip them silently")
     # ---- own rows, by tag, per request
     own, claims = {}, collections.defaultdict(list)
     per_arm_own = collections.Counter()
@@ -508,7 +539,7 @@ def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
         if not (w0s <= row["timestamp"] <= w1s):
             rep.bad(f"own call row {id8(rid)} at {row['timestamp']} lies outside the window {w0s}..{w1s}")
     # ---- window rows: foreign call rows, usage rows
-    calls_win = [row_dict(CALL_COLUMNS, r) for r in con.execute(SQL_WINDOW_CALLS, (w0s, w1s)).fetchall()]
+    calls_win = [row_dict(CALL_COLUMNS, r) for r in con.execute(SQL_WINDOW_CALLS, (u0s, w1s)).fetchall()]   # padded at the start like the usage rows: a foreign request that finished just before the window has its usage row in the pad
     usage_win = [row_dict(USAGE_COLUMNS, r) for r in con.execute(SQL_WINDOW_USAGE, (u0s, u1s)).fetchall()]
     foreign = [c for c in calls_win if c["id"] not in own]
     rep.say(f"WINDOW-ROWS call_logs={len(calls_win)} own={len(calls_win) - len(foreign)} foreign={len(foreign)}; usage_history={len(usage_win)}")
@@ -520,16 +551,16 @@ def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
         return len(bounds) - 1
 
     foreign_by = collections.Counter((tile(c["timestamp"]), c["path"], c["status"], c["model"]) for c in foreign)
-    for (k, path, status, model), n in sorted(foreign_by.items()):
-        times = sorted(c["timestamp"] for c in foreign if (tile(c["timestamp"]), c["path"], c["status"], c["model"]) == (k, path, status, model))
+    for (k, path, status, model), n in sorted(foreign_by.items(), key=repr):
+        times = sorted(str(c["timestamp"]) for c in foreign if (tile(c["timestamp"]), c["path"], c["status"], c["model"]) == (k, path, status, model))
         rep.say(f"FOREIGN tile={k} path={path} status={status} model={model} rows={n} first={times[0]} last={times[-1]}")
     for c in foreign[:20]:
         rep.say(f"   foreign call row id8={id8(c['id'])} at {c['timestamp']} path={c['path']} status={c['status']} model={c['model']} provider={c['provider']} connection={id8(c['connection_id'])}")
     if foreign:
-        rep.bad(f"{len(foreign)} foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one")
+        rep.bad(f"{len(foreign)} foreign call row(s) in the window (any call row without an own tag, read from {CANDIDATE_SECONDS} s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one")
     # ---- edges: the scripts' candidate query per own call row, intersected with associated()
     edges, lookalikes = {}, 0
-    for cid, c in sorted(own.items(), key=lambda kv: (kv[1]["timestamp"], kv[0])):
+    for cid, c in sorted(own.items(), key=lambda kv: (str(kv[1]["timestamp"]), str(kv[0]))):
         try:
             lo, hi = shift(c["timestamp"], -CANDIDATE_SECONDS), shift(c["timestamp"], CANDIDATE_SECONDS)
         except ValueError:   # a timestamp that is not the gateway's format (the FORMAT check above has reported it): the candidate window cannot be computed
@@ -564,6 +595,12 @@ def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
     for cid in uncovered:
         rep.bad(f"own call row {id8(cid)} ({own[cid]['path']}, status {own[cid]['status']}, tokens {own[cid]['tokens_in']}/{own[cid]['tokens_out']}) has no associated usage row (same model and token counts within {CANDIDATE_SECONDS} s, and provider, account, endpoint, latency, time to first token)")
     rep.say(f"MATCHING own_call_rows={len(edges)} components={len(comps)} statuses={dict(sorted(statuses.items()))} own_call_rows_without_usage_row={len(uncovered)} look_alike_usage_rows_that_do_not_associate={lookalikes}")
+    # ---- a group of usage rows with identical metadata (to the millisecond and the fraction of the first-token time) is a duplicated row, or requests the association cannot tell apart
+    groups = collections.Counter((u["model"], u["tokens_input"], u["tokens_output"], u["provider"], u["connection_id"], u["api_key_id"], u["endpoint"], u["latency_ms"], u["ttft_ms"]) for u in usage_win)
+    duplicated = {key: n for key, n in groups.items() if n > 1}
+    rep.say(f"DUPLICATES groups_of_usage_rows_with_identical_metadata={len(duplicated)} rows={sum(duplicated.values())}")
+    if duplicated:
+        rep.bad(f"{len(duplicated)} group(s) of usage rows with identical metadata (model, counts, account, endpoint, latency, time to first token): a duplicated row, or requests the association cannot tell apart")
     # ---- orphans: usage rows of the padded window with no edge from an own call row
     orphans = [u for u in usage_win if u["id"] not in with_edges]
     for u in orphans[:20]:
@@ -572,8 +609,8 @@ def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
     if orphans:
         rep.bad(f"{len(orphans)} orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written")
     # ---- counts by account (hashed), endpoint and model
-    rep.say("COUNTS own call rows by (connection, path, model): " + str(sorted(collections.Counter((id8(c["connection_id"]), c["path"], c["model"]) for c in own.values()).items())))
-    rep.say("COUNTS usage rows of the window by (connection, endpoint, model): " + str(sorted(collections.Counter((id8(u["connection_id"]), u["endpoint"], u["model"]) for u in usage_win).items())))
+    rep.say("COUNTS own call rows by (connection, path, model): " + str(sorted(collections.Counter((id8(c["connection_id"]), c["path"], c["model"]) for c in own.values()).items(), key=repr)))
+    rep.say("COUNTS usage rows of the window by (connection, endpoint, model): " + str(sorted(collections.Counter((id8(u["connection_id"]), u["endpoint"], u["model"]) for u in usage_win).items(), key=repr)))
     per_tile = collections.defaultdict(lambda: {"own_calls": 0, "foreign_calls": 0, "usage": 0, "orphans": 0})
     for c in calls_win:
         per_tile[tile(c["timestamp"])]["own_calls" if c["id"] in own else "foreign_calls"] += 1

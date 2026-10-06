@@ -143,7 +143,7 @@ def materialize(spec, work):
     def put_call(c, corr=None, rid=None, session=None):
         n[0] += 1
         con.execute("insert into call_logs (id, timestamp, path, status, model, requested_model, provider, connection_id, api_key_id, duration, ttft_ms, tokens_in, tokens_out, correlation_id, response_id, session_tag) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                    (f"call-{spec['name']}-{n[0]}", c["ts"] if isinstance(c["ts"], str) else utc(c["ts"]), c["path"], c["status"], c["model"], "codex/" + c["model"], c["provider"], c["conn"], c["key"], c["duration"], c["ttft"], c["tin"], c["tout"], corr, rid, session))
+                    (f"call-{spec['name']}-{n[0]}", c["ts"] if isinstance(c["ts"], (str, bytes)) else utc(c["ts"]), c["path"], c["status"], c["model"], ("codex/" + c["model"] if c["model"] else None), c["provider"], c["conn"], c["key"], c["duration"], c["ttft"], c["tin"], c["tout"], corr, rid, session))
 
     def put_usage(u):
         con.execute("insert into usage_history (provider, model, connection_id, api_key_id, tokens_input, tokens_output, status, latency_ms, ttft_ms, timestamp, endpoint) values (?,?,?,?,?,?,?,?,?,?,?)",
@@ -380,12 +380,12 @@ def main():
         reqs = []
         for i, off in enumerate((190.0, 215.0), 1):
             tag = f"{n}-race-{i}"
-            c = call(plus(off + 0.1), 22, 30, 900)
+            c = call(plus(off + 0.1), 22, 30 + i, 900 + 10 * i)
             reqs.append({"kind": "raw", "mode": "responses:early:0", "corr": corr_id(tag), "rid": resp_id(tag), "calls": [c], "usage": [usage_for(c)]})
         spec["arms"].insert(1, {"file": "arm-2-race.txt", "kind": "raw", "version": "2.2", "sha": RAW_SHA, "wrapper_start": plus(180.0), "script_start": plus(180.3), "script_end": plus(270.2), "wrapper_end": plus(271.0),
                                 "journal": "0", "summary": True, "run_status": 0, "requests": reqs, "db_override": None, "wrapper_kind": wrapper_kind})
         spec["arms"][2]["file"] = "arm-3-native.txt"
-        c2, c3 = call(plus(470.0), 15100, 40, 3000), call(plus(471.5), 15150, 37, 2500)
+        c2, c3 = call(plus(470.0), 15200, 41, 3100), call(plus(471.5), 15250, 38, 2600)
         nreqs = [{"kind": "native", "shape": "two-request", "tag": f"acceptance-20261006T200800-two-request-{n[:6]}-4", "min_rows": 2, "judged": True, "calls": [c2, c3], "usage": [usage_for(c2), usage_for(c3)]}]
         if last_kind == "raw":   # a wrong shape: the fourth arm is a raw arm
             c4 = call(plus(470.0), 22, 21, 1000)
@@ -483,7 +483,7 @@ def main():
     scenario("C5", "a foreign call row in the gap between the two arms (tiled window)", mutate=lambda s: add_foreign(s, ts=177.5), want=2, must=["FOREIGN tile=2"])
     scenario("C6", "a foreign call row 3 s after the last arm's end (inside the 5 s settle)", mutate=lambda s: add_foreign(s, ts=334.0), want=2, must=["foreign=1"])
     scenario("C6b", "a foreign call row 10 s after the last arm's end (outside the window): not counted", mutate=lambda s: add_foreign(s, ts=341.0), want=0, must=["CENSUS-RESULT PASS", "foreign=0"])
-    scenario("C7", "a foreign request 2 s BEFORE the window (before the guard's end): its call row is outside the window and not counted, but its usage row lies in the 3 s pad that is read, and is an orphan", mutate=lambda s: add_foreign(s, ts=-2.0), want=2, must=["1 orphan usage row(s)"])
+    scenario("C7", "a foreign request 2 s BEFORE the window (before the guard's end): its call row and its usage row both lie in the 3 s pad that is read: a foreign call row and an orphan", mutate=lambda s: add_foreign(s, ts=-2.0), want=2, must=["1 foreign call row(s) in the window", "1 orphan usage row(s)"])
     scenario("C7b", "a foreign call row 20 s before the window (its usage row too): not counted", mutate=lambda s: add_foreign(s, ts=-20.0), want=0, must=["CENSUS-RESULT PASS"])
     scenario("F1", "a call_logs row on the window's date whose timestamp lacks the milliseconds (a string bound would skip it silently)", mutate=lambda s: s["odd_calls"].append(call("2026-10-06T20:01:30Z", 5, 5, 100)), want=2,
              must=["another timestamp format=1".replace("another timestamp format=1", "call_logs_rows_with_another_timestamp_format=1"), "would skip them silently"])
@@ -499,6 +499,75 @@ def main():
         c = spec["arms"][0]["requests"][0]["calls"][0]
         c["ts"] = "2026-10-06T20:00:20Z"   # an OWN call row whose timestamp lacks the milliseconds
     scenario("N2", "an own call row whose timestamp lacks the milliseconds: INCONCLUSIVE (exit 2), not a crash (exit 3)", mutate=own_odd, want=2, must=["is not ????-??-??T??:??:??.???Z", "its candidate usage rows cannot be looked up"])
+
+
+    # ---- the adversarial review's reproductions (each was a PASS or a lost receipt before the last patch)
+    def pad_replacement(spec):
+        arm = spec["arms"][0]
+        for key, sec in (("wrapper_start", 0.5), ("script_start", 0.8)):
+            arm[key] = plus(sec)
+        c = arm["requests"][0]["calls"][0]
+        c["ts"] = plus(2.5)
+        arm["requests"][0]["usage"] = []   # the own usage row was dropped ...
+        f = call(plus(-0.010), c["tin"], c["tout"], c["duration"], c["path"])   # ... and a foreign request that finished 10 ms before the window has the identical metadata
+        spec["foreign_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(f, ts=plus(-0.014)))
+    scenario("Y1", "replacement through the pad: a foreign request finished 10 ms before the window (its call row and its identical usage row lie in the 3 s pad), the own usage row dropped: INCONCLUSIVE (the foreign call row is read)", mutate=pad_replacement, want=2, must=["1 foreign call row(s) in the window"])
+
+    def odd_foreign(ts_value):
+        def m(spec):
+            spec["odd_calls"].append(call(ts_value, 5, 5, 100))
+        return m
+    scenario("Y2a", "a foreign call row whose timestamp is epoch text (it does not start with the window's date)", mutate=odd_foreign("1791316884500"), want=2, must=["would skip them silently"])
+    scenario("Y2b", "a foreign call row whose timestamp has a leading space", mutate=odd_foreign(" 2026-10-06T20:01:24.500Z"), want=2, must=["would skip them silently"])
+    scenario("Y2c", "a foreign call row whose timestamp has another offset", mutate=odd_foreign("2026-10-07T01:31:24.500+05:30"), want=2, must=["would skip them silently"])
+    scenario("Y2d", "a foreign call row whose timestamp is a BLOB", mutate=odd_foreign(b"2026-10-06T20:01:24.500Z"), want=2, must=["would skip them silently"])
+
+    def dup_shared(spec):
+        r = spec["arms"][1]["requests"][1]
+        c2, c3 = r["calls"]
+        c3.update({"tin": c2["tin"], "tout": c2["tout"], "duration": c2["duration"], "ts": c2["ts"] + dt.timedelta(seconds=3.5)})
+        r["usage"] = [usage_for(c2), dict(usage_for(c2), ts=c2["ts"] + dt.timedelta(seconds=1))]   # the first call's usage row written twice, the second call's dropped
+    scenario("Y3", "a duplicated own usage row standing in for the next identical call's dropped one (3.5 s apart): INCONCLUSIVE (groups of identical usage rows)", mutate=dup_shared, want=2, must=["group(s) of usage rows with identical metadata"])
+
+    def edit_arm(arm_index, fn):
+        def post(db, files, guard):
+            f = files[arm_index]
+            f.write_text(fn(f.read_text()))
+        return post
+    scenario("Y4", "a RESULT line the census cannot parse (a double space): INCONCLUSIVE, never skipped", want=2, must=["a RESULT line the census cannot parse"],
+             post=edit_arm(0, lambda t: t.replace("RESULT mode=chat:eof", "RESULT  mode=chat:eof", 1)))
+    scenario("Y5a", "a second FROZEN line in one arm file (a hand-concatenated output)", want=2, must=["2 FROZEN lines"],
+             post=edit_arm(0, lambda t: t.replace("\nRESULT ", "\nFROZEN version=2.2 script_sha256=" + "0" * 64 + " start=2026-10-06T20:00:06.000Z db=x\nRESULT ", 1)))
+    scenario("Y5b", "a VOID earlier in the file followed by a real status 0", want=2, must=["marked this run VOID"],
+             post=edit_arm(0, lambda t: t.replace("\nRESULT ", "\nRUN-STATUS earlier status=4 (VOID)\nRESULT ", 1)))
+    scenario("Y5c", "two journal lines in one arm file", want=2, must=["2 journal_failed_to_save_call_log lines"],
+             post=edit_arm(0, lambda t: t.replace("\nRESULT ", "\njournal_failed_to_save_call_log=1 (earlier)\nRESULT ", 1)))
+    scenario("Y6", "a wrapper identity line with another MainPID and the fields not adjacent (NRestarts between them): compared, not skipped: INCONCLUSIVE", want=2, must=["a restart between them voids the idle claim"],
+             post=edit_arm(0, lambda t: t.replace("MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT", "MainPID=999 NRestarts=1 ExecMainStartTimestamp=Tue_2026-10-06_09:52:00_EDT", 1)))
+
+    def null_columns(spec):
+        for r in spec["arms"][0]["requests"][:1]:
+            r["calls"][0]["path"] = None
+            r["usage"][0]["endpoint"] = None
+    scenario("Y7a", "an own call row with a NULL path whose usage row has a NULL endpoint (they associate): no crash, PASS", mutate=null_columns, want=0, must=["CENSUS-RESULT PASS"])
+
+    def null_foreign(spec):
+        f = call(plus(120.0), 33, 3, 100, None, model=None)
+        f["status"] = None
+        spec["foreign_calls"].append(f)
+    scenario("Y7b", "a foreign call row with NULL path, model and status: INCONCLUSIVE with the receipt, no crash", mutate=null_foreign, want=2, must=["1 foreign call row(s) in the window", "FOREIGN tile="])
+    scenario("Y9", "a SUMMARY end of year 9999: an unparsable stamp (INCONCLUSIVE), not an overflow (exit 3)", want=2, must=["no end time", "CENSUS-RESULT INCONCLUSIVE"],
+             post=edit_arm(1, lambda t: t.replace("end=2026-10-06T20:05:30.200Z", "end=9999-12-31T23:59:59.999Z", 1).replace("# finished 2026-10-06T20:05:31Z", "# finished 9999-12-31T23:59:59Z", 1)))
+    scenario("Y10a", "a guard receipt with clean_for=nan", mutate=g(clean_for="nan"), want=2, must=["shorter than the 30 s"])
+    scenario("Y10b", "an unparsable FROZEN start= while the wrapper's stamp is present", want=2, must=["unparsable FROZEN start="],
+             post=edit_arm(0, lambda t: t.replace("start=2026-10-06T20:00:05.300Z", "start=garbage", 1)))
+    spaced = Path(ARGS.work) / "dir with space"
+    spaced.mkdir(exist_ok=True)
+    spec_sp = default_spec("sp1")
+    db_sp, files_sp, guard_sp = materialize(spec_sp, spaced)
+    rc_sp, out_sp, err_sp = run_census(db_sp, files_sp, guard_sp)
+    check("Y8", "the store path contains a space (the FROZEN line's db= field is read up to the next field): PASS", rc_sp, out_sp, err_sp, 0, must=["CENSUS-RESULT PASS"])
 
     # ---- X1: predicate parity with the frozen scripts, by AST (the frozen scripts run main() at import: never import them)
     census_text = Path(ARGS.census).read_text()
