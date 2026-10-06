@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "id": "syft-1540-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "syft"
+  ],
+  "claim": "The recorded version JSON returned \"version\": \"1.54.0\", \"gitCommit\": \"cc326e45a6213360266dda4b30cc68095946d676\" and \"schemaVersion\": \"16.1.11\" (exit 0). The recorded inventory smoke excerpt reports \"36 artifacts, 166 files, 177 relationships\" and \"CycloneDX 1.7, 123 components (36 library + 87 file)\" (exit 0).",
+  "limitations": [
+    "The recorded smoke says \"No stdout or stderr\"; inventory counts are the supplied output-file observations, not a new scan performed by this integration.",
+    "Signature verification and SPDX output were not exercised; 1.52.0 signature evidence does not apply to 1.54.0.",
+    "No SDK source fingerprint was captured; identical recorded package tuples are the comparison evidence.",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "1.52.0",
+    "version": "1.54.0",
+    "source": {
+      "repository": "https://github.com/anchore/syft",
+      "tag": "v1.54.0",
+      "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+      "published_at": "2026-10-01T20:54:29Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "github-release-asset",
+      "url": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_linux_amd64.tar.gz",
+      "sha256": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+      "integrity_checked": true,
+      "integrity_source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt line 8 (sha256sum --check --ignore-missing syft_1.54.0_checksums.txt -> 'syft_1.54.0_linux_amd64.tar.gz: OK', exit 0); also equal to the GitHub release asset digest sha256:54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860 (gh api repos/anchore/syft/releases/tags/v1.54.0). The checksums file's own sha256 e423344e663d7d14db62e51ddd31e4a5012818ed69e78358391dc487483f839c equals its API digest. Signature of the checksums file (syft_1.54.0_checksums.txt.sigstore.json) NOT verified: cosign is not installed here."
+    },
+    "install_recorded": {
+      "command": "tar --no-same-owner -xzf <qualification-root>/syft/syft_1.54.0_linux_amd64.tar.gz -C <qualification-root>/syft/prefix",
+      "exit": 0,
+      "prefix": "<qualification-root>/syft/prefix"
+    },
+    "version_recorded": {
+      "command": "env SYFT_CHECK_FOR_APP_UPDATE=false <qualification-root>/syft/prefix/syft version -o json",
+      "exit": 0,
+      "output": "{\n \"application\": \"syft\",\n \"buildDate\": \"2026-10-01T20:48:12Z\",\n \"compiler\": \"gc\",\n \"gitCommit\": \"cc326e45a6213360266dda4b30cc68095946d676\",\n \"gitDescription\": \"v1.54.0\",\n \"goVersion\": \"go1.26.8\",\n \"platform\": \"linux/amd64\",\n \"schemaVersion\": \"16.1.11\",\n \"version\": \"1.54.0\"\n}"
+    },
+    "smoke_recorded": {
+      "command": "bwrap --unshare-all --die-with-parent --new-session --cap-drop ALL --clearenv --ro-bind <qualification-root>/syft/prefix/syft /syft --ro-bind <host-prefix>/sdk-py313 /sdk --bind <qualification-root>/syft/smoke-output /output --proc /proc --dev /dev --tmpfs /tmp --chdir /tmp --setenv HOME /tmp --setenv SYFT_CHECK_FOR_APP_UPDATE false /syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json   (run under umask 077; this is manifests/stack.json (component id syft, JSON pointer /commands) inside the bubblewrap harness of blueprints/us-equities/supply-chain/README.md:112-126, scratch paths substituted)",
+      "exit": 0,
+      "output_excerpt": "No stdout or stderr. smoke-output/runtime.syft.json (1230272 B): descriptor syft 1.54.0, schema 16.1.11, source equity-worker-sdk (directory), 36 artifacts, 166 files, 177 relationships. smoke-output/runtime.cdx.json (160043 B): CycloneDX 1.7, 123 components (36 library + 87 file), tool syft 1.54.0. The 36 name/version/purl tuples are identical to the 36 in blueprints/us-equities/supply-chain/receipt.json (the 1.52.0 acceptance, which also records 166 files, 177 relationships, 36 library + 87 file components, CycloneDX 1.7, schemaVersion 16.1.10); diff exit 0. CycloneDX library components equal the syft-json artifacts (diff exit 0).",
+      "ran": true
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/anchore/syft",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.512869+00:00",
+          "ended_at": "2026-10-03T05:50:28.825921+00:00",
+          "stdout_sha256": "c9793fbd5c0319983ccf6f9f6b2cd3836296e718bb4071d422f75de865a48e24",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anchore/syft/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.826194+00:00",
+          "ended_at": "2026-10-03T05:50:29.100900+00:00",
+          "stdout_sha256": "a611ca1c6865b189c03778f245761b88defb6e1d830a3505957d02d7b7fa9588",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anchore/syft/commits/cc326e45a6213360266dda4b30cc68095946d676",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:29.101689+00:00",
+          "ended_at": "2026-10-03T05:50:29.448978+00:00",
+          "stdout_sha256": "64720efc1828ec8905184f903735d526962be49ad8def251379b5d273c294797",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anchore/syft/commits/v1.54.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:29.449234+00:00",
+          "ended_at": "2026-10-03T05:50:29.732600+00:00",
+          "stdout_sha256": "64720efc1828ec8905184f903735d526962be49ad8def251379b5d273c294797",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z",
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.0",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "cc326e45a6213360266dda4b30cc68095946d676",
+        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+        "committed_at": "2026-10-01T19:00:50Z"
+      },
+      "latest_release_source": {
+        "ref": "v1.54.0",
+        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+        "committed_at": "2026-10-01T19:00:50Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "signature_verified": false,
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+      "bytes": 29217540,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

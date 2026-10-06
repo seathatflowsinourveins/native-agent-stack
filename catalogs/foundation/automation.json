@@ -162,9 +162,9 @@
     },
     {
       "repository": "anchore/syft",
-      "version": "1.52.0",
-      "archive_sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
-      "source": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt",
+      "version": "1.54.0",
+      "archive_sha256": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+      "source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt",
       "command": "syft scan dir:<venv> -o spdx-json=... -o cyclonedx-json=...",
       "selection": "SBOM generator for supply-chain.yml's sbom-vuln job; SPDX and CycloneDX outputs for the reproduced nautilus_trader install venv, scanned by grype's high-severity gate. 90-day artifact retention.",
       "workflow": ".github/workflows/supply-chain.yml#sbom-vuln"
@@ -223,7 +223,7 @@
       "version": "publish-catalog.yml@2026-09-22-release",
       "source": ".github/workflows/publish-catalog.yml",
       "command": "git push origin v<version> (tag push) or gh workflow run publish-catalog.yml",
-      "selection": "Publication job now also triggers on push: tags: ['v*'] (job condition startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'), alongside the existing trusted-main workflow_dispatch. Adds a SHA-checked syft 1.52.0 SBOM (native-agent-stack-<sha>.spdx.json, predicate-type https://spdx.dev/Document) with its own actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 attestation, verified in-run with gh attestation verify and uploaded next to the archive with a matched digest, alongside the existing archive attestation. A tag-only release job (needs publish; job permissions contents: write only) downloads both attested artifacts by ID, re-checks them against the digests the publish job attested, and runs gh release create <tag> <archive> <sbom> --verify-tag, which gh 2.101.0 sequences as draft, upload, publish so the immutable release is published with its assets; it then confirms isImmutable and both asset digests.",
+      "selection": "Publication job now also triggers on push: tags: ['v*'] (job condition startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'), alongside the existing trusted-main workflow_dispatch. Adds a SHA-checked syft 1.54.0 SBOM (native-agent-stack-<sha>.spdx.json, predicate-type https://spdx.dev/Document) with its own actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 attestation, verified in-run with gh attestation verify and uploaded next to the archive with a matched digest, alongside the existing archive attestation. A tag-only release job (needs publish; job permissions contents: write only) downloads both attested artifacts by ID, re-checks them against the digests the publish job attested, and runs gh release create <tag> <archive> <sbom> --verify-tag, which gh 2.101.0 sequences as draft, upload, publish so the immutable release is published with its assets; it then confirms isImmutable and both asset digests.",
       "acceptance": "docs/github-automation.md 'Publication on tags': v* tag creation is admin-only (tag creation ruleset 23859358); the publish job keeps contents: read, id-token: write, attestations: write; only the release job has contents: write. No hosted tag run of the release job yet."
     },
     {

@@ -919,6 +919,25 @@ class RealExportIsolationTests(unittest.TestCase):
             "scored": True, "cited_files": ["evidence/receipt.json"],
             "export_files": ["evidence/broken.json", "evidence/log.jsonl", "evidence/receipt.json"]})
 
+    def test_prose_exposure_skips_a_json_value_too_long_to_name_a_file(self):
+        # 2026-10-03, #642 hosted validate: a cited receipt's output excerpt held a one-line JSON document longer
+        # than NAME_MAX, bare_reference() kept it as one token, and Path.is_file() raised ENAMETOOLONG instead of
+        # answering False. A value that cannot name a file is not a reference.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets, export = scratch / "packets", scratch / "export"
+        (export / "evidence").mkdir(parents=True)
+        packets.mkdir()
+        (packets / "foundation__layer.json").write_text(json.dumps({"candidates": [
+            {"key": "c1", "name": "Worktrunk", "repository": "https://github.com/acme/worktrunk", "adopted": True,
+             "evidence_refs": ["evidence/receipt.json"]}]}), encoding="utf-8")
+        long_value = json.dumps({"session_tokens_saved": 0, "padding": "x" * 400}, separators=(",", ":"))
+        self.assertIsNone(re.search(r"\s", long_value))
+        (export / "evidence" / "receipt.json").write_text(json.dumps({"output_excerpt": long_value}), encoding="utf-8")
+        report = isolation.prose_exposure(export, packets, {"foundation::layer": [("github.com/acme/worktrunk", "")]})
+        self.assertTrue(report["foundation::layer"]["scored"])
+
     def test_an_exact_component_id_picks_one_of_two_candidates_of_one_repository(self):
         # Codex review of #145 at 68e74f2c: alpaca-py and data-alpaca-py share alpacahq/alpaca-py, and normalizing
         # both to alpaca-py made a verdict for one match both.

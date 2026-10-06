@@ -342,7 +342,7 @@ Each install function first calls `interim_acknowledged`, which reads `wave2.ack
 
 ## Wave 3 (2026-10-04)
 
-The rows the wave-3 batch of the layer consensus added or changed, on the owner's decision of 2026-10-04 (amendment 4; README.md, section "Wave 3"). Status: UNRUN on every distribution. Versions and digests follow `manifests/stack.json` and `adoption/pins-linux-x86_64.json`: RTK was refreshed to 0.51.0 from main `14048b840` after PR #693; the other wave-3 assets retain the `f77a35eb` source, or `recipes/README.md` where the pins file has no row; upstream files were read at the pinned tag or commit on 2026-10-04. The ecosystem-root layout follows the repository's own bootstrap: [`install_single_binary_tarball`, line 414](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L414) (the link into `bin`), [`install_npm`, line 770](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L770) (`npm install --global --prefix` from the verified registry tarball) and [`install_uv_tool`, line 988](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L988) (`UV_TOOL_DIR` and `UV_TOOL_BIN_DIR`), and archives are extracted whole as [recipes/README.md, line 59](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L59) does.
+The rows the wave-3 batch of the layer consensus added or changed, on the owner's decision of 2026-10-04 (amendment 4; README.md, section "Wave 3"). Status: UNRUN on every distribution. Versions and digests follow `manifests/stack.json` and `adoption/pins-linux-x86_64.json`: RTK was refreshed to 0.51.0 from main `14048b840` after PR #693, and mcporter follows main's 0.14.2 selection; jcodemunch-mcp moved after `f77a35eb` to 1.108.327 through PR #642 W1, source `6d5ae86c130f96624e2ca2d797fa3b853c210b9d`; the other wave-3 assets retain the `f77a35eb` source, or `recipes/README.md` where the pins file has no row. The 2026-10-04 source reads remain historical; the jcodemunch README read at its selected 6d5ae86c pin is recorded below on 2026-10-05. The ecosystem-root layout follows the repository's own bootstrap: [`install_single_binary_tarball`, line 414](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L414) (the link into `bin`), [`install_npm`, line 770](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L770) (`npm install --global --prefix` from the verified registry tarball) and [`install_uv_tool`, line 988](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L988) (`UV_TOOL_DIR` and `UV_TOOL_BIN_DIR`), and archives are extracted whole as [recipes/README.md, line 59](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/recipes/README.md#L59) does.
 
 ### Departures from the recorded upstream commands
 
@@ -352,7 +352,7 @@ The rows the wave-3 batch of the layer consensus added or changed, on the owner'
 
 - **RTK 0.51.0 (`command-output`)**: the Linux asset ([README, line 113](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L113)); checks: [`--version`, line 121](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121), [`rtk git log`, line 193](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L193), [`rtk proxy`, line 313](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L313) and [`RTK_TELEMETRY_DISABLED`, line 551](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L551). The archive holds only `rtk`. Its freshly downloaded SHA-256 `5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5` matches the [v0.51.0 checksums file](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt) and GitHub asset digest. The [release notes](https://github.com/rtk-ai/rtk/releases/tag/v0.51.0) require `--shell` for executable positional scripts that need shell expansion; this plan uses direct arguments. The persisted `config/rtk-config.toml` retains one `[hooks]` table and the exact five exclusions required by [main bootstrap](https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L551); [config.rs, lines 119-123](https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L119-L123) declares `exclude_commands`.
 - **Headroom 0.37.0 (`output-compression`)**: [README, line 92](https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L92) (`uv tool install --python 3.13`, with the pins file's `[mcp]` extra instead of the README's `[all]`); [`headroom --version`, line 437](https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L437).
-- **jcodemunch-mcp 1.108.319 (`code-index`)**, source `8f7b34abe16fb459e0bf1c04747d584216dfe32e`: [README, line 91](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91) (`uv tool install`) and [line 113](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113) (`--version`); the pin and the root: recipes/README.md lines 519-524.
+- **jcodemunch-mcp 1.108.327 (`code-index`)**, source `6d5ae86c130f96624e2ca2d797fa3b853c210b9d`: [README, line 91](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91) (`uv tool install`) and [line 113](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113) (`--version`); the ecosystem root, `--python 3.13` and `==1.108.327`: [recipes/README.md:554-559 at the merged commit](https://github.com/seathatflowsinourveins/native-agent-stack/blob/f640b53094ed4de5a526cda44d6341de9598df30/recipes/README.md#L554-L559), with the version assertion at [line 560](https://github.com/seathatflowsinourveins/native-agent-stack/blob/f640b53094ed4de5a526cda44d6341de9598df30/recipes/README.md#L560). The selected .327 pin is in `manifests/stack.json`; its recorded W1 qualification and limitations are in `evidence/receipts/jcodemunch-1108327-qualification-20261003.json`. Read on 2026-10-05 at 2026-10-05T04:17:40Z: the README at `6d5ae86c130f96624e2ca2d797fa3b853c210b9d` and prior pin `8f7b34abe16fb459e0bf1c04747d584216dfe32e` has identical lines 91 (`uv tool install`), 113 (`--version`) and 141 ([session-stats confirmation](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141)); these anchors did not move.
 - **codebase-memory-mcp 0.11.0 (`code-graph`)**: [README, lines 88-95](https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/README.md#L88) (the archive, then its `install.sh`, which the plan does not run); [`--version`, src/main.c line 1236](https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/src/main.c#L1236). The archive holds the executable, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `install.sh`.
 - **Repomix 1.18.1 (`repo-packing`)**, source `80b4280a9196feace092fc672dfe2b5fac62ef08`: [README, line 109](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109) (`npm install -g repomix`); checks: [`--version`, line 609](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L609), [`--include`, line 204](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L204) and [`--style`, line 628](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L628); the two-file pack is this project's integration check.
 - **TOON 4.1.1 (`structured-data`)**: [packages/cli/README.md, line 11](https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L11) (`npm install -g @toon-format/cli`), [line 63](https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L63) (`-o`) and [line 65](https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L65) (`--decode`); `--version` prints only the version (adoption/pins-linux-x86_64.json, line 267). The round trip is this project's integration check.
@@ -764,7 +764,7 @@ For a future upgrade of any existing owned installation, stop its owned unit and
   The archive's published checksum is
   https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-x86_64-unknown-linux-gnu.tar.gz.sha256
   (`8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d`).
-- **Posture:** accepted r1 at
+- **Posture** (its deny list and Codex forbidden rules are superseded on 2026-10-06; see the relaxation below): accepted r1 at
   https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465;
   aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/config.rs:126-152;
   https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46.
@@ -805,6 +805,35 @@ source-accepted posture rather than claiming a new successful fetch. The builder
 Codex 0.159.3 native policy check returned forbidden; 0.160.0 remains the plan pin.
 The accepted OS-sandbox boundary and prefix limitations remain explicit in the
 [decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
+
+### Relaxation (2026-10-06)
+
+- **Decision:** [hcom relaxation](../../../docs/decisions/2026-10-06-hcom-relaxation.md),
+  on the user's decision of 2026-10-06T03:03:10Z (11:03 PM EDT on October 5). It
+  removes the Claude hcom deny list, `config/hcom-deny.rules`, the adapter's
+  running-Codex refusal and the forbidden-decision acceptance. Peer text stays
+  data, never the user's approval.
+- **Only Codex hcom policy:** upstream `hcom.rules`, which `hcom codex` writes
+  with `auto_approve=true`:
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1538
+  (build_codex_rules :1538-1563; written to `<codex home>/rules/hcom.rules` at
+  :1566-1579), with the command list at
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46
+  (:46-72).
+- **After-sign-in check, revised after the read at 3b6ea9d1e:**
+  - **Codex home.** It derives the Codex home as hcom does: `CODEX_HOME`, else the parent of `HCOM_DIR`.
+    https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L72 (:72-75);
+    https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/paths.rs#L26 (:26-53).
+  - **Effective policy.** It passes every `*.rules` file there to `codex execpolicy check --rules`
+    (https://developers.openai.com/codex/rules), the set Codex loads:
+    https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/exec_policy.rs#L662 (:662-700, :1121-1170).
+  - **Leftovers.** A stricter leftover file, or a retired Claude hcom deny entry, reports needs_user.
+  - **Retained probe.** `../hcom-relaxation-20261006/probe-receipt.json` (synthetic; codex-cli 0.160.1, whose exec-policy code equals rust-v0.160.0).
+- **Current release:** v0.7.27 at `2c5f343b` is still aannoo/hcom's latest
+  release (`gh api repos/aannoo/hcom/releases/latest`, read 2026-10-06). Its
+  plain-Claude hook guard is unchanged:
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/claude.rs#L135
+  (:135-140).
 
 ## Round-2 G3 sources (2026-10-04)
 
@@ -986,3 +1015,11 @@ in this builder.
   `needs_user` and no trial is invented. ATIF schema acceptance is separate from
   the native telemetry-contract assertions described in
   `config/harbor-worker-telemetry-contract.md`.
+
+## Currency qualification source scope (2026-10-05)
+
+Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).
+
+Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.
+
+The W1b receipt was read from local Git commit `748f701e1`; it is not a tracked file at this PR head. Source and qualification records were read without network access; no historical commands were replayed.

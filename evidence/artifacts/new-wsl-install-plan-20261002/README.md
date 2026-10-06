@@ -159,9 +159,9 @@ From the wave-2 batch of the layer consensus (`consensus.json`, key `wave2`, wit
 
 ## Wave 3 (2026-10-04)
 
-From the wave-3 batch of the layer consensus (`consensus.json`, key `wave3`), the owner's decision of 2026-10-04 under amendment 4 of the manifest's decision rule, relayed by `docs/decisions/2026-10-04-token-full-stack-owner-default.md`. The pins are those of `manifests/stack.json` and `adoption/pins-linux-x86_64.json` at `f77a35eb`. After main's PR #693 (2026-10-04) those files pin RTK 0.51.0 and mcporter 0.14.2, and this plan follows them. Every tool installs under the ecosystem root the client templates name, `${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}`: release archives and npm tarballs through `fetch_verified` against the recorded sha256 (no `gh release download`, so no GitHub sign-in), archives extracted whole into `tools/<tool>-<version>` (bundled licenses kept), npm packages with `npm install --global --prefix tools/<tool>-<version>` from the verified tarball, uv tools with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the root, and each command linked into `${ECO_ROOT}/bin`. Sources are in [SOURCES.md](SOURCES.md), section "Wave 3", and the checks that ran in [VALIDATION.md](VALIDATION.md), section "Wave 3".
+From the wave-3 batch of the layer consensus (`consensus.json`, key `wave3`), the owner's decision of 2026-10-04 under amendment 4 of the manifest's decision rule, relayed by `docs/decisions/2026-10-04-token-full-stack-owner-default.md`. The original wave-3 pins came from `manifests/stack.json` and `adoption/pins-linux-x86_64.json` at `f77a35eb`. After main's PR #693 (2026-10-04) those files pin RTK 0.51.0 and mcporter 0.14.2, and this plan follows them. PR #642 W1 also moved jcodemunch-mcp after `f77a35eb` to 1.108.327, source `6d5ae86c130f96624e2ca2d797fa3b853c210b9d`, and this plan follows that selected pin. Its README was read at 6d5ae86c and the prior 8f7b34ab pin on 2026-10-05; install, version and session-stats anchors 91, 113 and 141 are unchanged (SOURCES.md, the code-index row). Every tool installs under the ecosystem root the client templates name, `${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}`: release archives and npm tarballs through `fetch_verified` against the recorded sha256 (no `gh release download`, so no GitHub sign-in), archives extracted whole into `tools/<tool>-<version>` (bundled licenses kept), npm packages with `npm install --global --prefix tools/<tool>-<version>` from the verified tarball, uv tools with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the root, and each command linked into `${ECO_ROOT}/bin`. Sources are in [SOURCES.md](SOURCES.md), section "Wave 3", and the checks that ran in [VALIDATION.md](VALIDATION.md), section "Wave 3".
 
-- **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the Claude hook is the client configuration's, and the Codex hook is installed and trusted by this row, on the decision of 2026-10-04), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.319), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
+- **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the Claude hook is the client configuration's, and the Codex hook is installed and trusted by this row, on the decision of 2026-10-04), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.327, selected in `manifests/stack.json`; [W1 qualification](../../receipts/jcodemunch-1108327-qualification-20261003.json)), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
 - **Owner defaults**: `ccusage` (20.0.26, a read-only meter) and `session-analytics` (agentsview 0.43.0, a local archive only, telemetry and the update check off) now install; `context-supply` keeps its commands and checks and no longer calls `interim_acknowledged`, since its authority is the owner's decision and not amendment 3.
 - **`code-search`** installs SocratiCode 1.15.0 beside semble (its npm tarball with `--ignore-scripts --before=2026-09-24T12:00:00Z`, into the prefix the client templates run), keeps its gate, and its check reads SocratiCode's version from `package.json`, never by running it. SocratiCode serves nothing until the client configuration names a Qdrant store and an embedding endpoint, which no row installs yet.
 - **The gate** `interim_acknowledged` reads every wave batch and refuses while any of them owes an acknowledgement; an owner batch owes none.
@@ -466,32 +466,40 @@ evidence-registry digests and the upstream-freshness snapshot following the srt 
 
 [The coordinator decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md) records all 25 slot repairs, conflict resolutions, canonical Promptfoo owner-batch reconciliation, sources and remaining host gates. The revised merged recipes are UNRUN on a distribution. Earlier per-row statements are historical; no static integration check certifies the destination.
 
-## Round 2: agent messaging (2026-10-04)
+## Round 2: agent messaging (2026-10-04, relaxed 2026-10-06)
 
 The `agent-messaging` row installs adopted hcom 0.7.27 with its upstream
-checksum-verifying installer. It applies the accepted posture from the slot's
-extension of `adoption/new-wsl/client-config-map.json`, using the scoped
-`config/hcom-client-config.py` adapter and the shared mapper's existing merge,
+checksum-verifying installer. It applies the slot's extension of
+`adoption/new-wsl/client-config-map.json`, using the scoped
+`config/hcom-client-config.py` adapter and the shared mapper's existing
 instruction-block and atomic-write functions. It writes hcom's title/relay/trust
-preferences, Claude deny rules and native inbound setting, both clients' peer
-hints, and a separate Codex `hcom-deny.rules`. The adapter runs the mandatory
-native `codex execpolicy check`; upstream retains `hcom.rules`.
+preferences and both clients' peer hints. Since
+[the 2026-10-06 relaxation](../../../docs/decisions/2026-10-06-hcom-relaxation.md)
+it writes no Claude hcom deny rule and no Codex rule file: upstream `hcom.rules`,
+which `hcom codex` writes, is the only Codex hcom policy.
 
 Run `bash install.sh --only agent-messaging`, then
-`bash accept.sh --only agent-messaging`. Close Codex before apply and restart it
-afterward. Native client sign-ins and each lane folder's trust remain the user's
-own inputs. Existing conflicting hcom configuration, rule file or inbound choice
-is retained with `needs_user`, without printing its values. The installer needs
-no sudo. Post-install acceptance checks the installed binary's status/list
-behavior in a disposable HCOM_DIR, then installed client posture and native rule
-matching; it is separate from upstream repository-quality CI.
+`bash accept.sh --only agent-messaging`. The apply does not wait for Codex to
+close; running Claude Code and Codex sessions read the new instruction block
+when they next start. Native client sign-ins and each lane folder's trust remain
+the user's own inputs. Existing conflicting hcom configuration is retained with
+`needs_user`, without printing its values; a different Claude inbound choice is
+retained. The installer needs no sudo. Post-install acceptance checks the
+installed binary's status/list/send/listen behavior in a disposable HCOM_DIR; it
+is separate from upstream repository-quality CI. After the first `hcom codex`
+launch, the after-sign-in check takes the Codex home the way hcom does
+(`CODEX_HOME`, else the parent of `HCOM_DIR`). It then evaluates every `*.rules`
+file there, as Codex loads them, with the native `codex execpolicy check`.
+`hcom send` and `hcom term` must both be allowed. A stricter leftover file, such
+as the retired `hcom-deny.rules`, reports `needs_user`, and so do the retired
+Claude hcom deny entries. The retained probe is in
+`../hcom-relaxation-20261006/probe-receipt.json`.
 
 Claude <-> Claude stays on native messaging. Codex transport sessions use
 upstream `hcom codex`; this row creates no Claude hcom launch wrapper or global
 hooks. Plain Claude uses `hcom start` and `hcom listen`, which does not wake an
-idle plain Claude. Prefix denies have the accepted posture's known unmatched
-forms, including executable wrappers; the OS-sandbox change is the user's and
-outside this row. Full source, evidence classes, correction and overturn checks:
+idle plain Claude. The OS-sandbox choice is the user's and outside this row.
+Adoption sources, evidence classes and the hook-gap correction:
 [round-2 messaging decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
 
 The coordinator must refresh shared summary counts and `owners.json` when the
@@ -627,3 +635,11 @@ upstream snapshot, evidence registry and shared gateway template remain under
 their owners. Source: this PR:tests/test_stack_lifecycle.py:21. Destination
 installation, upstream runtime tests, native model/browser acceptance and
 provider/GPU checks have not run in this integration job.
+
+## Currency qualification limits (2026-10-05)
+
+Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).
+
+Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.
+
+The staged native acceptance commands remain unrun by this repair. Neither scratch receipt closes the release holds or proves destination service acceptance.

@@ -59,7 +59,7 @@ SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
 PINS = {"rtk": "0.51.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1",
         "mcporter": "0.14.2", "markitdown": "0.1.8", "ast-grep": "0.45.3",
         "ccusage": "20.0.26", "codebase-memory-mcp": "0.11.0", "headroom": "0.37.0",
-        "jcodemunch-mcp": "1.108.319", "context-mode": "1.0.169",
+        "jcodemunch-mcp": "1.108.327", "context-mode": "1.0.169",
         "serena": f"2.0.0.dev0 @ {SERENA_COMMIT}", "ai-memory": "2.4.1", "context-hub": "0.1.4",
         "agentsview": "0.43.0"}
 # The Linux adoption pins, checked against PINS for every tool they list (version, and Serena's

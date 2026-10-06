@@ -1,0 +1,65 @@
+{
+ "schema_version": 1,
+ "kind": "ibkr_paper_orders_criteria_addendum",
+ "id": "C5",
+ "name": "engine_cap_refuses_smart_order",
+ "preregistered_at_utc": "2026-10-06T15:53:40Z",
+ "approved_by": "the command center, item task-native-agent-stack-5f-20261006T155009Z (N4): a dated addendum to #754's frozen criteria; it adds a stricter check and loosens none of C1-C4",
+ "base_criteria": {
+  "pr": 754,
+  "commit": "3e23f71abf3ae29c63483ef35c8506b8347e2c56",
+  "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/plan.json",
+  "sha256": "24ffca56dfa7bd647bcf423dbc91ae3f605384a81a0ad9523cc024a36ac3ec72",
+  "frozen_at": "2026-10-05",
+  "unchanged": "C1-C4, bounds, instrument, client_ids, session, data, timeouts, exec_tester and end_disposition apply as frozen; C5 changes none of them"
+ },
+ "engine": {
+  "release": "v2.0.0rc6",
+  "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+  "issue": "https://github.com/nautechsystems/nautilus_trader/issues/4946",
+  "fix_commit": "ed6fc8bf47fd37dda97d63b9b2df160719ee2bac",
+  "source": {
+   "path": "crates/risk/src/engine/mod.rs",
+   "sha256_at_commit": "ad16f4bf0f071fd979f503423321d48df0ed6d51e0b98f2c060c6258a6c22776",
+   "check_orders_risk": "1212-1243",
+   "order_account_id": "1245-1276",
+   "max_notional_per_order_lookup": "1393",
+   "deny_notional_exceeds_max_per_order": "2358-2371",
+   "full_position_exit_exempt": "2359"
+  }
+ },
+ "setup": {
+  "host": "NativeStack2604",
+  "gateway": "127.0.0.1:4002 (IBKR paper)",
+  "client_ids": {"node": 91, "check": 92},
+  "instrument": "SPY=STK.SMART",
+  "risk": {"bypass": false, "max_notional_per_order": {"SPY=STK.SMART": "100"}},
+  "only_difference_from_base": "LiveRiskEngineConfig.max_notional_per_order for SPY=STK.SMART is 100 USD in the C5 node run; every other parameter is the base plan's",
+  "exec_tester_for_c5": {"open_position_on_start_qty": null, "open_position_on_first_quote": false, "enable_limit_buys": true, "order_qty": "1",
+                         "tob_offset_ticks": "floor(0.5 * admitted_bid / 0.01)", "limit_time_in_force": "GTD", "order_expire_time_delta_mins": 7}
+ },
+ "order": {
+  "type": "LIMIT", "side": "BUY", "quantity": 1,
+  "price": "C1's rule: bid minus floor(0.5 * admitted_bid / 0.01) ticks, about half the bid; non-marketable",
+  "precondition": "the runner computes the order's notional before it reaches the engine; if notional <= 100 USD (a bid below about 200 USD), C5 is refused (exit 3) and never counted as passed"
+ },
+ "pass_all": [
+  "the engine emits OrderDenied for the C5 client order id with reason NotionalExceedsMaxPerOrder, as rc6 renders it",
+  "no OrderSubmitted, OrderAccepted, venue OrderRejected or venue order id exists for that client order id",
+  "the check client (92) sees no open order and no execution for the C5 order at the end",
+  "end disposition: positions 0, open orders 0"
+ ],
+ "fail": {
+  "condition": "any pass item not met",
+  "if_the_order_reached_the_venue": "cancel it at once by client order id through the check client; the GTD 7-minute expiry is the backstop; record FAIL",
+  "consequence": "the rc6 pointer does not move; the IBKR paper lane stays on rc5"
+ },
+ "sequence": "C5 runs first, in its own node run, in the slot 10-07 13:45-20:00Z. C1-C4 run on rc6 only after C5 passes. A C5 failure ends the slot.",
+ "exit_codes": {"passed": 0, "failed_or_incomplete": 1, "not_connected": 2, "refused_or_cleanup_required": 3},
+ "receipt": "the base receipt form, plus: the configured cap, the order notional, the OrderDenied event with its reason string, the three absence proofs, the engine commit and this file's sha256",
+ "limits": [
+  "one paper LIMIT BUY opening order on one instrument: the cap is proven on this route for that order class only",
+  "market orders are exercised by C3 under the base 1000 USD cap, not by C5",
+  "full position exits are exempt from the per-order cap by design (mod.rs:2359); C4 is unaffected"
+ ]
+}

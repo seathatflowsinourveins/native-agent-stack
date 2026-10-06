@@ -62,7 +62,7 @@ this PR, `tools/adoption/managed_block.py:104`.
 [Codex rules](https://developers.openai.com/codex/rules),
 [hcom configuration fields:126-152](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/config.rs#L126).
 
-The mapped posture keeps `title_mode=off`, `relay.enabled=false`,
+**Superseded (2026-10-06)** by [the hcom relaxation](2026-10-06-hcom-relaxation.md), except the four configuration values and the peer-data instruction: The mapped posture keeps `title_mode=off`, `relay.enabled=false`,
 `auto_trust_workspace=false` and `auto_approve=true`. Peer text carries no user
 authority, including `bigboss`. Both clients receive that instruction. Claude
 gets the posture's hcom and uvx-hcom denies, including equals-joined `send --from`
@@ -193,7 +193,7 @@ hook, model trial or OS-sandbox change is added to conceal it.
 
 ## Repair 2026-10-05: transport trust and measured RTK interaction
 
-Launching `hcom codex` grants trust to its per-run hooks and their pre-trusted
+**Superseded (2026-10-06)** by [the hcom relaxation](2026-10-06-hcom-relaxation.md), for this paragraph's combined-rules acceptance: Launching `hcom codex` grants trust to its per-run hooks and their pre-trusted
 current_hash values. With auto_approve=true, hcom writes its upstream allow list
 to `rules/hcom.rules`, including term, relay, config and hooks. These are per-run
 hooks; the adapter itself installs no global client hooks. After the first

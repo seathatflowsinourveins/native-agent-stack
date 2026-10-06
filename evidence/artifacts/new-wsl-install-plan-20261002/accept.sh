@@ -295,12 +295,11 @@ mcporter() {
 }
 
 agent-messaging() {
-  # Native upstream CLI smoke assertions; client wiring is a separate integration check.
+  # Native upstream CLI smoke assertions; upstream hcom.rules is checked after the first hcom codex launch.
   case "$stage" in
     post_install)
-      # Kind: upstream smoke + native integration; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
-      # Source: https://developers.openai.com/codex/rules
-      check agent-messaging 'upstream smoke + native integration' 'smoke="$(mktemp -d)"
+      # Kind: upstream smoke; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
+      check agent-messaging 'upstream smoke' 'smoke="$(mktemp -d)"
 trap '"'"'rm -rf -- "$smoke"'"'"' EXIT
 mkdir -p -- "$smoke/home"
 hcom_binary="$(command -v hcom)"
@@ -323,19 +322,38 @@ jq -s -e --arg sender "$sender" '"'"'[.[] | select(.type == "message")] | length
 "${isolated[@]}" "$hcom_binary" list --json | jq -e --arg sender "$sender" --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 1) and any(.[]; .name == $sender and .unread_count == 0)'"'"' >/dev/null
 "${isolated[@]}" "$hcom_binary" listen --name "$recipient" --timeout 1 --json > "$smoke/delivered.jsonl"
 jq -s -e --arg sender "$sender" '"'"'length == 1 and .[0].from == $sender and .[0].text == "hello there" and .[0].reply_id == (.[0].event_id | tostring)'"'"' "$smoke/delivered.jsonl" >/dev/null
-"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 0)'"'"' >/dev/null
-python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --check'
+"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 0)'"'"' >/dev/null'
       ;;
     after_sign_in)
       # Kind: native integration; Source: https://developers.openai.com/codex/rules
-      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1566
-      check agent-messaging 'native integration' 'codex_rules="${CODEX_HOME:-$HOME/.codex}/rules"
-if [[ ! -f "$codex_rules/hcom.rules" ]]; then
-  printf "needs_user: launch hcom codex once before checking its upstream allow rules together with the posture denies.\n" >&2
+      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L72 (Codex home: CODEX_HOME, else the parent of HCOM_DIR, src/paths.rs#L26)
+      # Source: https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/exec_policy.rs#L662 (every *.rules file of the layer is loaded)
+      check agent-messaging 'native integration' 'hcom_dir="${HCOM_DIR:-$HOME/.hcom}"
+case "$hcom_dir" in "~"*) hcom_dir="$HOME${hcom_dir#"~"}" ;; esac
+case "$hcom_dir" in /*) ;; *) hcom_dir="$PWD/$hcom_dir" ;; esac
+codex_home="${CODEX_HOME:-$(dirname -- "$hcom_dir")/.codex}"
+case "$codex_home" in /*) ;; *) codex_home="$PWD/$codex_home" ;; esac
+codex_rules="$codex_home/rules"
+claude_settings="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
+if [[ -f "$claude_settings" ]]; then
+  retired="$(jq "[.permissions.deny[]? | strings | select(test(\"^Bash[(](uvx )?hcom ((term|relay|config|hooks|run|kill|stop|reset|update|claude-pty)( [*])?|[*] claude-pty [*]|--name [*]|--go [*]|send -b [*]|send --from [*]|send --from=[*])[)]$\"))] | length" "$claude_settings")"
+  if [[ "$retired" != 0 ]]; then
+    printf "needs_user: %s retired 2026-10-04 hcom deny entries remain in the Claude settings.\n" "$retired" >&2
+    exit 78
+  fi
+fi
+if [[ ! -f "$codex_rules/hcom.rules" || -L "$codex_rules/hcom.rules" ]]; then
+  printf "needs_user: launch hcom codex once so that upstream writes its hcom.rules.\n" >&2
   exit 78
 fi
-codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom term inject luna hi | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null
-codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom config | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null'
+rules=()
+while IFS= read -r -d "" file; do rules+=(--rules "$file"); done < <(find "$codex_rules" -maxdepth 1 -type f -name "*.rules" -print0 | sort -z)
+send="$(codex execpolicy check --pretty "${rules[@]}" -- hcom send @luna -- hi | jq -r ".decision // \"none\"")"
+term="$(codex execpolicy check --pretty "${rules[@]}" -- hcom term inject luna hi | jq -r ".decision // \"none\"")"
+if [[ "$send" != allow || "$term" != allow ]]; then
+  printf "needs_user: the Codex rules in this home give %s for hcom send and %s for hcom term, so a stricter rules file (such as the retired hcom-deny.rules) remains beside upstream hcom.rules.\n" "$send" "$term" >&2
+  exit 78
+fi'
       ;;
     *) skipped agent-messaging ;;
   esac
@@ -763,12 +781,12 @@ output-compression() {
   esac
 }
 code-index() {
-  # jcodemunch-mcp 1.108.319 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
+  # jcodemunch-mcp 1.108.327 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113 (jcodemunch-mcp --version); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L525 (its output at the pin)
-      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.319" ]]'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113 (jcodemunch-mcp --version); manifests/stack.json (jcodemunch-mcp 1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (recorded W1 qualification and limitations; this plan row remains UNRUN)
+      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.327" ]]'
       ;;
     *) skipped code-index ;;
   esac

@@ -279,6 +279,8 @@ and the real run waits until the failure is understood. The rehearsal's private 
 outlive `--unregister`. After the required comparison records, run the page again from P1 for the default real
 `<Name>`, or the qualified rollback, without R1.
 
+`pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its `orx` entry (0.2.7 to 0.2.15); the Node 24.21.0 pin used here is unchanged.
+
 ## Pre-checks in the workstation distribution
 
 P1 to P3 run as `sh` in the workstation's distribution, before W1, so before anything is downloaded on Windows or
@@ -944,6 +946,8 @@ dpkg-query -W -f='${Package} ${Version}\n' jq libatomic1 uidmap
 Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages. The historical
 24.04.5 image lacked them; do not assume the selected 26.04.1 image has the same package gaps.
 
+`pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its `orx` entry (0.2.7 to 0.2.15); the Node 24.21.0 pin used here is unchanged.
+
 ### F5. Subordinate ids
 
 Rootless Docker needs at least 65,536 subordinate uids and gids for the user. The image ships empty `/etc/subuid` and
@@ -1072,7 +1076,7 @@ after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-insta
 grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until
 Codex trusts its directory; the Codex hooks wired here are the context-mode plugin's six, whose approvals the tool
 writes once their hashes were read back and compared on this host, and rtk's one, which the plan's `command-output` row
-installs with `rtk init -g --codex` and trusts at its current hash with `tools/adoption/codex_hook_trust.py` (which first reviews the user layer's Codex rule files without parsing them, because the hook rewrites commands before Codex matches rules by their words: a file passes only by its sha256 on `tools/adoption/exec_rules_reviewed.json` (added after `v2026.10.05.1`; today #713's `hcom-deny.rules`, reviewed for rtk 0.51.0; the list is re-reviewed when the rtk pin moves) or as Codex's own allow-only format (`default.rules`, hcom's `hcom.rules`), and any other file refuses `--apply`; `--check` exits 6 for a trusted hook beside such a file; `--allow-exec-rules` accepts).
+installs with `rtk init -g --codex` and trusts at its current hash with `tools/adoption/codex_hook_trust.py` (which first reviews the user layer's Codex rule files without parsing them, because the hook rewrites commands before Codex matches rules by their words: a file passes only by its sha256 on `tools/adoption/exec_rules_reviewed.json` (added after `v2026.10.05.1`; its one entry is #713's `hcom-deny.rules`, reviewed for rtk 0.51.0, which the plan stopped installing in the 2026-10-06 hcom relaxation, `docs/decisions/2026-10-06-hcom-relaxation.md`, so the entry only covers a copy left on a host that applied the 2026-10-04 posture; the list is re-reviewed when the rtk pin moves) or as Codex's own allow-only format (`default.rules`, hcom's `hcom.rules`), and any other file refuses `--apply`; `--check` exits 6 for a trusted hook beside such a file; `--allow-exec-rules` accepts).
 
 Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with `check passed`; `--apply` ends with a
 `summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key

@@ -1297,9 +1297,12 @@ class ReceiptAndCommands(unittest.TestCase):
                 ledger.reserve_intent("mvr-t1-0000002", "ABCD", "sell", "61", "3.25", quote=exit_quote, now=now + 1,
                                       market_open=True, session_close=now + 36000)
                 ledger.record_order("mvr-t1-0000002", broker_ids[1], "filled", "61", "3.26", timestamp=now + 1)
+                stream_health = {"frozen": True, "reasons": ["quote_stale"], "fresh_quotes": False,
+                                 "data_timeout_seconds": None}
                 outcome = {"status": "passed", "flat": True, "native_fill_events": 2, "legs": h.book.leg_receipts(),
                            "reconciliation": {"positions_match": True, "cash_match": True,
-                                              "cash_delta_usd": "2.44", "open_orders": 0, "positions": 0}}
+                                              "cash_delta_usd": "2.44", "open_orders": 0, "positions": 0},
+                           "stream_health": stream_health}
                 receipt = mover_runner.build_receipt(plan=h.plan, outcome=outcome, config_sha256="c" * 64,
                                                      scan=h.scan, ledger=ledger, ledger_before=before,
                                                      prefixes=("mvr-t1-", "rec-t1-"))
@@ -1311,6 +1314,9 @@ class ReceiptAndCommands(unittest.TestCase):
         self.assertTrue(receipt["totals"]["pnl_consistent"])
         self.assertEqual(receipt["scan_sha256"], h.scan.sha256)
         self.assertEqual(receipt["reconciliation"]["end"]["cash_match"], True)
+        # The command center's #812 review (P2): the terminal stream freeze and watchdog policy reach the receipt.
+        self.assertEqual(receipt["native"]["stream_health"], stream_health)
+        self.assertIsNone(mover_runner._stream_health(object()))  # a port without the view (simulation, tests)
         body = json.dumps(receipt)
         self.assertIsNone(UUID.search(body))
         for forbidden in ("account_identity", "baseline_cash", '"cash":', '"equity":', "buying_power",

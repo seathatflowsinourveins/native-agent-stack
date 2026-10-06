@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "sharp-review-followup-20261006",
+  "kind": "local_integration_and_record_correction",
+  "recorded_at_utc": "2026-10-06T17:08:53Z",
+  "reviewed_head": "4f32d59d0b411cc69beccac9a2676449c70d0e9d",
+  "sources": [
+    "native-agent-stack@4f32d59d0b411cc69beccac9a2676449c70d0e9d:blueprints/convergence-practice/application-delivery/Makefile:3-5,27-32,34-58",
+    "native-agent-stack@4f32d59d0b411cc69beccac9a2676449c70d0e9d:blueprints/convergence-practice/application-delivery/playwright.config.ts:8-16",
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
+    "https://github.com/lovell/sharp/releases/tag/v0.35.5",
+    "https://pnpm.io/cli/install",
+    "command-center item task-ns2604-coop-20261006T170124Z, ruling 2, relayed by the co-op"
+  ],
+  "checks": {
+    "a_frozen_install": {
+      "argv": ["rtk", "proxy", "env", "COREPACK_HOME=<task-private-state>/corepack", "TMPDIR=<task-private-state>/tmp", "NEXT_TELEMETRY_DISABLED=1", "nice", "-n", "19", "corepack", "pnpm", "install", "--frozen-lockfile", "--npmrc-auth-file", "<owned-worktree>/.local/sharp-20261006/public-registry.npmrc", "--store-dir", "<task-private-state>/pnpm-store", "--state-dir", "<task-private-state>/pnpm-state"],
+      "cwd": "blueprints/convergence-practice/application-delivery",
+      "exit_code": 0,
+      "evidence": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-install.txt",
+      "scope": "Pinned pnpm 12.4.2; frozen lock, no resolution change. This fresh command omits --ignore-scripts; no build/install-script activity was returned."
+    },
+    "a_frontend_build": {
+      "argv": ["rtk", "proxy", "env", "COREPACK_HOME=<task-private-state>/corepack", "TMPDIR=<task-private-state>/tmp", "NEXT_TELEMETRY_DISABLED=1", "nice", "-n", "19", "corepack", "pnpm", "build"],
+      "cwd": "blueprints/convergence-practice/application-delivery",
+      "exit_code": 0,
+      "evidence": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-build.txt",
+      "scope": "Actual Next 16.3.8 frontend production build; upstream's own build workers and cache. Not a browser/image-response or exploit test."
+    },
+    "b_test_db_setup": {
+      "argv": ["rtk", "proxy", "nice", "-n", "19", "make", "postgres-init"],
+      "cwd": "blueprints/convergence-practice/application-delivery",
+      "exit_code": 2,
+      "inner_exit_code": 127,
+      "evidence": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-db-init.txt",
+      "cause": "Recipe binary .runtime/postgresql/18.6/bin/initdb does not exist. No cluster/server/test database was created.",
+      "boundary": "postgres-install explicitly downloads/configures/builds PostgreSQL source; it was not run under the upstream-never-rebuild and quiet-window rules. No host/container/image installer or credential workaround."
+    },
+    "c_browser": {
+      "status": "not_run_in_this_followup",
+      "cause": "Recipe Playwright webServer.url and use.baseURL are fixed to 127.0.0.1:18080, which the co-op identifies as held by the local alert service; no recipe port override is exposed in Makefile/config.",
+      "prior_attempt": "sharp-0355-qualification-20261006.json records browser exit 1 before cases executed.",
+      "boundary": "Alert service untouched; no test/config edit or service takeover."
+    }
+  },
+  "record_correction": "Restore the Mako history row's two literal JSON \\u2192 spellings from base; parsed row values unchanged. No production/frozen lock change in this repair.",
+  "browser_followup": {
+    "registered_date": "2026-10-06",
+    "owner": "github-ci-finalize",
+    "gate": "After tools-wave GO and outside heavy windows, run the unchanged browser recipe in an isolated network namespace if no supported port override exists; first supply its dedicated test DB through an upstream-supported release path.",
+    "completion": "Retain actual cases, exits and outputs; current browser acceptance remains unfinished."
+  },
+  "decision": "Co-op relays the command center's conditional urgent-landing acceptance of the disclosed browser gap: fresh frozen install/build pass plus Mako spelling restoration/registry last; exact new-head ACK remains required.",
+  "evidence_classes": {
+    "frontend_commands": "local_integration, actual native execution",
+    "db_attempt": "failed local prerequisite retained",
+    "browser_port_contract": "source_review plus prior failed local attempt; no new cases",
+    "unchanged_upstream_tests": "not_run",
+    "hosted_new_head": "pending",
+    "original_receipt": "unchanged historical observations, not overwritten"
+  },
+  "sanitization": "Public argv replaces owned/private path prefixes only; build progress CRs, trailing spaces and extra EOF blank lines normalized. A staged whitespace check initially exited 2, then was corrected before push. Actual returned outputs retained privately. No credentials, account values or other conversations."
+}

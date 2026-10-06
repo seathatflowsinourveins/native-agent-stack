@@ -304,7 +304,7 @@
   {
    "layer": "token-efficiency",
    "slot": "code-index",
-   "owner": "jcodemunch-mcp 1.108.319",
+   "owner": "jcodemunch-mcp 1.108.327",
    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
    "installed": true,
    "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"

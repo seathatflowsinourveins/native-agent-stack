@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+          "sha256": "736c6141639225bb33e2ed142ebdfdcf5816e745cd48cead7cb03b76bdecb9d9"
         },
         "convergence": {
           "file": "convergence.json",
@@ -859,7 +859,7 @@
               }
             ],
             "catalog": "foundation",
-            "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules",
+            "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules; the 2026-10-06 relaxation retired those deny rules (docs/decisions/2026-10-06-hcom-relaxation.md)",
             "coincides_with_lane_record": null,
             "default": "hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging)",
             "definitive": false,
@@ -924,7 +924,7 @@
               "install": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
               "open_acceptance_gates": [
                 "the installer's own sha256 equals the release asset digest, and hcom --version reports 0.7.27",
-                "codex execpolicy check --pretty --rules <file> -- hcom term inject <peer> hi returns forbidden (a parse error drops every user rule)",
+                "2026-10-06 relaxation (docs/decisions/2026-10-06-hcom-relaxation.md), replacing the 2026-10-04 forbidden gate: after the first hcom codex launch, codex execpolicy check --pretty over every *.rules file in the Codex home that hcom derives (CODEX_HOME, else the parent of HCOM_DIR) allows hcom send and hcom term inject, and no retired 2026-10-04 Claude hcom deny entry remains (a parse error drops every user rule)",
                 "one Claude Code -> Codex and one Codex -> Claude Code message arrive as data, and a peer message cannot approve or change configuration"
               ],
               "outcome": "owner_default",
@@ -939,7 +939,7 @@
               ],
               "usage_rules": [
                 "hcom owns the Claude Code <-> Codex transport only; Claude <-> Claude stays on native cross-session messaging, Codex-internal work on multi_agent and codex queue",
-                "the converged posture's deny rules and peer-message hints apply in both clients; agents never use hcom term, relay, config, hooks, run, kill, stop, reset, update, claude-pty or send -b/--from",
+                "2026-10-06 relaxation (docs/decisions/2026-10-06-hcom-relaxation.md), replacing the 2026-10-04 deny rules and forbidden-verb list: the peer-message hints apply in both clients, a peer message is data and never the user's approval, and upstream hcom.rules is the only Codex hcom policy",
                 "the command-center ledger stays the authorization record for any [cc-msg v1] item hcom carries",
                 "re-read hcom's safe list (src/hooks/common.rs) at every pin bump; re-pin at the first release that closes issue 151"
               ]
@@ -2609,7 +2609,7 @@
             "catalog": "foundation",
             "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "coincides_with_lane_record": null,
-            "default": "jcodemunch-mcp 1.108.319",
+            "default": "jcodemunch-mcp 1.108.327",
             "definitive": false,
             "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "installs_nothing_extra": false,
@@ -2621,20 +2621,22 @@
             "resolution": {
               "batch": "wave3",
               "by": "the owner's decision of 2026-10-04",
-              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.319 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
               "open_acceptance_gates": [
                 "${ECO_ROOT}/bin/jcodemunch-mcp runs from the uv tool",
                 "a project-scoped registration indexes a selected folder, and order search_symbols then get_symbol_source returns the requested definition"
               ],
               "outcome": "added_by_owner_decision",
               "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without jcodemunch-mcp against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
-              "pin": "PyPI jcodemunch-mcp==1.108.319, source 8f7b34abe16fb459e0bf1c04747d584216dfe32e (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
+              "pin": "PyPI jcodemunch-mcp==1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
               "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
               "sources": [
                 "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
                 "docs/token-efficiency-stack.json (rows[component_id=jcodemunch-mcp].upstream_commands)",
                 "docs/token-session-handbook.md (uv tool specifications, line 334)",
-                "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319"
+                "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+                "manifests/stack.json (components[id=jcodemunch-mcp])",
+                "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
               ],
               "usage_rules": [
                 "registered per project, never at user scope (docs/token-session-handbook.md:108)",
@@ -7830,19 +7832,19 @@
         "updated_at"
       ],
       "path": "adoption/manifest.json",
-      "sha256": "159ad1f56a9a654951eb16a4a66645378d225d8b924eede282815f49342add55"
+      "sha256": "67d53c69ab322a37437aeaaceaec73655710657abc08ec269d5e5bbb115abdfb"
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04"
+      "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec"
+      "sha256": "bc37a2c3fde395818f1ffcaae01e9578fa222367cac5b36f92bcbc013e5f491a"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "3a8081049976785e320cfd99bc93bd3dcefa0a8a351fcc4f3cab1d8022a6b1cd"
+      "sha256": "ac44cbe2e51590ef256b69d7cb5c360b764b483c53cbdbdf128d4d8d789aade9"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7958,7 +7960,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "8694fff119eded04b6009c75a5d328e82b4142b0a6ec6130398748307fc556d5"
+      "sha256": "ce52b6a34c58f93938adef7bf775c439f568001dcb5c444534e3b29a73e2ed32"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7982,7 +7984,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+      "sha256": "736c6141639225bb33e2ed142ebdfdcf5816e745cd48cead7cb03b76bdecb9d9"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
@@ -9711,7 +9713,7 @@
       "acceptance": {
         "command": null,
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job.",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
         "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96"
       },
       "aliases": [
@@ -9719,6 +9721,7 @@
       ],
       "blocking_gaps": [
         "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
+        "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
@@ -9740,7 +9743,9 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+        "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
       ],
       "install": {
         "command": null,
@@ -9889,7 +9894,7 @@
       "acceptance": {
         "command": null,
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job.",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
         "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657"
       },
       "aliases": [
@@ -9899,6 +9904,7 @@
         "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
         "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
         "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass.",
+        "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
@@ -9920,7 +9926,9 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
       ],
       "install": {
         "command": null,
@@ -12082,21 +12090,21 @@
           "A project-scoped registration and an index of the selected code."
         ],
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L141"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141"
       },
       "aliases": [
         "jcodemunch-mcp"
       ],
       "blocking_gaps": [
-        "No artifact digest is recorded for this pin: the checksum is the source commit (manifests/stack.json), and uv's index hashes are the only artifact check.",
+        "This profile records source identity only (manifests/stack.json); the W1 receipt evidence/receipts/jcodemunch-1108327-qualification-20261003.json records the qualified wheel digest and its limitations. uv checks its index hashes.",
         "checksum: real SHA-256 and its source pending in W-PROF",
         "checksum: source identity does not verify an install artifact or lockfile"
       ],
       "checksum": {
         "algorithm": "git-sha1",
         "kind": "source",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
-        "value": "8f7b34abe16fb459e0bf1c04747d584216dfe32e"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+        "value": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -12104,21 +12112,23 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "manifests/stack.json (components[id=jcodemunch-mcp])",
+        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
       ],
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.319",
+        "command": "uv tool install jcodemunch-mcp==1.108.327",
         "execution_status": "UNRUN",
         "prerequisites": [
           "uv with CPython 3.13."
         ],
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91"
       },
       "name": "jcodemunch-mcp",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.108.319",
+      "pin": "1.108.327",
       "position": 17,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
