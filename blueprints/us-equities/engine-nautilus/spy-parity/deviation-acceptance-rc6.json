@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "deviation_id": "first_v2_run_preceded_review",
+  "accepted_by": "native-agent-stack-5f, the trading-custody gate-owner Claude session for the NautilusTrader destination qualification, acting on the command center's 2026-10-06 relay (task-native-agent-stack-5f-20261006T053021Z) under the user's standing trading-lane authorization; not a user signature",
+  "accepted_utc": "2026-10-06T05:35:35+00:00",
+  "reviewed_harness_local_source_sha256": {
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "run-rc6.py": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+    "compare-rc6.py": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+    "mapping-manifest-rc6.json": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+    "PREREGISTRATION-ADDENDUM-rc6-20261006.md": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38"
+  },
+  "statement": "The rc6 candidate replication (PREREGISTRATION-ADDENDUM-rc6-20261006.md, frozen at native-agent-stack@910351ff0472fe90d97e92a1ade0b69d30c1e7d7) inherits the original v2 replay prefix, whose earlier v2 replays ran before any review and stay superseded (deviation-acceptance-v2.json and replay-history-v2.json, both unchanged), and appends the two retained J2 rc5 attempts of 2026-10-06 (runtime-env 04:40:32Z, documented-env 04:41:27Z), which ran the rc5 harness, not this one. The gate owner accepts that the first replay from exactly the seven reviewed rc6 harness files bound here, run after this acceptance and after an independent review record with zero unresolved findings for exactly these files, with the committed candidate history, may qualify under otherwise unchanged sealed criteria, tolerances, data, oracles and economic predicates. The accepted differences are only the binding sites the addendum enumerates: the exact nautilus_trader 2.0.0rc6 version and extension identity, active-source identities, and the explicit maker/taker fee model with the original zero rates. A changed bound file means this acceptance does not bind the harness that runs. No retry from this harness can qualify; each attempt is appended to replay-history-rc6.json before any retry. This acceptance covers SPY one_zero only, qualifies no AAPL case or other SPY case, waives no other precondition and does not decide the runtime-target pin."
+}
