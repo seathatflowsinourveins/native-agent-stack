@@ -16028,7 +16028,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7a11c341ad0c194ae42e4bcd8fc0fc61c3765bb871e97fec31bef03f3c933594",
+      "sha256": "4255ca9f74fa9472707006de37e1337e0601eba126a430494e764d41cc75be59",
       "bytes": 155287
     },
     {
@@ -17398,8 +17398,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "96d70d7cd370613bde8ec1504db1d699698c8f93a33a7f21bce6fe1eb272f6de",
-      "bytes": 185521
+      "sha256": "296be9b2b1c66ce6f4305826dc0f1bc70837eb0e625616d2a32fb8ea7361d5d1",
+      "bytes": 187056
     },
     {
       "path": "docs/stack.md",
