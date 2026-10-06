@@ -46332,6 +46332,11 @@
       "bytes": 17035
     },
     {
+      "path": "evidence/artifacts/skills-tier-a-recorder-20261006/alias-correction.json",
+      "sha256": "7413f2fcabb8aad65191361445a0ad329c6835b9428c66b6fdf58b589a624862",
+      "bytes": 2966
+    },
+    {
       "path": "evidence/artifacts/skills-tier-a-recorder-20261006/source-review.json",
       "sha256": "7482ad13600c5b70934e146c63ec5e44362b98ea2279b24a69cc567a6b316b13",
       "bytes": 6169
@@ -55408,8 +55413,8 @@
     },
     {
       "path": "tests/test_skill_state_recorder.py",
-      "sha256": "bce68682ee1287a5a1e451f42c86d52cfb793efa7dd24d1002ae3e8990a83c44",
-      "bytes": 15016
+      "sha256": "6310149faa9dcc6935543c2f4b44a5ddc475fdcef781f9c38b0d9d8d401f16fa",
+      "bytes": 15744
     },
     {
       "path": "tests/test_skill_usage.py",
@@ -55668,8 +55673,8 @@
     },
     {
       "path": "tools/adoption/skill_state_recorder.py",
-      "sha256": "b4ef03aa20a94c1349afa8771cfa6fb454dd85ce698a5226a21e976624baef7d",
-      "bytes": 20439
+      "sha256": "065133f130be0d170c5524d11b187f09486321490069204d264a85f87adfbdae",
+      "bytes": 20435
     },
     {
       "path": "tools/capability-gate/README.md",
