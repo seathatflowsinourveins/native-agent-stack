@@ -764,6 +764,13 @@ def main(argv=None) -> int:
         # without credentials (counts of the latest rows' flags only). A documented residual for the command center.
         "gateway_logs": gateway_log_exposure(),
         "service_tier_check": service_tier_check,
+        # CC item task-ns2604-coop-20261006T170607Z (2): the pilot's first Codex trial (the gate-0 CL3 native trial on
+        # G1) is the designated calibration cell for the call-id key; grade.call_id_calibration records its pass or fail.
+        "calibration": {"decision": "task-ns2604-coop-20261006T170607Z", "cell": "gate0-G1",
+                        "key": "X-OmniRoute-Request-Id equals the call log's id (or correlationId)",
+                        "on_fail": "G11 stays failed; fix the key from the deployed build's source "
+                                   "(omniroute-3.8.51-5f4b3d577-affinity-pr15167) with file:line and re-run the "
+                                   "calibration; no fallback that reads foreign ids"},
         "claude_session_cap": CLAUDE_SESSION_CAP, "claude_completion": completion, "claude_meter": claude_meter,
         "cells": cells, "cell_codes": cell_codes, "tests_by_ref": tests_by_ref, "schedule": str(root / "schedule.json"),
         "unavailable_cells": suite.UNAVAILABLE_CELLS, "label_vector_sha256": None,

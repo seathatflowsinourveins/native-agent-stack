@@ -2155,7 +2155,9 @@ def tier_evidence(effort: dict, launch_tier) -> dict:
 # GPT read of a513616d, P2 (closure evidence), ruled by CC item task-ns2604-coop-20261006T164313Z: gate 0 and G13
 # require the stage-1 self-test's verified denial of a trial's access to the gateway's log, payload and management
 # routes, and to the other local listeners. A probe that is missing or inconclusive fails, as does any access.
-CLOSURE_EXPECTATIONS = ("codex /api/health refused by the filter", "codex /api/usage/call-logs refused by the filter",
+CLOSURE_EXPECTATIONS = ("qdrant: another trial's collection refused", "qdrant: an unprefixed collection refused",
+                        "qdrant: other routes refused", "vllm: other routes refused",
+                        "codex /api/health refused by the filter", "codex /api/usage/call-logs refused by the filter",
                         "codex dashboard refused by the filter", "codex dot-segment detour refused",
                         "codex percent-encoded detour refused", "ai-memory web interface refused",
                         "ai-memory handoff of another scope refused", "claude has no gateway port",
@@ -2178,6 +2180,51 @@ def gateway_cache_gate(cfg: dict) -> dict:
             "decision": CACHE_RULE_DECISION, "verdict": reading.get("verdict"), "cache_config": reading.get("cache_config"),
             "semantic_cache": semantic, "gateway_build": build, "codex_version": codex_version,
             "rule": "cache on; source evidence at the pinned builds; per-trial readings with 0 hits and unchanged entries"}
+
+
+# Round 6b (CC item task-ns2604-coop-20261006T170607Z, (1)): a tool under test that cannot run inside a trial has its
+# cells marked NOT-TESTABLE with the cause (from the stage-1 self-test), never NOT-READY.
+TESTABILITY_DECISION = "task-ns2604-coop-20261006T170607Z"
+
+
+def mark_testability(oir: dict, selftest: dict | None) -> dict:
+    """Each item|cell row gets testability: "testable", or "NOT-TESTABLE" with its cause, for its tool and client."""
+    tools = (selftest or {}).get("tools_under_test") or {}
+    for key, row in oir.items():
+        item, _, cell = key.partition("|")
+        client = "claude" if cell.startswith(("claude", "prompted-claude")) else "codex"
+        record = (tools.get(item.lower()) or {}).get(client)
+        if record and not record.get("testable"):
+            row["testability"], row["testability_cause"] = "NOT-TESTABLE", record.get("cause")
+        else:
+            row["testability"] = "testable"
+    return oir
+
+
+# Round 6b (CC item task-ns2604-coop-20261006T170607Z, (2)): the pilot's first Codex trial, the gate-0 CL3 native trial
+# on G1, is the designated calibration cell for the call-id key. It passes when every X-OmniRoute-Request-Id its
+# gateway forward recorded matched a call-log row's id or correlationId (common.gateway_calls_for_trial), and at least
+# one did. Otherwise G11 stays failed: the key is fixed from the deployed build's source
+# (omniroute-3.8.51-5f4b3d577-affinity-pr15167), cited by file and line, and the calibration re-runs. There is no
+# fallback that reads foreign ids.
+CALIBRATION_DECISION = "task-ns2604-coop-20261006T170607Z"
+CALIBRATION_KEY = "gate0-G1"
+
+
+def call_id_calibration(root: Path, trial_id: str | None) -> dict:
+    """The calibration cell's record: request ids recorded, matched and unmatched, and the pass or fail."""
+    out = {"decision": CALIBRATION_DECISION, "cell": CALIBRATION_KEY, "trial_id": trial_id,
+           "rule": "every X-OmniRoute-Request-Id the trial's responses carried is a call-log id or correlationId"}
+    path = Path(root) / "gateway" / f"{trial_id}.json" if trial_id else None
+    if not path or not path.exists():
+        return {**out, "pass": False, "cause": "no collected gateway record for the calibration trial"}
+    data = load_json(path)
+    recorded, unmatched = data.get("request_ids") or 0, data.get("unmatched_request_ids")
+    calls = sum(len(v) for v in (data.get("by_thread") or {}).values())
+    passed = bool(recorded) and unmatched == 0 and calls > 0
+    return {**out, "request_ids": recorded, "unmatched_request_ids": unmatched, "calls_matched": calls, "pass": passed,
+            "cause": None if passed else ("no request id recorded" if not recorded else
+                                          f"{unmatched} request id(s) matched no call-log row")}
 
 
 def closure_evidence(selftest: dict | None) -> dict:
@@ -2504,6 +2551,7 @@ def gate0(root: Path) -> dict:
             extra["exec_rules"] = canary_exec_rules(graded, client)
         elif key == "gate0-G1" and graded is not None:
             extra["agreement"] = graded["agreement"]["pass"]
+            extra["call_id_calibration"] = call_id_calibration(root, record["trial_id"])
             extra["code_mode_wrappers_rollout"] = graded["agreement"].get("code_mode_wrappers_rollout")
             extra["loki_functions_exec_excluded"] = graded["agreement"].get("loki_functions_exec_excluded")
             extra["hooks_recorded"] = {"hook_context_items": graded.get("hook_context_items"),
@@ -2697,6 +2745,7 @@ def grade_run(root: Path) -> dict:
                               "exposure": ("not exposed (PATH-only" + ("; vendor-skill surface stratum)" if v["n_vendor_skill_surface"]
                                                                        else ")")) if v["not_exposed_path_only"] and not v["n"] else None}
            for (item, cell), v in per_item.items()}
+    mark_testability(oir, load_json(root / isolation.SELFTEST_FILE) if (root / isolation.SELFTEST_FILE).exists() else None)
     # A verified negative (G15): a valid trial on a control task (R4: G1-G6' are should_not for every item) whose joins
     # and stream-Loki agreement hold, so its non-use of each item is checked against the raw sources. Items it did use
     # are listed as should_not uses: a measurement, not an instrumentation failure.
@@ -2789,6 +2838,12 @@ def grade_run(root: Path) -> dict:
         "failing": {tid: {k: v for k, v in (e or {}).items() if k != "ok"} for tid, e in evidence.items()
                     if not (e or {}).get("ok")}}
     if gates["G11"]["service_tier"]["other"] or fast or gates["G11"]["service_tier"]["evidence"]["failing"]:
+        gates["G11"]["pass"] = False
+    # Round 6b (2): the calibration cell must have passed (gate0.json); otherwise G11 stays failed.
+    calibration = (((load_json(root / "gate0.json") if (root / "gate0.json").exists() else {}).get("checks") or {})
+                   .get(CALIBRATION_KEY) or {}).get("call_id_calibration") or {"pass": False, "cause": "no calibration record"}
+    gates["G11"]["call_id_calibration"] = calibration
+    if not calibration.get("pass"):
         gates["G11"]["pass"] = False
     # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every launched trial's receipt shows each listed
     # answer source hidden from its mount namespace for its whole lifetime, and stage 1's wrapper-only self-test

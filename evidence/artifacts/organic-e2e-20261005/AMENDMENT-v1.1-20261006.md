@@ -129,6 +129,32 @@ Inside the namespace, socat listens on each forward's usual loopback port (`isol
   - the record that its forwards ran.
 - **What a trial can no longer reach:** every other service on the host's loopback (Dagu, Serena, hcom, the codebase-memory daemon, agentsview, Loki, Grafana and the rest), and the internet except Claude's two model hosts. That includes web tools, `gh`, npm (chrome-devtools' `npx`) and socraticode's Qdrant and embedding servers. This is a treatment boundary for the CC: any further forward is added to `NET_FORWARDS` with its reason.
 
+### Round 6b: forwards for the tools under test, NOT-TESTABLE, and the calibration cell (item task-ns2604-coop-20261006T170607Z)
+
+This extends the Gate 0 network amendment above. Each forward serves a tool under test or its local dependency. Each has its reason, its path filter, the tool it serves and a negative test, and nothing else is added.
+
+| Forward | Tool it serves | Path filter | Reason | Negative test |
+| --- | --- | --- | --- | --- |
+| vllm 127.0.0.1:28231 | SocratiCode (`LMSTUDIO_URL`), and the other tools under test with an embedding mode | POST `/v1/embeddings`, GET `/v1/models` | They need embeddings. Embedding calls are stateless and store nothing, so this opens no answer channel. | `/v1/chat/completions`, `/v1/completions`, `/metrics` refused |
+| qdrant 127.0.0.1:21633 | SocratiCode (`QDRANT_URL`, external mode) | GET `/healthz`; GET `/collections` (names only); data operations on `/collections/<the trial's own prefix>*` only | SocratiCode's vector store, reached only through the trial's own collections | another trial's collection, every unprefixed collection, and other routes (`/telemetry`, `/cluster`, `/aliases`) refused |
+
+- **Qdrant: one prefix per trial.**
+  - Each trial gets its own `QDRANT_COLLECTION_PREFIX` (`ns2604_trial_<trial id>_`), set by the wrapper.
+  - SocratiCode 1.15.0 (the installed npm release of tag v1.15.0, commit `0f5a8658`) prefixes every collection with it, its metadata collection included: `dist/constants.js:59-66`, `dist/config.js:193-226`, `dist/services/qdrant.js:1067`.
+  - **GET `/collections` is admitted only because SocratiCode cannot create its collections without it.** It lists them first (`dist/services/qdrant.js:105-118` and `:1090-1100`). The client skips its version check (`checkCompatibility: false`, `:93`, `:99`), so no other route is needed.
+  - The trial builds its own index from its own fixture, and never reaches another trial's collection.
+- **chrome-devtools has no npm forward.** The pinned `chrome-devtools-mcp@1.10.1` is already in the home's npm cache (`~/.npm/_npx`), which the home overlay shows. Every trial runs with `npm_config_offline=true`, so `npx -y chrome-devtools-mcp@1.10.1` starts from the cache with no registry; the self-test checks this in both clients. No loopback dashboard target is forwarded, as no preregistered task spec uses one.
+- **Web tools and `gh` stay off** unless a task's preregistered spec requires them. None of the tools under test needs the internet, and GitHub or web content can carry task answers.
+- **Treatment fact, not a forward:** Claude's server-side web search runs at Anthropic, reached through the existing model API forward.
+- **NOT-TESTABLE, never NOT-READY.** Where a tool under test still cannot run inside a trial, the stage-1 self-test records the cause (`isolation.tool_testability`), and the grader marks that tool's item and cell rows `NOT-TESTABLE` with it (`grade.mark_testability`). On this host:
+  - SocratiCode in Claude cells is NOT-TESTABLE. Claude's user configuration points it at `127.0.0.1:16333` and `127.0.0.1:8231`, where nothing listens on the host either; that is a host configuration matter for the co-op.
+  - SocratiCode in Codex cells, and chrome-devtools in both clients, are testable.
+- **The calibration cell (2).** The pilot's first Codex trial, the gate-0 CL3 native trial on G1 (`gate0-G1`), is the designated calibration cell for the call-id key. run.json records the designation.
+  - **Pass:** every `X-OmniRoute-Request-Id` its gateway forward recorded matched a call-log row's id or correlation id, and at least one did (`grade.call_id_calibration`).
+  - **Required by:** gate 0 (the `gate0-G1` check) and G11.
+  - **If it fails, G11 stays failed.** The key is then fixed from the deployed build's source (`omniroute-3.8.51-5f4b3d577-affinity-pr15167`), cited by file and line, and the calibration re-runs. There is no fallback that reads foreign ids.
+- **Claude's credentials file** written back to the host is accepted as is (CC 17:06Z).
+
 ### The GPT read of a513616d (CHANGES_REQUESTED), folded in (item 164313Z)
 
 - **P1, the call-log detail GET.** The command guard permits it through its id exception (`scripts/hooks/secret_path_guard.py:4657-4658`). Under the CC's interim rule, `common.gateway_calls_for_trial` replaces the thread scan:
@@ -666,6 +692,13 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **Round 6b** (the tools-under-test forwards, NOT-TESTABLE and the calibration cell): the focused module passes 93 of 93 tests, client starts included.
+  - **Red run.** On the round-6 head (the closure commit), exactly its 7 tests are red (1 fails, 6 error), and the other 86 pass.
+  - **Stage-1 self-test:**
+    - 27 of 27 network expectations are met: Qdrant answers its health, the collection names and the trial's own collections, and refuses another trial's collection, an unprefixed one and other routes; vLLM answers models and embeddings and refuses other routes;
+    - 79 probes are hidden, all with ENOENT, and 7 of 7 client checks pass;
+    - the tools-under-test record is as described above.
+  - **Read-only re-grade of smoke-20261006c:** the run root is unchanged, and no gate's pass changes against its 10:48Z grade. G11's calibration record is missing, so G11 fails, as it does closed.
 - **The answer-channel closure commit:** the focused module passes 87 of 87 tests, client starts included.
   - **Red run.** On the round-6 commit without it, exactly its 11 closure tests are red (9 fail, 2 error), and the other 76 pass.
   - **Stage-1 self-test** with the overlay and the closed stores:

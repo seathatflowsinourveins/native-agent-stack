@@ -16,7 +16,8 @@ or experiment word while sessions run.
    host harness file moved since the protocol's hashes, one Claude probe is added and the give-way rule drops
    G1|claude-sdk, so the Claude total stays 14. Stage 1 refuses a Claude schedule above 14.
 2  Gate 0: the Codex probes and canaries (gh auth through the shell, and through ctx_batch_execute in both Codex arms;
-   the exec-rules canary), the gate-0 CL3 native trial on G1, then the Claude probe if one is required; collect.py on those trials and
+   the exec-rules canary), the gate-0 CL3 native trial on G1 (the designated call-id calibration cell, CC item
+   task-ns2604-coop-20261006T170607Z: grade.call_id_calibration, required by gate 0 and G11), then the Claude probe if one is required; collect.py on those trials and
    grade.py gate0. Stages 3 and 4 never start unless gate0.json passes.
 3  The prompted oracle runs: --prompted entries with "stage": 3 (stage3-oracles.json for the pilot), in their own
    oracle-<base cell> cells, one block per cell.

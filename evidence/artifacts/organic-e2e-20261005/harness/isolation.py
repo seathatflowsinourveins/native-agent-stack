@@ -221,16 +221,49 @@ NET_FORWARDS = {
                   "and the lifecycle hooks' routes (POST /hook, POST /hook/batch, GET /handoff: "
                   "crates/ai-memory-hooks/src/router.rs:605-611 at v2.5.2), whose queries must name the trial's "
                   "scope. The web interface, /admin and every other route stay out."},
+    # Round 6b (CC item task-ns2604-coop-20261006T170607Z, (1)): the local dependencies of the tools under test.
+    "vllm": {
+        "clients": ["claude", "codex"], "listen": 28231, "kind": "http", "upstream": ["127.0.0.1", 28231],
+        "rules": [{"exact": "/v1/embeddings", "methods": ["POST"]}, {"exact": "/v1/models", "methods": ["GET"]}],
+        "tool": "socraticode (LMSTUDIO_URL http://127.0.0.1:28231/v1), and the other tools under test with an embedding "
+                "mode",
+        "reason": "SocratiCode and the other tools under test with embedding modes need it. Embedding calls are "
+                  "stateless and store nothing, so this opens no answer channel."},
+    "qdrant": {
+        "clients": ["claude", "codex"], "listen": 21633, "kind": "http", "upstream": ["127.0.0.1", 21633],
+        # {prefix} becomes the trial's own QDRANT_COLLECTION_PREFIX (network_for).
+        "rules": [{"exact": "/healthz", "methods": ["GET"]},
+                  {"exact": "/collections", "methods": ["GET"]},
+                  {"prefix": "/collections/{prefix}", "methods": ["GET", "PUT", "POST", "PATCH", "DELETE"]}],
+        "tool": "socraticode (QDRANT_URL http://127.0.0.1:21633, QDRANT_MODE external)",
+        "reason": "SocratiCode's vector store. Data operations reach only the trial's own collections: socraticode "
+                  "1.15.0 prefixes every collection with QDRANT_COLLECTION_PREFIX (dist/constants.js:59-66, "
+                  "dist/config.js:193-226, its metadata collection dist/services/qdrant.js:1067), which the wrapper "
+                  "sets per trial. GET /collections (names only) is admitted because socraticode cannot create its "
+                  "collections without it (dist/services/qdrant.js:105-118 and 1090-1100 list the collections first). "
+                  "The trial builds its own index from its own fixture; another trial's collection is never reachable."},
     "model-egress": {
         "clients": ["claude"], "listen": PROXY_PORT, "kind": "connect",
         "allow": [["api.anthropic.com", 443], ["platform.claude.com", 443]],
         "reason": "Claude Code's model API and OAuth token refresh: the installed 2.1.291 binary's BASE_API_URL "
                   "https://api.anthropic.com and TOKEN_URL https://platform.claude.com/v1/oauth/token. Claude Code "
-                  "honours HTTPS_PROXY, which the wrapper sets for Claude trials only. TLS stays end to end."},
+                  "honours HTTPS_PROXY, which the wrapper sets for Claude trials only. TLS stays end to end. A "
+                  "treatment fact, not a forward: Claude's server-side web search runs at Anthropic, reached through "
+                  "this same API."},
 }
+# Round 6b: web tools and gh stay off (no forward) unless a task's preregistered spec requires one: none of the tools
+# under test needs the internet, and GitHub or web content can carry task answers.
+
+
+def qdrant_prefix(trial_id: str) -> str:
+    """The trial's own Qdrant collection prefix (socraticode accepts [A-Za-z0-9_-] only)."""
+    return "ns2604_trial_" + "".join(ch for ch in trial_id if ch.isalnum()).lower() + "_"
 NET_ENV = {"claude": [["HTTPS_PROXY", f"http://127.0.0.1:{PROXY_PORT}"], ["https_proxy", f"http://127.0.0.1:{PROXY_PORT}"],
                       ["NO_PROXY", "127.0.0.1,localhost,::1"], ["no_proxy", "127.0.0.1,localhost,::1"]],
            "codex": []}
+# Round 6b, for every trial: npm resolves only from the cache already in the home (no registry: chrome-devtools-mcp
+# 1.10.1 sits in ~/.npm/_npx), and socraticode names its collections with the trial's own prefix (network_for).
+NET_ENV_ALL = [["npm_config_offline", "true"]]
 # (B) Inside the namespace, before the client: one socat listener per forward on its usual loopback port, connected to
 # the forward's Unix socket (sandbox-runtime's bridge, README.md line 553 at v0.0.78). The client starts only once every
 # port listens (read from /proc/net/tcp, so no connection is made), and the trial fails closed otherwise.
@@ -367,15 +400,21 @@ def network_for(client: str, trial_id: str, private=None) -> dict:
     socket it is served on outside when private is given; the environment the wrapper adds; and the ai-memory scope the
     hook routes must name."""
     forwards = {}
+    prefix = qdrant_prefix(trial_id)
     for name, forward in NET_FORWARDS.items():
         if client in forward["clients"]:
-            entry = {k: v for k, v in forward.items() if k != "clients"}
+            entry = json.loads(json.dumps({k: v for k, v in forward.items() if k != "clients"}))
+            for rule in entry.get("rules") or []:
+                if "{prefix}" in rule.get("prefix", ""):
+                    rule["prefix"] = rule["prefix"].replace("{prefix}", prefix)
             if private is not None:
                 entry["socket"] = str(Path(private) / "net" / client / f"{name}.sock")
             forwards[name] = entry
+    setenv = [list(pair) for pair in NET_ENV.get(client, [])] + [list(pair) for pair in NET_ENV_ALL] \
+        + [["QDRANT_COLLECTION_PREFIX", prefix]]
     return {"decision": ROUND6_DECISION, "namespace": "own (--unshare-net)", "forwards": forwards,
-            "setenv": [list(pair) for pair in NET_ENV.get(client, [])], "inside_dir": str(NET_DIR_INSIDE),
-            "scope": {"workspace": AI_MEMORY_WORKSPACE, "project": trial_id}}
+            "setenv": setenv, "inside_dir": str(NET_DIR_INSIDE),
+            "scope": {"workspace": AI_MEMORY_WORKSPACE, "project": trial_id}, "qdrant_prefix": prefix}
 
 
 def network_policy(network: dict | None) -> dict | None:
@@ -1208,6 +1247,8 @@ def selftest(cfg: dict | None = None, run_root=None, clients: bool = False) -> d
         # management routes, the other local listeners and any direct egress do not; Claude's model egress reaches only
         # its listed hosts.
         report["network"] = network_probes(plans)
+        # Round 6b: which tools under test can run inside a trial (the grader marks the others NOT-TESTABLE).
+        report["tools_under_test"] = tool_testability(plans, report["network"])
         # P2-2: the host execution brokers are unreachable from the namespace.
         report["host_brokers"] = host_broker_probes(plans["claude"])
         if clients:
@@ -1322,10 +1363,58 @@ def host_broker_probes(plan_: dict) -> dict:
 # ROUND6_DECISION (B): local listeners the network probes sample, each asked only where it answers on the host.
 LISTENER_SAMPLE = (("Dagu", 21080), ("Serena's MCP server", 24282), ("agentsview", 21808), ("Loki", 21300),
                    ("Grafana", 21301), ("the codebase-memory daemon", 9749), ("the older gateway", 20128),
-                   ("vLLM", 28231), ("Prometheus", 21090), ("the gateway's WebSocket", 21129))
+                   ("Alertmanager", 21093), ("Prometheus", 21090), ("the gateway's WebSocket", 21129))
+FORWARDED_PORTS = {forward["listen"] for forward in NET_FORWARDS.values()}
 # One line per probe: label|curl exit code|HTTP status|X-Trial-Network header. No body is kept; no credential is sent.
 PROBE_SCRIPT = ('probe() { label=$1; shift; out=$(curl -s -o /dev/null -m 20 -w "%{http_code} %header{x-trial-network}" '
                 '"$@"); rc=$?; echo "$label|$rc|$out"; }\n')
+
+
+# Round 6b (CC item task-ns2604-coop-20261006T170607Z, (1)): the tools under test with a network dependency, and where
+# each client's configuration points them. A tool whose dependency no forward serves, or which does not start in a
+# trial, has its cells marked NOT-TESTABLE with the cause (grade.mark_testability), never NOT-READY.
+TOOLS_WITH_DEPENDENCIES = {"socraticode": {"forwards": ("qdrant", "vllm"), "env": ("QDRANT_URL", "LMSTUDIO_URL")},
+                           "chrome-devtools": {"start": ["npx", "-y", "chrome-devtools-mcp@1.10.1", "--version"]}}
+
+
+def _client_mcp_env(client: str, server: str) -> dict:
+    """The env one client's own configuration gives an MCP server (URL values only are read)."""
+    try:
+        if client == "claude":
+            servers = json.loads((HOME / ".claude.json").read_text()).get("mcpServers") or {}
+        else:
+            import tomllib
+            servers = tomllib.loads((CODEX_HOME_REAL / "config.toml").read_text()).get("mcp_servers") or {}
+    except (OSError, ValueError):
+        return {}
+    env = (servers.get(server) or {}).get("env") or {}
+    return {k: v for k, v in env.items() if isinstance(v, str) and v.startswith("http")}
+
+
+def tool_testability(plans: dict, network: dict) -> dict:
+    """Per tool under test and client: testable, or NOT-TESTABLE with its cause."""
+    from urllib.parse import urlparse
+    expect = network.get("expect") or {}
+    ports = {name: forward["listen"] for name, forward in NET_FORWARDS.items()}
+    out: dict = {}
+    for client, plan_ in plans.items():
+        env = _client_mcp_env(client, "socraticode")
+        unserved = []
+        for key in TOOLS_WITH_DEPENDENCIES["socraticode"]["env"]:
+            port = urlparse(env.get(key, "")).port
+            if port not in (ports["qdrant"], ports["vllm"]):
+                unserved.append(f"{key} points at 127.0.0.1:{port}, which no forward serves (nothing listens there on "
+                                "the host either)" if port else f"{key} is not configured")
+        reachable = expect.get("qdrant health answers") and expect.get("vllm models answer")
+        cause = "; ".join(unserved) or (None if reachable else "Qdrant or vLLM did not answer through the forwards")
+        out.setdefault("socraticode", {})[client] = {"testable": cause is None, "cause": cause}
+        result, _ = run_wrapped(plan_, TOOLS_WITH_DEPENDENCIES["chrome-devtools"]["start"], timeout=120)
+        tail = (result.stderr or result.stdout).strip().splitlines()[-1:] or [""]
+        out.setdefault("chrome-devtools", {})[client] = {
+            "testable": result.returncode == 0,
+            "cause": None if result.returncode == 0 else
+            f"chrome-devtools-mcp@1.10.1 does not start offline (rc {result.returncode}): {public_text(tilde(tail[0]))[:120]}"}
+    return out
 
 
 def _listening(port: int) -> bool:
@@ -1357,7 +1446,7 @@ def network_probes(plans: dict) -> dict:
     - Claude: the model egress proxy tunnels to api.anthropic.com only, and the gateway's port is closed.
     Each verdict keeps the curl exit code, the HTTP status and whether the filter answered."""
     other = str(uuid.uuid4())
-    listeners = [(name, port) for name, port in LISTENER_SAMPLE if _listening(port)]
+    listeners = [(name, port) for name, port in LISTENER_SAMPLE if _listening(port) and port not in FORWARDED_PORTS]
     gw, mem, otlp = "http://127.0.0.1:21128", "http://127.0.0.1:29374", "http://127.0.0.1:21318"
     codex = [("v1_models", [f"{gw}/v1/models"]),
              ("api_health", [f"{gw}/api/health"]),
@@ -1372,6 +1461,22 @@ def network_probes(plans: dict) -> dict:
              ("otlp_post_empty", ["-X", "POST", "-H", "Content-Type: application/x-protobuf", "--data-binary", "",
                                   f"{otlp}/v1/logs"]),
              ("direct_egress", ["--noproxy", "*", "https://example.com/"])]
+    # Round 6b: the tools-under-test forwards, path-filtered.
+    own_prefix = plans["codex"]["network"]["qdrant_prefix"]
+    other_prefix = qdrant_prefix(other)
+    qd, vl = "http://127.0.0.1:21633", "http://127.0.0.1:28231"
+    codex += [("qdrant_healthz", [f"{qd}/healthz"]),
+              ("qdrant_list", [f"{qd}/collections"]),
+              ("qdrant_own", [f"{qd}/collections/{own_prefix}codebase_probe"]),
+              ("qdrant_other_trial", [f"{qd}/collections/{other_prefix}codebase_probe"]),
+              ("qdrant_unprefixed", [f"{qd}/collections/socraticode_metadata"]),
+              ("qdrant_other_route", [f"{qd}/telemetry"]),
+              ("vllm_models", [f"{vl}/v1/models"]),
+              ("vllm_embeddings", ["-X", "POST", "-H", "Content-Type: application/json", "--data", "{}",
+                                   f"{vl}/v1/embeddings"]),
+              ("vllm_chat", ["-X", "POST", "-H", "Content-Type: application/json", "--data", "{}",
+                             f"{vl}/v1/chat/completions"]),
+              ("vllm_metrics", [f"{vl}/metrics"])]
     codex += [(f"listener_{port}", ["--noproxy", "*", f"http://127.0.0.1:{port}/"]) for _, port in listeners]
     claude = [("model_egress", ["https://api.anthropic.com/"]),
               ("egress_other_host", ["https://example.com/"]),
@@ -1408,6 +1513,15 @@ def network_probes(plans: dict) -> dict:
         and k["egress_other_host"]["rc"] not in (0, None),
         "claude has no gateway port": refused(k.get("gateway_port")),
         "claude direct egress fails": bool(k.get("direct_egress")) and k["direct_egress"]["rc"] not in (0, None),
+        "qdrant health answers": answered(c.get("qdrant_healthz")),
+        "qdrant collection names answer": answered(c.get("qdrant_list")),
+        "qdrant own collections reach Qdrant": answered(c.get("qdrant_own")),
+        "qdrant: another trial's collection refused": denied(c.get("qdrant_other_trial")),
+        "qdrant: an unprefixed collection refused": denied(c.get("qdrant_unprefixed")),
+        "qdrant: other routes refused": denied(c.get("qdrant_other_route")),
+        "vllm models answer": answered(c.get("vllm_models")),
+        "vllm embeddings reach vLLM": answered(c.get("vllm_embeddings")),
+        "vllm: other routes refused": denied(c.get("vllm_chat")) and denied(c.get("vllm_metrics")),
         "local listeners refused (codex)": all(refused(c.get(f"listener_{port}")) for _, port in listeners),
         "local listeners refused (claude)": all(refused(k.get(f"listener_{port}")) for _, port in listeners)}
     return {"decision": ROUND6_DECISION, "listeners_sampled": [f"{name} ({port})" for name, port in listeners],

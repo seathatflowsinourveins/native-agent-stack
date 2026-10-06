@@ -567,9 +567,10 @@ class G13Check(unittest.TestCase):
         import isolation
         codex = isolation.network_for("codex", "t")
         claude = isolation.network_for("claude", "t")
-        self.assertEqual(sorted(codex["forwards"]), ["ai-memory", "gateway", "otlp"])
-        self.assertEqual(sorted(claude["forwards"]), ["ai-memory", "model-egress", "otlp"])
-        self.assertEqual(codex["setenv"], [])
+        self.assertEqual(sorted(codex["forwards"]), ["ai-memory", "gateway", "otlp", "qdrant", "vllm"])
+        self.assertEqual(sorted(claude["forwards"]), ["ai-memory", "model-egress", "otlp", "qdrant", "vllm"])
+        self.assertNotIn("HTTPS_PROXY", [k for k, _ in codex["setenv"]])
+        self.assertEqual(sorted(k for k, _ in codex["setenv"]), ["QDRANT_COLLECTION_PREFIX", "npm_config_offline"])
         self.assertIn(["HTTPS_PROXY", "http://127.0.0.1:3128"], claude["setenv"])
         self.assertEqual(codex["forwards"]["gateway"]["rules"][0]["prefix"], "/v1/")
         self.assertEqual(claude["forwards"]["model-egress"]["allow"], [["api.anthropic.com", 443],
@@ -651,6 +652,44 @@ class NetFilterRules(unittest.TestCase):
             with self.assertRaises(self.nf.Denied, msg=target):
                 self.nf.connect_target(target, allow)
 
+    def test_qdrant_admits_only_the_trials_own_collections(self):
+        """Round 6b (CC item task-ns2604-coop-20261006T170607Z, (1)): health, the collection names (socraticode 1.15.0
+        lists them before creating its own), and data operations on the trial's own prefixed collections only."""
+        import isolation
+        trial, other_trial = str(uuid.uuid4()), str(uuid.uuid4())
+        qdrant = isolation.network_for("codex", trial)["forwards"]["qdrant"]
+        own = isolation.qdrant_prefix(trial)
+        other = isolation.qdrant_prefix(other_trial)
+        for method, target in (("GET", "/healthz"), ("GET", "/collections"), ("PUT", f"/collections/{own}codebase_x"),
+                               ("POST", f"/collections/{own}codebase_x/points/query"),
+                               ("PUT", f"/collections/{own}codebase_x/points?wait=true"),
+                               ("GET", f"/collections/{own}socraticode_metadata"),
+                               ("DELETE", f"/collections/{own}codegraph_x")):
+            self.assertTrue(self.admits(qdrant, method, target), (method, target))
+        for method, target in (("GET", f"/collections/{other}codebase_x"),
+                               ("POST", f"/collections/{other}codebase_x/points/scroll"),
+                               ("GET", "/collections/socraticode_metadata"), ("GET", "/collections/codebase_abc"),
+                               ("POST", "/collections"), ("GET", "/telemetry"), ("GET", "/cluster"), ("GET", "/aliases"),
+                               ("GET", f"/collections/{own[:-1]}"), ("GET", f"/collections/{own}x/../../{other}x")):
+            self.assertFalse(self.admits(qdrant, method, target), (method, target))
+
+    def test_vllm_admits_embeddings_and_models_only(self):
+        import isolation
+        vllm = isolation.NET_FORWARDS["vllm"]
+        self.assertTrue(self.admits(vllm, "POST", "/v1/embeddings"))
+        self.assertTrue(self.admits(vllm, "GET", "/v1/models"))
+        for method, target in (("POST", "/v1/chat/completions"), ("POST", "/v1/completions"), ("GET", "/metrics"),
+                               ("GET", "/v1/embeddings"), ("POST", "/v1/models"), ("GET", "/health")):
+            self.assertFalse(self.admits(vllm, method, target), (method, target))
+
+    def test_each_trial_gets_its_own_collection_prefix(self):
+        import isolation
+        first, second = isolation.network_for("claude", "a" * 8 + "-1"), isolation.network_for("codex", "b" * 8 + "-2")
+        self.assertNotEqual(first["qdrant_prefix"], second["qdrant_prefix"])
+        self.assertIn(["QDRANT_COLLECTION_PREFIX", first["qdrant_prefix"]], first["setenv"])
+        self.assertIn(["npm_config_offline", "true"], second["setenv"])
+        self.assertRegex(first["qdrant_prefix"], r"\A[A-Za-z0-9_-]+\Z")   # socraticode's own check (constants.js:61)
+
     def test_a_request_head_is_parsed_strictly(self):
         nf = self.nf
         self.assertEqual(nf.parse_head(b"GET /v1/models HTTP/1.1\r\nHost: x")[0:3], ("GET", "/v1/models", "HTTP/1.1"))
@@ -731,6 +770,42 @@ class Round5Grading(unittest.TestCase):
         tags = grade.host_service_tags({"calls": calls}, "claude")
         self.assertEqual(tags, {"wsl-interop": ["p", "w"], "gateway-management-api": ["g"], "local-service-http": ["l"],
                                 "ai-memory-http": ["m"]})
+
+    def test_a_tool_that_cannot_run_is_not_testable(self):
+        """Round 6b (1): a tool under test that cannot run inside a trial has its cells marked NOT-TESTABLE with the
+        cause, never NOT-READY; the others are testable."""
+        import grade
+        oir = {"socraticode|claude-native": {}, "socraticode|codex-native": {}, "chrome-devtools|codex-env": {},
+               "jcodemunch|claude-env": {}}
+        selftest = {"tools_under_test": {
+            "socraticode": {"claude": {"testable": False, "cause": "QDRANT_URL points at 127.0.0.1:16333"},
+                            "codex": {"testable": True, "cause": None}},
+            "chrome-devtools": {"codex": {"testable": False, "cause": "does not start offline"}}}}
+        grade.mark_testability(oir, selftest)
+        self.assertEqual(oir["socraticode|claude-native"]["testability"], "NOT-TESTABLE")
+        self.assertIn("16333", oir["socraticode|claude-native"]["testability_cause"])
+        self.assertEqual(oir["socraticode|codex-native"]["testability"], "testable")
+        self.assertEqual(oir["chrome-devtools|codex-env"]["testability"], "NOT-TESTABLE")
+        self.assertEqual(oir["jcodemunch|claude-env"]["testability"], "testable")
+        self.assertNotIn("NOT-READY", json.dumps(oir))
+
+    def test_the_calibration_cell_passes_only_on_a_matched_key(self):
+        """Round 6b (2): the gate-0 CL3 G1 trial calibrates the call-id key; any unmatched id, no id or no record
+        fails it (and so G11)."""
+        import grade
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "gateway").mkdir()
+            def write(tid, data):
+                (root / "gateway" / f"{tid}.json").write_text(json.dumps(data))
+            write("ok", {"request_ids": 3, "unmatched_request_ids": 0, "by_thread": {"t": [{"id": "a"}, {"id": "b"}]}})
+            write("unmatched", {"request_ids": 3, "unmatched_request_ids": 1, "by_thread": {"t": [{"id": "a"}]}})
+            write("none", {"request_ids": 0, "unmatched_request_ids": 0, "by_thread": {}})
+            self.assertTrue(grade.call_id_calibration(root, "ok")["pass"])
+            for tid in ("unmatched", "none", "missing", None):
+                result = grade.call_id_calibration(root, tid)
+                self.assertFalse(result["pass"], tid)
+                self.assertTrue(result["cause"], tid)
 
     def test_g11_fails_closed_on_tier_evidence(self):
         """GPT read of a513616d, P2: the launch tier must be default and every call's forwarded tier normal. A missing
@@ -1278,6 +1353,25 @@ class NetworkNamespace(unittest.TestCase):
                                     ("logs", ["--noproxy", "*", "http://127.0.0.1:21128/api/usage/call-logs?limit=1"])])
         for label, result in out.items():
             self.assertEqual(result["rc"], 7, (label, result))   # curl: could not connect
+
+    def test_qdrant_and_vllm_forwards_are_path_filtered(self):
+        """Round 6b (1): another trial's collection and every unprefixed collection are refused by the filter; the
+        trial's own collections reach Qdrant; vLLM answers embeddings and models only."""
+        import isolation
+        own = self.plans["codex"]["network"]["qdrant_prefix"]
+        other = isolation.qdrant_prefix(str(uuid.uuid4()))
+        qd, vl = "http://127.0.0.1:21633", "http://127.0.0.1:28231"
+        out = self.probe("codex", [("other", [f"{qd}/collections/{other}codebase_x"]),
+                                   ("unprefixed", [f"{qd}/collections/socraticode_metadata"]),
+                                   ("own", [f"{qd}/collections/{own}codebase_x"]),
+                                   ("health", [f"{qd}/healthz"]),
+                                   ("chat", ["-X", "POST", "--data", "{}", f"{vl}/v1/chat/completions"]),
+                                   ("models", [f"{vl}/v1/models"])])
+        for label in ("other", "unprefixed", "chat"):
+            self.assertEqual((out[label]["status"], out[label]["denied"]), ("403", True), (label, out[label]))
+        for label in ("own", "health", "models"):
+            self.assertFalse(out[label]["denied"], (label, out[label]))
+            self.assertEqual(out[label]["rc"], 0, (label, out[label]))
 
     def test_other_local_listeners_are_unreachable(self):
         self.assertGreaterEqual(len(self.listeners), 3, self.listeners)
