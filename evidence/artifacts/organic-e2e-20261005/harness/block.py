@@ -37,6 +37,7 @@ from common import (append_jsonl, classify_provider_error, clean_login_env, clon
                     current_s7_baseline, gateway_build, gateway_get, load_json, read_jsonl, rebaseline_cost_ok,
                     rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change, sha256_file,
                     stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp, write_json)
+import isolation  # noqa: E402
 
 
 def stop_flags(root: Path, client: str, cell: str | None = None) -> list[str]:
@@ -269,13 +270,25 @@ def main(argv=None) -> int:
             # Finding 1: the attempt's clone trust (hooks_state, projects, trusted set) before and after, as the
             # launcher's S7 snapshot judges the other Codex cells.
             clone_before = clone_trust_view(work / "clones" / trial["trial_id"])
+            iso_plan = iso_receipt = None
+            if cfg.get("isolation"):
+                # The structural G13 (CC item task-ns2604-coop-20261006T132948Z): promptfoo's provider runs the
+                # attempt's wrapper as codex (its codex_path_override), so the wrapper's options come from a fresh plan
+                # written here, just before the eval.
+                codex_real = (cfg.get("binaries") or {}).get("codex", {}).get("realpath") \
+                    or os.path.realpath(Path.home() / ".local/bin/codex")
+                iso_plan = isolation.plan(cfg, root, trial["trial_id"], "codex", Path(trial["fixture_private"]),
+                                          clone=work / "clones" / trial["trial_id"])
+                isolation.write_app_server_wrapper(iso_plan, codex_real)
+                iso_receipt = isolation.receipt(iso_plan, [codex_real, "app-server", "<the provider's arguments>"])
             # CL7b has no launcher, so its launched row carries the gateway build (CL9, G11) the launcher records for
             # the other Codex cells, and the attempt's config name, by which a resume finds a still-running attempt.
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
                                                  "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
                                                  "test_key": trial["test_key"], "phase": "launched", "at": started,
                                                  "gateway_build": row.get("gateway_build"), "config_name": config.name,
-                                                 "attempt": trial.get("attempt", 1),
+                                                 "attempt": trial.get("attempt", 1), "isolation": iso_receipt,
+                                                 "fixture_private": trial.get("fixture_private"),
                                                  "launched_by": "block.py (CL7b: promptfoo's own provider, no launcher)"})
         with open(log, "wb") as handle:
             proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)
@@ -307,6 +320,7 @@ def main(argv=None) -> int:
                                                  "provider_error_class": error_class, "rate_limited": reason == "rate_limited",
                                                  "host_s7_clone_trust_changed": [f"/clone_config/{k}" for k in clone_changed],
                                                  "attempt": trial.get("attempt", 1),
+                                                 "isolation_runtime": isolation.app_server_runtime(iso_plan) if iso_plan else None,
                                                  "provider_output_sha256": provider[0].get("provider_output_sha256")})
             if reason == "rate_limited":
                 (root / "STOP.codex").write_text(f"{utc_now()} rate_limit_error_from_provider {trial['trial_id']}\n")

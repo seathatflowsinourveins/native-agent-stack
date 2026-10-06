@@ -6,7 +6,11 @@
                         [--amendment-ref TEXT] [--claude-grace-s N] [--claude-expected-usage X]
                         [--gateway-pipeline-details on|off] [--registry-review file]
                         [--allow-provisional-registry] [--repeat-override K] [--skip-oracle-tests] [--skip-quota]
-                        [--allow-timing]
+                        [--allow-timing] [--isolation bwrap|off]
+
+The structural G13 (CC item task-ns2604-coop-20261006T132948Z) is on by default: every trial's client tree runs under
+bwrap with the answer sources hidden (isolation.py), and stage 1 ends with the wrapper-only self-test
+(isolation-selftest.json in the run root; a failed self-test refuses the run).
 
 The defaults carry the command center's decisions on v1.1 (CC item task-ns2604-coop-20261006T105529Z, recorded in
 AMENDMENT-v1.1-20261006.md): complete-at-result with T = 1,800 s (decision 1; another policy or T needs its own
@@ -44,10 +48,11 @@ from common import (CC_V11_DECISIONS, CLAUDE_COMPLETION_DEFAULT, CLAUDE_SESSION_
                     s7_snapshot, sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
 import arms  # noqa: E402
 import fixture  # noqa: E402
+import isolation  # noqa: E402
 import suite  # noqa: E402
 
 HARNESS_FILES = ("common.py", "suite.py", "fixture.py", "arms.py", "launcher.py", "sdk_claude.py", "sdk_codex.mjs",
-                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "stage2-canaries.json",
+                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "isolation.py", "stage2-canaries.json",
                  "stage3-oracles.json")
 PROBE_HASHES = {"claude/CLAUDE.md": "b86ea2c4655637fa", "claude/settings.json": "861959ff0e49803f"}
 BLACKOUTS = (("10:35", "10:55"), ("13:20", "13:45"))
@@ -184,10 +189,13 @@ def promptfoo_config(work: Path, code: str, tests: list[dict]) -> str:
 
 
 def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, clone: Path, gh_dir: Path,
-                      path_value: str, t_seconds: int = T_SECONDS, profile_layer: dict | None = None) -> str:
+                      path_value: str, t_seconds: int = T_SECONDS, profile_layer: dict | None = None,
+                      codex_path: str | None = None) -> str:
     """CL7b: promptfoo's own openai:codex-app-server provider, one provider entry (and config) per trial. cli_config is
     the omniroute profile layer (codex_profile_layer: app-server takes no --profile) plus the CL3 overrides, written as
-    one YAML flow mapping (JSON) that promptfoo flattens into -c key=value pairs."""
+    one YAML flow mapping (JSON) that promptfoo flattens into -c key=value pairs. Under the structural G13, codex_path
+    is the attempt's wrapper (isolation.write_app_server_wrapper, written by block.py just before the eval), which
+    execs bwrap and the real codex."""
     otel = f"ecosystem.task.id={trial_id},ecosystem.lane={test['lane']},service.instance.id={trial_id}"
     # model_reasoning_effort here as well as in the provider's turn settings: CL3 sets it with -c, which is the thread
     # default codex.conversation_starts reports (devcheck-cl7-20261006a: without it the app-server thread started at the
@@ -197,7 +205,7 @@ def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, c
     cfg = [f"description: {yaml_quote(code)}",
            "prompts:", "  - '{{task_text}}'", "providers:",
            "  - id: openai:codex-app-server", f"    label: {yaml_quote(code)}", "    config:",
-           f"      codex_path_override: {yaml_quote(os.path.realpath(HOME / '.local/bin/codex'))}",
+           f"      codex_path_override: {yaml_quote(codex_path or os.path.realpath(HOME / '.local/bin/codex'))}",
            f"      working_dir: {yaml_quote(str(fixture_dir))}", "      skip_git_repo_check: true", "      ephemeral: false",
            "      reuse_server: false", "      approval_policy: never", f"      sandbox_mode: {yaml_quote(test['sandbox'])}",
            "      network_access_enabled: false", "      model: gpt-6.1-sol", "      model_reasoning_effort: max",
@@ -232,7 +240,8 @@ def allocate_app_server_attempt(cfg: dict, root: Path, cell_name: str, cell: dic
     clone_record = arms.build_clone(clone, cell["arm"], gh_dir, rules_text)
     t_seconds = int((cfg.get("claude_completion") or {}).get("t_seconds") or T_SECONDS)
     text = app_server_config(cell.get("code") or cell_name, trial_id, test, fixture_dir, clone, gh_dir,
-                             cfg.get("login_path") or "", t_seconds, cfg.get("codex_profile_layer"))
+                             cfg.get("login_path") or "", t_seconds, cfg.get("codex_profile_layer"),
+                             str(isolation.app_server_wrapper_path(cfg, root, trial_id)) if cfg.get("isolation") else None)
     earlier = {r.get("trial_id") for r in read_jsonl(root / "ledger.jsonl")
                if r.get("phase") == "launched" and r.get("ref") == trial["ref"]}
     neutral = work / "p" / f"{cell.get('code') or 'c'}-{trial_id[:8]}.yaml"
@@ -332,7 +341,8 @@ def main(argv=None) -> int:
                         "the first pilot block)")
     parser.add_argument("--answer-source-path", action="append", default=[],
                         help="decision 3 as confirmed at 11:43Z: a further grader expected-output path outside the run "
-                        "roots and the fixture cache (repeatable); a trial that reads it is invalid")
+                        "roots and the fixture cache (repeatable); the structural G13 hides it from every trial "
+                        "(isolation.py)")
     parser.add_argument("--gateway-pipeline-details", choices=("on", "off"), default=None,
                         help="decision 8 (RP4, G11): whether the co-op turned the gateway's pipeline details on for this "
                         "run; recorded only (the harness never switches them, and keeps only their effort fields)")
@@ -341,12 +351,20 @@ def main(argv=None) -> int:
     parser.add_argument("--allow-provisional-registry", action="store_true",
                         help="development smoke only: let organic trials run on the provisional registry (recorded)")
     parser.add_argument("--repeat-override", type=int, default=None, help="every cell's repeat (smoke runs)")
+    parser.add_argument("--isolation", choices=("bwrap", "off"), default="bwrap",
+                        help=f"the structural G13 ({isolation.ISOLATION_DECISION}): every trial's client tree runs under "
+                        "bwrap with the answer sources hidden (default); off needs --amendment-ref, and G13 then fails")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.run_id):
         parser.error("run id: letters, digits, dot, underscore and hyphen")
     decision_1 = args.claude_completion == CLAUDE_COMPLETION_DEFAULT and args.claude_t_seconds == T_SECONDS
     if not decision_1 and not args.amendment_ref:
         parser.error("a completion policy or T other than decision 1's (complete-at-result, 1,800 s) needs --amendment-ref")
+    if args.isolation == "off" and not args.amendment_ref:
+        parser.error(f"--isolation off departs from the structural G13 ({isolation.ISOLATION_DECISION}): it needs "
+                     "--amendment-ref")
+    if args.isolation == "bwrap" and not os.access(isolation.BWRAP, os.X_OK):
+        parser.error(f"the structural G13 needs bubblewrap at {isolation.BWRAP}")
     if not 0 < args.claude_expected_usage <= METER_CEILING:
         parser.error("--claude-expected-usage is a share of one meter window, in (0, 1]")
     if (args.repeat_override or 1) > 1 and "codex-app-server" in (args.cells or "").split(","):
@@ -620,7 +638,7 @@ def main(argv=None) -> int:
                 clone = work / "clones" / trial_id
                 clone_record = arms.build_clone(clone, spec["arm"], GH_EMPTY, rules_text)
                 text = app_server_config(code, trial_id, test, fixture_dir, clone, GH_EMPTY, path_value, args.claude_t_seconds,
-                                         profile_layer)
+                                         profile_layer, str(work / "iso" / trial_id / "x") if args.isolation == "bwrap" else None)
                 neutral = work / "p" / f"{code}-t{index}.yaml"
                 neutral.write_text(text, encoding="utf-8")
                 record["trials"].append({"trial_id": trial_id, "ref": test["ref"], "test_key": test["test_key"],
@@ -713,6 +731,12 @@ def main(argv=None) -> int:
         "meter_stage1_allows": headroom_allows(meter, args.claude_expected_usage), "quota_stage1": quota,
         "gateway_build": gateway_build(), "gateway_pipeline_details": pipeline_details,
         "answer_source_paths": [str(Path(p).expanduser()).replace(str(HOME), "~", 1) for p in args.answer_source_path],
+        # The structural G13 (CC item task-ns2604-coop-20261006T132948Z): the launcher and block.py run every trial's
+        # client tree under bwrap with the answer sources hidden; stage 1's self-test result is isolation-selftest.json.
+        "isolation": ({"decision": isolation.ISOLATION_DECISION, "wrapper": isolation.BWRAP,
+                       "version": isolation.bwrap_version(), "selftest": isolation.SELFTEST_FILE}
+                      if args.isolation == "bwrap" else None),
+        "isolation_off_amendment": args.amendment_ref if args.isolation == "off" else None,
         "claude_session_cap": CLAUDE_SESSION_CAP, "claude_completion": completion, "claude_meter": claude_meter,
         "cells": cells, "cell_codes": cell_codes, "tests_by_ref": tests_by_ref, "schedule": str(root / "schedule.json"),
         "unavailable_cells": suite.UNAVAILABLE_CELLS, "label_vector_sha256": None,
@@ -729,6 +753,16 @@ def main(argv=None) -> int:
                "quota": quota.get("rc"), "gateway_build": run_json["gateway_build"], "timing": timing,
                "g12": {k: g12[k] for k in ("pass", "differing")}, "registry": registry_status,
                "claude_completion": completion, "claude_sessions": claude_sessions}
+    if run_json["isolation"]:
+        # The wrapper-only smoke (no model call): cat on a real file in each hidden location fails in the namespace,
+        # the trial's own inputs stay readable, and every launch path's binary starts under the wrapper.
+        selftest = isolation.selftest(run_json, root, clients=True)
+        write_json(root / isolation.SELFTEST_FILE, selftest, 0o600)
+        summary["isolation_selftest"] = {"pass": selftest["pass"], "probes": selftest["probes"]}
+        if not selftest["pass"]:
+            summary["refused"] = f"the structural G13's self-test failed (see {isolation.SELFTEST_FILE})"
+            print(json.dumps(summary))
+            return 2
     print(json.dumps(summary))
     return 0
 

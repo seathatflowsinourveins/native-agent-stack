@@ -803,6 +803,15 @@ def deadline_without_result(duration_s, time_to_result_s, t_seconds) -> bool:
     return duration_s >= t_seconds and (not isinstance(time_to_result_s, (int, float)) or time_to_result_s >= t_seconds)
 
 
+def decision_times(row: dict) -> tuple:
+    """(elapsed, result arrival) for the deadline and completion decisions. GPT micro-check of 1f81d645, P3: the
+    launcher's unrounded offsets when it recorded them, so a result that arrived before T (1799.96 s) is never held
+    because a one-decimal presentation field rounded it to T; runs recorded before that keep their rounded fields."""
+    if "duration_exact_s" in row:
+        return row.get("duration_exact_s"), row.get("time_to_result_exact_s")
+    return row.get("duration_s"), row.get("time_to_result_s")
+
+
 PROVIDER_ERROR_CLASSES = (
     ("rate_limit", re.compile(r"rate.?limit|usage limit|session limit|too many requests|\b429\b|quota", re.I)),
     ("timeout", re.compile(r"time.?out|timed out|deadline", re.I)),

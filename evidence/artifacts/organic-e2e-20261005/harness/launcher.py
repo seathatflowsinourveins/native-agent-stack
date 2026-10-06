@@ -42,11 +42,13 @@ sys.path.insert(0, str(HERE))
 
 from common import (CLAUDE_COMPLETION_DEFAULT, CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, LANE, LOCK_WAIT_S,  # noqa: E402
                     POST_RESULT_GRACE_S, PROTOCOL_T_SECONDS, T_SECONDS, append_jsonl, clean_login_env,
-                    current_s7_baseline, deadline_without_result, gateway_build, headroom_allows, load_json, manifest_digest,
+                    current_s7_baseline, deadline_without_result, decision_times, gateway_build, headroom_allows,
+                    load_json, manifest_digest,
                     newest_meter_reading, rate_limit_hit, rate_limit_readings, read_jsonl, rebaseline_cost_ok,
                     rebaselines_between, resume_after, run_expected_usage, s7_persistent_change, sha256_bytes,
                     sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir, tree_manifest, try_rebaseline, utc_now,
                     write_json)
+import isolation  # noqa: E402
 
 RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many requests", "quota")
 # Kill reasons after which the client's remaining tests wait for headroom (DEFER.<client>, cleared by pilot.py on
@@ -61,9 +63,8 @@ def holds_cell(client: str, outcome: dict, t_seconds: int) -> bool:
     rule for all of them, whatever the arm, kind (CLI or SDK) or stage, so the arms stay symmetric. GPT micro-check of
     87f9f1d7, finding 3: the rule reads the evidence, not the exit code: the session reached T with no result event
     before T (common.deadline_without_result), so a timeout that needed its SIGKILL (rc 137) holds the cell too, and a
-    session that failed before T does not."""
-    return client == "claude" and deadline_without_result(outcome.get("duration_s"), outcome.get("time_to_result_s"),
-                                                          t_seconds)
+    session that failed before T does not. GPT micro-check of 1f81d645, P3: on the unrounded offsets (decision_times)."""
+    return client == "claude" and deadline_without_result(*decision_times(outcome), t_seconds)
 BACKGROUND_SUBTYPES = ("background_tasks_changed", "task_started", "task_progress", "task_notification")
 
 
@@ -373,7 +374,24 @@ def _lock(timeout_s: int):
             time.sleep(2)
 
 
-def _kill_group(proc: subprocess.Popen) -> None:
+def _kill_group(proc: subprocess.Popen, wrapped: bool = False) -> None:
+    if wrapped:
+        # Under bwrap (structural G13) a TERM to the whole group would end the wrapper first, and its death SIGKILLs the
+        # namespace (--die-with-parent) before the client can exit gracefully. So TERM goes to the tree below the
+        # wrapper (its PID-1 reaper ignores it and waits for the client), and the group gets KILL after 30 s.
+        for pid, _, _, _ in descendants(proc.pid):
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        return
     try:
         os.killpg(proc.pid, signal.SIGTERM)
     except ProcessLookupError:
@@ -399,18 +417,29 @@ def _defer(root: Path, client: str, reason: str) -> None:
 
 
 def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, stream_path: Path, err_path: Path,
-               meter_source: dict | None) -> dict:
+               meter_source: dict | None, isolation_plan: dict | None = None) -> dict:
     """Run the line and watch it. Returns rc, the kill reason (if the launcher killed it), the result event's arrival
     and the model's final turn end (decision 1), meter readings and rate-limit hits (decision 6), the process-tree
-    observations, and for a Claude trial without a result event before T a no_result_diagnosis."""
+    observations, and for a Claude trial without a result event before T a no_result_diagnosis. With an isolation
+    plan (the structural G13, CC item task-ns2604-coop-20261006T132948Z) the line runs under bwrap, and the result
+    carries the namespace record and, from every tree sample, which mount namespace each process was in."""
     env = clean_login_env()
     policy = completion_policy(cfg)
     expected = run_expected_usage(cfg, root)
     claude_bin, codex_bin = cfg["binaries"]["claude"]["realpath"], cfg["binaries"]["codex"]["realpath"]
+    info_fd = None
     with open(stream_path, "wb") as out, open(err_path, "wb") as err:
-        proc = subprocess.Popen(["bash", "-lc", line], cwd=str(fixture), env=env, stdout=out, stderr=err,
-                                stdin=subprocess.DEVNULL, start_new_session=True)
+        if isolation_plan:
+            proc, info_fd = isolation.spawn(isolation_plan, ["bash", "-lc", line], cwd=str(fixture), env=env, stdout=out,
+                                            stderr=err, stdin=subprocess.DEVNULL, start_new_session=True)
+        else:
+            proc = subprocess.Popen(["bash", "-lc", line], cwd=str(fixture), env=env, stdout=out, stderr=err,
+                                    stdin=subprocess.DEVNULL, start_new_session=True)
     started = time.time()
+    wrapped = isolation_plan is not None
+    iso_info = isolation.read_info(info_fd) if info_fd is not None else None
+    trial_ns, host_ns = isolation.info_namespace(iso_info), isolation.mnt_namespace("self")
+    census: dict[int, tuple[str | None, str]] = {}
     offset, buffer = 0, b""
     first, last, readings = None, None, 0
     kill_reason, kill_at, nested_seen, exes = None, None, [], set()
@@ -518,18 +547,24 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
             if nested:
                 nested_seen.extend(nested)
                 set_kill("nested_client")
+            if wrapped:
+                # The structural G13's lifetime evidence: the mount namespace of every process seen in the tree below
+                # the wrapper (the wrapper itself stays in the host's).
+                for pid, _, exe, _ in descendants(proc.pid):
+                    if pid not in census:
+                        census[pid] = (isolation.mnt_namespace(pid), os.path.basename(exe))
             next_tree = time.time() + 2
         if (client == "claude" and policy["policy"] == "complete-at-result" and result_at is not None and rc is None
                 and time.time() - result_at >= policy["grace_s"]):
             set_kill("post_result_grace")
         if kill_reason and rc is None:
-            _kill_group(proc)
+            _kill_group(proc, wrapped)
             rc = proc.wait()
         if rc is not None:
             break
         if time.time() - started > policy["t_seconds"] + 90:
             set_kill("wall_guard")
-            _kill_group(proc)
+            _kill_group(proc, wrapped)
             rc = proc.wait()
             break
         time.sleep(1)
@@ -555,9 +590,24 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
                                           "events": background["events"], "last_event_s": background["last_event_s"],
                                           "notifications": background["notifications"]},
                      "processes_at_last_poll": last_tree, "result_at_s": round(result_at - started, 1) if result_at else None}
+    runtime = None
+    if wrapped:
+        # A namespace below the trial's (Codex's own sandbox, a nested bwrap, `unshare -rm`) is a copy of the trial's
+        # view with its mounts locked (mount_namespaces(7)), so it is counted apart; only a process in the host's mount
+        # namespace would be one that escaped, and no process of the tree can join that namespace without privilege.
+        seen = {pid: ns for pid, ns in census.items() if ns[0]}
+        runtime = {"info": iso_info, "namespace": trial_ns, "host_namespace": host_ns,
+                   "tree": {"processes_seen": len(seen),
+                            "in_trial_namespace": sum(1 for ns, _ in seen.values() if ns == trial_ns),
+                            "in_nested_namespaces": sum(1 for ns, _ in seen.values() if ns not in (trial_ns, host_ns)),
+                            "outside": [{"exe": exe, "namespace": ns} for ns, exe in seen.values() if ns == host_ns][:20]}}
+    # GPT micro-check of 1f81d645, P3: the deadline and completion decisions read the unrounded offsets
+    # (common.decision_times); the one-decimal fields are presentation only.
     return {"rc": rc, "kill_reason": kill_reason, "kill_at": iso_ms(kill_at) if kill_at else None,
             "duration_s": round(ended - started, 1), "result_at": iso_ms(result_at) if result_at else None,
             "time_to_result_s": round(result_at - started, 1) if result_at else None,
+            "duration_exact_s": ended - started, "time_to_result_exact_s": (result_at - started) if result_at else None,
+            "isolation_runtime": runtime,
             "post_result_s": round(ended - result_at, 1) if result_at else None,
             "result_before_kill": bool(result_at and (kill_at is None or result_at <= kill_at)),
             "result_event": result_info, "final_turn_end_s": final_turn_end_s,
@@ -590,8 +640,9 @@ def stream_completed(client: str, stream_path: Path) -> bool:
 def result_before_t(policy: dict, outcome: dict) -> bool:
     """The result event reached the stream before T. Claude Code in print mode holds its result event while a background
     task (a Workflow run) is still going and writes it when the process is terminated: smoke-20261006c's claude-native
-    result reported duration_ms 575920 but arrived at 900.7 s, after the timeout's SIGTERM, so arrival time decides."""
-    ttr = outcome.get("time_to_result_s")
+    result reported duration_ms 575920 but arrived at 900.7 s, after the timeout's SIGTERM, so arrival time decides. GPT
+    micro-check of 1f81d645, P3: the unrounded arrival decides (decision_times)."""
+    ttr = decision_times(outcome)[1]
     return ttr is not None and ttr < policy["t_seconds"]
 
 
@@ -614,7 +665,7 @@ def trial_reason(client: str, policy: dict, outcome: dict, completed: bool) -> t
     if rc in (137, -9, 143, -15):
         # Finding 3: the timeout's SIGKILL after its grace (rc 137 at T + 30 s) is a deadline outcome, not a failure
         # before T; the elapsed time and the result's arrival decide which.
-        deadline = deadline_without_result(outcome.get("duration_s"), outcome.get("time_to_result_s"), policy["t_seconds"])
+        deadline = deadline_without_result(*decision_times(outcome), policy["t_seconds"])
         return ("timeout_killed" if deadline else "killed"), False
     if not completed:
         return f"incomplete_stream_rc{rc}", False
@@ -761,12 +812,23 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             line = codex_sdk_line(cfg, trial_id, fixture, clone, prompt_file, sandbox, cell_cfg["effort"], lane, t_seconds)
         else:
             raise Censored(f"unsupported_cell_kind:{kind}")
+        iso_plan, iso_receipt = None, None
+        if cfg.get("isolation"):
+            # The structural G13 (CC item task-ns2604-coop-20261006T132948Z): the client's process tree runs in a mount
+            # namespace of its own in which every listed answer source is hidden; the launched row carries the receipt
+            # (wrapper argv, mount operations, the hidden list with its sha256s) that G13 checks.
+            iso_plan = isolation.plan(cfg, root, trial_id, client, fixture, clone=clone, settings=settings_file,
+                                      prompt=prompt_file)
+            isolation.prepare_dirs(iso_plan)
+            iso_receipt = isolation.receipt(iso_plan, ["bash", "-lc", "<line>"])
         exposure = host_argv_exposure(cfg["lexicon"], {os.getpid()})
         launched_at = utc_now()
         ledger(root, {**base, "phase": "launched", "at": launched_at, "line_sha256": sha256_bytes(line.encode()),
                       "line_shape": line.replace(trial_id, "<trial_id>").replace(str(Path.home()), "~"),
-                      "host_argv_exposure_at_launch": exposure})
-        outcome = run_client(root, cfg, client, line, fixture, stream_path, err_path, meter_source)
+                      "host_argv_exposure_at_launch": exposure, "isolation": iso_receipt})
+        outcome = run_client(root, cfg, client, line, fixture, stream_path, err_path, meter_source, iso_plan)
+        if iso_plan:
+            outcome["isolation_runtime"] = {**(outcome.get("isolation_runtime") or {}), **isolation.safe_finish(iso_plan)}
         completed = stream_completed(client, stream_path)
         reason, post_result_terminated = trial_reason(client, policy, outcome, completed)
         result.update({"rc": outcome["rc"], "censored": reason is not None, "reason": reason})
@@ -776,6 +838,8 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                     "completion_amendment": policy["amendment"] if client == "claude" else None,
                     "terminated_by": outcome["kill_reason"], "kill_at": outcome["kill_at"],
                     "result_at": outcome["result_at"], "time_to_result_s": outcome["time_to_result_s"],
+                    "duration_exact_s": outcome["duration_exact_s"], "time_to_result_exact_s": outcome["time_to_result_exact_s"],
+                    "isolation_runtime": outcome.get("isolation_runtime"),
                     "final_turn_end_s": outcome["final_turn_end_s"], "final_turn_end_at": outcome["final_turn_end_at"],
                     "result_event": outcome["result_event"], "no_result_diagnosis": outcome["no_result_diagnosis"],
                     "post_result_s": outcome["post_result_s"], "post_result_terminated": post_result_terminated,

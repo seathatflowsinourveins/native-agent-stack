@@ -3,11 +3,75 @@
 - **Source:** command-center item `task-ns2604-coop-20261006T105529Z`, section "Organic E2E v1.1: the CC's decisions before the pilot", sent 2026-10-06 at 10:55Z. The decisions below keep that item's numbers.
 - **Confirmations:** command-center item `task-ns2604-coop-20261006T114319Z`, sent at 11:43Z, settles the five points this file had marked for confirmation. Each is recorded below as "Confirmed (CC 11:43Z)", with its point number.
 - **Rulings of 12:30Z:** command-center item `task-ns2604-coop-20261006T123036Z` confirms one interpretation and extends decision 1's timing record to every cell. Both are recorded below as "Confirmed (CC 12:30Z)".
+- **Structural G13 of 13:29Z:** command-center item `task-ns2604-coop-20261006T132948Z` replaces decision 3's classifier-based invalidation with a structural G13: the answer sources are hidden from every trial's mount namespace, and the command classifier becomes a diagnostic tag. It is recorded first below, and it governs wherever earlier sections describe G13's invalidation.
 - **Applies to:** PROTOCOL-v1.1.md (organic-e2e-v1.1-20261005), which stays verbatim, and PILOT-SPEC-v1.1.md. Where they differ from this file, this file governs from 2026-10-06 10:55Z.
 - **Harness:** each decision's code is in `harness/`, in the commit that adds this file.
   - `CC_V11_DECISIONS` in `harness/common.py` names the item.
   - `prepare.py` writes this file's sha256 into run.json as `amendment_file_sha256`.
 - **Status:** no pilot or smoke has run under these changes. The checks under Verification are synthetic or offline.
+
+## Structural G13 (CC 13:29Z)
+
+Item `task-ns2604-coop-20261006T132948Z` decided that a classifier of the commands a model typed cannot converge, because shell grammar always has another form: aliases, xargs, find actions, subshells, `python -c`, here-docs. So G13 is now structural. `harness/isolation.py` implements it.
+
+1. **Every listed answer source is hidden from each trial's mount namespace.** Two components run each trial's client process tree under bubblewrap:
+   - the launcher, for every CLI and SDK cell and for the prompted and gate-0 cells;
+   - block.py, for CL7b, through the provider's `codex_path_override`, which points at a per-attempt wrapper.
+   - **Empty tmpfs:**
+     - the coordination state: every run root with its oracle runs, other trials' drafts, grades, run.json and gate0.json; the suite cards; the v1 captures;
+     - the fixture cache: oracles.json, oracle-work, the templates and the tarballs.
+   - **Empty tmpfs with the trial's own entries bound back:**
+     - the fixtures folder `~/.cache/ws`: the trial's own fixture only;
+     - the trial-files folder `~/.cache/wsr`: the trial's own prompt, settings, clone and -o file, and the run's neutral binaries;
+     - the Claude projects folder: every project outside the experiment's roots, and the trial's own.
+   - **A fresh per-trial folder over each per-session client store:**
+     - the shared Codex sessions folder, which the clone's `sessions` alias points at;
+     - Claude's file history;
+     - context-mode's per-project session and content stores, for both clients (its root stays shared);
+     - Claude's `/tmp/claude-<uid>` area.
+     After the trial, its rollouts are published to the native sessions folder for collect.py. No isolated trial sees that folder. A failed move or publish is recorded in the exit row as `finish_error`: it costs the copy, never the trial's exit row.
+   - **Unchanged:** the native home and the client configuration stay visible and writable, and the network and the environment are as before. The system runtime is read-only, as in the R2a replay's isolation.
+   - **Nested sandboxes** (Codex's own, `unshare -rm`, a nested bwrap) run in a namespace below the trial's. The trial's mounts are locked there, so a nested process cannot unmount a hidden tmpfs.
+   - **The wrapper:** bubblewrap 0.11.1 (`/usr/bin/bwrap`, Ubuntu 0.11.1-1ubuntu0.3, upstream containers/bubblewrap), unprivileged. Its options are read from a memfd (`--args`), so the namespace's PID 1 shows none of them.
+     - Options relied on: `--args`, `--ro-bind`, `--bind`, `--bind-try`, `--dev-bind`, `--tmpfs`, `--proc`, `--unshare-pid`, `--die-with-parent`, `--chdir`, `--info-fd`.
+     - Not `--new-session`: the launcher's TERM must reach the client for a graceful exit. So the launcher signals the tree below the wrapper, and kills the group only after 30 s.
+   - **The item's fallback is not used.** That fallback is systemd's `InaccessiblePaths=` in a transient user unit (systemd 259, systemd.exec(5)). bwrap hosts every launch path, as the self-test's client checks show:
+     - `claude --version` and `codex --version`;
+     - Codex's own sandbox, nested in bwrap;
+     - the CL6 and CL7 SDK imports;
+     - `codex app-server --help` through the CL7b wrapper.
+2. **G13 checks what was hidden** (`isolation.check`). The launched row's `isolation` receipt records:
+   - the wrapper's argv, both as bwrap parses it and as a process listing shows it;
+   - its mount operations;
+   - the hidden list, with each path's sha256 and, for a file, its content's sha256.
+
+   G13 passes when all of the following hold:
+   - every location the item lists for the trial is in the hidden list and covered by its mount;
+   - nothing is bound back into a hidden root but the trial's own entries, and nothing re-exposes a root after its tmpfs;
+   - the client tree ran in a mount namespace of its own (bwrap's `--info-fd` record);
+   - no process the launcher sampled in the tree was in the host's mount namespace (processes in a nested namespace are counted apart);
+   - stage 1's wrapper-only self-test passed (`isolation-selftest.json`).
+
+   Gate 0 requires that self-test and each stage-2 trial's receipt check, and a failed self-test refuses stage 1. A trial is valid only if its own check passes.
+3. **Optional audit, never a gate.** A fanotify listener held by root on the hidden roots, filtered to the trial tree's pids, would corroborate the receipts.
+   - An unprivileged listener (Linux 5.13 and later) may mark only inodes, not a mount or filesystem, and does not receive the pid that generated an event (fanotify_init(2), man-pages at man7.org). So the pid filter needs CAP_SYS_ADMIN.
+   - The harness runs no sudo, so the audit stays a documented option.
+4. **The command classifier is a diagnostic tag only.** `grade.reach` still records the categories and the answer-source reads it recognises. G13 reports them under `classifier_diagnostic`, and they never invalidate a trial.
+   - **Superseded:** the two P2s of the GPT micro-check of 1f81d645 (`cc-reads-20261005/pr786/GPT-VERDICT-1f81d645f.md`, outside the repository).
+     - F1: patterns and unrelated listings were taken for reads, and some content searches were missed.
+     - F4: the trial's own clone's sessions alias was exempted before classification.
+   - Both concern the classifier, which no longer decides validity, and the alias is now hidden structurally.
+5. **The P3 of that micro-check is fixed.** The deadline and completion decisions read the launcher's unrounded offsets (`duration_exact_s`, `time_to_result_exact_s`, `common.decision_times`):
+   - the hold;
+   - the launcher's result-before-T rule and its censoring reason;
+   - the grader's completion re-check (`effective_exit`) and its no-result list.
+
+   The one-decimal fields are presentation only. So a result at 1799.96 s, in a session that ran 1800.02 s, is complete, not held.
+
+**Limits:**
+- Services reached over a socket run outside the namespace: the ai-memory server, MCP servers configured by URL, the OmniRoute gateway, and a user systemd or Docker daemon. A file such a service reads for a trial is not hidden by the mount namespace; R10's per-trial scoping of those stores still applies.
+- `/tmp` and `/dev/shm` stay shared outside Claude's own area.
+- A setuid helper (sudo) does not work inside the user namespace.
 
 ## Confirmed (CC 11:43Z)
 
@@ -54,7 +118,9 @@ Item `task-ns2604-coop-20261006T123036Z`:
 
 ## Fixes from the GPT micro-check of 87f9f1d7 (2026-10-06)
 
-That check requested changes for four P2s (`cc-reads-20261005/pr786/GPT-VERDICT-87f9f1d72.md`, outside the repository). Each is fixed:
+That check requested changes for four P2s (`cc-reads-20261005/pr786/GPT-VERDICT-87f9f1d72.md`, outside the repository). Each is fixed.
+
+Findings 1 and 4 tune the command classifier. The GPT micro-check of 1f81d645 found both still partial, and the structural G13 of 13:29Z supersedes them (see the first section): the classifier described here is now a diagnostic tag. Findings 2 and 3 stand.
 
 1. **Filename-only operations invalidated trials.**
    - Access is now judged from each command's arguments and each tool's output mode.
@@ -202,6 +268,8 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 - 3 trials are tagged: host-checkout 3, user-harness-file 1.
 - No trial read an answer source.
 
+**Superseded at 13:29Z** (item `task-ns2604-coop-20261006T132948Z`, the first section above). The tags stay, but answer-source reads no longer invalidate a trial; they are a diagnostic. G13 now checks that the wrapper hid every listed answer source. Under that rule the same re-grade fails G13 for want of receipts.
+
 ## 4. chrome-devtools
 
 **Decision:** log it with a watcher only; no pre-execution deny.
@@ -289,6 +357,25 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **The structural G13 and the P3 (13:29Z item):** `harness/test_isolation.py`, the harness's own focused module (`nice -n 19 python3 -B -m unittest -v test_isolation`), passes 26 of 26 tests on this harness. On the harness at 1f81d645, 3 of its 20 runnable tests fail and 16 error: there is no isolation module, and the decisions read the rounded fields. It covers:
+  - in a synthetic trial's namespace (claude-like and codex-like), `cat` on a real file in each hidden location fails with ENOENT. The same files read outside the wrapper. The test fails if any is readable inside. The locations are:
+    - this run's sibling trial's -o answer, settings, prompt, clone history, promptfoo output and fixture draft;
+    - another run root, the v1 captures, the suite cards, the fixture cache's oracles.json and the command-center ledger;
+    - another trial's fixture, its files and its Claude transcript;
+    - a real Codex rollout, also through the clone's own sessions alias;
+    - Claude's file history, context-mode's stores and Claude's /tmp area;
+  - the trial's own fixture, prompt, settings, clone and neutral binaries, the native home's client configuration, and a Claude project outside the experiment stay readable;
+  - writes to the shared sessions alias and to the -o folder land in the trial's own folders, and PID 1's argv shows no option or hidden path;
+  - the receipt's hidden list, with path and content sha256s;
+  - G13 failing on a missing location, a tmpfs left out, another fixture or an experiment's project bound back, the home re-bound after the tmpfs, a tree outside the namespace, and a missing receipt;
+  - a nested `unshare -rm` that cannot unmount a hidden tmpfs and is counted apart, never as outside;
+  - the launcher's wrapped run recording the namespace, and its kill reaching the client's TERM handler;
+  - the client start checks;
+  - finish() moving the -o file and publishing rollouts (into a temporary sessions folder), and CL7b's runtime record read back from the wrapper's info file;
+  - the self-test report and the receipt serialising as plain JSON, as prepare.py and the ledger write them;
+  - the P3 decisions on 1800.02 s and 1799.96 s.
+- **The stage-1 self-test on this host** (`isolation.py selftest --clients`, no model call): 43 probes are hidden, all with ENOENT, and all 7 client checks pass. An S7 snapshot before and after it is equal, with no new trust.
+- **Scratch suites of rounds 1 to 3:** they were kept outside the repository and were lost when the host restarted at 13:47Z. They were not re-run in round 4, so their results below are as reported when they ran.
 - **Static checks:** every harness module parses (`ast.parse`) and imports. A stdlib `symtable` check found no undefined global names.
 - **Synthetic checks:** 95 checks of the decision helpers, all passing. The script is kept outside the repository.
   - They cover headroom and resets, rate-limit hits, completion reasons, the hold flag, exposure, answer sources, effort-only fields, the re-baseline bound, each refused key class, the absorbed concurrent exit and the CL7b re-run rule.
@@ -320,7 +407,10 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
     - both Codex times from a real `printf` event stream through the launcher, and from a rollout;
     - and, on smoke-20261006c read-only, all 11 Codex trials carrying both times.
 - **Operator step:** `grade.py meter-calibration` ran read-only on smoke-20261006c and wrote nothing in the run root. Its `--write` form was exercised on a copy of the ledger.
-- **Re-grade:** a read-only re-grade of smoke-20261006c with this `grade.py`, with its output kept outside the run root. Every gate matches the 10:48Z grade except G13, which now passes, as described under decision 3.
+- **Re-grade:** a read-only re-grade of smoke-20261006c with this `grade.py`, with its output kept outside the run root, which it left unchanged.
+  - Every gate matches the 10:48Z grade. Under round 3's classifier rule G13 had passed. Under the structural G13 it fails again, now for want of receipts: smoke-20261006c was prepared before the wrapper existed.
+  - None of its 16 launched trials is valid, for the same reason.
+  - The classifier's diagnostic still tags three trials (host-checkout 3, user-harness-file 1) and finds no answer-source read.
 - **Not yet run live:**
   - the launcher's final-turn and hold paths;
   - the headroom start rule and rate-limit re-runs;

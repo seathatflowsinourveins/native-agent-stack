@@ -31,10 +31,11 @@ sys.path.insert(0, str(HERE))
 
 from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,  # noqa: E402
                     CLI_VENDOR_SKILL_SURFACES, CLI_WRAPPERS, CLONE_TRUST_KEYS, HOME, MARKERS, MCP_SERVER_ITEMS, METER_CALIBRATION,
-                    deadline_without_result,
+                    deadline_without_result, decision_times,
                     REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows, load_json, meter_calibration,
                     parse_stream_text, read_jsonl, run_expected_usage, sha256_bytes, sha256_file, trial_dir, utc_now,
                     write_json)
+import isolation  # noqa: E402
 
 HARNESS_SKILLS = {"native-stack-research", "native-stack-worker", "standing-delegation"}
 READ_PROGRAMS = {"cat", "sed", "head", "tail", "nl", "less", "rg", "grep", "bat", "more"}
@@ -61,11 +62,11 @@ CREDENTIAL_READ = re.compile(r"(\.claude/\.credentials\.json|\.codex/auth\.json|
 _H = re.escape(str(HOME))
 # G13 categories (finding 9): what a call's input reaches outside the trial's own fixture, clone and project directory.
 # Decision 3 of CC item task-ns2604-coop-20261006T105529Z: these reads are tagged, never denied (a deny changes the
-# treatment), and the primary analysis reports tagged trials separately. A trial is invalid only when it reads the
-# task's gold or a fixture answer source: the harness's own stores (coordination: run roots with the oracle runs and
-# other trials' drafts, the suite cards, the fixture cache with oracles.json), or the fixture or transcript of another
-# trial of the same task (that trial's draft and answer). Reads of host checkouts, user-level harness files, the trial
-# root and trials of other tasks are tags.
+# treatment), and the primary analysis reports tagged trials separately. Since the structural G13 (CC item
+# task-ns2604-coop-20261006T132948Z, isolation.py) the answer sources are hidden from every trial's mount namespace, so
+# this classifier of the commands a model typed is a diagnostic only: its answer-source reads (the harness's stores,
+# another same-task trial's fixture or transcript) are reported and never invalidate a trial. Reads of host checkouts,
+# user-level harness files, the trial root and trials of other tasks are tags.
 REACH = {
     "coordination": re.compile(r"\.local/state/native-agent-stack/coordination|organic-e2e|ns2604-organic-fixtures"),
     "other-transcripts": re.compile(r"\.claude/projects(/|\b)|\.codex/sessions(/|\b)"),
@@ -1759,9 +1760,11 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixture
     """G13 (extended by finding 9): calls whose input reaches coordination paths, other sessions' transcripts, host
     checkouts (~/code, ~/projects), user-level harness files, harness trial roots or another trial's fixture. The
     trial's own fixture, clone, trial files and project directory (its auto memory, exempt and logged under §8.4) are
-    not counted. Decision 3: each entry is a tag; answer_source marks the reads that make the trial invalid
-    (answer_source_reasons: the harness's stores, this experiment's published outputs, a declared grader-output path,
-    or the fixture, transcript or trial-root files of another trial of the same task)."""
+    not counted. Decision 3: each entry is a tag; answer_source marks the reads the classifier takes for answer-source
+    reads (answer_source_reasons: the harness's stores, this experiment's published outputs, a declared grader-output
+    path, or the fixture, transcript or trial-root files of another trial of the same task). Since the structural G13
+    (CC item task-ns2604-coop-20261006T132948Z) that mark is a diagnostic only: the wrapper hides those locations, and
+    G13 checks what it hid (isolation.check)."""
     cwd = graded.get("cwd") or ""
     own = [p for p in (cwd, f"{HOME}/.claude/projects/{_claude_slug(cwd)}" if cwd else None) if p]
     work = cfg.get("trial_root")
@@ -1937,10 +1940,11 @@ def effective_exit(exit_row: dict) -> dict:
     """The exit row with the completion rule re-checked: under complete-at-result a Claude result counts only if it
     reached the stream before T (launcher.result_before_t). A launcher frozen before that rule marked a result written
     on the timeout's SIGTERM as complete (smoke-20261006c claude-native: result at 900.7 s, rc 124); the grader censors
-    such a trial as timeout_after_result and records that it overrode the launcher."""
+    such a trial as timeout_after_result and records that it overrode the launcher. GPT micro-check of 1f81d645, P3: the
+    unrounded arrival decides (decision_times), so a result at 1799.96 s is not overridden as one at T."""
+    arrival = decision_times(exit_row)[1]
     if exit_row.get("completion_policy") == "complete-at-result" and not exit_row.get("censored") \
-            and exit_row.get("time_to_result_s") is not None and exit_row.get("t_seconds") \
-            and exit_row["time_to_result_s"] >= exit_row["t_seconds"]:
+            and arrival is not None and exit_row.get("t_seconds") and arrival >= exit_row["t_seconds"]:
         return {**exit_row, "censored": True, "reason": "timeout_after_result", "grader_override": "result at or after T"}
     return exit_row
 
@@ -1969,6 +1973,8 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
               "result_event": exit_row.get("result_event"), "no_result_diagnosis": exit_row.get("no_result_diagnosis"),
               "held_cell": exit_row.get("held_cell"), "rate_limited": bool(exit_row.get("rate_limited")),
               "rebaseline": exit_row.get("rebaseline"), "reason_before_rebaseline": exit_row.get("reason_before_rebaseline")}
+    # GPT micro-check of 1f81d645, P3: the deadline decisions read the launcher's unrounded offsets (decision_times).
+    record.update({k: exit_row[k] for k in ("duration_exact_s", "time_to_result_exact_s") if k in exit_row})
     if not launched:
         return record, None
     task = tasks.get((trial.get("task"), trial.get("instance")), {})
@@ -2005,12 +2011,15 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     threads = {th for other in others for th in (threads_by_trial or {}).get(other, ())}
     record["reach"] = reach(graded, trial.get("client"), cfg, tid, {fid for fid in others.values() if fid}, set(others),
                             threads)
-    # Decision 3: reach entries are tags (reported as their own stratum); only a gold or answer-source read invalidates.
+    # Decision 3, as the structural G13 supersedes it (CC item task-ns2604-coop-20261006T132948Z): the command
+    # classifier's entries are diagnostic tags only, reported but never invalidating a trial; a trial is valid only if
+    # the wrapper hid every listed answer source for its whole lifetime (isolation.check).
     record["tagged"] = sorted({c for entry in record["reach"] for c in entry["categories"]})
     record["answer_source_reads"] = [entry["call_id"] for entry in record["reach"] if entry.get("answer_source")]
     record["answer_source_reasons"] = sorted({r for entry in record["reach"] for r in entry.get("answer_source_reasons") or []})
+    record["isolation"] = isolation.check(cfg, root, tid, trial.get("client"), rows)
     record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored")
-                           and not record["answer_source_reads"])
+                           and record["isolation"]["ok"])
     record["watcher"] = watcher(graded, trial.get("client"), record["reach"])
     record["target_exposure"] = cli_exposure(task.get("item"), trial.get("client"), graded) \
         if task.get("kind") in CLI_TASK_KINDS else None
@@ -2170,6 +2179,9 @@ def gate0(root: Path) -> dict:
         base = {"launched": bool(record and record["launched"]), "completed": bool(record and record["launched"] and not record["censored"]),
                 "joins": bool(record and record.get("joins", {}).get("pass")),
                 "host_unchanged": bool(record) and host_unchanged(record)}
+        if cfg.get("isolation"):
+            # The structural G13: a stage-2 trial's receipt must already pass, so a receipt fault shows before stage 4.
+            base["isolated"] = bool(record and (record.get("isolation") or {}).get("ok"))
         client = (record or {}).get("client") or test.get("cell", "").replace("prompted-", "").split("-")[0]
         extra = {}
         if key.startswith("probe-") and graded is not None:
@@ -2202,6 +2214,11 @@ def gate0(root: Path) -> dict:
                                                                                    "ecosystem_task_id_rows"))
         checks[key] = {**base, **extra, "trial_id": (record or {}).get("trial_id"), "pass": bool(passed and graded is not None)}
     # The ctx gh canary runs in both Codex arms: the leak the verifier observed (finding 6) was in the env clone.
+    if cfg.get("isolation"):
+        # Stage 1's wrapper-only self-test (isolation-selftest.json): every hidden location refused cat in the namespace.
+        selftest = load_json(root / isolation.SELFTEST_FILE) if (root / isolation.SELFTEST_FILE).exists() else None
+        checks["isolation-selftest"] = {"pass": bool(selftest and selftest.get("pass")),
+                                        "probes": (selftest or {}).get("probes"), "version": (selftest or {}).get("version")}
     canary_keys = ("canary-gh-auth", "canary-gh-auth-ctx", "canary-gh-auth-ctx-env", "canary-exec-rules")
     canaries = {k: checks.get(k, {}).get("pass") for k in canary_keys}
     report = {"at": utc_now(), "run_id": cfg["run_id"], "checks": checks, "trials": records, "canaries": canaries,
@@ -2334,8 +2351,9 @@ def grade_run(root: Path) -> dict:
                 gaps.append({"gate": "G11", "trial_id": tid, "gap": "calls without a forwarded effort value although the "
                              "pipeline details were exposed",
                              "calls": effort["gateway_calls_missing_forwarded_effort"][:20]})
-        # G13 (decision 3): no trial read the task's gold or a fixture answer source; other reaches are tags.
-        gate_rows["G13"].append(not record["answer_source_reads"])
+        # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every listed answer source stayed hidden from the
+        # trial's mount namespace for its whole lifetime; the command classifier's reads are diagnostic tags.
+        gate_rows["G13"].append(record["isolation"]["ok"])
         gate_rows["G14"].append(all(u.get("tag") for u in uses))
         if record["valid"] and trial.get("lane") == cfg.get("lane", "organic-e2e") and task.get("kind") != "prompted" \
                 and not (cfg.get("tests_by_ref") or {}).get(trial.get("ref") or "", {}).get("gate_trial"):
@@ -2435,12 +2453,26 @@ def grade_run(root: Path) -> dict:
         "declared": (cfg.get("gateway_pipeline_details") or {}).get("declared"),
         "observed": ("on" if with_pipeline == calls_seen else "partly on") if with_pipeline else ("off" if calls_seen else "no calls"),
         "calls": calls_seen, "calls_with_pipeline": with_pipeline}
-    # G13 and decision 3: tags are reported, only gold or answer-source reads fail the gate.
-    gates["G13"].update({"rule": f"decision 3 of {CC_V11_DECISIONS}: host-checkout and other reads are tagged, never "
-                                 "denied; a trial is invalid only if it reads the task's gold or a fixture answer source",
-                         "tagged_trials": sorted(r["trial_id"] for r in table if r.get("tagged")),
-                         "tag_categories": _count([c for r in table for c in r.get("tagged") or []]),
-                         "answer_source_trials": sorted(r["trial_id"] for r in table if r.get("answer_source_reads"))})
+    # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every launched trial's receipt shows each listed
+    # answer source hidden from its mount namespace for its whole lifetime, and stage 1's wrapper-only self-test
+    # passed. The command classifier (decision 3's tags and answer-source reads) is reported as a diagnostic only.
+    selftest = load_json(root / isolation.SELFTEST_FILE) if (root / isolation.SELFTEST_FILE).exists() else None
+    isolation_failures = {r["trial_id"]: r["isolation"]["failures"] for r in table
+                          if r.get("launched") and r.get("isolation") and not r["isolation"]["ok"]}
+    gates["G13"].update({"rule": f"structural ({isolation.ISOLATION_DECISION}): every listed answer source (run roots, "
+                                 "suite cards, the fixture cache's oracles.json, other trials' fixtures and transcripts, "
+                                 "the shared sessions alias) was hidden from the trial's mount namespace for its whole "
+                                 "lifetime; the command classifier is a diagnostic tag that never invalidates a trial",
+                         "isolation": {"configured": cfg.get("isolation"),
+                                       "selftest": {"pass": (selftest or {}).get("pass"), "probes": (selftest or {}).get("probes"),
+                                                    "version": (selftest or {}).get("version")} if selftest else None,
+                                       "trials_failing": isolation_failures},
+                         "classifier_diagnostic": {
+                             "tagged_trials": sorted(r["trial_id"] for r in table if r.get("tagged")),
+                             "tag_categories": _count([c for r in table for c in r.get("tagged") or []]),
+                             "answer_source_trials": sorted(r["trial_id"] for r in table if r.get("answer_source_reads"))}})
+    if gates["G13"].get("pass") is not None:
+        gates["G13"]["pass"] = bool(gates["G13"]["pass"] and cfg.get("isolation") and (selftest or {}).get("pass"))
     g12 = cfg.get("oracles_reproduce") or {}
     gates["G12"] = {"pass": g12.get("pass"), "differing": g12.get("differing"), "tests_run": g12.get("tests_run")}
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v], "negatives": negatives}
@@ -2472,7 +2504,7 @@ def grade_run(root: Path) -> dict:
             "no_result_trials": [{"trial_id": r["trial_id"], "cell": r.get("cell"), "reason": r.get("reason"),
                                   "diagnosis": r.get("no_result_diagnosis")}
                                  for r in table if r.get("client") == "claude" and r.get("launched")
-                                 and deadline_without_result(r.get("duration_s"), r.get("time_to_result_s"), r.get("t_seconds"))],
+                                 and deadline_without_result(*decision_times(r), r.get("t_seconds"))],
             "held_cells": sorted(p.name for p in root.glob("HOLD.*")),
             "rate_limited_trials": sorted(r["trial_id"] for r in table if r.get("rate_limited")),
             "cli_exposure": exposure,
