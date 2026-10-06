@@ -1,0 +1,16 @@
+# Preserve the reviewed native-data timer's two-minute cadence.
+# native-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:
+# observability/native-data/native-data.timer.example:1-11.
+# systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:
+# man/systemd.timer.xml:50-53 (no overlapping restart of an active service).
+[Unit]
+Description=Refresh selected native dashboard data on NativeStack2604
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=2min
+AccuracySec=10s
+Unit=ecosystem-native-data.service
+
+[Install]
+WantedBy=timers.target

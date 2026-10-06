@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "kind": "upkeep_timer_transfer",
+  "date_utc": "2026-10-06",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "evidence_classes": [
+    "source_review",
+    "local_integration",
+    "synthetic"
+  ],
+  "scope": "Four systemd user templates and the source-derived guard; maintained observer supports the destination loopback endpoint.",
+  "authorization": {
+    "plan_sha256": "775119dc6840552def19142a10e2730b489b6365c346e6f9fb6f5db5f2572ba2",
+    "plan_section": "Phase 1:63-106, step 6:100-104",
+    "item": "task-ns2604-coop-20261006T031317Z",
+    "placement_ruling": "co-op A49: adoption/templates/systemd; no new plan row, owner, API or default enablement"
+  },
+  "source_read": {
+    "distribution_role": "prior source distribution",
+    "authorized_after_utc": "2026-10-06T04:25:00Z",
+    "observed_session_interval_utc": "2026-10-06T04:26:00Z through 04:28:00Z",
+    "timing_basis": "Retained session clock/tool chronology; capture-file mtimes are not source-read timestamps.",
+    "read_only": true,
+    "drop_ins_observed": [],
+    "source_files": [
+      {
+        "name": "disk-headroom-guard.service",
+        "sha256": "da706cb9947ff96a2b503ca3074923bfc471f6c5b8b50f82ba7e669d06b6bd7e"
+      },
+      {
+        "name": "disk-headroom-guard.timer",
+        "sha256": "3d975232392dd4b76f35cd8a941214cd1a8829816605aa02e33426d81928990c"
+      },
+      {
+        "name": "ecosystem-native-data.service",
+        "sha256": "7fdc4366c94fd813f027498f0127698022a8fa4bafa4a8bc3038782efd7bcce6"
+      },
+      {
+        "name": "ecosystem-native-data.timer",
+        "sha256": "ec306282555c8c3dbc7669027022aea925aa0dc99c8c6a7118d1b6567ff6fb57"
+      },
+      {
+        "name": "ops/disk-headroom-guard.sh",
+        "sha256": "b2e0515c01ec385118f0d3c8a40b4102932ed05784085d13bc488074bceba58c"
+      }
+    ]
+  },
+  "sources": [
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.timer.xml:50-53,386-392",
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.service.xml:209-219",
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd-analyze.xml:1369-1378",
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemctl.xml:936-945",
+    "coreutils/coreutils@8e075ff8ee11692c5504d8e82a48ed47a7f07ba9:doc/coreutils.texi:903",
+    "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/cache.md:142-145",
+    "seathatflowsinourveins/native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:observability/native-data/README.md:158-208",
+    "Installed Bash 5.3.9 manual:5513-5514, regular-file conditional"
+  ],
+  "contract": {
+    "guard_timer": {
+      "boot_seconds": 120,
+      "interval_seconds": 120,
+      "accuracy_seconds": 15
+    },
+    "observer_timer": {
+      "boot_seconds": 45,
+      "interval_seconds": 120,
+      "accuracy_seconds": 10
+    },
+    "guard_action": "GNU df displayed whole GiB; local alerts below 60; only upstream uv cache prune below 30. Rounded display is not an exact byte threshold.",
+    "guard_timeout": "Source unlimited oneshot startup timeout retained; active service prevents overlapping timer start.",
+    "guard_changes": [
+      "omit process arguments",
+      "private logging",
+      "bad sample fails before prune",
+      "log errors nonzero while low-space prune still runs",
+      "preserve symlinks/non-regular logs including FIFO"
+    ],
+    "observer_urls": [
+      "http://127.0.0.1:13100/loki/api/v1/push",
+      "http://127.0.0.1:21300/loki/api/v1/push"
+    ],
+    "observer_default_unchanged": true,
+    "loopback_proxy_redirect_gates_preserved": true
+  },
+  "commands": [
+    {
+      "command": "nice -n 19 env TMPDIR=<private-cache> PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_native_dashboard_data tests.test_new_wsl_upkeep_timers tests.test_disk_headroom_guard -v",
+      "exit_code": 0,
+      "tests": 54,
+      "seconds": 1.533,
+      "class": "local_integration",
+      "log": "touched-tests-final.log"
+    },
+    {
+      "command": "nice -n 19 env XDG_RUNTIME_DIR=<private-runtime> SYSTEMD_UNIT_PATH=<private-rendered-units>:/usr/lib/systemd/user systemd-analyze --user --man=no --generators=no --recursive-errors=no verify <four rendered units>",
+      "exit_code": 0,
+      "class": "local_integration",
+      "log": "four-unit-native-verify.log",
+      "fixture_deviation": "Only executable path is bound to the candidate repository for parser checking; no service activation."
+    },
+    {
+      "command": "nice -n 19 python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit_code": 0,
+      "class": "local_integration",
+      "log": "check-plan.log"
+    },
+    {
+      "command": "bash -n tools/maintenance/disk-headroom-guard.sh",
+      "exit_code": 0,
+      "class": "local_integration"
+    },
+    {
+      "command": "Runbook six shell blocks bash -n and two embedded Python blocks ast.parse",
+      "exit_code": 0,
+      "class": "local_integration",
+      "host_commands_executed": false
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "class": "local_integration"
+    },
+    {
+      "command": "nice -n 19 env TMPDIR=<private-cache> PYTHONDONTWRITEBYTECODE=1 python3 -B scripts/validate.py",
+      "exit_code": 0,
+      "class": "local_integration",
+      "log": "validate-final.log",
+      "output": {
+        "components": 69,
+        "hashed_files": 10282,
+        "profiles": 4,
+        "receipts": 212,
+        "status": "passed"
+      }
+    }
+  ],
+  "failed_controls_retained": [
+    {
+      "attempt": "new 21300 URL before repair",
+      "exit_code": 1,
+      "log": "loki-endpoints-red.log"
+    },
+    {
+      "attempt": "parser test without XDG_RUNTIME_DIR",
+      "exit_code": 1,
+      "log": "native-data-unit-tests.log",
+      "correction": "Private fixture runtime binding; no broad host environment inheritance."
+    },
+    {
+      "attempt": "malformed OnBootSecc with ordinary native verify",
+      "exit_code": 0,
+      "warning_present": true,
+      "log": "verify-warning-default.log",
+      "interpretation": "Default exit 0 is a false-pass hazard."
+    },
+    {
+      "attempt": "same malformed unit with recursive-errors=no",
+      "exit_code": 1,
+      "log": "verify-warning-strict.log",
+      "interpretation": "Expected negative control."
+    },
+    {
+      "attempt": "first source read using unavailable RTK path",
+      "exit_code": 127,
+      "correction": "Read-only native fallback; successful source reads exit 0."
+    }
+  ],
+  "private_log_digests": [
+    {
+      "name": "touched-tests-final.log",
+      "sha256": "87aab176aeaea0120e6acfbbb5b8b2ff077e546cd62f4bcef1380b39901f374f",
+      "bytes": 9551,
+      "summary": [
+        "Ran 54 tests in 1.533s",
+        "OK"
+      ]
+    },
+    {
+      "name": "native-data-routing-tests.log",
+      "sha256": "8cf5a9a833860e5f70d2ea90baed48d3de99248de7dba00b6ce443d97bd7a227",
+      "bytes": 143,
+      "summary": [
+        "Ran 44 tests in 0.315s",
+        "OK"
+      ]
+    },
+    {
+      "name": "native-data-unit-tests.log",
+      "sha256": "9645de0004daf2b19de002138be7d14cb21985a554df7b023b66e1c75e8a2be8",
+      "bytes": 1759,
+      "summary": [
+        "Ran 3 tests in 0.027s",
+        "FAILED (failures=2)"
+      ]
+    },
+    {
+      "name": "native-data-unit-tests-private-runtime.log",
+      "sha256": "9e3618c465353a9e4a6828d5e621fa61c3754bf90d19d768cd975a69fc4289e2",
+      "bytes": 101,
+      "summary": [
+        "Ran 3 tests in 0.048s",
+        "OK"
+      ]
+    },
+    {
+      "name": "guard-fifo-controls.log",
+      "sha256": "19b04c0a08a35c4aa08414d58a4dcc7cc8781eb60eb4f5b46ee4c70e826bb012",
+      "bytes": 104,
+      "summary": [
+        "Ran 6 tests in 1.200s",
+        "OK"
+      ]
+    },
+    {
+      "name": "four-unit-tests.log",
+      "sha256": "a10efbea5a2da673780ddea94385d1bfa907df20dc3df2d9d51280d2194cf796",
+      "bytes": 102,
+      "summary": [
+        "Ran 4 tests in 0.062s",
+        "OK"
+      ]
+    },
+    {
+      "name": "four-unit-native-verify.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "summary": []
+    },
+    {
+      "name": "verify-warning-default.log",
+      "sha256": "c466ee2a960c55dd12f9069c5ca453e9f9155d5bd54cc28224d2eff3ffc23d7a",
+      "bytes": 135,
+      "summary": []
+    },
+    {
+      "name": "verify-warning-strict.log",
+      "sha256": "c466ee2a960c55dd12f9069c5ca453e9f9155d5bd54cc28224d2eff3ffc23d7a",
+      "bytes": 135,
+      "summary": []
+    },
+    {
+      "name": "loki-endpoints-red.log",
+      "sha256": "daa60e8c060abd1ff576f69aac215d5ac07e4c7de63fb1126c56be55faa7b616",
+      "bytes": 1005,
+      "summary": [
+        "FAILED (errors=1)"
+      ]
+    },
+    {
+      "name": "check-plan.log",
+      "sha256": "61ec367cab28434f26332620d8d0514429d79eb5f57efbf3baa6124c57e4e3e2",
+      "bytes": 202,
+      "summary": [
+        "OK: 84 rows: 63 installed (60 by the default run, 3 only when named), 2 measurement-only, 19 not installed; 185 commands and 113 acceptance entries agree with the scripts (2 additional checks included)"
+      ]
+    },
+    {
+      "name": "validate-final.log",
+      "sha256": "0a8938db67fa67b3c89dd4da4016edd0b8d1d803b805c4bed8fb6476dd5fcb27",
+      "bytes": 162,
+      "summary": [
+        "{\"components\": 69, \"hashed_files\": 10282, \"profiles\": 4, \"receipts\": 212, \"status\": \"passed\"}",
+        "Integrity and scope checks only; no live provider or GPU execution."
+      ]
+    }
+  ],
+  "completeness_review": {
+    "code_critic": "No material code blocker after FIFO repair.",
+    "runbook_findings": [
+      "missing-unit stop must be conditional",
+      "disable removes unrelated enablement links",
+      "capture expected observation exit codes",
+      "use actual observer stdout schema",
+      "unchecked rollback restoration/reactivation exits"
+    ],
+    "corrections": "Stop only prior-active/loaded units; preserve exact persistent/runtime enablement links without disable; rc files and mutation gates; fresh returned HTTP204 summary and counts. Guard restoration and timer reactivation fail explicitly; absent destination metadata was checked read-only (LoadState=not-found, ActiveState=inactive, exit 0).",
+    "independent_server_ingestion_proven": false
+  },
+  "host_acceptance": {
+    "state": "pending_coop_apply",
+    "lane_host_writes": false,
+    "fresh_manual_service_runs": false,
+    "new_timer_enablement": false,
+    "provider_or_model_execution": false,
+    "apply_readback_rollback": "adoption/templates/systemd/upkeep-transfer.md"
+  },
+  "privacy": {
+    "credential_values_read_printed_copied": false,
+    "credential_files_read_copied": false,
+    "environment_files_read": false,
+    "process_arguments_omitted": true,
+    "raw_source_reads_private": true,
+    "public_receipt_contains_no_machine_home_paths": true,
+    "config_remains_private": true
+  }
+}
