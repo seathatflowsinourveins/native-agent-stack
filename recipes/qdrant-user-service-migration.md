@@ -78,7 +78,14 @@ and [Qdrant@6ab21ca full-storage implementation](https://github.com/qdrant/qdran
 ## First start and ordinary starts
 
 After ACK, install the official archive and render the existing examples
-with reviewed absolute paths. Use **new, empty, separately owned native
+with reviewed absolute paths. **Before recovery, explicitly repin the
+ordinary base unit's `ExecStart` to the adopted 1.19.2 binary**, for example
+`/ABSOLUTE/STACK_HOME/tools/qdrant-1.19.2/qdrant`. The historical example
+names 1.19.1; replacing its absolute placeholders alone does not repin it.
+Use the same config path, working directory and owned storage paths for
+ordinary startup and the recovery override. The ordinary base argv must
+contain no snapshot-recovery arguments.
+Use **new, empty, separately owned native
 state**. Do not point the binary at Docker's internal volume directory.
 Set the reviewed HTTP port, for example 21633; keep `storage.temp_path`
 unset. At the reviewed source and target pins, full-unpack and collection
@@ -111,13 +118,27 @@ Wait for native HTTP readiness and the complete restored collection/alias
 inventory before treating recovery as complete. A Type=simple unit being
 active or `start` returning zero is insufficient. Retain the returned state,
 stop the owned unit, remove only the recovery drop-in, `daemon-reload`, and
-start the ordinary canonical unit. Ordinary starts must not repeat recovery.
+verify the effective base `ExecStart` **before** starting the ordinary unit:
+
+```sh
+systemctl --user show native-stack-qdrant.service -p ExecStart
+```
+
+Require the adopted 1.19.2 binary, the same config/storage paths and no
+snapshot-recovery arguments. Then start the ordinary canonical unit and
+record `systemctl --user show native-stack-qdrant.service -p ExecStart -p MainPID`.
+Inspect that owned running process's actual argv, for example its
+`/proc/<MainPID>/cmdline`, and require the same version/path checks with no
+`--storage-snapshot` or other recovery argument. Fail the gate before
+releasing writers if the effective unit or process selects 1.19.1.
+Ordinary starts must not repeat recovery.
 Enable the user unit only after its gates pass.
 
 Sources: [target CLI recovery](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/src/main.rs#L249),
 [target recovery staging](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/src/snapshots.rs#L145),
 [systemd@v259 Type=simple](https://github.com/systemd/systemd/blob/v259/man/systemd.service.xml#L164),
 [ExecStart reset](https://github.com/systemd/systemd/blob/v259/man/systemd.service.xml#L395),
+[Linux process argv](https://www.kernel.org/doc/html/latest/filesystems/proc.html#process-specific-subdirectories),
 [systemd resource control](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html).
 
 ## Acceptance and rollback
