@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "id": "nautilus-rc6-spy-first-replication-20261006",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "NativeStack2604 FIRST rc6 candidate replication of SPYone_zero returned replay0/comparator0, complete136PASS/0FAIL/0SKIPPED, copied-method preregistration_qualifying true, fees0.00, nativeendcash90734.08 and equal normalized economic records.",
+  "evidence_class": "local_integration",
+  "dataset_scope": "HIST retained LEAN sample",
+  "qualification_kind": "rc6 candidate replication",
+  "limitations": [
+    "One frozen SPYone_zero case through a locally maintained harness: rc6 candidate replication, not the original rc5 result or an unchanged upstream test suite.",
+    "136total checks include the106execution-check subset; never add the two counts. Source review, actual native execution and local fixture tests are separate evidence.",
+    "Opus accepted the source before execution; independent observation/review of this execution publication is still pending. No catalog readiness aggregate is derived.",
+    "AAPLbaseline and fee_slippage_stress remain blocked/unrun. No provider, broker/live order, credential, C1-C4 risk-cap or destination-pin action occurred;5f owns those.",
+    "Native receipt prose retains historicalv2names as an accepted limitation. actual_executed_files and exact sanitized vectors identify the rc6 files that ran; rawprimary outputs are byte-preserved.",
+    "Exactly one replay and one comparison occurred after both approved records; two internal engine runs are the unchanged determinism method. No smoke/dryrun/test invocation or retry; no retry qualifies.",
+    "Full seven-file attempt identity appended to candidate history, original/knownrc5prefix preserved; no predicate, economic data, strategy, oracle or tolerance retuned."
+  ],
+  "host": "NativeStack2604",
+  "case": "one_zero",
+  "reviewed_source_commit": "910351ff0472fe90d97e92a1ade0b69d30c1e7d7",
+  "actual_checkout_commit": "9af14ecd8d5574aeca88c2ebfcd404c6c6500f24",
+  "run": {
+    "attempt_id": "first-rc6-spy-20261006T055742Z",
+    "run_exit_code": 0,
+    "compare_exit_code": 0,
+    "run_started_utc": "2026-10-06T06:00:00Z",
+    "run_finished_utc": "2026-10-06T06:00:05Z",
+    "compare_started_utc": "2026-10-06T06:00:21Z",
+    "compare_finished_utc": "2026-10-06T06:00:21Z",
+    "replay_invocations": 1,
+    "comparator_invocations": 1,
+    "retry_allowed": false,
+    "scope": "Actual first native rc6 SPY invocation; never retry."
+  },
+  "commands": {
+    "route": "FINAL J2documented-env launcher-equivalent vector at5271c87d, rc6 runtime/variant/review/output substitutions only",
+    "run_argv": [
+      "nice",
+      "-n",
+      "19",
+      "bwrap",
+      "--unshare-all",
+      "--die-with-parent",
+      "--new-session",
+      "--clearenv",
+      "--ro-bind",
+      "/usr",
+      "/usr",
+      "--ro-bind-try",
+      "/lib",
+      "/lib",
+      "--ro-bind-try",
+      "/lib64",
+      "/lib64",
+      "--ro-bind",
+      "<RC6_RUNTIME_PROJECT>/.venv",
+      "<RC6_RUNTIME_PROJECT>/.venv",
+      "--ro-bind",
+      "<RC6_RUNTIME_PROJECT>/.python",
+      "<RC6_RUNTIME_PROJECT>/.python",
+      "--ro-bind",
+      "<REPO>",
+      "/repo",
+      "--ro-bind",
+      "<LEAN_DATA>",
+      "/data",
+      "--bind",
+      "<OWNED_OUTPUT>",
+      "/out",
+      "--proc",
+      "/proc",
+      "--dev",
+      "/dev",
+      "--tmpfs",
+      "/tmp",
+      "--setenv",
+      "LANG",
+      "C.UTF-8",
+      "--setenv",
+      "PATH",
+      "/usr/bin:/bin",
+      "--setenv",
+      "PYTHONDONTWRITEBYTECODE",
+      "1",
+      "--setenv",
+      "OPENBLAS_NUM_THREADS",
+      "1",
+      "--setenv",
+      "OMP_NUM_THREADS",
+      "1",
+      "--chdir",
+      "/repo",
+      "<RC6_RUNTIME_PROJECT>/.venv/bin/python",
+      "-I",
+      "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run-rc6.py",
+      "--lean-data",
+      "/data",
+      "--out",
+      "/out/native",
+      "--review-record",
+      "/repo/blueprints/us-equities/engine-nautilus/spy-parity/review-record-rc6.json",
+      "--harness-commit",
+      "910351ff0472fe90d97e92a1ade0b69d30c1e7d7"
+    ],
+    "compare_argv": [
+      "nice",
+      "-n",
+      "19",
+      "bwrap",
+      "--unshare-all",
+      "--die-with-parent",
+      "--new-session",
+      "--clearenv",
+      "--ro-bind",
+      "/usr",
+      "/usr",
+      "--ro-bind-try",
+      "/lib",
+      "/lib",
+      "--ro-bind-try",
+      "/lib64",
+      "/lib64",
+      "--ro-bind",
+      "<RC6_RUNTIME_PROJECT>/.venv",
+      "<RC6_RUNTIME_PROJECT>/.venv",
+      "--ro-bind",
+      "<RC6_RUNTIME_PROJECT>/.python",
+      "<RC6_RUNTIME_PROJECT>/.python",
+      "--ro-bind",
+      "<REPO>",
+      "/repo",
+      "--ro-bind",
+      "<LEAN_DATA>",
+      "/data",
+      "--bind",
+      "<OWNED_OUTPUT>",
+      "/out",
+      "--proc",
+      "/proc",
+      "--dev",
+      "/dev",
+      "--tmpfs",
+      "/tmp",
+      "--setenv",
+      "LANG",
+      "C.UTF-8",
+      "--setenv",
+      "PATH",
+      "/usr/bin:/bin",
+      "--setenv",
+      "PYTHONDONTWRITEBYTECODE",
+      "1",
+      "--setenv",
+      "OPENBLAS_NUM_THREADS",
+      "1",
+      "--setenv",
+      "OMP_NUM_THREADS",
+      "1",
+      "--chdir",
+      "/repo",
+      "<RC6_RUNTIME_PROJECT>/.venv/bin/python",
+      "-I",
+      "/repo/blueprints/us-equities/engine-nautilus/spy-parity/compare-rc6.py",
+      "--receipt",
+      "/out/native/receipt.json",
+      "--lean-data",
+      "/data",
+      "--verdict",
+      "/out/verdict.json"
+    ],
+    "observed_isolation": {
+      "argv": [
+        "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run-rc6.py",
+        "--lean-data",
+        "/data",
+        "--out",
+        "/out/native",
+        "--review-record",
+        "/repo/blueprints/us-equities/engine-nautilus/spy-parity/review-record-rc6.json",
+        "--harness-commit",
+        "910351ff0472fe90d97e92a1ade0b69d30c1e7d7"
+      ],
+      "cwd": "/repo",
+      "environment_names": [
+        "LANG",
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "PATH",
+        "PWD",
+        "PYTHONDONTWRITEBYTECODE"
+      ],
+      "environment_values": {
+        "LANG": "C.UTF-8",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PATH": "/usr/bin:/bin",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "namespaces": {
+        "links": {
+          "cgroup": "cgroup:[4026532631]",
+          "ipc": "ipc:[4026532629]",
+          "mnt": "mnt:[4026532416]",
+          "net": "net:[4026532632]",
+          "pid": "pid:[4026532630]",
+          "pid_for_children": "pid:[4026532630]",
+          "time": "time:[4026531834]",
+          "time_for_children": "time:[4026531834]",
+          "user": "user:[4026532813]",
+          "uts": "uts:[4026532628]"
+        },
+        "pid": 2,
+        "pid1_comm": "bwrap",
+        "uid_map": "      1000          0          1\n"
+      },
+      "network_interfaces": [
+        [
+          1,
+          "lo"
+        ]
+      ],
+      "python_flags_isolated": 1,
+      "read_only": {
+        "data_root": true,
+        "harness_source": true,
+        "python_prefix": true
+      },
+      "unobserved": "ipc, uts and cgroup namespace separation cannot be compared with the host from inside; see deviation isolation_partially_observed."
+    }
+  },
+  "result": {
+    "verdict": "PASS",
+    "complete": true,
+    "preregistration_qualifying": true,
+    "check_counts": {
+      "PASS": 136
+    },
+    "execution_checks_subset": {
+      "fail": 0,
+      "pass": 106,
+      "skipped": 0
+    },
+    "failed": 0,
+    "skipped_count": 0,
+    "fees_usd": "0.00",
+    "native_end_cash_usd": "90734.08",
+    "dividend_cash_usd": "428.64",
+    "processed_bars": 725,
+    "fills": 2,
+    "two_run_records_equal": true,
+    "engine_error_lines": [
+      0,
+      0
+    ],
+    "two_run_equality_scope": "Normalized economic records after only the frozen generated-ID normalization; not byte-identical raw report files.",
+    "determinism": {
+      "applied_id_fields": [
+        "init_id",
+        "event_id"
+      ],
+      "declared_id_fields": [
+        "client_order_id",
+        "venue_order_id",
+        "init_id",
+        "event_id",
+        "last_trade_id",
+        "trade_id",
+        "position_id",
+        "account_id",
+        "trader_id",
+        "strategy_id",
+        "order_list_id",
+        "exec_spawn_id"
+      ],
+      "normalization_rule": "Only freshly generated UUID4 identities are replaced by their ordinal, after format validation. Timing, prices, quantities, fees, distributions, transitions and decision order are never normalized.",
+      "normalized_economic_sha256_equal": true,
+      "raw_field_paths_differing": [
+        "fills[0].init_id",
+        "fills[1].init_id",
+        "positions[0].events[0].event_id",
+        "positions[0].events[1].event_id"
+      ],
+      "raw_report_sha256_equal": false,
+      "undeclared_differing_fields": []
+    }
+  },
+  "engine": {
+    "extension_sha256": {
+      "_libnautilus.cpython-312-x86_64-linux-gnu.so": "da5fd063a9f0df9f1e6d0b8dfcdfcc9d9691fe6f8d4eeb89562c96c508805178"
+    },
+    "package": "nautilus_trader",
+    "python": "3.12.3",
+    "upstream_commit_pin": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+    "version": "2.0.0rc6"
+  },
+  "actual_executed_files": [
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/run-rc6.py",
+      "sha256": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare-rc6.py",
+      "sha256": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-rc6.json",
+      "sha256": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-ADDENDUM-rc6-20261006.md",
+      "sha256": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38",
+      "role": "reviewed immutable source"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-rc6.json",
+      "sha256": "a59062bcea9013f3b25584adc0d11be411b4aa046f82ea08f4fa70413e84a311",
+      "role": "actual source-bound gate record"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-rc6.json",
+      "sha256": "28315835b1d34da729ee0d74d051a46a3b278a8390f086226e2a85a25645b7b1",
+      "role": "actual source-bound gate record"
+    }
+  ],
+  "actual_source_inventory": {
+    "PREREGISTRATION-ADDENDUM-rc6-20261006.md": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38",
+    "compare-rc6.py": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "mapping-manifest-rc6.json": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+    "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "run-rc6.py": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+    "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+  },
+  "candidate_history": {
+    "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
+    "sha256_after_append": "1281b34f2290fe03467e80f41da6161741ceb2f2832e0f0007c4c23aff72e27a",
+    "attempt_id": "rc6-first-one_zero-20261006T060000Z",
+    "full_seven_file_map_recorded": true,
+    "original_prefix_preserved": true
+  },
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/native-receipt.json",
+      "sha256": "8c69253179321805f3942873a81e4f22dee4299f74198fd57b417c91a409fe68",
+      "bytes": 62335,
+      "scope": "Byte-identical actual returned primary output."
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/native-verdict.json",
+      "sha256": "abfaf529667ed4417ed346455f0ccb703490720c0108a0587b173c0191881036",
+      "bytes": 50180,
+      "scope": "Byte-identical actual returned primary output."
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/replay-stdout.txt",
+      "sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9",
+      "bytes": 317,
+      "scope": "Byte-identical actual returned primary output."
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/comparison-stdout.txt",
+      "sha256": "e922dee279bb4c06ebb2f3d0c628d434e05a9beb01e0934dc5813e1b31b5671e",
+      "bytes": 25663,
+      "scope": "Byte-identical actual returned primary output."
+    }
+  ],
+  "independent_execution_review": "pending",
+  "pin_move": "5f_only_pending",
+  "sources": [
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "paths": [
+        "docs/getting_started/quickstart.py:131,221-224",
+        "python/nautilus_trader/execution/__init__.pyi:190-197"
+      ]
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "910351ff0472fe90d97e92a1ade0b69d30c1e7d7",
+      "paths": [
+        "blueprints/us-equities/engine-nautilus/spy-parity/run-rc6.py",
+        "blueprints/us-equities/engine-nautilus/spy-parity/compare-rc6.py",
+        "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-rc6.json",
+        "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-ADDENDUM-rc6-20261006.md"
+      ]
+    }
+  ]
+}

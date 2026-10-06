@@ -29,9 +29,20 @@ execution conditions. J4PROCEED permits the strict expanded engine/fee metadata
 and active-source/review bindings in separate copies. The originals and economic
 method are intact. The added candidate-changed-lines-20261006.json records every
 removed/added source line and category; the addendum carries variant/oracle
-hashes. There is no candidate case execution or economic parity result. The
-independent read, actual source-bound owner records and staged inputs/managed
-Python route remain pending before SPY execution; AAPL stays blocked.
+hashes. That source-freeze record preceded native case execution; its then-open
+review/owner/input/route conditions are preserved historically. The later native
+SPY result below has its own receipt; AAPL stays blocked.
+
+The later `spy-first-20261006/` primary outputs record the first rc6 candidate
+replication after both accepted source-bound records. Replay/comparator each
+exited0; the full verdict is136PASS/0FAIL/0SKIPPED, with106execution checks a
+subset. No retry occurred. The publication receipt
+`evidence/receipts/nautilus-rc6-spy-first-replication-20261006.json` explicitly
+names the rc6 files that ran, correcting the accepted stale-v2 prose limitation
+without changing any reviewed file. Original files and prior failures remain
+intact; the new history contains the full seven-file attempt map. Execution
+publication review, broker/risk-cap qualification and pin selection remain
+5f's; AAPL was not run.
 
 Original runtime receipts retain their historical rc5 scopes. The selected
 `catalogs/us-equities/runtime-target.json` is unchanged; 5f owns the pin decision

@@ -298,6 +298,34 @@
         }
       ],
       "status": "retained rc5 reproduction; unqualified full verdict; not an rc6 run"
+    },
+    {
+      "id": "rc6-first-one_zero-20261006T060000Z",
+      "observed_utc": [
+        "2026-10-06T06:00:01.027659+00:00"
+      ],
+      "engine_version": "2.0.0rc6",
+      "harness": "Separate frozen rc6 candidate files reviewed at910351ff; actual mounted checkout9af14ecd.",
+      "isolation": "Final documented-env launcher-equivalent vector, .venv/.python/repository/data read-only, fresh namespaces, five cleared environment values, Python-I, nice19.",
+      "outcome": "Exactly one replay invocation exit0 and one comparison exit0; complete136PASS/0FAIL/0SKIPPED;106execution checks are a subset. fees0.00, nativeendcash90734.08, distributions428.64, normalized economic records equal; raw reports need not be byte-identical. Candidate method qualifyingtrue; not the original rc5 result or destination/broker decision.",
+      "receipt_sha256": [
+        "8c69253179321805f3942873a81e4f22dee4299f74198fd57b417c91a409fe68"
+      ],
+      "verdict_sha256": "abfaf529667ed4417ed346455f0ccb703490720c0108a0587b173c0191881036",
+      "harness_local_source_sha256": {
+        "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+        "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+        "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+        "run-rc6.py": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+        "compare-rc6.py": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+        "mapping-manifest-rc6.json": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+        "PREREGISTRATION-ADDENDUM-rc6-20261006.md": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38"
+      },
+      "reviewed_before_run": true,
+      "review_record_sha256": "a59062bcea9013f3b25584adc0d11be411b4aa046f82ea08f4fa70413e84a311",
+      "deviation_acceptance_sha256": "28315835b1d34da729ee0d74d051a46a3b278a8390f086226e2a85a25645b7b1",
+      "publication_receipt": "evidence/receipts/nautilus-rc6-spy-first-replication-20261006.json",
+      "status": "actual first rc6 candidate replication; no retry can qualify"
     }
   ]
 }

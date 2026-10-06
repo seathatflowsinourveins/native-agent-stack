@@ -1,0 +1,138 @@
+PASS    intent_count         count                      expected=2              observed=2              delta=0            tol=0
+PASS    fill_count           count                      expected=2              observed=2              delta=0            tol=0
+PASS    extra_fills          fills_beyond_oracle        expected=0              observed=0              delta=0            tol=0
+PASS    missing_fills        oracle_fills_absent        expected=0              observed=0              delta=0            tol=0
+PASS    entry_intent         utc_seconds                expected=1577826000     observed=1577826000     delta=0            tol=0
+PASS    entry_intent         signed_quantity            expected=304            observed=304            delta=0            tol=0
+PASS    exit_intent          utc_seconds                expected=1588190400     observed=1588190400     delta=0            tol=0
+PASS    exit_intent          signed_quantity            expected=-304           observed=-304           delta=0            tol=0
+PASS    entry_fill           utc_seconds                expected=1577977200     observed=1577977200     delta=0            tol=0
+PASS    entry_fill           signed_quantity            expected=304            observed=304            delta=0            tol=0
+PASS    entry_fill           fee_usd                    expected=0.0            observed=0.00           delta=0.00         tol=0
+PASS    entry_fill           fill_price_usd             expected=323.58         observed=323.5800       delta=0.0000       tol=0
+PASS    exit_fill            utc_seconds                expected=1588255200     observed=1588255200     delta=0            tol=0
+PASS    exit_fill            signed_quantity            expected=-304           observed=-304           delta=0            tol=0
+PASS    exit_fill            fee_usd                    expected=0.0            observed=0.00           delta=0.00         tol=0
+PASS    exit_fill            fill_price_usd             expected=291.69         observed=291.6900       delta=0.0000       tol=0
+PASS    fees_total           fees_usd                   expected=0.0            observed=0.00           delta=0.00         tol=0
+PASS    distributions_total  dividend_cash_usd          expected=428.64         observed=428.64         delta=0.00         tol=0
+PASS    end_cash_internal    reconciled_vs_rebuilt_ledger expected=90734.0800     observed=90734.0800     delta=0.0000       tol=0.01
+PASS    native_end_cash_internal native_vs_rebuilt_ledger   expected=90734.0800     observed=90734.08       delta=0.0000       tol=0.01
+PASS    end_cash             reconciled_end_cash_usd    expected=90734.080      observed=90734.0800     delta=0.0000       tol=0.01
+PASS    native_end_cash      native_end_cash_usd        expected=90734.080      observed=90734.08       delta=0.000        tol=0.01
+PASS    final_quantity       shares                     expected=0              observed=0              delta=0            tol=0
+PASS    cash_ledger_events   count                      expected=4              observed=4              delta=0            tol=0
+PASS    cash_ledger[0]       distribution@1576818000    expected=100000.00      observed=100000.00      delta=0.00         tol=0.01
+PASS    cash_ledger[1]       fill@1577977200            expected=1631.6800      observed=1631.6800      delta=0.0000       tol=0.01
+PASS    cash_ledger[2]       distribution@1584676800    expected=2060.3200      observed=2060.3200      delta=0.0000       tol=0.01
+PASS    cash_ledger[3]       fill@1588255200            expected=90734.0800     observed=90734.0800     delta=0.0000       tol=0.01
+PASS    precondition_review  record_sha256_at_comparison expected=a59062bcea9013f3b25584adc0d11be411b4aa046f82ea08f4fa70413e84a311 observed=a59062bcea9013f3b25584adc0d11be411b4aa046f82ea08f4fa70413e84a311 delta=-            tol=exact
+PASS    precondition_review  schema                     expected=spy-parity-v2-harness-review/1 observed=spy-parity-v2-harness-review/1 delta=-            tol=exact
+PASS    precondition_review  reviewed_files_are_the_files_that_ran expected=[]             observed=[]             delta=-            tol=exact
+PASS    precondition_review  completed_before_run_started expected=< 2026-10-06T06:00:01.027659+00:00 observed=2026-10-06T05:51:42+00:00 delta=-            tol=exact
+PASS    precondition_review  unresolved_findings        expected=0              observed=0              delta=-            tol=exact
+PASS    precondition_review  replay_history_at_comparison expected=e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4 or an append-only extension of it observed=e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4 delta=-            tol=exact
+PASS    precondition_review  no_prior_replay_ran_the_reviewed_harness expected=[]             observed=[]             delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.path  expected=blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-rc6.json observed=blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-rc6.json delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.sha256_at_comparison expected=28315835b1d34da729ee0d74d051a46a3b278a8390f086226e2a85a25645b7b1 observed=28315835b1d34da729ee0d74d051a46a3b278a8390f086226e2a85a25645b7b1 delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.fields expected=['accepted_by', 'accepted_utc', 'deviation_id', 'reviewed_harness_local_source_sha256', 'schema_version', 'statement'] observed=['accepted_by', 'accepted_utc', 'deviation_id', 'reviewed_harness_local_source_sha256', 'schema_version', 'statement'] delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.schema_version expected=1              observed=1              delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.deviation_id expected=first_v2_run_preceded_review observed=first_v2_run_preceded_review delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.deviation_declared_in_receipt expected=True           observed=True           delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.accepted_by expected=non-empty text observed=native-agent-stack-5f, the trading-custody gate-owner Claude session for the NautilusTrader destination qualification, acting on the command center's 2026-10-06 relay (task-native-agent-stack-5f-20261006T053021Z) under the user's standing trading-lane authorization; not a user signature delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.statement expected=non-empty text observed=The rc6 candidate replication (PREREGISTRATION-ADDENDUM-rc6-20261006.md, frozen at native-agent-stack@910351ff0472fe90d97e92a1ade0b69d30c1e7d7) inherits the original v2 replay prefix, whose earlier v2 replays ran before any review and stay superseded (deviation-acceptance-v2.json and replay-history-v2.json, both unchanged), and appends the two retained J2 rc5 attempts of 2026-10-06 (runtime-env 04:40:32Z, documented-env 04:41:27Z), which ran the rc5 harness, not this one. The gate owner accepts that the first replay from exactly the seven reviewed rc6 harness files bound here, run after this acceptance and after an independent review record with zero unresolved findings for exactly these files, with the committed candidate history, may qualify under otherwise unchanged sealed criteria, tolerances, data, oracles and economic predicates. The accepted differences are only the binding sites the addendum enumerates: the exact nautilus_trader 2.0.0rc6 version and extension identity, active-source identities, and the explicit maker/taker fee model with the original zero rates. A changed bound file means this acceptance does not bind the harness that runs. No retry from this harness can qualify; each attempt is appended to replay-history-rc6.json before any retry. This acceptance covers SPY one_zero only, qualifies no AAPL case or other SPY case, waives no other precondition and does not decide the runtime-target pin. delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.reviewed_harness_is_the_harness_that_ran expected=[]             observed=[]             delta=-            tol=exact
+PASS    precondition_review  deviation_acceptance.accepted_before_run_started expected=< 2026-10-06T06:00:01.027659+00:00 observed=2026-10-06T05:35:35+00:00 delta=-            tol=exact
+PASS    precondition_hashes  sealed_manifest_sha256     expected=cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1 observed=cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1 delta=-            tol=exact
+PASS    precondition_hashes  tolerances_sha256          expected=c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a observed=c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a delta=-            tol=exact
+PASS    precondition_hashes  inputs_at_run              expected=frozen_sha256 of the manifest observed=equal          delta=-            tol=exact
+PASS    precondition_hashes  inputs_at_comparison       expected=re-hashed equal observed=re-hashed equal delta=-            tol=exact
+PASS    precondition_engine  version                    expected=2.0.0rc6       observed=2.0.0rc6       delta=-            tol=exact
+PASS    precondition_engine  extension_sha256           expected={'_libnautilus.cpython-312-x86_64-linux-gnu.so': 'da5fd063a9f0df9f1e6d0b8dfcdfcc9d9691fe6f8d4eeb89562c96c508805178'} observed={'_libnautilus.cpython-312-x86_64-linux-gnu.so': 'da5fd063a9f0df9f1e6d0b8dfcdfcc9d9691fe6f8d4eeb89562c96c508805178'} delta=-            tol=exact
+PASS    precondition_engine  network_interfaces         expected=[[1, 'lo']]    observed=[[1, 'lo']]    delta=-            tol=exact
+PASS    precondition_engine  environment_beyond_cleared_set expected=[]             observed=[]             delta=-            tol=exact
+PASS    precondition_engine  environment_values         expected={'LANG': 'C.UTF-8', 'PATH': '/usr/bin:/bin', 'PYTHONDONTWRITEBYTECODE': '1', 'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'} observed={'LANG': 'C.UTF-8', 'PATH': '/usr/bin:/bin', 'PYTHONDONTWRITEBYTECODE': '1', 'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'} delta=-            tol=exact
+PASS    precondition_engine  read_only_mounts           expected={'data_root': True, 'harness_source': True, 'python_prefix': True} observed={'data_root': True, 'harness_source': True, 'python_prefix': True} delta=-            tol=exact
+PASS    precondition_engine  python_isolated_flag       expected=1              observed=1              delta=-            tol=exact
+PASS    precondition_engine  user_namespace             expected=a uid_map other than the initial namespace's observed=      1000          0          1
+ delta=-            tol=exact
+PASS    precondition_engine  pid_namespace_pid1         expected=bwrap          observed=bwrap          delta=-            tol=exact
+PASS    oco_pairs            count                      expected=2              observed=2              delta=-            tol=exact
+PASS    oco_orders           count                      expected=4              observed=4              delta=-            tol=exact
+PASS    oco_pairs            order_refs_unique_and_equal_to_intents expected=['1', '2']     observed=['1', '2']     delta=-            tol=exact
+PASS    oco_orders           distinct_client_order_ids  expected=4              observed=4              delta=-            tol=exact
+PASS    order_events         client_order_ids_beyond_the_legs expected=[]             observed=[]             delta=-            tol=exact
+PASS    order_events         denied_or_rejected         expected=0              observed=0              delta=-            tol=exact
+PASS    entry_oco            submitted_clock_ns         expected=1577826000000000000 observed=1577826000000000000 delta=-            tol=exact
+PASS    entry_oco            legs_submitted_at_decision_ts expected={'O-1-MIT': [1577826000000000000], 'O-1-STOP': [1577826000000000000]} observed={'O-1-MIT': [1577826000000000000], 'O-1-STOP': [1577826000000000000]} delta=-            tol=exact
+PASS    entry_oco            legs_accepted_at_decision_ts expected={'O-1-MIT': [1577826000000000000], 'O-1-STOP': [1577826000000000000]} observed={'O-1-MIT': [1577826000000000000], 'O-1-STOP': [1577826000000000000]} delta=-            tol=exact
+PASS    entry_oco            leg_types                  expected=['MARKET_IF_TOUCHED', 'STOP_MARKET'] observed=['MARKET_IF_TOUCHED', 'STOP_MARKET'] delta=-            tol=exact
+PASS    entry_oco            oco_structure              expected=native OCO, full quantity, reciprocal links observed=as expected    delta=-            tol=exact
+PASS    entry_oco            reference_close            expected=321.8600       observed=321.8600       delta=-            tol=exact
+PASS    entry_oco            stop_market_trigger        expected=321.8601       observed=321.8601       delta=-            tol=exact
+PASS    entry_oco            market_if_touched_trigger  expected=321.8599       observed=321.8599       delta=-            tol=exact
+PASS    entry_oco            legs_accepted              expected=2              observed=2              delta=-            tol=exact
+PASS    entry_oco            denied_or_rejected         expected=0              observed=0              delta=-            tol=exact
+PASS    entry_oco            fill_events                expected=1              observed=1              delta=-            tol=exact
+PASS    entry_oco            fill_quantity              expected=304            observed=304            delta=-            tol=exact
+PASS    entry_oco            look_ahead_fill            expected=after 1577826000000000000 observed=1577977200000000000 delta=-            tol=exact
+PASS    entry_oco            sibling_cancels            expected=1              observed=1              delta=-            tol=exact
+PASS    entry_oco            sibling_canceled_at_fill_instant expected=1577977200000000000 observed=1577977200000000000 delta=-            tol=exact
+PASS    entry_oco            engine_final_status        expected={'filled': ('FILLED', '304'), 'sibling': ('CANCELED', '0')} observed={'filled': ('FILLED', '304'), 'sibling': ('CANCELED', '0')} delta=-            tol=exact
+PASS    entry_oco            fill_in_tested_bar         expected=1577977200000000000 observed=1577977200000000000 delta=-            tol=exact
+PASS    entry_oco            moo_proxy_no_gap           expected=>= 0.0001      observed=1.7200         delta=-            tol=exact
+PASS    entry_oco            moo_proxy_not_open         expected=323.5800       observed=323.5800       delta=-            tol=exact
+PASS    entry_oco            filled_leg_by_open_rule    expected=STOP_MARKET    observed=STOP_MARKET    delta=-            tol=exact
+PASS    exit_oco             submitted_clock_ns         expected=1588190400000000000 observed=1588190400000000000 delta=-            tol=exact
+PASS    exit_oco             legs_submitted_at_decision_ts expected={'O-2-MIT': [1588190400000000000], 'O-2-STOP': [1588190400000000000]} observed={'O-2-MIT': [1588190400000000000], 'O-2-STOP': [1588190400000000000]} delta=-            tol=exact
+PASS    exit_oco             legs_accepted_at_decision_ts expected={'O-2-MIT': [1588190400000000000], 'O-2-STOP': [1588190400000000000]} observed={'O-2-MIT': [1588190400000000000], 'O-2-STOP': [1588190400000000000]} delta=-            tol=exact
+PASS    exit_oco             leg_types                  expected=['MARKET_IF_TOUCHED', 'STOP_MARKET'] observed=['MARKET_IF_TOUCHED', 'STOP_MARKET'] delta=-            tol=exact
+PASS    exit_oco             oco_structure              expected=native OCO, full quantity, reciprocal links observed=as expected    delta=-            tol=exact
+PASS    exit_oco             reference_close            expected=293.2100       observed=293.2100       delta=-            tol=exact
+PASS    exit_oco             stop_market_trigger        expected=293.2099       observed=293.2099       delta=-            tol=exact
+PASS    exit_oco             market_if_touched_trigger  expected=293.2101       observed=293.2101       delta=-            tol=exact
+PASS    exit_oco             legs_accepted              expected=2              observed=2              delta=-            tol=exact
+PASS    exit_oco             denied_or_rejected         expected=0              observed=0              delta=-            tol=exact
+PASS    exit_oco             fill_events                expected=1              observed=1              delta=-            tol=exact
+PASS    exit_oco             fill_quantity              expected=304            observed=304            delta=-            tol=exact
+PASS    exit_oco             look_ahead_fill            expected=after 1588190400000000000 observed=1588255200000000000 delta=-            tol=exact
+PASS    exit_oco             sibling_cancels            expected=1              observed=1              delta=-            tol=exact
+PASS    exit_oco             sibling_canceled_at_fill_instant expected=1588255200000000000 observed=1588255200000000000 delta=-            tol=exact
+PASS    exit_oco             engine_final_status        expected={'filled': ('FILLED', '304'), 'sibling': ('CANCELED', '0')} observed={'filled': ('FILLED', '304'), 'sibling': ('CANCELED', '0')} delta=-            tol=exact
+PASS    exit_oco             fill_in_tested_bar         expected=1588255200000000000 observed=1588255200000000000 delta=-            tol=exact
+PASS    exit_oco             moo_proxy_no_gap           expected=>= 0.0001      observed=1.5200         delta=-            tol=exact
+PASS    exit_oco             moo_proxy_not_open         expected=291.6900       observed=291.6900       delta=-            tol=exact
+PASS    exit_oco             filled_leg_by_open_rule    expected=STOP_MARKET    observed=STOP_MARKET    delta=-            tol=exact
+PASS    runs                 count                      expected=2              observed=2              delta=-            tol=exact
+PASS    run_integrity        run-1.strategy_callback_errors expected=0              observed=0              delta=-            tol=exact
+PASS    engine_log           run-1.captured_lines       expected=> 0            observed=230            delta=-            tol=exact
+PASS    engine_log           run-1.error_lines          expected=0              observed=0              delta=-            tol=exact
+PASS    engine_log           run-1.negative_cash_lines  expected=0              observed=0              delta=-            tol=exact
+PASS    run_integrity        run-2.strategy_callback_errors expected=0              observed=0              delta=-            tol=exact
+PASS    engine_log           run-2.captured_lines       expected=> 0            observed=230            delta=-            tol=exact
+PASS    engine_log           run-2.error_lines          expected=0              observed=0              delta=-            tol=exact
+PASS    engine_log           run-2.negative_cash_lines  expected=0              observed=0              delta=-            tol=exact
+PASS    distribution_module  class                      expected=DistributionModule observed=DistributionModule delta=-            tol=exact
+PASS    distribution_module  venue_module_count         expected=1              observed=1              delta=-            tol=exact
+PASS    distribution_module  errors                     expected=0              observed=0              delta=-            tol=exact
+PASS    distribution_module  emissions                  expected=2              observed=2              delta=-            tol=exact
+PASS    distribution_1       process_called_at_ex_instant expected=1576818000000000000 observed=1576818000000000000 delta=-            tol=exact
+PASS    distribution_1       emitted_at_ns              expected=1576818000000000000 observed=1576818000000000000 delta=-            tol=exact
+PASS    distribution_1       on_time                    expected=True           observed=True           delta=-            tol=exact
+PASS    distribution_1       eligible_quantity          expected=0              observed=0              delta=-            tol=exact
+PASS    distribution_1       per_share                  expected=1.57           observed=1.57           delta=-            tol=exact
+PASS    distribution_1       amount_usd                 expected=0.00           observed=0.00           delta=0.00         tol=0
+PASS    distribution_1       acknowledged_applied       expected=True           observed=True           delta=-            tol=exact
+PASS    distribution_1       reported_account_state_delta expected=0.00           observed=0.00           delta=-            tol=exact
+PASS    distribution_2       process_called_at_ex_instant expected=1584676800000000000 observed=1584676800000000000 delta=-            tol=exact
+PASS    distribution_2       emitted_at_ns              expected=1584676800000000000 observed=1584676800000000000 delta=-            tol=exact
+PASS    distribution_2       on_time                    expected=True           observed=True           delta=-            tol=exact
+PASS    distribution_2       eligible_quantity          expected=304            observed=304            delta=-            tol=exact
+PASS    distribution_2       per_share                  expected=1.41           observed=1.41           delta=-            tol=exact
+PASS    distribution_2       amount_usd                 expected=428.64         observed=428.64         delta=0.00         tol=0
+PASS    distribution_2       acknowledged_applied       expected=True           observed=True           delta=-            tol=exact
+PASS    distribution_2       reported_account_state_delta expected=428.64         observed=428.64         delta=-            tol=exact
+PASS    distribution_module  unexplained_reported_account_states expected=[]             observed=[]             delta=-            tol=exact
+PASS    distribution_ledger  engine_posted              expected=True           observed=True           delta=-            tol=exact
+PASS    two_run_determinism  normalized_economic_sha256 expected=equal          observed=equal          delta=-            tol=exact
+VERDICT {"attribution_evidence": "converted bars", "blocking_mappings": [], "case": "one_zero", "complete": true, "deviation_acceptance_recorded": true, "execution_checks": {"fail": 0, "pass": 106, "skipped": 0}, "failed": 0, "manifest_schema_version": 2, "manifest_unsupported_mappings": [], "native_end_cash_usd": "90734.08", "note": "Mapping manifest v2 declares no unsupported row for this case, so no failure can be attributed: any failing check is FAIL, and so is any skipped check or rejected attribution (a sealed falsifier). The preconditions are checks under the sealed verdict rule, so an unmet precondition fails the comparison even when every execution check passes; preregistration_qualifying and execution_checks report the two separately.", "preconditions": {"precondition_engine.environment_beyond_cleared_set#53": "PASS", "precondition_engine.environment_values#54": "PASS", "precondition_engine.extension_sha256#51": "PASS", "precondition_engine.network_interfaces#52": "PASS", "precondition_engine.pid_namespace_pid1#58": "PASS", "precondition_engine.python_isolated_flag#56": "PASS", "precondition_engine.read_only_mounts#55": "PASS", "precondition_engine.user_namespace#57": "PASS", "precondition_engine.version#50": "PASS", "precondition_hashes.inputs_at_comparison#49": "PASS", "precondition_hashes.inputs_at_run#48": "PASS", "precondition_hashes.sealed_manifest_sha256#46": "PASS", "precondition_hashes.tolerances_sha256#47": "PASS", "precondition_review.completed_before_run_started#32": "PASS", "precondition_review.deviation_acceptance.accepted_before_run_started#45": "PASS", "precondition_review.deviation_acceptance.accepted_by#42": "PASS", "precondition_review.deviation_acceptance.deviation_declared_in_receipt#41": "PASS", "precondition_review.deviation_acceptance.deviation_id#40": "PASS", "precondition_review.deviation_acceptance.fields#38": "PASS", "precondition_review.deviation_acceptance.path#36": "PASS", "precondition_review.deviation_acceptance.reviewed_harness_is_the_harness_that_ran#44": "PASS", "precondition_review.deviation_acceptance.schema_version#39": "PASS", "precondition_review.deviation_acceptance.sha256_at_comparison#37": "PASS", "precondition_review.deviation_acceptance.statement#43": "PASS", "precondition_review.no_prior_replay_ran_the_reviewed_harness#35": "PASS", "precondition_review.record_sha256_at_comparison#29": "PASS", "precondition_review.replay_history_at_comparison#34": "PASS", "precondition_review.reviewed_files_are_the_files_that_ran#31": "PASS", "precondition_review.schema#30": "PASS", "precondition_review.unresolved_findings#33": "PASS"}, "preregistration_deviations": ["review_before_first_run", "first_v2_run_preceded_review", "sealed_status_fields_not_updated", "late_emission_refusal_is_post_run", "venue_module_count_not_engine_observable", "bars_mode_cannot_rehash_inputs", "isolation_partially_observed", "v2_output_paths", "manifest_evidence_class_token", "engine_log_level_info", "operator_declared_commit"], "preregistration_qualifying": true, "prior_v2_replays": 10, "prior_v2_replays_reviewed_before_run": 3, "qualification_kind": "rc6 candidate replication", "rejected_attributions": [], "skipped": [], "unattributed_failures": [], "verdict": "PASS"}

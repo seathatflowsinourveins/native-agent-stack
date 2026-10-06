@@ -73,13 +73,24 @@ economic predicate remain unchanged. The addendum records every changed line,
 its binding category and the variant/oracle hashes. Historical rc5 citations
 stay under their original engine provenance; old approvals are not relabelled.
 
-The final addendum still needs the independent Opus exact-head read;5f may
-object there. The copied method retains the source-bound gate-owner deviation
-predicate and needs the actual new owner record, plus verification of the staged inputs and the
-approved managed-Python route. Missing conditions remain visible failures or
-blockers. The source-freeze receipt is separate from historical runtime
-acceptance. No native case result is inferred from either. Open issues #5007,
-#5057 and #5060 retain their dated source-snapshot scope.
+Opus accepted the exact910351ff source with zero unresolved findings. Its actual
+review record and5f's issued deviation acceptance were committed unchanged;
+the seven reviewed file identities stayed intact. The staged input hashes and
+final documented-environment launcher-equivalent route were verified before
+the first and only rc6 SPY replay. Replay and comparator exited0: all136checks
+passed, no failures/skips, including the106execution-check subset. The method
+reports candidate preregistration_qualifying true, fees0.00, endcash90734.08,
+distributions428.64 and equal normalized economic records. Raw report files may
+differ under the unchanged generated-ID normalization rule.
+
+The [publication receipt](../../evidence/receipts/nautilus-rc6-spy-first-replication-20261006.json)
+names the actual rc6 files and preserves primary returned outputs. This is
+local historical candidate replication, not an unchanged upstream suite,
+broker/risk-cap acceptance or destination selection. Independent review of
+the execution publication remains pending. The attempt is appended with its
+full seven-file identity; no retry can qualify. AAPL remains blocked. The
+source-freeze and prior offline runtime receipts retain their separate dated
+scopes; issues #5007, #5057 and #5060 retain their source-snapshot scope.
 
 ## Consequences
 
