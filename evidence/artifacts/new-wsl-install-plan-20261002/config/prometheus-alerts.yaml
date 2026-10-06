@@ -24,6 +24,9 @@ groups:
       # Collector http_check targets (otel.yaml http_check/ecosystem), as in the template's
       # EcosystemOmniRouteHealthUnexpected; missing data counts as unexpected. agentsview is an on-demand daemon
       # (plan row session-analytics: started by agentsview daemon start), so it is observed without a rule.
+      # Contrib v0.162.0 scraper.go:419-440 emits failed status classes without the previous response code.
+      # The exporter retains that older successful label set for metric_expiration (5m), then these rules wait 2m:
+      # an outage after a healthy response takes about 7m to alert, plus collection/scrape/evaluation alignment.
       - alert: EcosystemOmniRouteHealthUnexpected
         expr: '(max(httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx"}) or vector(0)) < 1'
         for: 2m
@@ -33,7 +36,7 @@ groups:
           component: OmniRoute
         annotations:
           summary: 'Local OmniRoute health response is unexpected or missing'
-          description: 'Expected 2xx at http://127.0.0.1:21128/api/health, OmniRoute''s unauthenticated liveness route; this checks transport, not provider or job execution.'
+          description: 'Expected 2xx at http://127.0.0.1:21128/api/health, OmniRoute''s unauthenticated liveness route; this checks transport, not provider or job execution. After a healthy response, an outage takes about 7 minutes to alert: 5-minute metric expiration plus the 2-minute hold, with collection/scrape/evaluation alignment.'
       - alert: EcosystemDaguHealthUnexpected
         expr: '(max(httpcheck_status{http_url="http://127.0.0.1:21080/api/v1/health",http_status_class="2xx"}) or vector(0)) < 1'
         for: 2m
@@ -43,7 +46,7 @@ groups:
           component: Dagu
         annotations:
           summary: 'Local Dagu health response is unexpected or missing'
-          description: 'Expected 2xx at http://127.0.0.1:21080/api/v1/health, the route Dagu''s installer probes; DAG runs and the login are checked separately.'
+          description: 'Expected 2xx at http://127.0.0.1:21080/api/v1/health, the route Dagu''s installer probes; DAG runs and the login are checked separately. After a healthy response, an outage takes about 7 minutes to alert: 5-minute metric expiration plus the 2-minute hold, with collection/scrape/evaluation alignment.'
       - alert: EcosystemOllamaHealthUnexpected
         expr: '(max(httpcheck_status{http_url="http://127.0.0.1:21434/api/version",http_status_class="2xx"}) or vector(0)) < 1'
         for: 2m
@@ -53,7 +56,7 @@ groups:
           component: Ollama
         annotations:
           summary: 'Local Ollama server response is unexpected or missing'
-          description: 'Expected 2xx at http://127.0.0.1:21434/api/version; this checks the model server, not a loaded model.'
+          description: 'Expected 2xx at http://127.0.0.1:21434/api/version; this checks the model server, not a loaded model. After a healthy response, an outage takes about 7 minutes to alert: 5-minute metric expiration plus the 2-minute hold, with collection/scrape/evaluation alignment.'
       # prometheus/alertmanager@v0.34.1 doc/alertmanager-mixin/alerts.libsonnet:42-59 (alertmanagerSelector job="alertmanager").
       - alert: AlertmanagerFailedToSendAlerts
         expr: |

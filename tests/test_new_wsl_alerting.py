@@ -17,10 +17,13 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -252,11 +255,60 @@ exit 0
     def test_failing_unit_tests_leave_every_live_file_untouched(self):
         for name in ("prometheus-alerts.yaml", "prometheus-alerts.test.yaml", "prometheus.yaml"):
             (self.config / name).write_text(f"# live {name}\n")
+        (self.config / ".g4-source-digests.json").write_text(json.dumps(
+            {p.name: self.digest(p) for p in self.config.iterdir()}))
         before = {p.name: p.read_bytes() for p in self.config.iterdir()}
         result = self.render(STUB_TEST_EXIT="1")
         self.assertEqual(result.returncode, 1)
         self.assertIn("refused prometheus-alerts.test.yaml; originals retained", result.stderr)
         self.assertEqual({p.name: p.read_bytes() for p in self.config.iterdir()}, before)
+
+    def test_an_operator_scrape_edit_leaves_the_rule_pair_and_ledger_untouched(self):
+        for name in ("prometheus-alerts.yaml", "prometheus-alerts.test.yaml"):
+            (self.config / name).write_text(f"# earlier owned {name}\n")
+        (self.config / ".g4-source-digests.json").write_text(json.dumps(
+            {p.name: self.digest(p) for p in self.config.iterdir()}))
+        (self.config / "prometheus.yaml").write_text("# operator scrape configuration\n")
+        before = {p.name: p.read_bytes() for p in self.config.iterdir()}
+        result = self.render()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("retained operator configuration for prometheus.yaml", result.stderr)
+        self.assertEqual({p.name: p.read_bytes() for p in self.config.iterdir()}, before)
+
+    def test_an_operator_test_edit_leaves_the_rule_file_untouched(self):
+        rules = self.config / "prometheus-alerts.yaml"
+        rules.write_text("# earlier owned rules\n")
+        (self.config / ".g4-source-digests.json").write_text(json.dumps({rules.name: self.digest(rules)}))
+        (self.config / "prometheus-alerts.test.yaml").write_text("# operator test fixture\n")
+        before = {p.name: p.read_bytes() for p in self.config.iterdir()}
+        result = self.render()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("retained operator configuration for prometheus-alerts.test.yaml", result.stderr)
+        self.assertEqual({p.name: p.read_bytes() for p in self.config.iterdir()}, before)
+
+    def test_a_scrape_symlink_is_refused_before_publishing_the_rule_pair(self):
+        target = self.root / "operator-prometheus.yaml"
+        target.write_text("# operator scrape configuration\n")
+        (self.config / "prometheus.yaml").symlink_to(target)
+        result = self.render()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("retained symlink for prometheus.yaml", result.stderr)
+        self.assertEqual(sorted(p.name for p in self.config.iterdir()), ["prometheus.yaml"])
+        self.assertEqual(target.read_text(), "# operator scrape configuration\n")
+
+    def test_a_missing_promtool_names_the_owner_and_leaves_every_file_untouched(self):
+        (self.root / "tools/prometheus/prometheus-3.15.0.linux-amd64/promtool").unlink()
+        result = self.render()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("install the prometheus owner", result.stderr)
+        self.assertEqual(list(self.config.iterdir()), [])
+
+    def test_a_nonexecutable_promtool_is_refused_before_any_write(self):
+        (self.root / "tools/prometheus/prometheus-3.15.0.linux-amd64/promtool").chmod(0o600)
+        result = self.render()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("install the prometheus owner", result.stderr)
+        self.assertEqual(list(self.config.iterdir()), [])
 
     def test_a_missing_tool_root_is_refused_before_any_write(self):
         result = self.render(tool_root="")
@@ -309,6 +361,124 @@ class NativeCollectorTests(unittest.TestCase):
             result = subprocess.run([OTELCOL, "validate", f"--config={CONFIG / 'otel.yaml'}"], env=env,
                                     capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_native_hook_metric_dimensions_survive_the_real_privacy_processor(self):
+        """Synthetic OTLP metric through the committed processor and native Prometheus exporter; no host apply.
+
+        Names/dimensions: Codex 0.160.1 d27764b, otel/src/metrics/names.rs:61-62 and
+        core/src/hook_runtime.rs:985-1029. This exercises label retention, not a real hook firing.
+        """
+        def free_port():
+            with socket.socket() as sock:
+                sock.bind(("127.0.0.1", 0))
+                return sock.getsockname()[1]
+
+        with tempfile.TemporaryDirectory() as scratch:
+            otlp_port, prom_port = free_port(), free_port()
+            processor = re.search(r"(?ms)^  transform/privacy:\n.*?(?=^  transform/clock_offset_check:)",
+                                  (CONFIG / "otel.yaml").read_text()).group(0)
+            config = Path(scratch) / "fixture.yaml"
+            log_file = Path(scratch) / "events.jsonl"
+            config.write_text(
+                f"receivers:\n  otlp:\n    protocols:\n      http:\n        endpoint: 127.0.0.1:{otlp_port}\n"
+                + "processors:\n" + processor
+                + f"exporters:\n  prometheus:\n    endpoint: 127.0.0.1:{prom_port}\n"
+                + f"  file:\n    path: {log_file}\n"
+                + "service:\n  telemetry:\n    logs:\n      level: error\n  pipelines:\n"
+                + "    metrics:\n      receivers: [otlp]\n      processors: [transform/privacy]\n"
+                + "      exporters: [prometheus]\n"
+                + "    logs:\n      receivers: [otlp]\n      processors: [transform/privacy]\n"
+                + "      exporters: [file]\n")
+            process = subprocess.Popen([OTELCOL, "--config", str(config)], cwd=scratch,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+            try:
+                endpoint = f"http://127.0.0.1:{prom_port}/metrics"
+                for _ in range(100):
+                    try:
+                        with urllib.request.urlopen(endpoint, timeout=1):
+                            break
+                    except OSError:
+                        self.assertIsNone(process.poll(), "scratch Collector exited before readiness")
+                        time.sleep(0.05)
+                else:
+                    self.fail("scratch Collector did not become ready")
+                now = time.time_ns()
+                dimensions = {"hook_name": "PreToolUse", "source": "user", "status": "completed",
+                              "handler_type": "command", "execution_mode": "sync"}
+                attributes = [{"key": k, "value": {"stringValue": v}} for k, v in dimensions.items()]
+                attributes.append({"key": "private_fixture", "value": {"stringValue": "fixture-omitted"}})
+                payload = {"resourceMetrics": [{"scopeMetrics": [{"metrics": [{
+                    "name": "codex.hooks.run", "sum": {"isMonotonic": True, "aggregationTemporality": 2,
+                    "dataPoints": [{"attributes": attributes, "asInt": "1",
+                                    "startTimeUnixNano": str(now - 1_000_000_000), "timeUnixNano": str(now)}]}
+                }]}]}]}
+                request = urllib.request.Request(f"http://127.0.0.1:{otlp_port}/v1/metrics",
+                                                 data=json.dumps(payload).encode(),
+                                                 headers={"Content-Type": "application/json"})
+                with urllib.request.urlopen(request, timeout=5) as response:
+                    self.assertEqual(response.status, 200)
+                for _ in range(100):
+                    with urllib.request.urlopen(endpoint, timeout=1) as response:
+                        exported = response.read().decode()
+                    lines = [line for line in exported.splitlines() if line.startswith("codex_hooks_run_total{")]
+                    if lines:
+                        break
+                    time.sleep(0.05)
+                self.assertEqual(len(lines), 1, "one synthetic native-name counter must be exported")
+                for key, value in dimensions.items():
+                    self.assertIn(f'{key}="{value}"', lines[0])
+                self.assertNotIn("fixture-omitted", exported)
+                # Actual native source enums plus an invalid value; raw matcher/body text is a generated marker.
+                sources = ["config", "hook", "user_permanent", "user_temporary", "user_abort", "user_reject",
+                           "AutomatedReviewer", "Config", "User", "fixture-omitted"]
+                records = []
+                for i, source in enumerate(sources):
+                    values = {"receipt_id": str(i), "source": source,
+                              "event.name": "tool_decision" if i < 6 else "codex.tool_decision"}
+                    attrs = [{"key": k, "value": {"stringValue": v}} for k, v in values.items()]
+                    records.append({"timeUnixNano": str(now), "attributes": attrs,
+                                    "body": {"stringValue": "fixture-omitted"}})
+                hook_values = {"receipt_id": "hook", "event.name": "hook_execution_complete",
+                               "hook_event": "PreToolUse", "hook_name": "PreToolUse:fixture-omitted",
+                               "hook_source": "merged"}
+                attrs = [{"key": k, "value": {"stringValue": v}} for k, v in hook_values.items()]
+                attrs += [{"key": k, "value": {"intValue": str(v)}} for k, v in
+                          {"num_hooks": 2, "num_success": 1, "num_blocking": 1,
+                           "num_non_blocking_error": 0, "num_cancelled": 0, "total_duration_ms": 10}.items()]
+                records.append({"timeUnixNano": str(now), "attributes": attrs,
+                                "body": {"stringValue": "fixture-omitted"}})
+                payload = {"resourceLogs": [{"scopeLogs": [{"logRecords": records}]}]}
+                request = urllib.request.Request(f"http://127.0.0.1:{otlp_port}/v1/logs",
+                                                 data=json.dumps(payload).encode(),
+                                                 headers={"Content-Type": "application/json"})
+                with urllib.request.urlopen(request, timeout=5) as response:
+                    self.assertEqual(response.status, 200)
+                for _ in range(100):
+                    if log_file.exists() and log_file.stat().st_size:
+                        try:
+                            emitted = [json.loads(line) for line in log_file.read_text().splitlines()]
+                            break
+                        except json.JSONDecodeError:
+                            pass
+                    time.sleep(0.05)
+                else:
+                    self.fail("native file exporter did not return log records")
+                rows = [record for batch in emitted for resource in batch["resourceLogs"]
+                        for scope in resource["scopeLogs"] for record in scope["logRecords"]]
+                returned = {next(a["value"]["stringValue"] for a in row["attributes"]
+                                 if a["key"] == "receipt_id"):
+                            {a["key"]: next(iter(a["value"].values())) for a in row["attributes"]}
+                            for row in rows}
+                for i, source in enumerate(sources[:-1]):
+                    self.assertEqual(returned[str(i)]["source"], source)
+                self.assertNotIn("source", returned["9"])
+                self.assertEqual(returned["hook"]["hook_name"], "PreToolUse")
+                self.assertEqual(int(returned["hook"]["num_hooks"]), 2)
+                self.assertEqual(int(returned["hook"]["num_success"]), 1)
+                self.assertNotIn("fixture-omitted", log_file.read_text())
+            finally:
+                process.terminate()
+                process.communicate(timeout=10)
 
 
 if __name__ == "__main__":

@@ -312,8 +312,13 @@ the root-filesystem rules written after the 2026-10-05 ENOSPC incident.
 `install.sh --only otel-collector-contrib` publishes the matching `otel.yaml`.
 Restart the Collector and Prometheus units after both rows.
 
-Alerting post-install acceptance uses upstream amtool and native promtool rule
-validation/unit tests; install the Prometheus owner before selecting that check.
+Alerting installation and post-install acceptance use native promtool rule
+validation/unit tests; install the Prometheus owner before selecting either operation.
+The http_check rules retain the last successful coded metric for the exporter's
+5-minute expiration before their 2-minute hold: an outage after a healthy
+response takes about 7 minutes to alert, plus collection/scrape/evaluation alignment.
+After restarting Prometheus, wait for `/-/ready` and at least 30 seconds before
+the alerting `service_health` check, so the rule group's first evaluation has completed.
 Native delivery acceptance is `--only alerting --stage after_sign_in`. It prints
 `needs_user (78)` when the destination files are absent. Once wired, it
 posts an expiring tagged alert, exercises the empty file-SD fixture using a

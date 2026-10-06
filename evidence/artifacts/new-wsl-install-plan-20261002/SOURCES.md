@@ -1008,3 +1008,60 @@ in this builder.
   `needs_user` and no trial is invented. ATIF schema acceptance is separate from
   the native telemetry-contract assertions described in
   `config/harbor-worker-telemetry-contract.md`.
+
+## PR 779 review repair and log-field provenance (2026-10-06)
+
+- **Health alert latency:** Contrib v0.162.0
+  [status-class emission](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/httpcheckreceiver/scraper.go#L419)
+  and [five-minute exporter expiration](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md#L29)
+  require the real-shaped fixture: a retained successful coded series and an
+  uncoded zero from the failure. The shared exporter remains; the descriptions
+  disclose about seven minutes plus collection/scrape/evaluation alignment.
+- **Journal boot selection:** systemd v259
+  [journalctl.c:1014-1017](https://github.com/systemd/systemd/blob/v259/src/journal/journalctl.c#L1014)
+  makes `--follow` choose the current boot unless `--merge` is set. A stored
+  cursor does not remove that boot filter: old-boot lines after it are skipped
+  after reboot, while `merge: true` would replay retained boots.
+- **Dagu correction:** the earlier authentication citation only describes
+  access-log exclusions. The initial metrics probe reported 401; the repair-time
+  unauthenticated GET returned 200, with the body discarded. The existing
+  health route is retained; metrics qualification remains with its owner.
+- **Native Codex log attributes:** installed 0.160.1, release tag
+  `rust-v0.160.1`, commit `d27764b82f7118f674371e6d6e76271d9d606edb`. The
+  [release changelog](https://github.com/openai/codex/releases/tag/rust-v0.160.1)
+  was checked through `gh api`. The LOG allowlist retains optional decision
+  [source](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/otel/src/events/session_telemetry.rs#L1166),
+  legacy failure-log
+  [hook_name](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/hook_runtime.rs#L653),
+  and a supplied `hook.event_name`, whose native origin is a
+  [trace-span field](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/hooks/src/engine/command_runner.rs#L199).
+  These log fields are not promoted to resource labels. Decision source values
+  use the closed union of Codex's enum and Claude's documented lower-case values;
+  unknown values are removed. Hook identity is coarsened to the validated
+  lifecycle event, discarding arbitrary matcher text.
+  [Native hook-run metrics](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/hook_runtime.rs#L931)
+  are distinct from supplied logs; log-field retention alone establishes neither
+  hook firing counts nor total RTK rewrites.
+- **Native hook countability:**
+  [names.rs:61-62](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/otel/src/metrics/names.rs#L61)
+  defines plural `codex.hooks.run` and `codex.hooks.run.duration_ms`, correcting
+  the initial singular shorthand. Only these native metrics preserve the five
+  typed dimensions before aggregation and datapoint filtering; other metric
+  allowlists are unchanged. The exported counter is `codex_hooks_run_total`.
+  The native Collector synthetic fixture went red when `hook_name` was stripped
+  and green after retention. This proves the integration's field transport,
+  not real hook execution or deployed ingestion.
+- **Claude native hooks and decision sources:** installed `claude --version`
+  returned 2.1.291 and its
+  [release changelog](https://github.com/anthropics/claude-code/releases/tag/v2.1.291)
+  was checked through `gh api`. Official
+  [tool-decision documentation](https://code.claude.com/docs/en/monitoring-usage#tool-decision-event)
+  lists six source values; official
+  [hook execution documentation](https://code.claude.com/docs/en/monitoring-usage#hook-execution-start-event)
+  defines aggregate start/completion events, lifecycle identity and native count
+  fields. Raw matcher/configuration text is discarded; numeric count fields are
+  retained only with native numeric types. Native log counts are not inferred
+  by counting records when the producer publishes `num_hooks` or outcome counts.
+  The lifecycle vocabulary comes from the official
+  [hook events reference](https://code.claude.com/docs/en/hooks#hook-events)
+  together with Codex's typed event enum; unknown identities are discarded.

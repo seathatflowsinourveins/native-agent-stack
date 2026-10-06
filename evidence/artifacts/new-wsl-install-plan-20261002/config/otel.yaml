@@ -42,11 +42,12 @@ receivers:
     targets:
       - endpoint: http://127.0.0.1:21333/health/status
         timeout: 5s
-      # 2026-10-06: services with no /metrics that Prometheus can read without a login (probed that day).
+      # 2026-10-06: selected native HTTP health routes; metrics exposure is a separate service-owner qualification.
       # OmniRoute 3.8.51 unauthenticated liveness: diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e
       # src/app/api/health/route.ts:3-17. Dagu v2.18.2 health, the installer's own probe:
-      # dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4 scripts/installer.sh:1987-1989 (its /api/v1/metrics
-      # needs a login unless server.metrics is public: internal/service/frontend/server.go:804-811). Ollama v0.35.0:
+      # dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4 scripts/installer.sh:1987-1989. The initial metrics
+      # probe reported 401; a repair-time unauthenticated GET returned 200 (body discarded), so no current login
+      # requirement is inferred from the access-log path list. Ollama v0.35.0:
       # ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84 server/routes.go:2022-2023. agentsview v0.43.0, an
       # on-demand daemon (observed only, no alert rule): kenn-io/agentsview@9be7745ad1906ee24e04eb05bb86c872ef0939a1
       # internal/server/huma_routes_health.go:19-23. A refused connection records httpcheck.error and status 0 without
@@ -64,8 +65,10 @@ receivers:
   # _SYSTEMD_USER_UNIT on short-lived runs (45 of 121 lines this boot on 2026-10-06; command-center correction #8).
   # opentelemetry-collector-contrib v0.162.0 receiver/journaldreceiver/README.md:36-60,184-201 and
   # pkg/stanza/operator/input/journald/config_linux.go:90-153,194-205: start_at beginning passes --no-tail, so the
-  # cursor kept in file_storage resumes after a restart without losing lines (start_at end passes --lines=0, which
-  # skips the lines logged while the Collector was down). The first start reads the current boot once.
+  # cursor kept in file_storage resumes after a same-boot restart (start_at end passes --lines=0, which
+  # skips the lines logged while the Collector was down). systemd/systemd v259 src/journal/journalctl.c:1014-1017
+  # makes --follow select the current boot unless --merge is set: the first start reads that boot's earlier lines;
+  # merge: true would replay retained boots, and old-boot lines after a saved cursor are skipped after a reboot.
   journald/clock_offset_check:
     matches:
       - SYSLOG_IDENTIFIER: clock-offset-check
@@ -257,7 +260,34 @@ processors:
           # Loki stores these as structured metadata; only service.name is indexed by the backend template.
           # Codex size fields (tool_result.rs:64,74-76) are retained when supplied; lengths are trace-only upstream.
           # Codex call_id (shape-checked in transform/tool_names) pairs codex.tool_decision with codex.tool_result.
-          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "usage_scope", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "tool_use_id", "call_id", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "cost_usd", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "arguments_length", "output_length", "output_line_count", "output_truncated", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id"])
+          # Native decision source vocabularies: Claude monitoring-usage#tool-decision-event and Codex
+          # d27764b otel/src/lib.rs:48-54 (Display retains AutomatedReviewer/Config/User casing).
+          - delete_key(attributes, "source") where attributes["source"] != nil and not IsString(attributes["source"])
+          - delete_key(attributes, "hook_event") where attributes["hook_event"] != nil and not IsString(attributes["hook_event"])
+          - delete_key(attributes, "hook.event_name") where attributes["hook.event_name"] != nil and not IsString(attributes["hook.event_name"])
+          - delete_key(attributes, "hook_name") where attributes["hook_name"] != nil and not IsString(attributes["hook_name"])
+          - delete_key(attributes, "hook_source") where attributes["hook_source"] != nil and not IsString(attributes["hook_source"])
+          - delete_key(attributes, "source") where attributes["source"] != nil and not IsMatch(attributes["source"], "^(config|hook|user_permanent|user_temporary|user_abort|user_reject|AutomatedReviewer|Config|User)$")
+          # Claude hook_name includes arbitrary matcher text. Retain the closed lifecycle identity instead;
+          # Codex's only legacy notify hook name is fixed (hooks/src/legacy_notify.rs:45-48).
+          - delete_key(attributes, "hook_event") where attributes["hook_event"] != nil and not IsMatch(attributes["hook_event"], "^(SessionStart|Setup|InstructionsLoaded|UserPromptSubmit|UserPromptExpansion|MessageDisplay|PreToolUse|PermissionRequest|PostToolUse|PostToolUseFailure|PostToolBatch|PermissionDenied|Notification|SubagentStart|SubagentStop|TaskCreated|TaskCompleted|Stop|StopFailure|TeammateIdle|ConfigChange|CwdChanged|DirectoryAdded|FileChanged|WorktreeCreate|WorktreeRemove|PreCompact|PostCompact|PreModelSwitch|PostModelSwitch|SessionEnd|Elicitation|ElicitationResult|Interrupt)$")
+          - delete_key(attributes, "hook.event_name") where attributes["hook.event_name"] != nil and not IsMatch(attributes["hook.event_name"], "^(SessionStart|Setup|InstructionsLoaded|UserPromptSubmit|UserPromptExpansion|MessageDisplay|PreToolUse|PermissionRequest|PostToolUse|PostToolUseFailure|PostToolBatch|PermissionDenied|Notification|SubagentStart|SubagentStop|TaskCreated|TaskCompleted|Stop|StopFailure|TeammateIdle|ConfigChange|CwdChanged|DirectoryAdded|FileChanged|WorktreeCreate|WorktreeRemove|PreCompact|PostCompact|PreModelSwitch|PostModelSwitch|SessionEnd|Elicitation|ElicitationResult|Interrupt)$")
+          - set(attributes["hook_name"], attributes["hook_event"]) where attributes["hook_event"] != nil
+          - set(attributes["hook_name"], attributes["hook.event_name"]) where attributes["hook.event_name"] != nil and attributes["hook_event"] == nil
+          - delete_key(attributes, "hook_name") where attributes["hook_name"] != nil and not IsMatch(attributes["hook_name"], "^(SessionStart|Setup|InstructionsLoaded|UserPromptSubmit|UserPromptExpansion|MessageDisplay|PreToolUse|PermissionRequest|PostToolUse|PostToolUseFailure|PostToolBatch|PermissionDenied|Notification|SubagentStart|SubagentStop|TaskCreated|TaskCompleted|Stop|StopFailure|TeammateIdle|ConfigChange|CwdChanged|DirectoryAdded|FileChanged|WorktreeCreate|WorktreeRemove|PreCompact|PostCompact|PreModelSwitch|PostModelSwitch|SessionEnd|Elicitation|ElicitationResult|Interrupt|legacy_notify)$")
+          - delete_key(attributes, "hook_source") where attributes["hook_source"] != nil and not IsMatch(attributes["hook_source"], "^(userSettings|projectSettings|localSettings|flagSettings|policySettings|pluginHook|merged)$")
+          # Native Claude aggregate hook-event counts; do not retain arbitrary text in numeric fields.
+          - delete_key(attributes, "num_hooks") where attributes["num_hooks"] != nil and not IsInt(attributes["num_hooks"])
+          - delete_key(attributes, "num_success") where attributes["num_success"] != nil and not IsInt(attributes["num_success"])
+          - delete_key(attributes, "num_blocking") where attributes["num_blocking"] != nil and not IsInt(attributes["num_blocking"])
+          - delete_key(attributes, "num_non_blocking_error") where attributes["num_non_blocking_error"] != nil and not IsInt(attributes["num_non_blocking_error"])
+          - delete_key(attributes, "num_cancelled") where attributes["num_cancelled"] != nil and not IsInt(attributes["num_cancelled"])
+          - delete_key(attributes, "total_duration_ms") where attributes["total_duration_ms"] != nil and not (IsInt(attributes["total_duration_ms"]) or IsDouble(attributes["total_duration_ms"]))
+          # Installed Codex 0.160.1 (d27764b82f7118f674371e6d6e76271d9d606edb): events/session_telemetry.rs:1166-1191
+          # emits optional source for tool decisions; core/src/hook_runtime.rs:653-657 logs legacy failure hook_name.
+          # hook.event_name is a command-runner trace-span field (hooks/src/engine/command_runner.rs:199-211), retained
+          # only if a log producer supplies it. No hook firing or RTK rewrite count is inferred from these fields.
+          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "usage_scope", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "tool_use_id", "call_id", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "cost_usd", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "arguments_length", "output_length", "output_line_count", "output_truncated", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id", "source", "hook_name", "hook.event_name", "hook_event", "hook_source", "num_hooks", "num_success", "num_blocking", "num_non_blocking_error", "num_cancelled", "total_duration_ms"])
     metric_statements:
       - context: resource
         statements:
@@ -272,12 +302,28 @@ processors:
       - context: scope
         statements:
           - keep_keys(attributes, [])
+      - context: datapoint
+        statements:
+          # Typed native hook dimensions stay bounded before aggregation; no command/path identity is retained.
+          - delete_key(attributes, "hook_name") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["hook_name"] != nil and not IsString(attributes["hook_name"])
+          - delete_key(attributes, "hook_name") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["hook_name"] != nil and not IsMatch(attributes["hook_name"], "^(PreToolUse|PermissionRequest|PostToolUse|PreCompact|PostCompact|SessionStart|SessionEnd|UserPromptSubmit|SubagentStart|SubagentStop|Stop|Interrupt)$")
+          - delete_key(attributes, "source") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["source"] != nil and not IsString(attributes["source"])
+          - delete_key(attributes, "source") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["source"] != nil and not IsMatch(attributes["source"], "^(system|user|project|mdm|session_flags|plugin|cloud_requirements|cloud_managed_config|legacy_managed_config_file|legacy_managed_config_mdm|unknown)$")
+          - delete_key(attributes, "status") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["status"] != nil and not IsString(attributes["status"])
+          - delete_key(attributes, "status") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["status"] != nil and not IsMatch(attributes["status"], "^(running|completed|failed|blocked|stopped)$")
+          - delete_key(attributes, "handler_type") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["handler_type"] != nil and not IsString(attributes["handler_type"])
+          - delete_key(attributes, "handler_type") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["handler_type"] != nil and not IsMatch(attributes["handler_type"], "^(command|mcp_tool|prompt|agent)$")
+          - delete_key(attributes, "execution_mode") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["execution_mode"] != nil and not IsString(attributes["execution_mode"])
+          - delete_key(attributes, "execution_mode") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["execution_mode"] != nil and not IsMatch(attributes["execution_mode"], "^(sync|async)$")
       - context: metric
         statements:
           # Dropping an attribute that splits one writer's streams (agent.name, skill.name, mcp_server.name, decision,
           # phase, ...) must add those streams together; keep_keys alone leaves same-identity duplicates that
           # overwrite each other (cumulative) or are dropped as out of order (delta). Same allowlist as below.
-          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"]) where metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
+          # Exact native plural names (otel/src/metrics/names.rs:61-62) and closed typed dimensions
+          # (core/src/hook_runtime.rs:985-1029). Preserve them before aggregation as well as below.
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms")
       - context: datapoint
         statements:
           - set(resource.schema_url, "")
@@ -287,7 +333,8 @@ processors:
           - set(metric.description, "")
           - keep_keys(metric.metadata, [])
           - set(exemplars, nil) where metric.type != METRIC_DATA_TYPE_SUMMARY
-          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"])
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"]) where metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode"]) where metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms"
           - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
           - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
   # Level and reason of a clock-offset-check line, from the script's fixed vocabulary; an optional <0-7> syslog prefix

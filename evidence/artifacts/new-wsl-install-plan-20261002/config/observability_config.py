@@ -96,7 +96,7 @@ def main():
     ledger_path = root / ".g4-source-digests.json"
     ledger = json.loads(ledger_path.read_text()) if ledger_path.exists() else {}
 
-    def publish(name, text, template=None, validate=None, owned=True):
+    def guard(name, text, template=None):
         path = root / name
         if path.is_symlink():
             raise ValueError(f"retained symlink for {name}; migrate its owner configuration separately")
@@ -104,6 +104,10 @@ def main():
             old = path.read_text()
             if old != text and digest(old) not in (PRISTINE.get(name), ledger.get(name), digest(template or "")):
                 raise ValueError(f"retained operator configuration for {name}; merge the G4 source separately")
+
+    def publish(name, text, template=None, validate=None, owned=True):
+        guard(name, text, template)
+        path = root / name
         if validate:
             fd, temporary = tempfile.mkstemp(prefix=".g4-validate-", dir=root)
             try:
@@ -198,8 +202,15 @@ def main():
             if not os.environ.get("tool_root"):
                 raise ValueError("alerting requires tool_root, the plan's tool directory (install.sh exports it)")
             promtool = str(Path(os.environ["tool_root"]) / "prometheus/prometheus-3.15.0.linux-amd64/promtool")
+            if not Path(promtool).is_file() or not os.access(promtool, os.X_OK):
+                raise ValueError("alerting requires executable promtool; install the prometheus owner before --only alerting")
             rules = (source / "prometheus-alerts.yaml").read_text()
             tests = (source / "prometheus-alerts.test.yaml").read_text()
+            scrape = (source / "prometheus.yaml").read_text()
+            # Refuse every operator edit or symlink before changing the pair or its ownership ledger.
+            for name, text in (("prometheus-alerts.yaml", rules), ("prometheus-alerts.test.yaml", tests),
+                               ("prometheus.yaml", scrape)):
+                guard(name, text)
             with tempfile.TemporaryDirectory(prefix=".g4-validate-", dir=root) as scratch:
                 for name, text in (("prometheus-alerts.yaml", rules), ("prometheus-alerts.test.yaml", tests)):
                     (Path(scratch) / name).write_text(text)
@@ -208,7 +219,7 @@ def main():
                     raise ValueError("upstream validator refused prometheus-alerts.test.yaml; originals retained")
             publish("prometheus-alerts.yaml", rules, validate=[promtool, "check", "rules"])
             publish("prometheus-alerts.test.yaml", tests)
-            publish("prometheus.yaml", (source / "prometheus.yaml").read_text(), validate=[promtool, "check", "config"])
+            publish("prometheus.yaml", scrape, validate=[promtool, "check", "config"])
         mode, pointers, ready = destination()
         if not ready:
             print("needs_user: choose the alert destination and supply its private destination file(s); disarmed placeholder retained", file=sys.stderr)

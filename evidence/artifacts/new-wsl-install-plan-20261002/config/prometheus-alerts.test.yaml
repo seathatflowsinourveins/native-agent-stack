@@ -192,7 +192,10 @@ tests:
   - name: 'http_check: OmniRoute turns unhealthy, Dagu is missing, Ollama is healthy'
     interval: 15s
     input_series:
-    - {series: 'httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx",http_status_code="200",http_method="GET"}', values: 1x8 0x16}
+    # Failure starts at 2m15s. The receiver emits the failed class without a code; the exporter retains the last
+    # successful {2xx,200}=1 for its 5m expiration instead of emitting {2xx,200}=0.
+    - {series: 'httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx",http_status_code="200",http_method="GET"}', values: 1x28 stale}
+    - {series: 'httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx",http_method="GET"}', values: _x8 0x40}
     - {series: 'httpcheck_status{http_url="http://127.0.0.1:21434/api/version",http_status_class="2xx",http_status_code="200",http_method="GET"}', values: 1x30}
     alert_rule_test:
     - eval_time: 2m
@@ -203,9 +206,15 @@ tests:
       exp_alerts: []
     - eval_time: 4m15s
       alertname: EcosystemOmniRouteHealthUnexpected
+      exp_alerts: []
+    - eval_time: 9m10s
+      alertname: EcosystemOmniRouteHealthUnexpected
+      exp_alerts: []
+    - eval_time: 9m15s
+      alertname: EcosystemOmniRouteHealthUnexpected
       exp_alerts:
       - exp_labels: {severity: warning, scope: local-ecosystem, component: OmniRoute}
-        exp_annotations: {summary: Local OmniRoute health response is unexpected or missing, description: 'Expected 2xx at http://127.0.0.1:21128/api/health, OmniRoute''s unauthenticated liveness route; this checks transport, not provider or job execution.'}
+        exp_annotations: {summary: Local OmniRoute health response is unexpected or missing, description: 'Expected 2xx at http://127.0.0.1:21128/api/health, OmniRoute''s unauthenticated liveness route; this checks transport, not provider or job execution. After a healthy response, an outage takes about 7 minutes to alert: 5-minute metric expiration plus the 2-minute hold, with collection/scrape/evaluation alignment.'}
     - eval_time: 1m55s
       alertname: EcosystemDaguHealthUnexpected
       exp_alerts: []
@@ -213,7 +222,7 @@ tests:
       alertname: EcosystemDaguHealthUnexpected
       exp_alerts:
       - exp_labels: {severity: warning, scope: local-ecosystem, component: Dagu}
-        exp_annotations: {summary: Local Dagu health response is unexpected or missing, description: 'Expected 2xx at http://127.0.0.1:21080/api/v1/health, the route Dagu''s installer probes; DAG runs and the login are checked separately.'}
+        exp_annotations: {summary: Local Dagu health response is unexpected or missing, description: 'Expected 2xx at http://127.0.0.1:21080/api/v1/health, the route Dagu''s installer probes; DAG runs and the login are checked separately. After a healthy response, an outage takes about 7 minutes to alert: 5-minute metric expiration plus the 2-minute hold, with collection/scrape/evaluation alignment.'}
     - eval_time: 5m
       alertname: EcosystemOllamaHealthUnexpected
       exp_alerts: []
