@@ -338,7 +338,7 @@ def collect(home):
         "passwordless_sudo": {
             "marker": marker_observation(),
             "status": "unknown",
-            "other_source": "adoption/platforms/linux-wsl2-new-distro.md:627 (recipe criterion only; per-host acceptance not linked)",
+            "other_source": "adoption/platforms/linux-wsl2-new-distro.md:636 (recipe criterion only; per-host acceptance not linked)",
         },
         "launchers": {name: binary_observation(name) for name in LAUNCHERS},
         "launcher_packages": {name: package_observation(name) for name in ("time", "util-linux", "procps", "systemd", "gdb")},

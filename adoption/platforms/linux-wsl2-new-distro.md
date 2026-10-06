@@ -560,6 +560,8 @@ wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json
 wsl.exe -d '<Name>' -u root --exec cloud-init schema --system
 wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf
+wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value
+tzutil /g
 wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled
 wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'
 wsl.exe --list --verbose
@@ -621,9 +623,16 @@ Proof (path A, cloud-init provisioned the instance):
   `:1286-1293`). The 26.04.1 rehearsal returned `Valid schema user-data` after the marker on both host releases;
   each run must repeat that observation. Record the output (`schema_system`).
 - `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]` and
-  `default=<WSL_USER>`, each once. The explicit `[time]` key keeps the distribution on the time zone set in Windows
-  ([Microsoft wsl-config, "Time settings"](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#time-settings):
-  `useWindowsTimezone`, default `true`); W6 writes the same key on path B.
+  `default=<WSL_USER>`, each once. The `[time]` key restates WSL's default and records the intent
+  ([Microsoft wsl-config, "Time settings"](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#time-settings), read
+  2026-10-05: MicrosoftDocs/WSL `7ea1c6f9`, `WSL/wsl-config.md:152-158`, `useWindowsTimezone`, default `true`); W6
+  writes the same key on path B. This read-back proves the file's text at this boot only; nothing reads it later.
+- `timedatectl show -p Timezone --value` prints the IANA zone that CLDR's `windowsZones` mapping gives for the Windows
+  zone that `tzutil /g` prints ([tzutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil)
+  `/g`, read 2026-10-05) and the Windows region: the first zone of the region's row, else the `001` row, for example
+  `America/New_York` for `Eastern Standard Time` in the US. WSL maps the zone with the ICU that Windows ships and, while
+  `useWindowsTimezone` is true, links `/etc/localtime` to it at each instance start (microsoft/WSL `91f161fa`, tag
+  3.0.1: `src/windows/common/helpers.cpp:358-413`, `src/linux/init/timezone.cpp:22-110`). Record both outputs.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
 

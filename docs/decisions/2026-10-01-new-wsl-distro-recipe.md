@@ -701,6 +701,8 @@ workstation distribution (Evidence classes).
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json` | each of the four stages `finished` with empty `errors`; `recoverable_errors` recorded |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init schema --system` | path A: a line matching `^\s*Valid schema user-data$` and exit 0; skipped on path B |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf` | `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]`, `default=<WSL_USER>`, each once |
+| W5 | powershell | `wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value` | the IANA zone that CLDR's `windowsZones` mapping gives for `tzutil /g`'s zone and the Windows region, for example `America/New_York`; recorded |
+| W5 | powershell | `tzutil /g` | the Windows time zone ID, for example `Eastern Standard Time`; recorded |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled` | the marker exists |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'` | `(ALL) NOPASSWD: ALL` |
 | W5 | powershell | `wsl.exe --list --verbose` | the starred line equals W1's |
@@ -750,7 +752,7 @@ workstation distribution (Evidence classes).
 | W6 | sh | `chmod 0440 /etc/sudoers.d/90-wsl-default-user` | mode 0440 |
 | W6 | sh | `visudo -cf /etc/sudoers.d/90-wsl-default-user` | `parsed OK` |
 | W6 | sh | `grep -q '^\[user\]' /etc/wsl.conf \|\| printf '\n[user]\ndefault=%s\n' '<WSL_USER>' >> /etc/wsl.conf` | one `[user]` section naming the user |
-| W6 | sh | `grep -q '^\[time\]' /etc/wsl.conf \|\| printf '\n[time]\nuseWindowsTimezone=true\n' >> /etc/wsl.conf` | one `[time]` section with `useWindowsTimezone=true` |
+| W6 | sh | `grep -q '^\[time\]' /etc/wsl.conf \|\| printf '\n[time]\nuseWindowsTimezone=true\n' >> /etc/wsl.conf` | a `[time]` section exists (the guard reads only the header); W5's repeated read-back confirms `useWindowsTimezone=true` |
 | W6 | sh | `touch /etc/cloud/cloud-init.disabled` | the marker exists |
 | W6 | powershell | `wsl.exe --terminate '<Name>'` | exit 0 |
 | W6 | powershell | `wsl.exe --list --running` | `<Name>` absent |
@@ -1429,13 +1431,18 @@ native sign-ins are enough for them was not read from their sources and not run.
 ## Amendment 2026-10-05 (explicit `[time]` in `/etc/wsl.conf`)
 
 The user-data now writes `[time]` with `useWindowsTimezone=true` before `[user]`, and W6 appends the same key on path
-B, so both creation paths make WSL use and sync to the time zone set in Windows. Microsoft documents the key as a
-boolean that defaults to `true` (MicrosoftDocs/WSL `7ea1c6f9`, `WSL/wsl-config.md:152-158`, the pin in Sources). The
-26.04.1 image's `wsl-setup` 0.6.3 (`73418e32`, `wsl-setup:55-73`) only appends or completes `[user]`, so the section
-survives the first run. Writing the key makes W5 read it back. The coordinator measured on 2026-10-05 that
-NativeStack2604's `/etc/wsl.conf` held `useWindowsTimezone=false` with no repository record, and set it to `true` on
-that host. Only the content listings change here (path A and path B under Decision, the W5 proof and the new W6 row);
-"What the image contains" is a historical read and stays. This is a source review and local integration: no first
-launch or import ran for it. The experiment's frozen inputs that this amendment changed keep their recorded hashes
+B when `/etc/wsl.conf` has no `[time]` section. The key restates WSL's default: Microsoft documents it as a boolean that
+defaults to `true` (MicrosoftDocs/WSL `7ea1c6f9`, `WSL/wsl-config.md:152-158`, the pin in Sources), and the WSL 3.0.1
+source holds the same default (microsoft/WSL `91f161fa`, `src/linux/init/WslDistributionConfig.h:58`). Writing it
+leaves WSL's behavior unchanged and records the intent. W5 reads it back, so the first boot fails W5 when it finds
+another value or no `[time]` section; path B repeats W5's checks once after W6. Nothing reads `/etc/wsl.conf` after
+provisioning, so a later change of the key is not detected. W5 also pairs `timedatectl show -p Timezone --value` with
+`tzutil /g`, so the receipt holds the zone the distribution reports beside the Windows zone, not only the file's text.
+The 26.04.1 image's `wsl-setup` 0.6.3 (`73418e32`, `wsl-setup:55-73`) only appends or completes `[user]`, so the
+section survives the first run. The coordinator measured on 2026-10-05 that NativeStack2604's `/etc/wsl.conf` held
+`useWindowsTimezone=false` with no repository record, and set it to `true` on that host. Only the content listings
+change here (path A and path B under Decision, the W5 commands and proof, the new W5 and W6 rows); "What the image
+contains" is a historical read and stays. This is a source review and local integration: no first launch or import
+ran for it. The experiment's frozen inputs that this amendment changed keep their recorded hashes
 under `evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/`. Decision:
 [`2026-10-05-user-facing-local-time.md`](2026-10-05-user-facing-local-time.md).

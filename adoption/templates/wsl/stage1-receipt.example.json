@@ -768,6 +768,18 @@
     },
     {
       "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: the IANA zone; it must be the CLDR windowsZones mapping of the tzutil /g zone for the Windows region, for example America/New_York>"
+    },
+    {
+      "step": "W5",
+      "cmd": "tzutil /g",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: the Windows time zone ID, for example Eastern Standard Time>"
+    },
+    {
+      "step": "W5",
       "cmd": "wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
