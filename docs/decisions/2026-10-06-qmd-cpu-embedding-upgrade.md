@@ -1,8 +1,10 @@
 # Decision: test official Qwen3-Embedding-8B Q8_0 in qmd on CPU (2026-10-06)
 
-Status: selected for native acceptance; host adoption pending the authorized time
-window and supported MCP maintenance. This is a model selection record, not a
-passed benchmark or installation receipt.
+Status: selected for native acceptance in a separate named index; host build
+pending the authorized time window. The user's A1 resolves shared MCP maintenance
+by retaining the existing index and adopting the new index on natural client
+restarts. This is a selection record, not a passed benchmark or installation
+receipt.
 
 The north-star action is source-backed catalog retrieval for complex engineering
 and US-equities research and historical simulation. No trading operation or
@@ -70,28 +72,43 @@ New Qwen-VL multimodal models are outside this text-only embedding path.
 
 After the authorized time gate, freeze one known-answer catalog fixture in
 qmd's [native format](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/bench/fixtures/example.json).
-Run unchanged `qmd bench` before the model change and after a full
-`embed -f --timeout 0`, always on CPU at nice 19. Retain actual returned JSON and
+Run unchanged `qmd bench` against the existing 0.6B index and the separate 8B index
+after its native `update` and full `embed -f --timeout 0`, always on CPU at nice 19.
+Retain actual returned JSON and
 stderr; distinguish fixture checks from upstream tests. Report hit counts,
 R@1/R@3/R@5/MRR, vector first-load and subsequent-query latency, and working set.
 The [native harness](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/bench/bench.ts#L167)
 catches individual backend exceptions and produces zero rows, so independently
 require populated vector results and a complete current index.
 
-Shared MCP maintenance is unsettled. Existing stdio stores load the YAML and
-create their model once, as shown by
+Build a separate named index by copying the existing YAML and changing only
+`models.embed`. Named-index configuration is supported in the
+[README](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L710).
+Explicitly unset `INDEX_PATH` for build/benchmark commands: the
+[database resolver](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/store.ts#L636)
+gives that variable precedence over the index name. Verify distinct actual
+database paths. Model download caches remain shared. Compare the two indexes'
+active document names and content hashes before attributing a gain solely to the
+model; preserve any corpus difference rather than silently mixing conditions.
+
+The user's A1 replaces in-place migration with separate indexes. Existing stdio
+stores load the YAML and create their model once, as shown by
 [src/index.ts](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/index.ts#L369).
 The documented
 [`qmd mcp stop`](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/cli/qmd.ts#L4739)
-addresses daemon PID files, not these transports. Resolve an owning-client
-shutdown/reconnect route before changing the shared embedding space. No client
-configuration edits are included.
+addresses daemon PID files, not these transports. The existing sessions retain
+their consistent 0.6B index. No process is quiesced or killed. After acceptance,
+prepare the exact MCP registration argument/database-route difference for the
+command center; it applies client configuration and sessions adopt the 8B index
+as they restart naturally. Intended new registrations must force CPU mode and
+avoid an inherited old `INDEX_PATH`. No client configuration edits are included
+in this lane.
 
-Back up the index YAML and preserve the 0.6B weights. YAML rollback must be
-paired with a full 0.6B re-embed or a matching native SQLite snapshot; restoring
-only YAML leaves incompatible 4096-dimensional vectors. MCP stores must reconnect
-to the restored configuration too. Host-specific backup paths and actual before/
-after results belong in the private lane status, not this portable record.
+Preserve the existing YAML, database and 0.6B weights as rollback. Its vector
+space remains intact, so returning future client registrations to the old index
+needs no old-index re-embed. Host-specific index paths, the registration diff and
+actual before/after results belong in the private lane status, not this portable
+record.
 
 The comparison that would overturn this choice is a native catalog regression,
 unacceptable CPU latency or RAM behavior compared with 4B, or a clean qmd release
@@ -102,8 +119,8 @@ supporting a stronger embedder's complete runtime and prompt contract.
 A separate bounded reviewer covered missed candidate and modality classes,
 quantization evidence, benchmark failure handling, CPU context memory, shared
 stdio lifetime and rollback dimensions. Its findings are incorporated above.
-The next sweep should prioritize documented MCP maintenance, per-quant CPU and
-retrieval measurements, and complete common-task benchmark coverage.
+The next sweep should prioritize per-quant CPU and retrieval measurements,
+complete common-task benchmark coverage and named-index migration preflight.
 
 Corrections retained: `qmd mcp status` has no dispatcher branch despite its stale
 inline comment; use documented `qmd status`. Current bench rejects missing/empty
