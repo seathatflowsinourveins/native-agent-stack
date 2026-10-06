@@ -14,7 +14,7 @@ prepare the adjudicated changes: export TriggerInfo for the record, set only
 the startup type to Automatic, set Minutes=1 while preserving MaxTimes=7,
 configure the three bounded debug-log values and re-pause quality updates with
 the Windows-local run date. Every write has an immediate printed read-back.
-[Automatic, MicrosoftDocs 16dafadd](https://github.com/MicrosoftDocs/windowsserverdocs/blob/16dafaddc757fb0b4ad7e5f8da33fbfc888fbcd4/WindowsServerDocs/networking/windows-time-service/configuring-systems-for-high-accuracy.md#L47-L50),
+[Automatic, MicrosoftDocs 16dafadd](https://github.com/MicrosoftDocs/windowsserverdocs/blob/16dafaddc757fb0b4ad7e5f8da33fbfc888fbcd4/WindowsServerDocs/networking/windows-time-service/configuring-systems-for-high-accuracy.md#L54-L56),
 [backoff/defaults, ef9afdb7](https://github.com/MicrosoftDocs/windowsserverdocs/blob/ef9afdb74d7e649d54aeaf104efe28dcd857ff2f/WindowsServerDocs/networking/windows-time-service/Windows-Time-Service-Tools-and-Settings.md#L375-L376).
 
 Two broader workflow proposals were rejected by the command-center

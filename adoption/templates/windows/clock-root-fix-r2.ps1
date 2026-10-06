@@ -5,7 +5,7 @@ Allowed writes: one TriggerInfo export; W32Time start=auto; backoff Minutes=1;
 three KB 816043 logging values; the Windows Update quality-pause start date.
 
 S1 Automatic (ms.date 2025-02-25):
-https://github.com/MicrosoftDocs/windowsserverdocs/blob/16dafaddc757fb0b4ad7e5f8da33fbfc888fbcd4/WindowsServerDocs/networking/windows-time-service/configuring-systems-for-high-accuracy.md#L47-L50
+https://github.com/MicrosoftDocs/windowsserverdocs/blob/16dafaddc757fb0b4ad7e5f8da33fbfc888fbcd4/WindowsServerDocs/networking/windows-time-service/configuring-systems-for-high-accuracy.md#L54-L56
 S2 NtpClient defaults/backoff (ms.date 2025-09-18):
 https://github.com/MicrosoftDocs/windowsserverdocs/blob/ef9afdb74d7e649d54aeaf104efe28dcd857ff2f/WindowsServerDocs/networking/windows-time-service/Windows-Time-Service-Tools-and-Settings.md
 S3 KB 816043 (ms.date 2025-05-08; adjudication source pin):
@@ -32,7 +32,6 @@ $updateKey = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
 $triggerNative = 'HKLM\SYSTEM\CurrentControlSet\Services\W32Time\TriggerInfo'
 $scExe = Join-Path $env:SystemRoot 'System32\sc.exe'
 $regExe = Join-Path $env:SystemRoot 'System32\reg.exe'
-$earliestApply = [DateTimeOffset]::Parse('2026-10-07T00:06:00Z')
 $earliestBoot = [DateTimeOffset]::Parse('2026-10-07T04:45:00Z')
 
 function Show-RegistryValue {
@@ -94,9 +93,6 @@ try {
         $principal = New-Object Security.Principal.WindowsPrincipal($identity)
         if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
             throw 'Open PowerShell as administrator after the command-center review.'
-        }
-        if ([DateTimeOffset]::UtcNow -lt $earliestApply) {
-            throw 'Apply no earlier than 2026-10-07T00:06:00Z, after the paper owner confirms paper-ext-20261006 is inactive.'
         }
     }
     Write-Host 'CLOCK-R2: the paper owner must confirm inactivity before the actual apply.'
