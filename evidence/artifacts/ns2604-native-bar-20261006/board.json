@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "native_bar_operational_recount",
-  "recorded_at_utc": "2026-10-06T14:09:07Z",
+  "recorded_at_utc": "2026-10-06T14:17:29Z",
   "host_scope": "NativeStack2604",
   "source_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
   "north_star_action": "Finish the native foundation used for US-equities research and historical simulation; research and paper operation continue under their separate gates.",
@@ -133,21 +133,23 @@
     }
   ],
   "owner_policy": {
-    "meaning": "One named accountable lane for every row. Proposed dispatches are explicit recommendations requiring co-op handoff/acceptance, not a claim those lanes already accepted new scope.",
+    "meaning": "One named accountable lane per row. The co-op accepted all 18 formerly proposed handoffs and is delivering them. Individual lane acknowledgment is not independently verified. Client-install step owners await the CC plan; this operational assignment does not override that hold.",
     "open_without_named_owner": 0,
-    "proposed_open_dispatches": 18,
-    "configuration_and_scope_decisions": "Command center/user retain their existing authority; naming a lane never authorizes configuration, credentials, trust, sudo or merges."
+    "proposed_open_dispatches": 0,
+    "configuration_and_scope_decisions": "Command center/user retain their existing authority; naming a lane never authorizes configuration, credentials, trust, sudo or merges.",
+    "co_op_accepted_dispatches": 18,
+    "individual_lane_acknowledgments": "not independently verified"
   },
   "eta_to_79": {
-    "assessment_at_utc": "2026-10-06T14:09:07Z",
+    "assessment_at_utc": "2026-10-06T14:17:29Z",
     "earliest_planning_bound_utc": "2026-10-08T22:00:00Z",
     "working_planning_target_utc": "2026-10-09T22:00:00Z",
     "confidence": "low",
     "owner_committed_delivery": false,
-    "basis": "Refreshed dependency assessment after five landings and custody's policy closure. The prior earliest bound is retained; Friday 22:00Z is a planning target, not a measured or owner-committed completion time. No unsupported acceleration is inferred from landings.",
+    "basis": "Refreshed dependency assessment after five landings and custody's policy closure. The prior earliest bound is retained; Friday 22:00Z is a planning target, not a measured or owner-committed completion time. No unsupported acceleration is inferred from landings. The co-op has now accepted the 18 owner handoffs; individual lane acknowledgment and the CC client-install plan remain separate dependencies.",
     "constraints": [
       "52 additional operational closures and an independently reviewed same-80-slot S4 remain.",
-      "Proposed owner dispatches, D01/D04 and other CC scope/configuration readbacks must be resolved.",
+      "Individual lane handoff acceptance, D01/D04 and other CC scope/configuration readbacks must be resolved; seven named token tools remain under the CC client-wiring hold.",
       "5f owns queued PR writes/landing; connector threads and exact-head reviews precede queues.",
       "Organic counts, account quota gates and a held configuration freeze remain unmeasured dependencies.",
       "No heavy phase from 2026-10-06T19:50:00Z through 2026-10-07T00:10:00Z; future paper windows need current confirmation.",
@@ -365,6 +367,21 @@
       "captured_at_utc": "2026-10-06T14:09:07Z",
       "origin_locator": "coordination:ns2604-coop/lanes/supersession-ledger.status.md",
       "origin_sha256_at_capture": "bb02bcd98cae30eed483e6138661885e68ed6b7698739c8b4417ac173d40b20d"
+    },
+    {
+      "id": "accepted-owner-dispatch",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/owner-dispatch-and-client-hold.json",
+      "sha256": "b0a5a7e8ab57b310d381ac9f6de84356fd88e9650cac67f560e7f1f795785bce",
+      "pointer": "/owner_answer",
+      "evidence_class": "source_review",
+      "scope": "Frozen co-op A13 acceptance/delivery of 18 named handoffs, with its explicit client-wiring caveat; individual lane acknowledgment unverified."
+    },
+    {
+      "id": "cc-client-hold",
+      "locator": "coordination:command-center/ITEM-ns2604-coop-20261006T140508Z.md",
+      "sha256": "88710bdadfbf75139c8902d2488c6c67e280990c9b4fd1b74a76a12bd589ae86",
+      "evidence_class": "source_review",
+      "scope": "CC workflow prepares the seven-tool install plan; client wiring/installs held while backend/index/PR work may continue."
     }
   ],
   "slots": [
@@ -501,7 +518,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "skills-lifecycle",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
       "evidence": [
@@ -512,6 +529,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/instructions-skills~1skill-discovery"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Confirm the proposed handoff from fixwave-defects, repair the native evidence capture and retain organic discovery use or an accepted dated exclusion."
@@ -629,7 +650,7 @@
       "state": "IN_PROGRESS",
       "closed": false,
       "owner": "github-ci-finalize",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "IN_PROGRESS",
       "foundation_prerequisite": true,
       "evidence": [
@@ -640,6 +661,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/cross:gpt6-harnesses~1gpt-gateway"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Finish current gateway records/fold-in, CC application and pinned native route acceptance. The security relock landing removes a queue prerequisite only."
@@ -689,7 +714,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-codenav",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
       "evidence": [
@@ -700,6 +725,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/code-navigation~1serena"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Persist condition-absent controls; delete harness text naming serena (PLAN:139) and re-measure organic choice"
@@ -729,7 +758,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-codenav",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
       "evidence": [
@@ -740,6 +769,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/code-navigation~1structural-search"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Dated exclusion (overlaps Grep/rg and serena search_for_pattern) or routing fix (ADJ fix_lever)"
@@ -764,9 +797,13 @@
         {
           "source": "model-observation",
           "scope": "Vector/consumer integration and liveness are separate from final slot qualification; generation exclusion unadopted."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Finish the Qdrant/client cutover and accepted known-answer gates. Preserve the approved confirmatory-design/preregistration locator and recorded #723 repair prerequisite before quality execution. The indexed native known-answer result is integration evidence, not complete retrieval-quality qualification."
+      "remaining_gate": "Finish the Qdrant/client cutover and accepted known-answer gates. Preserve the approved confirmatory-design/preregistration locator and recorded #723 repair prerequisite before quality execution. The indexed native known-answer result is integration evidence, not complete retrieval-quality qualification. Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "semantic-rag/embedding-model",
@@ -836,9 +873,13 @@
         {
           "source": "lane-lm-qmd",
           "scope": "Active repair/qualification work; no whole-slot closure."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Complete the dedicated named-index blue/green change and native qmd bench before/after. Also retain the unresolved refresh lifecycle (qmd update/embed on the planned persistent Dagu timer) and organic query/get or an accepted CC scope ruling; benchmark-only completion is insufficient."
+      "remaining_gate": "Complete the dedicated named-index blue/green change and native qmd bench before/after. Also retain the unresolved refresh lifecycle (qmd update/embed on the planned persistent Dagu timer) and organic query/get or an accepted CC scope ruling; benchmark-only completion is insufficient. Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "document-retrieval/mineru",
@@ -885,7 +926,7 @@
       "state": "BLOCKED",
       "closed": false,
       "owner": "currency",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "BLOCKED",
       "foundation_prerequisite": true,
       "evidence": [
@@ -896,6 +937,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/web-research~1playwright-cli"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "User sudo consent and sign-ins, rerun after_sign_in; else dated exclusion for text retrieval (overlaps Codex web/run)"
@@ -945,7 +990,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
       "evidence": [
@@ -956,6 +1001,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1ccusage"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "PLAN:148: sign in or exclude; weak exclusion candidate (overlaps agentsview, OTel token metrics)"
@@ -965,7 +1014,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -976,6 +1025,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1context-supply"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "PLAN:148 dated Harbor A/B, or ctx-doctor verify plus Claude wiring fix"
@@ -985,7 +1038,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
       "evidence": [
@@ -996,6 +1049,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1statusline"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Capture HUD and Codex footer per ruling 8; then BY_DESIGN or READY"
@@ -1005,7 +1062,7 @@
       "state": "IN_PROGRESS",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1020,16 +1077,24 @@
         {
           "source": "lane-overlap-token",
           "scope": "Active repair/qualification work; no whole-slot closure."
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Finish the RTK hook/logger proposal, CC application and hook-disarmed controls with organic before/after invocation/dashboard counts."
+      "remaining_gate": "Finish the RTK hook/logger proposal, CC application and hook-disarmed controls with organic before/after invocation/dashboard counts. Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "token-efficiency/output-compression",
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1040,16 +1105,24 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1output-compression"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Dated exclusion (overlaps context-mode and rtk, ADJ) or Harbor A/B"
+      "remaining_gate": "Dated exclusion (overlaps context-mode and rtk, ADJ) or Harbor A/B Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "token-efficiency/code-index",
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1060,16 +1133,24 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1code-index"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Dated exclusion (overlaps serena) or Harbor A/B"
+      "remaining_gate": "Dated exclusion (overlaps serena) or Harbor A/B Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "token-efficiency/code-graph",
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1080,16 +1161,24 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1code-graph"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Dated exclusion (overlaps serena find_referencing_symbols) or Harbor A/B"
+      "remaining_gate": "Dated exclusion (overlaps serena find_referencing_symbols) or Harbor A/B Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "token-efficiency/repo-packing",
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1100,6 +1189,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1repo-packing"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Upstream acceptance then measure; else dated exclusion (overlaps Read/Grep, ctx_batch_execute)"
@@ -1109,7 +1202,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1120,6 +1213,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1structured-data"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Upstream acceptance then measure; else dated exclusion (overlaps jq via ctx_execute)"
@@ -1129,7 +1226,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1140,6 +1237,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1doc-conversion"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Upstream acceptance then measure; else dated exclusion (overlaps ctx_fetch_and_index, mineru)"
@@ -1169,7 +1270,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1180,6 +1281,10 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1trace-viewer"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Add upstream test targets to plan, run; else dated exclusion"
@@ -1189,7 +1294,7 @@
       "state": "NOT_STARTED",
       "closed": false,
       "owner": "overlap-token",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": false,
       "evidence": [
@@ -1200,9 +1305,17 @@
         {
           "source": "landed-requalification",
           "pointer": "/slots/token-efficiency~1token-lane-carriers"
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "cc-client-hold",
+          "scope": "Backend/index/PR work may continue; client-side changes wait for the CC install plan."
         }
       ],
-      "remaining_gate": "Confirm a named implementation owner, apply reviewed role-agent grants through CC, and retain organic invocation counts and the dated acceptance comparison."
+      "remaining_gate": "Confirm a named implementation owner, apply reviewed role-agent grants through CC, and retain organic invocation counts and the dated acceptance comparison. Client re-install/re-wiring is held pending the CC plan naming step owners; no MCP, hook/trust or instruction/grant changes under this board."
     },
     {
       "slot": "observation-inference/otel-collector-contrib",
@@ -1381,7 +1494,7 @@
       "state": "IN_PROGRESS",
       "closed": false,
       "owner": "orch-records",
-      "owner_assignment": "proposed_dispatch",
+      "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "IN_PROGRESS",
       "foundation_prerequisite": true,
       "evidence": [
@@ -1396,6 +1509,10 @@
         {
           "source": "orchestration-observation",
           "scope": "Bounded pre-reboot native observation; remaining predicates preserved."
+        },
+        {
+          "source": "accepted-owner-dispatch",
+          "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
       "remaining_gate": "Retain the pre-reboot successful agentsview idle/API observation separately from the complete slot predicates and post-reboot lifecycle qualification."
@@ -2029,5 +2146,29 @@
       ],
       "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
     }
-  ]
+  ],
+  "client_wiring_hold": {
+    "status": "ACTIVE",
+    "source": "cc-client-hold",
+    "workflow": "wf_8703c159-c6d",
+    "tools": [
+      "semble",
+      "codebase-memory",
+      "jcodemunch",
+      "qmd",
+      "headroom",
+      "SocratiCode",
+      "Codex RTK hook"
+    ],
+    "held_operations": [
+      "Client-side re-install/re-wiring",
+      "MCP registrations",
+      "Hooks and hook trust",
+      "Instruction files",
+      "P2-9 Codex RTK hook work",
+      "P0-1 role-agent grant diffs"
+    ],
+    "allowed_work": "Backend, index and PR work continues, including Qdrant/Nemotron, qmd named-index blue/green and countable hook/panel source work.",
+    "release_condition": "The CC's ordered install plan names the step owners; the CC applies client configuration."
+  }
 }

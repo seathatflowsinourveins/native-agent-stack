@@ -1,6 +1,6 @@
 # NativeStack2604 operational native-bar board
 
-Recorded at 2026-10-06T14:09:07Z against main `0d5e6506434fab598dee861c749a22e628beb75a`.
+Recorded at 2026-10-06T14:17:29Z against main `0d5e6506434fab598dee861c749a22e628beb75a`.
 
 **27/80 operational closures: 13 READY and 14 BY_DESIGN.** There are 53 open slots; 52 more closures reach the 79/80 ceiling. Base-distribution remains the external upstream hold. The seven progress changes below do not add closures.
 
@@ -16,7 +16,7 @@ The north-star action is US-equities research and historical simulation on a fin
 | BLOCKED | 7 |
 | NOT_STARTED | 24 |
 
-Each row names one lane. A **proposed** owner needs a co-op handoff and acknowledgment; naming the lane does not claim that it accepted new scope. There are 18 proposed open dispatches, zero unnamed owners. CC/user configuration decisions and 5f's queued-PR ownership remain intact.
+Each row names one lane. The co-op has accepted and is delivering all 18 previously proposed handoffs; individual lane acknowledgments are not independently verified. There are zero unnamed owners and zero unaccepted routing proposals. CC/user decisions and 5f's queued-PR ownership remain intact. Client-install step owners still await the CC's ordered plan.
 
 | Slot | State | Evidence | Owner lane |
 | --- | --- | --- | --- |
@@ -26,40 +26,40 @@ Each row names one lane. A **proposed** owner needs a co-op handoff and acknowle
 | agent-sdks/codex-sdk-and-codex-exec-app-server | READY | [Row 4](board.json) | ns2604-coop |
 | instructions-skills/trail-of-bits-security-skills-trailofbits-skills | IN_PROGRESS | [Row 5](board.json) | skills-lifecycle |
 | instructions-skills/engineering-process-skills | IN_PROGRESS | [Row 6](board.json) | skills-lifecycle |
-| instructions-skills/skill-discovery | NOT_STARTED | [Row 7](board.json) | skills-lifecycle (proposed) |
+| instructions-skills/skill-discovery | NOT_STARTED | [Row 7](board.json) | skills-lifecycle (co-op handoff accepted) |
 | instructions-skills/skill-authoring | IN_PROGRESS | [Row 8](board.json) | skills-lifecycle |
 | instructions-skills/research-skill | NOT_STARTED | [Row 9](board.json) | ns2604-coop |
 | mcp-surfaces/mcporter | READY | [Row 10](board.json) | ns2604-coop |
 | mcp-surfaces/mcp-inspector | IN_PROGRESS | [Row 11](board.json) | fixwave-defects |
 | workers/agent-messaging | IN_PROGRESS | [Row 12](board.json) | orch-records |
-| cross:gpt6-harnesses/gpt-gateway | IN_PROGRESS | [Row 13](board.json) | github-ci-finalize (proposed) |
+| cross:gpt6-harnesses/gpt-gateway | IN_PROGRESS | [Row 13](board.json) | github-ci-finalize (co-op handoff accepted) |
 | cross:runtime-workers/agent-runtime-worker | IN_PROGRESS | [Row 14](board.json) | fixwave-defects |
 | cross:runtime-workers/research-harnesses | IN_PROGRESS | [Row 15](board.json) | convergence-practice |
-| code-navigation/serena | NOT_STARTED | [Row 16](board.json) | overlap-codenav (proposed) |
+| code-navigation/serena | NOT_STARTED | [Row 16](board.json) | overlap-codenav (co-op handoff accepted) |
 | code-navigation/claude-plugins-official-code-intelligence-lsp-pl | BY_DESIGN | [Row 17](board.json) | overlap-codenav |
-| code-navigation/structural-search | NOT_STARTED | [Row 18](board.json) | overlap-codenav (proposed) |
+| code-navigation/structural-search | NOT_STARTED | [Row 18](board.json) | overlap-codenav (co-op handoff accepted) |
 | semantic-rag/code-search | BLOCKED | [Row 19](board.json) | memory-h2h |
 | semantic-rag/embedding-model | IN_PROGRESS | [Row 20](board.json) | memory-h2h |
 | semantic-rag/reranker-model | BY_DESIGN | [Row 21](board.json) | memory-h2h |
 | document-retrieval/tobi-qmd | IN_PROGRESS | [Row 22](board.json) | lm-qmd |
 | document-retrieval/mineru | NOT_STARTED | [Row 23](board.json) | skills-lifecycle |
 | web-research/trafilatura | BY_DESIGN | [Row 24](board.json) | ns2604-coop |
-| web-research/playwright-cli | BLOCKED | [Row 25](board.json) | currency (proposed) |
+| web-research/playwright-cli | BLOCKED | [Row 25](board.json) | currency (co-op handoff accepted) |
 | web-research/web-search-provider | BY_DESIGN | [Row 26](board.json) | ns2604-coop |
 | durable-memory/memory-owner | BLOCKED | [Row 27](board.json) | memory-h2h |
-| token-efficiency/ccusage | NOT_STARTED | [Row 28](board.json) | overlap-token (proposed) |
-| token-efficiency/context-supply | NOT_STARTED | [Row 29](board.json) | overlap-token (proposed) |
-| token-efficiency/statusline | NOT_STARTED | [Row 30](board.json) | overlap-token (proposed) |
-| token-efficiency/command-output | IN_PROGRESS | [Row 31](board.json) | overlap-token (proposed) |
-| token-efficiency/output-compression | NOT_STARTED | [Row 32](board.json) | overlap-token (proposed) |
-| token-efficiency/code-index | NOT_STARTED | [Row 33](board.json) | overlap-token (proposed) |
-| token-efficiency/code-graph | NOT_STARTED | [Row 34](board.json) | overlap-token (proposed) |
-| token-efficiency/repo-packing | NOT_STARTED | [Row 35](board.json) | overlap-token (proposed) |
-| token-efficiency/structured-data | NOT_STARTED | [Row 36](board.json) | overlap-token (proposed) |
-| token-efficiency/doc-conversion | NOT_STARTED | [Row 37](board.json) | overlap-token (proposed) |
+| token-efficiency/ccusage | NOT_STARTED | [Row 28](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/context-supply | NOT_STARTED | [Row 29](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/statusline | NOT_STARTED | [Row 30](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/command-output | IN_PROGRESS | [Row 31](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/output-compression | NOT_STARTED | [Row 32](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/code-index | NOT_STARTED | [Row 33](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/code-graph | NOT_STARTED | [Row 34](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/repo-packing | NOT_STARTED | [Row 35](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/structured-data | NOT_STARTED | [Row 36](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/doc-conversion | NOT_STARTED | [Row 37](board.json) | overlap-token (co-op handoff accepted) |
 | token-efficiency/api-docs | NOT_STARTED | [Row 38](board.json) | codex-token-parity |
-| token-efficiency/trace-viewer | NOT_STARTED | [Row 39](board.json) | overlap-token (proposed) |
-| token-efficiency/token-lane-carriers | NOT_STARTED | [Row 40](board.json) | overlap-token (proposed) |
+| token-efficiency/trace-viewer | NOT_STARTED | [Row 39](board.json) | overlap-token (co-op handoff accepted) |
+| token-efficiency/token-lane-carriers | NOT_STARTED | [Row 40](board.json) | overlap-token (co-op handoff accepted) |
 | observation-inference/otel-collector-contrib | NOT_STARTED | [Row 41](board.json) | ns2604-coop |
 | observation-inference/prometheus | READY | [Row 42](board.json) | ns2604-coop |
 | observation-inference/loki | READY | [Row 43](board.json) | ns2604-coop |
@@ -68,7 +68,7 @@ Each row names one lane. A **proposed** owner needs a co-op handoff and acknowle
 | observation-inference/local-model-server | IN_PROGRESS | [Row 46](board.json) | memory-h2h |
 | observation-inference/alerting | IN_PROGRESS | [Row 47](board.json) | overlap-token |
 | observation-inference/local-generation-model | NOT_STARTED | [Row 48](board.json) | memory-h2h |
-| observation-inference/session-analytics | IN_PROGRESS | [Row 49](board.json) | orch-records (proposed) |
+| observation-inference/session-analytics | IN_PROGRESS | [Row 49](board.json) | orch-records (co-op handoff accepted) |
 | quality-evaluation/inspect-ai | IN_PROGRESS | [Row 50](board.json) | fixwave-defects |
 | quality-evaluation/harbor-containerized-agent-e2e-runner | IN_PROGRESS | [Row 51](board.json) | fixwave-defects |
 | quality-evaluation/promptfoo | IN_PROGRESS | [Row 52](board.json) | fixwave-defects |
@@ -119,7 +119,9 @@ Hcom's bounded native terminal/hook/delivery observation, agentsview's successfu
 
 Planning lower bound: **October 8, 6:00 PM EDT (22:00Z)**. Working target: **October 9, 6:00 PM EDT (22:00Z)**, with low confidence. This refresh removes the security queue blocker and custody publication gate, but retains the earlier lower bound. The Friday time is a planning target, not a newly measured or owner-committed completion date.
 
-The path is owner dispatches, scoped fixes or accepted dated exclusions, CC application/readbacks, exact-head reviews and 5f landings, then independently reviewed organic counts and S4. Account quotas and a held configuration freeze are unresolved inputs. No heavy phase runs from **October 6, 3:50 PM EDT to 8:10 PM EDT (19:50Z–00:10Z on October 7)**. Future paper windows need current confirmation.
+The path is individual handoff acknowledgment, scoped fixes or accepted dated exclusions, CC application/readbacks, exact-head reviews and 5f landings, then independently reviewed organic counts and S4. Account quotas and a held configuration freeze are unresolved inputs. No heavy phase runs from **October 6, 3:50 PM EDT to 8:10 PM EDT (19:50Z–00:10Z on October 7)**. Future paper windows need current confirmation.
+
+The CC's workflow `wf_8703c159-c6d` holds client-side installs and re-wiring for semble, codebase-memory, jcodemunch, qmd, headroom, SocratiCode and the Codex RTK hook. MCP registrations, hooks/trust, instruction files, P2-9 and P0-1 grant diffs wait for that plan to name step owners. Backend, index and PR work continues. This board grants no client-change authority.
 
 On each landing or accepted configuration/decision change, readiness-runner updates only the affected rows from the new evidence, recalculates all 80 rows, keeps failed conditions and reviews intact, and refreshes the same checkpoint gate. A landing with no full-slot effect is recorded without increasing the numerator. No background poller or new monitor is introduced.
 
