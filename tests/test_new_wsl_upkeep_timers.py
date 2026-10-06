@@ -123,10 +123,16 @@ class NativeUpkeepTimerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, "unset rollback was a false success")
         self.assertFalse(invoked, "rollback operated before validating its manifest")
 
-    def run_restore(self, edit=False, corrupt=False, early=False, pending=False, deleted=False, rollback_pending=False):
+    def run_restore(self, edit=False, corrupt=False, early=False, pending=False, deleted=False,
+                    rollback_pending=False, outside_root=False):
         text = (UNITS / "upkeep-transfer.md").read_text().split("<!-- upkeep:restore -->", 1)[1]
         code = re.search(r"```sh\n(.*?)```", text, re.S).group(1)
-        with tempfile.TemporaryDirectory() as directory:
+        # The real rollback requires owned roots under the real home, independent
+        # of CI's external TMPDIR. Use TemporaryDirectory's supported dir binding
+        # (python/cpython@v3.13.16 Lib/tempfile.py:115-129,887); never replace HOME.
+        cache = Path.home() / ".cache"
+        cache.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="nas-upkeep-restore-", dir=cache) as directory:
             root = Path(directory)
             batch = root / "batch"
             batch.mkdir(mode=0o700)
@@ -184,7 +190,8 @@ class NativeUpkeepTimerTests(unittest.TestCase):
             if edit:
                 restored.write_bytes(b"later operator edit\n")
             manifest = {"schema_version": 1, "approved_sha": "a" * 40, "home": os.environ["HOME"],
-                        "batch": str(batch), "config_root": str(config_root), "runtime_root": str(runtime),
+                        "batch": str(batch), "config_root": "/tmp/unowned-upkeep-config" if outside_root else str(config_root),
+                        "runtime_root": str(runtime),
                         "ops": str(Path.home() / ".local/state/native-agent-stack/ops"), "paths": [] if early else paths,
                         "timers": {}, "timer_actions": {}}
             manifest_path = batch / "manifest.json"
@@ -222,6 +229,20 @@ class NativeUpkeepTimerTests(unittest.TestCase):
                 self.assertTrue(observed["created_exists"])
                 if kwargs.get("edit"):
                     self.assertEqual(observed["regular"], b"later operator edit\n")
+
+    def test_restore_fixture_ignores_external_tmpdir_and_preserves_root_gate(self):
+        # Override the stdlib's cached default without creating anything in /tmp.
+        # Both the positive replay and the wrong-root negative execute the real
+        # rollback block with fixture systemctl; no user-manager call is made.
+        with mock.patch.object(tempfile, "tempdir", "/tmp"):
+            result, observed = self.run_restore()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(observed["regular"], b"operator baseline\n")
+            result, observed = self.run_restore(outside_root=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("manifest roots outside owned scope", result.stderr)
+            self.assertFalse(observed["manager_calls"])
+            self.assertEqual(observed["regular"], b"candidate\n")
 
     def test_partial_remove_install_is_recoverable_and_early_manifest_leaves_manager_untouched(self):
         result, observed = self.run_restore(pending=True)

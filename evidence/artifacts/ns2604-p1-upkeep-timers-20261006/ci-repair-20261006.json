@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "kind": "upkeep_timer_ci_fixture_repair",
+  "date_utc": "2026-10-06",
+  "evidence_classes": ["source", "synthetic", "local_integration"],
+  "prior_head": "28d82fc4fbfb3b24db46bf74404cb33c8f5f9e1b",
+  "rebase_base": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "failed_ci": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37424811527/job/112143463618",
+    "result": "failure",
+    "tests": [
+      "tests.test_new_wsl_upkeep_timers.NativeUpkeepTimerTests.test_fresh_shell_restore_preserves_bytes_modes_dangling_links_and_unrelated_alias",
+      "tests.test_new_wsl_upkeep_timers.NativeUpkeepTimerTests.test_partial_remove_install_is_recoverable_and_early_manifest_leaves_manager_untouched"
+    ],
+    "retained": true,
+    "trace_confirmation": "Both tests failed at the first private-batch guard, before JSON parsing or manager operations.",
+    "returned_error": "AssertionError: 1 != 0 : owned private batch/manifest required before rollback",
+    "path_observation_limit": "The job log does not print the selected temporary path. The default-location/HOME-boundary mismatch follows from the unchanged fixture and guard; an exact /tmp path is not independently observed."
+  },
+  "correction": {
+    "cause": "The rollback fixture used TemporaryDirectory's default location, while the actual rollback requires its private batch and configuration roots under the real home directory. The local TMPDIR happened to satisfy that contract. Both CI traces reject the private batch at the first boundary guard; the selected default path is not printed.",
+    "repair": "Bind only the rollback fixture's TemporaryDirectory to a private directory under Path.home() / .cache. Preserve the actual HOME, production manifest validation and every native apply/rollback command.",
+    "controls": [
+      "Both originally failing test methods pass.",
+      "The positive rollback passes with the stdlib cached temporary directory explicitly set to /tmp, without writing a fixture there.",
+      "A manifest naming an out-of-home configuration root fails before any fixture manager call and preserves the candidate bytes.",
+      "Existing corrupt-manifest, operator-edit and unexpected-deletion rejection controls pass."
+    ]
+  },
+  "sources": [
+    {
+      "repository": "python/cpython",
+      "pin": "v3.13.16",
+      "path": "Lib/tempfile.py",
+      "lines": "115-129, 865-887",
+      "url": "https://github.com/python/cpython/blob/v3.13.16/Lib/tempfile.py#L115",
+      "contract": "An explicit dir bypasses the default gettempdir selection; TemporaryDirectory forwards it to native mkdtemp."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "f95c420faecc5234ccbd85e1c00d7dc8c9e6c17b",
+      "path": "adoption/templates/systemd/upkeep-transfer.md",
+      "lines": "547-573",
+      "contract": "The real rollback rejects an unowned private batch or out-of-home manifest roots before manager calls."
+    }
+  ],
+  "commands": [
+    {
+      "command": "nice -n 19 python3 -B -m unittest -v",
+      "test_methods": [
+        "tests.test_new_wsl_upkeep_timers.NativeUpkeepTimerTests.test_fresh_shell_restore_preserves_bytes_modes_dangling_links_and_unrelated_alias",
+        "tests.test_new_wsl_upkeep_timers.NativeUpkeepTimerTests.test_partial_remove_install_is_recoverable_and_early_manifest_leaves_manager_untouched",
+        "tests.test_new_wsl_upkeep_timers.NativeUpkeepTimerTests.test_restore_fixture_ignores_external_tmpdir_and_preserves_root_gate",
+        "tests.test_new_wsl_upkeep_timers.NativeUpkeepTimerTests.test_rollback_rejects_corrupt_manifest_and_operator_edit_before_manager_calls"
+      ],
+      "tests": 4,
+      "exit_code": 0,
+      "log": "ci-rollback-focused.log",
+      "evidence_class": "synthetic"
+    },
+    {
+      "command": "nice -n 19 python3 -B scripts/validate.py",
+      "exit_code": 0,
+      "log": "ci-repair-validate.log",
+      "output": {"components": 69, "hashed_files": 10328, "profiles": 4, "receipts": 212, "status": "passed"},
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "evidence_class": "local_integration"
+    }
+  ],
+  "full_suite": {
+    "status": "pending",
+    "not_before_utc": "2026-10-06T13:45:00Z",
+    "command": "nice -n 19 python3 -B -m unittest -v --durations 50",
+    "source": ".github/workflows/validate.yml:227-239 at c1300c15b42f1a6643f3dc4172f40c01d99abdcd"
+  },
+  "preservation": {
+    "backup_branch": "codex/ns2604-p1-timers-ci-backup-28d82fc4",
+    "dropped_commit": "28d82fc4fbfb3b24db46bf74404cb33c8f5f9e1b",
+    "dropped_commit_changes_only": ["manifests/evidence.json"],
+    "prior_source_preserved": true,
+    "guard_service_sha256": "23a5f7433022f2fa3daf99f28e7160b9af6e97c9e7369cf0c37494c512d4b3a4",
+    "guard_script_sha256": "2d8b3e4129043bd30ae02538e598300243980874338a54b72932e146cf099009"
+  },
+  "completeness_critic": {
+    "result": "No material gap found; no production custody gate weakened.",
+    "scope": "Read-only source review of the explicit fixture dir binding, external-default control, wrong-root preservation control and stub manager PATH.",
+    "evidence_class": "source"
+  },
+  "limits": [
+    "No production unit, guard script, observer or apply/rollback block changes.",
+    "These are synthetic fixtures and local integration, not upstream test acceptance, host activation or a successful GitHub CI rerun.",
+    "Full unittest validation and publication wait until the paper window closes; the CI failure remains disclosed.",
+    "No real user-manager, pruning, native-data publication, model or credential-store call is made."
+  ]
+}

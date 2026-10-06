@@ -6,6 +6,20 @@ This serves reliable foundation upkeep during US-equities research and historica
 
 ## Source and reuse
 
+CI correction: the hosted validation of 28d82fc4 failed the two positive rollback
+tests because their default temporary root did not meet the real rollback's
+home-directory contract. The earlier local run's TMPDIR masked that assumption;
+its passing fixtures are not CI acceptance. Bind the rollback fixture to a
+private home-cache directory through CPython's maintained
+[TemporaryDirectory dir argument](https://github.com/python/cpython/blob/v3.13.16/Lib/tempfile.py#L115).
+Keep HOME, production root validation and every apply/rollback command unchanged.
+A positive control forces the cached default to /tmp without creating a fixture
+there; an out-of-home manifest still fails before any manager call and preserves
+the candidate bytes. The [CI repair receipt](../../evidence/artifacts/ns2604-p1-upkeep-timers-20261006/ci-repair-20261006.json)
+keeps the hosted failure and later local results distinct. Full-suite validation
+waits until after the 2026-10-06 paper window ends at 13:45Z; publication requires
+that run.
+
 The private approved `PLAN-full-resolution-20261005.md` has SHA256 775119dc6840552def19142a10e2730b489b6365c346e6f9fb6f5db5f2572ba2. Its Phase 1 at 63-106 and timer assignment at 100-104 distinguish these two timers from the other upkeep jobs assigned to Dagu. Command-center item task-ns2604-coop-20261006T031317Z and the co-op's A49 govern the bounded transfer.
 
 Reuse the existing observer and [native-data unit examples](https://github.com/seathatflowsinourveins/native-agent-stack/blob/ecfa112764c664d35377dd66b8cfcb67e5a94d60/observability/native-data/README.md#L158), including their two-minute cadence. The observer projects supported native metadata, runs no model, and preserves unknown observations. It remains the maintained integration at `observability/native-data/snapshot.py`; no replacement collector or scheduler is built.
