@@ -483,11 +483,14 @@ def compute_oracles(work: Path, *, run_tests: bool = True) -> dict:
 
 def build(repo: Path, *, commit_ref: str = FREEZE_COMMIT, lex_names=(), run_tests: bool = True, force: bool = False) -> dict:
     commit = git(repo, "rev-parse", f"{commit_ref}^{{commit}}").decode().strip()
-    out_dir = FIXTURE_CACHE / f"fixture-{commit[:8]}-{builder_hash()[:8]}"
+    # A template whose D oracles were computed without the unit tests (--skip-oracle-tests, self-tests) has its own
+    # cache directory: smoke-20261006a reused one and froze a null context-mode.P1 oracle, which G12 then flagged.
+    out_dir = FIXTURE_CACHE / f"fixture-{commit[:8]}-{builder_hash()[:8]}{'' if run_tests else '-nt'}"
     record_path = out_dir / "fixture.json"
     if record_path.exists() and not force:
         record = load_json(record_path)
-        if Path(record["tar"]["path"]).exists() and sha256_file(record["tar"]["path"]) == record["tar"]["sha256"]:
+        if Path(record["tar"]["path"]).exists() and sha256_file(record["tar"]["path"]) == record["tar"]["sha256"] \
+                and record.get("oracle_tests_run", True) == run_tests:
             record["reused"] = True
             return record
     if out_dir.exists():
@@ -518,6 +521,7 @@ def build(repo: Path, *, commit_ref: str = FREEZE_COMMIT, lex_names=(), run_test
     work = out_dir / "oracle-work"
     extract_tar(out_dir / "fixture.tar", work)
     oracles = compute_oracles(work, run_tests=run_tests)
+    record["oracle_tests_run"] = run_tests
     record["oracles_sha256"] = write_json(out_dir / "oracles.json", oracles, 0o600)
     record["oracles_digest_without_time"] = sha256_json({k: v for k, v in oracles.items() if k != "computed_at"})
     record["dir"] = str(out_dir)
