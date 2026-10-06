@@ -83,11 +83,13 @@ run rows; Grafana's anonymous API and fresh browser both showed **15 panels**.
 review passed; the adopted SDK environment passed all **202 tests** without skips.
 Missing or failed native history is explicitly unavailable, not zero or success.
 
-The Dagu
-operator UI keeps its existing protection: upstream `auth.mode: none` does not
-mean anonymous read-only, because some workspace/scheduler operations bypass the
-two DAG run/write switches. Models continue using native commands for authorized
-work rather than an unprotected browser control endpoint.
+The historical receipt above retains its original Dagu operator-UI scope. On
+NativeStack2604, the [2026-10-06 record](../../docs/decisions/2026-10-06-dagu-loopback-auth-none.md)
+documents `auth.mode: none` as an unauthenticated loopback operator path. It does
+not provide anonymous read-only access: some workspace/scheduler operations
+bypass the two DAG run/write switches. Grafana's anonymous Viewer role does not
+extend to Dagu. Keep the Dagu listener on loopback, with no exposure through a
+listener or tunnel; models retain native commands for authorized work.
 
 This setup adds no authentication proxy, token forwarding, remote model route,
 paid host or automatic broker execution. New machines adopt the same native

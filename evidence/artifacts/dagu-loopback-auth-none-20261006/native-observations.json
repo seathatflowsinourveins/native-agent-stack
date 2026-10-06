@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "scope": "Read-only NativeStack2604 Dagu operator-path observations; no DAG execution or readiness acceptance",
+  "listener": {
+    "command": [
+      "ss",
+      "-H",
+      "-ltn",
+      "( sport = :21080 )"
+    ],
+    "rc": 0,
+    "stdout": "LISTEN 0      4096   127.0.0.1:21080 0.0.0.0:*",
+    "start_utc": "2026-10-06T10:39:36.366927+00:00",
+    "end_utc": "2026-10-06T10:39:36.390901+00:00"
+  },
+  "direct_non_loopback": {
+    "address_discovery_rc": 0,
+    "addresses_tested": 3,
+    "results": [
+      {
+        "endpoint": "host non-loopback IPv4",
+        "port": 21080,
+        "connect_errno": 111,
+        "symbol": "ECONNREFUSED"
+      },
+      {
+        "endpoint": "host non-loopback IPv4",
+        "port": 21080,
+        "connect_errno": 111,
+        "symbol": "ECONNREFUSED"
+      },
+      {
+        "endpoint": "host non-loopback IPv4",
+        "port": 21080,
+        "connect_errno": 111,
+        "symbol": "ECONNREFUSED"
+      }
+    ],
+    "scope": "Direct host-interface TCP only; reverse proxies, tunnels and off-host paths were not tested",
+    "observed_utc": "2026-10-06T10:39:36.414024+00:00"
+  },
+  "health": {
+    "method": "GET",
+    "url": "http://127.0.0.1:21080/api/v1/health",
+    "authorization_header": false,
+    "cookie_header": false,
+    "proxy": false,
+    "start_utc": "2026-10-06T10:41:05.563935+00:00",
+    "end_utc": "2026-10-06T10:41:05.572700+00:00",
+    "http_status": 200,
+    "selected_response": {
+      "version": "2.18.2",
+      "status": "healthy"
+    },
+    "response_top_level_keys": [
+      "status",
+      "timestamp",
+      "uptime",
+      "version"
+    ],
+    "scope": "Health/version only; public health does not establish operator auth mode"
+  },
+  "dag_list": {
+    "start_utc": "2026-10-06T10:59:15.317623+00:00",
+    "end_utc": "2026-10-06T10:59:15.373646+00:00",
+    "curl_argv": [
+      "rtk",
+      "proxy",
+      "nice",
+      "-n",
+      "19",
+      "curl",
+      "--disable",
+      "--silent",
+      "--show-error",
+      "--fail",
+      "--max-time",
+      "10",
+      "--noproxy",
+      "*",
+      "--write-out",
+      "%{stderr}%{http_code}\n",
+      "http://127.0.0.1:21080/api/v1/dags?page=1&perPage=100&sort=name&order=asc"
+    ],
+    "jq_argv": [
+      "rtk",
+      "proxy",
+      "nice",
+      "-n",
+      "19",
+      "jq",
+      "-c",
+      "{returned:(.dags|length),totalRecords:.pagination.totalRecords,dags:[.dags[]|{name:.dag.name,tags:.dag.tags,tags_present:(.dag|has(\"tags\"))}]}"
+    ],
+    "curl_exit_code": 0,
+    "jq_exit_code": 0,
+    "http_status": 200,
+    "default_curl_config_disabled": true,
+    "authorization_header": false,
+    "cookie_header": false,
+    "proxy": false,
+    "sanitization": "Only names, native tag presence/value and counts retained; raw body, parameters/defaultParams and definitions excluded",
+    "selected_response": {
+      "returned": 8,
+      "totalRecords": 8,
+      "dags": [
+        {
+          "name": "example-01-basic-sequential",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "example-02-parallel-execution",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "example-03-scheduling",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "example-04-nested-workflows",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "example-05-template-and-file",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "restic-backup",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "restic-restore-check",
+          "tags": [],
+          "tags_present": true
+        },
+        {
+          "name": "tz-currency-check",
+          "tags": [],
+          "tags_present": true
+        }
+      ]
+    }
+  },
+  "client_version": {
+    "command": [
+      "rtk",
+      "proxy",
+      "nice",
+      "-n",
+      "19",
+      "dagu",
+      "version"
+    ],
+    "exit_code": 0,
+    "stdout": "2.18.2",
+    "observed_utc": "2026-10-06T10:39:57Z"
+  },
+  "initial_inventory_attempt": {
+    "observed_start_utc": "2026-10-06T10:42:57.870857+00:00",
+    "observed_end_utc": "2026-10-06T10:42:57.921009+00:00",
+    "http_status": 200,
+    "curl_exit_code": 0,
+    "jq_exit_code": 0,
+    "default_curl_config_disabled": false,
+    "interpretation": "Inventory evidence only: no explicit Authorization/cookie argument, but automatic curl configuration was not disabled and was not inspected; not used as credential-free proof",
+    "returned": 8,
+    "totalRecords": 8,
+    "names": [
+      "example-01-basic-sequential",
+      "example-02-parallel-execution",
+      "example-03-scheduling",
+      "example-04-nested-workflows",
+      "example-05-template-and-file",
+      "restic-backup",
+      "restic-restore-check",
+      "tz-currency-check"
+    ]
+  },
+  "sanitization": [
+    "Host-interface addresses omitted from the native TCP results",
+    "API response streamed to maintained jq; parameter values/defaultParams/definitions discarded before model context and retention",
+    "No raw HTTP bodies, config/environment/key files, credential values, or native DAG definitions captured"
+  ],
+  "limitations": [
+    "Direct listener/interface scope only; reverse proxies, tunnels and off-host paths were not tested",
+    "Server/client versions are returned strings, not binary checksum or install acceptance",
+    "DAG names/tags establish inventory only, not unchanged body identity, ownership or paper operation"
+  ],
+  "normalized_tags_inventory_attempt": {
+    "start_utc": "2026-10-06T10:44:26.142607+00:00",
+    "end_utc": "2026-10-06T10:44:26.194966+00:00",
+    "curl_argv": [
+      "rtk",
+      "proxy",
+      "nice",
+      "-n",
+      "19",
+      "curl",
+      "--disable",
+      "--silent",
+      "--show-error",
+      "--fail",
+      "--max-time",
+      "10",
+      "--noproxy",
+      "*",
+      "--write-out",
+      "%{stderr}%{http_code}\n",
+      "http://127.0.0.1:21080/api/v1/dags?page=1&perPage=100&sort=name&order=asc"
+    ],
+    "jq_argv": [
+      "rtk",
+      "proxy",
+      "nice",
+      "-n",
+      "19",
+      "jq",
+      "-c",
+      "{returned:(.dags|length),totalRecords:.pagination.totalRecords,dags:[.dags[]|{name:.dag.name,tags:(.dag.tags//[])}]}"
+    ],
+    "curl_exit_code": 0,
+    "jq_exit_code": 0,
+    "http_status": 200,
+    "default_curl_config_disabled": true,
+    "authorization_header": false,
+    "cookie_header": false,
+    "proxy": false,
+    "sanitization": "Only names, tags and counts retained from streamed native response; raw body, params/defaultParams and definitions excluded before model context or persistence",
+    "selected_response": {
+      "returned": 8,
+      "totalRecords": 8,
+      "dags": [
+        {
+          "name": "example-01-basic-sequential",
+          "tags": []
+        },
+        {
+          "name": "example-02-parallel-execution",
+          "tags": []
+        },
+        {
+          "name": "example-03-scheduling",
+          "tags": []
+        },
+        {
+          "name": "example-04-nested-workflows",
+          "tags": []
+        },
+        {
+          "name": "example-05-template-and-file",
+          "tags": []
+        },
+        {
+          "name": "restic-backup",
+          "tags": []
+        },
+        {
+          "name": "restic-restore-check",
+          "tags": []
+        },
+        {
+          "name": "tz-currency-check",
+          "tags": []
+        }
+      ]
+    },
+    "interpretation": "Credential-free request succeeded; tag filter normalized null/missing to []; later explicit tag-presence capture verifies native empty arrays without that normalization"
+  }
+}
