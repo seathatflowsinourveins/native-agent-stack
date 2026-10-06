@@ -5347,7 +5347,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "1d1014d536df408e413abf7ce7f382f3cb56eb49c162fd101281cdd71cb7ef57",
+      "sha256": "aa2b1e4f38ca84d3e1566617bb5777944fc54f866a8a2d65867577d349260511",
       "bytes": 17843
     },
     {
@@ -17423,8 +17423,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
-      "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
-      "bytes": 3660
+      "sha256": "fea570f286de55097b6b3bf4377e1509f3517f27ac20d197dfe98129e810d711",
+      "bytes": 3654
     },
     {
       "path": "docs/decisions/2026-10-06-cc-orchestration-composition.md",
@@ -53138,7 +53138,7 @@
     },
     {
       "path": "evidence/receipts/pr765-bindings-amendment-20261006.json",
-      "sha256": "2d244c6967bed30a335bf671803857acd08939b2595cab400d1a76b15b99f485",
+      "sha256": "b8537f551ec70a4ccfcaf048be74bbdf956f3554356aa70db6c6ddf61faf40a9",
       "bytes": 5094
     },
     {
