@@ -445,7 +445,12 @@ GitHub-hosted macOS runner; see
      It refuses to install any file unless
      every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
      (paths relative to that file); skipped per file if the installed copy
-     already matches.
+     already matches. `SHA256SUMS` changed after `v2026.10.05.1`: it pins the
+     secret-path guard that also refuses a reader on the IBKR paper gateway's
+     three `IBKR_PAPER_*` pointers and a `TWS_USERID` reference
+     ([decision](../docs/decisions/2026-10-06-ibkr-paper-passwordless-login.md)),
+     so a host installed from that tag keeps the earlier guard until it
+     reinstalls the profile from a later checkout.
    - **agents**: copies the eleven [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical. They changed after `v2026.09.26`: `stack-researcher`,

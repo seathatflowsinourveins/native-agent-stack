@@ -25,7 +25,7 @@ against it.
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
 | `claude-native`, `codex-native`, `gh-native` | Native sign-ins | stored by each tool | each tool's own store | none |
 | `huggingface-native`, `huggingface-native-stored` | Hugging Face sign-in: the active token and every saved token | stored by `hf auth login`, one token per host ([Hugging Face sign-in](#hugging-face-sign-in)) | `$HF_HOME/token` and `$HF_HOME/stored_tokens`; `HF_HOME` defaults to `${XDG_CACHE_HOME:-$HOME/.cache}/huggingface` | none |
-| `ibkr-gateway` | IB Gateway / TWS login | typed in at login, nothing stored | none | none |
+| `ibkr-gateway`, `ibkr-gateway-tws-password`, `ibkr-gateway-vnc-password` | IB Gateway paper login (user ID and password) and its VNC screen password, stored so the paper gateway signs in by itself, with a weekly second-factor approval on the user's phone ([IBKR paper gateway sign-in](#ibkr-paper-gateway-sign-in-2026-10-06)) | optional, paper only; live trading stays out of scope | three files in `<store>`, by pointer only: `IBKR_PAPER_LOGIN_ENV`, `IBKR_PAPER_TWS_FILE`, `IBKR_PAPER_VNC_FILE`. Each is `0600` with one link; the two password files are owned by the rootless container user (your subordinate uid that container uid 1000 maps to) | none on the host; `TWS_USERID`, `TWS_PASSWORD_FILE` and `VNC_SERVER_PASSWORD_FILE` exist only inside the gateway container |
 | `github-actions` | `FOUNDATION_RESTORE_FIXTURE_20260920` and the per-job `github.token` | CI only | GitHub's encrypted secret store | none locally |
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
@@ -37,7 +37,11 @@ them: `GITHUB_TOKEN`, `GH_TOKEN`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
 names `ALPACA_API_KEY`/`ALPACA_SECRET_KEY`, `TWS_*`/`IBKR_ACCOUNT_ID`, and the
 names that appear only in catalogs (`MISTRAL_`, `PREFECT_`, `MC_`, `MSB_`,
 `PAPERCLIP_`, `OPENROUTER_API_KEY`). The checker lists any that are set, by
-name only. `HF_TOKEN_PATH` holds a path, not a secret, but it stays unset
+name only. The IBKR paper gateway's stored user ID, `TWS_USERID`, is one of
+the `TWS_*` names. Its three `IBKR_PAPER_*` pointers hold paths, not values,
+and are not in this list
+([IBKR paper gateway sign-in](#ibkr-paper-gateway-sign-in-2026-10-06)).
+`HF_TOKEN_PATH` holds a path, not a secret, but it stays unset
 too: it moves the Hugging Face token files away from where the checker, the
 guard and the deny rules look. The checker lists it by name under
 `native store path overrides`.
@@ -289,6 +293,10 @@ export PAPER_ENV_FILE="$_nas_store/alpaca-paper.env"
 export PAPER_ENV_FILE_2="$_nas_store/alpaca-paper-2.env"   # second paper account, where this host holds one
 export SEC_CONTACT_ENV="$_nas_store/sec-contact.env"
 export PIT_ALPACA_ENV_PATH="$PAPER_ENV_FILE" PIT_SEC_ENV_PATH="$SEC_CONTACT_ENV"
+# the IBKR paper gateway host only (2026-10-06)
+export IBKR_PAPER_LOGIN_ENV="$_nas_store/ibkr-paper-login.env"
+export IBKR_PAPER_TWS_FILE="$_nas_store/ibkr-paper-tws.password"
+export IBKR_PAPER_VNC_FILE="$_nas_store/ibkr-paper-vnc.password"
 unset _nas_store
 ```
 
@@ -333,8 +341,11 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
 2. Sign in natively yourself: run `claude`, `codex login --device-auth`,
    `gh auth login` and then `gh auth setup-git`. On a host that downloads
    gated models, also run `hf auth login` as described in
-   [Hugging Face sign-in](#hugging-face-sign-in). Start IB Gateway/TWS
-   interactively if you use IBKR.
+   [Hugging Face sign-in](#hugging-face-sign-in). On the IBKR paper gateway
+   host, store the paper login once and start the gateway with its recreate
+   script, as
+   [IBKR paper gateway sign-in](#ibkr-paper-gateway-sign-in-2026-10-06)
+   describes.
 3. Create the store and one file per provider you need. Start each file from
    its template. `install` sets the mode as it creates the file, and it works
    the same way with GNU and BSD `install` because the source is a regular file:
@@ -616,6 +627,114 @@ no need for it.
 `hf auth login` again. Rotate at once if the value was printed anywhere, for
 example by `hf auth token`, and follow
 [Rotation and incidents](#rotation-and-incidents).
+
+## IBKR paper gateway sign-in (2026-10-06)
+
+The IB Gateway that serves the IBKR paper account on NativeStack2604 signs in
+by itself. On 2026-10-06 the user decided that the passwordless, LLM-native
+and frictionless workflow they prefer extends to the IBKR paper login, so the
+paper login is now stored instead of typed at every sign-in. The decision
+record is
+[`decisions/2026-10-06-ibkr-paper-passwordless-login.md`](decisions/2026-10-06-ibkr-paper-passwordless-login.md).
+Live trading stays out of scope: no live login is stored, and no tool here
+accepts one.
+
+**What is stored, and where.** Three files in `<store>`. Commands reach each
+one through its pointer and never spell out its path:
+
+| Pointer | Inventory id | Holds | Owner |
+| --- | --- | --- | --- |
+| `IBKR_PAPER_LOGIN_ENV` | `ibkr-gateway` | the paper user ID, one `TWS_USERID=` line in docker env-file syntax | you: the docker CLI reads it on the host through `--env-file` |
+| `IBKR_PAPER_TWS_FILE` | `ibkr-gateway-tws-password` | the paper password alone | the container user, after the recreate script's chown |
+| `IBKR_PAPER_VNC_FILE` | `ibkr-gateway-vnc-password` | the password of the gateway's VNC screen, published on 127.0.0.1:5900 only | the container user, after the recreate script's chown |
+
+Each file is mode `0600` with one link, in the `0700` store. The user typed
+the values at private prompts in their own terminal, the passwords hidden, so
+no value went through an agent, a chat or a command line. The shell startup
+file exports the three pointers, which hold paths only
+([Picking up in a new session](#picking-up-in-a-new-session)).
+
+**How the gateway reads them.**
+[`ibkr-gateway-recreate-durable.sh`](../blueprints/us-equities/runtime-2604/ibkr-gateway-recreate-durable.sh)
+starts the digest-pinned gnzsnz/ib-gateway 10.51.1b image with
+`--env-file "$IBKR_PAPER_LOGIN_ENV"`, and mounts the two password files
+read-only at the paths that `TWS_PASSWORD_FILE` and `VNC_SERVER_PASSWORD_FILE`
+name inside the container. The image reads a credential from the file that a
+defined `_FILE` variable names (README
+[Configuration table and Credentials section at `8a22deaa6cab`](https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/README.md#configuration),
+the `ibgateway-latest@10.51.1b` release).
+
+**Owner under rootless Docker.** Rootless Docker maps your uid to container
+root, and the image runs as uid 1000, so a `0600` file you own is unreadable
+inside the container. The recreate script therefore chowns the two password
+files to `1000:1000` inside the user namespace and leaves their mode at
+`0600`. On the host their owner is then the uid that the namespace maps
+container uid 1000 to: the start of your first `/etc/subuid` range plus 999
+(rootlesskit v3.1.0,
+[`pkg/parent/parent.go` L401-L432](https://github.com/rootless-containers/rootlesskit/blob/62d2101fbbe4f79bc845a337c4e868d27ff602c9/pkg/parent/parent.go#L401-L432)).
+You cannot read them back yourself. `scripts/credential_status.py` accepts
+that owner only for the two rows that declare `rootless_container_uid`,
+derives it from `/etc/subuid` at run time, and still requires mode `0600`
+and one link ([Checker](#checker)). The login env file stays yours, because
+the docker CLI reads it on the host.
+
+**Weekly second factor.** The recreate script sets `AUTO_RESTART_TIME` to
+11:00 PM New York time, with `TWOFA_TIMEOUT_ACTION=restart` and
+`RELOGIN_AFTER_TWOFA_TIMEOUT=yes`. IBC 3.24.2 then restarts the gateway each
+night without a new authentication, so one session runs all week with a
+single authentication at its start, until IBKR expires the session credentials
+on Sunday
+([userguide.md L586-L601 at `2be2ecd05d77`](https://github.com/IbcAlpha/IBC/blob/2be2ecd05d7707f97479fda9ad098fdcc15ab807/userguide.md#L586-L601)).
+The user approves IBKR's second-factor prompt on their phone about once a
+week, and again after a cold start of the gateway, such as a new container
+or a host restart.
+
+**Values never reach workers.**
+- `tools/credentials/credential_run.py` never injects the three rows, which
+  are `private_file` stores, and strips all three pointers from every command
+  it starts. `tools/credentials/set_credential.py` never writes them.
+- `scripts/hooks/secret_path_guard.py` refuses a reader, a copy, a redirect
+  or a `source` on each pointer, and any `TWS_USERID` reference.
+  `TWS_USERID` is in `must_not_be_set`.
+- Codex shells use `inherit = "none"` ([Codex](#codex)).
+- Docker is not a modelled reader, so these pass the guard: a container
+  that mounts a pointer's file, `docker exec` into the gateway, and a bare
+  `docker inspect` of the gateway container, whose `Config.Env` holds
+  `TWS_USERID`. In an agent session, never run a bare `docker inspect` on
+  the gateway. Ask for named fields with `--format`, as the recreate script
+  does. The guard's test suite records these forms as expected pass-throughs,
+  and the decision record accepts the residual for the paper login.
+
+**The pointer names.** The three `IBKR_PAPER_*` names hold paths, not values.
+They are documented pointer names, like `PAPER_ENV_FILE`, so the rule that
+`TWS_*` and `IBKR_ACCOUNT_ID` stay unset does not cover them. The checker
+matches `must_not_be_set` by exact name and does not flag them. The gap-wave2
+probe `worker_env_check.sh` lists every name with a broker prefix (`APCA_`,
+`ALPACA_`, `TWS_` or `IBKR_`), so a rerun of it from a shell that exports
+these pointers lists them too. They are paths. The probe stays unchanged,
+because it is the recorded method of its receipts.
+
+**Records and refusals.** Each run of the recreate script writes the
+container's `docker inspect` output, which holds the user ID, into a new
+`0700` directory of `0600` files under
+`${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/ibkr-gateway/`. It
+refuses to start, before any change, when that directory would sit inside a
+Git worktree, while an API client is connected to 127.0.0.1:4002, when `ss`
+is missing, or under a rootful Docker daemon. It keeps the previous container
+stopped under a `-pre-durable-<stamp>` name for rollback, and prints the
+rollback command.
+
+**Rotation.**
+- **Paper password:** change it at IBKR (Client Portal, Settings, Paper
+  Trading Account). Write the new value to a new `0600` file at a private
+  hidden prompt in your own terminal, move it over the old one, then rerun
+  the recreate script. The script hands the new file to the container user
+  again; the running container keeps the old file until then.
+- **User ID:** rewrite the login env file the same way.
+- **VNC password:** rewrite it the same way (6 to 8 characters; VNC uses at
+  most 8), then rerun the recreate script.
+- Rotate also on every trigger in
+  [Rotation and incidents](#rotation-and-incidents).
 
 <a id="memory-only-option-linux-kernel-keyring-2026-09-26"></a>
 
@@ -2098,6 +2217,8 @@ To rotate the other kinds:
   `hf auth logout` and `hf auth login` in your own terminal.
 - **Actions secret:** run `gh secret set FOUNDATION_RESTORE_FIXTURE_20260920`
   from your own terminal.
+- **IBKR paper gateway:** follow the Rotation steps of
+  [IBKR paper gateway sign-in](#ibkr-paper-gateway-sign-in-2026-10-06).
 
 If a value reaches GitHub or any store that keeps output:
 
@@ -2120,8 +2241,22 @@ python3 scripts/credential_status.py --client-guards   # also check the user-lev
 
 The checker uses `lstat` only and never opens a credential file. For each
 entry it reports existence, type, mode, owner, directory mode, whether the
-file is inside a worktree or tracked by Git, and the file's age. It also
-reports:
+file is inside a worktree or tracked by Git, and the file's age.
+
+An entry whose store declares `rootless_container_uid` (only the IBKR paper
+gateway's two password files, 2026-10-06) holds a file that is handed to that
+container uid inside a rootless Docker user namespace. Its owner may then also
+be the host uid that the namespace maps the container uid to. The checker
+reads `/etc/subuid`, never the credential file, and lays out your ranges as
+rootlesskit v3.1.0 does, so container uid 1000 maps to the start of your
+first range plus 999. Such a file still needs mode `0600` and exactly one
+link: a second name for it is the finding `hard_link`, the runner's reason
+for the same rule. Its row reports `owner` as `user` or
+`rootless_container_user`. A missing, unreadable or malformed `/etc/subuid`
+accepts no mapped owner, and `--subuid PATH` points the check at another file
+(the tests pass a fixture).
+
+It also reports:
 
 - secret variable names that are set in the current environment, names only;
 - native store path overrides that are set (`HF_TOKEN_PATH`), names only; each
