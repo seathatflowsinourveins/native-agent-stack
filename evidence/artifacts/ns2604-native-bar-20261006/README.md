@@ -6,7 +6,7 @@ Recorded at 2026-10-06T15:47:07Z against main `0d5e6506434fab598dee861c749a22e62
 
 The exact durable census reported at 06:47Z supplies all 80 identifiers and the inherited native 26 baseline. PR #715 publishes custody's dated policy exclusion, resolving that row's publication gate. The historical #700 result remains 30/80. This board does not claim a fresh same-80-slot E2E, post-reboot native execution or final S4 qualification; that qualified count is unknown.
 
-The north-star action is US-equities research and historical simulation on a finished native foundation. Trading research and paper operation retain their separate authorization and acceptance.
+The north-star action is US-equities research and historical simulation on an evidence-bound foundation. The CC's new start-line decision gates new R&D waves on reviewed/adjudicated same-80-slot S4; existing Wave1 is runtime qualification only. Paper operation keeps its separate scope.
 
 | State | Slots |
 | --- | ---: |
@@ -123,13 +123,19 @@ Hcom's bounded native terminal/hook/delivery observation, agentsview's successfu
 
 ## ETA and next refresh
 
-Planning lower bound: **October 8, 6:00 PM EDT (22:00Z)**. Working target: **October 9, 6:00 PM EDT (22:00Z)**, with low confidence. This refresh removes the security queue blocker and custody publication gate, but retains the earlier lower bound. The Friday time is a planning target, not a newly measured or owner-committed completion date.
+The CC's [north-star start line](../../../docs/decisions/2026-10-06-north-star-start-line.md) requires independently reviewed/adjudicated S4 on all80 slots:40 currently open prerequisites ready/by-design/dated-exclusion, memory+11token rows interim with dated completion plans, and the distribution hold retained. The full partition is27 recorded closures+40open prerequisites+12interim+1distribution=80; no denominator shrinks. Required interim dates are not claimed already fulfilled.
 
-The path is individual handoff acknowledgment, scoped fixes or accepted dated exclusions, CC application/readbacks, exact-head reviews and 5f landings, then independently reviewed organic counts and S4. Account quotas and a held configuration freeze are unresolved inputs. No heavy phase runs from **October 6, 3:50 PM EDT to 8:10 PM EDT (19:50Z–00:10Z on October 7)**. Future paper windows need current confirmation.
+Conditional **R&D start**: earliest **October9,6PM EDT(22:00Z)**, organic path/all steps first-time; likely **October13,6PM EDT(22:00Z)**, reported rangeOctober12–14, lowconfidence. **Full79/80 has no evidence-based date.** The old full-readiness forecast is superseded; these dates do not forecast79/80 or declare S4 complete.
+
+The path is individual handoff acknowledgment, scoped fixes or accepted dated exclusions, CC application/readbacks, exact-head reviews and 5f landings, then independently reviewed organic counts and CC-adjudicated S4. Betterleaks ownergithub-ci-finalize must pull its P1 test before2026-10-09 afterGO or obtain a dated exclusion. Two counted closures (credential-guard and convergence-validators) carry critic corrections for CC ruling; the later guard canary counterevidence is retained. Reported27 remainspending those rulings. Account quotas and a held configuration freeze are unresolved inputs. No heavy phase runs from **October 6, 3:50 PM EDT to 8:10 PM EDT (19:50Z–00:10Z on October 7)**. Future paper windows need current confirmation.
 
 The CC's workflow `wf_8703c159-c6d` holds client-side installs and re-wiring for semble, codebase-memory, jcodemunch, qmd, headroom, SocratiCode and the Codex RTK hook. MCP registrations, hooks/trust, instruction files, P2-9 and P0-1 grant diffs wait for that plan to name step owners. Backend, index and PR work continues. This board grants no client-change authority.
 
 On each landing or accepted configuration/decision change, readiness-runner updates only the affected rows from the new evidence, recalculates all 80 rows, keeps failed conditions and reviews intact, and refreshes the same checkpoint gate. A landing with no full-slot effect is recorded without increasing the numerator. No background poller or new monitor is introduced.
+
+## Closed user-decision batch
+
+The CC reports git identity resolved by global/main/lane readback. D01/D04 authorization is resolved but CC apply/readback still awaits tonight's window and the reviewed D04 source prerequisite. ccusage is offline-only monitoringG6, with no new sign-in. Playwright site sign-ins are excluded from the start line for web retrieval; this is not blanket browser acceptance/exclusion. Chrome package authorization is reported settled; no sudo or host apply occurred here. See the dated decision and board fields for scope.
 
 ## Dashboard publication
 

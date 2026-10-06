@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "native_bar_operational_recount",
-  "recorded_at_utc": "2026-10-06T15:47:07Z",
+  "recorded_at_utc": "2026-10-06T17:50:07Z",
   "host_scope": "NativeStack2604",
   "source_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
   "north_star_action": "Finish the native foundation used for US-equities research and historical simulation; research and paper operation continue under their separate gates.",
@@ -153,20 +153,14 @@
     ]
   },
   "eta_to_79": {
-    "assessment_at_utc": "2026-10-06T14:17:29Z",
-    "earliest_planning_bound_utc": "2026-10-08T22:00:00Z",
-    "working_planning_target_utc": "2026-10-09T22:00:00Z",
-    "confidence": "low",
+    "assessment_at_utc": "2026-10-06T17:50:07Z",
+    "earliest_planning_bound_utc": null,
+    "working_planning_target_utc": null,
+    "confidence": "no evidence-based date",
     "owner_committed_delivery": false,
-    "basis": "Refreshed dependency assessment after five landings and custody's policy closure. The prior earliest bound is retained; Friday 22:00Z is a planning target, not a measured or owner-committed completion time. No unsupported acceleration is inferred from landings. The co-op has now accepted the 18 owner handoffs; individual lane acknowledgment and the CC client-install plan remain separate dependencies.",
-    "constraints": [
-      "52 additional operational closures and an independently reviewed same-80-slot S4 remain.",
-      "Individual lane handoff acceptance, D01/D04 and other CC scope/configuration readbacks must be resolved; seven named token tools remain under the CC client-wiring hold.",
-      "5f owns queued PR writes/landing; connector threads and exact-head reviews precede queues.",
-      "Organic counts, account quota gates and a held configuration freeze remain unmeasured dependencies.",
-      "No heavy phase from 2026-10-06T19:50:00Z through 2026-10-07T00:10:00Z; future paper windows need current confirmation.",
-      "Base-distribution stays externally blocked and is excluded only from the 79 ceiling, never from the 80 denominator."
-    ]
+    "basis": "CC start-line decision supersedes the old full-readiness forecast. Corrected October9/13 dates forecast conditional R&D start, not full79/80.",
+    "remaining_operational_closures": 52,
+    "final_s4_qualified_count": null
   },
   "dashboard_delivery": {
     "route": "Replace the existing new-wsl-distribution-20261002 checkpoint gate with a summary and evidence link to this complete board.",
@@ -401,6 +395,20 @@
       "sha256": "170fb4618e7142b169d819c2b26dcff2eb4b27defee6550ef659bf981c5457d6",
       "evidence_class": "source_review",
       "scope": "Frozen accepted scope/custody transfer, exact input digests, separate native gates and conjunctive exclusion rule; no native execution."
+    },
+    {
+      "id": "cc-start-line",
+      "locator": "coordination:command-center/ITEM-ns2604-coop-20261006T175007Z.md",
+      "sha256": "9d251e3416ec4081ad1889c52493e592372ab70fd159b63d9f1aa8f6763e3f2f",
+      "evidence_class": "source_review",
+      "scope": "CC start-line/closed user-decision batch; no new native acceptance by this publication."
+    },
+    {
+      "id": "start-line-refutation",
+      "locator": "coordination:e2e-truth-20261006/north-star-eta-wf_f004715f-5a4.json",
+      "sha256": "dc294eb428aaabfcf2070208cb6f65edf8c1f01ca5744b1b81e4b03e6fbb3f70",
+      "evidence_class": "source_review",
+      "scope": "Synthesis, adversarial corrected R&D-start forecast and23-finding completeness critic."
     }
   ],
   "slots": [
@@ -422,7 +430,7 @@
           "pointer": "/slots/native-clients~1claude-code"
         }
       ],
-      "remaining_gate": "D01 configuration/scope decision and native readback; fresh session proof."
+      "remaining_gate": "D01 authorization resolved; CC applies supported plugin/marketplace removal or its approved scope route and retains readback, then fresh intended-profile qualification. Ordinary F9 excludes this policy and does not alone close it."
     },
     {
       "slot": "native-clients/codex",
@@ -442,7 +450,7 @@
           "pointer": "/slots/native-clients~1codex"
         }
       ],
-      "remaining_gate": "D04 stack-worker-route scope or approved configuration/readback; fresh session proof. The service-tier migration source alone does not close it."
+      "remaining_gate": "D04 authorization resolved; CC selects the reviewed additive profile source, applies codex-files with both-profile backups/readbacks and retains fresh stack-worker route proof after GO. Current-main create-only F9 is not claimed as a repair."
     },
     {
       "slot": "agent-sdks/claude-agent-sdk",
@@ -972,7 +980,12 @@
           "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
-      "remaining_gate": "User sudo consent and sign-ins, rerun after_sign_in; else dated exclusion for text retrieval (overlaps Codex web/run)"
+      "remaining_gate": "CC dated start-line exclusion covers site-sign-in web retrieval; other web tools cover that scope. Browser installation/exposure and any retained native modality gates remain distinct. Chrome package authorization is resolved for CC/operator; no new user prompt or sudo by this lane.",
+      "start_line_exclusion": {
+        "source": "cc-start-line",
+        "scope": "site-sign-in web retrieval requirement",
+        "native_whole_slot_closed": false
+      }
     },
     {
       "slot": "web-research/web-search-provider",
@@ -1036,7 +1049,7 @@
           "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
         }
       ],
-      "remaining_gate": "PLAN:148: sign in or exclude; weak exclusion candidate (overlaps agentsview, OTel token metrics)"
+      "remaining_gate": "Offline-only monitoring G6 cross-check, no sign-in; retain positive offline reports, condition-absent controls and separate native/accounting scope evidence."
     },
     {
       "slot": "token-efficiency/context-supply",
@@ -1744,7 +1757,7 @@
           "pointer": "/slots/git-github-automation~1git"
         }
       ],
-      "remaining_gate": "Upstream test or native operation at pin (RUL:12); user identity confirmation; lean-rules re-measure"
+      "remaining_gate": "Git identity is resolved by CC readback. Retain pinned upstream/native operation, controls and organic-use evidence; no new identity prompt."
     },
     {
       "slot": "git-github-automation/gh-github-cli",
@@ -2028,7 +2041,14 @@
           "pointer": "/slots/secrets-credentials~1betterleaks"
         }
       ],
-      "remaining_gate": "Set hooksPath (gitleaks 8.30.1 via mise aqua, or betterleaks with cited equivalence); run P1 swap test by 10-20"
+      "remaining_gate": "After GO-RELAUNCH, github-ci-finalize runs the authorized P1 swap test before2026-10-09 or obtains an accepted dated exclusion; conservative exclusive cutoff2026-10-09T00:00Z. Preserve evidence/refutation; no test or exclusion is claimed by this source update.",
+      "pull_forward": {
+        "owner": "github-ci-finalize",
+        "exclusive_target_utc": "2026-10-09T00:00:00Z",
+        "target_basis": "Conservative UTC date boundary to remove legacy year/time-zone ambiguity",
+        "go_relaunch_required": true,
+        "execution_status": "unrun in this update"
+      }
     },
     {
       "slot": "secrets-credentials/trufflehog",
@@ -2093,7 +2113,8 @@
           "pointer": "/slots/cross:credential-practice~1credential-guard"
         }
       ],
-      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence.",
+      "critic_ruling_status": "pending CC"
     },
     {
       "slot": "recovery-portability/mise",
@@ -2173,7 +2194,8 @@
           "pointer": "/slots/cross:convergence-practice~1convergence-validators"
         }
       ],
-      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence.",
+      "critic_ruling_status": "pending CC"
     }
   ],
   "client_wiring_hold": {
@@ -2215,5 +2237,214 @@
       "allowed_changes": "none until CC revival"
     },
     "not_owned_pr": 758
-  }
+  },
+  "eta_to_rd_start": {
+    "assessment_at_utc": "2026-10-06T17:50:07Z",
+    "earliest_utc": "2026-10-09T22:00:00Z",
+    "likely_utc": "2026-10-13T22:00:00Z",
+    "reported_range_dates": [
+      "2026-10-12",
+      "2026-10-14"
+    ],
+    "confidence": "low",
+    "owner_committed_delivery": false,
+    "path": "Organic; earliest only if every step succeeds first time.",
+    "source": "cc-start-line",
+    "constraints": [
+      "Tools-wave GO-RELAUNCH and valid organic observation",
+      "Forty currently open prerequisite rows ready/by-design/accepted dated exclusion",
+      "Memory and11token rows each with a dated interim completion plan; plan dates are not claimed fulfilled",
+      "Independently reviewed same80-slot S4 and CC adjudication, including unresolved critic corrections",
+      "Pulled-forward betterleaks P1 or accepted dated exclusion; no new user-item prompt",
+      "Queue/application/refutation/quota and current paper constraints"
+    ]
+  },
+  "rd_start_line": {
+    "decider": "command center",
+    "decision": "docs/decisions/2026-10-06-north-star-start-line.md",
+    "same_slot_denominator": 80,
+    "current_partition": {
+      "recorded_operational_closed": 27,
+      "currently_open_prerequisites": 40,
+      "interim_required": 12,
+      "upstream_distribution_hold": 1
+    },
+    "open_prerequisite_slots": [
+      "native-clients/claude-code",
+      "native-clients/codex",
+      "instructions-skills/trail-of-bits-security-skills-trailofbits-skills",
+      "instructions-skills/engineering-process-skills",
+      "instructions-skills/skill-discovery",
+      "instructions-skills/skill-authoring",
+      "instructions-skills/research-skill",
+      "mcp-surfaces/mcp-inspector",
+      "workers/agent-messaging",
+      "cross:gpt6-harnesses/gpt-gateway",
+      "cross:runtime-workers/agent-runtime-worker",
+      "cross:runtime-workers/research-harnesses",
+      "code-navigation/serena",
+      "code-navigation/structural-search",
+      "semantic-rag/code-search",
+      "semantic-rag/embedding-model",
+      "document-retrieval/tobi-qmd",
+      "document-retrieval/mineru",
+      "web-research/playwright-cli",
+      "token-efficiency/ccusage",
+      "token-efficiency/statusline",
+      "observation-inference/otel-collector-contrib",
+      "observation-inference/grafana",
+      "observation-inference/local-model-server",
+      "observation-inference/alerting",
+      "observation-inference/local-generation-model",
+      "observation-inference/session-analytics",
+      "quality-evaluation/inspect-ai",
+      "quality-evaluation/harbor-containerized-agent-e2e-runner",
+      "quality-evaluation/promptfoo",
+      "ci-supply-chain/syft",
+      "git-github-automation/git",
+      "git-github-automation/gh-github-cli",
+      "git-github-automation/worktrunk",
+      "git-github-automation/difftastic",
+      "git-github-automation/cross-family-review",
+      "scheduling-supervision/dagu",
+      "isolation/sandbox-runtime-srt",
+      "secrets-credentials/betterleaks",
+      "recovery-portability/mise"
+    ],
+    "interim_rows": [
+      {
+        "slot": "durable-memory/memory-owner",
+        "owner": "memory-h2h",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/context-supply",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/command-output",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/output-compression",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/code-index",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/code-graph",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/repo-packing",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/structured-data",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/doc-conversion",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/api-docs",
+        "owner": "codex-token-parity",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/trace-viewer",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      },
+      {
+        "slot": "token-efficiency/token-lane-carriers",
+        "owner": "overlap-token",
+        "dated_plan_requirement": "Required before CC start-line adjudication; actual plan/run date not verified by this documentary update."
+      }
+    ],
+    "final_s4_qualified_count": null,
+    "satisfied": false,
+    "distribution_hold": "Supported upstream release remains pending.",
+    "alternative": "Full79/80 before R&D; no evidence-based date.",
+    "new_rd_waves": "Not before CC-adjudicated start line; existing Wave1 only runtime qualification under its own gates."
+  },
+  "user_item_batch": {
+    "authority": "cc-start-line",
+    "decision_status": "CC closed the user-decision batch; component execution/qualification remain separate.",
+    "git_identity": {
+      "status": "RESOLVED_BY_CC_READBACK",
+      "scopes": [
+        "global",
+        "main-checkout",
+        "lane-worktree"
+      ],
+      "name": "seathatflowsinourveins",
+      "email_class": "users.noreply.github.com",
+      "legacy_plan_identity": "stale",
+      "new_execution_by_this_update": false
+    },
+    "D01": {
+      "authorization": "resolved",
+      "apply_readback": "pending CC",
+      "step_packet": "coordination:ns2604-coop/readiness-20261005/jobs/NORTH-STAR-START-LINE-20261006/D01-D04-STEPS.md"
+    },
+    "D04": {
+      "authorization": "resolved",
+      "apply_readback": "pending CC and reviewed additive source selection",
+      "source_gate": "Current main0d5e6506 is create-only; reviewed#716b63381f8 or reviewed successor must be selected before existing-profile repair.",
+      "step_packet": "coordination:ns2604-coop/readiness-20261005/jobs/NORTH-STAR-START-LINE-20261006/D01-D04-STEPS.md"
+    },
+    "ccusage": {
+      "scope": "Offline-only monitoring G6 cross-check",
+      "sign_in_required": false,
+      "acceptance": "Offline outputs/controls/accounting still need evidence"
+    },
+    "playwright_cli": {
+      "start_line_exclusion": "Site sign-ins for web retrieval",
+      "scope_boundary": "Not a blanket native browser capability exclusion or acceptance.",
+      "chrome_packages": "Covered by reported workstation authorization; CC/operator applies; no sudo by this lane."
+    }
+  },
+  "critic_rulings_needed": [
+    {
+      "slot": "cross:credential-practice/credential-guard",
+      "counted_state": "BY_DESIGN",
+      "status": "CC ruling pending; no autonomous demotion",
+      "critic": "coordination:ns2604-coop/organic-e2e-20261005/rebaseline-20261005/critic.json:20-21",
+      "critic_sha256": "e8230bb076d51ffa776bb4fc23113c00cce0afe80aef62ff403ff9cdd0ea515a",
+      "issue": "Upgrade required designed fresh Codex canary or ruling accepting one-leg evidence.",
+      "later_counterevidence": {
+        "result": "coordination:ns2604-coop/readiness-20261005/jobs/1/result.md:3-7",
+        "stream": "coordination:ns2604-coop/readiness-20261005/jobs/1/codex.jsonl:5",
+        "stream_sha256": "cb7ae0fdc416c2f0561170f53f3374de3d3ccf5452d02c46438a3c4a9b8ad509",
+        "native_item_exit": 0,
+        "present_control_exit": 1,
+        "launcher_presence_exit": 0
+      },
+      "requested_ruling": "Bind the retained later Codex proof with separate Claude/unchanged guard evidence and decide qualification."
+    },
+    {
+      "slot": "cross:convergence-practice/convergence-validators",
+      "counted_state": "READY",
+      "status": "CC classification ruling pending; no autonomous demotion",
+      "critic": "coordination:ns2604-coop/organic-e2e-20261005/rebaseline-20261005/critic.json:25-26",
+      "issue": "Infrastructure definition conflicts with adjudication's session-invocation rationale.",
+      "corroboration": [
+        "coordination:ns2604-coop/organic-e2e-20261005/rebaseline-20261005/INPUTS.md:9",
+        "coordination:ns2604-coop/organic-e2e-20261005/rebaseline-20261005/adjudication.json:731-737"
+      ],
+      "requested_ruling": "Justify intended CI-only consumer with evidence or require model-chosen per-script organic validation proof."
+    }
+  ]
 }
