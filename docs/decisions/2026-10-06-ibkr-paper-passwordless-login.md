@@ -51,6 +51,17 @@ Everything else in that decision stands, including its threat model.
    3.24.2) with `--env-file "$IBKR_PAPER_LOGIN_ENV"`. It mounts the two
    password files read-only at the paths that `TWS_PASSWORD_FILE` and
    `VNC_SERVER_PASSWORD_FILE` name inside the container.
+   - The user or an agent runs it from an interactive shell (`bash -i`).
+     It never reads or prints a value, so only typing the values, once, is
+     the user's own step.
+   - It runs the paper account with orders enabled (`TRADING_MODE=paper`,
+     `READ_ONLY_API=no`). The IBKR paper-orders harness needs Read-Only API
+     off ([its README](../../blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md):
+     L121, the refused and passed runs of 2026-09-23 at L246-L249, and the
+     user's manual untick before the 2026-10-05 run at L345). The 2026-10-05
+     read-only acceptance used `READ_ONLY_API=yes`. The setting is in the
+     trading lane's scope, so its acknowledgement of this pull request
+     covers it.
 3. **The owner under rootless Docker.** The image runs as uid 1000, and
    rootless Docker maps the user to container root, so a `0600` file the user
    owns is unreadable inside the container. The script chowns the two
@@ -101,7 +112,8 @@ Everything else in that decision stands, including its threat model.
    inside a Git worktree, while an API client is connected to
    127.0.0.1:4002, when `ss` is missing, or under a rootful daemon. It keeps
    the previous container stopped for rollback under a
-   `-pre-durable-<stamp>` name.
+   `-pre-durable-<stamp>` name. It prints the rollback command before it
+   starts the new container, so a failed start still shows it.
 
 ## SOTA sources
 
@@ -132,11 +144,18 @@ Everything else in that decision stands, including its threat model.
     container uid 0 maps to the user, and the user's subordinate ranges
     follow from container uid 1. Container uid 1000 therefore maps to the
     first range's start plus 999.
-  - L363-L385: the default source tries `getsubids`, then `/etc/subuid`.
-  - [`pkg/parent/idtools/idtools.go` L48-L85](https://github.com/rootless-containers/rootlesskit/blob/62d2101fbbe4f79bc845a337c4e868d27ff602c9/pkg/parent/idtools/idtools.go#L48-L85):
-    a line matches by uid or name, and a malformed line fails the whole file.
+  - L363-L385: the default source tries `getsubids`, then `/etc/subuid`
+    (the `auto` branch is L375-L381).
+  - [`pkg/parent/idtools/idtools.go` L48-L83](https://github.com/rootless-containers/rootlesskit/blob/62d2101fbbe4f79bc845a337c4e868d27ff602c9/pkg/parent/idtools/idtools.go#L48-L83),
+    the static source: a line matches by uid or name, and a malformed line
+    fails the whole file.
 
-  The checker mirrors that parser.
+  The checker mirrors that static parser only.
+- **Vendor organization first.** The InteractiveBrokers GitHub organization
+  ships no gateway container and no login automation. On 2026-10-06,
+  `gh api 'orgs/InteractiveBrokers/repos?per_page=100'` returned only
+  `InteractiveBrokers/tws-api-public`, last pushed 2018-01-23. The
+  gnzsnz/ib-gateway-docker image with IBC fills that gap.
 - **ShellCheck** 0.11.0 (the `shellcheck-py` wheel) found nothing in the
   adopted script.
 

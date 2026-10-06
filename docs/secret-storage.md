@@ -662,7 +662,11 @@ read-only at the paths that `TWS_PASSWORD_FILE` and `VNC_SERVER_PASSWORD_FILE`
 name inside the container. The image reads a credential from the file that a
 defined `_FILE` variable names (README
 [Configuration table and Credentials section at `8a22deaa6cab`](https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/README.md#configuration),
-the `ibgateway-latest@10.51.1b` release).
+the `ibgateway-latest@10.51.1b` release). It runs the paper account with
+orders enabled (`TRADING_MODE=paper`, `READ_ONLY_API=no`), which the
+[IBKR paper-orders harness](../blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md)
+needs. The user or an agent runs the script from an interactive shell
+(`bash -i`); only typing the stored values is the user's own step.
 
 **Owner under rootless Docker.** Rootless Docker maps your uid to container
 root, and the image runs as uid 1000, so a `0600` file you own is unreadable
@@ -722,7 +726,8 @@ refuses to start, before any change, when that directory would sit inside a
 Git worktree, while an API client is connected to 127.0.0.1:4002, when `ss`
 is missing, or under a rootful Docker daemon. It keeps the previous container
 stopped under a `-pre-durable-<stamp>` name for rollback, and prints the
-rollback command.
+rollback command before it starts the new container, so a failed start still
+shows it.
 
 **Rotation.**
 - **Paper password:** change it at IBKR (Client Portal, Settings, Paper
@@ -730,9 +735,12 @@ rollback command.
   hidden prompt in your own terminal, move it over the old one, then rerun
   the recreate script. The script hands the new file to the container user
   again; the running container keeps the old file until then.
-- **User ID:** rewrite the login env file the same way.
-- **VNC password:** rewrite it the same way (6 to 8 characters; VNC uses at
+- **User ID:** replace the login env file the same way.
+- **VNC password:** replace it the same way (6 to 8 characters; VNC uses at
   most 8), then rerun the recreate script.
+- Replace, never edit in place: after the chown you cannot open the two
+  password files, but you can move a new file over them, because the store
+  directory is yours.
 - Rotate also on every trigger in
   [Rotation and incidents](#rotation-and-incidents).
 
@@ -2249,12 +2257,17 @@ container uid inside a rootless Docker user namespace. Its owner may then also
 be the host uid that the namespace maps the container uid to. The checker
 reads `/etc/subuid`, never the credential file, and lays out your ranges as
 rootlesskit v3.1.0 does, so container uid 1000 maps to the start of your
-first range plus 999. Such a file still needs mode `0600` and exactly one
-link: a second name for it is the finding `hard_link`, the runner's reason
-for the same rule. Its row reports `owner` as `user` or
-`rootless_container_user`. A missing, unreadable or malformed `/etc/subuid`
-accepts no mapped owner, and `--subuid PATH` points the check at another file
-(the tests pass a fixture).
+first range plus 999. Such a file still needs mode `0600`. Its row reports
+`owner` as `user` or `rootless_container_user`. A missing, unreadable or
+malformed `/etc/subuid` accepts no mapped owner, and `--subuid PATH` points
+the check at another file (the tests pass a fixture). This is rootlesskit's
+static source; its default `auto` source asks `getsubids` first, so a host
+whose ranges come from an NSS subid provider fails closed here
+(`foreign_owner`).
+
+Every `private_file` store needs exactly one link: the IBKR paper gateway's
+three files and the generated host keys. A second name for the file is the
+finding `hard_link`, the runner's reason for the same rule.
 
 It also reports:
 

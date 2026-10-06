@@ -26,8 +26,10 @@ paper gateway's two password files) holds a file handed to that uid inside a
 rootless Docker user namespace. Its owner may then also be the host uid the
 namespace maps that container uid to, derived at run time from this user's
 /etc/subuid ranges as rootlesskit lays them out. Such a file still needs mode
-0600 and exactly one link (`hard_link` otherwise, credential_run.py's reason).
-Only /etc/subuid is read for it, never the credential file.
+0600. Every private_file store (these two, the IBKR login env file and the
+generated host keys) also needs exactly one link (`hard_link` otherwise,
+credential_run.py's reason for the same rule). Only /etc/subuid is read for
+the owner rule, never the credential file.
 
 Exit status is 1 when any credential file that exists is unsafe (whatever the
 entry's status, since a stored optional or paid key leaks just as badly), and 2
@@ -82,8 +84,10 @@ CLASSES = {"broker_api_key_pair", "broker_login", "contact_identity", "provider_
 # rootlesskit v3.1.0 (commit 62d2101f), the rootless dockerd's namespace parent, maps container uid 0 to the user and
 # lays this user's /etc/subuid ranges end to end, in file order, from container uid 1 (pkg/parent/parent.go:401-432).
 # A line names the user by uid or by name; blank and `#` lines are skipped; any other line without exactly three
-# `:` fields fails the whole file (pkg/parent/idtools/idtools.go:48-85). Container uid 1000, the gateway image's
-# user, therefore lands on the first range's start plus 999.
+# `:` fields fails the whole file (pkg/parent/idtools/idtools.go:48-83). Container uid 1000, the gateway image's
+# user, therefore lands on the first range's start plus 999. This mirrors rootlesskit's static source only: its
+# default `auto` source asks getsubids first (pkg/parent/parent.go:375-381), so a host whose ranges come from an NSS
+# subid provider rather than /etc/subuid gets no mapped owner here and fails closed (foreign_owner).
 SUBUID = Path("/etc/subuid")
 SUBID_NUMBER = re.compile(r"[0-9]+")
 TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
@@ -351,7 +355,7 @@ def inspect_entry(entry: dict, env, uid: int, now: float, subuid: Path | None = 
     elif mode != 0o600:
         findings.append("mode_not_0600")
     container_uid = store.get("rootless_container_uid")
-    if container_uid is not None and info.st_nlink != 1:
+    if store["kind"] == "private_file" and info.st_nlink != 1:
         findings.append("hard_link")  # a second name for the inode, which this check never sees
     if info.st_uid == uid:
         if container_uid is not None:

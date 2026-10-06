@@ -36,7 +36,10 @@ case "$1" in
       esac
     fi ;;
   run)
-    case " $* " in *" -d "*) : > "$STUB_STARTED"; echo 0123456789abcdef ;; esac ;;
+    case " $* " in *" -d "*)
+      if [ "$STUB_START_FAILS" = 1 ]; then echo "docker: Error response from daemon: stub start failure" >&2; exit 125; fi
+      : > "$STUB_STARTED"; echo 0123456789abcdef ;;
+    esac ;;
 esac
 exit 0
 """
@@ -68,10 +71,10 @@ class RecreateScriptTests(unittest.TestCase):
         store = self.base / "store"
         store.mkdir(mode=0o700)
         self.user = "FAKEUSER" + os.urandom(6).hex()
-        self.password = "FAKEPASS" + os.urandom(6).hex()
+        self.tws_fake = "FAKETWS" + os.urandom(6).hex()  # stands in for the paper password
         self.pointers = {}
         for variable, name, text in (("IBKR_PAPER_LOGIN_ENV", "login.env", f"TWS_USERID={self.user}\n"),
-                                     ("IBKR_PAPER_TWS_FILE", "tws.password", self.password),
+                                     ("IBKR_PAPER_TWS_FILE", "tws.password", self.tws_fake),
                                      ("IBKR_PAPER_VNC_FILE", "vnc.password", "fakevnc1")):
             path = store / name
             path.write_text(text)
@@ -80,13 +83,14 @@ class RecreateScriptTests(unittest.TestCase):
         self.log = self.base / "docker.log"
         self.state = self.base / "state"
 
-    def run_script(self, *, exists=True, rootless=True, connections=0, state=None, **overrides):
+    def run_script(self, *, exists=True, rootless=True, connections=0, state=None, start_fails=False, **overrides):
         env = {"PATH": str(self.bin), "HOME": str(self.home), "XDG_STATE_HOME": str(self.state if state is None else state),
                "STUB_LOG": str(self.log), "STUB_STARTED": str(self.base / "started"), "STUB_USER": self.user,
                "STUB_EXISTS": "1" if exists else "0", "STUB_ROOTLESS": "1" if rootless else "0",
+               "STUB_START_FAILS": "1" if start_fails else "0",
                "SS_CONNECTIONS": str(connections), **self.pointers, **overrides}
         result = subprocess.run(["/bin/bash", str(SCRIPT)], env=env, capture_output=True, text=True, timeout=60)
-        for value in (self.user, self.password):
+        for value in (self.user, self.tws_fake):
             self.assertNotIn(value, result.stdout + result.stderr)
         return result
 
@@ -135,7 +139,7 @@ class RecreateScriptTests(unittest.TestCase):
         self.assertIn("TRADING_MODE=paper", result.stdout)
         self.assertIn("rollback: docker stop", result.stdout)
         # The pointer files are only named, never rewritten.
-        self.assertEqual(Path(self.pointers["IBKR_PAPER_TWS_FILE"]).read_text(), self.password)
+        self.assertEqual(Path(self.pointers["IBKR_PAPER_TWS_FILE"]).read_text(), self.tws_fake)
 
     def test_refuses_a_record_directory_inside_a_git_worktree(self):
         repository = self.base / "checkout"
@@ -184,7 +188,7 @@ class RecreateScriptTests(unittest.TestCase):
         result = self.run_script()
         self.assertEqual(result.returncode, 3, result.stderr)
         self.assertEqual(self.calls(), [])
-        Path(self.pointers["IBKR_PAPER_TWS_FILE"]).write_text(self.password)
+        Path(self.pointers["IBKR_PAPER_TWS_FILE"]).write_text(self.tws_fake)
         result = self.run_script(IBKR_PAPER_VNC_FILE=str(self.base / "absent"))
         self.assertEqual(result.returncode, 3, result.stderr)
         self.assertEqual(self.calls(), [])
@@ -198,6 +202,25 @@ class RecreateScriptTests(unittest.TestCase):
         (record,) = self.records()
         self.assertEqual(sorted(p.name for p in record.iterdir()), ["after-inspect.json", "container-id.txt"])
         self.assertNotIn("rollback: docker stop", result.stdout)
+        self.assertNotIn("rollback, if", result.stdout)
+
+    def test_a_failed_start_still_shows_the_rollback(self):
+        # The old container is already stopped and renamed when `docker run -d` fails; set -e ends the run there, so the
+        # way back must be on screen before the start, and it must work with no new container.
+        result = self.run_script(start_fails=True)
+        self.assertEqual(result.returncode, 125, result.stdout + result.stderr)
+        lines = result.stdout.splitlines()
+        kept = next(i for i, line in enumerate(lines) if line.startswith(f"kept for rollback: {NAME}-pre-durable-"))
+        stamp = lines[kept].split("-pre-durable-", 1)[1].split()[0]
+        self.assertEqual(lines[kept + 1],
+                         f"rollback, if the new container does not come up: docker stop {NAME} 2>/dev/null; "
+                         f"docker rename {NAME} {NAME}-durable-failed-{stamp} 2>/dev/null; "
+                         f"docker rename {NAME}-pre-durable-{stamp} {NAME} && docker start {NAME}")
+        verbs = [call.split()[0] for call in self.calls()]
+        self.assertLess(verbs.index("rename"), max(i for i, verb in enumerate(verbs) if verb == "run"))
+        self.assertNotIn("rollback record:", result.stdout)
+        (record,) = self.records()
+        self.assertEqual(sorted(p.name for p in record.iterdir()), ["before-inspect.json", "container-id.txt"])
 
 
 if __name__ == "__main__":

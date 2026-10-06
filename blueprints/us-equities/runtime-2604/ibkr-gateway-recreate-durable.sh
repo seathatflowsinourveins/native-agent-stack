@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Recreates the NativeStack2604 IB Gateway (IBKR paper account, orders enabled) so that it signs in by itself and the
-# sign-in lasts all week. Run it yourself from an interactive shell (`bash -i <this file>`), so that ~/.bashrc supplies
-# the three IBKR_PAPER_* path pointers. It never reads or prints a credential value: the docker CLI reads the login env
-# file through --env-file, and the two password files are mounted read-only.
+# sign-in lasts all week. Run it from an interactive shell (`bash -i <this file>`), by the user or an agent, so that
+# ~/.bashrc supplies the three IBKR_PAPER_* path pointers. It never reads or prints a credential value: the docker CLI
+# reads the login env file through --env-file, and the two password files are mounted read-only. Only typing the stored
+# values, once, at the user's private prompt is the user's own step.
 # Decision: docs/decisions/2026-10-06-ibkr-paper-passwordless-login.md (the user's decision of 2026-10-06, about 01:50Z,
 # for a passwordless, frictionless gateway sign-in; paper only). Inventory rows ibkr-gateway, ibkr-gateway-tws-password
 # and ibkr-gateway-vnc-password (adoption/credential-inventory.json); check them with python3 scripts/credential_status.py.
@@ -94,6 +95,10 @@ if [ "$existing" = yes ]; then
   docker stop -t 30 "$NAME" >/dev/null
   docker rename "$NAME" "$NAME-pre-durable-$stamp"
   echo "kept for rollback: $NAME-pre-durable-$stamp (stopped)"
+  # Printed before the new container starts, so a failed start (set -e ends the run) still shows the way back. Each step
+  # tolerates a new container that was never created, or created and never started.
+  rollback="docker stop $NAME 2>/dev/null; docker rename $NAME $NAME-durable-failed-$stamp 2>/dev/null; docker rename $NAME-pre-durable-$stamp $NAME && docker start $NAME"
+  echo "rollback, if the new container does not come up: $rollback"
 fi
 docker run -d --name "$NAME" --restart unless-stopped \
   -p 127.0.0.1:4002:4004 -p 127.0.0.1:5900:5900 \
@@ -116,5 +121,5 @@ docker inspect "$NAME" --format '{{range .Config.Env}}{{println .}}{{end}}' \
   | grep -E '^(TRADING_MODE|READ_ONLY_API|TIME_ZONE|AUTO_RESTART_TIME|TWOFA_TIMEOUT_ACTION|RELOGIN_AFTER_TWOFA_TIMEOUT|EXISTING_SESSION_DETECTED_ACTION)=' \
   || echo "none of the expected settings were found in the new container's environment"
 if [ "$existing" = yes ]; then
-  echo "rollback: docker stop $NAME && docker rename $NAME $NAME-durable-failed-$stamp && docker rename $NAME-pre-durable-$stamp $NAME && docker start $NAME"
+  echo "rollback: $rollback"
 fi

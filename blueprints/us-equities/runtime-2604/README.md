@@ -123,18 +123,26 @@ gateway signs in by itself
 The script recreates the digest-pinned gnzsnz/ib-gateway 10.51.1b container,
 the image of the [2026-10-05 IBKR acceptance receipt](../../../evidence/receipts/ibkr-readonly-acceptance-20261005.json),
 with the stored paper login and a nightly IBC auto-restart. One second-factor
-approval on the user's phone then lasts all week.
+approval on the user's phone then lasts all week. It runs the paper account
+with orders enabled (`TRADING_MODE=paper`, `READ_ONLY_API=no`). The
+[IBKR paper-orders harness](../engine-nautilus/ibkr-paper-orders/README.md)
+needs Read-Only API off, which the user had set by hand in the running Gateway
+before; the read-only acceptance ran with `READ_ONLY_API=yes`.
 
-The user runs it from an interactive shell (`bash -i`), so that the three
-`IBKR_PAPER_*` path pointers are set. It never reads or prints a credential
-value. Before any change, it refuses in each of these cases:
+Run it from an interactive shell (`bash -i`), by the user or an agent, so
+that the three `IBKR_PAPER_*` path pointers are set. Only typing the stored
+values, once, at the user's private prompt is the user's own step. The script
+never reads or prints a credential value. Before any change, it refuses in
+each of these cases:
 - the record directory would sit inside a Git worktree;
 - the Docker daemon is not rootless;
 - `ss` is missing;
 - an API client is connected to 127.0.0.1:4002.
 
 It then hands the two password files to the container user inside the
-rootless user namespace and keeps the old container stopped for rollback. Its
+rootless user namespace and keeps the old container stopped for rollback. It
+prints the rollback command before it starts the new container, so a failed
+start still shows the way back. Its
 records are the full `docker inspect` output, which holds the user ID. It
 writes them `0600` under
 `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/ibkr-gateway/`.

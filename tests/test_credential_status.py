@@ -563,7 +563,7 @@ class CredentialStatusTests(unittest.TestCase):
     def test_rootless_host_uid_lays_out_subuid_ranges_as_rootlesskit_does(self):
         # rootlesskit v3.1.0: container uid 0 is the user and the user's ranges follow from container uid 1, in file order
         # (pkg/parent/parent.go:401-432); a line names the user by uid or name, and any line without three fields fails the
-        # whole file (pkg/parent/idtools/idtools.go:48-85).
+        # whole file (pkg/parent/idtools/idtools.go:48-83, the static source).
         uid = 3_999_999  # no passwd entry, so only a line naming the uid matches
         cases = {
             f"{uid}:100000:65536\n": 100999,
@@ -680,6 +680,32 @@ class CredentialStatusTests(unittest.TestCase):
         result = self.run_cli("--json", "--subuid", str(subuid))
         self.assertEqual(result.returncode, 1)
         self.assertEqual(sorted(json.loads(result.stdout)["unsafe_stored"]), sorted(ROOTLESS_IDS))
+
+    def test_every_private_file_row_needs_one_link(self):
+        # The IBKR login env file stays the user's and declares no container owner, yet it holds the user ID: a second
+        # name for it is refused as well, as for every private_file store (the generated host key too). An env-file
+        # store keeps its own rules; credential_run.py refuses a hard link there when it injects.
+        paths = self.write_ibkr()
+        key = self.config / "nativestack" / "generation.key"
+        key.parent.mkdir(mode=0o700)
+        key.write_text(self.fake_a)
+        key.chmod(0o600)
+        report = self.report()
+        for identifier in IBKR_FILES:
+            self.assertEqual(self.entry(report, identifier)["state"], "ok", identifier)
+        self.assertEqual(self.entry(report, "nativestack-generation-key")["state"], "ok")
+        os.link(paths["ibkr-gateway"], self.home / "login.second-name")
+        os.link(key, self.home / "key.second-name")
+        alpaca = self.write_alpaca()
+        os.link(alpaca, self.home / "alpaca.second-name")
+        report = self.report()
+        for identifier in ("ibkr-gateway", "nativestack-generation-key"):
+            with self.subTest(id=identifier):
+                entry = self.entry(report, identifier)
+                self.assertEqual(entry["state"], "unsafe")
+                self.assertEqual(entry["findings"], ["hard_link"])
+        self.assertNotIn("hard_link", self.entry(report, "alpaca-paper")["findings"])
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
 
     def test_rootless_rule_reads_only_the_subuid_file(self):
         checker, subuid = self.mapped_owner()
