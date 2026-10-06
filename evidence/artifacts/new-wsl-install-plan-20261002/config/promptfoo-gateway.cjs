@@ -11,11 +11,20 @@ const topology = JSON.parse(fs.readFileSync(
 const endpoint = topology.gateway?.endpoint;
 const gpt = topology.pool_fallback?.model;
 const claude = topology.promptfoo?.claude_model;
-if (typeof endpoint !== 'string' || !/^https?:\/\//.test(endpoint) ||
-    endpoint.includes('gateway.example.com') ||
+// Source: https://nodejs.org/api/url.html#urlhostname and #urlport.
+// This plan owns exactly the loopback gateway on port 21128.
+let url;
+try {
+  url = new URL(endpoint);
+} catch {
+  throw new Error('The plan gateway topology must declare its endpoint and distinct GPT/Claude model IDs.');
+}
+if (typeof endpoint !== 'string' || url.protocol !== 'http:' ||
+    url.hostname !== '127.0.0.1' || url.port !== '21128' ||
+    url.pathname !== '/v1' || url.username || url.password || url.search || url.hash ||
     [gpt, claude].some(model => typeof model !== 'string' || !model.trim() ||
       ['your-gpt-model-id', 'your-claude-model-id', 'your-model-id'].includes(model) ||
-      /\s/.test(model)) || gpt === claude) {
+      /[\s\x00-\x1f\x7f]/.test(model)) || gpt === claude) {
   throw new Error('The plan gateway topology must declare its endpoint and distinct GPT/Claude model IDs.');
 }
 

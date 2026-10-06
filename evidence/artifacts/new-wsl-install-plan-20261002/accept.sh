@@ -55,12 +55,12 @@ prepare_path() {
   path_ready=true
 }
 check() {
-  local slot="$1" program="$3" rc=0
+  local slot="$1" program="$3" pending_kind="${4:-needs_user}" rc=0
   # Kind/source remain in JSON and beside each command. Suppress stdout, which
   # diagnostics/model examples can fill with private config; retain stderr/status.
   if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; fi
   if [[ "$rc" == 78 ]]; then
-    printf '%s | %s | needs_user (78)\n' "$slot" "$stage"
+    printf '%s | %s | %s (78)\n' "$slot" "$stage" "$pending_kind"
   else
     [[ "$rc" == 0 ]] || failed=1
     printf '%s | %s | %s\n' "$slot" "$stage" "$rc"
@@ -1406,6 +1406,33 @@ codex mcp get promptfoo --json | jq -e --arg pf "$pf" '"'"'.transport.command ==
       check promptfoo smoke 'pf="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo"
 # Native config reads the active plan'"'"'s nonsecret gateway topology.
 gateway="$plan_dir/config/promptfoo-gateway.cjs"
+# Inspect nonsecret ownership data before the native config is loaded.
+node - "$plan_dir/config/gpt-gateway-topology.json" <<'"'"'JS'"'"'
+const fs = require("node:fs");
+const topology = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+if (typeof topology.gateway?.endpoint !== "string" ||
+    (Object.hasOwn(topology, "promptfoo") &&
+     (topology.promptfoo === null || typeof topology.promptfoo !== "object" ||
+      Array.isArray(topology.promptfoo)))) {
+  throw new Error("Malformed gateway endpoint or Promptfoo topology.");
+  }
+const endpoint = new URL(topology.gateway?.endpoint);
+if (endpoint.protocol !== "http:" || endpoint.hostname !== "127.0.0.1" ||
+    endpoint.port !== "21128" || endpoint.pathname !== "/v1" ||
+    endpoint.username || endpoint.password || endpoint.search || endpoint.hash) {
+  throw new Error("The plan gateway endpoint must be http://127.0.0.1:21128/v1.");
+  }
+const gpt = topology.pool_fallback?.model;
+if (typeof gpt !== "string" || !gpt || /[\s\x00-\x1f\x7f]/.test(gpt) ||
+    ["your-gpt-model-id", "your-model-id"].includes(gpt)) {
+  throw new Error("The plan must supply its GPT route.");
+  }
+if (!Object.hasOwn(topology.promptfoo ?? {}, "claude_model") &&
+    topology.gateway?.claude_route === "pending canonical owner decision; no guessed binding") {
+  console.error("needs_owner: the canonical Claude gateway route is pending.");
+  process.exit(78);
+  }
+JS
 expected="$(node -e '"'"'process.stdout.write(JSON.stringify(require(process.argv[1]).providers.map(provider => provider.id)))'"'"' "$gateway")"
 export PROMPTFOO_CONFIG_DIR="$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1
 run="$config_root/promptfoo-acceptance/$(date -u +%Y%m%dT%H%M%SZ)-$$"
@@ -1453,7 +1480,7 @@ prompt="Call the promptfoo MCP run_evaluation tool once with these exact argumen
 CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt Execute the requested tool once in the foreground and wait for its complete returned result before ending. Do not start background work, retry a failed evaluation, change providers or read authentication/credential files." --model opus --effort max --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
 codex exec --json -c '"'"'mcp_servers.promptfoo.env_vars=["OMNIROUTE_API_KEY"]'"'"' --sandbox workspace-write -C "$run" -c '"'"'mcp_servers.promptfoo.tools.run_evaluation.approval_mode="approve"'"'"' -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "$prompt" </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
 jq -s -e --arg client claude --argjson expected "$expected" -f "$plan_dir/config/promptfoo-session.jq" "$run/claude.jsonl" >/dev/null
-jq -s -e --arg client codex --argjson expected "$expected" -f "$plan_dir/config/promptfoo-session.jq" "$run/codex.jsonl" >/dev/null'
+jq -s -e --arg client codex --argjson expected "$expected" -f "$plan_dir/config/promptfoo-session.jq" "$run/codex.jsonl" >/dev/null' needs_owner
       ;;
     *) skipped promptfoo ;;
   esac
@@ -2039,6 +2066,17 @@ for gateway_name in gpt-gateway-topology.json gpt-gateway-client-accept.sh; do [
 systemctl --user is-active --quiet omniroute.service
 [[ "$(systemctl --user show -p ExecStart --value omniroute.service)" == *"$gateway_prefix/omniroute-serve.sh"* ]]
 [[ "$(systemctl --user show -p DropInPaths --value omniroute.service)" == *"$HOME/.config/systemd/user/omniroute.service.d/10-show-log.conf"* ]]
+# Source: systemd/systemd@v259:man/org.freedesktop.systemd1.xml (ActiveEnterTimestamp);
+# https://www.gnu.org/software/coreutils/manual/html_node/Date-input-formats.html
+gateway_started="$(LC_ALL=C systemctl --user show --timestamp=us+utc -p ActiveEnterTimestamp omniroute.service)"
+[[ "$gateway_started" == ActiveEnterTimestamp=* ]]
+gateway_started="${gateway_started#ActiveEnterTimestamp=}"
+[[ -n "$gateway_started" ]]
+gateway_started_ns="$(date --date="$gateway_started" +%s%N)"
+for gateway_name in omniroute.service omniroute.service.d/10-show-log.conf; do
+  gateway_mtime_ns="$(date --date="$(stat --format=%y "$HOME/.config/systemd/user/$gateway_name")" +%s%N)"
+  [[ "$gateway_started_ns" -gt "$gateway_mtime_ns" ]]
+done
 curl -fsS http://127.0.0.1:21128/readyz
 DATA_DIR="$HOME/.local/share/omniroute" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 "$HOME/.local/bin/omniroute" --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health'
       ;;
@@ -2061,6 +2099,17 @@ for gateway_name in gpt-gateway-topology.json gpt-gateway-client-accept.sh; do [
 systemctl --user is-active --quiet omniroute.service
 [[ "$(systemctl --user show -p ExecStart --value omniroute.service)" == *"$gateway_prefix/omniroute-serve.sh"* ]]
 [[ "$(systemctl --user show -p DropInPaths --value omniroute.service)" == *"$HOME/.config/systemd/user/omniroute.service.d/10-show-log.conf"* ]]
+# Source: systemd/systemd@v259:man/org.freedesktop.systemd1.xml (ActiveEnterTimestamp);
+# https://www.gnu.org/software/coreutils/manual/html_node/Date-input-formats.html
+gateway_started="$(LC_ALL=C systemctl --user show --timestamp=us+utc -p ActiveEnterTimestamp omniroute.service)"
+[[ "$gateway_started" == ActiveEnterTimestamp=* ]]
+gateway_started="${gateway_started#ActiveEnterTimestamp=}"
+[[ -n "$gateway_started" ]]
+gateway_started_ns="$(date --date="$gateway_started" +%s%N)"
+for gateway_name in omniroute.service omniroute.service.d/10-show-log.conf; do
+  gateway_mtime_ns="$(date --date="$(stat --format=%y "$HOME/.config/systemd/user/$gateway_name")" +%s%N)"
+  [[ "$gateway_started_ns" -gt "$gateway_mtime_ns" ]]
+done
 bash "$config_root/gpt-gateway-client-accept.sh"'
       ;;
     *) skipped gpt-gateway ;;

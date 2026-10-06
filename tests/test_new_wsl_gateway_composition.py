@@ -130,8 +130,50 @@ class GatewayCompositionSources(unittest.TestCase):
         client = command.index('bash "$config_root/gpt-gateway-client-accept.sh"')
         for binding in ("systemctl --user is-active --quiet omniroute.service",
                         "systemctl --user show -p ExecStart --value omniroute.service",
-                        "systemctl --user show -p DropInPaths --value omniroute.service"):
+                        "systemctl --user show -p DropInPaths --value omniroute.service",
+                        "systemctl --user show --timestamp=us+utc -p ActiveEnterTimestamp omniroute.service"):
             self.assertLess(command.index(binding), client)
+
+    def test_active_process_must_have_started_after_both_unit_files(self):
+        """Real date/stat comparison, synthetic systemd timestamps; no manager call."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            units = root / ".config/systemd/user"
+            units.mkdir(parents=True)
+            unit = units / "omniroute.service"
+            drop_in = units / "omniroute.service.d/10-show-log.conf"
+            drop_in.parent.mkdir()
+            unit.write_text("fixture unit\n")
+            drop_in.write_text("fixture drop-in\n")
+            binary = root / "bin"
+            binary.mkdir()
+            manager = binary / "systemctl"
+            manager.write_text('#!/bin/sh\n[ "$*" = "--user show --timestamp=us+utc -p ActiveEnterTimestamp omniroute.service" ] || exit 99\nprintf "ActiveEnterTimestamp=%s\\n" "$FIXTURE_STARTED"\n')
+            manager.chmod(0o755)
+            for stage in ("service_health", "after_sign_in"):
+                command = gateway_row()["acceptance"][stage]["command"]
+                start = command.index('gateway_started="')
+                end = command.index("\ndone", start) + len("\ndone")
+                freshness = command[start:end]
+                for case, started, unit_ns, drop_in_ns in (
+                    ("fresh", "2026-10-06 23:00:03.000001 UTC", 1791327601000000000, 1791327602000000000),
+                    ("old-unit", "2026-10-06 23:00:03 UTC", 1791327604000000000, 1791327602000000000),
+                    ("old-drop-in", "2026-10-06 23:00:03 UTC", 1791327601000000000, 1791327604000000000),
+                    ("same-microsecond", "2026-10-06 23:00:03.000001 UTC", 1791327601000000000, 1791327603000001000),
+                    ("missing-start", "", 1791327601000000000, 1791327602000000000),
+                    ("malformed-start", "not a timestamp", 1791327601000000000, 1791327602000000000),
+                ):
+                    with self.subTest(stage=stage, case=case):
+                        os.utime(unit, ns=(unit_ns, unit_ns))
+                        os.utime(drop_in, ns=(drop_in_ns, drop_in_ns))
+                        result = subprocess.run(["bash", "-euo", "pipefail", "-c", freshness],
+                                                env={"PATH": str(binary) + os.pathsep + os.environ["PATH"],
+                                                     "HOME": str(root), "FIXTURE_STARTED": started},
+                                                capture_output=True, text=True, timeout=10)
+                        if case == "fresh":
+                            self.assertEqual(result.returncode, 0, result.stderr)
+                        else:
+                            self.assertNotEqual(result.returncode, 0, result.stderr)
 
 
 class GatewayCompositionFilesystemControls(unittest.TestCase):

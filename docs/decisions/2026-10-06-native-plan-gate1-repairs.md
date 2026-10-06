@@ -264,3 +264,11 @@ systemctl --user show omniroute.service -p ActiveState -p ExecStart -p DropInPat
 ```
 
 Compare restored files/symlinks and the effective previous prefix/drop-ins with the saved prior layout. A rollback is complete only after that read-back; restoring a symlink alone is not a service rollback. Preserve the packet and both prefixes for the command center's review.
+
+## Addendum (2026-10-06): exact-head J723 delta
+
+The exact-head review found a stale handbook publication binding, permissive Promptfoo URL validation, and gateway checks that could pass before the running process loaded the rendered drop-in. The bounded repair keeps the maintained receipt guard's exact assertions, retains the former output bindings, validates the parsed loopback hostname and recorded port, and classifies the explicitly pending Claude route as needs_owner/78 before loading the evaluator config. Malformed supplied routes still fail; no Claude route is invented.
+
+Both gateway stages now require the keyed, microsecond UTC ActiveEnterTimestamp to be strictly later than the unit and drop-in mtimes, preserving all identity, health and client-result gates. Research clones also assert the official GPT Researcher and DeerFlow tag commits. Sources and pins are in the J723 section of the install plan's SOURCES.md. Synthetic URL, pending-owner and stale-process controls are local integration evidence; host re-apply and delivered provider behavior remain owed to the command center.
+
+The command center's J723b ruling withdraws restoration of the unlanded A50 draft amendment. Its observed native-messaging smoke receipt is retained byte-identically in private lane state, mode0600, with its digest disclosed in the PR body. #771 governs the relaxed operational posture. No retired policy or enforcement test is restored.

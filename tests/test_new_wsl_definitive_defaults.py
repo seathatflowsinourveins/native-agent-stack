@@ -2382,15 +2382,14 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
             )
 
     def topology(self):
-        return {"gateway": {"endpoint": "http://127.0.0.1:21991/v1"},
+        return {"gateway": {"endpoint": "http://127.0.0.1:21128/v1"},
                 "pool_fallback": {"model": "fixture/gpt-a", "model_reasoning_effort": "xhigh"},
                 "promptfoo": {"claude_model": "fixture/claude-a"}}
 
-    def test_both_providers_follow_changed_canonical_routes_and_endpoint(self):
+    def test_both_providers_follow_changed_canonical_routes_on_the_owned_endpoint(self):
         import copy
         original = self.topology()
         changed = copy.deepcopy(original)
-        changed["gateway"]["endpoint"] = "http://127.0.0.1:21992/v1"
         changed["pool_fallback"]["model"] = "fixture/gpt-b"
         changed["promptfoo"]["claude_model"] = "fixture/claude-b"
         for topology in (original, changed):
@@ -2482,7 +2481,16 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
         baseline = self.topology()
         for field, bad_value in (("endpoint", None), ("endpoint", "gateway.example.com"),
                                  ("endpoint", "https://gateway.example.com/v1"),
+                                 ("endpoint", "http://127.0.0.1:21991/v1"),
+                                 ("endpoint", "http://127.0.0.1.example.com:21128/v1"),
+                                 ("endpoint", "http://evil.example:21128/v1?gateway.example.com"),
+                                 ("endpoint", "http://127.0.0.1:21128@evil.example/v1"),
+                                 ("endpoint", "http://evil.example:21128/127.0.0.1/v1"),
+                                 ("endpoint", "http://127.0.0.1:21128/v1#ignored"),
+                                 ("endpoint", "http://127.0.0.1:21128/v1?ignored=1"),
+                                 ("endpoint", "https://127.0.0.1:21128/v1"),
                                  ("gpt", None), ("gpt", "your-gpt-model-id"),
+                                 ("gpt", "fixture/gpt\x00a"),
                                  ("claude", None), ("claude", "your-claude-model-id"),
                                  ("claude", "fixture/gpt-a"), ("claude", "fixture/claude a")):
             with self.subTest(field=field, bad_value=bad_value):
@@ -2493,8 +2501,67 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
                 topology[target][key] = bad_value
                 result = self.render(topology)
                 self.assertNotEqual(result.returncode, 0)
-                self.assertEqual(result.stdout, "")
                 self.assertIn("plan gateway topology must declare", result.stderr)
+                self.assertEqual(result.stdout, "")
+
+    def test_explicit_owner_pending_is_78_before_config_loading(self):
+        import copy
+        import importlib.util
+        import shlex
+        command = next(row for row in load(PLAN / "install-plan.json")["owners"]
+                       if row["slot"] == "promptfoo")["acceptance"]["after_sign_in"]["command"]
+        preflight = command.split('\nexpected="', 1)[0]
+        spec = importlib.util.spec_from_file_location("pending_plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        functions = checker.functions((PLAN / "accept.sh").read_text())
+        dispatcher = functions["check"]
+        tokens = shlex.split(functions["promptfoo"], comments=True)
+        pending_kind = tokens[tokens.index(command) + 1]
+        self.assertEqual(pending_kind, "needs_owner")
+        pending = self.topology()
+        pending["promptfoo"] = {}
+        pending["gateway"]["claude_route"] = "pending canonical owner decision; no guessed binding"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "config").mkdir()
+            # A poison config proves the preflight does not load it or run providers.
+            (root / "config/promptfoo-gateway.cjs").write_text('throw new Error("CONFIG_LOADED");')
+            for case in ("pending", "supplied-bad-route", "missing-ownership", "wrong-port",
+                         "endpoint-array", "promptfoo-array", "promptfoo-string", "promptfoo-null", "gpt-nul"):
+                with self.subTest(case=case):
+                    topology = copy.deepcopy(pending)
+                    if case == "supplied-bad-route":
+                        topology["promptfoo"]["claude_model"] = "your-claude-model-id"
+                    elif case == "missing-ownership":
+                        del topology["gateway"]["claude_route"]
+                    elif case == "wrong-port":
+                        topology["gateway"]["endpoint"] = "http://127.0.0.1:20128/v1"
+                    elif case == "endpoint-array":
+                        topology["gateway"]["endpoint"] = [topology["gateway"]["endpoint"]]
+                    elif case.startswith("promptfoo-"):
+                        topology["promptfoo"] = {"promptfoo-array": [], "promptfoo-string": "bad",
+                                                 "promptfoo-null": None}[case]
+                    elif case == "gpt-nul":
+                        topology["pool_fallback"]["model"] = "fixture/gpt\x00a"
+                    (root / "config/gpt-gateway-topology.json").write_text(json.dumps(topology))
+                    program = preflight + '\nnode "$gateway"'
+                    stage = ('stage=after_sign_in; failed=0; prepare_path() { :; };\ncheck() {\n' +
+                             dispatcher + '\n}\ncheck promptfoo smoke ' + shlex.quote(program) +
+                             ' ' + pending_kind + '\nexit "$failed"')
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", stage],
+                                            env={"PATH": os.environ["PATH"], "HOME": str(root),
+                                                 "plan_dir": str(root)},
+                                            capture_output=True, text=True, timeout=10)
+                    if case == "pending":
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(result.stdout, "promptfoo | after_sign_in | needs_owner (78)\n")
+                        self.assertIn("needs_owner:", result.stderr)
+                        self.assertNotIn("CONFIG_LOADED", result.stderr)
+                    else:
+                        self.assertEqual(result.returncode, 1, result.stderr)
+                        self.assertNotIn("needs_owner (78)", result.stdout)
+                        self.assertNotIn("needs_user", result.stdout)
 
 
 class FixwaveAcceptanceRepairs(unittest.TestCase):

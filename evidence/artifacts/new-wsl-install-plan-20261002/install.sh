@@ -944,8 +944,8 @@ agent-runtime-worker() {
 }
 
 research-gpt-researcher() {
-  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
-  run_command 'checkout_tag https://github.com/assafelovic/gpt-researcher.git v3.7.0 "$tool_root/gpt-researcher"' || return "$?"
+  # Source: https://github.com/assafelovic/gpt-researcher/tree/0957c301ed06c2a5857b834358c7227c739041d4
+  run_command 'checkout_tag https://github.com/assafelovic/gpt-researcher.git v3.7.0 "$tool_root/gpt-researcher" && [[ "$(git -C "$tool_root/gpt-researcher" rev-parse HEAD)" == "0957c301ed06c2a5857b834358c7227c739041d4" ]]' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
   run_command 'ensure_venv "$tool_root/gpt-researcher/.venv"' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
@@ -955,8 +955,8 @@ research-gpt-researcher() {
 }
 
 research-deer-flow() {
-  # Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/Install.md#L38
-  run_command 'checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 "$tool_root/deer-flow"' || return "$?"
+  # Source: https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/Install.md#L38
+  run_command 'checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 "$tool_root/deer-flow" && [[ "$(git -C "$tool_root/deer-flow" rev-parse HEAD)" == "345f08be00c8a9495079b732a39b46aa9af1584e" ]]' || return "$?"
   # Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/Install.md#L38
   run_command '(cd "$tool_root/deer-flow" && if [[ ! -e config.yaml && ! -e .env && ! -e frontend/.env ]]; then make config; elif [[ ! -e config.yaml || ! -e .env || ! -e frontend/.env ]]; then printf "Partial DeerFlow config; repair from upstream recipe.\n" >&2; exit 1; fi)' || return "$?"
   # Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/Makefile#L96
