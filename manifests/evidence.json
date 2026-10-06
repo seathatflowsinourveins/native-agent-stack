@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe",
-      "bytes": 92982
+      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec",
+      "bytes": 93206
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -16868,8 +16868,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "17220f1d3866439d8b0a7ccd1c73aafe05354f94d7ec67dd685ad937833f7313",
-      "bytes": 135333
+      "sha256": "2bcc4e1c173e1780cd6f48f863e6e4fcb134d9374971f95d1217e755e7f336d4",
+      "bytes": 135623
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17008,8 +17008,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
-      "sha256": "b8087bb88987388183aa06f8055448192e7f596d14f739edfee4f2b4dfa1c368",
-      "bytes": 7630
+      "sha256": "e025fdf43cb7c4051b2e74ed89cca78aa15e60f655934bf8da9694ba4bf61b87",
+      "bytes": 7847
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md",
@@ -17063,8 +17063,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-codex-service-tier-migration.md",
-      "sha256": "a4d7c6c98e86be419af3bd673e374b529e62b80287556e5cb42cda5c19961fb1",
-      "bytes": 6420
+      "sha256": "5efb729f1b102601b368929927a9d1ac9664b76be35abaefceb27b3f4f9367ae",
+      "bytes": 8411
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
@@ -18668,8 +18668,8 @@
     },
     {
       "path": "evidence/artifacts/codex-service-tier-migration-20261005/receipt.json",
-      "sha256": "8cce957f20f41260d26910c3695b7dec0ffc585be98e4ba84e33f3e977124512",
-      "bytes": 8318
+      "sha256": "dcae2dc2a2ba0b8b0b82f529d0a5a3ea5f41e7f0b4f85287f6890ff598ec2ec4",
+      "bytes": 13257
     },
     {
       "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt",
@@ -54793,8 +54793,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "d94c94f8a6f9202af35853126264caa65012f1aa3f652f456279572959360a30",
-      "bytes": 292017
+      "sha256": "7c3533b29e9eb6c39ff12b3b94c20cb4e6eab0e7b303349b5b68023f2dbcaa6d",
+      "bytes": 298226
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -55273,8 +55273,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "f2c155b7a60527a27e0a4629a542d4846173c5684d94e216a15f23dbcb3a8053",
-      "bytes": 160229
+      "sha256": "08639afa0c43d537a9071055fbae81b219bff9550be76b2afaba50d386c2e147",
+      "bytes": 160807
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
