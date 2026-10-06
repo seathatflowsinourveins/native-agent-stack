@@ -208,9 +208,10 @@ def main(argv=None) -> int:
     if args.to_stage < 3:
         write_log(root, log)
         return 0
-    # Stage 2 is a gate for every later session: the stage-3 oracle runs and the stage-4 trials.
+    # Stage 2 is a gate for every later session: the stage-3 oracle runs and the stage-4 trials (a resume at stage 5 or
+    # 6 only collects and grades, so it is not refused).
     g0 = load_json(root / "gate0.json") if (root / "gate0.json").exists() else {}
-    if not g0.get("pass"):
+    if args.from_stage <= 4 and not g0.get("pass"):
         print(json.dumps({"refused": ["gate0.json does not pass (stage 2 is a gate)"]}))
         write_log(root, log)
         return 2
