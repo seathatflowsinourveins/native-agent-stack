@@ -15,21 +15,36 @@ receipt. A host that requires review/ACK obtains it before downloading,
 snapshotting, restoring, or applying a unit. Keep the original service
 available until the reviewed cutover window.
 
-## Pin and currency
+## Proposed target and retained fallback
 
-The catalog names Qdrant 1.19.1 and its official
-[Linux musl release archive](https://github.com/qdrant/qdrant/releases/tag/v1.19.1),
-SHA256 `70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9`.
-Retain the upstream license beside the binary; follow the
-[existing archive recipe](README.md).
+The proposed migration source is the indexed Qdrant 1.19.1 store; target is
+the official stable 1.19.2 release, subject to the owner's ACK. Its release
+notes name flush-consistency, write-tearing and recovery fixes relevant to
+this operation. Release age alone does not establish quality, and these
+fixes do not establish that the existing store is corrupted.
 
-A currency read on 2026-10-06 found stable 1.19.2, published
-2026-10-05T14:16:50Z. Requested 1.19.1 is within 180 days, but is no longer
-latest. [Upstream 1.19.2 notes](https://github.com/qdrant/qdrant/releases/tag/v1.19.2)
-include flush-consistency, storage write-tearing and restart-recovery fixes.
-The owner explicitly settles patch adoption before migration is ACKed.
-This procedure keeps the requested same-version 1.19.1 path concrete; it
-does not silently change the pin or establish current corruption.
+| Role | Official release | Linux musl archive SHA256 | Bytes |
+| --- | --- | --- | ---: |
+| Proposed target | [1.19.2](https://github.com/qdrant/qdrant/releases/tag/v1.19.2), published 2026-10-05T14:16:50Z | `50b253243309ed0ae50a19f678f0d0adcc4f0b567b3bd2c5c0c7e02fa8404bb6` | 33015429 |
+| Retained catalog/B fallback | [1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1) | `70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9` | 32315868 |
+
+The archive is `qdrant-x86_64-unknown-linux-musl.tar.gz`; use the selected
+release's official asset and retain its upstream license. The target hash
+comes from the [release-assets API](https://api.github.com/repos/qdrant/qdrant/releases/tags/v1.19.2).
+This proposal updates neither the catalog nor active installation.
+
+The B files are pre-execution alternative pin choices requiring new, empty
+native state. They must never open state already recovered or populated by
+1.19.2; operational rollback uses the separate preserved source or a fresh
+compatible restore described below.
+
+The [official snapshot compatibility contract](https://qdrant.tech/documentation/snapshots/#restore-snapshot)
+permits the same minor version with target patch at least the source patch.
+Thus 1.19.1-to-1.19.2 is an upstream-supported format route. Full-storage
+recovery remains the CLI startup operation; target
+[`016542aa5deb6c66380bb137badf73d54f742bde`](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/src/main.rs#L249)
+retains it. Source compatibility is not an executed restore or retrieval
+qualification: those gates remain required after ACK.
 
 ## Preserve the whole owned store
 
@@ -63,8 +78,8 @@ After ACK, install the official archive and render the existing examples
 with reviewed absolute paths. Use **new, empty, separately owned native
 state**. Do not point the binary at Docker's internal volume directory.
 Set the reviewed HTTP port, for example 21633; keep `storage.temp_path`
-unset. At 1.19.1, default full-unpack and collection-staging locations are
-derived from the owned storage paths.
+unset. At the reviewed source and target pins, full-unpack and collection
+staging locations are derived from the owned storage paths.
 
 Apply the reviewed CPU policy: a user unit may set
 `Slice=background.slice` and `Nice=19`; the embedding service retains its
@@ -86,7 +101,7 @@ Omit `--force-snapshot`. A first-start systemd drop-in clears inherited
 ```ini
 [Service]
 ExecStart=
-ExecStart=/ABSOLUTE/STACK_HOME/tools/qdrant-1.19.1/qdrant --config-path /ABSOLUTE/CONFIG/qdrant.yaml --disable-telemetry --storage-snapshot /ABSOLUTE/SNAPSHOTS/verified.snapshot
+ExecStart=/ABSOLUTE/STACK_HOME/tools/qdrant-1.19.2/qdrant --config-path /ABSOLUTE/CONFIG/qdrant.yaml --disable-telemetry --storage-snapshot /ABSOLUTE/SNAPSHOTS/verified.snapshot
 ```
 
 Wait for native HTTP readiness and the complete restored collection/alias
@@ -96,14 +111,18 @@ stop the owned unit, remove only the recovery drop-in, `daemon-reload`, and
 start the ordinary canonical unit. Ordinary starts must not repeat recovery.
 Enable the user unit only after its gates pass.
 
-Sources: [pinned CLI recovery](https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/src/main.rs#L249),
-[recovery staging](https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/src/snapshots.rs#L145),
+Sources: [target CLI recovery](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/src/main.rs#L249),
+[target recovery staging](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/src/snapshots.rs#L145),
+[systemd@v259 Type=simple](https://github.com/systemd/systemd/blob/v259/man/systemd.service.xml#L164),
+[ExecStart reset](https://github.com/systemd/systemd/blob/v259/man/systemd.service.xml#L395),
 [systemd resource control](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html).
 
 ## Acceptance and rollback
 
 Before releasing writers, retain:
 
+- The executed 1.19.2 archive checksum, restored source/target versions and
+  startup outcome. A matching release-API digest alone is source review.
 - Native version/commit, active user-unit state and its actual process.
 - Complete collection/alias inventory, each vector configuration and point
   count compared with the quiesced source. Include metadata/graph collections.
