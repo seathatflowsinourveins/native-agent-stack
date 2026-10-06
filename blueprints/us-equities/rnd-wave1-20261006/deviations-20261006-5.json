@@ -26,7 +26,7 @@
     {
       "id": "D7.1",
       "finding": "CC refined Q5 to form (a), minimal.",
-      "rule": "D6 entries are independent pins checked against deterministic source derivations, never a binding output lookup. Derive only the 15 date ranges listed below from their original source spans. D6 is never a fallback or a parser-selector input."
+      "rule": "D6 entries are independent pins checked against deterministic source derivations, never a binding output lookup. Bind only the 15 date-range fields identified by the original table; a literal date pair is not proof of a complete data-read interval. Preserve unresolved bounds under D1, including C06's unknown lower date. D6 is never a fallback or parser-selector input."
     },
     {
       "id": "D7.2",
@@ -74,7 +74,7 @@
               "span_sha256": "c5090b404ad0b4ffc5a62cbef5fe026020d296e5d943b28c968b04a2955b52ac"
             }
           ],
-          "parser_kind": "singleton_prose",
+          "parser_kind": "partial_prose",
           "output_type": "two inclusive ISO calendar dates, as written",
           "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
           "date_pattern": "^## Dated scan: session (?P<day>\\d{4}-\\d{2}-\\d{2}) \\(",
@@ -83,9 +83,11 @@
           ],
           "required_matches": 1,
           "capture_order": [
-            "day",
+            "unknown",
             "day"
-          ]
+          ],
+          "unknown_lower_reason": "The same original cited span at README:139-140 records older/stale snapshot bars and gives no earliest data date. The session title determines only the known recorded upper date; D1 preserves an unknown lower endpoint.",
+          "operation": "Emit [unknown, captured day]. Do not fill the lower endpoint with the session label or the D6 pin."
         },
         {
           "entry_id": "D6-C08",
@@ -452,6 +454,11 @@
       "id": "D7.5",
       "finding": "Earlier fixtures and gates remain frozen.",
       "rule": "D4.1 fixtures and A1-A8, D4.2 integer exits and precedence, D5.3's exactly two external records and their member/field restrictions, and all 57 D6 entries / 49 out_items remain unchanged. In particular C02's independent pin and C10's additional full-range pin are not edited. No new mapping resolves them by fiat."
+    },
+    {
+      "id": "D7.6",
+      "finding": "J808 P2-2 requires the concrete expected unknown rerun behavior.",
+      "rule": "Unknown fields stay present for completeness; they are not a new automatic rejection. Their potential scope is covered conservatively under D1. An unbounded unknown covers every case; lookup returns no record when any relevant scope/case is unresolved, so reserved_access refuses. Keep all 57 mandatory D6 entries and every known/critic-cited read; unknown entries count as present. With prerequisites met and no lower-numbered rejection, the required unknown derivations differ from known D6 oracle pins (for example C01), so the expected completed rerun status is REJECTED_DERIVATION, integer exit 11. The already reported eligible-session counts are zero, reported rather than gated and recomputed by deterministic code. This is an expected outcome, not a preassigned native result."
     }
   ],
   "all_D6_entry_ids": [
@@ -563,5 +570,15 @@
     "table_json_sha256": "4661411437a683a54839a2760594dcee70a7bc90e171db2324b52f28222d6428",
     "D6_sha256": "c3eb8594f3da2acbc54ce331cf104e146e57a9418ca9b806968bae8cff3aa87c"
   },
-  "execution_gate": "DRAFT ONLY until a GPT read and the command center's ACK of this exact dated record. No gate-bearing registry before that ACK. The later authorized rerun uses nice 19 outside 19:50Z-00:10Z, follows D1's status rules with these unknowns, retains all native/sanitizer exits and failed/refused artifacts, and leaves attempt 1 untouched."
+  "execution_gate": "DRAFT ONLY until a GPT read and the command center's ACK of this exact dated record. No gate-bearing registry before that ACK. The later authorized rerun uses nice 19 outside 19:50Z-00:10Z, follows D1's status rules with these unknowns, retains all native/sanitizer exits and failed/refused artifacts, and leaves attempt 1 untouched.",
+  "rerun_outcome_expectation": {
+    "prerequisites": "Unchanged D2/D5/D6 checks first. The source base must be clean; protected catalyst files must be byte-identical; required retained records and pins must satisfy the frozen gates. An unmet prerequisite or missing required record is NOT_STARTED (30) and no wave command runs. D5.3 external hash mismatch is also NOT_STARTED (30); D6 source/citation hash mismatch follows REJECTED_DERIVATION (11).",
+    "coverage": "D1 unknown fields cover every case whose security or date could lie in their scope. An unbounded unknown covers every case. A resolved covering entry yields inspected=true; otherwise any relevant unresolved entry/case makes lookup return no record, and contract.reserved_access refuses. No missing-identity or unknown case is admitted.",
+    "completeness": "D2 counts an entry with unknown fields as present. Retain all 57 D6 entries, existing known reads and every critic-cited read; do not drop unknowns or unmatched pins. If a required read has no entry, REJECTED_COMPLETENESS (10) takes precedence over 11.",
+    "eligibility": "The frozen D6 result and the current conservative coverage imply eligible-session counts of 0 per v1 segment. Counts remain deterministic reported-not-gated outputs; do not hardcode this context value into a gate.",
+    "expected_status": "After prerequisites and completed checks, expect REJECTED_DERIVATION (11) because required unknown derivations do not equal the retained known D6 pins. Unknown alone is not a new rejection rule. Actual native computation determines the recorded status.",
+    "precedence": "Unchanged D4.2: when completed checks have several rejection statuses, report the lowest-numbered rejection and list every failing check. Retain 10 completeness, 11 derivation, 12 refusal, 13 protocol, 14 byte reproducibility, 15 acceptance and 16 fixture rejection semantics. A command that never reaches a verdict retains ERROR (2); do not turn an outer-tool code into a native verdict.",
+    "receipts": "Every command retains native exit and any sanitizer/wrapper exit separately, original stdout/stderr, both builder outputs and every refusal/failure artifact in private durable state. Attempt 1 remains unchanged."
+  },
+  "review_note_C06": "J808's verification gap requires scoped adjudication of the stale-bar exposure. The proposed lower bound stays unknown pending the exact record ACK; no oracle value is copied. There are 15 authorized date-field bindings, including this partial bound, not 15 claimed complete data-read intervals."
 }
