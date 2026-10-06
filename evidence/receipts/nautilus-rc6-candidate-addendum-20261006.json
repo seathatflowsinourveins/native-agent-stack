@@ -11,8 +11,8 @@
     "No rc6 case has run. Source/fixture controls do not establish native economic parity, risk policy, broker acceptance or a destination pin move.",
     "An independent Opus exact-head read is pending;5f may object at the addendum read. Synthetic reviews/approvals are confined to fixtures, not actual acceptance.",
     "The existing failed-history/owner-acceptance predicate remains active.5f must supply an actual source-bound deviation-acceptance-rc6.json; old approved fields are not copied or cleared. Missing/old approval remains a failing precondition.",
-    "The owner must stage the retained five inputs and approve the managed-Python isolation route. AAPL remains blocked; no credentials, provider, broker or orders are touched.",
-    "Old engine/source/probe/review/history evidence remains historical rc5 evidence. Initial candidate history is byte-copied; actual future rc6 attempts append only to the candidate file, preserving the originals.",
+    "J2 has staged the retained five inputs and executed the approved managed-Python route; J4 input checks pass, while native rc6 execution still awaits its independent read and source-bound owner records. AAPL remains blocked; no credentials, provider, broker or orders are touched.",
+    "Old engine/source/probe/review/history evidence remains historical rc5 evidence. Candidate history preserves the original prefix and adds two verified historical rc5 attempts; real future rc6 attempts append only to that candidate file.",
     "The earlier24-check offline runtime acceptance remains separately dated; it does not qualify these copied sources or substitute for a native historical-case run."
   ],
   "state": "frozen_pending_independent_review",
@@ -147,16 +147,17 @@
     "exit_code": 0,
     "evidence_class": "local_integration",
     "returned_output": {
+      "candidate_history_sha256": "e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4",
       "comparator_functions_changed": [
         "main"
       ],
-      "comparator_main_change": "output identity only",
-      "history_copy_byte_identical": true,
-      "manifest_sha256": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
-      "scope": "Source checks only; no engine or candidate imports.",
+      "original_history_sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+      "original_replay_prefix_preserved": true,
+      "retained_appended_rc5_attempts": 2,
+      "scope": "Source/compile checks; no candidate main or native engine execution.",
       "status": "passed"
     },
-    "scope": "Source/compile check: copied comparator functions byte-identical except CLI result labeling; no runtime import or engine case."
+    "scope": "Current source/compile and preserved-history-prefix checks; no candidate main or native engine case."
   },
   "blocked_bindings": [],
   "reviews": {
@@ -194,7 +195,7 @@
     }
   ],
   "owner_ruling": "ns2604-coop J4RULINGS2026-10-06T03:49:15Z,5f report-native-agent-stack-5f-20261006T0100Z-j4; J4PROCEED2026-10-06T04:36:06Z, command-center item task-ns2604-coop-20261006T043449Z section2",
-  "addendum_sha256": "580fa4b9af21ac3b3caf39fd8d7ae5e9a294e655371f8e2f348062f7e08e2aa2",
+  "addendum_sha256": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38",
   "recipe_fixture_checks": {
     "command": "nice -n 19 python3 -B -m unittest tests.test_nautilus_rc6_candidate tests.test_spy_parity tests.test_nautilus_equity_replay tests.test_native_nautilus_ci tests.test_trading_2604_lock",
     "exit_code": 0,
@@ -211,13 +212,36 @@
   "open_conditions": [
     "Independent passing read and checkout-contained actual review record covering7immutable files.",
     "Actual5f gate-owner deviation disposition bound to the candidate reviewed files.",
-    "Owner-staged retained inputs with exact hashes and managed-Python route approval.",
     "SPY-only native candidate replication and full unchanged oracle/predicate verdict; AAPL remains blocked."
   ],
   "changed_line_table": "evidence/artifacts/nautilus-rc6-qualification-20261005/candidate-changed-lines-20261006.json",
   "history_copy": {
     "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
-    "sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
-    "bytes_match_original_at_freeze": true
-  }
+    "sha256": "e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4",
+    "original_history_sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+    "original_replay_prefix_preserved": true,
+    "appended_historical_rc5_attempts": 2,
+    "scope": "Verified retained J2 attempts only; no rc6 case."
+  },
+  "staged_input_check": {
+    "command": "nice -n 19 sha256sum -c MANIFEST.sha256",
+    "exit_code": 0,
+    "returned_summary": "All five retained files: OK",
+    "evidence_class": "local_integration",
+    "scope": "Input integrity only, not native economic qualification.",
+    "manifest_sha256": "a6f92379563e789f8baeef4ef278f1d7e7147d964b0d6d601fca3e234c3d1eba",
+    "route_source": "seathatflowsinourveins/native-agent-stack@5271c87dbf8ebbc745afe3b9ee22c4d8528c4770:blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json#/attempts/documented-env",
+    "source_scope": "J2 onrc5, not anrc6 acceptance."
+  },
+  "paper_windows_utc": [
+    {
+      "start": "2026-10-06T10:35:00Z",
+      "end": "2026-10-06T13:45:00Z"
+    },
+    {
+      "start": "2026-10-06T19:50:00Z",
+      "end": "2026-10-07T00:10:00Z"
+    }
+  ],
+  "paper_window_source": "Co-op correction2026-10-06T05:04:26Z,5f via command-center item task-ns2604-coop-20261006T050351Z; no heavy phases/user-manager restart; pause between steps, never kill cases."
 }

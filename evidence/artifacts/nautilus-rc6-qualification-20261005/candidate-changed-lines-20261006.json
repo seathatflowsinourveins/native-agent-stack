@@ -558,12 +558,957 @@
           "category": "version"
         }
       ]
+    },
+    {
+      "original_path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
+      "original_sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+      "candidate_path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
+      "candidate_sha256": "e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4",
+      "changed_lines": [
+        {
+          "side": "candidate",
+          "line": 145,
+          "text": "    },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 146,
+          "text": "    {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 147,
+          "text": "      \"id\": \"j2-rc5-runtime-env-20261006\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 148,
+          "text": "      \"observed_utc\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 149,
+          "text": "        \"2026-10-06T04:40:32Z\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 150,
+          "text": "      ],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 151,
+          "text": "      \"engine_version\": \"2.0.0rc5\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 152,
+          "text": "      \"harness\": \"Original ecfa11276 rc5 source; J2 retained attempt, not an rc6 candidate execution.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 153,
+          "text": "      \"isolation\": \"Launcher-equivalent vector; .venv/.python/repository/data read-only; cleared environment; one owned output. Initial acceptance environment included extra names, rejected by the comparator.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 154,
+          "text": "      \"outcome\": \"Replay exit0; comparator exit1; full verdictFAIL retained. {\\\"PASS\\\": 134, \\\"FAIL\\\": 2}; failure fields no_prior_replay_ran_the_reviewed_harness,environment_beyond_cleared_set. No qualification inferred from execution checks.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 155,
+          "text": "      \"receipt_sha256\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 156,
+          "text": "        \"ee29bf214b3831aac1206624cd575ab4bfd20a24e4c1470ee953b0e2e241c695\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 157,
+          "text": "      ],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 158,
+          "text": "      \"verdict_sha256\": \"a1569e1c68f87c3767930e6c00be193633f2a0d9d193289704ca2942ecd6d6f2\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 159,
+          "text": "      \"harness_local_source_sha256\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 160,
+          "text": "        \"compare.py\": \"c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 161,
+          "text": "        \"convert.py\": \"08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 162,
+          "text": "        \"distribution_module.py\": \"eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 163,
+          "text": "        \"fixture_strategy.py\": \"59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 164,
+          "text": "        \"mapping-manifest-v2.json\": \"1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 165,
+          "text": "        \"mapping-manifest.json\": \"43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 166,
+          "text": "        \"run.py\": \"c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 167,
+          "text": "        \"tolerances.json\": \"c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 168,
+          "text": "      },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 169,
+          "text": "      \"reviewed_before_run\": true,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 170,
+          "text": "      \"review_coverage_proof\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 171,
+          "text": "        \"source_locator\": \"seathatflowsinourveins/native-agent-stack@5271c87dbf8ebbc745afe3b9ee22c4d8528c4770:blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json#/attempts/runtime-env\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 172,
+          "text": "        \"source_sha256\": \"f909ea5a9c4ede9260f2938218db87d523359ed67c994521dac46ab47f981417\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 173,
+          "text": "        \"returned_verdict_sha256\": \"a1569e1c68f87c3767930e6c00be193633f2a0d9d193289704ca2942ecd6d6f2\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 174,
+          "text": "        \"checks\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 175,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 176,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 177,
+          "text": "            \"field\": \"record_sha256_at_comparison\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 178,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 179,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 180,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 181,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 182,
+          "text": "            \"field\": \"schema\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 183,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 184,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 185,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 186,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 187,
+          "text": "            \"field\": \"reviewed_files_are_the_files_that_ran\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 188,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 189,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 190,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 191,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 192,
+          "text": "            \"field\": \"completed_before_run_started\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 193,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 194,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 195,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 196,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 197,
+          "text": "            \"field\": \"unresolved_findings\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 198,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 199,
+          "text": "          }",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 200,
+          "text": "        ]",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 201,
+          "text": "      },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 202,
+          "text": "      \"returned_failing_checks\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 203,
+          "text": "        {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 204,
+          "text": "          \"blocked_by\": null,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 205,
+          "text": "          \"delta\": \"-\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 206,
+          "text": "          \"expected\": \"[]\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 207,
+          "text": "          \"field\": \"no_prior_replay_ran_the_reviewed_harness\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 208,
+          "text": "          \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 209,
+          "text": "          \"key\": \"precondition_review.no_prior_replay_ran_the_reviewed_harness#35\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 210,
+          "text": "          \"observed\": \"['bwrap-cc4503f-host-nativestack-5975wx-20260925', 'bwrap-cc4503f-qualifying']\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 211,
+          "text": "          \"ordinal\": 35,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 212,
+          "text": "          \"status\": \"FAIL\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 213,
+          "text": "          \"tolerance\": \"exact\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 214,
+          "text": "        },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 215,
+          "text": "        {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 216,
+          "text": "          \"blocked_by\": null,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 217,
+          "text": "          \"delta\": \"-\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 218,
+          "text": "          \"expected\": \"[]\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 219,
+          "text": "          \"field\": \"environment_beyond_cleared_set\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 220,
+          "text": "          \"id\": \"precondition_engine\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 221,
+          "text": "          \"key\": \"precondition_engine.environment_beyond_cleared_set#53\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 222,
+          "text": "          \"observed\": \"['GIT_OPTIONAL_LOCKS', 'HOME', 'MPLBACKEND', 'UV_OFFLINE', 'XDG_CACHE_HOME']\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 223,
+          "text": "          \"ordinal\": 53,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 224,
+          "text": "          \"status\": \"FAIL\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 225,
+          "text": "          \"tolerance\": \"exact\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 226,
+          "text": "        }",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 227,
+          "text": "      ],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 228,
+          "text": "      \"status\": \"retained rc5 reproduction; unqualified full verdict; not an rc6 run\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 229,
+          "text": "    },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 230,
+          "text": "    {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 231,
+          "text": "      \"id\": \"j2-rc5-documented-env-20261006\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 232,
+          "text": "      \"observed_utc\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 233,
+          "text": "        \"2026-10-06T04:41:27Z\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 234,
+          "text": "      ],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 235,
+          "text": "      \"engine_version\": \"2.0.0rc5\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 236,
+          "text": "      \"harness\": \"Original ecfa11276 rc5 source; J2 retained attempt, not an rc6 candidate execution.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 237,
+          "text": "      \"isolation\": \"Launcher-equivalent vector; .venv/.python/repository/data read-only; cleared environment; one owned output. Final environment uses the five documented values.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 238,
+          "text": "      \"outcome\": \"Replay exit0; comparator exit1; full verdictFAIL retained. {\\\"PASS\\\": 135, \\\"FAIL\\\": 1}; failure fields no_prior_replay_ran_the_reviewed_harness. No qualification inferred from execution checks.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 239,
+          "text": "      \"receipt_sha256\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 240,
+          "text": "        \"bebba33c0a1dd6eabc6570ca00c0acd3517fcf4397ae6f0874e24f325537871d\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 241,
+          "text": "      ],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 242,
+          "text": "      \"verdict_sha256\": \"5c788e43f6bcaf2596f586a597e615338406f3b8483045f32c25796ff903d44e\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 243,
+          "text": "      \"harness_local_source_sha256\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 244,
+          "text": "        \"compare.py\": \"c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 245,
+          "text": "        \"convert.py\": \"08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 246,
+          "text": "        \"distribution_module.py\": \"eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 247,
+          "text": "        \"fixture_strategy.py\": \"59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 248,
+          "text": "        \"mapping-manifest-v2.json\": \"1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 249,
+          "text": "        \"mapping-manifest.json\": \"43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 250,
+          "text": "        \"run.py\": \"c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 251,
+          "text": "        \"tolerances.json\": \"c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 252,
+          "text": "      },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 253,
+          "text": "      \"reviewed_before_run\": true,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 254,
+          "text": "      \"review_coverage_proof\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 255,
+          "text": "        \"source_locator\": \"seathatflowsinourveins/native-agent-stack@5271c87dbf8ebbc745afe3b9ee22c4d8528c4770:blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json#/attempts/documented-env\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 256,
+          "text": "        \"source_sha256\": \"f909ea5a9c4ede9260f2938218db87d523359ed67c994521dac46ab47f981417\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 257,
+          "text": "        \"returned_verdict_sha256\": \"5c788e43f6bcaf2596f586a597e615338406f3b8483045f32c25796ff903d44e\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 258,
+          "text": "        \"checks\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 259,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 260,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 261,
+          "text": "            \"field\": \"record_sha256_at_comparison\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 262,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 263,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 264,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 265,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 266,
+          "text": "            \"field\": \"schema\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 267,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 268,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 269,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 270,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 271,
+          "text": "            \"field\": \"reviewed_files_are_the_files_that_ran\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 272,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 273,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 274,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 275,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 276,
+          "text": "            \"field\": \"completed_before_run_started\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 277,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 278,
+          "text": "          },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 279,
+          "text": "          {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 280,
+          "text": "            \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 281,
+          "text": "            \"field\": \"unresolved_findings\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 282,
+          "text": "            \"status\": \"PASS\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 283,
+          "text": "          }",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 284,
+          "text": "        ]",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 285,
+          "text": "      },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 286,
+          "text": "      \"returned_failing_checks\": [",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 287,
+          "text": "        {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 288,
+          "text": "          \"blocked_by\": null,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 289,
+          "text": "          \"delta\": \"-\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 290,
+          "text": "          \"expected\": \"[]\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 291,
+          "text": "          \"field\": \"no_prior_replay_ran_the_reviewed_harness\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 292,
+          "text": "          \"id\": \"precondition_review\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 293,
+          "text": "          \"key\": \"precondition_review.no_prior_replay_ran_the_reviewed_harness#35\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 294,
+          "text": "          \"observed\": \"['bwrap-cc4503f-host-nativestack-5975wx-20260925', 'bwrap-cc4503f-qualifying']\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 295,
+          "text": "          \"ordinal\": 35,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 296,
+          "text": "          \"status\": \"FAIL\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 297,
+          "text": "          \"tolerance\": \"exact\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 298,
+          "text": "        }",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 299,
+          "text": "      ],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 300,
+          "text": "      \"status\": \"retained rc5 reproduction; unqualified full verdict; not an rc6 run\"",
+          "category": "source identity"
+        }
+      ]
     }
   ],
-  "byte_identical_copy": {
-    "original_path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
-    "candidate_path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
-    "sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
-    "scope": "Inherited historical rows remain intact; append real rc6 attempts only in the new file, never in the original."
+  "history_prefix": {
+    "original_sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+    "candidate_sha256": "e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4",
+    "original_replays_prefix_preserved": true,
+    "appended_historical_rc5_attempts": 2,
+    "scope": "Actual J2 attempts retain original rc5 source/review identities and failing full verdicts; no rc6 attempt."
   }
 }

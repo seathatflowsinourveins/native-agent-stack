@@ -55,8 +55,14 @@ class Rc6CandidateTests(unittest.TestCase):
         old.pop("fee_model")
         new.pop("fee_model")
         self.assertEqual(old, new)
-        self.assertEqual((SOURCE / "replay-history-rc6.json").read_bytes(),
-                         (SOURCE / "replay-history-v2.json").read_bytes())
+        original = SOURCE / "replay-history-v2.json"
+        self.assertEqual(hashlib.sha256(original.read_bytes()).hexdigest(),
+                         "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c")
+        old_history = json.loads(original.read_text())
+        new_history = json.loads((SOURCE / "replay-history-rc6.json").read_text())
+        self.assertEqual(new_history["replays"][:len(old_history["replays"])], old_history["replays"])
+        self.assertEqual(new_history["replays"][-2]["engine_version"], "2.0.0rc5")
+        self.assertEqual(new_history["replays"][-1]["engine_version"], "2.0.0rc5")
 
     def test_existing_synthetic_full_method_passes_with_candidate_identity(self):
         receipt, context = candidate_fixture()

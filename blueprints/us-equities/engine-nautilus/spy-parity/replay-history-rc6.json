@@ -142,6 +142,162 @@
       },
       "reviewed_before_run": false,
       "status": "host reproduction, not qualifying: a later retry of the reviewed harness cc4503f on another host, which the accepted deviation cannot qualify; receipt and verdicts published in evidence/artifacts/workstation-lane-20260925/spy-parity/"
+    },
+    {
+      "id": "j2-rc5-runtime-env-20261006",
+      "observed_utc": [
+        "2026-10-06T04:40:32Z"
+      ],
+      "engine_version": "2.0.0rc5",
+      "harness": "Original ecfa11276 rc5 source; J2 retained attempt, not an rc6 candidate execution.",
+      "isolation": "Launcher-equivalent vector; .venv/.python/repository/data read-only; cleared environment; one owned output. Initial acceptance environment included extra names, rejected by the comparator.",
+      "outcome": "Replay exit0; comparator exit1; full verdictFAIL retained. {\"PASS\": 134, \"FAIL\": 2}; failure fields no_prior_replay_ran_the_reviewed_harness,environment_beyond_cleared_set. No qualification inferred from execution checks.",
+      "receipt_sha256": [
+        "ee29bf214b3831aac1206624cd575ab4bfd20a24e4c1470ee953b0e2e241c695"
+      ],
+      "verdict_sha256": "a1569e1c68f87c3767930e6c00be193633f2a0d9d193289704ca2942ecd6d6f2",
+      "harness_local_source_sha256": {
+        "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+        "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+        "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+        "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+        "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+        "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+        "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+        "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+      },
+      "reviewed_before_run": true,
+      "review_coverage_proof": {
+        "source_locator": "seathatflowsinourveins/native-agent-stack@5271c87dbf8ebbc745afe3b9ee22c4d8528c4770:blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json#/attempts/runtime-env",
+        "source_sha256": "f909ea5a9c4ede9260f2938218db87d523359ed67c994521dac46ab47f981417",
+        "returned_verdict_sha256": "a1569e1c68f87c3767930e6c00be193633f2a0d9d193289704ca2942ecd6d6f2",
+        "checks": [
+          {
+            "id": "precondition_review",
+            "field": "record_sha256_at_comparison",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "schema",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "reviewed_files_are_the_files_that_ran",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "completed_before_run_started",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "unresolved_findings",
+            "status": "PASS"
+          }
+        ]
+      },
+      "returned_failing_checks": [
+        {
+          "blocked_by": null,
+          "delta": "-",
+          "expected": "[]",
+          "field": "no_prior_replay_ran_the_reviewed_harness",
+          "id": "precondition_review",
+          "key": "precondition_review.no_prior_replay_ran_the_reviewed_harness#35",
+          "observed": "['bwrap-cc4503f-host-nativestack-5975wx-20260925', 'bwrap-cc4503f-qualifying']",
+          "ordinal": 35,
+          "status": "FAIL",
+          "tolerance": "exact"
+        },
+        {
+          "blocked_by": null,
+          "delta": "-",
+          "expected": "[]",
+          "field": "environment_beyond_cleared_set",
+          "id": "precondition_engine",
+          "key": "precondition_engine.environment_beyond_cleared_set#53",
+          "observed": "['GIT_OPTIONAL_LOCKS', 'HOME', 'MPLBACKEND', 'UV_OFFLINE', 'XDG_CACHE_HOME']",
+          "ordinal": 53,
+          "status": "FAIL",
+          "tolerance": "exact"
+        }
+      ],
+      "status": "retained rc5 reproduction; unqualified full verdict; not an rc6 run"
+    },
+    {
+      "id": "j2-rc5-documented-env-20261006",
+      "observed_utc": [
+        "2026-10-06T04:41:27Z"
+      ],
+      "engine_version": "2.0.0rc5",
+      "harness": "Original ecfa11276 rc5 source; J2 retained attempt, not an rc6 candidate execution.",
+      "isolation": "Launcher-equivalent vector; .venv/.python/repository/data read-only; cleared environment; one owned output. Final environment uses the five documented values.",
+      "outcome": "Replay exit0; comparator exit1; full verdictFAIL retained. {\"PASS\": 135, \"FAIL\": 1}; failure fields no_prior_replay_ran_the_reviewed_harness. No qualification inferred from execution checks.",
+      "receipt_sha256": [
+        "bebba33c0a1dd6eabc6570ca00c0acd3517fcf4397ae6f0874e24f325537871d"
+      ],
+      "verdict_sha256": "5c788e43f6bcaf2596f586a597e615338406f3b8483045f32c25796ff903d44e",
+      "harness_local_source_sha256": {
+        "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+        "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+        "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+        "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+        "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+        "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+        "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+        "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+      },
+      "reviewed_before_run": true,
+      "review_coverage_proof": {
+        "source_locator": "seathatflowsinourveins/native-agent-stack@5271c87dbf8ebbc745afe3b9ee22c4d8528c4770:blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json#/attempts/documented-env",
+        "source_sha256": "f909ea5a9c4ede9260f2938218db87d523359ed67c994521dac46ab47f981417",
+        "returned_verdict_sha256": "5c788e43f6bcaf2596f586a597e615338406f3b8483045f32c25796ff903d44e",
+        "checks": [
+          {
+            "id": "precondition_review",
+            "field": "record_sha256_at_comparison",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "schema",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "reviewed_files_are_the_files_that_ran",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "completed_before_run_started",
+            "status": "PASS"
+          },
+          {
+            "id": "precondition_review",
+            "field": "unresolved_findings",
+            "status": "PASS"
+          }
+        ]
+      },
+      "returned_failing_checks": [
+        {
+          "blocked_by": null,
+          "delta": "-",
+          "expected": "[]",
+          "field": "no_prior_replay_ran_the_reviewed_harness",
+          "id": "precondition_review",
+          "key": "precondition_review.no_prior_replay_ran_the_reviewed_harness#35",
+          "observed": "['bwrap-cc4503f-host-nativestack-5975wx-20260925', 'bwrap-cc4503f-qualifying']",
+          "ordinal": 35,
+          "status": "FAIL",
+          "tolerance": "exact"
+        }
+      ],
+      "status": "retained rc5 reproduction; unqualified full verdict; not an rc6 run"
     }
   ]
 }

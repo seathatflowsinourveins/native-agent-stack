@@ -54,7 +54,10 @@ cells change; HOME-derived paths, isolation, sync vector, other direct pins,
 image/adapter pins and the cutoff remain unchanged.
 
 The J2 contract identifies SPY one_zero, AAPL baseline and AAPL fee_slippage_stress
-at ecfa11276. Their retained inputs and launcher mount route remain unavailable.
+at ecfa11276. J2's later retained run at5271c87d supplies staged SPY input
+hashes and the working launcher-equivalent route with the managed .python mount.
+Its full comparator verdict remains FAIL and is not promoted from the passing
+execution subset. AAPL's retained input remains unavailable.
 The later trading-owner ruling permits separate source variants with strict rc6
 guards and SPY's explicit native maker/taker model, preserving the original rc5
 files and the economic method. The
@@ -72,7 +75,7 @@ stay under their original engine provenance; old approvals are not relabelled.
 
 The final addendum still needs the independent Opus exact-head read;5f may
 object there. The copied method retains the source-bound gate-owner deviation
-predicate and needs the actual new owner record, plus staged inputs and the
+predicate and needs the actual new owner record, plus verification of the staged inputs and the
 approved managed-Python route. Missing conditions remain visible failures or
 blockers. The source-freeze receipt is separate from historical runtime
 acceptance. No native case result is inferred from either. Open issues #5007,
