@@ -606,6 +606,23 @@ def main():
         bad("observability", "alerting: acceptance must check and unit-test the Prometheus rules with promtool")
     if not alerting.get("needs_user") or "after_sign_in" not in alerting.get("acceptance", {}):
         bad("observability", "alerting: destination choice and an independently confirmed delivery are required")
+    # 2026-10-06 (docs/decisions/2026-10-06-ns2604-alerting.md): the clock lines are matched by SYSLOG_IDENTIFIER,
+    # never by unit (journald drops the unit fields on short-lived runs: command-center correction #8), and a critical
+    # rule reads their CRIT count. The exporter sets no namespace, so no rule may name an ecosystem_ metric.
+    otel_text = (plan_dir / "config/otel.yaml").read_text()
+    journald = re.search(r"(?m)^  journald/clock_offset_check:\n((?:    .*\n|\s*\n)+)", otel_text)
+    if (not journald or not re.search(r"(?m)^      - SYSLOG_IDENTIFIER: clock-offset-check$", journald.group(1))
+            or re.search(r"(?m)^    (units|identifiers):", journald.group(1))):
+        bad("observability", "otel-collector-contrib: the clock receiver must match SYSLOG_IDENTIFIER, not a unit")
+    if "receivers: [journald/clock_offset_check]" not in otel_text:
+        bad("observability", "otel-collector-contrib: no pipeline reads the clock receiver")
+    rules_text = (plan_dir / "config/prometheus-alerts.yaml").read_text()
+    critical_clock = re.search(r"(?m)^      - alert: EcosystemClockOffsetCritical\n        expr: .*level=\"crit\".*\n"
+                               r"(?:        .*\n)*?          severity: critical$", rules_text)
+    if not critical_clock:
+        bad("observability", "alerting: a critical rule must read the clock-offset-check CRIT count")
+    if re.search(r"\becosystem_[a-z_]+\{", rules_text):
+        bad("observability", "alerting: 2604's exporter sets no namespace; rules must not name ecosystem_ metrics")
 
     # Config files: service copy_config calls and direct, preserving tool-config installs both consume plan files.
     # Ports do not collide between rows. Only the install source operand counts, never an arbitrary filename mention.
@@ -643,10 +660,11 @@ def main():
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
     # promtool input-series labels are references, rather than additional listening sockets.
     observability_references = {
-        "otel.yaml": {21300},
-        "prometheus.yaml": {21090, 21093, 21888, 21889},
+        "otel.yaml": {21300, 21128, 21080, 21434, 21808},
+        "prometheus.yaml": {21090, 21093, 21888, 21889, 21300, 21301},
         "grafana-datasources.yaml": {21090, 21300, 21093},
-        "prometheus-alerts.test.yaml": {21090, 21997},
+        "prometheus-alerts.yaml": {21128, 21080, 21434},
+        "prometheus-alerts.test.yaml": {21090, 21997, 21128, 21080, 21434},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:

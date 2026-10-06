@@ -32,3 +32,606 @@ tests:
       - eval_time: 20s
         alertname: EcosystemAcceptanceTargetDown
         exp_alerts: []
+
+  # ---- 2026-10-06 (docs/decisions/2026-10-06-ns2604-alerting.md): clock, service-check, Alertmanager and
+  # rule-failure scenarios, and a port of tests/test_observability_backends_alerts.py RootFilesystemRuleTests
+  # to system_filesystem_usage_bytes. Synthetic series; Prometheus scrapes are modelled at the stated interval,
+  # and "stale" stands for the exporter dropping a series. Generated once, then reviewed; not a live receipt.
+  - name: 'clock CRIT: a first line starts a new series that increase() alone cannot see'
+    interval: 15s
+    input_series:
+    - {series: 'clock_offset_check_lines_total{level="ok",reason="sample"}', values: 1+0.25x160}
+    - {series: 'clock_offset_check_lines_total{level="crit",reason="sample"}', values: _x40 1x19 stale}
+    alert_rule_test:
+    - eval_time: 9m55s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+    - eval_time: 10m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 14m45s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 15m5s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+  - name: 'clock CRIT: an increment of a series older than the window'
+    interval: 15s
+    input_series:
+    - {series: 'clock_offset_check_lines_total{level="ok",reason="sample"}', values: 1+0.25x160}
+    - {series: 'clock_offset_check_lines_total{level="crit",reason="sample"}', values: 1x80 2x60}
+    alert_rule_test:
+    - eval_time: 5m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 12m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+    - eval_time: 20m15s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 29m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 31m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+  - name: 'clock CRIT: a series stale for more than five minutes returns at a higher cumulative value'
+    interval: 15s
+    input_series:
+    - {series: 'clock_offset_check_lines_total{level="ok",reason="sample"}', values: 1+0.25x160}
+    - {series: 'clock_offset_check_lines_total{level="crit",reason="sample"}', values: 1x19 stale _x60 2x19 stale}
+    alert_rule_test:
+    - eval_time: 1m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 6m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+    - eval_time: 20m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+    - eval_time: 20m15s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 25m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 25m30s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+  - name: 'clock CRIT: a Collector restart resets the counter to 1'
+    interval: 15s
+    input_series:
+    - {series: 'clock_offset_check_lines_total{level="ok",reason="sample"}', values: 1+0.25x160}
+    - {series: 'clock_offset_check_lines_total{level="crit",reason="sample"}', values: 3x60 stale _x3 1x20}
+    alert_rule_test:
+    - eval_time: 12m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+    - eval_time: 16m15s
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 20m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: sample, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason sample), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 27m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+  - name: clock WARN, an unparsed line and a CRIT error reason
+    interval: 15s
+    input_series:
+    - {series: 'clock_offset_check_lines_total{level="ok",reason="sample"}', values: 1+0.25x160}
+    - {series: 'clock_offset_check_lines_total{level="warn",reason="sample"}', values: _x4 1x10}
+    - {series: 'clock_offset_check_lines_total{level="other",reason="sample"}', values: _x8 1x10}
+    - {series: 'clock_offset_check_lines_total{level="crit",reason="chronyc_failed"}', values: _x4 1x10}
+    alert_rule_test:
+    - eval_time: 55s
+      alertname: EcosystemClockOffsetWarning
+      exp_alerts: []
+    - eval_time: 3m
+      alertname: EcosystemClockOffsetWarning
+      exp_alerts:
+      - exp_labels: {level: warn, reason: sample, severity: warning, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged WARN, description: 'A WARN line reached Prometheus in the last 10 minutes: the error bound passed 50 ms, the reference is missing or stale, the leap status is not Normal, or clock-change-check recorded a clock step or zone change. The line''s why= field names the cause: journalctl -t clock-offset-check -n 20.'}
+    - eval_time: 3m
+      alertname: EcosystemClockOffsetCheckUnparsed
+      exp_alerts:
+      - exp_labels: {level: other, reason: sample, severity: warning, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: 'clock-offset-check logged a line that is not OK, WARN or CRIT', description: 'The Collector could not classify a clock-offset-check line, so a changed output format could hide a CRIT. Compare the script with transform/clock_offset_check in otel.yaml.'}
+    - eval_time: 3m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts:
+      - exp_labels: {level: crit, reason: chronyc_failed, severity: critical, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: clock-offset-check logged CRIT (reason chronyc_failed), description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'}
+    - eval_time: 3m
+      alertname: EcosystemClockOffsetCheckSilent
+      exp_alerts: []
+  - name: 'clock monitor silent: no line for ten minutes, then five more'
+    interval: 15s
+    input_series:
+    - {series: 'clock_offset_check_lines_total{level="ok",reason="sample"}', values: 1+0.25x79 stale}
+    alert_rule_test:
+    - eval_time: 19m
+      alertname: EcosystemClockOffsetCheckSilent
+      exp_alerts: []
+    - eval_time: 29m
+      alertname: EcosystemClockOffsetCheckSilent
+      exp_alerts: []
+    - eval_time: 34m
+      alertname: EcosystemClockOffsetCheckSilent
+      exp_alerts: []
+    - eval_time: 35m
+      alertname: EcosystemClockOffsetCheckSilent
+      exp_alerts:
+      - exp_labels: {severity: warning, scope: local-ecosystem, component: clock}
+        exp_annotations: {summary: No clock-offset-check line has reached Prometheus for 15 minutes, description: 'The every-minute timer, the script, the Collector''s journald receiver or the otel-native scrape has stopped. Missing data is unknown, not a healthy clock.'}
+    - eval_time: 35m
+      alertname: EcosystemClockOffsetCritical
+      exp_alerts: []
+  - name: 'http_check: OmniRoute turns unhealthy, Dagu is missing, Ollama is healthy'
+    interval: 15s
+    input_series:
+    - {series: 'httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx",http_status_code="200",http_method="GET"}', values: 1x8 0x16}
+    - {series: 'httpcheck_status{http_url="http://127.0.0.1:21434/api/version",http_status_class="2xx",http_status_code="200",http_method="GET"}', values: 1x30}
+    alert_rule_test:
+    - eval_time: 2m
+      alertname: EcosystemOmniRouteHealthUnexpected
+      exp_alerts: []
+    - eval_time: 4m10s
+      alertname: EcosystemOmniRouteHealthUnexpected
+      exp_alerts: []
+    - eval_time: 4m15s
+      alertname: EcosystemOmniRouteHealthUnexpected
+      exp_alerts:
+      - exp_labels: {severity: warning, scope: local-ecosystem, component: OmniRoute}
+        exp_annotations: {summary: Local OmniRoute health response is unexpected or missing, description: 'Expected 2xx at http://127.0.0.1:21128/api/health, OmniRoute''s unauthenticated liveness route; this checks transport, not provider or job execution.'}
+    - eval_time: 1m55s
+      alertname: EcosystemDaguHealthUnexpected
+      exp_alerts: []
+    - eval_time: 2m
+      alertname: EcosystemDaguHealthUnexpected
+      exp_alerts:
+      - exp_labels: {severity: warning, scope: local-ecosystem, component: Dagu}
+        exp_annotations: {summary: Local Dagu health response is unexpected or missing, description: 'Expected 2xx at http://127.0.0.1:21080/api/v1/health, the route Dagu''s installer probes; DAG runs and the login are checked separately.'}
+    - eval_time: 5m
+      alertname: EcosystemOllamaHealthUnexpected
+      exp_alerts: []
+  - name: Alertmanager fails 10% of Telegram notifications; webhook stays healthy
+    interval: 1m
+    input_series:
+    - {series: 'alertmanager_notifications_total{job="alertmanager",instance="alertmanager",integration="telegram"}', values: 0+10x30}
+    - {series: 'alertmanager_notifications_failed_total{job="alertmanager",instance="alertmanager",integration="telegram",reason="serverError"}', values: 0+1x30}
+    - {series: 'alertmanager_notifications_total{job="alertmanager",instance="alertmanager",integration="webhook"}', values: 0+10x30}
+    - {series: 'alertmanager_notifications_failed_total{job="alertmanager",instance="alertmanager",integration="webhook",reason="serverError"}', values: '0x30'}
+    alert_rule_test:
+    - eval_time: 5m55s
+      alertname: AlertmanagerFailedToSendAlerts
+      exp_alerts: []
+    - eval_time: 6m
+      alertname: AlertmanagerFailedToSendAlerts
+      exp_alerts:
+      - exp_labels: {job: alertmanager, instance: alertmanager, integration: telegram, reason: serverError, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: An Alertmanager instance failed to send notifications., description: Alertmanager failed to send 10% of notifications to telegram. With one receiver this alert may not reach the phone; read Alertmanager's journal and /api/v2/status.}
+  - name: a rule group fails evaluations for fifteen minutes
+    interval: 1m
+    input_series:
+    - {series: 'prometheus_rule_evaluation_failures_total{job="prometheus",instance="prometheus",rule_group="failing"}', values: 0x5 1+1x25}
+    - {series: 'prometheus_rule_evaluation_failures_total{job="prometheus",instance="prometheus",rule_group="healthy"}', values: '0x30'}
+    alert_rule_test:
+    - eval_time: 20m55s
+      alertname: PrometheusRuleFailures
+      exp_alerts: []
+    - eval_time: 21m
+      alertname: PrometheusRuleFailures
+      exp_alerts:
+      - exp_labels: {job: prometheus, instance: prometheus, rule_group: failing, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: Prometheus is failing rule evaluations., description: Rule group failing has failed evaluations in the last 5 minutes for 15 minutes; its alerts cannot fire. Read /api/v1/rules for the rule whose health is err.}
+  - name: 'filesystem: the 24-hour filling warning fires after one hour and resolves at 40%'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 375809638400-322122547.2x360 429496729600x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 644245094400+322122547.2x360 590558003200x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x360 53687091200x9}
+    alert_rule_test:
+    - eval_time: 60m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 61m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within 24 hours, description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'}
+    - eval_time: 6h
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within 24 hours, description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'}
+    - eval_time: 6h1m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+  - name: 'filesystem: the 4-hour filling critical needs its own prediction and resolves'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 268435456000-322122547.2x660 536870912000x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 751619276800+322122547.2x660 483183820800x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x660 53687091200x9}
+    alert_rule_test:
+    - eval_time: 60m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 61m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within 24 hours, description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'}
+    - eval_time: 653m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within 24 hours, description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'}
+    - eval_time: 654m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within 24 hours, description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'}
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within four hours, description: 'Less than 20% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within four hours, sustained for one hour. Inspect active scratch writers and stop recursive checkout copies.'}
+    - eval_time: 660m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within 24 hours, description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'}
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to run out of space within four hours, description: 'Less than 20% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within four hours, sustained for one hour. Inspect active scratch writers and stop recursive checkout copies.'}
+    - eval_time: 661m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+  - name: 'filesystem: below 5% (reserve counted in size) warns and resolves'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 51539607552x31 214748364800x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 968515125248x31 805306368000x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x41}
+    alert_rule_test:
+    - eval_time: 29m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 30m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 5% available space, description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'}
+    - eval_time: 31m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 5% available space, description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'}
+    - eval_time: 32m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+  - name: 'filesystem: below 3% is critical with the warning and resolves'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 31138512896x31 214748364800x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 988916219904x31 805306368000x9}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x41}
+    alert_rule_test:
+    - eval_time: 29m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 30m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 5% available space, description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'}
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 3% available space, description: Available bytes have stayed below 3% of total filesystem bytes for 30 minutes. Recover headroom before the Collector and Prometheus fail to persist data.}
+    - eval_time: 31m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 5% available space, description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'}
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 3% available space, description: Available bytes have stayed below 3% of total filesystem bytes for 30 minutes. Recover headroom before the Collector and Prometheus fail to persist data.}
+    - eval_time: 32m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+  - name: 'filesystem: a runaway fill of 128 GiB in 240s pages before exhaustion and resolves'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 137438953472x125 120259084288x1 103079215104x1 85899345920x1 68719476736x1 51539607552x1 34359738368x1 17179869184x1 0x1 137438953472x4}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 882615779328x125 899795648512x1 916975517696x1 934155386880x1 951335256064x1 968515125248x1 985694994432x1 1002874863616x1 1020054732800x1 882615779328x4}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x146}
+    alert_rule_test:
+    - eval_time: 2025s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available, description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval; faster fills can exhaust the disk first, and prediction requires at least two samples. The repository''s test TMPDIR/copy guard prevents the known recursive cause; no separate headroom timer was found on NativeStack2604 on 2026-10-06. Stop the offending writer and recover headroom.'}
+    - eval_time: 2040s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available, description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval; faster fills can exhaust the disk first, and prediction requires at least two samples. The repository''s test TMPDIR/copy guard prevents the known recursive cause; no separate headroom timer was found on NativeStack2604 on 2026-10-06. Stop the offending writer and recover headroom.'}
+    - eval_time: 2025s
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 2025s
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 2130s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[2020s])
+      eval_time: 2020s
+      exp_samples: []
+  - name: 'filesystem: a runaway fill of 128 GiB in 300s pages before exhaustion and resolves'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 137438953472x125 123695058125x1 109951162778x1 96207267430x1 82463372083x1 68719476736x1 54975581389x1 41231686042x1 27487790694x1 13743895347x1 0x1 137438953472x4}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 882615779328x125 896359674675x1 910103570022x1 923847465370x1 937591360717x1 951335256064x1 965079151411x1 978823046758x1 992566942106x1 1006310837453x1 1020054732800x1 882615779328x4}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x150}
+    alert_rule_test:
+    - eval_time: 2085s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available, description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval; faster fills can exhaust the disk first, and prediction requires at least two samples. The repository''s test TMPDIR/copy guard prevents the known recursive cause; no separate headroom timer was found on NativeStack2604 on 2026-10-06. Stop the offending writer and recover headroom.'}
+    - eval_time: 2100s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts:
+      - exp_labels: {device: root-test, mode: rw, mountpoint: /, type: ext4, job: otel-native, instance: host-test, state: free, severity: critical, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available, description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval; faster fills can exhaust the disk first, and prediction requires at least two samples. The repository''s test TMPDIR/copy guard prevents the known recursive cause; no separate headroom timer was found on NativeStack2604 on 2026-10-06. Stop the offending writer and recover headroom.'}
+    - eval_time: 2085s
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 2085s
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 2190s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[2080s])
+      eval_time: 2080s
+      exp_samples: []
+  - name: 'filesystem: a legitimate 30 GiB burst from 151 GiB stays silent'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 162135015424x125 146028888064x1 129922760704x72}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 857919717376x125 874025844736x1 890131972096x72}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x200}
+    alert_rule_test:
+    - eval_time: 3000s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[3000s])
+      eval_time: 3000s
+      exp_samples: []
+  - name: 'filesystem: a legitimate 30 GiB burst from 128 GiB stays silent'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 137438953472x125 121332826112x1 105226698752x72}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 882615779328x125 898721906688x1 914828034048x72}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x200}
+    alert_rule_test:
+    - eval_time: 3000s
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[3000s])
+      eval_time: 3000s
+      exp_samples: []
+  - name: 'filesystem: below 50 GiB without imminent exhaustion stays silent (flat)'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 52613349376x80}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 967441383424x80}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x80}
+    alert_rule_test:
+    - eval_time: 20m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[20m])
+      eval_time: 20m
+      exp_samples: []
+  - name: 'filesystem: below 50 GiB without imminent exhaustion stays silent (slow)'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 52613349376x1 52559662285x1 52505975194x1 52452288102x1 52398601011x1 52344913920x1 52291226829x1 52237539738x1 52183852646x1 52130165555x1 52076478464x1 52022791373x1 51969104282x1 51915417190x1 51861730099x1 51808043008x1 51754355917x1 51700668826x1 51646981734x1 51593294643x1 51539607552x1 51485920461x1 51432233370x1 51378546278x1 51324859187x1 51271172096x1 51217485005x1 51163797914x1 51110110822x1 51056423731x1 51002736640x1 50949049549x1 50895362458x1 50841675366x1 50787988275x1 50734301184x1 50680614093x1 50626927002x1 50573239910x1 50519552819x1 50465865728}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 967441383424x1 967495070515x1 967548757606x1 967602444698x1 967656131789x1 967709818880x1 967763505971x1 967817193062x1 967870880154x1 967924567245x1 967978254336x1 968031941427x1 968085628518x1 968139315610x1 968193002701x1 968246689792x1 968300376883x1 968354063974x1 968407751066x1 968461438157x1 968515125248x1 968568812339x1 968622499430x1 968676186522x1 968729873613x1 968783560704x1 968837247795x1 968890934886x1 968944621978x1 968998309069x1 969051996160x1 969105683251x1 969159370342x1 969213057434x1 969266744525x1 969320431616x1 969374118707x1 969427805798x1 969481492890x1 969535179981x1 969588867072}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x80}
+    alert_rule_test:
+    - eval_time: 20m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[20m])
+      eval_time: 20m
+      exp_samples: []
+  - name: 'filesystem: below 50 GiB with over ten minutes of runway does not page the two-minute rule'
+    interval: 15s
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 48318382080-805306368x40}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 971736350720+805306368x40}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x40}
+    alert_rule_test:
+    - eval_time: 10m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    promql_expr_test:
+    - expr: count_over_time(ALERTS{alertname="EcosystemRootFilesystemBurstFill",alertstate="firing"}[10m])
+      eval_time: 10m
+      exp_samples: []
+  - name: 'filesystem: a steady disk fires none of the new alerts and is not missing'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 85899345920x420}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 934155386880x420}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x420}
+    alert_rule_test:
+    - eval_time: 1h
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 1h
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 1h
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 1h
+      alertname: EcosystemHostFilesystemMetricsMissing
+      exp_alerts: []
+    - eval_time: 1h
+      alertname: EcosystemRootFilesystemLowSpace
+      exp_alerts: []
+    - eval_time: 6h
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 6h
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 6h
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 6h
+      alertname: EcosystemHostFilesystemMetricsMissing
+      exp_alerts: []
+    - eval_time: 6h
+      alertname: EcosystemRootFilesystemLowSpace
+      exp_alerts: []
+    - eval_time: 7h
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 7h
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 7h
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 7h
+      alertname: EcosystemHostFilesystemMetricsMissing
+      exp_alerts: []
+    - eval_time: 7h
+      alertname: EcosystemRootFilesystemLowSpace
+      exp_alerts: []
+  - name: 'filesystem: other mountpoints are excluded'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/scratch",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 137438953472 120259084288 103079215104 85899345920 68719476736 51539607552 34359738368 17179869184 0x62}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/scratch",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 882615779328 899795648512 916975517696 934155386880 951335256064 968515125248 985694994432 1002874863616 1020054732800x62}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/scratch",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x70}
+    alert_rule_test:
+    - eval_time: 8m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 8m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 8m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 40m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 40m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 40m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 70m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 70m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 70m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+  - name: 'filesystem: read-only roots are excluded'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="ro",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 137438953472 120259084288 103079215104 85899345920 68719476736 51539607552 34359738368 17179869184 0x62}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="ro",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 882615779328 899795648512 916975517696 934155386880 951335256064 968515125248 985694994432 1002874863616 1020054732800x62}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="ro",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x70}
+    alert_rule_test:
+    - eval_time: 8m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 8m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 8m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 40m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 40m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 40m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+    - eval_time: 70m
+      alertname: EcosystemRootFilesystemSpaceFillingUp
+      exp_alerts: []
+    - eval_time: 70m
+      alertname: EcosystemRootFilesystemAlmostOutOfSpace
+      exp_alerts: []
+    - eval_time: 70m
+      alertname: EcosystemRootFilesystemBurstFill
+      exp_alerts: []
+  - name: 'filesystem: under 5 GiB free for ten minutes'
+    interval: 1m
+    input_series:
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="free"}', values: 4294967296x15}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="used"}', values: 1015759765504x15}
+    - {series: 'system_filesystem_usage_bytes{device="root-test",mode="rw",mountpoint="/",type="ext4",job="otel-native",instance="host-test",state="reserved"}', values: 53687091200x15}
+    alert_rule_test:
+    - eval_time: 9m55s
+      alertname: EcosystemRootFilesystemLowSpace
+      exp_alerts: []
+    - eval_time: 10m
+      alertname: EcosystemRootFilesystemLowSpace
+      exp_alerts:
+      - exp_labels: {severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem has less than 5 GiB free, description: Local WSL filesystem only; Windows backing-disk capacity is separate.}
+  - name: 'filesystem: no root observations for two minutes'
+    interval: 1m
+    input_series:
+    - {series: 'up{job="otel-native"}', values: 1x5}
+    alert_rule_test:
+    - eval_time: 1m55s
+      alertname: EcosystemHostFilesystemMetricsMissing
+      exp_alerts: []
+    - eval_time: 2m
+      alertname: EcosystemHostFilesystemMetricsMissing
+      exp_alerts:
+      - exp_labels: {mountpoint: /, severity: warning, scope: local-ecosystem}
+        exp_annotations: {summary: WSL root filesystem observations are missing, description: 'Missing data is unknown, not proof of available space.'}

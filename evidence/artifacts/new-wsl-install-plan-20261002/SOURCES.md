@@ -530,6 +530,28 @@ comparison and completeness critic are in
   establish delivered alerts; future selected delivery acceptance also requires
   real firing/resolution, increased native notification counters and the user's
   independently confirmed receipt. Loki ruler qualification is deferred.
+- 2026-10-06 alerting
+  ([decision](../../../docs/decisions/2026-10-06-ns2604-alerting.md)): the
+  `clock-offset-check` lines reach Prometheus through the Collector, as this plan's
+  design names, not the deferred Loki ruler. The sources are the OTel Contrib
+  v0.162.0 (`ae8c507510f48f433ab47dd1c6b01a59d6c388b5`)
+  [journald receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/journaldreceiver/README.md#L36-L60)
+  and its [journalctl arguments](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/pkg/stanza/operator/input/journald/config_linux.go#L90-L153),
+  the [count connector](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/connector/countconnector/README.md#L66-L123)
+  and the [exporter's metric_expiration](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md#L29).
+  The new scrape jobs and `http_check` targets read Alertmanager v0.34.1, Loki v3.7.8
+  ([GET /metrics](https://github.com/grafana/loki/blob/v3.7.8/docs/sources/reference/loki-http-api.md#L1228-L1238))
+  and Grafana v13.2.3 ([metrics defaults](https://github.com/grafana/grafana/blob/v13.2.3/conf/defaults.ini#L2015-L2027)),
+  OmniRoute 3.8.51 [/api/health](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/api/health/route.ts#L3-L17),
+  Dagu v2.18.2 [/api/v1/health](https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/scripts/installer.sh#L1987-L1989),
+  Ollama v0.35.0 [/api/version](https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L2020-L2023)
+  and agentsview v0.43.0 [/api/ping](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/huma_routes_health.go#L19-L23).
+  The new rules come from the [Alertmanager mixin](https://github.com/prometheus/alertmanager/blob/v0.34.1/doc/alertmanager-mixin/alerts.libsonnet#L42-L59),
+  the [Prometheus mixin](https://github.com/prometheus/prometheus/blob/v3.15.0/documentation/prometheus-mixin/alerts.libsonnet#L251-L263)
+  and the root-filesystem rules of `this PR: observability/backends/templates/ecosystem-prometheus-rules.yml.example:62-147`.
+  `observability_config.py alerting` now publishes `prometheus-alerts.yaml` and its
+  tests under the same digest guard as `prometheus.yaml`, after native
+  `promtool test rules` passes on the new pair in a scratch directory.
 
 Configuration transport is adapted from
 `this PR: observability/backends/configure.py:76-96`; the helper

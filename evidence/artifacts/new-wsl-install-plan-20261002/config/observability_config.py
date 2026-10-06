@@ -23,6 +23,9 @@ PRISTINE = {
     "grafana.ini": "139c743c02b428653de39bfac449a9a0f4f02f786732891715838022b25f936d",
     "alertmanager.yaml": "b4ff240a87515fa2c9b606c3570ed9c6c64dc36bd2cbad52c8ee62f22745f6a4",
     "prometheus.yaml": "1565e9df52167eb06e5b33a4d57bc45fa1f9d1bd87a1bc3c268f9a3d5f0e58c4",
+    # The rule pair as copy_config installed it through ecfa11276 (2026-10-06); a host copy with these bytes is the plan's.
+    "prometheus-alerts.yaml": "bae729f6545d7adcb1620921f37f2975d3e683b77a21e06b30cfb62496647fdd",
+    "prometheus-alerts.test.yaml": "ef748a5c0ee3284ec73335826b857c321b091509d992f85c9d0adb4887303352",
 }
 
 
@@ -188,7 +191,24 @@ def main():
         if args.action == "alerting":
             # Install source/receiver wiring together for a pristine or previously owned plan.
             # Custom Prometheus configuration is retained for its owner to merge.
-            publish("prometheus.yaml", (source / "prometheus.yaml").read_text())
+            # 2026-10-06: the rule pair is published too; copy_config installs it only when absent, so a changed
+            # rule never reached an existing host. Native unit tests run on the new pair in a scratch directory
+            # before any live file is replaced (prometheus v3.15.0 docs/configuration/unit_testing_rules.md:6;
+            # docs/command-line/promtool.md check rules/config), and the rules land before prometheus.yaml loads them.
+            if not os.environ.get("tool_root"):
+                raise ValueError("alerting requires tool_root, the plan's tool directory (install.sh exports it)")
+            promtool = str(Path(os.environ["tool_root"]) / "prometheus/prometheus-3.15.0.linux-amd64/promtool")
+            rules = (source / "prometheus-alerts.yaml").read_text()
+            tests = (source / "prometheus-alerts.test.yaml").read_text()
+            with tempfile.TemporaryDirectory(prefix=".g4-validate-", dir=root) as scratch:
+                for name, text in (("prometheus-alerts.yaml", rules), ("prometheus-alerts.test.yaml", tests)):
+                    (Path(scratch) / name).write_text(text)
+                if subprocess.run([promtool, "test", "rules", "prometheus-alerts.test.yaml"], cwd=scratch,
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+                    raise ValueError("upstream validator refused prometheus-alerts.test.yaml; originals retained")
+            publish("prometheus-alerts.yaml", rules, validate=[promtool, "check", "rules"])
+            publish("prometheus-alerts.test.yaml", tests)
+            publish("prometheus.yaml", (source / "prometheus.yaml").read_text(), validate=[promtool, "check", "config"])
         mode, pointers, ready = destination()
         if not ready:
             print("needs_user: choose the alert destination and supply its private destination file(s); disarmed placeholder retained", file=sys.stderr)
