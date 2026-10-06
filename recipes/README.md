@@ -274,6 +274,11 @@ The expected source symbol is `greeting`. A language-server setup error is a mis
 
 ## Local semantic code search
 
+For an already indexed standalone store moving to the native user unit, use
+[Qdrant user-service migration](qdrant-user-service-migration.md). It preserves
+all collections and aliases with upstream full-storage snapshot/restore,
+records rollback, and keeps client adoption and organic use separate.
+
 Use [qdrant.yaml.example](../examples/qdrant.yaml.example) and the service templates only after replacing absolute paths and creating their state directories. They bind to loopback, disable Qdrant telemetry and gRPC, and keep storage outside binary prefixes. The service port is **16333**, the embedding endpoint **8231**. Loopback limits exposure; it is not authorization against another local user. Add Qdrant's supported API-key protection if that is part of the host's threat model, and keep that key private.
 
 The model is [NVIDIA Nemotron-3-Embed-1B-BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), released July 16, 2026, under OpenMDW-1.1. Pin the revision and retain model license/config files:
