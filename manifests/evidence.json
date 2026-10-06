@@ -4481,6 +4481,26 @@
   ],
   "files": [
     {
+      "path": ".claude/agents/isolated-builder-agent-docs.md",
+      "sha256": "8aa5d7b0dfca39b8ed6f74463eb31a29d73525e4a0507998efac03eede8a7e16",
+      "bytes": 3425
+    },
+    {
+      "path": ".claude/agents/isolated-builder-ci-pr.md",
+      "sha256": "3d7ff6310305502307f6bfc8e64422c38874efc56fbbeda1237dfbedd8b738b4",
+      "bytes": 3393
+    },
+    {
+      "path": ".claude/agents/security-reviewer-skills.md",
+      "sha256": "3ba55c2bc8f392713e651575c8233dcfe71265b57c6680110163b4a2ec54799d",
+      "bytes": 3293
+    },
+    {
+      "path": ".claude/rules/agent-docs.md",
+      "sha256": "47bba9c254a2e09221fa8ed303ee1f8e73ca57d5b07ad9116f8132d2cf501242",
+      "bytes": 524
+    },
+    {
       "path": ".claude/settings.json",
       "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
       "bytes": 2884
@@ -4527,8 +4547,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "6ac40e443963ca0bc93d75e440c697268682bd11810ea6203794d063a4d6be76",
-      "bytes": 15075
+      "sha256": "3c7bed9c3899e22a022acf4172719dd510124d45664f24cf656def14e6ad999b",
+      "bytes": 15176
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4547,8 +4567,13 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "0b37433fb0fb165c893737e8e887581a07a6469683fbdf67ada1a08288758605",
-      "bytes": 467
+      "sha256": "6b0ee7b764f16182b9b7be91574dfbcc27d034f5872e7ed2b88f926bf2f5c162",
+      "bytes": 583
+    },
+    {
+      "path": ".github/requirements-validation.txt",
+      "sha256": "d96e73d845f131f388b61da45c20a438ef9ffbab15a52007ca6fca9d8a45a9c6",
+      "bytes": 1096
     },
     {
       "path": ".github/tag-ruleset.json",
@@ -4562,8 +4587,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "96f4e9e7843827fa3e8689839fdb37d0adb98e37198c187f68f286a0880a301d",
-      "bytes": 56981
+      "sha256": "5ac05f5fed87389375cc9be035abefb7d94ba74cb03ca52e8fc29fecce37c11f",
+      "bytes": 57090
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -4716,6 +4741,16 @@
       "bytes": 2892
     },
     {
+      "path": "adoption/agents/claude/isolated-builder-agent-docs.md",
+      "sha256": "8aa5d7b0dfca39b8ed6f74463eb31a29d73525e4a0507998efac03eede8a7e16",
+      "bytes": 3425
+    },
+    {
+      "path": "adoption/agents/claude/isolated-builder-ci-pr.md",
+      "sha256": "3d7ff6310305502307f6bfc8e64422c38874efc56fbbeda1237dfbedd8b738b4",
+      "bytes": 3393
+    },
+    {
       "path": "adoption/agents/claude/isolated-builder.md",
       "sha256": "0f8e0834012ec80af39398bfb948b0fe7f0b6dff8effaf06f264d20eb3ed5db7",
       "bytes": 3485
@@ -4724,6 +4759,11 @@
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
       "sha256": "bb7e436080483adf0eb14e69e3d73b4feb9c7c4b55baff31e8b70f30733e369c",
       "bytes": 1871
+    },
+    {
+      "path": "adoption/agents/claude/security-reviewer-skills.md",
+      "sha256": "3ba55c2bc8f392713e651575c8233dcfe71265b57c6680110163b4a2ec54799d",
+      "bytes": 3293
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
@@ -5159,6 +5199,51 @@
       "path": "adoption/update.md",
       "sha256": "fa66de9fa5f37eb440fe0a8f4b9d611ba584e0da59594b02a0b2889db5262aef",
       "bytes": 32102
+    },
+    {
+      "path": "adoption/workflow/README.md",
+      "sha256": "e66662c7935b8dd475119915b4af16602a4afe2ed314a433f9dfe96f1388d572",
+      "bytes": 3163
+    },
+    {
+      "path": "adoption/workflow/manifest.json",
+      "sha256": "15d6a03b849de02daff7e0b331a525d60f786a17f57d9290a2faf50889bf06a7",
+      "bytes": 34028
+    },
+    {
+      "path": "adoption/workflow/pending-agents/isolated-builder-broker-adapter.md",
+      "sha256": "b91e4606e8c1ba55b67a58295a61ebb820c307b578ac0eead9ca0e220f29014f",
+      "bytes": 3496
+    },
+    {
+      "path": "adoption/workflow/pending-agents/isolated-builder-hosting.md",
+      "sha256": "d84f45b101b4d66c67feb4d3ff9bb69eace3fd0a4fbf081f05bd667f7c3041b7",
+      "bytes": 3390
+    },
+    {
+      "path": "adoption/workflow/pending-agents/isolated-builder-skills.md",
+      "sha256": "e5bf262367e864e2ee3368ef12c2e8991be18e3cd873e770be407e43858cf2c4",
+      "bytes": 3420
+    },
+    {
+      "path": "adoption/workflow/pending-agents/stack-researcher-data-quant.md",
+      "sha256": "5958ea81d8eb93b2335bd687ea47384b1600d992865a3026b30cd0292bfd668d",
+      "bytes": 3922
+    },
+    {
+      "path": "adoption/workflow/pending-rules/hosting.md",
+      "sha256": "34104f744d9d27d7e69893ca02b9c3d4ddd28168eb992983c0f9f8bea663a3c2",
+      "bytes": 379
+    },
+    {
+      "path": "adoption/workflow/role-tool-measurements.md",
+      "sha256": "e7cb4045408a1eb5c12a2fc489e1da0c431cd11b3fcf8dfe8d78de1462a5b739",
+      "bytes": 4854
+    },
+    {
+      "path": "adoption/workflow/routing.md",
+      "sha256": "03fbae1f1130e9ddec725b228e89b644821734bffa3d1102d97df90c07c8323c",
+      "bytes": 3786
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -16362,6 +16447,11 @@
       "bytes": 21449
     },
     {
+      "path": "catalogs/landscape/skills-lifecycle.json",
+      "sha256": "e11b6d24fc400cc097cd8efbc8d1e14260d511c64cf4ea7a706f92c6885a0896",
+      "bytes": 28617
+    },
+    {
       "path": "catalogs/landscape/upstream-snapshot.json",
       "sha256": "85a1715168203fef8f201672d3f284ff3021797c0576a974ef05ed4b6af7446c",
       "bytes": 258289
@@ -17355,6 +17445,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-sota-workflow-manifest.md",
+      "sha256": "31303ac22416954eab4000f55eba0955fef1649fbd65f7d6456d2669c6f008b7",
+      "bytes": 19472
     },
     {
       "path": "docs/direct-results.md",
@@ -46332,6 +46427,11 @@
       "bytes": 11280
     },
     {
+      "path": "evidence/artifacts/skills-workflow-round2-20261006/checkpoint.json",
+      "sha256": "d5fbc65cd34bf012a3ea5c6f0f6dc2d33b0e973e2f43099f302592f8e08b1799",
+      "bytes": 4489
+    },
+    {
       "path": "evidence/artifacts/sota-convergence-review-20260922/manifest-citation-review.json",
       "sha256": "97ffac75c1208a58d9700ad5e30d1c0aa0f3decfc3199f10ce4d88135b7d10e4",
       "bytes": 90508
@@ -53312,9 +53412,44 @@
       "bytes": 2456
     },
     {
+      "path": "examples/claude-native/agents/isolated-builder-agent-docs.md",
+      "sha256": "8aa5d7b0dfca39b8ed6f74463eb31a29d73525e4a0507998efac03eede8a7e16",
+      "bytes": 3425
+    },
+    {
+      "path": "examples/claude-native/agents/isolated-builder-ci-pr.md",
+      "sha256": "3d7ff6310305502307f6bfc8e64422c38874efc56fbbeda1237dfbedd8b738b4",
+      "bytes": 3393
+    },
+    {
       "path": "examples/claude-native/agents/isolated-builder.md",
       "sha256": "0f8e0834012ec80af39398bfb948b0fe7f0b6dff8effaf06f264d20eb3ed5db7",
       "bytes": 3485
+    },
+    {
+      "path": "examples/claude-native/agents/pending/isolated-builder-broker-adapter.md",
+      "sha256": "b91e4606e8c1ba55b67a58295a61ebb820c307b578ac0eead9ca0e220f29014f",
+      "bytes": 3496
+    },
+    {
+      "path": "examples/claude-native/agents/pending/isolated-builder-hosting.md",
+      "sha256": "d84f45b101b4d66c67feb4d3ff9bb69eace3fd0a4fbf081f05bd667f7c3041b7",
+      "bytes": 3390
+    },
+    {
+      "path": "examples/claude-native/agents/pending/isolated-builder-skills.md",
+      "sha256": "e5bf262367e864e2ee3368ef12c2e8991be18e3cd873e770be407e43858cf2c4",
+      "bytes": 3420
+    },
+    {
+      "path": "examples/claude-native/agents/pending/stack-researcher-data-quant.md",
+      "sha256": "5958ea81d8eb93b2335bd687ea47384b1600d992865a3026b30cd0292bfd668d",
+      "bytes": 3922
+    },
+    {
+      "path": "examples/claude-native/agents/security-reviewer-skills.md",
+      "sha256": "3ba55c2bc8f392713e651575c8233dcfe71265b57c6680110163b4a2ec54799d",
+      "bytes": 3293
     },
     {
       "path": "examples/claude-native/agents/security-reviewer.md",
@@ -53353,8 +53488,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "466817eba6c4c99d3bc7620cf0b241e14f7d031abfa825dc84de6f028c91901f",
-      "bytes": 110684
+      "sha256": "52e7f49ad36f53efac12fafc96ec34f85694fef384da7ade561b47353baf3a42",
+      "bytes": 112506
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -54238,8 +54373,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
-      "bytes": 26751
+      "sha256": "455ff0ce1305855c68dae6b4cd69e51fd63f8dccfb9e13a9749027f48e6e1580",
+      "bytes": 27714
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -54973,8 +55108,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "66225f2f62892b5600883e15ac362c0a62ef0d858e856ed00b86f418620699bc",
-      "bytes": 131331
+      "sha256": "d7971a99751cd1acb762ca86f7ab986ccb02c9c4f7e0e0c7d37d6d1798365f89",
+      "bytes": 140595
     },
     {
       "path": "tests/test_install_skills.py",
@@ -55527,6 +55662,11 @@
       "bytes": 149433
     },
     {
+      "path": "tests/test_workflow_manifest.py",
+      "sha256": "2f1a95400ff38fe1799182d22324f89a015b5796de18a9f55e0fbaf29e8028b7",
+      "bytes": 17678
+    },
+    {
       "path": "tests/test_workflow_policy.py",
       "sha256": "1c518c3b82f265c9567bfeb9034e48329b9f3d8e83999776917647462cf3523e",
       "bytes": 82779
@@ -55647,9 +55787,24 @@
       "bytes": 5605
     },
     {
+      "path": "tools/adoption/render_workflow.py",
+      "sha256": "ba4a15799950b13de1d5c3eaa8cadb3e786cfe95e05364cd1da39efc80a6067a",
+      "bytes": 9174
+    },
+    {
       "path": "tools/adoption/runtime_skill_freshness.py",
       "sha256": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
       "bytes": 8628
+    },
+    {
+      "path": "tools/adoption/workflow_manifest.py",
+      "sha256": "76de05f78626845224ffb99a6c0c04c17022d8ca6c5a9a33c6297b969c154269",
+      "bytes": 23611
+    },
+    {
+      "path": "tools/adoption/workflow_variants.py",
+      "sha256": "873d4be57d44dd231f915c1baa20e68f90ef568203d609c48c2514100d6ec5c2",
+      "bytes": 6853
     },
     {
       "path": "tools/capability-gate/README.md",
