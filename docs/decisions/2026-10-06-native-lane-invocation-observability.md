@@ -122,6 +122,12 @@ Pinned Loki3.7.8 last_over_time/filter/vector/on-label behavior and Grafana13.2.
 axis/value-mapping forms follow the native documentation/source. Config, query,
 browser and threshold-override read-backs remain unverified until deployment.
 
+Source correction: the first clock extraction statements used bare YAML
+scalars containing a regex colon followed by whitespace. A config data read
+raised a YAML ScannerError; the clock processor's statements now use quoted
+YAML scalars, preserving the OTTL expressions. This correction changes source
+serialization only. Native Collector/schema/query/browser checks remain pending.
+
 The Lanes dashboard uses uid `cc-lanes`, the existing file provider, and native
 conversation/session identities with the hcom name lookup. An `ecosystem_lane`
 environment label is not authoritative identity: a historical sampled label
