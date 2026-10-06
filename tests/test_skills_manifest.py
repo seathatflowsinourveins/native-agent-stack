@@ -185,8 +185,10 @@ class BudgetTests(unittest.TestCase):
         expected = sum(skill["description_chars"] for skill in self.skills if skill["claude_listing"] == "on")
         self.assertEqual(self.budget["claude_on_description_chars"], expected)
 
-    def test_manifest_sums_are_not_a_live_client_listing_gate(self):
-        self.assertNotIn("claude_on_cap", self.budget)
+    def test_manifest_policy_cap_is_separate_from_live_client_listing(self):
+        # A18 retains this repository policy independently of native client budgets.
+        self.assertEqual(self.budget["claude_on_cap"], 10500)
+        self.assertLessEqual(self.budget["claude_on_description_chars"], self.budget["claude_on_cap"])
 
     def test_codex_enabled_description_chars_is_the_sum_over_codex_enabled_skills(self):
         expected = sum(skill["description_chars"] for skill in self.skills if skill["codex_enabled"])

@@ -216,7 +216,7 @@ def skill_metadata(folder: Path, name: str) -> dict:
 
 
 def refresh_budget(manifest: dict) -> None:
-    """Static manifest totals remain metadata; the live native catalogs own the budget gate."""
+    """Refresh static totals without changing repository policy or native client budgets."""
     budget = manifest.get("budget")
     if not isinstance(budget, dict):
         return

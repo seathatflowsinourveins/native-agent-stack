@@ -96,6 +96,9 @@ Compare source, URL, path, ref, tree and SKILL.md digest together: identical byt
 a fork do not inherit the earlier origin, license or audit evidence. Unverified rows
 preserve the earlier entry and remain unresolved; no ref is guessed. See the
 [recording and live-budget decision](../../docs/decisions/2026-10-06-skill-recording-and-live-catalog-budgets.md).
+Its cap-retirement proposal is superseded by the
+[repository-cap amendment](../../docs/decisions/2026-10-06-skill-recording-cap-amendment.md):
+retain the repository ceiling alongside the separate native catalog evidence.
 
 Tool-coupled skills follow their binary release. The status check compares retained
 binary-release metadata and reports an advisory upstream restore/update proposal;
@@ -291,7 +294,11 @@ for current qualification limits.
   characters when the window is unknown. Each description is cut at 1,024
   characters. The template sets 6,000 tokens.
 - **Manifest.** `budget.claude_on_description_chars` stays within
-  `trial.on_description_char_cap`, and `budget.codex_enabled_description_chars`
+  `budget.claude_on_cap` and `trial.on_description_char_cap`. The repository
+  ceiling remains 10,500 characters under the
+  [cap amendment](../../docs/decisions/2026-10-06-skill-recording-cap-amendment.md);
+  a passing sum does not establish fresh native listing visibility.
+  `budget.codex_enabled_description_chars`
   counts every Codex-enabled description; the manifest tests recompute both.
   `budget.codex_catalog_description_chars` counts the descriptions Codex shows the
   model, leaving out `upstream_allow_implicit_invocation: false` skills;
