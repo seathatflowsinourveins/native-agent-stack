@@ -1,0 +1,28 @@
+{
+  "schema": "spy-parity-v2-harness-review/1",
+  "reviewer": "claude-opus-5.5 (ns2604-coop cross-family read)",
+  "completed_utc": "2026-10-06T05:51:42+00:00",
+  "reviewed_commit": "910351ff0472fe90d97e92a1ade0b69d30c1e7d7",
+  "reviewed_local_source_sha256": {
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "run-rc6.py": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+    "compare-rc6.py": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+    "mapping-manifest-rc6.json": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+    "PREREGISTRATION-ADDENDUM-rc6-20261006.md": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38"
+  },
+  "unresolved_findings": 0,
+  "scope": "Pre-run exact-head source read against ecfa11276: originals byte-identical; 242 changed lines (86 binding, 156 appended history) equal the computed diff and allowed categories; data, strategy, oracles, tolerances and predicates unchanged; explicit MakerTakerFeeModel with Decimal zero rates against the frozen fees_usd 0 oracle; history prefix exact, two retained J2 rc5 failures appended, no rc6 attempt. No harness, test or native engine was run.",
+  "accepted_limitations": [
+    "Receipt prose keeps v2 locators: run-rc6.py:89 and :879-881 name deviation-acceptance-v2.json and :143-144 name receipt-v2/verdict-v2/replay-history-v2, while the candidate uses the rc6 files (run-rc6.py:167-169; compare-rc6.py:91-94, 833). No check reads this text; the publication receipt must name the files that ran. Help text at run-rc6.py:14 and compare-rc6.py:35 is likewise stale.",
+    "Changed-line table is complete and exact, but reflow from the fee-model edit is labelled 'source identity' (run.py:51; run-rc6.py:52, 55, 57, 582), and run.py:797 -> run-rc6.py:805 is a one-space re-indent.",
+    "Reviewed set grows from five to seven files (manifest, addendum): stricter review and deviation binding; a prior replay now counts as a rerun only if all seven files match.",
+    "Appended J2 entries: eight-name harness maps rebuilt from ecfa11276; the five review-record PASS checks are implied by the published J2 receipt's complete failing list, not listed in it. No gate effect.",
+    "Carried from review-record-v2-cc4503f.json (logic byte-identical): a run-time history that is a prefix of the on-disk file reads as append-only; entries without harness_local_source_sha256 are skipped, so every rc6 attempt must be appended with its full seven-file map before any retry; gate-owner authorship of deviation-acceptance-rc6.json cannot be verified in code; the fill_quantity int() note is unchanged."
+  ],
+  "follow_ups_outside_reviewed_files": [
+    "tests/test_nautilus_rc6_candidate.py:64-65 index the J2 entries from the end; fix before the first rc6 append.",
+    "Re-register replay-history-rc6.json in manifests/evidence.json after each append."
+  ]
+}
