@@ -4631,8 +4631,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "6ac40e443963ca0bc93d75e440c697268682bd11810ea6203794d063a4d6be76",
-      "bytes": 15075
+      "sha256": "3c7bed9c3899e22a022acf4172719dd510124d45664f24cf656def14e6ad999b",
+      "bytes": 15176
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4655,6 +4655,11 @@
       "bytes": 467
     },
     {
+      "path": ".github/requirements-validation.txt",
+      "sha256": "458d8cb1fef26d0d0a9a6a76707c0bad04fe84558550db750d50af206fecba81",
+      "bytes": 719
+    },
+    {
       "path": ".github/tag-ruleset.json",
       "sha256": "b11fda27d1e2011ff3c001ac830fa3b2c0c3af6090e929ee2d20e4d0507dda5e",
       "bytes": 320
@@ -4671,8 +4676,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "96f2208ee271fd4fbe58a26ea281a5fb244c42a62aeb2cb9a13fcc07739c9d72",
-      "bytes": 26294
+      "sha256": "673dbb816767e67d002b6dcdf866053c8408a7a47203683650af8d9f3be4b23a",
+      "bytes": 26872
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -4716,8 +4721,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "652bf181e1097963b1ce23d81eefb9bc9fb4c0f3051c3c5611c07ede4ab8a291",
-      "bytes": 20110
+      "sha256": "6f48ef65db2a270121e607aea1f08f2cad7c9f883009babd40af42b21c8f3167",
+      "bytes": 20399
     },
     {
       "path": ".github/workflows/receipt-staleness.yml",
