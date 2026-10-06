@@ -5091,6 +5091,26 @@
       "bytes": 2953
     },
     {
+      "path": "adoption/templates/systemd/disk-headroom-guard.service",
+      "sha256": "23a5f7433022f2fa3daf99f28e7160b9af6e97c9e7369cf0c37494c512d4b3a4",
+      "bytes": 654
+    },
+    {
+      "path": "adoption/templates/systemd/disk-headroom-guard.timer",
+      "sha256": "b4a73c7fba903416d61b13ac263d3d8c962e275f981947e8c26944a607125b00",
+      "bytes": 492
+    },
+    {
+      "path": "adoption/templates/systemd/ecosystem-native-data.service",
+      "sha256": "f8bc290b02fe2b9dfce53bc4621c47444fca4f53be9403e17ba5f6827dd4f641",
+      "bytes": 870
+    },
+    {
+      "path": "adoption/templates/systemd/ecosystem-native-data.timer",
+      "sha256": "f015d1c9764235126ec4363aa5236e8f75c4ed9fb63e295d40b885e2c90c449c",
+      "bytes": 524
+    },
+    {
       "path": "adoption/templates/systemd/omniroute-fw.service",
       "sha256": "a81772106fd2ed2be213679c683f002f1ac0b0b3a27ac68093508aa2ebb0aef5",
       "bytes": 5935
@@ -5109,6 +5129,11 @@
       "path": "adoption/templates/systemd/token-report-refresh.service",
       "sha256": "580f7e0d4e538d6013342dc943922ab3988b7567be34fe14b01faa97d2733cae",
       "bytes": 9260
+    },
+    {
+      "path": "adoption/templates/systemd/upkeep-transfer.md",
+      "sha256": "9d43e75909a0a8b52082f5b5aa7aa0af069d1f585683acbab243aea40eb71252",
+      "bytes": 40485
     },
     {
       "path": "adoption/templates/systemd/upstream-surface-watch.service",
@@ -17350,6 +17375,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-06-2604-upkeep-timer-transfer.md",
+      "sha256": "40047cca9d6e0d2883adbef928fd0b0c435d3163a67168672979e2f220e7fa63",
+      "bytes": 23012
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
@@ -40822,6 +40852,21 @@
       "bytes": 4589
     },
     {
+      "path": "evidence/artifacts/ns2604-p1-upkeep-timers-20261006/ci-repair-20261006.json",
+      "sha256": "eeadcb5214d296125cdaf9f0966975158a3277f571ebdcecd82166c50dba84b1",
+      "bytes": 16760
+    },
+    {
+      "path": "evidence/artifacts/ns2604-p1-upkeep-timers-20261006/receipt.json",
+      "sha256": "e4f2b35feead64d259969978c35b2f3f43068c6cdee79c871388d923125ee498",
+      "bytes": 11853
+    },
+    {
+      "path": "evidence/artifacts/ns2604-p1-upkeep-timers-20261006/review-repair-20261006.json",
+      "sha256": "36e961df7edbe95b2a1d3bb73c5c2a3dd7f01f585ff8ee8ac56f6c07878c3bf5",
+      "bytes": 12947
+    },
+    {
       "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
       "sha256": "52e6f98e6e2af67941770b84a314cd9fc5673a016f986cc5cb8a2c5e3dc8bac4",
       "bytes": 11175
@@ -53998,12 +54043,17 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "0ced49d094ec8ab7737da7ef008216b053ee8c2622c82508966f854b326786f8",
-      "bytes": 16655
+      "sha256": "0b23a704ff774fc2ec4c225c4b4c5280fce13e8e1c744a74b257935cbcee9d1b",
+      "bytes": 20178
     },
     {
       "path": "observability/native-data/config.example.json",
       "sha256": "317b80ee3609523b475f379651ad8ebe285c57e9e01c09d6719504c90361d276",
+      "bytes": 1008
+    },
+    {
+      "path": "observability/native-data/config.ns2604.example.json",
+      "sha256": "e6814eb7041ae9c6c52475ddab03545f60b3167656ce13ae6c18f184dd33a31b",
       "bytes": 1008
     },
     {
@@ -54033,8 +54083,8 @@
     },
     {
       "path": "observability/native-data/snapshot.py",
-      "sha256": "ec68f05a9dea2c8d3e37888b2928760bd085ce1567bcdd09145e82a6196fb68b",
-      "bytes": 29140
+      "sha256": "8a92bb3f3fb5048dbfedcd0010e8d3b62f5deffc426bf3a34a565573a458f730",
+      "bytes": 29496
     },
     {
       "path": "observability/receipt.json",
@@ -54267,6 +54317,11 @@
       "bytes": 3802
     },
     {
+      "path": "tests/_credential_mutation_driver.py",
+      "sha256": "70d7625daab33d2148181333126fab5c073c8a4d5bf9f984471462c77e1e81ad",
+      "bytes": 13754
+    },
+    {
       "path": "tests/adaptive_paper_hermetic.py",
       "sha256": "0f41601cd10abf10ccba4f17d9c35716bb766a5e9951a4390649d6c9387fc1da",
       "bytes": 5384
@@ -54448,8 +54503,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_credential_race.py",
-      "sha256": "1b0b6521045858fc9c974fc9e50e390ac888c7091f5f92606feb1bf49f7ef022",
-      "bytes": 66824
+      "sha256": "b1b94ea3dd2566b2ab7d974b431e801f18c65cb3dc20b8c0980212b5ef84e285",
+      "bytes": 68203
     },
     {
       "path": "tests/test_adaptive_paper_credential_source.py",
@@ -54538,8 +54593,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "e4e23c487f6376a5a9e711a98f360cd68442920d2deb2e0800cc2130ea45f37a",
-      "bytes": 105903
+      "sha256": "af6e4543812e7dac9a85d8f3273bec05ca4962e8ca4a066bdd871f732f78f531",
+      "bytes": 105986
     },
     {
       "path": "tests/test_adoption_bootstrap_linux_platform.py",
@@ -54568,13 +54623,13 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "c8db8b668f3f75c2ef1e13a736223e05ffcdc747861062850aa9eac3049a5f14",
-      "bytes": 41460
+      "sha256": "cebd880f4ee3fd8a2c00c609ea39d10fb45ccb4b4c9017b485b3eabc967a69fe",
+      "bytes": 41996
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "f50a8f8e3106e0ec34151dff4ac549c60e19f1109e3555fab7fad689af5f34c2",
-      "bytes": 111506
+      "sha256": "c3fa118fa4d56f00399a4aeb6a94c91f62ec87b3501478c1c0e6dd2a187c85d4",
+      "bytes": 111929
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -54815,6 +54870,11 @@
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
+    },
+    {
+      "path": "tests/test_disk_headroom_guard.py",
+      "sha256": "9e54b6b3b2ad241c37c09161fae710a4aea5a11d6afb2b358627771efb953590",
+      "bytes": 7197
     },
     {
       "path": "tests/test_document_ingestion.py",
@@ -55098,8 +55158,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "7696c21ef08a5a0fde82c67cebe928d7efe02e0e0fa5f465dd28f4b809157b4e",
-      "bytes": 40258
+      "sha256": "30ff3836a6ee792fad84d35d0c6976cde950486da52612e5747338780a18de28",
+      "bytes": 43361
     },
     {
       "path": "tests/test_native_faults_min.py",
@@ -55165,6 +55225,11 @@
       "path": "tests/test_new_wsl_profile.py",
       "sha256": "49aa447fb050a329eafc6106a3a25f9f966a66db9f583c4ba04e990bfa2e8b00",
       "bytes": 19560
+    },
+    {
+      "path": "tests/test_new_wsl_upkeep_timers.py",
+      "sha256": "638537a1c075a5f77e24246b9a221df89df5f966c5b732abac467ad7545e0380",
+      "bytes": 32218
     },
     {
       "path": "tests/test_observability.py",
@@ -55750,6 +55815,11 @@
       "path": "tools/credentials/credential_run.py",
       "sha256": "bcab1b94a1cdf73b630b50c45c6a8a0189de089e987abb21b327e4238bd04222",
       "bytes": 55887
+    },
+    {
+      "path": "tools/maintenance/disk-headroom-guard.sh",
+      "sha256": "2d8b3e4129043bd30ae02538e598300243980874338a54b72932e146cf099009",
+      "bytes": 3008
     },
     {
       "path": "tools/omniroute/gateway_record.py",
