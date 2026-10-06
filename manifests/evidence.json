@@ -4460,8 +4460,8 @@
         "No rc6 case has run. Source/fixture controls do not establish native economic parity, risk policy, broker acceptance or a destination pin move.",
         "An independent Opus exact-head read is pending;5f may object at the addendum read. Synthetic reviews/approvals are confined to fixtures, not actual acceptance.",
         "The existing failed-history/owner-acceptance predicate remains active.5f must supply an actual source-bound deviation-acceptance-rc6.json; old approved fields are not copied or cleared. Missing/old approval remains a failing precondition.",
-        "The owner must stage the retained five inputs and approve the managed-Python isolation route. AAPL remains blocked; no credentials, provider, broker or orders are touched.",
-        "Old engine/source/probe/review/history evidence remains historical rc5 evidence. Initial candidate history is byte-copied; actual future rc6 attempts append only to the candidate file, preserving the originals.",
+        "J2 has staged the retained five inputs and executed the approved managed-Python route; J4 input checks pass, while native rc6 execution still awaits its independent read and source-bound owner records. AAPL remains blocked; no credentials, provider, broker or orders are touched.",
+        "Old engine/source/probe/review/history evidence remains historical rc5 evidence. Candidate history preserves the original prefix and adds two verified historical rc5 attempts; real future rc6 attempts append only to that candidate file.",
         "The earlier24-check offline runtime acceptance remains separately dated; it does not qualify these copied sources or substitute for a native historical-case run."
       ],
       "evidence_class": "source_review",
@@ -14172,8 +14172,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-ADDENDUM-rc6-20261006.md",
-      "sha256": "580fa4b9af21ac3b3caf39fd8d7ae5e9a294e655371f8e2f348062f7e08e2aa2",
-      "bytes": 22049
+      "sha256": "6edb5e6be6acd6e05d588c75e6555acce89b5df543386b45b60f0b5d789d7e38",
+      "bytes": 41299
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
@@ -14382,8 +14382,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
-      "sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
-      "bytes": 10844
+      "sha256": "e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4",
+      "bytes": 18474
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
@@ -17162,8 +17162,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-nautilus-rc6-runtime-candidate.md",
-      "sha256": "859c1065120cb3cdc5b53d4e30603a6c9e19c712e4b240ff94754d4049f1ec19",
-      "bytes": 7023
+      "sha256": "b7dcc94a2ced63f1d4826c4ff387e03e9bef36ecde187e076cfa93029980d1b7",
+      "bytes": 7257
     },
     {
       "path": "docs/direct-results.md",
@@ -38627,8 +38627,8 @@
     },
     {
       "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/candidate-changed-lines-20261006.json",
-      "sha256": "906ff5b4c1407b0ac20c0c289ccff8b0a478d8f3cf6279bd1cd73eb216b9b39b",
-      "bytes": 20261
+      "sha256": "7d36b4f9c5c8f25eef0cbd29f61a6317a3f248e49e856ede4ea599bee0672a96",
+      "bytes": 49949
     },
     {
       "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/changed-lines.json",
@@ -52717,8 +52717,8 @@
     },
     {
       "path": "evidence/receipts/nautilus-rc6-candidate-addendum-20261006.json",
-      "sha256": "849e2f80f9d53d97c8b8689537fed270245b8867bd9d8ed620324b0e0f5e178d",
-      "bytes": 11053
+      "sha256": "f0646793158ae3233f7f8ff3dffe5cdb7a9437ff55ae7a301a8772fedb3ab252",
+      "bytes": 12488
     },
     {
       "path": "evidence/receipts/nautilus-rc6-runtime-2604-20261006.json",
@@ -54887,8 +54887,8 @@
     },
     {
       "path": "tests/test_nautilus_rc6_candidate.py",
-      "sha256": "e2a8fb27f248b9e9257d0e15b9292dbef1e68cb7ed4b0144c497b98c89db18d0",
-      "bytes": 6326
+      "sha256": "daab9f0e090631e2cd97aeede8404657ef99a46cd5acf05523e7b5514346c537",
+      "bytes": 6804
     },
     {
       "path": "tests/test_new_host_grand_list.py",
