@@ -369,6 +369,13 @@ def main(argv=None) -> int:
     sdk_venv_site = sorted((HOME / ".local/share/new-wsl-native-stack/tools/claude-agent-sdk/lib").glob("python3*/site-packages"))
     header = f"import sys\nsys.path.insert(0, {json.dumps(str(sdk_venv_site[0]))})\n" if sdk_venv_site else ""
     (work / "bin" / "run.py").write_text(header + (HERE / "sdk_claude.py").read_text(encoding="utf-8"), encoding="utf-8")
+    # The CL6 launcher must compile as written (a `from __future__` import after the header is a SyntaxError).
+    import py_compile
+    try:
+        py_compile.compile(str(work / "bin" / "run.py"), cfile=str(work / "h" / "run.pyc"), doraise=True)
+    except py_compile.PyCompileError as error:
+        print(json.dumps({"refused": "the CL6 launcher bin/run.py does not compile", "error": str(error)[:300]}))
+        return 2
     shutil.copy2(HERE / "sdk_codex.mjs", work / "bin" / "run.mjs")
     sdk_dir = HOME / ".local/share/new-wsl-native-stack/tools/codex-sdk/node_modules/@openai/codex-sdk"
     if sdk_dir.exists():

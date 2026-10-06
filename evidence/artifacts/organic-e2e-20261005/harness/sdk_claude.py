@@ -1,11 +1,14 @@
 """CL6: one Claude Agent SDK (Python, claude-agent-sdk 0.2.163) session, written from the SDK README's query() example.
 
-Run by launcher.py inside the same lock, meter and timeout as CL2, with the SDK's own interpreter. Every message the
-SDK yields is serialized to stdout as one JSON line in the CLI's stream-json shape where the SDK keeps the raw fields
-(system messages carry their raw data; rate_limit_event carries rate_limit_info.raw), so one grader reads CL2 and CL6.
-"""
-from __future__ import annotations
+Run by launcher.py inside the same lock, meter and timeout as CL2. Every message the SDK yields is serialized to stdout
+as one JSON line in the CLI's stream-json shape where the SDK keeps the raw fields (system messages carry their raw
+data; rate_limit_event carries rate_limit_info.raw), so one grader reads CL2 and CL6.
 
+prepare.py writes this file as the trial root's bin/run.py behind a two-line header that puts the SDK venv's
+site-packages first on sys.path (the venv path names an experiment word, so it stays out of argv), and compiles the
+result at stage 1. The header precedes everything here, so this file carries no `from __future__` import, which would
+have to come first (smoke-20261006a: the header ahead of one was a SyntaxError and the CL6 trial exited at once).
+"""
 import argparse
 import asyncio
 import dataclasses
