@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-roadmap-evidence-20261005",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-10-05T10:57:55Z",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md",
+      "change": "Claim revised at 8c1629baaf5c42b5767d66be3c9b47422efb69e2 after #715 source review: superseded 40/44 scenarios and retained 37/32 as provisional source_review proposals; official 30/80 unchanged."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "change": "Claim revised at 73d75df4b33f390c30cd435253b6d675103eb95d: superseded 37/40/44/32 proposals, retained captured-status provisional 30/80 as of 11:44Z excluding custody at 13:02Z, and deferred organic qualification to final verified E2E S4."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:28:40Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md",
+      "change": "Claim revised at bfff257c0f61be6857cdc50cf0284e57584ab873: restored the #700 qualification bar and distinguished captured-status counts and model READY source_review leads from measured qualification; official 30/80 unchanged."
+    }
+  ],
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "omniroute"
+  ],
+  "claim": "Historical NativeStack2604 documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Captured-status counts and model READY leads remain source_review. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC captured-status provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
+  "limitations": [
+    "This historical documentary capture is not live verification or a new host execution. The Claude publication review of head ec7dbc2d0ce4782a5157e5f9d14c7e5ce39863e8 requested changes; review of this corrected candidate's exact head remains pending.",
+    "Only the command center's own dated final verified E2E of the same80slots, followed by independent review and adjudication, can change official readiness. A PR or publication review cannot lift provisional status.",
+    "Retained native operations, unchanged upstream tests, local wrappers, synthetic fixtures, source review and structural checks retain separate classes and host/attempt scopes.",
+    "Old failures and skips remain historical observations. Later success is tied to its own source, time and inputs; it does not rewrite an earlier process result.",
+    "The historical host capture remains distinct. The generated correction reports official30 with current/conditional null and a decision pointer. Its pre-merge#713 hold is released after1796303f; the publication is reconciled with main424b8a77. Older coupled projections are superseded context, not readiness authority. Both reported37 and32 are superseded.",
+    "Job4 still requires each owner's stages2\u20135, independent review and adjudication. Its #723 receipt must use the merged commit and JSON path when available. The earlier Job5#713 merge hold is released after1796303f; merge itself executes or qualifies no deferred job.",
+    "This corrected candidate awaits the command center's exact-head re-check. The ec7 publication review is preserved as an earlier review, not acceptance of these corrections. Local validation remains source consistency only.",
+    "Ccusage condition-absent controls remain transcript-only; session-analytics requires a complete owner-native idle-period rerun with argv, stdout/stderr, rc, times, pin and hashes. Retained rerun2/service.8yU0G1 gaps are not inferred away.",
+    "The command center confirms user authorship of the Alerting attestation. The receipt's original not_verified field remains historical; fresh unmodified delivery stays blocked by defect14 and the printed plan result line is unconfirmed.",
+    "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
+  ],
+  "data": {
+    "host": "NativeStack2604",
+    "source_workflow": "wf_cfa1d860-ebd",
+    "source_class": "historical_inventory",
+    "north_star_action": "Give portable complex engineering and later broker-specific research/paper qualification an accurate inventory of retained foundation evidence and open gates.",
+    "new_qualification": false,
+    "new_readiness_numerator": null,
+    "roadmap_statuses_are_provisional": true,
+    "review_correction": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+    "reported_proposals": [
+      {
+        "source": "roadmap",
+        "reported_numerator": 37,
+        "reported_denominator": 80,
+        "evidence_class": "source_review",
+        "status": "superseded historical source-review proposal",
+        "superseded_by": "review-715-corrections.json#/bounded_repair_rulings",
+        "bar": "old-bar"
+      },
+      {
+        "source": "command_center",
+        "reported_numerator": 32,
+        "reported_denominator": 80,
+        "evidence_class": "source_review",
+        "status": "superseded historical source-review proposal",
+        "superseded_by": "review-715-corrections.json#/bounded_repair_rulings",
+        "bar": "old-bar"
+      },
+      {
+        "source": "command_center_exact_head_ruling",
+        "reported_numerator": 30,
+        "reported_denominator": 80,
+        "evidence_class": "source_review",
+        "status": "provisional pending the coordinator's final verified E2E",
+        "bar": "old-bar",
+        "as_of_utc": "2026-10-05T11:44:00Z",
+        "custody_1302_by_design_included": false,
+        "captured_status_boundary": "It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar.",
+        "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+      }
+    ],
+    "superseded_reported_scenarios": [40,44,37,32],
+    "aggregate_derivation_performed": false,
+    "publication_reconciliation": {"base":"424b8a778222ae8857aade42c49ae6f7a13b3138","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"previous_hold_descriptions":"Historical preparation-phase observations; owner paths are now released.","changed_plan_pin_boundary":"Old4c host attempts do not qualify new #740 Dagu/Mise plan/profile pins.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
+    "dated_rulings": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+    "independent_publication_review": "changes_requested_recheck_pending",
+    "independent_publication_review_scope": "The retained Claude review covers the earlier ec7 head. The command center's exact-head recheck of this corrected candidate remains pending; neither review qualifies new readiness.",
+    "recorded_publication_review": {
+      "locator": "coordination-root:bounded-jobs-20261004/read-715/verdict-claude-715.md",
+      "sha256": "cf54816c12d77a705b1d278f332d18166bfc8e926e65c3ecaac7eb2921bde5c8",
+      "reviewed_head": "ec7dbc2d0ce4782a5157e5f9d14c7e5ce39863e8",
+      "evidence_class": "source_review",
+      "status": "changes_requested",
+      "corrections": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json"
+    },
+    "readiness_lift_condition": "Only the command center's own dated final verified E2E of the same 80 slots, followed by independent review and adjudication, can change official readiness. A PR or publication review cannot lift provisional status.",
+    "original_receipt": "evidence/receipts/ns2604-requalification-20261005.json",
+    "artifacts": [
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-observation.json",
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
+      "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
+      "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json"
+    ],
+    "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+    "method_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/ns2604-e2e-20261004/method.md:56-72",
+    "readiness_authority": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114-121",
+    "evidence_policy": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:19",
+    "sanitization": "No raw conversations, session/account identities, host paths, credential values or active client configuration. Private proof locators use documented logical prefixes and byte hashes.",
+    "qualification_bar": {
+      "old_bar": "the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present",
+      "scope": "The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
+      "new_bar": "Same upstream acceptance, wiring and fresh-session use, but no harness text names the tool in the organic native arm; introduced around15:12Z.",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+    },
+    "old_bar_provisional": {
+      "source": "command_center_exact_head_ruling",
+      "reported_numerator": 30,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional pending the coordinator's final verified E2E",
+      "bar": "old-bar",
+      "as_of_utc": "2026-10-05T11:44:00Z",
+      "custody_1302_by_design_included": false,
+      "captured_status_boundary": "It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar.",
+      "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+    },
+    "exact_head_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
+    }
+  }
+}
