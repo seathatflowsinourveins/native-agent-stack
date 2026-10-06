@@ -6,6 +6,11 @@ The [administrator runbook](clock-root-fix-r2.md) and
 configuration correction from measured clock readiness. This is a reviewed-main
 reference candidate; use the exact accepted commit, not an older deployed release.
 
+The [clock disposition](../../../docs/decisions/2026-10-06-wsl-clock-disposition.md)
+records the final Gate 2 ruling: the maintained WSL agent survives retirement,
+so the native steering takeover is dropped. Keep NativeStack2604 chronyd -x
+on 3323; no PHC addition or clock-transfer rollback is needed.
+
 The [D0 reader](../../../scripts/d0_check.py) extends the existing PHC0 census
 with native, read-only Windows SCM/Registry/ScheduledTasks queries. Default mode
 checks persistence before sampling the agent. A persistence failure exits

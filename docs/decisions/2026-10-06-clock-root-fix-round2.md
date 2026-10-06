@@ -5,6 +5,12 @@ acceptance remain pending. This foundation unit supports clock readiness for
 the repository's independently qualified US-equities paper operation. It
 changes neither a broker adapter nor a trading gate owned by the custodian.
 
+The command center's 2026-10-06 ruling drops the Linux clock takeover:
+[WSL clock disposition](2026-10-06-wsl-clock-disposition.md). PHC0/323 is the
+WSL platform agent, surviving NativeStack retirement; native chronyd stays
+observe-only on 3323. D0 checks the platform while the outside NTP monitor
+and this Windows remedy retain their separate acceptance requirements.
+
 Windows Time's documented high-accuracy startup choice is Automatic. The
 read-only reference-host observation at 2026-10-06T11:03:59Z instead returned
 numeric Start=2 with delayed startup, RUNNING, two START triggers, no STOP
