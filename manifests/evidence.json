@@ -17357,9 +17357,14 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-north-star-start-line.md",
+      "sha256": "3e8cbc6285f077efa1254900dfed3fbcb676cd7f205ba6a228748f94adc0607c",
+      "bytes": 7264
+    },
+    {
       "path": "docs/decisions/2026-10-06-ns2604-native-bar-recount.md",
-      "sha256": "ae33012177b75f5caa1492cfe3dfc0c271b501a3d7785e2e5a0e88a2f67367a2",
-      "bytes": 4396
+      "sha256": "88b7bf244cb671f115ff597e2bd9d47b5f4849b9c5c7a57e05a7d8185e28a80b",
+      "bytes": 4880
     },
     {
       "path": "docs/direct-results.md",
@@ -40828,13 +40833,13 @@
     },
     {
       "path": "evidence/artifacts/ns2604-native-bar-20261006/README.md",
-      "sha256": "5db8e9134985ac3b8ccb252060d6498e580b0b81b6c9d0995b7bf830ddad1e8f",
-      "bytes": 15520
+      "sha256": "ac169c28ac536a3e2ebe3b5d41d42eab920fffe9a98004876548999724ad1934",
+      "bytes": 16966
     },
     {
       "path": "evidence/artifacts/ns2604-native-bar-20261006/board.json",
-      "sha256": "56266ab0337ee86cbefbe9c4d97634cca45a44db993c9bf96d364e6177b83fe4",
-      "bytes": 87950
+      "sha256": "5e0567fae4878dc3b90e089b4e0e039d9fe3526fe9a86d985e40677ebf6fbfca",
+      "bytes": 98713
     },
     {
       "path": "evidence/artifacts/ns2604-native-bar-20261006/code-navigation-map.json",
@@ -53983,8 +53988,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "2822d4746cf4b99933a08e3b4030f9564365628dfe3d68e0eb6aae93860d5d8c",
-      "bytes": 23937
+      "sha256": "7a424c0d8994461fb9570b021db246a56e243d81d477c8d77a6b34e3ad5e24fc",
+      "bytes": 23643
     },
     {
       "path": "observability/memory-scheduled-20260923.json",

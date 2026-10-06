@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-06T15:47:07Z",
-  "meaning": "Operational NativeStack2604 native-bar recount against main 0d5e6506434fab598dee861c749a22e628beb75a: 27 of 80 operational closures (13 inherited READY and 14 BY_DESIGN), including the landed custody policy decision; final S4 qualification remains unknown. The complete 80-row evidence/owner board is linked from the existing distribution gate, preserving the 128-entity cap. All 18 formerly proposed handoffs are accepted by the co-op; individual lane acknowledgment remains unverified. Seven token tools remain under the CC client-wiring hold pending its ordered install plan. All other lane/gate/worker entries retain their previous historical scope and evidence; this checkpoint is not a fresh native run or live process registry.",
+  "recorded_at_utc": "2026-10-06T17:50:07Z",
+  "meaning": "CC-selected north-star start line: reviewed/adjudicated same80-slot S4,40currentlyopen prerequisites plus12dated interim plans anddistributionhold. Corrected conditionalR&Dstart earliest2026-10-09T22:00Z, likely2026-10-13T22:00Z, rangeOctober12-14, lowconfidence; full79has no evidence-based date. Currentreportedoperational27 andall other historical checkpoint entries retain scope; critic corrections awaitCCruling. No new native qualification or live process claim.",
   "lanes": [
     {
       "kind": "lane",
@@ -366,7 +366,7 @@
       "kind": "gate",
       "id": "new-wsl-distribution-20261002",
       "title": "NativeStack2604 native bar / readiness-runner",
-      "state": "operational 27 of 80 / native 26 / S4 unknown / 53 open / 18 handoffs accepted / client wiring held / ceiling 79 / owner readiness-runner",
+      "state": "reported 27 of 80 / S4 pending / RD earliest Oct9 likely Oct13 / full79 date unknown / owner readiness-runner",
       "evidence_ref": "evidence/artifacts/ns2604-native-bar-20261006/README.md"
     },
     {
