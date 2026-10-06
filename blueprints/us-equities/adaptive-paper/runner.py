@@ -1851,6 +1851,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
               "dropped_quotes": {"by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
                                  "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}},
+              "stream_health": _stream_health(port),
               "native_fill_events": strategy.native_fills, "native_rejections": strategy.native_rejections,
               "policy_selections": strategy.policy.counts, "accounting": state,
               "reconciliation": reconciliation, "startup_reconciliation": session.reconciliation,
@@ -1913,6 +1914,13 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     _finalize_status_and_financing(reconciliation, session.errors, strategy.native_fills, outcome,
                                    session_policy, config, controller.ledger, baseline_cash, time.time())
     return outcome
+
+
+def _stream_health(port):
+    """The native transport's terminal stream view (transport.AlpacaPaperTransport.stream_health: frozen,
+    reasons, fresh_quotes, data_timeout_seconds); None for a port without one (simulation and test ports)."""
+    reader = getattr(port, "stream_health", None)
+    return reader() if callable(reader) else None
 
 
 def _run_native_status(reconciliation, session_errors, native_fills, outcome, session_policy, now):
@@ -2477,6 +2485,7 @@ def main():
                     outcome["dropped_quotes"] = {
                         "by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
                         "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}}
+                    outcome["stream_health"] = _stream_health(controller.port)  # before recovery replaces the port
                 if isinstance(controller.events, LiveEventLog):
                     outcome["live_event_write_errors"] = controller.events.write_errors
                 if ledger.positions() or ledger.unresolved():
