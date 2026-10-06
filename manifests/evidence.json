@@ -17357,6 +17357,11 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-ns2604-native-bar-recount.md",
+      "sha256": "c5dd251b81ee2798f94133b0dfee6b96fa89fa9b8b908e0c3308afcdd2c7ccf9",
+      "bytes": 3051
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -40822,6 +40827,16 @@
       "bytes": 4589
     },
     {
+      "path": "evidence/artifacts/ns2604-native-bar-20261006/README.md",
+      "sha256": "ca2bd2132d4806828bd84fa58813999c2704192cab0a7ba25acd5d97ab8a33bd",
+      "bytes": 13672
+    },
+    {
+      "path": "evidence/artifacts/ns2604-native-bar-20261006/board.json",
+      "sha256": "4035ac988bff49b6de3855409595ad962a787065765a771530b7e0aad28360be",
+      "bytes": 77543
+    },
+    {
       "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
       "sha256": "52e6f98e6e2af67941770b84a314cd9fc5673a016f986cc5cb8a2c5e3dc8bac4",
       "bytes": 11175
@@ -53963,8 +53978,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "6dc4f85e48a3ddc5b3b9f9f5e485aa66aaeb53b9a1e173c57d857a4e04da6274",
-      "bytes": 24794
+      "sha256": "a40230c5b23aa74bba0c56b14861fe5fa34a74766a133ee9dc817a1a60aa7810",
+      "bytes": 23789
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
