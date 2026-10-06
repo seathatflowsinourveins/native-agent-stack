@@ -99,6 +99,22 @@ There is no automatic refresh. Run the
 Codex upgrade, before reusing the opt-in profile; record the new version and
 both export/projection hashes. The workhorse does not reference this projection.
 
+The planned new-WSL map's opt-in profile row is metadata under
+`slot_configs.gpt-gateway`, with the CC as its application owner and the native
+known-answer search pending. It does not claim that the producer writes this
+file: the current producer enumerates only the three existing Codex config
+groups and rejects unmatched map entries
+([native-agent-stack@9f3af37d: new_wsl_client_config.py:552-592](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9f3af37dd4659d8686c454d8ac727a3de73452a4/tools/adoption/new_wsl_client_config.py#L552-L592)),
+and renders only its existing two profiles
+([:1158-1162](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9f3af37dd4659d8686c454d8ac727a3de73452a4/tools/adoption/new_wsl_client_config.py#L1158-L1162)).
+The metadata row is deferred until main includes
+[#771](https://github.com/seathatflowsinourveins/native-agent-stack/pull/771),
+whose owner also changes the map. Proposed follow-up: the live template owners
+[#716](https://github.com/seathatflowsinourveins/native-agent-stack/pull/716)
+and [#770](https://github.com/seathatflowsinourveins/native-agent-stack/pull/770)
+fold the opt-in profile/catalog into executable producer wiring after their
+cross-family review. This records PR does not edit their producer or templates.
+
 ## Alternatives, acceptance and overturn condition
 
 Keeping standalone search enabled against the clean release retains the 404.
