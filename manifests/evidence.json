@@ -17097,6 +17097,11 @@
       "bytes": 9226
     },
     {
+      "path": "docs/decisions/2026-10-06-ns2604-alerting.md",
+      "sha256": "5e8308351319754e65566767d1fe181add849f3857d1de1fd75173ca6a230c8a",
+      "bytes": 21461
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
