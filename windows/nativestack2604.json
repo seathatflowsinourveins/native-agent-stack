@@ -166,6 +166,62 @@
       ],
       "tabColor": "#3B8065",
       "suppressApplicationTitle": true
+    },
+    {
+      "guid": "{934b8295-4281-5d0c-8d33-e392cac20ab6}",
+      "name": "NativeStack2604 - Codex root lane",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec bash ~/.local/state/native-agent-stack/lanes/codex-lane.sh ~/.local/state/native-agent-stack/lanes/codex-root-lane.prompt.txt\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "tabColor": "#2E7D32",
+      "tabTitle": "Codex root lane"
+    },
+    {
+      "guid": "{6b5693eb-2771-5249-8d73-38c4469c9600}",
+      "name": "NativeStack2604 - Codex runtime lane",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec bash ~/.local/state/native-agent-stack/lanes/codex-lane.sh ~/.local/state/native-agent-stack/lanes/codex-runtime-lane.prompt.txt\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "tabColor": "#6A1B9A",
+      "tabTitle": "Codex runtime lane"
+    },
+    {
+      "guid": "{ca48cf62-5659-5717-b717-0d72bbd874ba}",
+      "name": "NativeStack2604 - Codex token lane",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec bash ~/.local/state/native-agent-stack/lanes/codex-lane.sh ~/.local/state/native-agent-stack/lanes/codex-token-lane.prompt.txt\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "tabColor": "#C62828",
+      "tabTitle": "Codex token lane"
+    },
+    {
+      "guid": "{4bd11567-6188-5300-bc92-f806830aeab2}",
+      "name": "NativeStack2604 - Codex trading lane",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec bash ~/.local/state/native-agent-stack/lanes/codex-lane.sh ~/.local/state/native-agent-stack/lanes/codex-trading-lane.prompt.txt\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "tabColor": "#EF6C00",
+      "tabTitle": "Codex trading lane"
     }
   ]
 }
