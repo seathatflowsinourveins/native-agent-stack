@@ -53,8 +53,13 @@ legacy `profile=` key is not a substitute.
 
 ## Check readiness, then execute
 
+On NativeStack2604, first complete both model-free checks in
+[2604 gateway preflights](README.md#2604-gateway-preflights). Every launch passes
+the explicit 21128 flag; the guarded reader remains a fallback.
+
 ```sh
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" --codex-home "$WORKER_CODEX_HOME" \
   --preflight --require-mcp context-mode \
   --timeout 60

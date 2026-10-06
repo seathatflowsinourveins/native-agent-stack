@@ -18,9 +18,9 @@
     "deepagents_prefix": "nas-deepagents-omniroute-",
     "claude_prefix": "nas-claude-runtime-sdk-",
     "suffix": "fresh UUID hex",
-    "deepagents_scope": "Separate main/specialist model instances, each holding its own tag; distinct conversations are not joined.",
+    "deepagents_scope": "Distinct configured main/specialist model tags held for each instance; effective replay isolation is unqualified.",
     "claude_scope": "One fresh standalone invocation through worker-scoped options.env.",
-    "gateway_scope": "Header groups conversation/reasoning replay and persists as call_logs.session_tag. Not a purely cosmetic label.",
+    "gateway_scope": "Header persists as call_logs.session_tag and can be a replay-key fallback after sessionAffinityKey. Distinct census tags alone do not guarantee disjoint replay scopes.",
     "counting": "Prefix attributes logged attempts; distinct DeepAgents model tags are not worker-invocation counts. No live logs inspected."
   },
   "checks": [
@@ -70,10 +70,19 @@
     "live_gateway_or_provider": "not_run",
     "native_bar_closure": "not_claimed"
   },
+  "source_review_correction": {
+    "date": "2026-10-06",
+    "reviewed_head": "aca1104d6c082cfb64f1babddecc906f2752c9cd",
+    "earlier_overclaim": "Distinct census tags guarantee separate reasoning-replay scopes; distinct conversations are not joined.",
+    "corrected_claim": "Only distinct configured tags and source-supported census attribution are established. Live delivery and effective replay isolation remain unqualified.",
+    "source": "diegosouzapw/OmniRoute@2f42a9ac19d1a247ec9ce5473b790843724b3061:open-sse/handlers/chatCore.ts:1093-1095;src/sse/services/sessionAffinityPin.ts:197-215",
+    "runtime_change": "None; header values and SDK options are unchanged. Original recorded outputs are retained."
+  },
   "retained_prior_evidence": "worker-gateway-defaults-20261006.json remains byte-identical at this fold; its historical observations, failed controls and warnings are not replaced by these checks.",
   "sanitization": "Summary output comes from actual returned native commands; task-private paths and random tag values are omitted. No credentials, private conversations or native session IDs are recorded.",
   "limits": [
     "Header source/persistence review is not an observed new live request.",
+    "Distinct configured census tags are not a proof of effective reasoning-replay isolation.",
     "Canonical endpoint changes require renewed default tests; model/profile/effort/provider/deployment acceptance remains separate.",
     "Original historical records and another owner's host configuration remain untouched."
   ]

@@ -21,17 +21,19 @@ Pass native readiness before dispatch, requiring Context Mode. Add
 selected skill in the private worker home; a new home with none installed has
 no skill requirement. Require Serena too when the task needs semantic navigation. Tell it other workers
 are present and that it must preserve their edits. Feed the task on stdin.
-The commands below use the guarded canonical topology default. For a worker
-revision without that reader, pass `--base-url http://127.0.0.1:21128/v1`
-explicitly:
+For every NativeStack2604 launch, pass `--base-url http://127.0.0.1:21128/v1`
+explicitly, including readiness checks. Before dispatch, complete both model-free
+checks in `examples/omniroute-codex-sdk/README.md`, "2604 gateway preflights".
 
 ```sh
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --preflight --require-mcp context-mode \
   --timeout 60 &&
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --timeout 600 \

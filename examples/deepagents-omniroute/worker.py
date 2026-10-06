@@ -69,7 +69,7 @@ def chat_model(api_key_env, base_url):
         api_key=os.environ[api_key_env],
         # langchain@026c3da2 base.py:1016,1467; OmniRoute@2f42a9ac
         # attemptLogging.ts:296-299 persists this native header as session_tag.
-        # Each model keeps its own conversation/reasoning-replay scope.
+        # Distinct census tags; effective reasoning-replay isolation is unqualified.
         default_headers={"X-OmniRoute-Session-Id": RUN_MARKER + "-" + uuid.uuid4().hex},
         use_responses_api=True,
         use_previous_response_id=False,

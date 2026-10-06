@@ -24,7 +24,7 @@ the package installation is the SDK's
 
 ```sh
 rtk uv lock --script examples/claude-runtime-sdk/worker.py --check
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway http://127.0.0.1:21128 --preflight
 ```
 
 Preflight makes no provider request. It reports selected options, package pin,
@@ -57,8 +57,9 @@ Each standalone invocation supplies a fresh
 [`ANTHROPIC_CUSTOM_HEADERS`](https://code.claude.com/docs/en/env-vars) environment
 interface and the pinned SDK's worker-scoped `options.env`. OmniRoute records it
 as [`call_logs.session_tag`](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/src/lib/usage/callLogs.ts#L741),
-filterable by the documented prefix. The header scopes gateway conversation and
-reasoning replay as well as attribution; a global shared tag is not used.
+filterable by the documented prefix. Distinct tags establish census attribution;
+effective replay isolation remains unqualified because the pinned gateway
+[`sessionAffinityKey` can outrank the marker](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/open-sse/handlers/chatCore.ts#L1093).
 Preflight reports only the prefix. Count logged attempts separately from native
 sessions or invocations; local option tests do not prove delivery or a live census.
 
@@ -99,6 +100,11 @@ Actual hook/MCP/plugin activation needs an observed worker run.
 
 ## Run, interrupt and recover
 
+Before dispatch on NativeStack2604, complete both
+[model-free gateway preflights](../omniroute-codex-sdk/README.md#2604-gateway-preflights).
+Every invocation, including this bridge's preflight, explicitly passes
+`--gateway http://127.0.0.1:21128`; its Anthropic transport adds `/v1/messages`.
+
 Supply a prompt on stdin and an isolated owned cwd. A run contains one native
 SDK query and no retries. The native client handles additional model/tool turns.
 The runner observes the first native result, so independent background jobs need
@@ -106,6 +112,7 @@ their own completion and usage qualification.
 
 ```sh
 rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py \
+  --gateway http://127.0.0.1:21128 \
   --cwd "$WORKER_CHECKOUT" --setting-source project \
   --skill search-first --allow-tool Read --timeout 180 \
   --result-output "$PRIVATE_RUN/returned.txt" < "$PRIVATE_RUN/prompt.txt"
@@ -157,7 +164,7 @@ wrong-family, token-binding, missing-result, cancellation and cumulative-snapsho
 are not unchanged upstream tests or live provider evidence.
 
 ```sh
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway http://127.0.0.1:21128 --preflight
 rtk uv run --with claude-agent-sdk==0.2.162 \
   python -m unittest discover -s examples/claude-runtime-sdk/tests -v
 rtk uv run --with claude-agent-sdk==0.2.162 \

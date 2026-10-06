@@ -12,14 +12,14 @@ canonical install-plan topology assigns NativeStack2604's gateway to
 select the other distribution's service. This fix serves the north-star action
 of routing bounded foundation/trading engineering jobs to their intended host.
 
-Both standalone Python examples read the checked-out plan's nonsecret
+All three standalone Python examples read the checked-out plan's nonsecret
 `config/gpt-gateway-topology.json` field `gateway.endpoint`, which is already
 present on main at ecfa11276. A46's checked-out reader and the Promptfoo endpoint
 reader are source proposals in open draft #723 at 84c79f7f. This implementation
 reads main's canonical data directly. Missing, malformed or legacy-20128/20129
 topology defaults fall back to 21128. The candidate
 uses the Codex worker's existing port-qualified HTTP loopback `/v1` contract.
-Explicit `--base-url` overrides retain their existing behavior. DeepAgents'
+Explicit endpoint overrides retain their existing behavior. DeepAgents'
 configuration description reports the selected default as its underlying lane.
 
 The alternative was replacing the two literals alone. Reading the canonical
@@ -27,9 +27,10 @@ field keeps future approved topology changes in one place while retaining a
 portable fallback for copies of the examples without that asset. Topology path
 lookup occurs inside the guarded default reader, so a shallow copy such as
 `/worker.py` also reaches the fallback. The skill's commands use that guarded
-default. Jobs using older worker revisions without the reader explicitly pass
-21128, as the command center requested. The two example README descriptions
-use the same revision-based condition.
+default. Every NativeStack2604 invocation explicitly passes its 21128 flag,
+regardless of reader revision, and both model-free gateway preflights precede
+dispatch. Current skill/README commands follow that rule; Claude uses its native
+Anthropic-root `--gateway` flag. The reader remains a fallback.
 Historical trial plans and receipts keep their original addresses.
 
 At the initial reviewed head 1942acb12, four fixture tests executed the actual Codex argument parser and DeepAgents
@@ -79,13 +80,20 @@ Claude SDK bridge. LangChain `default_headers` and Claude's official
 `ANTHROPIC_CUSTOM_HEADERS` through SDK `options.env` send the gateway-native
 `X-OmniRoute-Session-Id`. Prefixes `nas-deepagents-omniroute-` and
 `nas-claude-runtime-sdk-` plus fresh UUID hex fit the pinned gateway's 128-character
-cap and persist as `call_logs.session_tag`. This header also scopes conversation
-and reasoning replay. A first local fixture expected both DeepAgents models to
-share a tag; pinned gateway source refuted the assumption that tagging was
-cosmetic, so the final change gives each model a distinct tag. Each model keeps
-its own tag for its instance; Claude keeps one fresh invocation tag. Stable
-global tags and arbitrary unpersisted headers were rejected. Distinct model tags
-and call attempts are not worker-invocation counts.
+cap and persist as `call_logs.session_tag`. Each DeepAgents model keeps its own
+configured census tag; Claude keeps one fresh invocation tag. Stable global tags
+and arbitrary unpersisted headers were rejected. Distinct model tags and call
+attempts are not worker-invocation counts.
+
+Review correction, 2026-10-06: the earlier inference that distinct census tags
+guarantee separate reasoning-replay scopes was too strong. At the pinned gateway,
+`reasoningReplaySessionKey` uses `sessionAffinityKey` before the marker fallback;
+the affinity selector recognizes other session headers or body/input-derived
+keys. Narrow the claim to distinct configured tags and source-supported census
+attribution. Effective replay isolation and live delivery remain unqualified;
+no affinity header or routing behavior is added. Original fixture outputs and
+failed attempts remain recorded. The earlier shared-tag fixture was superseded
+for marker uniqueness; it was never a native proof of replay isolation.
 
 Eight current synthetic configuration checks and all 26 existing repository
 Claude SDK integration cases pass. The native upstream wheel is installed only
@@ -113,4 +121,4 @@ Sources:
 - [Pinned DeepAgents API](https://github.com/langchain-ai/deepagents/tree/4394bcd00b8eb46e7c423939643a0dfcfb5d8773) and [LangChain OpenAI base_url](https://github.com/langchain-ai/langchain/blob/026c3da2b615abe52f8446e37de460b844d07a43/libs/partners/openai/langchain_openai/chat_models/base.py) remain the example's supported runtime APIs.
 - `langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py:1016,1464-1468` supports request default headers.
 - `anthropics/claude-agent-sdk-python@f2204bb956bab02907aaf3cb88eb9dead28eaa35:src/claude_agent_sdk/types.py:2124-2127;_internal/transport/subprocess_cli.py:819-825` passes worker-scoped environment. [Official Claude header interface](https://code.claude.com/docs/en/env-vars), read 2026-10-06.
-- `diegosouzapw/OmniRoute@2f42a9ac19d1a247ec9ce5473b790843724b3061:open-sse/services/conversationTracker.ts:453,462-468;open-sse/handlers/chatCore.ts:1082-1095,1127-1133;src/lib/usage/callLogs.ts:741,804-821,995-996` defines header scope, persistence and filtering. [UUID generation](https://docs.python.org/3.13/library/uuid.html#uuid.uuid4) supplies distinct identifiers without credential or path content.
+- `diegosouzapw/OmniRoute@2f42a9ac19d1a247ec9ce5473b790843724b3061:open-sse/services/conversationTracker.ts:453,462-468;open-sse/handlers/chatCore.ts:1082-1095,1127-1133;src/lib/usage/callLogs.ts:741,804-821,995-996` defines marker handling, persistence and filtering; `src/sse/services/sessionAffinityPin.ts:197-215` plus `chatCore.ts:1093-1095` refute guaranteed replay isolation from those tags. [UUID generation](https://docs.python.org/3.13/library/uuid.html#uuid.uuid4) supplies distinct identifiers without credential or path content.

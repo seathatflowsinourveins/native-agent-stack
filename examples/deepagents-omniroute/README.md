@@ -27,9 +27,10 @@ provider execution or promote this candidate to a default.
   seconds and zero retries. The caller supplies an existing credential through
   an environment-variable name; the recipe does not copy native client sign-ins.
   WSL distributions share networking; implicit defaults avoid NativeStack's
-  ports 20128 and 20129. Workers with the topology reader use the canonical
-  default. For an older revision, explicitly pass
-  `--base-url http://127.0.0.1:21128/v1`.
+  ports 20128 and 20129. Every NativeStack2604 invocation explicitly passes
+  `--base-url http://127.0.0.1:21128/v1`, regardless of worker revision.
+  Complete both [model-free gateway preflights](../omniroute-codex-sdk/README.md#2604-gateway-preflights)
+  before dispatch.
 - SQLite checkpoint package **3.1.1**, [matched release source `b2926a0f`](https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite).
   The published wheel SHA-256 is
   `8505c54c94a658080525d7e6780fdd4e0c078ff2566b30d399c02cc9f9af1c63`;
@@ -41,9 +42,10 @@ Each model sends `X-OmniRoute-Session-Id: nas-deepagents-omniroute-<UUID hex>`
 through LangChain's pinned `default_headers` interface. The main model and
 specialist keep distinct fresh tags, held for each model instance. OmniRoute's
 [`session_tag` persistence](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/src/lib/usage/callLogs.ts#L741)
-and prefix filter at :995-996 support census attribution. This header also scopes
-gateway conversation/reasoning replay; sharing a tag between those conversations
-was rejected. Count attempts and distinct model tags separately from worker
+and prefix filter at :995-996 support census attribution. Distinct tags do not
+guarantee distinct effective reasoning-replay keys: the pinned
+[`sessionAffinityKey` takes priority](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/open-sse/handlers/chatCore.ts#L1093).
+Replay isolation remains unqualified. Count attempts and distinct model tags separately from worker
 invocations. `--describe` reports the prefix, not a live request or census result.
 
 The main worker and named `source-reviewer` each receive their own configured
@@ -71,6 +73,7 @@ rtk uv venv --python 3.13 "$TRIAL_STATE/integration-venv"
 rtk uv pip sync --python "$TRIAL_PYTHON" --require-hashes "$RECIPE/requirements.lock"
 rtk uv pip check --python "$TRIAL_PYTHON"
 rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --workspace "$WORKSPACE" \
+  --base-url http://127.0.0.1:21128/v1 \
   --checkpoint "$CHECKPOINT" --thread-id research-trial \
   --skill /skills --api-key-env OMNIROUTE_WORKER_API_KEY --describe
 ```
@@ -79,14 +82,15 @@ rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --workspace "$WORKSPACE" \
 no graph execution, authentication check or provider call. Before an authorized
 trial, supply the existing child credential under `OMNIROUTE_WORKER_API_KEY`
 without logging its value and prepare the frozen task and source files.
-For the independently observed trial, pass the coordinator's owned reverse
-observer endpoint explicitly with `--base-url http://127.0.0.1:25371/v1` to both
-description and execution. Description prints that actual endpoint separately
+The retained historical trial used the coordinator's owned reverse observer at
+`http://127.0.0.1:25371/v1` for description and execution. The current 2604 commands
+target 21128 explicitly. Description prints the selected endpoint separately
 from the retained underlying lane; it does not verify provider identity.
 
 ```sh
 rtk timeout --signal=TERM --kill-after=5s 600s "$TRIAL_PYTHON" \
   "$RECIPE/worker.py" --workspace "$WORKSPACE" --checkpoint "$CHECKPOINT" \
+  --base-url http://127.0.0.1:21128/v1 \
   --thread-id research-trial --skill /skills \
   --api-key-env OMNIROUTE_WORKER_API_KEY --prompt-file "$PROMPT_FILE"
 ```
