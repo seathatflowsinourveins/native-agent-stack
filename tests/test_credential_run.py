@@ -38,7 +38,7 @@ import set_credential as writer  # noqa: E402
 
 INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily",
                   "claude-oauth-token", "canary-e2e"}
-NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
+NOT_INJECTABLE_IDS = ("grafana-admin", "grafana-admin-generic", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
                       "github-actions")
 MARK = b"[REDACTED:TAVILY_API_KEY]"
@@ -510,8 +510,11 @@ class RefusalTests(RunnerCase):
                 result = self.run_tool(held, *child)
                 self.assertEqual(result.returncode, 1, result.stderr)
                 self.assertIn(f"credential_run: {held}: refused: not_injectable".encode(), result.stderr)
-        # The hint names the engine or native client that holds the key.
-        self.assertIn(b"observability/backends/configure.py", self.run_tool("grafana-admin", *child).stderr)
+        selected = self.run_tool("grafana-admin", *child).stderr
+        self.assertIn(b"generated and held by its own service", selected)
+        self.assertNotIn(b"observability/backends/configure.py", selected)
+        # Only the generic deployment claims this producer; both IDs remain non-injectable.
+        self.assertIn(b"observability/backends/configure.py", self.run_tool("grafana-admin-generic", *child).stderr)
         self.assertIn(b"(claude)", self.run_tool("claude-native", *child).stderr)
         self.assertIn(b"GitHub Actions", self.run_tool("github-actions", *child).stderr)
         self.assertFalse(marker.exists(), "a refused run started its command")

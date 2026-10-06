@@ -426,8 +426,10 @@ GitHub-hosted macOS runner; see
    - **guard hooks**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
      to `~/.claude/hooks/effort-default-guard.py` and the secret guard
      [`scripts/hooks/secret_path_guard.py`](../scripts/hooks/secret_path_guard.py)
-     to `~/.claude/hooks/secret_path_guard.py` (the secret guard and its
-     settings entries were added after `v2026.09.24.1`). This step **changed after `v2026.09.26.2`**:
+      to `~/.claude/hooks/secret_path_guard.py` (the secret guard and its
+      settings entries were added after `v2026.09.24.1`). The secret guard checksum in
+      `adoption/hooks/claude/SHA256SUMS` changed after `v2026.10.05.1` for the selected service-store path coverage.
+      This step **changed after `v2026.09.26.2`**:
      it also copies [`adoption/hooks/claude/token-lanes-subagent-start.py`](hooks/claude/token-lanes-subagent-start.py)
      and its sibling [`adoption/hooks/claude/token-lanes-block.md`](hooks/claude/token-lanes-block.md)
      with the five role blocks `adoption/hooks/claude/token-lanes-block.<role>.md`
