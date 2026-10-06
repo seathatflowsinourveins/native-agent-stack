@@ -560,7 +560,7 @@
       "role": "Native authenticated model discovery and revision-pinned downloads",
       "commands": [
         "hf --version",
-        "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json"
+        "hf download nvidia/Nemotron-3-Embed-8B-BF16 --revision d1f2f25730bbd775b99b29185134bc86653bf2d1 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2"
       ],
       "evidence_ids": [
         "component-history",
@@ -573,7 +573,8 @@
         "https://github.com/huggingface/huggingface_hub"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Revision-pinned shared NativeStack2604 8B model recipe; metadata/source correction only. Historical model receipts retain their original tested versions and inputs."
     },
     {
       "id": "markitdown",
@@ -1038,14 +1039,23 @@
     {
       "id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
-      "version": "0.30.0",
+      "version": "0.31.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native GPU serving for pinned recent local embeddings",
       "commands": [
-        "vllm serve \"${MODEL_DIRECTORY}\" --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests"
+        "vllm serve \"${MODEL_DIRECTORY}\" --served-model-name nvidia/Nemotron-3-Embed-8B-BF16 --host 127.0.0.1 --port 28231 --max-model-len 8192 --max-num-seqs 4 --gpu-memory-utilization 0.62 --enforce-eager --no-enable-log-requests"
       ],
       "evidence_ids": [
+        "ns2604-local-models-rulings-20261006"
+      ],
+      "upstream_sources": [
+        "https://github.com/vllm-project/vllm",
+        "https://github.com/vllm-project/vllm/releases/tag/v0.31.0"
+      ],
+      "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "freshness": "2026-10-06 CC pin record names 0.31.0, released 2026-10-05, as the current NativeStack2604 serving runtime; this PR records source selection and repeats no native acceptance.",
+      "historical_evidence_ids": [
         "native-rag",
         "vllm-compatibility",
         "desktop-direct-rag",
@@ -1059,11 +1069,7 @@
         "claude-repository-evidence-20260921",
         "vllm-030-switch-20260925"
       ],
-      "upstream_sources": [
-        "https://github.com/vllm-project/vllm"
-      ],
-      "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
-      "freshness": "0.30.0 serves production embeddings on the WSL2 RTX 4090 host since 2026-09-25 after an owned-instance qualification against 0.25.0 (identical embeddings and code-index results); 0.30.0 carries the WSL pinned-memory fallback that 0.29.0 lacked and closes GHSA-25q3-v2hm-8vpf and GHSA-5fj9-pfhr-6j48. 0.25.0 is kept for rollback."
+      "command_scope": "NativeStack2604 selected shared 8B text endpoint. Historical evidence_ids are retained separately; the new documentary receipt is source_review."
     },
     {
       "id": "worktrunk",
@@ -2095,69 +2101,19 @@
       "distribution": "Hosted; no local weights or CI calls"
     },
     {
-      "id": "nvidia/Nemotron-3-Embed-1B-BF16",
-      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "id": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
       "release_date": "2026-07-16",
       "license": "OpenMDW-1.1",
       "runtime": "vllm",
       "query_prefix": "query: ",
       "document_prefix": "passage: ",
-      "dimensions": 2048,
+      "dimensions": 4096,
       "evidence_ids": [
-        "native-rag",
-        "hf-memory-models-20260921"
-      ]
-    },
-    {
-      "id": "unsloth/Qwen3.8-27B-GGUF",
-      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
-      "license": "Apache-2.0",
-      "runtime": "llama-cpp",
-      "runtime_version": "b11146 (0.5.0-dev, commit 7fe450e19305b828c199d602c23a8337aaa1f03b)",
-      "quantization": "UD-Q4_K_M",
-      "file": "Qwen3.8-27B-UD-Q4_K_M.gguf",
-      "file_bytes": 16464440224,
-      "base_model": "Qwen/Qwen3.8-27B",
-      "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
-      "file_sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
-      "serving_profile": {
-        "id": "li26-c2",
-        "host": "nativestack-5975wx-20260925",
-        "unit": "nativestack-generation.service with the drop-in li26-c2-serving-profile.conf",
-        "flags": [
-          "--gpu-layers 99",
-          "--n-cpu-ffn 20",
-          "--spec-type draft-mtp",
-          "--spec-draft-n-max 3",
-          "--ctx-size 8192",
-          "--parallel 1",
-          "--fit off",
-          "--threads 16",
-          "--threads-batch 24",
-          "--batch-size 512",
-          "--ubatch-size 128",
-          "--sleep-idle-seconds 600"
-        ],
-        "changed_from": "C0: --gpu-layers 36 with no --n-cpu-ffn and no MTP drafting; the base unit keeps it, so removing the drop-in restores it",
-        "selected_by": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json"
-      },
-      "note": "Corrected on 2026-09-26 to the artifact production serves: the path was read from the unit's ExecStart and the file hashed. This replaces the ggml-org/Qwen3.8-27B-GGUF Q4_K_M entry at efbb3b1f70a21d97fd4495240648405f7228554f (file sha256 c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747), the 2026-09-20 trial file of native-gpu-patch-20260920, which production does not serve. The llama-cpp component pin stays b11057 (0.4.1-dev), while production runs b11146.",
-      "evidence_ids": [
-        "local-inference-c2-serving-switch-20260926"
-      ]
-    },
-    {
-      "id": "sentence-transformers/all-MiniLM-L6-v2",
-      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-      "license": "Apache-2.0",
-      "runtime": "ai-memory",
-      "dimensions": 384,
-      "role": "Supported symmetric memory baseline, not latest SOTA",
-      "distribution": "Three files pinned by upstream ai-memory loader; other repository formats are not installed",
-      "evidence_ids": [
-        "native-memory-rag-alignment-20260921",
-        "hf-memory-models-20260921"
-      ]
+        "ns2604-local-models-rulings-20261006"
+      ],
+      "runtime_version": "0.31.0",
+      "scope": "NativeStack2604 shared text endpoint; historical 1B receipt provenance is preserved in the dated supersession record."
     },
     {
       "id": "claude-fable-5-1",
