@@ -72,20 +72,13 @@ IGNORE_SCOPES = {
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock, relocked onto PyJWT 2.14.0 and then, on 2026-09-30, onto urllib3 2.8.0 and PyJWT 2.15.0 and onto litellm 1.93.2. Its
-    # receipt carries the 2026-09-29 oauthlib review forward at this sha256 (those relocks change only the urllib3, PyJWT and litellm
-    # entries); the relock onto oauthlib 4.0.0 deletes this entry in the same change.
+    # Live recipe lock; the 2026-10-05 relock changes only fsspec and multidict
+    # and carries the existing oauthlib review forward at the new exact digest.
+    # No fsspec ignore is granted; moving oauthlib to 4.0.0 removes this entry.
     "blueprints/runtime-workers/openhands/requirements.lock": {
         "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
-        "evidence": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
-    },
-    # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
-    # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.
-    "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock": {
-        "advisories": ["GHSA-8mgp-746c-j5xp", "GHSA-h35f-9h28-mq5c", "GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
-        "evidence": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+        "sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
+        "evidence": "evidence/receipts/osv-openhands-fsspec-relock-20261005.json",
     },
 }
 # A dated exception for one frozen artifact is not a repo-wide ignore: OSV-Scanner 2.6.0 applies an explicit --config to every input of its
@@ -97,9 +90,9 @@ FROZEN_LOCKS = {
     # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
     "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
         "config": FROZEN_CONFIG,
-        "advisories": ["GHSA-vcvr-r3jv-pc5j"],
+        "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q", "GHSA-wq5f-xc86-pv6w"],
         "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
-        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
+        "evidence": "evidence/receipts/sharp-0355-qualification-20261006.json",
     },
 }
 

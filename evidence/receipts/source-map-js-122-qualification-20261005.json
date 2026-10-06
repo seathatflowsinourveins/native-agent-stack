@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "record": "Targeted source-map-js production lock relock and bounded frontend qualification",
+  "evidence_class": "local_integration",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "authorization": "J-FSSPEC A19/A20 and extension2, same PR; frozen artifacts unchanged",
+  "lock": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+  "before_sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
+  "after_sha256": "e31f7b3cc3336fa0424cfed0f63c11a8d7d448e7f1f8e20f82094434187f3cfd",
+  "moved_pins": [
+    {
+      "package": "source-map-js",
+      "before": "1.2.1",
+      "after": "1.2.2",
+      "advisory": "GHSA-68fv-2mgg-jv7q"
+    }
+  ],
+  "metadata_review": {
+    "evidence_class": "source_review",
+    "records": 109,
+    "manager_records": 15,
+    "application_records": 94,
+    "request_errors": 0,
+    "parents": [
+      {
+        "package": "postcss",
+        "version": "8.5.23",
+        "range": "^1.2.1",
+        "allows_fixed": true,
+        "source": "https://registry.npmjs.org/postcss/8.5.23"
+      }
+    ],
+    "parser": "native npm semver7.8.5",
+    "manager_document_unchanged": true,
+    "importers_unchanged": true,
+    "limits": "Derived inventory/source review, not native install or browser/API acceptance"
+  },
+  "native_client": {
+    "node": "24.21.0",
+    "corepack": "0.36.0",
+    "pnpm": "12.4.2",
+    "isolated_job_cache_store_state": true
+  },
+  "commands": [
+    {
+      "command": "pnpm update source-map-js --no-save --lockfile-only --ignore-scripts --store-dir <owned-store> --state-dir <owned-state>",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.update.txt",
+        "sha256": "e5231b332c2dd0c7cf51e99ea5fb3d2324ad66655ea9d0c6fd02b80d03a3bfec",
+        "bytes": 162
+      }
+    },
+    {
+      "command": "pnpm install --frozen-lockfile --ignore-scripts --store-dir <owned-store> --state-dir <owned-state>",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.install.txt",
+        "sha256": "bca4edfcd2dcebf76a05d5ef258653d0b9edce7cf9f30671d25487208abe8020",
+        "bytes": 999
+      }
+    },
+    {
+      "command": "pnpm peers check",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.peers.txt",
+        "sha256": "5ecf82a3fc1f9007eeea79ce3bf0d9c587150219ef245bb5a5a23609cdb562fb",
+        "bytes": 32
+      }
+    },
+    {
+      "command": "pnpm typecheck",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.typecheck.txt",
+        "sha256": "99d7c2179cdd316467c51f37901025a0753453664d741214ba56fc631fa6c0bc",
+        "bytes": 90
+      }
+    },
+    {
+      "command": "NEXT_TELEMETRY_DISABLED=1 pnpm build",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.build.txt",
+        "sha256": "7faa2f64f42e23d9ac4c076bcb1c56637268da80edd67cee4bf29e16997d155a",
+        "bytes": 663
+      }
+    }
+  ],
+  "release_integrity": "sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==",
+  "sources": [
+    "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+    "https://registry.npmjs.org/source-map-js/1.2.2",
+    "https://pnpm.io/cli/update",
+    "pnpm/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4:pnpm/crates/cli/src/cli_args/update.rs:110,136,151",
+    "native-agent-stack@798ac445307e2cd8eba6e74d7722ac0e16da02c7:evidence/receipts/nextjs-1638-qualification-20261001.json:141,154,167,180",
+    "native-agent-stack@c96c2555c2d84683d9e519623354c814aeb6a584:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:50-56"
+  ],
+  "osv": {
+    "before_extension2_ordinary_exit": 1,
+    "before_extension2_packages": 5,
+    "after_rulings_ordinary_exit": 0,
+    "after_rulings_frozen_exit": 0,
+    "limits": "Whole-inventory native local execution, not hosted acceptance"
+  },
+  "limits": "Bounded #587 frontend qualification. No full PostgreSQL/API/browser rerun, shared database, provider/model request or deployment. No other package/version or package.json change.",
+  "overturn": "Any additional pin, changed project prerequisites, failed qualification or fresh scan finding reopens acceptance.",
+  "output_sanitization": "Known private interpreter/worktree/store paths replaced by explicit placeholders. Terminal carriage returns and trailing progress-line spaces normalized; text and command outcomes preserved. This is captured output, not another run."
+}

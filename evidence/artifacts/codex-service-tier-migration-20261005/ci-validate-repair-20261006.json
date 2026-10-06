@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "ci-validation-repair",
+  "date": "2026-10-06",
+  "pull_request": 752,
+  "source_head": "d2f6d8c3de42226cf37fea5b145bfae73f867482",
+  "base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "evidence_classes": ["source_review", "local_integration", "structural_validation", "independent_ci_observation"],
+  "cause": {
+    "owner": "PR #752",
+    "changed_input": "adoption/platforms/linux-wsl2-new-distro.md",
+    "change_commit": "8c1cfd39",
+    "change_lines": "1044-1047",
+    "recorded_and_base_sha256": "4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe",
+    "current_sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec",
+    "changed_provenance_inputs": 1,
+    "total_provenance_inputs": 38,
+    "description": "Migration prose changed a hashed generator input while both handbook outputs and their receipt retained the base digest. The Markdown-first error does not imply the JSON was current: both outputs are stale.",
+    "not_inherited_from_main": true,
+    "osv_is_a_separate_job": true
+  },
+  "sources": [
+    "native-agent-stack@d2f6d8c3de42226cf37fea5b145bfae73f867482:scripts/build_new_wsl_handbook.py:189-190,693,1196-1199,1209-1242",
+    "native-agent-stack@d2f6d8c3de42226cf37fea5b145bfae73f867482:tests/test_new_wsl_handbook.py:1440-1457",
+    "native-agent-stack@d2f6d8c3de42226cf37fea5b145bfae73f867482:.github/workflows/validate.yml:235-240",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:docs/lanes.md:96-128"
+  ],
+  "ci_failure": {
+    "class": "independent_ci_observation",
+    "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37401702955",
+    "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37401702955/job/112071390644",
+    "step": "Test validation failure modes",
+    "started_at": "2026-10-06T02:03:25Z",
+    "completed_at": "2026-10-06T02:32:04Z",
+    "python": "3.12.3",
+    "tests": 11365,
+    "seconds": 1712.983,
+    "failures": 1,
+    "skipped": 1026,
+    "sanitized_excerpt": "FAIL: test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them (tests.test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them)\nFile <checkout>/tests/test_new_wsl_handbook.py, line 1443\nself.assertEqual(result.returncode, 0, result.stderr)\nAssertionError: 1 != 0 : new-wsl-handbook: stale generated output: docs/new-wsl-handbook.md; run --write\nRan 11365 tests in 1712.983s\nFAILED (failures=1, skipped=1026)",
+    "sanitization": "Runner checkout path replaced with <checkout>; unrelated logs omitted. No credential values included."
+  },
+  "local_frozen_baseline": {
+    "class": "local_integration",
+    "source_head": "d2f6d8c3de42226cf37fea5b145bfae73f867482",
+    "command": "set -o pipefail\nmkdir -p \"$RUNNER_TEMP/suite\"\ntimeout --signal=ABRT --kill-after=60s 55m \\\n  python3 -m unittest -v --durations 50 2>&1 | tee \"$RUNNER_TEMP/suite/unittest-verbose.log\"",
+    "wrapper": "nice -n 19; PYTHONFAULTHANDLER=1; private external-cache RUNNER_TEMP/TMPDIR; PYTHONDONTWRITEBYTECODE=1",
+    "python": "3.13.16",
+    "exit": 1,
+    "tests": 10361,
+    "seconds": 2296.544,
+    "failures": 19,
+    "errors": 18,
+    "skipped": 905,
+    "targeted_failure_reproduced": true,
+    "limits": "Exact workflow run command on the native interpreter, not the GitHub runner environment. Full raw output retained privately; inputs stayed frozen until completion. This is not a green full-suite or upstream acceptance claim.",
+    "additional_native_findings": [
+      "All 18 import/error diagnostics report missing exchange_calendars in the native interpreter. Hosted CI did not report these import errors and has its own requirements-install step. No claim that requirements-ci.txt directly declares this dependency; retain the native environment gap separately from this generated-artifact repair.",
+      "Five credential-mutation failures reject the pristine child; selected driver prefers an installed adaptive-paper interpreter. Retain actual native baseline failure rather than call it a killed mutation.",
+      "Bootstrap/launchd fake-PATH stderr reports missing dirname. Installed Bash 5.3.9 rejects cd -- empty-path (exit 1); incomplete fixtures differ from hosted CI behavior. Selected scripts/tests are unchanged from PR base.",
+      "Containment fixture parsed running into its TasksCurrent slot from unlabelled show --value output; this is not a demonstrated runtime-limit failure. Positional property ordering, probe/default/override seams require the foundation runtime owner's follow-up (tests/test_adoption_guarded_runners.py:410-411,445-450).",
+      "Token export/canary fixtures and the installed-client auth_storage_failure notification coverage also fail locally. Preserve these native portability/installed-client findings for their owners; no unrelated gate is disabled here."
+    ]
+  },
+  "local_discriminating_control": {
+    "command": "python3 scripts/build_new_wsl_handbook.py --check",
+    "before_exit": 1,
+    "before_error": "new-wsl-handbook: stale generated output: docs/new-wsl-handbook.md; run --write",
+    "after_exit": 0,
+    "after_returned": {"status": "passed", "outputs": {"docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda", "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7"}}
+  },
+  "native_regeneration": {
+    "command": "nice -n 19 python3 scripts/build_new_wsl_handbook.py --write",
+    "exit": 0,
+    "returned": {"status": "written", "outputs": {"docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda", "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7"}},
+    "output_delta": "Only the distro-guide provenance hash in both outputs. Builder, tests, profile, client configuration and runtime code unchanged."
+  },
+  "focused_checks": {
+    "command": "nice -n 19 python3 -m unittest -v tests.test_new_wsl_handbook",
+    "exit": 0,
+    "tests": 76,
+    "seconds": 32.202,
+    "returned_summary": "Ran 76 tests in 32.202s\nOK"
+  },
+  "independent_source_review": {
+    "class": "source_review",
+    "description": "Independent reader verified the base/input/blob attribution and existing native regeneration route without running tests or editing files.",
+    "next_sweep": "Carry the inherited native dependency, fake-PATH, containment, export-canary and installed-client notification findings to their layer owners separately."
+  },
+  "limits": [
+    "Native local green proves the handbook repair, not recovery of the full native suite or OSV.",
+    "New-head GitHub validate result is observed after push and reported separately; no predeclared CI success.",
+    "No host configuration apply, merge, provider or whole-stack readiness claim."
+  ]
+}

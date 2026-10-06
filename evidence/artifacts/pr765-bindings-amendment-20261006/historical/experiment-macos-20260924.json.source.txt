@@ -1,0 +1,710 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Re-qualify the typed run-ledger application on the Mac at the 2026-09-24 catalog pins (uv 0.12.18, pnpm 12.6.0) after the pin bumps left the Mac application-slice gate unverified. Observed failure: the blueprint's packageManager pnpm@12.4.2 and the lockfile's package-manager section make pnpm run 12.4.2 in the project regardless of the global 12.6.0, so the frozen blueprint cannot qualify 12.6.0 unchanged.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/vercel/next.js/tree/ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "revision": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9"
+    },
+    {
+      "url": "https://github.com/react/react/tree/1d34f91dfde6bba84d08b683aaba164c7194dacb",
+      "revision": "1d34f91dfde6bba84d08b683aaba164c7194dacb"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/tree/95f8322ee1dcda7ceace7b1c4f6c9915b36d748f",
+      "revision": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f"
+    },
+    {
+      "url": "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2",
+      "revision": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f"
+    },
+    {
+      "url": "https://github.com/pnpm/pnpm/tree/a959dceda501e552dbb03bbab19ab5e060718fde",
+      "revision": "a959dceda501e552dbb03bbab19ab5e060718fde"
+    }
+  ],
+  "discovery_provenance": [
+    "agent-ecosystem acceptance.json listed the Mac application-slice gate as unverified after the 2026-09-24 pin bumps (uv 0.12.18, ty 0.0.83, pnpm 12.6.0)."
+  ],
+  "license_and_compatibility": "Next/React/FastAPI MIT; PostgreSQL License. Dependency licenses and compatible TypeScript5.9.3 generator pin are retained in source review and native locks. No global upgrade. pnpm is MIT (official v12.6.0 release, verified tag). The variant changes only pnpm's own pin; every project dependency and its lock entry is byte-identical to the frozen blueprint.",
+  "baseline_and_candidate": {
+    "baseline": "2026-09-20 frozen blueprint qualification (experiment.json): pnpm 12.4.2, uv 0.12.17",
+    "candidate": "The same frozen blueprint with only the pnpm self-pin raised to 12.6.0 (retained variant package.json and pnpm-lock.yaml), uv 0.12.18"
+  },
+  "frozen_inputs": {
+    "base_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+    "tasks": [
+      "run-ledger"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/application-delivery/backend/app.py",
+        "sha256": "0dbd2f601405cb670b7f2d3bb944aef362333d44b07374e9b00e698c87ee1ff4"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/app/page.tsx",
+        "sha256": "690e4b1f75242a41101d391c66bd96ead09aa2ba30ea541533fb51bffac4ef15"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/migrations/versions/0001_run_ledger.py",
+        "sha256": "ee4bc7d75e19f704d333f9cae23886456ad0bf265f3a526472a28224a6bc3d03"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/uv.lock",
+        "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
+      },
+      {
+        "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+        "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
+        "sha256": "a8ac3edea74e51294f8359a201d94cc963348dbc24ddd2faecf2e04a3ec9e29e"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/Makefile",
+        "sha256": "799c61469b98dddbc20870b6166737312968a97ddf16aa6ed3e7d50104278e80"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/serve.py",
+        "sha256": "bba1f9655cce0b412257fbd0c40680b6b0ccc0ecffb91a2f3605323491655aed"
+      },
+      {
+        "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+        "sha256": "02becfe07513621c35367d1cd703d2ba2fb5965eb6b719790e040a0a70295ddc"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/application-delivery/backend/test_api.py",
+        "sha256": "404cef6a7ba380a331ee15dc7a9414756d84f12456f67c34982d5d8968ea813e"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts",
+        "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/verify_schema.py",
+        "sha256": "d1e8a5df945bc207fd5d1707f59eba12b9c5e22dde7cfc2b7d340ee109130c1b"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Invalid requests and stale writes rejected; audit failure rolls back state; migration idempotent; typed production UI creates/updates; exact saved row survives PostgreSQL and app restart. The run uses pnpm 12.6.0 with the project lock section byte-identical to the frozen blueprint.",
+    "usage_rule": "No model invocation by qualification commands; each run records observed zeros. The coordinating Claude session's usage is unknown and excluded; no efficiency claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Darwin 25.5.0 arm64",
+    "tools": [
+      {
+        "name": "python",
+        "version": "3.14.7"
+      },
+      {
+        "name": "node",
+        "version": "24.21.0"
+      },
+      {
+        "name": "pnpm",
+        "version": "12.6.0"
+      },
+      {
+        "name": "uv",
+        "version": "0.12.18"
+      },
+      {
+        "name": "next",
+        "version": "16.3.5"
+      },
+      {
+        "name": "react",
+        "version": "19.3.0"
+      },
+      {
+        "name": "fastapi",
+        "version": "0.141.1"
+      },
+      {
+        "name": "postgresql",
+        "version": "18.6"
+      },
+      {
+        "name": "typescript",
+        "version": "5.9.3"
+      },
+      {
+        "name": "playwright_test",
+        "version": "1.63.0"
+      },
+      {
+        "name": "playwright_cli",
+        "version": "0.1.21"
+      },
+      {
+        "name": "chrome",
+        "version": "153.0.8010.53"
+      }
+    ],
+    "isolation": "Scratch copy of the blueprint at the source revision plus the two retained variant files, in a task scratch directory; project-local locks, environments and native PostgreSQL under .runtime; dedicated ledger_test database; loopback-only owned processes; disposable test browsers. Sandbox-scope attempts ran inside the Claude Code Bash sandbox; native-scope attempts ran unsandboxed in the user shell."
+  },
+  "commands": [
+    "make setup",
+    "pnpm install --lockfile-only --ignore-scripts --store-dir .runtime/pnpm-store",
+    "make postgres-install",
+    "make postgres-init; make postgres-start; make postgres-databases",
+    "make migrate; make migrate; make migrate-test",
+    "make verify",
+    "PostgreSQL stop/start and API/Next restart with exact-record comparison; Alembic upgrade/downgrade/re-upgrade on a new empty fixture database",
+    "playwright-cli -s=<isolated session> open http://127.0.0.1:18080 --browser=chrome; fill; click; select; console; screenshot; close",
+    "make postgres-stop; confirm no listener on 15432/18080/18081 and no owned process"
+  ],
+  "observations": [
+    {
+      "id": "macos-20260924-sandbox-01",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 typed run-ledger commands inside the Claude Code Bash sandbox",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-sandbox-02",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 typed run-ledger commands inside the Claude Code Bash sandbox",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-03",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        },
+        {
+          "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+          "sha256": "02becfe07513621c35367d1cd703d2ba2fb5965eb6b719790e040a0a70295ddc"
+        },
+        {
+          "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+          "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-04",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 4,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        },
+        {
+          "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+          "sha256": "02becfe07513621c35367d1cd703d2ba2fb5965eb6b719790e040a0a70295ddc"
+        },
+        {
+          "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+          "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-sandbox-05",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 5,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 typed run-ledger commands inside the Claude Code Bash sandbox",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-sandbox-06",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 6,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 typed run-ledger commands inside the Claude Code Bash sandbox",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-07",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 7,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-sandbox-08",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 8,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 typed run-ledger commands inside the Claude Code Bash sandbox",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-09",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 9,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-10",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 10,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-11",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 11,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-sandbox-12",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 12,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 typed run-ledger commands inside the Claude Code Bash sandbox",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-13",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 13,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-14",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 14,
+      "command_index": 7,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-20260924-native-qualified",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 15,
+      "command_index": 8,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+          "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b"
+        },
+        {
+          "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+          "sha256": "02becfe07513621c35367d1cd703d2ba2fb5965eb6b719790e040a0a70295ddc"
+        },
+        {
+          "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+          "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "macos-20260924-sandbox-01",
+      "reason": "ERR_PNPM_FROZEN_LOCKFILE_WITH_OUTDATED_LOCKFILE: pnpm 12 records its own version in the lockfile, so raising packageManager alone leaves the frozen lockfile outdated (uv half passed)."
+    },
+    {
+      "run_id": "macos-20260924-sandbox-02",
+      "reason": "pnpm 12 registry fetch failed TLS verification under the sandbox (invalid peer certificate, OSStatus -26276) after about 70 s of retries."
+    },
+    {
+      "run_id": "macos-20260924-sandbox-06",
+      "reason": "initdb could not create System V shared memory under the sandbox (shmget: Operation not permitted)."
+    },
+    {
+      "run_id": "macos-20260924-sandbox-08",
+      "reason": "Sandboxed psycopg clients could not connect to the loopback PostgreSQL (connect: Operation not permitted)."
+    },
+    {
+      "run_id": "macos-20260924-native-11",
+      "reason": "Every functional check passed, but the script's own post-SIGTERM bind probe found port 18081 busy: one TIME_WAIT socket remained. lsof then showed no listener and no application process."
+    },
+    {
+      "run_id": "macos-20260924-sandbox-12",
+      "reason": "pnpm 12 could not open its store operation lock under the sandbox (Operation not permitted), even with a populated store and no network need."
+    }
+  ],
+  "limitations": [
+    "Mac arm64 local synthetic vertical slice only. No WSL/cloud/production application, authenticated users, broker or trading qualification.",
+    "Qualified on a scratch copy with the retained variant files; the committed blueprint keeps its frozen pnpm@12.4.2 self-pin and experiment.json, which remain the historical record.",
+    "The native PostgreSQL source build omits ICU, readline, zlib and TLS; loopback TCP, no Unix socket, local trust authentication. Not a production database profile.",
+    "Sandbox-scope attempts show which steps the Claude Code Bash sandbox blocks in a Desktop Code-tab session; a terminal session's profile can differ.",
+    "The qualification aggregates attempts 3-15: restart persistence passed its functional checks at attempt 11, the restarted UI showed the same record at attempt 14, and release of the owned ports was confirmed at attempt 15.",
+    "No model/provider calls by qualification commands; whole coordinator usage unknown; no token-saving claim.",
+    "No production load test, external ingestion, pagination beyond 100 rows, independent-host restore or deployment."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6 at pnpm 12.6.0 and uv 0.12.18, native user shell",
+    "qualification_run_ids": [
+      "macos-20260924-native-qualified"
+    ]
+  },
+  "rollback": "Keep the frozen blueprint (pnpm@12.4.2 self-pin) as the committed recipe; stop owned application and PostgreSQL processes and discard the scratch copy. The variant files are evidence only and change nothing that runs from the repository.",
+  "next_decision_changing_test": "Promote the variant into the blueprint only with a new frozen record that retains experiment.json's inputs under history/; rerun these commands when any pinned component changes, and rerun the sandbox-scope attempts before adopting strict sandbox mode.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

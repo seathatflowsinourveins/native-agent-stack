@@ -266,6 +266,45 @@
       "source": "catalogs/landscape/research-state.json"
     }
   ],
+  "host_requalification": {
+    "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+    "disputed_slot_ids": [
+      "token-efficiency/code-index",
+      "token-efficiency/command-output",
+      "token-efficiency/output-compression",
+      "token-efficiency/repo-packing"
+    ],
+    "host": "NativeStack2604",
+    "independent_review": {
+      "recorded_source_review": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "scope": "The Claude source review of this public projection recorded changes required; correction re-check remains pending. This review is not a new host replication or final qualification. Only the command center own dated final same-80-slot verified E2E, independently reviewed and adjudicated, can replace official readiness 30/80 or lift provisional.",
+      "status": "pending"
+    },
+    "publication_date_utc": "2026-10-05",
+    "qualification_scope": "Historical documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. CC captured-status provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. No new-bar count is supplied until final verified E2E S4, independent review and adjudication. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. Evidence classes remain distinct; no new acceptance or execution.",
+    "readiness": {
+      "bar": "old-bar",
+      "baseline": {
+        "denominator": 80,
+        "numerator": 30,
+        "percent": 37.5,
+        "status": "historical_adjudicated_2026-10-04"
+      },
+      "conditional": null,
+      "current": null,
+      "derivation_gap": "Final readiness awaits the command center own new dated same-80-slot qualification with independent review and adjudication. A complete public projection review alone never lifts provisional.",
+      "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Final verified E2E S4",
+      "official_source": "evidence/receipts/ns2604-e2e-20261004.json",
+      "provisional": true,
+      "rounding": "Exact percentages shown; baseline PR #700 rounded 37.5% half up to 38%."
+    },
+    "receipt_id": "ns2604-requalification-20261005",
+    "receipt_kind": "historical_inventory",
+    "source": "evidence/receipts/ns2604-requalification-20261005.json",
+    "source_class": "Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record."
+  },
   "kind": "generated_new_wsl_handbook",
   "layers": [
     {
@@ -1293,10 +1332,10 @@
         "source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "text": "Use the judge's sealed set of 30-50 target-language questions with exact file:line answers, on WSL2 and once on macOS arm64. (a) Within Claude Code, Serena against the native LSP plugins; Codex uses Serena only. (b) For the structural slot, codebase-memory-mcp (installed with --skip-config and invoked explicitly) against CodeGraph and jCodeMunch, each scored against an rg+Read known-source baseline. Score reference precision and recall, correctness, tokens, tool calls, wall time, cold index build, incremental update after an edit and RSS. Confirm from each transcript that the arm's tools were invoked. Adopt a structural index only for the question class where it beats the baseline."
       },
-      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "ownership_source": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
       "owns": [
-        "Serena (Codex sessions)",
-        "the official code-intelligence LSP plugins (Claude Code sessions)"
+        "Serena (symbol navigation and references for both clients)",
+        "ast-grep (syntax-pattern code search and rewrite)"
       ],
       "reference_edition": {
         "role": "reference only; no winners, pins or closure inherited",
@@ -7799,11 +7838,11 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe"
+      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "8420f58ef2f613bab8da7a4486e907a9118b178d9d8e5eb8c70e4d84950c6c73"
+      "sha256": "3a8081049976785e320cfd99bc93bd3dcefa0a8a351fcc4f3cab1d8022a6b1cd"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7812,6 +7851,10 @@
     {
       "path": "catalogs/landscape/us-equities.json",
       "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+      "sha256": "44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d"
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
@@ -7940,6 +7983,18 @@
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
       "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "sha256": "09ce43141deaaa59c6f0da5119d3668833dc2ac9f48c26646059ffc050459a71"
+    },
+    {
+      "path": "evidence/receipts/ns2604-e2e-20261004.json",
+      "sha256": "4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705"
+    },
+    {
+      "path": "evidence/receipts/ns2604-requalification-20261005.json",
+      "sha256": "1d0afd73a954e448eb00bac14dbe0f2c7384d65a51efd0ad0c5e990f7ae3273b"
     }
   ],
   "stage_order": [

@@ -41,7 +41,7 @@
       "filename": "openhands_tools-1.49.6-py3-none-any.whl"
     }
   },
-  "requirements_sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
+  "requirements_sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
   "build_requirements_sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
   "grader": {
     "repository": "https://github.com/OpenHands/benchmarks",

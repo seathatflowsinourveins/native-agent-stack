@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "kind": "new-wsl-handbook-profile-integration",
-  "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
-  "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
+  "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
-    "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+    "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+    "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
   },
   "inventory": {
     "layers": 37,
@@ -62,6 +62,36 @@
       "condition": "explicit unsupported metadata URL coalesced with the sole canonical sibling",
       "native_exit_code": 1,
       "correction": "only a selection alias without its own profile entry may inherit a sole canonical package"
+    },
+    {
+      "condition": "First post-review candidate suite found stale manually maintained publication receipt hashes after native builder regenerated its two outputs.",
+      "command": "python3 -m unittest tests.test_new_wsl_handbook",
+      "native_exit_code": 1,
+      "tests": 85,
+      "failures": 1,
+      "returned_output": "Ran 85 tests in 32.468s; FAILED (failures=1): generator_sha256 receipt mismatch.",
+      "evidence_class": "local_integration",
+      "correction": "Refresh the existing receipt generator/profile/output hashes and inventory from actual files; preserve the failed check and rerun the native suite."
+    },
+    {
+      "condition": "J-715R first86-test suite found stale publication receipt generator/output hashes after native builder regeneration.",
+      "command": "python3 -m unittest tests.test_new_wsl_handbook",
+      "native_exit_code": 1,
+      "tests": 86,
+      "failures": 1,
+      "returned_output": "Ran86tests in36.581s; FAILED(failures=1): generator_sha256 receipt mismatch.",
+      "evidence_class": "local_integration",
+      "correction": "Refresh actual generator/output hashes; retain failure and rerun suite."
+    },
+    {
+      "condition": "Round 715-r3 initial 97-test run found stale handbook receipt generator/output hashes after the required builder source checks and regeneration.",
+      "command": "python3 -m unittest tests.test_new_wsl_handbook tests.test_architecture_pin_source tests.test_stack_lifecycle",
+      "native_exit_code": 1,
+      "tests": 97,
+      "failures": 1,
+      "returned_output": "Ran 97 tests in 34.301s\n\nFAILED (failures=1)",
+      "evidence_class": "local_integration",
+      "correction": "Refresh the existing receipt generator/output hashes from actual files, retain the failed check and rerun the native suite."
     }
   ],
   "derived_catalog_correction": {
@@ -248,6 +278,178 @@
         "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
         "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
       },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #752 added one-time service-tier migration prose to the hashed distro guide without regenerating the handbook. Validate run 37401702955 failed its existing freshness test at head d2f6d8c. Regenerated through the unchanged native builder; both output deltas are only the distro-guide provenance digest.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+        "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "repair_evidence": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json"
+    },
+    {
+      "date": "2026-10-05",
+      "source_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Claude-review correction: official30 retained, current/conditional null, hashed decision pointer, no monotonic/four-additive assumption, canonical Serena ownership; #724 adoption hashing preserved. Candidate publication awaits #713 ownership release.",
+      "previous_generator_sha256": "f12da714276918f4951f8220a3fb95e0bfd9d5d25022c4b22dc6d7a65bb310ef",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b72ec0299a300da82d9f35bc7ed98658bd167c9ee156a5ef5a7466f59e277149",
+        "docs/new-wsl-handbook.json": "97360d359377f9eedbbc9c580e3080038b326eab09fba6a2e627d8401e97041e"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "31023d37c5c97fae5542a5a39996978db9a1b94b52487e6c8cd009f6c24e92d4",
+        "docs/new-wsl-handbook.json": "9ce7e8a0a5558ef01909d3cdc0e2f3b271567b223b5ffe59da4a841e769e8b45"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@77d7516d81a94b1cb0e77a7b6c910c28c8104dc9:evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "receipt_contract": "tests/test_new_wsl_handbook.py:test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them",
+      "final_checks": "85 handbook integration tests passed after receipt-hash refresh (32.705s). Fresh validator and handbook checks are recorded separately in the private lane status; these checks are structural/local only."
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T13:11:40Z",
+      "source_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Dated criterion2 reading for all17slots, custody BY_DESIGN/supersededchanges1-3, basePARTIAL/G8 and corrected F1 scope; same generator/test code, changed hashed decision input. A7 keeps publication held for#713 or owner release.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "31023d37c5c97fae5542a5a39996978db9a1b94b52487e6c8cd009f6c24e92d4",
+        "docs/new-wsl-handbook.json": "9ce7e8a0a5558ef01909d3cdc0e2f3b271567b223b5ffe59da4a841e769e8b45"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "b116b48cc9a9f5a61be91241df5831d34c27e4cd4b93c6eea3949bf50d40fc27",
+        "docs/new-wsl-handbook.json": "e7f0aecd832393d92dfa4e8c92b13316271e766fc5bf11837ddeef245012ab05"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@77d7516d81a94b1cb0e77a7b6c910c28c8104dc9:evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "receipt_contract": "tests/test_new_wsl_handbook.py:test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them",
+      "final_checks": "Native regeneration returned0. Final local validator, receipt/output and decision-hash checks are retained separately in lane status. Earlier85-test evidence covers unchanged generator/test code, not these dated-input hashes."
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T16:19:54Z",
+      "source_main": "9e955327702e6b7a8dd1909b2884196726a15ba5",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Released #713 hold: reconcile main owner/profile/browser104-row changes with official30/null/decision projection and dated source notes. Preserve main7 regeneration entries plus distinct prior lane histories and failed conditions. No host acceptance.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
+        "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "d402e9b2e438916cf49723764aa6d60302c5e644b06247347198ac3b49e16b3c",
+        "docs/new-wsl-handbook.json": "cce0832baa0a5a5d683a40751dcc003590e6987edf31ff943c17af406b60041f"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@1796303f:evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T17:55:00Z",
+      "source_main": "2d849ba1fe1b879144cfa470f0514d3ac3b8e487",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "J-715R exact-head source corrections: old-bar official30/null/decision; superseded37/40/44/32; reported provisionaloldbar30asof11:44 excludes custody13:02; no organicnewbarcount untilS4. Owner fields and prior histories preserved.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "d402e9b2e438916cf49723764aa6d60302c5e644b06247347198ac3b49e16b3c",
+        "docs/new-wsl-handbook.json": "cce0832baa0a5a5d683a40751dcc003590e6987edf31ff943c17af406b60041f"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "d5a8f9c9481c8fe139a3ab2bd9f759bb97d7e42e01718e670222d9d2d7228318",
+        "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@2d849ba1:scripts/build_new_wsl_handbook.py",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T19:21:36Z",
+      "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "J-715R2 three-item micro-repair: correct the #700 bar to upstream acceptance, wiring and fresh-session use with harness text present; captured-status provisional30 includes five slots with fresh-session use not evidenced and is not measured #700 qualification. Supersede32; preserve official30/current-null/conditional-null and owner fields. No new execution or acceptance.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "d5a8f9c9481c8fe139a3ab2bd9f759bb97d7e42e01718e670222d9d2d7228318",
+        "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
+        "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@424b8a778222ae8857aade42c49ae6f7a13b3138:scripts/build_new_wsl_handbook.py",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #715 refreshed onto main ecfa11276 (after #703 landed). The catalog merged cleanly as text from #703's and #715's changes, and #715's generator and inputs changed the handbook's source digests; regenerated with --write, and --check passed. The receipt's regenerations were united at the entry level: base 7, #715's 5 and main's #703 entry.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
+        "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T23:09:15Z",
+      "round": "715-r3",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Check and hash official baseline and recorded source-review inputs; restore the bounded-ruling locator, date later amendments and clarify the qualification boundary. The existing receipt mirrors the regenerated generator/output hashes; no new host acceptance is claimed.",
+      "previous_generator_sha256": "d6dba4004564275b53cd1b44a86f2ae04349ca278e6a05b9bb9803569d5166ee",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "cfb5c3ea852d756268667802d66d203789024d5f357eeeb90023e631d7fc5316",
+        "docs/new-wsl-handbook.json": "c11d2d1affc274e0cfb15480110aa77f8b2695dea508e5ddd524273c2617ca57"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
+        "docs/new-wsl-handbook.json": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@d25ea1f7d47eb9cb325503f94935b6611cf0c23c:evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "receipt_contract": "tests/test_new_wsl_handbook.py:test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "#715 T3 completion (command-center ruling at c3f4d8ddf): review-715-corrections.json's bounded_repair_rulings and micro_repair_rulings amended_at_utc now carry their revisions' write times, 19:12:17Z (73d75df4b) and 19:28:40Z (bfff257c0), equal to the receipts' amendments; the item times stay in amendment_source_item. The changed input digest made the handbook stale; regenerated with --write, and --check passed.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
+        "docs/new-wsl-handbook.json": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "#715 round 3 (CC ROUND3-RULINGS-20261006.md): review-715-corrections.json's bounded_repair_rulings gains an amendments list mirroring the receipts. 73d75df4b at 19:12:17Z (item 170827Z) wrote the block, and bfff257c0 at 19:28:40Z (item 181852Z) revised it (old_bar_provisional.captured_status_boundary). A per-block check over the file's git history found a matching stamp for every content revision. The changed input digest made the handbook stale; regenerated with --write, and --check passed.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "90d4fa2e4d46eaaf8a2ede82f29fe864100c837f966c9df1a61746c1ea481c30",
+        "docs/new-wsl-handbook.json": "d569771bf8e8e73538758c68e43045973b9b7010fb32cec8ad2f170cce0cea12"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Custody refresh of PR #715 onto main b0df1fb04: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "b0df1fb0440698b0f210cb6becdcb24c685e232b",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
+        "docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda"
+      },
+      "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]

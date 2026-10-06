@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Documentary native uv targeted Mako update and Makefile's isolated no-build install.
+# Sources: astral-sh/uv@0.12.22; application-delivery/Makefile:3.
+# Usage: bash <script> <project> <owned-scratch> <rtk> <uv>
+set -euo pipefail
+P=$1; R=$2; RTK=$3; UV=$4
+export UV_CACHE_DIR=$R/uv-cache UV_PROJECT_ENVIRONMENT=$R/backend-venv UV_PYTHON_DOWNLOADS=never
+"$RTK" "$UV" lock --project "$P" --upgrade-package mako==1.4.2
+"$RTK" "$UV" lock --project "$P" --check
+"$RTK" "$UV" sync --project "$P" --frozen --no-build
+"$RTK" "$UV" pip check --python "$R/backend-venv/bin/python"
+"$RTK" "$R/backend-venv/bin/python" -c 'import importlib.metadata as m; from mako.template import Template; import alembic; assert m.version("Mako")=="1.4.2"; assert Template("qualified").render()=="qualified"; print("Mako",m.version("Mako"),"Alembic",m.version("alembic"),"native imports/render passed; no database/provider request")'
