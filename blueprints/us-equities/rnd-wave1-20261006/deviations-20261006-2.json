@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "kind": "rnd_wave1_preregistration_deviations",
+  "recorded_at_utc": "2026-10-06T10:19:41+00:00",
+  "frozen_commit": "d4601bfcbc4db74e57cd5c387bf48faebe263642",
+  "previous_deviation_commit": "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
+  "kept_sha256": {
+    "PREREGISTRATION.md": "7b7f4ce3f4506abf2370938a36556dbcdb5596bcbcdf792f2a92b494671e4f96",
+    "plan.json": "36e55742ec837809cf6d41ae1b35e22237cc25a0c3abf01d0f36384cee0e1743",
+    "deviations.json": "6dfca17ac1fa1a011a36a4fd37919fcdcd29941bef4c9a359ce3675f941bae42"
+  },
+  "found_by": "The command center's ACK_AFTER of the deviation at c5834a1ba (item task-native-agent-stack-5f-20261006T095300Z): a GPT micro-check adjudicated by the command center, four P2s. The prior P1 is closed at specification level.",
+  "policy": "PREREGISTRATION.md, plan.json and deviations.json stay byte-identical. This file adds D4 before any R1 or R2b execution; where it conflicts with them, D4 governs. R2a, already cleared to start, is unaffected.",
+  "deviations": [
+    {
+      "id": "D4.1",
+      "finding": "P2: no independent extractor-versus-source check",
+      "rule": "Every authoritative scope field of each fixture below is pinned here, independently of any extractor. R1's builder output for each fixture read must equal the pinned values exactly (dates as written, inclusive); a mismatch is R1 status REJECTED_FIXTURE. A6 now requires the exact endpoints 2024-01-01 and 2026-08-14: an extraction truncated to 2025-12-31, or any other endpoint, is rejected. Fixture values were read from the cited records at the base commit; the two event-scope date ranges were read from the retained package by the coordinator (counts and endpoints only).",
+      "fixtures": [
+        {
+          "read": "broad-universe reserved evaluation",
+          "source": "blueprints/us-equities/broad-universe/protocol.json:116 (reserved); README.md:95",
+          "expected": {
+            "scope_kind": "universe_date_range",
+            "identifiers_or_universe": "the broad-universe main universe as defined in broad-universe/protocol.json",
+            "date_range": [
+              "2024-01-01",
+              "2026-08-14"
+            ],
+            "access_kind": "result_inspected"
+          }
+        },
+        {
+          "read": "broad-universe development and validation",
+          "source": "blueprints/us-equities/broad-universe/protocol.json:114-115",
+          "expected": {
+            "scope_kind": "universe_date_range",
+            "identifiers_or_universe": "the broad-universe main universe as defined in broad-universe/protocol.json",
+            "date_range": [
+              "2017-01-01",
+              "2023-12-31"
+            ],
+            "access_kind": "result_inspected"
+          }
+        },
+        {
+          "read": "mover-early-entry development and validation",
+          "source": "blueprints/us-equities/mover-early-entry/protocol.json:121-122; README.md:18-22 (holdout not read)",
+          "expected": {
+            "scope_kind": "universe_date_range",
+            "identifiers_or_universe": "the mover-early-entry candidate universe as defined in mover-early-entry/protocol.json",
+            "date_range": [
+              "2021-01-04",
+              "2025-12-31"
+            ],
+            "access_kind": "result_inspected"
+          }
+        },
+        {
+          "read": "extreme-gainer price audit",
+          "source": "blueprints/us-equities/extreme-gainer-audit/README.md:3-6; plan.json:8 (package sha256)",
+          "expected": {
+            "scope_kind": "event",
+            "identifiers_or_universe": "the 957 events of datasets/forward-returns-2021-2026.csv in package a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c",
+            "event_count": 957,
+            "date_range": [
+              "2021-01-06",
+              "2026-09-22"
+            ],
+            "access_kind": "outcome_selected"
+          }
+        },
+        {
+          "read": "mover-coverage-asof E2",
+          "source": "blueprints/us-equities/mover-coverage-asof/README.md:3; evidence/summary-asof-20260929.json",
+          "expected": {
+            "scope_kind": "event",
+            "identifiers_or_universe": "the package events dated in the window (715), of package a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c",
+            "event_count": 715,
+            "date_range": [
+              "2021-01-04",
+              "2025-12-31"
+            ],
+            "access_kind": "result_inspected"
+          }
+        },
+        {
+          "read": "catalyst v1 previously inspected 2021Q1 ETF control",
+          "source": "blueprints/us-equities/catalyst-experiment/protocol.json chronology.previously_inspected",
+          "expected": {
+            "scope_kind": "universe_date_range",
+            "identifiers_or_universe": "unknown (the ETF control as recorded)",
+            "date_range": [
+              "2021-01-01",
+              "2021-03-31"
+            ],
+            "access_kind": "result_inspected"
+          }
+        }
+      ],
+      "added_acceptance": {
+        "A7_fixtures": "the builder output equals every fixture exactly",
+        "A8_truncation": "a synthetic extraction of the broad-universe reserved range ending 2025-12-31 is rejected"
+      }
+    },
+    {
+      "id": "D4.2",
+      "finding": "P2: R1 and R3 outcome mappings incomplete",
+      "R1_added_statuses": [
+        {
+          "status": "REJECTED_REPRODUCIBILITY",
+          "exit": 14,
+          "when": "A5 fails: two builder runs differ in any byte, including ordering or descriptions, even with equal scopes"
+        },
+        {
+          "status": "REJECTED_ACCEPTANCE",
+          "exit": 15,
+          "when": "any other completed acceptance check fails (A1-A4, A8: the builder accepts a narrowed, drifted, unknown or missing case it must refuse)"
+        },
+        {
+          "status": "REJECTED_FIXTURE",
+          "exit": 16,
+          "when": "A7 fails: an extractor output differs from a pinned fixture value"
+        }
+      ],
+      "R1_precedence": "When several fail, the lowest-numbered rejection status is reported and every failing check is listed.",
+      "R3": {
+        "prerequisites": "none (repository files only; no data)",
+        "statuses": [
+          {
+            "status": "REVIEWED",
+            "exit": 0,
+            "when": "a non-Claude-family review completes and writes every finding to the mover-v3 draft's review record"
+          },
+          {
+            "status": "SKIPPED",
+            "exit": 40,
+            "when": "not started (capacity or priority); no effect on R1, R2a or R2b"
+          },
+          {
+            "status": "ERROR",
+            "exit": 2,
+            "when": "the review does not complete"
+          }
+        ],
+        "unresolved_findings": "Findings stay open in the review record with their dates; REVIEWED means the review completed, not that the draft passed. Freeze eligibility stays governed by mover-v3/protocol-core-draft.json freeze_preconditions, which this wave does not change."
+      }
+    },
+    {
+      "id": "D4.3",
+      "finding": "P2: R2b's validator unspecified",
+      "validator": {
+        "path": "blueprints/us-equities/rnd-wave1-20261006/validate_r2b.py",
+        "sha256": "af1b42494713ebf344b0654f02cd4e8be92d389441470878b4c81d84cc51a7ed",
+        "invocation": "python3 -I blueprints/us-equities/rnd-wave1-20261006/validate_r2b.py <profile.json>",
+        "self_test": "python3 -I .../validate_r2b.py --self-test (6 cases; exit 0)",
+        "schema": "the docstring of validate_r2b.py: two populations (97, 261), five dimensions, frozen bucket keys, an unknown bucket in every dimension, normalized catalyst labels, claims insufficient_evidence"
+      },
+      "mapping": [
+        {
+          "validator": "exit 0",
+          "R2b": "DESCRIBED (0)"
+        },
+        {
+          "validator": "exit 1 with reason reconciliation",
+          "R2b": "REJECTED_RECONCILIATION (31)"
+        },
+        {
+          "validator": "exit 1 with any other reason",
+          "R2b": "REJECTED_SCHEMA (32)"
+        },
+        {
+          "validator": "exit 2",
+          "R2b": "ERROR (2)"
+        }
+      ],
+      "note": "The existing mover publication scanner stays unchanged; R2b publishes only through this validator."
+    },
+    {
+      "id": "D4.4",
+      "finding": "P2: the wave files were not in the evidence registry",
+      "rule": "All five wave files (PREREGISTRATION.md, plan.json, deviations.json, this file and validate_r2b.py) are registered in manifests/evidence.json with scripts/host_receipts.register_file, in the branch's last commit (docs/lanes.md hot-file protocol)."
+    }
+  ],
+  "execution_gate": "R1 waits for a GPT micro-check of this file and the command center's ACK; R2b waits for an accepted R1, a reproduced R2a and that ACK."
+}
