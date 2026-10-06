@@ -39,7 +39,8 @@ from mover import (EXIT_HEADROOM_FACTOR, PROTOCOL_ID, X1_FLATTEN_AT_ET, X2_HOLD_
                    X3_TRAIL_FRACTION, X4_STOP_FRACTION, X4_TARGET_FRACTION, MoverBook, MoverRefusal, Timing,
                    build_plan, engine_config, load_mover_config, load_scan, plan_session, session_state_after, text)
 from runner import (Controller, LiveEventLog, _apply_forced_recovery_outcome, _run_native_status,  # noqa: E402
-                    credentials, public_preflight, reconcile, save, trial_phase_and_exit_code, validate_preflight)
+                    _stream_health, credentials, public_preflight, reconcile, save, trial_phase_and_exit_code,
+                    validate_preflight)
 from safety import Ledger, SafetyError, account_lock_fingerprint  # noqa: E402
 from sessions import SessionKind, extended_session_close, session_at, validate_session_policy  # noqa: E402
 
@@ -416,6 +417,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                "dropped_quotes": {"by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
                                   "by_symbol": {str(k): int(v) for k, v in
                                                 port_health.get("dropped_quotes_by_symbol", {}).items()}},
+               "stream_health": _stream_health(port),
                "session_policy": {"extended_hours": session_policy["extended_hours"],
                                   "overnight_holds": session_policy["overnight_holds"]},
                "elapsed_seconds": time.monotonic() - started}
@@ -562,7 +564,8 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
         "foreign_terminal_orders_ignored": outcome.get("foreign_terminal_orders_ignored", 0),
         "native": {key: outcome.get(key) for key in ("engine", "native_quotes", "native_fill_events",
                                                    "native_rejections", "orders_submitted", "requests",
-                                                   "dropped_quotes", "session_policy", "elapsed_seconds")},
+                                                   "dropped_quotes", "stream_health", "session_policy",
+                                                   "elapsed_seconds")},
         "events": outcome.get("events", []),
         "limitations": list(LIMITATIONS[plan.evidence_class])}
     if preflight is not None:

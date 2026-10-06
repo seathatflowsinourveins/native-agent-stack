@@ -236,10 +236,14 @@ than stale quotes. Thin sessions produced that reconnect in trial
 `20260923-post-extended-hours`, which then stopped, and in Account 2's
 2026-10-06 recovery. The cost is that an extended-hours run, its
 regular-session part included, no longer reconnects a connected-but-mute
-socket, which ping/pong cannot detect. It stays frozen on `quote_stale`, with
-no entry and no quote-priced exit, until the run ends and recovery connects
-anew. Freshness gating is unchanged: the `quote_stale` watchdog and the
-order-time quote age still apply. A small handshake protocol guard
+socket, which ping/pong cannot detect. A persistently mute transport stays
+frozen on `quote_stale`, with no entry and no quote-priced exit, until a new
+transport is built. Recovery builds one only for residual positions or
+unresolved orders, and an accepted overnight hold skips it. Run receipts
+record the transport's terminal `stream_health`: frozen, reasons, fresh quotes
+and the selected `data_timeout_seconds`, where null is the SDK default. That
+view does not tell legitimate quiet from a mute socket. Freshness gating is
+unchanged: the `quote_stale` watchdog and the order-time quote age still apply. A small handshake protocol guard
 rejects WebSocket redirects before credentials can be sent to another endpoint.
 REST disables retries after construction (the pinned constructor ignores zero),
 environment proxies and redirects, with finite connect/read timeouts.
