@@ -7,18 +7,20 @@ The script changes settings without restarting the service or stepping the clock
 
 Use the exact reviewed copy in an existing local Windows directory. With
 RemoteSigned, an unsigned UNC copy can be treated as remote and refused; keep
-the current execution policy. From the owned WSL worktree, replace
+the current execution policy. From the owned WSL worktree, set
+`CLOCK_WINDOWS_SCRIPT` to the script's WSL path under Windows `USERPROFILE`
+(the private handoff supplies the host-specific path), and replace
 `<reviewed-head>` with the command center's reviewed commit:
 
 ```bash
-rtk proxy git show <reviewed-head>:adoption/templates/windows/clock-root-fix-r2.ps1 > /mnt/c/Users/apoth/clock-root-fix-r2.ps1
+rtk proxy git show <reviewed-head>:adoption/templates/windows/clock-root-fix-r2.ps1 > "$CLOCK_WINDOWS_SCRIPT"
 ```
 
 Then in administrator PowerShell, keep the preview made immediately before apply
 as the prior-value receipt:
 
 ```powershell
-Set-Location C:\Users\apoth
+Set-Location $env:USERPROFILE
 Get-FileHash .\clock-root-fix-r2.ps1 -Algorithm SHA256  # match the CC's receipt
 .\clock-root-fix-r2.ps1 -WhatIf 6>&1 | Tee-Object .\clock-r2-before.txt
 .\clock-root-fix-r2.ps1
