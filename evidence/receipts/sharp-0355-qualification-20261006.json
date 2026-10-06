@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "id": "sharp-0355-qualification-20261006",
+  "kind": "source_review_and_local_integration",
+  "recorded_at_utc": "2026-10-06T15:26:59Z",
+  "base_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "claim": "The maintained application lock moves sharp to first patched 0.35.5 and its required companion packages; frozen install, schema/type/build checks pass. Captured macOS lock bytes remain unchanged with a scoped, dated exception. Full application acceptance is not claimed.",
+  "advisory": {
+    "id": "GHSA-wq5f-xc86-pv6w",
+    "cve": "CVE-2026-96889",
+    "published_at": "2026-10-06T13:43:57Z",
+    "affected": "<0.35.5",
+    "first_patched": "0.35.5"
+  },
+  "sources": [
+    "https://github.com/lovell/sharp/security/advisories/GHSA-wq5f-xc86-pv6w",
+    "https://github.com/lovell/sharp/releases/tag/v0.35.5",
+    "lovell/sharp@51a990faa26ade5586a4934ac9673c98d8893326",
+    "https://github.com/lovell/sharp-libvips/releases/tag/v1.3.4",
+    "lovell/sharp@7f1a0a22cc285fe180766f4935d50b55af6e8432:src/common.cc:323,506,596;src/pipeline.cc:48",
+    "https://pnpm.io/cli/update",
+    "https://pnpm.io/cli/install",
+    "https://registry.npmjs.org/next/16.3.8",
+    "https://registry.npmjs.org/sharp/0.35.5"
+  ],
+  "live_lock": {
+    "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+    "before_sha256": "e31f7b3cc3336fa0424cfed0f63c11a8d7d448e7f1f8e20f82094434187f3cfd",
+    "after_sha256": "b657db5288b38fd1aa667c656b06154ed5c613bfb7bb6d0ab754ea5d65c979d7",
+    "previous_retained_path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0d5e6506.yaml",
+    "pnpm": "12.4.2",
+    "node": "24.21.0",
+    "dependent": "next16.3.8 optionalDependencies.sharp ^0.35.4 permits 0.35.5",
+    "moved_family": "sharp and required @img/sharp* 0.35.4→0.35.5; @img/sharp-libvips*1.3.3→1.3.4",
+    "moved_package_entries": 27,
+    "unrelated_package_entries_unchanged": 67,
+    "manifest_and_manager_document_unchanged": true
+  },
+  "frozen_lock": {
+    "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+    "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+    "byte_identical": true,
+    "exception_config": ".github/osv-scanner-frozen-macos.toml",
+    "exception_id": "GHSA-wq5f-xc86-pv6w",
+    "ignoreUntil": "2026-12-24",
+    "scope": "One captured lock only; ordinary config/inventory unchanged.",
+    "reachability": "Sharp's OpenInput can reach VipsForeignLoadSvgFile/Buffer during SVG processing. Source review finds no supported installer/build/server/replay consumer of this retained variant; prior scratch qualification stays historical. Direct-reference tripwire is not proof against all possible manual or indirect use.",
+    "overturn": "Remove/re-review before manual install, replay, a consuming route, changed bytes or expiry."
+  },
+  "checks": {
+    "frozen_install": {
+      "exit_code": 0,
+      "evidence": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.install.txt"
+    },
+    "peers": {
+      "exit_code": 0
+    },
+    "typecheck": {
+      "exit_code": 0
+    },
+    "build": {
+      "exit_code": 0
+    },
+    "native_package": {
+      "exit_code": 0,
+      "sharp": "0.35.5",
+      "vips": "8.18.7",
+      "rsvg": "2.63.2"
+    },
+    "full_make_verify": {
+      "exit_code": 2,
+      "schema": "passed on compatible Python3.13.16",
+      "peers_type_build": "passed",
+      "api_tests": "12 setup errors: dedicated PostgreSQL connection timeout",
+      "browser": "not reached by make; separate unchanged Playwright attempt exits1 because18080 is occupied"
+    },
+    "browser_attempt": {
+      "exit_code": 1,
+      "evidence": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.browser.txt"
+    },
+    "osv_api_version_queries": {
+      "before": [
+        "GHSA-wq5f-xc86-pv6w"
+      ],
+      "after": [],
+      "scope": "OSV database advisory query only, not native full inventory scanner"
+    },
+    "local_osv_scanner": "Not found on PATH or searched preserved tool/cache locations; no local scanner execution claimed."
+  },
+  "failed_attempts": [
+    {
+      "phase": "versioned transitive selector",
+      "exit_code": 1,
+      "error": "ERR_PNPM_UPDATE_VERSION_ON_INDIRECT_DEP",
+      "recovery": "Native12.4.2 requires unversioned update for an indirect package. Published latest equals first patched0.35.5; exact resulting lock version verified. No override or manifest change."
+    },
+    {
+      "phase": "single-document lock parser",
+      "exit_code": 1,
+      "error": "PyYAML ComposerError; pnpm12 lock has manager and project documents",
+      "recovery": "Used upstream safe_load_all and independently compared both documents."
+    },
+    {
+      "phase": "make verify without shim",
+      "exit_code": 2,
+      "error": "pnpm not on PATH",
+      "recovery": "Supported Corepack enable --install-directory created only task-private shims; no global change."
+    }
+  ],
+  "evidence_classes": {
+    "vendor_and_reachability": "source_review",
+    "lock_metadata": "structural_validation",
+    "native_install_and_build": "local_integration",
+    "api_and_browser": "failed prerequisite conditions retained; no full-stack pass",
+    "native_upstream_tests": "not run",
+    "hosted_checks": "pending new-head observation"
+  },
+  "sanitization": "Actual command outputs retained in documentary files with owned-state/worktree prefixes replaced and three build-progress trailing spaces trimmed. Full failed API log stays privately durable; public receipt retains decisive counts/cause. No real data or credential values used.",
+  "limitations": [
+    "The fixed-library identity is metadata, not an exploit test.",
+    "Full make verify failed; Python3.13 is compatible, PostgreSQL is unavailable and the browser's configured port is busy.",
+    "Frozen exception relies on scoped reviewed non-use; it does not qualify manual replay.",
+    "No ordinary ignore or inventory edit, Docker/PG build, global install, model/provider execution or merge."
+  ]
+}
