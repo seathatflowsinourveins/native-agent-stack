@@ -1587,6 +1587,89 @@ def cmd_render(args: argparse.Namespace) -> int:
     return 0
 
 
+def login_profile_reaches_profile(home: Path) -> bool:
+    """Recognize simple native login chains without executing operator code.
+
+    Bash 5.3 shell.c:1116-1126 falls through only when the higher candidate is absent, not on a read error.
+    GNU Bash Startup Files and Conditional Constructs. Unrecognized scripts require separate native qualification.
+    """
+    path_word = r'(?:"\$HOME/\.profile"|"\$\{HOME\}/\.profile"|~/\.profile)'
+    source = rf'(?:\.|source)[ \t]+{path_word}'
+    separator = r'(?:;[ \t]*|\n[ \t]*)'
+    direct = rf'{source}[ \t]*;?'
+    conditional = rf'if[ \t]+\[[ \t]+-r[ \t]+{path_word}[ \t]+\][ \t]*{separator}then(?:[ \t]+|\n[ \t]*){source}[ \t]*{separator}fi[ \t]*;?'
+    for name in (".bash_profile", ".bash_login"):
+        target = home / name
+        try:
+            target.lstat()
+        except FileNotFoundError:
+            continue
+        if target.is_symlink() or not target.is_file():
+            return False
+        if not os.access(target, os.R_OK):
+            return False
+        text, _ = managed_block.read_target(target)
+        if any((ord(char) < 32 and char not in "\n\t") or char in "\x7f\x85\u2028\u2029" for char in text):
+            return False
+        script = "\n".join(line.strip(" \t") for line in text.split("\n")
+                           if line.strip(" \t") and not line.lstrip(" \t").startswith("#"))
+        return bool(re.fullmatch(direct, script) or re.fullmatch(conditional, script))
+    return True
+
+
+def login_env_policy_checks(policy: object, expected: dict) -> dict:
+    if not isinstance(policy, dict):
+        return {key: False for key in ("codex_inherit_none", "codex_pointer_values", "codex_pointer_filters")}
+    have = policy.get("set", {})
+    include = policy.get("include_only", [])
+    filters = policy.get("filters", {})
+    exclude = policy.get("exclude", [])
+    return {
+        "codex_inherit_none": policy.get("inherit") == "none",
+        "codex_pointer_values": isinstance(have, dict) and all(have.get(key) == value for key, value in expected.items()),
+        "codex_pointer_filters": (
+            isinstance(include, list) and not include and isinstance(filters, dict) and not filters
+            and isinstance(exclude, list) and all(isinstance(item, str) for item in exclude)
+            and not ("filters" in policy and ("exclude" in policy or "include_only" in policy))
+            and "rules" not in policy
+        ),
+    }
+
+
+def cmd_preflight_login_env(args: argparse.Namespace) -> int:
+    """Predict the pointer merge and verify supported startup/target contracts before any host write."""
+    if not args.host or not HOST_NAME.fullmatch(args.host):
+        print("--preflight-login-env needs --host NAME", file=sys.stderr)
+        return 2
+    try:
+        results, _, plan, errors, _ = analyse(args.root)
+        if errors:
+            raise ConfigError("repository wiring check failed")
+        home = Path(args.home) if args.home else Path.home()
+        values = host_values(args.host, plan, home, wired_path_dirs(results))
+        expected = pointer_environment(args.root, values)
+        target = home / ".config/environment.d" / ENVIRONMENT_RENDER
+        managed_block.read_target(target)
+        profile, _ = managed_block.read_target(home / ".profile")
+        managed_block.merged_profile_env(profile, str(target), str(home))
+        config, _ = managed_block.read_target(home / ".codex/config.toml")
+        merge = plan_merge(tomllib.loads(config), {"shell_environment_policy": {"inherit": "none", "set": expected}})
+        projected = tomllib.loads(merge_toml_text(config, merge))
+        if first_difference(projected, merge.expected) is not None:
+            raise MergeError("pointer merge readback differs from its plan")
+        checks = {
+            "profile_not_shadowed": login_profile_reaches_profile(home),
+            "profile_reader_compatible": True,
+            "environment_target_compatible": True,
+            **login_env_policy_checks(projected.get("shell_environment_policy"), expected),
+        }
+        print(json.dumps({"checks": checks, "result": "passed" if all(checks.values()) else "failed"}, sort_keys=True))
+        return 0 if all(checks.values()) else 1
+    except (ConfigError, MergeError, OSError, ValueError, managed_block.Refused) as error:
+        print(f"login-env preflight failed ({type(error).__name__})", file=sys.stderr)
+        return 1
+
+
 def cmd_check_login_env(args: argparse.Namespace) -> int:
     """Read back only non-secret configuration metadata; never source a host file or read a credential store."""
     if not args.host or not HOST_NAME.fullmatch(args.host):
@@ -1609,10 +1692,8 @@ def cmd_check_login_env(args: argparse.Namespace) -> int:
         checks = {
             "environment_source": source == files.get(ENVIRONMENT_RENDER),
             "profile_reader": span is not None and profile[span[0]:span[1]] == managed_block.profile_env_block(str(target), str(home)),
-            "profile_not_shadowed": not any((home / name).is_file() for name in (".bash_profile", ".bash_login")),
-            "codex_inherit_none": policy.get("inherit") == "none",
-            "codex_pointer_values": all(policy.get("set", {}).get(key) == value for key, value in expected.items()),
-            "codex_pointer_filters": not policy.get("include_only") and not policy.get("filters") and not policy.get("rules"),
+            "profile_not_shadowed": login_profile_reaches_profile(home),
+            **login_env_policy_checks(policy, expected),
         }
         print(json.dumps({"checks": checks, "result": "passed" if all(checks.values()) else "failed"}, sort_keys=True))
         return 0 if all(checks.values()) else 1
@@ -2733,6 +2814,8 @@ def build_parser() -> argparse.ArgumentParser:
     mode.add_argument("--check", action="store_true", help="check the map against the manifest, plan and templates")
     mode.add_argument("--check-login-env", action="store_true",
                       help="--host NAME: read back pointer source, profile reader and Codex policy (booleans only)")
+    mode.add_argument("--preflight-login-env", action="store_true",
+                      help="--host NAME: predict pointer adoption and startup compatibility without writing (booleans only)")
     mode.add_argument("--render", action="store_true", help="write the wired pieces for --host into --out")
     mode.add_argument("--apply", action="store_true", help="put the wired pieces in place for --host")
     mode.add_argument("--write-blocks", action="store_true",
@@ -2741,7 +2824,7 @@ def build_parser() -> argparse.ArgumentParser:
                         help="the catalog checkout whose map, templates, manifest and plan are read (default: this one)")
     parser.add_argument("--host", help="adoption/hosts/<name>.json, the host value file")
     parser.add_argument("--out", type=Path, help="--render: the directory to write")
-    parser.add_argument("--home", help="--apply or --check-login-env: the home directory (default: the current user's)")
+    parser.add_argument("--home", help="--apply, --check-login-env or --preflight-login-env: the home directory (default: the current user's)")
     parser.add_argument("--claude-bin", help="--apply: the claude binary (default: the native installer's, from PATH)")
     parser.add_argument("--codex-bin", help="--apply: the codex binary (default: the native installer's, from PATH)")
     parser.add_argument("--dry-run", action="store_true", help="--apply: report each step; run no client, write nothing")
@@ -2800,6 +2883,8 @@ def main(argv: list | None = None) -> int:
         return cmd_check(args)
     if args.check_login_env:
         return cmd_check_login_env(args)
+    if args.preflight_login_env:
+        return cmd_preflight_login_env(args)
     if args.render:
         return cmd_render(args)
     return Apply(args).run()

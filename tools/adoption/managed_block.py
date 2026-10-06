@@ -386,7 +386,7 @@ def build_parser() -> argparse.ArgumentParser:
     profile.add_argument("--extra-dir", action="append", default=[], metavar="DIR",
                          help="another absolute directory to put on PATH when it is not on it yet, behind the "
                               "ecosystem's bin directory (repeatable; none by default). A host whose tools come from "
-                               "native installers and mise names ~/.local/bin and mise's shims directory here")
+                              "native installers and mise names ~/.local/bin and mise's shims directory here")
     env = blocks.add_parser("profile-env", help="source the generated non-secret pointer file from ~/.profile")
     env.add_argument("--target", type=Path, help="default: <home>/.profile")
     env.add_argument("--env-file", required=True, help="generated environment.d pointer file (no credential file)")

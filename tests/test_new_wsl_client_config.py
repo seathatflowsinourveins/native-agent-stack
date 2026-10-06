@@ -2215,6 +2215,115 @@ class LoginEnvironmentTests(ApplyCase):
         self.assertNotIn(str(self.home), out)
         self.assertNotIn("wrong-pointer.env", out)
 
+    def test_login_env_accepts_the_native_2604_profile_chain(self):
+        self.installed_state()
+        (self.home / ".bash_profile").write_text('if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi\n')
+        self.assertEqual(self.apply()[0], 0)
+        code, out, err = run_main("--check-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 0, out + err)
+        self.assertTrue(json.loads(out)["checks"]["profile_not_shadowed"])
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_login_env_preflight_accepts_missing_keys_without_writing(self):
+        self.installed_state()
+        (self.home / ".bash_profile").write_text('if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi\n')
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 0, out + err)
+        self.assertTrue(all(json.loads(out)["checks"].values()))
+        self.assertEqual(tree(self.home), before)
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_login_env_preflight_refuses_a_non_chaining_profile_without_writing(self):
+        self.installed_state()
+        (self.home / ".bash_profile").write_text("# Operator profile does not chain\n")
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, out + err)
+        self.assertFalse(json.loads(out)["checks"]["profile_not_shadowed"])
+        self.assertEqual(tree(self.home), before)
+
+    def test_login_env_preflight_refuses_preserved_policy_conflicts_without_values(self):
+        self.installed_state()
+        target = self.home / ".codex/config.toml"
+        for text, failed_key in (("[shell_environment_policy]\ninherit = \"all\"\n", "codex_inherit_none"),
+                ("[shell_environment_policy]\ninclude_only = [\"*PATH*\"]\n", "codex_pointer_filters"),
+                ("[shell_environment_policy.set]\nPAPER_ENV_FILE = \"operator-private-path\"\n", "codex_pointer_values")):
+            with self.subTest(key=failed_key):
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(text)
+                before = tree(self.home)
+                code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+                self.assertEqual(code, 1, out + err)
+                self.assertFalse(json.loads(out)["checks"][failed_key])
+                self.assertEqual(tree(self.home), before)
+                self.assertNotIn("operator-private-path", out + err)
+
+    def test_login_env_preflight_rejects_malformed_empty_filter_fields(self):
+        self.installed_state()
+        target = self.home / ".codex/config.toml"
+        for field in ('filters = []', 'filters = false', 'include_only = ""', 'include_only = false',
+                      'filters = {}\ninclude_only = []', 'filters = {}\nexclude = []',
+                      'exclude = false', 'exclude = [1]', 'rules = {}'):
+            with self.subTest(field=field):
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text('[shell_environment_policy]\n' + field + '\n')
+                before = tree(self.home)
+                code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+                self.assertEqual(code, 1, out + err)
+                self.assertFalse(json.loads(out)["checks"]["codex_pointer_filters"])
+                self.assertEqual(tree(self.home), before)
+        for field in ('include_only = []', 'filters = {}', 'exclude = ["*SECRET*"]'):
+            target.write_text('[shell_environment_policy]\n' + field + '\n')
+            code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+            self.assertEqual(code, 0, out + err)
+
+    def test_login_profile_uses_only_the_first_candidate_without_skipping_read_errors(self):
+        first, second = self.home / ".bash_profile", self.home / ".bash_login"
+        second.write_text('. "$HOME/.profile"\n')
+        self.assertTrue(cfg.login_profile_reaches_profile(self.home))
+        first.write_text("# Readable file prevents fallback\n")
+        self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        with mock.patch.object(cfg.os, "access", return_value=False):
+            self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        first.write_text('source "${HOME}/.profile"\n')
+        self.assertTrue(cfg.login_profile_reaches_profile(self.home))
+        first.unlink()
+        second.write_text("if false; then . \"$HOME/.profile\"; fi\n")
+        self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        second.write_text(". '$HOME/.profile'\n")
+        self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+
+    def test_login_profile_rejects_non_native_line_and_blank_normalization(self):
+        target = self.home / ".bash_profile"
+        for text in ('. "$HOME/.profile"\r\n', '# comment\u2028. "$HOME/.profile"\n',
+                     '\u00a0. "$HOME/.profile"\n', '. "$HOME/.profile"\x00\n'):
+            with self.subTest(text=repr(text)):
+                target.write_bytes(text.encode("utf-8"))
+                self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        target.write_bytes(b'# comment\n\t. "$HOME/.profile"\n')
+        self.assertTrue(cfg.login_profile_reaches_profile(self.home))
+
+    def test_login_env_preflight_refuses_malformed_managed_block_without_writing(self):
+        self.installed_state()
+        (self.home / ".profile").write_text(managed_block.PROFILE_ENV_BEGIN + "\n")
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, out + err)
+        self.assertEqual(tree(self.home), before)
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_login_env_preflight_refuses_an_unextendable_inline_policy_without_writing(self):
+        self.installed_state()
+        target = self.home / ".codex/config.toml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text('shell_environment_policy = {inherit = "none"}\n')
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, out + err)
+        self.assertEqual(tree(self.home), before)
+        self.assertNotIn(str(self.home), out + err)
+
     def test_pointer_template_rejects_executable_or_undefined_substitutions(self):
         with tempfile.TemporaryDirectory() as scratch:
             root = Path(scratch)

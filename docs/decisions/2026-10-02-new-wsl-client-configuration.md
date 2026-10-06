@@ -1033,7 +1033,7 @@ projection and workflow-contract evidence, not a new destination host acceptance
 
 The user's [September 30 LLM-native invocation directive](2026-09-30-skills-llm-native-listing.md) governs skill visibility independently of startup file bytes. All nine audit listings return to `on`, and NativeStack2604 keeps `skillListingBudgetFraction: 0.05`. Main's ordinary settings merge preserves unmentioned host keys and applies the configured fraction. Codex carriers now inline the complete pinned RTK 0.51.0 awareness source; the compact template holds only its include marker. See the [round 3 budget comparison](2026-10-05-harness-context-budget.md#2026-10-05-repair-round-3-user-directed-listing-and-verbatim-rtk) for sources and byte ceilings.
 
-After the refresh onto main 9e9553277, wave 5 had 398 pieces and 358 wired. Phase 1's pointer reader and eight Codex pointer fields add nine practice pieces: Today: 407 pieces, 367 wired (216 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces. The check prints `authorization: 16`, and 24 pieces are not wired. Earlier dated tables and counts remain historical.
+After the refresh onto main 9e9553277, wave 5 had 398 pieces and 358 wired. Phase 1's pointer reader and eight Codex pointer fields add nine practice pieces; its selected-store deny rules add two more. Today: 409 pieces, 369 wired (218 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces. The check prints `authorization: 16`, and 24 pieces are not wired. Earlier dated tables and counts remain historical.
 
 | Piece | Wiring | Why it is not wired |
 | --- | --- | --- |

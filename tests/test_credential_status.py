@@ -98,6 +98,15 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertIn("HUGGING_FACE_HUB_TOKEN", self.inventory["must_not_be_set"])
         self.assertIn("HF_TOKEN", self.inventory["must_not_be_set"])
 
+    def test_selected_and_generic_grafana_stores_keep_separate_provenance(self):
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        selected, generic = rows["grafana-admin"], rows["grafana-admin-generic"]
+        self.assertEqual(selected["loaders"], [])
+        self.assertTrue(selected["store"]["path_template"].endswith("/new-wsl-native-stack/grafana.env"))
+        self.assertTrue(generic["store"]["path_template"].endswith("/ecosystem-observability/ecosystem-grafana.env"))
+        self.assertEqual(generic["loaders"], ["observability/backends/configure.py#systemd-EnvironmentFile"])
+        self.assertEqual(selected["status"], generic["status"])
+
     def pointer_inventory(self):
         # Synthetic metadata for the separately owned IBKR rows, whose canonical paths are pinned at bf1d143c.
         inventory = copy.deepcopy(self.inventory)

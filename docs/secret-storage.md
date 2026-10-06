@@ -26,7 +26,6 @@ against it.
 | `claude-native`, `codex-native`, `gh-native` | Native sign-ins | stored by each tool | each tool's own store | none |
 | `huggingface-native`, `huggingface-native-stored` | Hugging Face sign-in: the active token and every saved token | stored by `hf auth login`, one token per host ([Hugging Face sign-in](#hugging-face-sign-in)) | `$HF_HOME/token` and `$HF_HOME/stored_tokens`; `HF_HOME` defaults to `${XDG_CACHE_HOME:-$HOME/.cache}/huggingface` | none |
 | `ibkr-gateway` | IB Gateway / TWS login | typed in at login, nothing stored | none | none |
-
 | `github-actions` | `FOUNDATION_RESTORE_FIXTURE_20260920` and the per-job `github.token` | CI only | GitHub's encrypted secret store | none locally |
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
@@ -304,12 +303,20 @@ the result to the paper owner. The two IBKR passwords retain their rootless-cont
 proved as that container's uid 1000, with readonly-mount identity checked, rather than weakening custody for a host-shell check.
 systemd v259.5 reruns environment generators on manager startup and `daemon-reload`
 ([native lifecycle](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.environment-generator.xml#L54-L73)).
-The [owner procedure](../evidence/artifacts/pointer-environment-transfer-20261006/README.md) schedules apply and
-manager-affecting rollback outside 10:35Z-13:45Z and 19:50Z-2026-10-07T00:10Z, with no manager restart or killed case.
+The [owner procedure](../evidence/artifacts/pointer-environment-transfer-20261006/README.md) runs value-free preflight
+before any mutation. It defers all host writes, manager reload and Dagu restart until the frozen 10-06 paper run has
+finished, no earlier than 2026-10-07T00:10Z. A later apply or rollback also requires that day's explicit 5f-approved
+windows; missing, malformed or stale scheduling data fails closed. No running case is killed.
 
 For this transfer, `grafana-admin` names the existing `new-wsl-native-stack/grafana.env` store; this is an inventory
-correction, not a rerun of the generic `observability/backends/configure.py` producer. The host generation key is
-regenerated through its own service only if that service moves. The separate `omniroute-fw-lane.env` store remains
+correction, not a rerun of the generic `observability/backends/configure.py` producer.
+The selected `grafana-admin` entry names no producer; `grafana-admin-generic` separately preserves that recipe's
+`ecosystem-observability/ecosystem-grafana.env` inventory coverage. The Claude template denies reads of service `.env`
+files in `new-wsl-native-stack`, and the guard explicitly recognizes the selected Grafana path. Its preexisting dotenv
+reader rule already blocked modeled Bash reads; this change does not claim those reads were previously unrestricted.
+
+The host generation key is regenerated through its own service only if that service moves. The separate
+`omniroute-fw-lane.env` store remains
 conditional on Phase 3 selecting an actual 20129 route; otherwise it is excluded. These conditions do not copy a
 credential or private key between hosts.
 
@@ -521,7 +528,7 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
    pass `--env-file` with the conventional path, for example
    `%h/.config/native-agent-stack/alpaca-paper.env` in `ExecStart=`. Do not
    use `EnvironmentFile=`: it puts the values into
-    `/proc/<pid>/environ`. No secret is written into the unit or plist.
+   `/proc/<pid>/environ`. No secret is written into the unit or plist.
     For paper units generated from 2026-10-07, use the runner's direct `--env-file` argument in `ExecStart=` and no
     `bash -ic` wrapper. The 2026-10-06 units stay untouched; historical launch receipts are not a generation template.
    Model-serving units need no Hugging Face token at all: they serve from a

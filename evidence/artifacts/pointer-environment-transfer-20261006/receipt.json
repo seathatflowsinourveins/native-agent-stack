@@ -10,7 +10,7 @@
     "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/environment.d.xml:59-74",
     "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.environment-generator.xml:116-121",
     "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:src/basic/env-file.c:526-559",
-    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/shell_environment_policy.rs:23,35,106-108,161",
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/shell_environment_policy.rs:23,35,106-108,161",
     "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/protocol/src/shell_environment.rs:100-147",
     "containers/bubblewrap@124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe:bwrap.xml:50-59,230-233,309-314,409-415",
     "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:tools/adoption/managed_block.py:93-114,319-338",
@@ -122,6 +122,48 @@
     "implementation_code_changed": false,
     "prior_289_test_result_reused": true,
     "limits": "Documentation and controlled shell syntax/time-boundary qualification only. No manager reload/re-exec, Dagu restart, real store readability or real paper-unit execution performed."
+  },
+  "review_repair": {
+    "reviewed_head": "ce80c086203985b753b2847260c4c20bccf6d89f",
+    "directive": "co-op 2026-10-06T05:52:35Z, task-ns2604-coop-20261006T055125Z",
+    "class": "local_integration",
+    "host_apply": false,
+    "sources": [
+      "GNU Bash 5.3 release archive sha256 0d5cd86965f869a26cf64f4b71be7b96f90a3ba8b3d74e27e8e9d9d5550f31ba:doc/bashref.texi:7935-7945,shell.c:1116-1126,builtins/evalfile.c:119-130; patches 001-009 selection reviewed",
+      "native-agent-stack@ce80c086203985b753b2847260c4c20bccf6d89f:tools/adoption/new_wsl_client_config.py:plan_merge,merge_toml_text,first_difference",
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/shell_environment_policy.rs:44-47,106-108",
+      "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:observability/backends/configure.py:94,108,140-146",
+      "uutils/coreutils@28b6856d7b215bf844b4223589cb54ade84f5223:src/uu/sha256sum/src/sha256sum.rs:6"
+    ],
+    "changes": ["finite native login-profile chain recognition", "value-free write-free pointer-policy preflight", "all host mutations deferred until frozen paper run finishes after cutoff", "explicit approved day/windows required and rechecked in consuming child", "exact XDG-default legacy export and trailing-comment matching", "selected and generic Grafana store provenance kept separate", "native Read deny and dedicated store-path guard coverage", "cheap P3 formatting and public PR path redaction"],
+    "retained_failures": [
+      {"phase": "reported native login chain red", "exit": 1, "tests": 1, "seconds": 1.047},
+      {"phase": "expanded login fixtures", "exit": 1, "reason": "test used patch instead of existing mock.patch; corrected"},
+      {"phase": "F9 wiring check with exact Grafana Read deny", "exit": 1, "reason": "component-mention detector treated exact file name as unwired adoption; used existing service-env wildcard deny format"},
+      {"phase": "six touched modules local fail-fast", "exit": 1, "tests": 356, "seconds": 130.080, "failures": 1, "skipped": 2, "reason": "installed host guard differs from changed repository guard; host apply forbidden and pending owner"},
+      {"phase": "six touched modules CI=1", "exit": 1, "tests": 530, "seconds": 166.244, "failures": 1, "skipped": 3, "reason": "existing harness recognizes CI=true, not CI=1; same installed host-copy mismatch retained"}
+    ],
+    "checks": {
+      "six_touched_modules": {"command": "CI=true TMPDIR=<owned-cache> PYTHONDONTWRITEBYTECODE=1 rtk proxy nice -n 19 python3 -B -m unittest tests.test_new_wsl_client_config tests.test_managed_block tests.test_credential_status tests.test_secret_path_guard tests.test_install_claude_profile tests.test_render_config", "exit": 0, "tests": 530, "seconds": 164.853, "skipped": 4, "limits": "Existing CI mode holds out installed-host-copy comparison; that real-host mismatch is retained separately. The later normalization fixture was verified in the final module rerun."},
+      "normalization_F9_module": {"exit": 0, "tests": 202, "seconds": 76.859},
+      "initial_filter_shape_F9_module": {"exit": 0, "tests": 203, "seconds": 74.375, "limits": "Ran before final canonical/legacy presence correction; retained as intermediate integration result."},
+      "final_F9_module": {"command": "CI=true TMPDIR=<owned-cache> PYTHONDONTWRITEBYTECODE=1 rtk proxy nice -n 19 python3 -B -m unittest tests.test_new_wsl_client_config", "exit": 0, "tests": 203, "seconds": 75.563},
+      "repository_validation": {"command": "TMPDIR=<owned-cache> PYTHONDONTWRITEBYTECODE=1 rtk proxy nice -n 19 python3 -B scripts/validate.py", "exit": 0, "components": 69, "hashed_files": 10276, "profiles": 4, "receipts": 212, "limits": "Integrity and scope only, no live provider/GPU acceptance."},
+      "generated_handbook_and_reports": {"handbook_write_exit": 0, "handbook_check_exit": 0, "handbook_changed": false, "component_matrix_exit": 0, "new_host_grand_list_exit": 0, "status_flips": 0},
+      "whitespace": {"command": "rtk git diff --check", "exit": 0},
+      "native_chain_green": {"exit": 0, "tests": 1, "seconds": 1.053},
+      "focused_login_and_store_fixtures": {"exit": 0, "tests": 16, "seconds": 7.749},
+      "native_bash_syntax": {"blocks": 5, "exits": [0, 0, 0, 0, 0]},
+      "frozen_clock_controls": {"cases": 18, "all_expected_exits_matched": true, "all_silent": true, "missing_stale_malformed_windows_fail_closed": true, "every_interval_intersects_approved_day": true},
+      "legacy_export_controls": {"names": 4, "exact_XDG_default_prefix_and_comments": true, "changed_paths_and_compound_commands_refused": true},
+      "isolated_native_chain": {"class": "synthetic", "preflight_exit": 0, "check_login_env_exit": 0, "bash_login_exit": 0, "live_host_environment_hidden": true, "credential_values_read": false},
+      "F9_check": {"exit": 0, "pieces": 409, "wired": 369, "not_wired": 24, "authorization": 16},
+      "native_hook_checksum": {"exit": 0, "files": 12}
+    },
+    "independent_critic_corrections": ["do not skip unreadable higher Bash startup candidates", "preserve physical LF and ASCII blank semantics; reject CRLF and unsupported controls", "reject valid but day-disjoint approval intervals", "generic Grafana regeneration requires removing its existing file first", "validate native filter types and reject canonical/legacy mixes by field presence even when empty; rules is not a native field"],
+    "final_independent_review": {"class": "source_review", "reviewers": 2, "result": "approve publication, no remaining material scoped finding", "tests_or_host_operations_by_reviewers": false, "next_acceptance_sweep": ["actual owner-executed fresh client, manager-child and container proofs", "custom-home/profile and concurrent-operator boundaries", "combined guard checksum after the second dependency lands"]},
+    "dependency": {"PR": 769, "verified_head": "b444d148019e705f3f94123cd579fef1d0a8336f", "guard_hunks_disjoint": true, "second_to_land_rebases_and_regenerates_combined_checksum": true},
+    "limits": "Local integration and isolated synthetic checks only. Preflight predicts pointer-policy/managed-target barriers, not arbitrary operator .profile behavior, unrelated settings or races. No real manager, Dagu, Docker, client configuration or credential apply; actual consuming proofs and installed-host-copy acceptance remain owner gates after micro-check and both PRs land. Prior final_checks describe the earlier reviewed head."
   },
   "conditions": {"generation_key": "only if its service moves", "fw_lane_store": "only if Phase 3 selects an actual 20129 lane", "paper_units": "future 2026-10-07 units direct --env-file; 2026-10-06 unchanged"}
 }
