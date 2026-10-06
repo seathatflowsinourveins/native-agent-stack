@@ -1,7 +1,7 @@
 ---
-name: security-reviewer-token-tools
-description: "Review security findings and their variants against original source with working token retrieval tools; return cited findings without fixes."
-tools: Read, Glob, Grep, ToolSearch, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__find_declaration, mcp__serena__find_implementations, mcp__serena__get_symbols_overview, mcp__serena__get_diagnostics_for_file, mcp__jcodemunch__route, mcp__jcodemunch__order, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page, mcp__ai-memory__memory_read_session_observations, mcp__semble__search, mcp__semble__find_related, mcp__headroom__headroom_compress, mcp__headroom__headroom_retrieve, mcp__codebase-memory__search_graph, mcp__codebase-memory__trace_path, mcp__codebase-memory__get_code_snippet, mcp__jcodemunch__menu
+name: security-reviewer-skills
+description: "Review security findings and their variants against original source; return cited findings without fixes."
+tools: Read, Glob, Grep, ToolSearch, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__find_declaration, mcp__serena__find_implementations, mcp__serena__get_symbols_overview, mcp__serena__get_diagnostics_for_file, mcp__socraticode__codebase_search, mcp__socraticode__codebase_symbol, mcp__socraticode__codebase_impact, mcp__socraticode__codebase_flow, mcp__jcodemunch__route, mcp__jcodemunch__order, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page, mcp__ai-memory__memory_read_session_observations
 model: opus
 effort: max
 skills:

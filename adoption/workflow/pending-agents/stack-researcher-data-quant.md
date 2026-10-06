@@ -1,7 +1,7 @@
 ---
 name: stack-researcher-data-quant
 description: "Research SEC filings and quantitative data with EdgarTools; return source-cited findings inline."
-tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_fetch_and_index, mcp__plugin_context-mode_context-mode__ctx_search, mcp__qmd__query, mcp__qmd__get, mcp__ai-memory__memory_query, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__get_symbols_overview, mcp__jcodemunch__route, mcp__jcodemunch__menu, mcp__jcodemunch__order, mcp__semble__search, mcp__semble__find_related, mcp__headroom__headroom_compress, mcp__headroom__headroom_retrieve, mcp__codebase-memory__search_graph, mcp__codebase-memory__trace_path, mcp__codebase-memory__get_code_snippet
+tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_fetch_and_index, mcp__plugin_context-mode_context-mode__ctx_search, mcp__qmd__query, mcp__qmd__get, mcp__ai-memory__memory_query, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__get_symbols_overview, mcp__jcodemunch__route, mcp__jcodemunch__menu, mcp__jcodemunch__order
 model: opus
 effort: max
 skills:

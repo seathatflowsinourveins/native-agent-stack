@@ -1,0 +1,1144 @@
+{
+  "schema_version": 1,
+  "kind": "sota_workflow_manifest",
+  "trigger_syntax": "python_regex",
+  "checked_at": "2026-10-06",
+  "decision_record": "docs/decisions/2026-10-06-sota-workflow-manifest.md",
+  "clients": {
+    "claude_code": "2.1.291",
+    "codex_cli": "0.160.0"
+  },
+  "client_snapshot_note": "Requested/observed decision clients; component identity and accepted versions remain in their pin stores.",
+  "pin_sources": {
+    "skills": "adoption/skills/manifest.json",
+    "stack": "manifests/stack.json",
+    "agents": "adoption/agents",
+    "workflow": "examples/claude-native/workflows"
+  },
+  "lanes": [
+    "cc",
+    "coop",
+    "codex_lane",
+    "sdk_worker",
+    "ultracode_stage",
+    "agent_team",
+    "scheduled_headless",
+    "blind"
+  ],
+  "channels": [
+    "description",
+    "preload",
+    "skill_grant_packet",
+    "path_rule",
+    "hook_prompt",
+    "hook_tool_event",
+    "hook_subagent_start",
+    "pointer",
+    "native_verify",
+    "codex_role_text",
+    "sdk_native_arg"
+  ],
+  "rows": [
+    {
+      "id": "skills-research",
+      "uses": [
+        "skills:search-first",
+        "skills:iterative-retrieval",
+        "agents:stack-researcher"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": {
+          "agentType": "stack-researcher",
+          "model": "opus",
+          "effort": "max",
+          "preload": [],
+          "required_skills": [],
+          "base": "agents:stack-researcher",
+          "description": "Gather and verify public source evidence for the bounded research task; preserve source pins and return findings inline."
+        }
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:research|investigate|look up|find maintained)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "stack-researcher"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [
+              "native-stack-research"
+            ],
+            "reason": "Pending reviewed lifecycle registration from draft719 and the S11 native runtime consumer."
+          }
+        },
+        "coordinator_only_skills": [
+          "search-first",
+          "iterative-retrieval"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner."
+    },
+    {
+      "id": "skills-skill-lifecycle",
+      "uses": [
+        "skills:find-skills",
+        "skills:skill-creator",
+        "agents:stack-verifier",
+        "stack:promptfoo"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": {
+          "agentType": "stack-verifier",
+          "base": "agents:stack-verifier",
+          "description": "Run the named acceptance commands and verify their evidence; never fix the implementation.",
+          "preload": [],
+          "model": "opus",
+          "effort": "max",
+          "required_skills": []
+        }
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:find|install|update|retire|evaluate)\\b.{0,100}\\b(?:skill|plugin)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "stack-verifier"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          },
+          "codex_lane": {
+            "skills": [
+              "skill-creator"
+            ],
+            "reason": "The canonical Anthropic source is Claude-only. Codex's same-named built-in requires a separately registered source identity; no alias substitution."
+          }
+        },
+        "coordinator_only_skills": [
+          "find-skills",
+          "skill-creator"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner."
+    },
+    {
+      "id": "skills-design-intake",
+      "uses": [
+        "agents:evidence-reviewer"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "Interrogate requirements before building: stress-test an ambiguous request or plan (assumptions, open decisions, acceptance) before implementation starts. The skill must "
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": []
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          }
+        }
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "No separate intake/brainstorm approval gate is introduced for already authorized bounded work."
+    },
+    {
+      "id": "skills-architecture",
+      "uses": [
+        "skills:codebase-design",
+        "agents:isolated-builder"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:design|refactor|deepen)\\b.{0,100}\\b(?:module|interface|architecture)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "isolated-builder-skills"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          },
+          "ultracode_stage": {
+            "skills": [
+              "codebase-design"
+            ],
+            "reason": "Prepared Skill grant only; no accepted native caller currently forwards this row's named imperative packet."
+          }
+        },
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-skills",
+          "base": "agents:isolated-builder",
+          "description": "Implement a bounded task as an unnamed child in the owned worktree; invoke the packet-named skill with Skill before editing.",
+          "preload": [
+            "context-mode:context-mode"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "skill_grant": true,
+          "packet_imperative": "Invoke the applicable packet-named skill with the Skill tool before editing: codebase-design.",
+          "required_skills": [
+            "codebase-design"
+          ]
+        },
+        "deliverable": false
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Native caller delivery of the selected row's Skill imperative packet is pending."
+    },
+    {
+      "id": "skills-implement",
+      "uses": [
+        "skills:modern-python",
+        "skills:frontend-design",
+        "agents:isolated-builder"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:implement|build|change)\\b.{0,100}\\b(?:Python|frontend|UI|feature)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "isolated-builder-skills"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          },
+          "ultracode_stage": {
+            "skills": [
+              "modern-python",
+              "frontend-design"
+            ],
+            "reason": "Prepared Skill grant only; no accepted native caller currently forwards this row's named imperative packet."
+          }
+        },
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-skills",
+          "base": "agents:isolated-builder",
+          "description": "Implement a bounded task as an unnamed child in the owned worktree; invoke the packet-named skill with Skill before editing.",
+          "preload": [
+            "context-mode:context-mode"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "skill_grant": true,
+          "packet_imperative": "Invoke the applicable packet-named skill with the Skill tool before editing: modern-python, frontend-design.",
+          "required_skills": [
+            "modern-python",
+            "frontend-design"
+          ]
+        },
+        "deliverable": false
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Native caller delivery of the selected row's Skill imperative packet is pending."
+    },
+    {
+      "id": "skills-test",
+      "uses": [
+        "skills:tdd",
+        "skills:property-based-testing",
+        "agents:isolated-builder"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:add|write|fix)\\b.{0,100}\\b(?:test|tests|property)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "isolated-builder-skills"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          },
+          "ultracode_stage": {
+            "skills": [
+              "tdd",
+              "property-based-testing"
+            ],
+            "reason": "Prepared Skill grant only; no accepted native caller currently forwards this row's named imperative packet."
+          }
+        },
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-skills",
+          "base": "agents:isolated-builder",
+          "description": "Implement a bounded task as an unnamed child in the owned worktree; invoke the packet-named skill with Skill before editing.",
+          "preload": [
+            "context-mode:context-mode"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "skill_grant": true,
+          "packet_imperative": "Invoke the applicable packet-named skill with the Skill tool before editing: tdd, property-based-testing.",
+          "required_skills": [
+            "tdd",
+            "property-based-testing"
+          ]
+        },
+        "deliverable": false
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Native caller delivery of the selected row's Skill imperative packet is pending."
+    },
+    {
+      "id": "skills-debug",
+      "uses": [
+        "skills:diagnosing-bugs",
+        "agents:isolated-builder"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:debug|diagnose|repair)\\b.{0,100}\\b(?:bug|failure|error|slow|exception)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "isolated-builder-skills"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          },
+          "ultracode_stage": {
+            "skills": [
+              "diagnosing-bugs"
+            ],
+            "reason": "Prepared Skill grant only; no accepted native caller currently forwards this row's named imperative packet."
+          }
+        },
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-skills",
+          "base": "agents:isolated-builder",
+          "description": "Implement a bounded task as an unnamed child in the owned worktree; invoke the packet-named skill with Skill before editing.",
+          "preload": [
+            "context-mode:context-mode"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "skill_grant": true,
+          "packet_imperative": "Invoke the applicable packet-named skill with the Skill tool before editing: diagnosing-bugs.",
+          "required_skills": [
+            "diagnosing-bugs"
+          ]
+        },
+        "deliverable": false
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Native caller delivery of the selected row's Skill imperative packet is pending."
+    },
+    {
+      "id": "skills-review",
+      "uses": [
+        "skills:typesafe-ai",
+        "skills:variant-analysis",
+        "agents:evidence-reviewer"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": {
+          "agentType": "evidence-reviewer",
+          "base": "agents:evidence-reviewer",
+          "description": "Review a supplied patch or artifact against original source; return cited findings inline.",
+          "preload": [],
+          "model": "opus",
+          "effort": "max",
+          "required_skills": []
+        }
+      },
+      "triggers": {
+        "intent": [
+          "\\breview\\b.{0,100}\\b(?:code|diff|change|regression|HEAD)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "evidence-reviewer"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          }
+        },
+        "coordinator_only_skills": [
+          "typesafe-ai",
+          "variant-analysis"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner."
+    },
+    {
+      "id": "skills-security",
+      "uses": [
+        "skills:security-best-practices",
+        "skills:security-threat-model",
+        "skills:codeql",
+        "skills:supply-chain-risk-auditor",
+        "skills:agentic-actions-auditor",
+        "skills:sarif-parsing",
+        "skills:fp-check",
+        "skills:security-audit",
+        "agents:security-reviewer-skills",
+        "skills:variant-analysis"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": {
+          "agentType": "security-reviewer-skills",
+          "base": "agents:security-reviewer",
+          "description": "Review security findings and their variants against original source; return cited findings without fixes.",
+          "preload": [
+            "security-best-practices",
+            "variant-analysis"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "required_skills": [
+            "security-best-practices",
+            "variant-analysis"
+          ]
+        }
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:threat.model|security audit|audit security|vulnerability)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "security-reviewer-skills"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          }
+        },
+        "coordinator_only_skills": [
+          "security-threat-model",
+          "codeql",
+          "supply-chain-risk-auditor",
+          "agentic-actions-auditor",
+          "sarif-parsing",
+          "fp-check",
+          "security-audit"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner."
+    },
+    {
+      "id": "skills-ci-pr",
+      "uses": [
+        "skills:gh-fix-ci",
+        "skills:gh-address-comments",
+        "agents:isolated-builder-ci-pr"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": {
+          "agentType": "isolated-builder-ci-pr",
+          "base": "agents:isolated-builder",
+          "description": "Repair CI failures and prepare PR changes in the owned worktree with gh-fix-ci preloaded.",
+          "preload": [
+            "context-mode:context-mode",
+            "gh-fix-ci"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "required_skills": [
+            "gh-fix-ci"
+          ]
+        }
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:fix|repair|diagnose|debug)\\b.{0,120}\\b(?:CI|check|GitHub Actions|workflow)\\b",
+          "\\b(?:address|resolve|reply to)\\b.{0,100}\\b(?:PR|review)\\b.{0,50}\\b(?:comments?|requests?|feedback)\\b"
+        ],
+        "paths": [],
+        "tool_events": [
+          {
+            "tool": "Bash",
+            "regex": "\\bgh\\s+run\\s+view\\b.*--log-failed\\b"
+          },
+          {
+            "tool": "Bash",
+            "regex": "\\bgh\\s+(?:api|pr\\s+view)\\b.*(?:review|comments)"
+          },
+          {
+            "tool": "Bash",
+            "regex": "\\bgh\\s+pr\\s+create\\b"
+          }
+        ],
+        "agent_types": [
+          "isolated-builder-ci-pr"
+        ],
+        "skill_intents": {
+          "gh-fix-ci": [
+            "\\b(?:fix|repair|diagnose|debug)\\b.{0,120}\\b(?:CI|check|GitHub Actions|workflow)\\b"
+          ],
+          "gh-address-comments": [
+            "\\b(?:address|resolve|reply to)\\b.{0,100}\\b(?:PR|review)\\b.{0,50}\\b(?:comments?|requests?|feedback)\\b"
+          ]
+        }
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          }
+        },
+        "coordinator_only_skills": [
+          "gh-address-comments"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner."
+    },
+    {
+      "id": "skills-agent-docs",
+      "uses": [
+        "skills:writing-for-agents",
+        "agents:isolated-builder-agent-docs"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description",
+          "path_rule"
+        ],
+        "coop": [
+          "description",
+          "path_rule"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": {
+          "agentType": "isolated-builder-agent-docs",
+          "base": "agents:isolated-builder",
+          "description": "Update AGENTS.md, CLAUDE.md and agent instructions in the owned worktree with writing-for-agents preloaded.",
+          "preload": [
+            "context-mode:context-mode",
+            "writing-for-agents"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "required_skills": [
+            "writing-for-agents"
+          ]
+        }
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:edit|write|update|fix)\\b.{0,100}\\b(?:AGENTS\\.md|CLAUDE\\.md|SKILL\\.md|agent instructions)\\b"
+        ],
+        "paths": [
+          "adoption/agents/**/*.md",
+          "adoption/skills/**/SKILL.md",
+          "adoption/templates/*AGENTS*",
+          ".claude/agents/**/*.md",
+          "examples/claude-native/agents/**/*.md",
+          "blueprints/runtime-workers/skills/**/SKILL.md"
+        ],
+        "tool_events": [],
+        "agent_types": [
+          "isolated-builder-agent-docs"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          }
+        }
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner."
+    },
+    {
+      "id": "skills-browser",
+      "uses": [
+        "skills:agent-browser"
+      ],
+      "status": "held",
+      "lanes": {
+        "cc": [],
+        "coop": [],
+        "codex_lane": [],
+        "sdk_worker": [],
+        "agent_team": [],
+        "scheduled_headless": [],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:browser|web automation)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": []
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          }
+        },
+        "pending_skills": [
+          "agent-browser"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "agent-browser remains held pending its owning browser measurement."
+    },
+    {
+      "id": "skills-mcp-build",
+      "uses": [
+        "skills:mcp-builder",
+        "agents:isolated-builder"
+      ],
+      "status": "kept",
+      "lanes": {
+        "cc": [
+          "description"
+        ],
+        "coop": [
+          "description"
+        ],
+        "codex_lane": [
+          "description"
+        ],
+        "sdk_worker": [],
+        "agent_team": [
+          "description"
+        ],
+        "scheduled_headless": [
+          "description"
+        ],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:build|fix|implement)\\b.{0,100}\\bMCP\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": [
+          "isolated-builder-skills"
+        ]
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "pending_lane_dependencies": {
+          "sdk_worker": {
+            "skills": [],
+            "reason": "S11 native argument consumer is owned by another stage and not accepted here."
+          },
+          "ultracode_stage": {
+            "skills": [
+              "mcp-builder"
+            ],
+            "reason": "Prepared Skill grant only; no accepted native caller currently forwards this row's named imperative packet."
+          }
+        },
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-skills",
+          "base": "agents:isolated-builder",
+          "description": "Implement a bounded task as an unnamed child in the owned worktree; invoke the packet-named skill with Skill before editing.",
+          "preload": [
+            "context-mode:context-mode"
+          ],
+          "model": "opus",
+          "effort": "max",
+          "skill_grant": true,
+          "packet_imperative": "Invoke the applicable packet-named skill with the Skill tool before editing: mcp-builder.",
+          "required_skills": [
+            "mcp-builder"
+          ]
+        },
+        "deliverable": false
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Native caller delivery of the selected row's Skill imperative packet is pending."
+    },
+    {
+      "id": "skills-data-quant",
+      "uses": [
+        "stack:edgartools",
+        "agents:stack-researcher"
+      ],
+      "status": "held",
+      "lanes": {
+        "cc": [],
+        "coop": [],
+        "codex_lane": [],
+        "sdk_worker": [],
+        "agent_team": [],
+        "scheduled_headless": [],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:SEC|filings|Edgar|systematic research)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": []
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "deliverable": false,
+        "pending_skills": [
+          "EdgarTools"
+        ],
+        "planned_ultracode_stage": {
+          "agentType": "stack-researcher-data-quant",
+          "base": "agents:stack-researcher",
+          "description": "Research SEC filings and quantitative data with EdgarTools; return source-cited findings inline.",
+          "preload": [
+            "EdgarTools"
+          ],
+          "model": "opus",
+          "effort": "max"
+        }
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Pending EdgarTools skill Tier B entry and research-lane qualification."
+    },
+    {
+      "id": "skills-broker-adapter",
+      "uses": [
+        "stack:alpaca-py",
+        "agents:isolated-builder"
+      ],
+      "status": "held",
+      "lanes": {
+        "cc": [],
+        "coop": [],
+        "codex_lane": [],
+        "sdk_worker": [],
+        "agent_team": [],
+        "scheduled_headless": [],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:broker|Alpaca|IBKR)\\b.{0,100}\\badapter\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": []
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "deliverable": false,
+        "pending_skills": [
+          "alpaca-broker-money-precision",
+          "alpaca-broker-rate-limits-resilience"
+        ],
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-broker-adapter",
+          "base": "agents:isolated-builder",
+          "description": "Implement exact monetary arithmetic and resilient Alpaca clients in the owned worktree with the broker skills preloaded.",
+          "preload": [
+            "context-mode:context-mode",
+            "alpaca-broker-money-precision",
+            "alpaca-broker-rate-limits-resilience"
+          ],
+          "model": "opus",
+          "effort": "max"
+        }
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Read-only fit candidate; pending deny-set ruling, trading owner and Tier B entries."
+    },
+    {
+      "id": "skills-hosting",
+      "uses": [
+        "stack:dagu",
+        "agents:isolated-builder"
+      ],
+      "status": "held",
+      "lanes": {
+        "cc": [],
+        "coop": [],
+        "codex_lane": [],
+        "sdk_worker": [],
+        "agent_team": [],
+        "scheduled_headless": [],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:Dagu|DAG|nightly schedule)\\b"
+        ],
+        "paths": [
+          "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/**"
+        ],
+        "tool_events": [],
+        "agent_types": []
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "deliverable": false,
+        "pending_skills": [
+          "dagu"
+        ],
+        "planned_ultracode_stage": {
+          "agentType": "isolated-builder-hosting",
+          "base": "agents:isolated-builder",
+          "description": "Author or debug Dagu DAG definitions in the owned worktree with the dagu skill preloaded.",
+          "preload": [
+            "context-mode:context-mode",
+            "dagu"
+          ],
+          "model": "opus",
+          "effort": "max"
+        }
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Pending binary-coupled dagu skill Tier B entry; host rollout remains with the command center."
+    },
+    {
+      "id": "skills-model-hub",
+      "uses": [
+        "stack:huggingface-hub-native"
+      ],
+      "status": "held",
+      "lanes": {
+        "cc": [],
+        "coop": [],
+        "codex_lane": [],
+        "sdk_worker": [],
+        "agent_team": [],
+        "scheduled_headless": [],
+        "blind": [],
+        "ultracode_stage": "inert"
+      },
+      "triggers": {
+        "intent": [
+          "\\b(?:Hugging Face|Hub model|Hub dataset)\\b"
+        ],
+        "paths": [],
+        "tool_events": [],
+        "agent_types": []
+      },
+      "sdk": {},
+      "challenger": {},
+      "measure": {
+        "readiness": "NOT_READY",
+        "delivery_evidence": "not_measured",
+        "deliverable": false,
+        "pending_skills": [
+          "hf-cli"
+        ]
+      },
+      "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
+      "inert_reason": "Pending S4 vendor-generated lifecycle record and the native model-hub consumer."
+    }
+  ],
+  "native_skill_aliases": {
+    "context-mode:context-mode": "stack:context-mode"
+  }
+}

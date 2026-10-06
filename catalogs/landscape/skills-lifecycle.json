@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills-lifecycle",
-  "checked_at": "2026-09-30",
+  "checked_at": "2026-10-06",
   "scope": "The lifecycle tasks the landscape sweep's skills modality sweeps (tools/sota-convergence/landscape-sweep/README.md, Skills modality), the installed skills of adoption/skills/manifest.json that serve each task, and the skill sources it searches. Each task is one skills-* layer. Inclusion does not install, accept or authorize a skill; adoption/skills/manifest.json stays the only place a skill is pinned.",
   "notes": [
     "Each GitHub source's pin is its default-branch HEAD commit, read on 2026-09-30 with gh api repos/<owner>/<repo>/commits/<default branch> (read-only). None of the sources was archived.",
@@ -11,7 +11,7 @@
     "Maintenance was checked on 2026-09-30 for all 22 GitHub sources under the landscape sweep's common maintenance rule (templates.json common: stale when archived or with no commit on the default branch in the last 90 days, established with gh api repos/<owner>/<repo>/commits?since=<date 90 days ago>&per_page=1, not from pushed_at): gh api repos/<owner>/<repo>/commits?sha=<default branch>&since=2026-07-02T00:00:00Z&per_page=1. None is archived, and only openai-skills returned no commit, so it alone carries a maintenance record. Its four installed skills stay pinned and listed; the tasks they serve name the stale source as an open gap.",
     "The manifest's excluded source 'various' (Lark/Feishu, Azure, genmedia and other vendor packs) names no single repository, so it is not a source here.",
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
-    "alpacahq-alpaca-skills and vercel-labs-agent-skills serve no task: the paper-trading skills have the model submit orders, which deterministic code owns here, and the React/Vercel skills have no code here (the manifest's excluded reasons).",
+    "Historical 2026-09-30 disposition: alpacahq-alpaca-skills and vercel-labs-agent-skills served no task. The 2026-10-06 broker-adapter task now records read-only fit candidates; order mutation stays outside that fit and no install occurs before the deny-set ruling. React/Vercel remains off-domain here.",
     "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit.",
     "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill."
   ],
@@ -38,7 +38,10 @@
     {"source_id": "typesafe-ai-skills", "kind": "github-skills-repo", "url": "https://github.com/typesafe-ai/skills", "pin": "65a39f393687675ce170e6094757de20370365b9"},
     {"source_id": "vercel-labs-agent-browser", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-browser", "pin": "d01253d9db28d75080e36da3c1c31ef89454731e"},
     {"source_id": "vercel-labs-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-skills", "pin": "063bee94c3f4df8453406c830b0a7df0f2860278"},
-    {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"}
+    {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"},
+    {"source_id": "dgunning-edgartools", "kind": "github-skills-repo", "url": "https://github.com/dgunning/edgartools", "pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348"},
+    {"source_id": "dagucloud-dagu", "kind": "github-skills-repo", "url": "https://github.com/dagucloud/dagu", "pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4"},
+    {"source_id": "huggingface-huggingface-hub", "kind": "github-skills-repo", "url": "https://github.com/huggingface/huggingface_hub", "pin": "bd4a76030582d118e28dc9ad6c7a5911ea76176b"}
   ],
   "tasks": [
     {
@@ -181,6 +184,42 @@
       "source_ids": ["anthropics-skills", "microsoft-skills", "affaan-m-ecc", "anthropics-claude-code", "huggingface-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen MCP server build and fix tasks shows a candidate producing servers that pass their own tests and connect in Claude Code and Codex more often than mcp-builder at no higher token or time cost, in Claude Code and in Codex; or mcp-builder's upstream is archived, removed or relicensed."
+    },
+    {
+      "layer_id": "skills-data-quant",
+      "lifecycle_task": "data-quant",
+      "requirement": "Source public SEC data and prepare reproducible systematic research while preserving as-known information and keeping numeric, risk and order state deterministic.",
+      "installed": [],
+      "source_ids": ["dgunning-edgartools", "anthropics-skills", "openai-skills", "alpacahq-alpaca-skills"],
+      "open_gaps": ["EdgarTools vendor skill is a pending Tier B trial; compare vendor finance candidates by systematic-research fit and connector requirements rather than omitting them."],
+      "overturn_when": "A maintained vendor alternative better meets the frozen research outcome, provenance and token criteria, or the selected owner fails native delivery."
+    },
+    {
+      "layer_id": "skills-broker-adapter",
+      "lifecycle_task": "broker-adapter",
+      "requirement": "Review read-only broker API and adapter guidance against the selected research/paper scope. Deterministic code owns numeric, risk and order state; no skill or MCP install precedes the deny-set ruling.",
+      "installed": [],
+      "source_ids": ["alpacahq-alpaca-skills", "microsoft-skills", "anthropics-skills"],
+      "open_gaps": ["Alpaca money-precision, resilience and market-data frontmatter names are vendor candidates, not permission to install or submit orders. The trading owner qualifies domain changes."],
+      "overturn_when": "A qualified vendor-native owner fails the read-only fit or a better maintained source passes the same scope and outcome criteria."
+    },
+    {
+      "layer_id": "skills-hosting",
+      "lifecycle_task": "hosting",
+      "requirement": "Prepare native Dagu DAG and runtime-hosting changes with binary-coupled guidance and state/storage outside source worktrees.",
+      "installed": [],
+      "source_ids": ["dagucloud-dagu", "affaan-m-ecc", "skills-sh-registry"],
+      "open_gaps": ["The dagu skill and hosting preload remain pending until their native release identity and Tier B entry are recorded. Native host operations and private cleanup stay with the command center."],
+      "overturn_when": "Native acceptance fails, a skill tree moves ahead of its binary, or a maintained alternative wins the declared hosting outcome."
+    },
+    {
+      "layer_id": "skills-model-hub",
+      "lifecycle_task": "model-hub",
+      "requirement": "Use Hugging Face's native CLI and generated guidance for Hub model and dataset work, with recorded source/version identity and bounded data/model operations.",
+      "installed": [],
+      "source_ids": ["huggingface-huggingface-hub", "huggingface-skills", "microsoft-skills"],
+      "open_gaps": ["hf-cli is observed installed through the vendor route; its generated-source lifecycle reconciliation is a separate S4 draft dependency. Compare curated Hugging Face and NVIDIA skill sets by task rather than omitting them."],
+      "overturn_when": "The generator or native route fails the declared task, the recorded bytes/version drift, or a maintained candidate wins the same bounded outcome."
     }
   ]
 }

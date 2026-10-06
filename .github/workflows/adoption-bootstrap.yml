@@ -858,6 +858,7 @@ jobs:
       - name: Install the hash-locked session calendar
         run: |
           python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
+          python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-validation.txt
       # Every step from here through "Run the full test suite (gating on macOS)" runs in full mode only
       # (docs/decisions/2026-10-03-macos-ci-scope.md); changed-tests mode runs its own step further below.
       - name: Validate manifests and evidence integrity

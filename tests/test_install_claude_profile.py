@@ -1214,17 +1214,17 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
         return {cells[0]: cells[1].strip("`") for cells in cls.table_rows(text, cls.ROLE_HEADER)}
 
     def test_every_preload_is_listing_eligible_and_targeted_roles_have_exact_skills(self):
-        # Sources: the pinned table's Listing column and the upstream sub-agents
-        # preload rules. Plugin skills are not table rows: only their namespace shape
+        # Sources: the current lifecycle store and upstream sub-agent preload
+        # rules. Dated decision tables are historical. Plugin skills are not rows: only their namespace shape
         # is checked here; this is not a native plugin-preload probe.
         try:
             import yaml
         except ImportError:
             self.skipTest("PyYAML is not installed")
-        columns = [cell.strip() for cell in self.SKILLS_HEADER.strip("|").split("|")]
-        rows = self.table_rows(self.SKILLS_DOC.read_text(encoding="utf-8"), self.SKILLS_HEADER)
-        self.assertTrue(rows, "pinned skills table is missing")
-        listing = {row[columns.index("Name")]: row[columns.index("Listing")] for row in rows}
+        rows = json.loads((ROOT / "adoption/skills/manifest.json").read_text(encoding="utf-8"))["skills"]
+        self.assertTrue(rows, "canonical skill store is missing")
+        listing = {row["name"]: row.get("claude_listing") for row in rows
+                   if row.get("status") in {"kept", "trial"}}
         preloads = {}
         for path in sorted(icp.AGENTS_SRC_DIR.glob("*.md")):
             with self.subTest(agent=path.name):
@@ -1243,7 +1243,7 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                                       f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
         for agent, expected in {
             "isolated-builder": ["context-mode:context-mode"],
-            "security-reviewer": ["security-best-practices", "variant-analysis"],
+            "security-reviewer": ["security-best-practices"],
         }.items():
             with self.subTest(agent=agent):
                 self.assertIn(agent, preloads)
@@ -1302,9 +1302,7 @@ class PreloadVariantTests(unittest.TestCase):
                                             "alpaca-broker-rate-limits-resilience"],
         "stack-researcher-data-quant": ["EdgarTools"],
         "isolated-builder-skills": ["context-mode:context-mode"],
-        "evidence-reviewer-token-tools": [],
-        "stack-verifier-token-tools": [],
-        "security-reviewer-token-tools": ["security-best-practices", "variant-analysis"],
+        "security-reviewer-skills": ["security-best-practices", "variant-analysis"],
     }
 
     @classmethod
@@ -1374,18 +1372,11 @@ class PreloadVariantTests(unittest.TestCase):
                 self.assertEqual(actual["skills"], self.PRELOADS[name])
                 self.assertNotEqual(actual["description"], original["description"])
 
-    def test_variants_grant_working_token_layers_without_socraticode_or_symbol_writers(self):
+    def test_client_wiring_hold_preserves_every_base_tool_grant(self):
         try:
             import yaml
         except ImportError:
             self.skipTest("PyYAML is not installed")
-        required = {
-            "mcp__semble__search", "mcp__headroom__headroom_compress", "mcp__headroom__headroom_retrieve",
-            "mcp__codebase-memory__search_graph", "mcp__codebase-memory__trace_path",
-            "mcp__plugin_context-mode_context-mode__ctx_execute", "mcp__serena__find_symbol",
-            "mcp__serena__find_referencing_symbols", "mcp__jcodemunch__route", "mcp__jcodemunch__menu",
-            "mcp__jcodemunch__order",
-        }
         for name, base in variants.VARIANTS.items():
             with self.subTest(agent=name):
                 role = icp.AGENTS_SRC_DIR / f"{name}.md"
@@ -1394,15 +1385,10 @@ class PreloadVariantTests(unittest.TestCase):
                 front = yaml.safe_load(self.parts(role.read_bytes())[0])
                 original = yaml.safe_load(self.parts((icp.AGENTS_SRC_DIR / f"{base}.md").read_bytes())[0])
                 tools, base_tools = set(front["tools"].split(", ")), set(original["tools"].split(", "))
-                self.assertLessEqual(required, tools)
-                self.assertFalse(any(tool.startswith("mcp__socraticode__") for tool in tools))
-                allowed_additions = set(variants.TOKEN_TOOLS) | ({"Skill"} if name == "isolated-builder-skills" else set())
-                self.assertLessEqual(tools - base_tools, allowed_additions)
-                self.assertEqual(base_tools - tools,
-                                 {tool for tool in base_tools if tool.startswith("mcp__socraticode__")})
-                self.assertFalse(any(tool in tools for tool in {"mcp__serena__replace_symbol_body",
-                                                                "mcp__serena__insert_after_symbol",
-                                                                "mcp__serena__rename_symbol"}))
+                expected = base_tools | ({"Skill"} if name == "isolated-builder-skills" else set())
+                self.assertEqual(tools, expected)
+                if name != "isolated-builder-skills":
+                    self.assertEqual(front["tools"], original["tools"])
 
     def test_inert_route_can_render_its_passive_plan_without_becoming_deliverable(self):
         manifest = self.manifest()

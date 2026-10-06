@@ -6,8 +6,8 @@ adoption/agents/claude/{isolated-builder,stack-researcher}.md plus
 tests/test_install_claude_profile.py:1289-1346. This fills the workflow's lack of
 a per-call skills field; it is PR-time format glue, not a dispatch or eval runner.
 Definitions and task descriptions come from adoption/workflow/manifest.json.
-A14 (2026-10-06) adds the working token-tool allowlist; canonical Claude tool IDs
-are in docs/token-session-handbook.md:245 and the connected upstream MCP schemas.
+The 2026-10-06 client-wiring hold preserves the pinned base tool grants exactly;
+P0-1 tool-grant proposals remain private plan inputs, outside this PR.
 This module returns repository artifacts and never installs or writes them.
 """
 
@@ -18,8 +18,8 @@ import re
 from pathlib import Path
 
 
-# These bodies remain held by the token-E2E owner. A variant inherits the same
-# classification, not an amendment to the base's instructions or evidence.
+# Variants retain their base's held or evidence-sentence classification. This is
+# not an amendment to the pinned body or a new instruction-use evidence claim.
 VARIANTS = {
     "isolated-builder-ci-pr": "isolated-builder",
     "isolated-builder-agent-docs": "isolated-builder",
@@ -27,29 +27,19 @@ VARIANTS = {
     "isolated-builder-broker-adapter": "isolated-builder",
     "stack-researcher-data-quant": "stack-researcher",
     "isolated-builder-skills": "isolated-builder",
-    "evidence-reviewer-token-tools": "evidence-reviewer",
-    "stack-verifier-token-tools": "stack-verifier",
-    "security-reviewer-token-tools": "security-reviewer",
+    "security-reviewer-skills": "security-reviewer",
 }
+RETIRED_VARIANTS = frozenset({
+    "stack-researcher-token-tools", "evidence-reviewer-token-tools",
+    "stack-verifier-token-tools", "security-reviewer-token-tools",
+})
+OWNED_VARIANT_NAMES = frozenset(VARIANTS) | RETIRED_VARIANTS
 AGENT_DIRS = (
     "adoption/agents/claude",
     "examples/claude-native/agents",
     ".claude/agents",
 )
 PENDING_DIRS = ("adoption/workflow/pending-agents", "examples/claude-native/agents/pending")
-TOKEN_TOOLS = (
-    "mcp__semble__search", "mcp__semble__find_related",
-    "mcp__headroom__headroom_compress", "mcp__headroom__headroom_retrieve",
-    "mcp__codebase-memory__search_graph", "mcp__codebase-memory__trace_path",
-    "mcp__codebase-memory__get_code_snippet",
-    "mcp__plugin_context-mode_context-mode__ctx_execute",
-    "mcp__plugin_context-mode_context-mode__ctx_execute_file",
-    "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
-    "mcp__plugin_context-mode_context-mode__ctx_search",
-    "mcp__serena__find_symbol", "mcp__serena__find_referencing_symbols",
-    "mcp__serena__get_symbols_overview",
-    "mcp__jcodemunch__route", "mcp__jcodemunch__menu", "mcp__jcodemunch__order",
-)
 FIELD = re.compile(rb"(?m)^([A-Za-z_][A-Za-z0-9_-]*):")
 
 
@@ -101,12 +91,11 @@ def _render(source: bytes, stage: dict) -> bytes:
     fields["skills"] = ("skills:\n" + "\n".join("  - " + json.dumps(skill, ensure_ascii=False)
                                                      for skill in preload)).encode("utf-8") if preload else b"skills: []"
     tools = fields["tools"].decode("utf-8").removeprefix("tools: ").split(", ")
-    tools = [tool for tool in tools if not tool.startswith("mcp__socraticode__")]
     if grant:
         if "Skill" in tools:
             raise ValueError("pinned builder already grants Skill; review the base change first")
         tools.append("Skill")
-    fields["tools"] = ("tools: " + ", ".join(dict.fromkeys(tools + list(TOKEN_TOOLS)))).encode("utf-8")
+        fields["tools"] = ("tools: " + ", ".join(tools)).encode("utf-8")
     return b"---\n" + b"\n".join(fields.values()) + b"\n---\n" + body
 
 

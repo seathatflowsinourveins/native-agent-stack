@@ -1,7 +1,7 @@
 ---
 name: isolated-builder-agent-docs
 description: "Update AGENTS.md, CLAUDE.md and agent instructions in the owned worktree with writing-for-agents preloaded."
-tools: Read, Edit, Write, Glob, Grep, Bash, ToolSearch, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__find_declaration, mcp__serena__get_symbols_overview, mcp__serena__get_diagnostics_for_file, mcp__jcodemunch__route, mcp__jcodemunch__order, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page, mcp__semble__search, mcp__semble__find_related, mcp__headroom__headroom_compress, mcp__headroom__headroom_retrieve, mcp__codebase-memory__search_graph, mcp__codebase-memory__trace_path, mcp__codebase-memory__get_code_snippet, mcp__jcodemunch__menu
+tools: Read, Edit, Write, Glob, Grep, Bash, ToolSearch, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__find_declaration, mcp__serena__get_symbols_overview, mcp__serena__get_diagnostics_for_file, mcp__socraticode__codebase_search, mcp__socraticode__codebase_symbol, mcp__socraticode__codebase_impact, mcp__jcodemunch__route, mcp__jcodemunch__order, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page
 model: opus
 effort: max
 skills:
