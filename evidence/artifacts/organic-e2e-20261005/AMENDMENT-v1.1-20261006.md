@@ -150,10 +150,31 @@ This extends the Gate 0 network amendment above. Each forward serves a tool unde
   - SocratiCode in Claude cells is NOT-TESTABLE. Claude's user configuration points it at `127.0.0.1:16333` and `127.0.0.1:8231`, where nothing listens on the host either; that is a host configuration matter for the co-op.
   - SocratiCode in Codex cells, and chrome-devtools in both clients, are testable.
 - **The calibration cell (2).** The pilot's first Codex trial, the gate-0 CL3 native trial on G1 (`gate0-G1`), is the designated calibration cell for the call-id key. run.json records the designation.
-  - **Pass:** every `X-OmniRoute-Request-Id` its gateway forward recorded matched a call-log row's id or correlation id, and at least one did (`grade.call_id_calibration`).
+  - **Pass:** every `X-OmniRoute-Request-Id` its gateway forward recorded equals a call-log row's `id`, strictly (round 6d: no correlation-id substitution), and at least one did (`grade.call_id_calibration`).
   - **Required by:** gate 0 (the `gate0-G1` check) and G11.
   - **If it fails, G11 stays failed.** The key is then fixed from the deployed build's source (`omniroute-3.8.51-5f4b3d577-affinity-pr15167`), cited by file and line, and the calibration re-runs. There is no fallback that reads foreign ids.
 - **Claude's credentials file** written back to the host is accepted as is (CC 17:06Z).
+
+### Round 6d: the GPT read of 50752dde (CHANGES_REQUESTED, one P1 and three P2s)
+
+1. **P1, fixed: an owned collection route could return another collection's payload.** Grouped queries take `with_lookup`, as a string or an object, and queries take `lookup_from` (in @qdrant/js-client-rest 1.18.0's API schema). Through them, an owned route could read another collection.
+   - **Only the operations SocratiCode 1.15.0 performs are admitted** (`netfilter.judge_qdrant`). Its dist calls `getCollections`, `createCollection`, `getCollection`, `deleteCollection`, `createPayloadIndex`, `upsert`, `retrieve`, `delete` (points), `scroll` and `query` (`dist/services/qdrant.js`, `dist/services/symbol-graph-store.js`).
+   - **Those map to these routes, each on a collection of the trial's own prefix:**
+     - GET, PUT and DELETE `/collections/<name>`;
+     - PUT `/index`;
+     - PUT and POST `/points`;
+     - POST `/points/delete`, `/points/scroll` and `/points/query`.
+   - **Every other route is refused**, even on an owned collection: grouped, batch, search, recommend, discover, count, payload, vector, snapshot and alias routes.
+   - **Every body is parsed before forwarding.** Every collection it names must carry the trial's prefix (`netfilter.qdrant_selectors_ok`): `with_lookup` in both forms, and `lookup_from` at any depth (prefetch, batch searches).
+   - **New required probes** (`CLOSURE_EXPECTATIONS`, required by Gate 0 and G13): a foreign collection in an owned query's body is refused, and a grouped query is refused.
+2. **P2, fixed: the collection listing was an inter-trial channel.** GET `/collections` is now answered with the receiving trial's own names only (`netfilter.filter_collection_list`).
+   - The response envelope (status, time, result) is kept, and the framing is recomputed: the upstream body is read whole (Content-Length, chunked or until close), and the answer carries a new Content-Length.
+   - A required probe checks that foreign names are absent inside, while the same listing outside holds others' (5 on this host).
+   - A two-trial test checks that a collection trial A creates is in A's listing and absent from B's.
+3. **P2, fixed: calibration now uses strict equality.** A recorded `X-OmniRoute-Request-Id` matches only a call-log row whose `id` equals it. A `correlationId` match is not substituted (`common.gateway_calls_for_trial`). The designation (run.json `calibration.key`) and this file say so. A negative case checks that a request id equal only to a `correlationId` matches nothing and stays unresolved.
+4. **P2, fixed: the calibration cell now runs first.** `pilot.py` schedules `codex-native-gate0` first (`CALIBRATION_CELL`). It then collects that trial and runs `grade.py calibration`, which writes `calibration.json` (0600) and exits non-zero unless the calibration passed. Only after a pass does it advance to any other cell; a failure stops the pilot.
+
+Also from that read: SocratiCode's NOT-TESTABLE cause for Claude cells now states what was probed. The host ports are checked, not asserted.
 
 ### Round 6c: the GPT read of 80be1483 (CHANGES_REQUESTED, two P2s)
 
@@ -174,9 +195,9 @@ This extends the Gate 0 network amendment above. Each forward serves a tool unde
 
 - **P1, the call-log detail GET.** The command guard permits it through its id exception (`scripts/hooks/secret_path_guard.py:4657-4658`). Under the CC's interim rule, `common.gateway_calls_for_trial` replaces the thread scan:
   - It runs on the coordinator side after the trial (`collect.py`), never inside a trial.
-  - It requests a detail **only** for list rows whose id or correlation id is one of the `X-OmniRoute-Request-Id` values the trial's own responses carried. The gateway forward records those values (OmniRoute v3.8.51 `src/shared/constants/headers.ts`).
+  - It requests a detail **only** for list rows whose `id` equals one of (strictly since round 6d; no correlation-id substitution) the `X-OmniRoute-Request-Id` values the trial's own responses carried. The gateway forward records those values (OmniRoute v3.8.51 `src/shared/constants/headers.ts`).
   - It keeps only model, status, received and forwarded effort and tier, and the cache source. No body enters a receipt.
-  - That the header value is the call log's id or correlation id is read from source, not yet observed. With no match, nothing is requested and G11 stays failed.
+  - That the header value is the call log's `id` is read from source, not yet observed; the calibration cell checks it first (round 6b, 6d). With no match, nothing is requested and G11 stays failed.
   - A test checks that a foreign id is never requested.
 - **P2, closure evidence.** Gate 0 (`network-closure`) and G13 require the stage-1 self-test's verified denials (`grade.closure_evidence`, 13 required probes). These cover:
   - `/api/health`, the call logs and the dashboard refused by the filter;
@@ -707,6 +728,11 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **Round 6d** (the GPT read of 50752dde): the focused module passes 100 of 100 tests, client starts included.
+  - **Red run.** On the round-6c head, exactly its 6 tests are red (3 fail, 3 error), and the other 94 pass. There, the two-trial test fails because trial B sees trial A's collection; its clean-up removed that collection.
+  - **Stage-1 self-test:**
+    - 30 of 30 network expectations are met: a foreign body selector and grouped queries are refused, and the listing shows 0 foreign names inside against 5 outside;
+    - 79 probes return ENOENT, and 7 of 7 client checks pass.
 - **Round 6c** (the GPT read of 80be1483): the focused module passes 95 of 95 tests, client starts included.
   - **Red run.** On the round-6b head, exactly its 3 tests are red (1 fails, 2 error), and the other 92 pass.
   - **Stage-1 self-test:** 79 probes return ENOENT, 7 of 7 client checks pass, and 27 of 27 network expectations are met.

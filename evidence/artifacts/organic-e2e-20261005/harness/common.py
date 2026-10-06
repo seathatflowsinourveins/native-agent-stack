@@ -996,8 +996,8 @@ def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_row
     """GPT read of a513616d, P1, ruled by CC item task-ns2604-coop-20261006T164313Z (section 3): the trial's own gateway
     calls, read on the coordinator side after the trial and never from inside one.
     - The call-log list (GET /api/usage/call-logs with limit and offset) is scanned for rows in [since, until] whose id
-      or correlationId is one of request_ids: the X-OmniRoute-Request-Id values the trial's own responses carried,
-      which its gateway forward recorded.
+      equals one of request_ids (strictly; no correlationId substitution): the X-OmniRoute-Request-Id values the
+      trial's own responses carried, which its gateway forward recorded.
     - A detail GET is made only for those rows, so no other session's call is ever requested.
     - Only the fields grading needs are kept: model, status, received and forwarded effort and tier, and the cache
       source. No request or response body enters a record.
@@ -1018,7 +1018,9 @@ def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_row
             stamp = row.get("timestamp") or ""
             if stamp < since_iso or stamp > until_iso:
                 continue
-            hit = wanted & {str(row.get("id")), str(row.get("correlationId"))}
+            # Round 6d (GPT read of 50752dde, P2): strict equality with the call log's own id; a correlationId match
+            # is not substituted.
+            hit = wanted & {str(row.get("id"))}
             if not hit:
                 continue
             matched |= hit

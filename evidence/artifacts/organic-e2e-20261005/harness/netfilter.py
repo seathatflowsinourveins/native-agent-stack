@@ -133,6 +133,70 @@ def scope_ok(query: str, scope: dict) -> bool:
     return values.get("workspace") == [scope.get("workspace")] and values.get("project") == [scope.get("project")]
 
 
+# Round 6d (GPT read of 50752dde, P1): the Qdrant operations socraticode 1.15.0 performs, and no other. Its dist calls
+# getCollections, createCollection, getCollection, deleteCollection, createPayloadIndex, upsert, retrieve, delete
+# (points), scroll and query (services/qdrant.js and services/symbol-graph-store.js), which @qdrant/js-client-rest
+# 1.18.0 sends as the routes below (dist/types/openapi/generated_schema.d.ts). Grouped, batch, search, recommend,
+# discover, snapshot, alias and cluster routes stay out. Each body is parsed, and every collection it names
+# (with_lookup in both forms, lookup_from at any depth) must carry the trial's own prefix.
+QDRANT_ROUTES = {"": {"GET", "PUT", "DELETE"}, "/index": {"PUT"}, "/points": {"PUT", "POST"},
+                 "/points/delete": {"POST"}, "/points/scroll": {"POST"}, "/points/query": {"POST"}}
+QDRANT_NAME = re.compile(r"\A[A-Za-z0-9_-]+\Z")
+MAX_QDRANT_BODY = 64 * 1024 * 1024
+
+
+def judge_qdrant(prefix: str, method: str, path: str) -> dict:
+    """The Qdrant rule a request matches: health, the collection list (filtered on the way back), or one of
+    QDRANT_ROUTES on a collection of the trial's own prefix. Denied otherwise."""
+    if path == "/healthz" and method == "GET":
+        return {"name": "health"}
+    if path == "/collections" and method == "GET":
+        return {"name": "list", "rewrite": "qdrant-collections"}
+    if not path.startswith("/collections/"):
+        raise Denied("Qdrant route not admitted")
+    name, _, rest = path[len("/collections/"):].partition("/")
+    suffix = "/" + rest if rest else ""
+    if not name.startswith(prefix) or not QDRANT_NAME.match(name) or len(name) == len(prefix):
+        raise Denied("a collection outside the trial's own prefix")
+    if suffix not in QDRANT_ROUTES:
+        raise Denied("Qdrant operation not admitted (not one socraticode 1.15.0 uses)")
+    if method not in QDRANT_ROUTES[suffix]:
+        raise Denied(f"method {method} not admitted on this Qdrant operation")
+    return {"name": "collection", "body": "qdrant-selectors" if method in ("POST", "PUT") else None}
+
+
+def qdrant_selectors_ok(value, prefix: str) -> bool:
+    """Every collection a Qdrant request body names carries the trial's prefix: with_lookup as a string or an object
+    with collection, and lookup_from objects at any depth (prefetch, batch searches)."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key == "with_lookup":
+                name = item if isinstance(item, str) else item.get("collection") if isinstance(item, dict) else None
+                if not isinstance(name, str) or not name.startswith(prefix):
+                    return False
+            elif key == "lookup_from":
+                name = item.get("collection") if isinstance(item, dict) else None
+                if not isinstance(name, str) or not name.startswith(prefix):
+                    return False
+            if not qdrant_selectors_ok(item, prefix):
+                return False
+    elif isinstance(value, list):
+        return all(qdrant_selectors_ok(item, prefix) for item in value)
+    return True
+
+
+def filter_collection_list(body: bytes, prefix: str) -> bytes:
+    """Round 6d (P2): GET /collections answered with only the receiving trial's own collection names; the envelope
+    (status, time, result) is kept."""
+    data = json.loads(body)
+    result = data.get("result") if isinstance(data, dict) else None
+    if not isinstance(result, dict) or not isinstance(result.get("collections"), list):
+        raise ValueError("not a Qdrant collection list")
+    result["collections"] = [c for c in result["collections"]
+                             if isinstance(c, dict) and str(c.get("name", "")).startswith(prefix)]
+    return json.dumps(data, separators=(",", ":")).encode()
+
+
 def judge(forward: dict, scope: dict, method: str, target: str, headers: list[tuple[str, str]]) -> dict:
     """The rule an HTTP request matches; Denied when none admits it. Pure: the tests call it with no network."""
     if method in ("CONNECT", "TRACE"):
@@ -141,6 +205,8 @@ def judge(forward: dict, scope: dict, method: str, target: str, headers: list[tu
         raise Denied("Upgrade requested")
     path, query = plain_target(target)
     framing(headers)
+    if forward.get("qdrant_prefix"):
+        return judge_qdrant(forward["qdrant_prefix"], method, path)
     for rule in forward["rules"]:
         if path == rule.get("exact") or ("prefix" in rule and path.startswith(rule["prefix"])):
             if method not in rule["methods"]:
@@ -282,6 +348,16 @@ class Filter:
                 body = await reader.readexactly(length)
                 if not batch_ok(body, self.scope):
                     raise Denied("a batch item names another ai-memory scope")
+            if rule.get("body") == "qdrant-selectors" and mode != "none":
+                if mode != "length" or length > MAX_QDRANT_BODY:
+                    raise Denied("Qdrant body without a bounded Content-Length")
+                body = await reader.readexactly(length)
+                try:
+                    parsed_body = json.loads(body) if body.strip() else {}
+                except ValueError:
+                    raise Denied("Qdrant body is not JSON") from None
+                if not qdrant_selectors_ok(parsed_body, forward["qdrant_prefix"]):
+                    raise Denied("the body names a collection outside the trial's own prefix")
         except Denied as denial:
             await _respond(writer, 403, "Forbidden")
             self.record(forward=name, method=method, path=path, decision="denied", reason=str(denial))
@@ -322,8 +398,11 @@ class Filter:
                 key_text = key.decode("latin-1").strip().lower()
                 if key_text in RESPONSE_META:
                     meta[RESPONSE_META[key_text]] = value.decode("latin-1").strip()[:120]
-            writer.write(head)
-            await _pump(up_reader, writer)
+            if rule.get("rewrite") == "qdrant-collections":
+                await self._rewrite_listing(head, up_reader, writer, forward["qdrant_prefix"])
+            else:
+                writer.write(head)
+                await _pump(up_reader, writer)
         except (asyncio.IncompleteReadError, asyncio.LimitOverrunError, ConnectionError):
             pass
         finally:
@@ -331,6 +410,36 @@ class Filter:
                 sender.cancel()
             _close(up_writer)
         self.record(forward=name, method=method, path=path, decision="allowed", status=status, **meta)
+
+    async def _rewrite_listing(self, head: bytes, up_reader, writer, prefix: str) -> None:
+        """Read the whole upstream response (Content-Length, chunked or until close), filter its collection names to
+        the trial's prefix, and answer with the same status and a recomputed Content-Length."""
+        lines = head[:-4].split(b"\r\n")
+        headers = [line.partition(b":") for line in lines[1:]]
+        lowered = {k.decode("latin-1").strip().lower(): v.decode("latin-1").strip() for k, _, v in headers}
+        if lowered.get("transfer-encoding", "").lower() == "chunked":
+            body = b""
+            while True:
+                size = int((await up_reader.readuntil(b"\r\n")).split(b";", 1)[0].strip() or b"0", 16)
+                if size == 0:
+                    while (await up_reader.readuntil(b"\r\n")) != b"\r\n":
+                        pass
+                    break
+                body += (await up_reader.readexactly(size + 2))[:-2]
+        elif lowered.get("content-length", "").isdigit():
+            body = await up_reader.readexactly(int(lowered["content-length"]))
+        else:
+            body = await up_reader.read()
+        try:
+            filtered = filter_collection_list(body, prefix)
+        except ValueError:
+            await _respond(writer, 502, "Bad Gateway")
+            return
+        keep = [lines[0]] + [line for line in lines[1:] if line.partition(b":")[0].strip().lower()
+                             not in (b"content-length", b"transfer-encoding", b"connection")]
+        writer.write(b"\r\n".join(keep) + f"\r\nContent-Length: {len(filtered)}\r\nConnection: close\r\n\r\n".encode()
+                     + filtered)
+        await writer.drain()
 
     async def tunnel(self, name: str, forward: dict, reader, writer) -> None:
         target = "?"

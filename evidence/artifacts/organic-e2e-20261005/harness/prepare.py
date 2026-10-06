@@ -767,7 +767,9 @@ def main(argv=None) -> int:
         # CC item task-ns2604-coop-20261006T170607Z (2): the pilot's first Codex trial (the gate-0 CL3 native trial on
         # G1) is the designated calibration cell for the call-id key; grade.call_id_calibration records its pass or fail.
         "calibration": {"decision": "task-ns2604-coop-20261006T170607Z", "cell": "gate0-G1",
-                        "key": "X-OmniRoute-Request-Id equals the call log's id (or correlationId)",
+                        "order": "codex-native-gate0 runs first; pilot.py collects it and checks the calibration "
+                                 "(grade.py calibration) before any other cell",
+                        "key": "X-OmniRoute-Request-Id equals the call log's id, strictly (no correlationId substitution)",
                         "on_fail": "G11 stays failed; fix the key from the deployed build's source "
                                    "(omniroute-3.8.51-5f4b3d577-affinity-pr15167) with file:line and re-run the "
                                    "calibration; no fallback that reads foreign ids"},

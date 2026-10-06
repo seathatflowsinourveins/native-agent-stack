@@ -59,7 +59,9 @@ from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, HOME, METER_CALIBRA
 
 PROTOCOL_PREFIXES = {HOME / ".claude/CLAUDE.md": "b86ea2c4655637fa", HOME / ".claude/settings.json": "861959ff0e49803f"}
 CLAUDE_PROBE = {"key": "probe-claude-native", "cell": "claude-native", "prompt": "Reply with the single word: ready."}
-CODEX_STAGE2 = ("prompted-codex-native", "prompted-codex-env", "codex-native-gate0")
+# Round 6d (GPT read of 50752dde, P2): the calibration cell runs first, and is collected and checked before any other.
+CALIBRATION_CELL = "codex-native-gate0"
+CODEX_STAGE2 = (CALIBRATION_CELL, "prompted-codex-native", "prompted-codex-env")
 CLAUDE_STAGE2 = ("prompted-claude-native", "prompted-claude-env")
 CODEX_BLOCKS = ("codex-native", "codex-env", "codex-native-ultra", "codex-sdk", "codex-app-server")
 PREPARE_FLAGS = ("--claude-completion", "--amendment-ref", "--claude-grace-s", "--claude-t-seconds", "--registry-review",
@@ -289,7 +291,24 @@ def main(argv=None) -> int:
                         write_log(root, log)
                         return 2
         else:
-            for cell in CODEX_STAGE2 + CLAUDE_STAGE2:
+            # The call-id calibration cell first (CC item task-ns2604-coop-20261006T170607Z (2)): run, collect and check
+            # it before advancing to any other cell; a failed calibration stops the pilot (fail closed).
+            if CALIBRATION_CELL in cfg["cells"]:
+                if run_cell("stage 2 calibration", CALIBRATION_CELL):
+                    write_log(root, log)
+                    return 2
+                gate_refs = {ref for ref, test in (cfg.get("tests_by_ref") or {}).items() if test.get("gate_trial")}
+                cal_ids = sorted({r["trial_id"] for r in read_jsonl(root / "ledger.jsonl")
+                                  if r.get("phase") == "launched" and r.get("ref") in gate_refs})
+                step("stage 2 calibration collect", py + [str(root / "harness" / "collect.py"), "--run-root", str(root),
+                                                          "--trials", ",".join(cal_ids)], log)
+                if step("stage 2 calibration check", py + [str(root / "harness" / "grade.py"), "calibration",
+                                                           "--run-root", str(root)], log):
+                    print(json.dumps({"refused": ["the call-id calibration failed (calibration.json): fix the key from "
+                                                  "the deployed build's source and re-run the calibration"]}))
+                    write_log(root, log)
+                    return 2
+            for cell in CODEX_STAGE2[1:] + CLAUDE_STAGE2:
                 if cell in cfg["cells"] and run_cell("stage 2", cell):
                     write_log(root, log)
                     return 2

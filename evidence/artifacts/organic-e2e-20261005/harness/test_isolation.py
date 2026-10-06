@@ -673,6 +673,53 @@ class NetFilterRules(unittest.TestCase):
                                ("GET", f"/collections/{own[:-1]}"), ("GET", f"/collections/{own}x/../../{other}x")):
             self.assertFalse(self.admits(qdrant, method, target), (method, target))
 
+    def test_qdrant_admits_only_socraticodes_operations(self):
+        """Round 6d (GPT read of 50752dde, P1): only the operations socraticode 1.15.0 performs; grouped, batch,
+        search, recommend, discover, snapshot and alias routes are refused even on the trial's own collection."""
+        import isolation
+        trial = str(uuid.uuid4())
+        qdrant = isolation.network_for("codex", trial)["forwards"]["qdrant"]
+        own = isolation.qdrant_prefix(trial) + "codebase_x"
+        for method, suffix in (("GET", ""), ("PUT", ""), ("DELETE", ""), ("PUT", "/index"), ("PUT", "/points"),
+                               ("POST", "/points"), ("POST", "/points/delete"), ("POST", "/points/scroll"),
+                               ("POST", "/points/query")):
+            self.assertTrue(self.admits(qdrant, method, f"/collections/{own}{suffix}"), (method, suffix))
+        for method, suffix in (("POST", "/points/query/groups"), ("POST", "/points/search/groups"),
+                               ("POST", "/points/query/batch"), ("POST", "/points/search"),
+                               ("POST", "/points/search/batch"), ("POST", "/points/recommend"),
+                               ("POST", "/points/recommend/groups"), ("POST", "/points/discover"),
+                               ("POST", "/points/batch"), ("POST", "/points/count"), ("GET", "/snapshots"),
+                               ("POST", "/snapshots"), ("GET", "/aliases"), ("PATCH", ""), ("POST", "/points/payload"),
+                               ("GET", "/points/1"), ("PUT", "/points/vectors")):
+            self.assertFalse(self.admits(qdrant, method, f"/collections/{own}{suffix}"), (method, suffix))
+
+    def test_qdrant_bodies_may_name_only_the_trials_collections(self):
+        """P1: every collection a body names (with_lookup as a string or an object, lookup_from at any depth) must carry
+        the trial's prefix."""
+        import netfilter
+        own, other = "ns2604_trial_a_", "ns2604_trial_b_"
+        ok = netfilter.qdrant_selectors_ok
+        self.assertTrue(ok({"query": [0.1], "limit": 3, "prefetch": [{"query": [0.1], "using": "dense"}]}, own))
+        self.assertTrue(ok({"query": [0.1], "lookup_from": {"collection": own + "x"}}, own))
+        for body in ({"with_lookup": other + "x"}, {"with_lookup": {"collection": other + "x", "with_payload": True}},
+                     {"lookup_from": {"collection": other + "x"}}, {"lookup_from": {"vector": "dense"}},
+                     {"prefetch": [{"prefetch": [{"lookup_from": {"collection": "socraticode_metadata"}}]}]},
+                     {"searches": [{"query": [0.1], "lookup_from": {"collection": other + "x"}}]},
+                     {"with_lookup": None}):
+            self.assertFalse(ok(body, own), body)
+
+    def test_the_collection_listing_names_only_the_trials_own(self):
+        """P2: the envelope is kept and foreign names are dropped."""
+        import netfilter
+        body = json.dumps({"result": {"collections": [{"name": "ns2604_trial_a_codebase_1"}, {"name": "ns2604_trial_b_x"},
+                                                      {"name": "socraticode_metadata"}]},
+                           "status": "ok", "time": 0.001}).encode()
+        out = json.loads(netfilter.filter_collection_list(body, "ns2604_trial_a_"))
+        self.assertEqual(out["result"]["collections"], [{"name": "ns2604_trial_a_codebase_1"}])
+        self.assertEqual((out["status"], out["time"]), ("ok", 0.001))
+        with self.assertRaises(ValueError):
+            netfilter.filter_collection_list(b'{"result": []}', "x")
+
     def test_vllm_admits_embeddings_and_models_only(self):
         import isolation
         vllm = isolation.NET_FORWARDS["vllm"]
@@ -801,7 +848,9 @@ class Round5Grading(unittest.TestCase):
         other_thread = json.loads(json.dumps(good))
         other_thread["requestBody"]["client_metadata"]["thread_id"] = "t-child"
         base = {"requested_turn_context": "max", "gateway_build": "b", "gateway_calls": 2, "gateway_forwarded": ["max"]}
-        row = lambda i, rid: {"id": i, "correlationId": rid, "timestamp": "2026-10-06T12:00:01Z", "path": "/v1/responses"}
+        # Round 6d: the call log's own id equals the request id (strict); the correlation id is a different value.
+        row = lambda rid: {"id": rid, "correlationId": "c-" + rid, "timestamp": "2026-10-06T12:00:01Z",
+                           "path": "/v1/responses"}
 
         def judge(out):
             calls = [c for v in out["by_thread"].values() for c in v]
@@ -809,14 +858,14 @@ class Round5Grading(unittest.TestCase):
             coverage = grade.call_coverage(["req-a", "req-b"], grade.evidence_calls(calls))
             return coverage, grade.g11_trial_ok(effort, "default", coverage)
 
-        both = self._collect([row("A", "req-a"), row("B", "req-b")], {"A": good, "B": other_thread})
+        both = self._collect([row("req-a"), row("req-b")], {"req-a": good, "req-b": other_thread})
         coverage, ok = judge(both)
         self.assertTrue(ok, coverage)   # the call from another thread is kept and counted
-        failed = self._collect([row("A", "req-a"), row("B", "req-b")], {"A": good, "B": TimeoutError()})
+        failed = self._collect([row("req-a"), row("req-b")], {"req-a": good, "req-b": TimeoutError()})
         coverage, ok = judge(failed)
         self.assertFalse(ok)
         self.assertEqual((coverage["missing"], coverage["incomplete"]), ([], ["req-b"]))
-        unmatched = self._collect([row("A", "req-a")], {"A": good})
+        unmatched = self._collect([row("req-a")], {"req-a": good})
         coverage, ok = judge(unmatched)
         self.assertFalse(ok)
         self.assertEqual(coverage["missing"], ["req-b"])
@@ -854,6 +903,26 @@ class Round5Grading(unittest.TestCase):
         self.assertEqual(oir["chrome-devtools|codex-env"]["testability"], "NOT-TESTABLE")
         self.assertEqual(oir["jcodemunch|claude-env"]["testability"], "testable")
         self.assertNotIn("NOT-READY", json.dumps(oir))
+
+    def test_the_calibration_cell_runs_first_and_its_check_fails_closed(self):
+        """Round 6d (P2): codex-native-gate0 is the first stage-2 cell, and `grade.py calibration` exits non-zero
+        unless the calibration passed (pilot.py stops before any other cell)."""
+        import grade
+        import pilot
+        self.assertEqual(pilot.CODEX_STAGE2[0], pilot.CALIBRATION_CELL)
+        self.assertEqual(pilot.CALIBRATION_CELL, "codex-native-gate0")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "gateway").mkdir()
+            (root / "run.json").write_text(json.dumps({"tests_by_ref": {"r1": {"gate_trial": True, "stage": 2}}}))
+            (root / "ledger.jsonl").write_text(json.dumps({"phase": "launched", "ref": "r1", "trial_id": "t1"}) + "\n")
+            (root / "gateway" / "t1.json").write_text(json.dumps(
+                {"request_ids": 2, "unmatched_request_ids": 1, "by_thread": {"x": [{"id": "a"}]}}))
+            self.assertEqual(grade.main(["calibration", "--run-root", str(root)]), 1)
+            (root / "gateway" / "t1.json").write_text(json.dumps(
+                {"request_ids": 2, "unmatched_request_ids": 0, "by_thread": {"x": [{"id": "a"}, {"id": "b"}]}}))
+            self.assertEqual(grade.main(["calibration", "--run-root", str(root)]), 0)
+            self.assertEqual(oct((root / "calibration.json").stat().st_mode & 0o777), "0o600")
 
     def test_the_calibration_cell_passes_only_on_a_matched_key(self):
         """Round 6b (2): the gate-0 CL3 G1 trial calibrates the call-id key; any unmatched id, no id or no record
@@ -1045,18 +1114,24 @@ class GatewayCacheReading(unittest.TestCase):
         saved = common.gateway_get
         common.gateway_get = fake
         try:
-            out = common.gateway_calls_for_trial(["own-1", "c-own-2"], "2026-10-06T12:00:00Z", "2026-10-06T12:10:00Z")
+            out = common.gateway_calls_for_trial(["own-1", "own-2"], "2026-10-06T12:00:00Z", "2026-10-06T12:10:00Z")
             details = [p for p in asked if not p.startswith("/api/usage/call-logs?")]
             asked.clear()
             nothing = common.gateway_calls_for_trial([], "2026-10-06T12:00:00Z", "2026-10-06T12:10:00Z")
+            asked.clear()
+            # Round 6d (GPT read of 50752dde, P2): a request id equal only to a row's correlationId matches nothing.
+            correlation_only = common.gateway_calls_for_trial(["c-own-1"], "2026-10-06T12:00:00Z",
+                                                              "2026-10-06T12:10:00Z")
+            correlation_details = [p for p in asked if not p.startswith("/api/usage/call-logs?")]
         finally:
             common.gateway_get = saved
         self.assertEqual(details, ["/api/usage/call-logs/own-1", "/api/usage/call-logs/own-2"])
         self.assertEqual(out["unmatched_request_ids"], 0)
         self.assertNotIn("a prompt that must not be kept", json.dumps(out))
         self.assertEqual(sorted(c["id"] for c in out["by_thread"]["t1"]), ["own-1", "own-2"])
-        self.assertEqual(asked, [])
         self.assertEqual(nothing["detail_requests"], [])
+        self.assertEqual(correlation_details, [])
+        self.assertEqual(correlation_only["unresolved_request_ids"], ["c-own-1"])
 
     def test_the_harness_calls_only_allowlisted_gateway_routes(self):
         """The allowlist rule (CC 15:57Z): every /api route the harness's code names is one the repository's command
@@ -1439,6 +1514,45 @@ class NetworkNamespace(unittest.TestCase):
         for label in ("own", "health", "models"):
             self.assertFalse(out[label]["denied"], (label, out[label]))
             self.assertEqual(out[label]["rc"], 0, (label, out[label]))
+
+    def test_two_trials_never_see_each_others_collections(self):
+        """Round 6d (P2), two trials: a collection trial A creates is in A's listing and absent from B's, and B's
+        listing names only B's prefix. P1: a foreign collection in an owned route's body, and a grouped query, are
+        refused."""
+        import isolation
+        a, b = self.plans["codex"], self.plans["claude"]
+        qd = "http://127.0.0.1:21633"
+        name = a["network"]["qdrant_prefix"] + "listprobe"
+        create = ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-X", "PUT", "-H",
+                  "Content-Type: application/json", "--data", json.dumps({"vectors": {"size": 1, "distance": "Cosine"}}),
+                  f"{qd}/collections/{name}"]
+        try:
+            made, _ = isolation.run_wrapped(a, create, timeout=60)
+            self.assertEqual(made.stdout.strip(), "200", made.stdout)
+
+            def listing(plan_):
+                out, _ = isolation.run_wrapped(plan_, ["curl", "-s", "-m", "20", f"{qd}/collections"], timeout=60)
+                return [c["name"] for c in json.loads(out.stdout)["result"]["collections"]]
+
+            self.assertIn(name, listing(a))
+            seen_by_b = listing(b)
+            self.assertNotIn(name, seen_by_b)
+            self.assertTrue(all(n.startswith(b["network"]["qdrant_prefix"]) for n in seen_by_b), seen_by_b)
+            other = isolation.qdrant_prefix(str(uuid.uuid4()))
+            out = self.probe("codex", [
+                ("lookup", ["-X", "POST", "-H", "Content-Type: application/json", "--data",
+                            json.dumps({"query": [0.1], "lookup_from": {"collection": other + "x"}}),
+                            f"{qd}/collections/{name}/points/query"]),
+                ("groups", ["-X", "POST", "-H", "Content-Type: application/json", "--data",
+                            json.dumps({"group_by": "k", "with_lookup": other + "x"}),
+                            f"{qd}/collections/{name}/points/query/groups"])])
+            for label, result in out.items():
+                self.assertEqual((result["status"], result["denied"]), ("403", True), (label, result))
+        finally:
+            isolation.run_wrapped(a, ["curl", "-s", "-o", "/dev/null", "-X", "DELETE", f"{qd}/collections/{name}"],
+                                  timeout=60)
+            subprocess.run(["curl", "-s", "-o", "/dev/null", "-X", "DELETE", f"{qd}/collections/{name}"],
+                           capture_output=True, timeout=60)
 
     def test_other_local_listeners_are_unreachable(self):
         self.assertGreaterEqual(len(self.listeners), 3, self.listeners)

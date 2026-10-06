@@ -2157,7 +2157,9 @@ def tier_evidence(effort: dict, launch_tier) -> dict:
 # GPT read of a513616d, P2 (closure evidence), ruled by CC item task-ns2604-coop-20261006T164313Z: gate 0 and G13
 # require the stage-1 self-test's verified denial of a trial's access to the gateway's log, payload and management
 # routes, and to the other local listeners. A probe that is missing or inconclusive fails, as does any access.
-CLOSURE_EXPECTATIONS = ("qdrant: another trial's collection refused", "qdrant: an unprefixed collection refused",
+CLOSURE_EXPECTATIONS = ("qdrant: a foreign collection named in a request body refused", "qdrant: grouped queries refused",
+                        "qdrant: foreign collection names absent from the listing",
+                        "qdrant: another trial's collection refused", "qdrant: an unprefixed collection refused",
                         "qdrant: other routes refused", "vllm: other routes refused",
                         "codex /api/health refused by the filter", "codex /api/usage/call-logs refused by the filter",
                         "codex dashboard refused by the filter", "codex dot-segment detour refused",
@@ -2204,9 +2206,9 @@ def mark_testability(oir: dict, selftest: dict | None) -> dict:
 
 
 # Round 6b (CC item task-ns2604-coop-20261006T170607Z, (2)): the pilot's first Codex trial, the gate-0 CL3 native trial
-# on G1, is the designated calibration cell for the call-id key. It passes when every X-OmniRoute-Request-Id its
-# gateway forward recorded matched a call-log row's id or correlationId (common.gateway_calls_for_trial), and at least
-# one did. Otherwise G11 stays failed: the key is fixed from the deployed build's source
+# on G1, is the designated calibration cell for the call-id key, scheduled first (pilot.py). It passes when every
+# X-OmniRoute-Request-Id its gateway forward recorded equals a call-log row's id, strictly (round 6d: no correlationId
+# substitution; common.gateway_calls_for_trial), and at least one did. Otherwise G11 stays failed: the key is fixed from the deployed build's source
 # (omniroute-3.8.51-5f4b3d577-affinity-pr15167), cited by file and line, and the calibration re-runs. There is no
 # fallback that reads foreign ids.
 CALIBRATION_DECISION = "task-ns2604-coop-20261006T170607Z"
@@ -2216,7 +2218,7 @@ CALIBRATION_KEY = "gate0-G1"
 def call_id_calibration(root: Path, trial_id: str | None) -> dict:
     """The calibration cell's record: request ids recorded, matched and unmatched, and the pass or fail."""
     out = {"decision": CALIBRATION_DECISION, "cell": CALIBRATION_KEY, "trial_id": trial_id,
-           "rule": "every X-OmniRoute-Request-Id the trial's responses carried is a call-log id or correlationId"}
+           "rule": "every X-OmniRoute-Request-Id the trial's responses carried equals a call-log row's id (strict)"}
     path = Path(root) / "gateway" / f"{trial_id}.json" if trial_id else None
     if not path or not path.exists():
         return {**out, "pass": False, "cause": "no collected gateway record for the calibration trial"}
@@ -3279,6 +3281,8 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
     p_trials = sub.add_parser("trials")
     p_trials.add_argument("--run-root", required=True)
+    p_cal = sub.add_parser("calibration", help="the call-id calibration cell's record (round 6d): exit 0 only on a pass")
+    p_cal.add_argument("--run-root", required=True)
     p_gate0 = sub.add_parser("gate0")
     p_gate0.add_argument("--run-root", required=True)
     p_replay = sub.add_parser("replay")
@@ -3306,6 +3310,16 @@ def main(argv=None) -> int:
         print(json.dumps({k: (v.get("pass") if isinstance(v, dict) else v) for k, v in report.items() if k in ("a", "b", "c", "d", "e", "f", "G1")}))
         return 0
     root = Path(args.run_root)
+    if args.cmd == "calibration":
+        root = Path(args.run_root)
+        cfg = load_json(root / "run.json")
+        gate_refs = {ref for ref, test in (cfg.get("tests_by_ref") or {}).items() if test.get("gate_trial")}
+        launched = [r["trial_id"] for r in read_jsonl(root / "ledger.jsonl")
+                    if r.get("phase") == "launched" and r.get("ref") in gate_refs]
+        result = call_id_calibration(root, launched[-1] if launched else None)
+        write_json(root / "calibration.json", result, 0o600)
+        print(json.dumps(result, sort_keys=True))
+        return 0 if result["pass"] else 1
     if args.cmd == "gate0":
         report = gate0(root)
         print(json.dumps({"gate0": report["pass"], "checks": {k: v["pass"] for k, v in report["checks"].items()},

@@ -231,17 +231,27 @@ NET_FORWARDS = {
                   "stateless and store nothing, so this opens no answer channel."},
     "qdrant": {
         "clients": ["claude", "codex"], "listen": 21633, "kind": "http", "upstream": ["127.0.0.1", 21633],
-        # {prefix} becomes the trial's own QDRANT_COLLECTION_PREFIX (network_for).
+        # The filter is netfilter.judge_qdrant (round 6d): these rules document it; {prefix} becomes the trial's own
+        # QDRANT_COLLECTION_PREFIX (network_for, which also sets the forward's qdrant_prefix).
         "rules": [{"exact": "/healthz", "methods": ["GET"]},
-                  {"exact": "/collections", "methods": ["GET"]},
-                  {"prefix": "/collections/{prefix}", "methods": ["GET", "PUT", "POST", "PATCH", "DELETE"]}],
+                  {"exact": "/collections", "methods": ["GET"], "response": "the trial's own names only"},
+                  {"prefix": "/collections/{prefix}", "operations": {"": ["GET", "PUT", "DELETE"], "/index": ["PUT"],
+                                                                     "/points": ["PUT", "POST"],
+                                                                     "/points/delete": ["POST"],
+                                                                     "/points/scroll": ["POST"],
+                                                                     "/points/query": ["POST"]},
+                   "body": "every with_lookup and lookup_from collection carries the prefix"}],
         "tool": "socraticode (QDRANT_URL http://127.0.0.1:21633, QDRANT_MODE external)",
-        "reason": "SocratiCode's vector store. Data operations reach only the trial's own collections: socraticode "
-                  "1.15.0 prefixes every collection with QDRANT_COLLECTION_PREFIX (dist/constants.js:59-66, "
+        "reason": "SocratiCode's vector store. Only the operations socraticode 1.15.0 performs are admitted "
+                  "(getCollections, create, get and delete collection, payload index, upsert, retrieve, delete, "
+                  "scroll and query: dist/services/qdrant.js, dist/services/symbol-graph-store.js), each on a "
+                  "collection of the trial's own QDRANT_COLLECTION_PREFIX (dist/constants.js:59-66, "
                   "dist/config.js:193-226, its metadata collection dist/services/qdrant.js:1067), which the wrapper "
-                  "sets per trial. GET /collections (names only) is admitted because socraticode cannot create its "
-                  "collections without it (dist/services/qdrant.js:105-118 and 1090-1100 list the collections first). "
-                  "The trial builds its own index from its own fixture; another trial's collection is never reachable."},
+                  "sets per trial. Every collection a body names (with_lookup, lookup_from) must carry it too, and "
+                  "grouped, batch, search, recommend and discover routes stay out. GET /collections is admitted because "
+                  "socraticode cannot create its collections without it (dist/services/qdrant.js:105-118 and "
+                  "1090-1100), and it answers with the trial's own names only. The trial builds its own index from "
+                  "its own fixture."},
     "model-egress": {
         "clients": ["claude"], "listen": PROXY_PORT, "kind": "connect",
         "allow": [["api.anthropic.com", 443], ["platform.claude.com", 443]],
@@ -407,6 +417,8 @@ def network_for(client: str, trial_id: str, private=None) -> dict:
             for rule in entry.get("rules") or []:
                 if "{prefix}" in rule.get("prefix", ""):
                     rule["prefix"] = rule["prefix"].replace("{prefix}", prefix)
+            if name == "qdrant":
+                entry["qdrant_prefix"] = prefix
             if private is not None:
                 entry["socket"] = str(Path(private) / "net" / client / f"{name}.sock")
             forwards[name] = entry
@@ -422,7 +434,7 @@ def network_policy(network: dict | None) -> dict | None:
     environment and the scope."""
     if not network:
         return None
-    return {"forwards": {name: {k: forward.get(k) for k in ("listen", "kind", "upstream", "rules", "allow")}
+    return {"forwards": {name: {k: forward.get(k) for k in ("listen", "kind", "upstream", "rules", "allow", "qdrant_prefix")}
                          for name, forward in sorted((network.get("forwards") or {}).items())},
             "setenv": network.get("setenv"), "scope": network.get("scope"), "inside_dir": network.get("inside_dir")}
 
@@ -1403,8 +1415,11 @@ def tool_testability(plans: dict, network: dict) -> dict:
         for key in TOOLS_WITH_DEPENDENCIES["socraticode"]["env"]:
             port = urlparse(env.get(key, "")).port
             if port not in (ports["qdrant"], ports["vllm"]):
-                unserved.append(f"{key} points at 127.0.0.1:{port}, which no forward serves (nothing listens there on "
-                                "the host either)" if port else f"{key} is not configured")
+                # GPT read of 50752dde: the host side is probed, not asserted.
+                host = "nothing listens there on the host (probed)" if port and not _listening(port) \
+                    else "a service listens there on the host but is not forwarded"
+                unserved.append(f"{key} points at 127.0.0.1:{port}, which no forward serves; {host}" if port
+                                else f"{key} is not configured")
         reachable = expect.get("qdrant health answers") and expect.get("vllm models answer")
         cause = "; ".join(unserved) or (None if reachable else "Qdrant or vLLM did not answer through the forwards")
         out.setdefault("socraticode", {})[client] = {"testable": cause is None, "cause": cause}
@@ -1476,7 +1491,15 @@ def network_probes(plans: dict) -> dict:
                                    f"{vl}/v1/embeddings"]),
               ("vllm_chat", ["-X", "POST", "-H", "Content-Type: application/json", "--data", "{}",
                              f"{vl}/v1/chat/completions"]),
-              ("vllm_metrics", [f"{vl}/metrics"])]
+              ("vllm_metrics", [f"{vl}/metrics"]),
+              # Round 6d (GPT read of 50752dde, P1): a foreign collection named in an owned route's body, and a grouped
+              # query (with_lookup), are refused.
+              ("qdrant_foreign_lookup", ["-X", "POST", "-H", "Content-Type: application/json", "--data",
+                                         json.dumps({"query": [0.1], "lookup_from": {"collection": f"{other_prefix}x"}}),
+                                         f"{qd}/collections/{own_prefix}codebase_probe/points/query"]),
+              ("qdrant_groups", ["-X", "POST", "-H", "Content-Type: application/json", "--data",
+                                 json.dumps({"group_by": "x", "with_lookup": {"collection": f"{other_prefix}x"}}),
+                                 f"{qd}/collections/{own_prefix}codebase_probe/points/query/groups"])]
     codex += [(f"listener_{port}", ["--noproxy", "*", f"http://127.0.0.1:{port}/"]) for _, port in listeners]
     claude = [("model_egress", ["https://api.anthropic.com/"]),
               ("egress_other_host", ["https://example.com/"]),
@@ -1484,6 +1507,7 @@ def network_probes(plans: dict) -> dict:
               ("direct_egress", ["--noproxy", "*", "https://api.anthropic.com/"])]
     claude += [(f"listener_{port}", ["--noproxy", "*", f"http://127.0.0.1:{port}/"]) for _, port in listeners]
     results = {"codex": _run_probes(plans["codex"], codex), "claude": _run_probes(plans["claude"], claude)}
+    listing = qdrant_listing_probe(plans["codex"])
 
     def denied(r):
         return bool(r) and r["status"] == "403" and r["denied"]
@@ -1522,10 +1546,38 @@ def network_probes(plans: dict) -> dict:
         "vllm models answer": answered(c.get("vllm_models")),
         "vllm embeddings reach vLLM": answered(c.get("vllm_embeddings")),
         "vllm: other routes refused": denied(c.get("vllm_chat")) and denied(c.get("vllm_metrics")),
+        "qdrant: a foreign collection named in a request body refused": denied(c.get("qdrant_foreign_lookup")),
+        "qdrant: grouped queries refused": denied(c.get("qdrant_groups")),
+        "qdrant: foreign collection names absent from the listing": listing["foreign_inside"] == 0
+        and (listing["foreign_outside"] or 0) > 0,
         "local listeners refused (codex)": all(refused(c.get(f"listener_{port}")) for _, port in listeners),
         "local listeners refused (claude)": all(refused(k.get(f"listener_{port}")) for _, port in listeners)}
     return {"decision": ROUND6_DECISION, "listeners_sampled": [f"{name} ({port})" for name, port in listeners],
-            "results": results, "expect": expect, "ok": bool(listeners) and all(expect.values())}
+            "results": results, "qdrant_listing": listing, "expect": expect,
+            "ok": bool(listeners) and all(expect.values())}
+
+
+def qdrant_listing_probe(plan_: dict) -> dict:
+    """Round 6d (P2): GET /collections inside the trial's namespace names only its own collections, while the same
+    listing outside holds others' (the control). Counts only; no name is kept."""
+    prefix = plan_["network"]["qdrant_prefix"]
+
+    def names(text):
+        try:
+            return [c.get("name", "") for c in json.loads(text)["result"]["collections"]]
+        except (ValueError, KeyError, TypeError):
+            return None
+
+    inside, _ = run_wrapped(plan_, ["curl", "-s", "-m", "20", "http://127.0.0.1:21633/collections"], timeout=60)
+    try:
+        outside = subprocess.run(["curl", "-s", "-m", "20", "http://127.0.0.1:21633/collections"], capture_output=True,
+                                 text=True, timeout=60).stdout
+    except (OSError, subprocess.SubprocessError):
+        outside = ""
+    seen_in, seen_out = names(inside.stdout), names(outside)
+    return {"foreign_inside": None if seen_in is None else sum(1 for n in seen_in if not n.startswith(prefix)),
+            "foreign_outside": None if seen_out is None else sum(1 for n in seen_out if not n.startswith(prefix)),
+            "envelope_kept": seen_in is not None}
 
 
 def _client_checks(plans: dict, fixture: Path, hidden_probe: list[Path]) -> dict:
