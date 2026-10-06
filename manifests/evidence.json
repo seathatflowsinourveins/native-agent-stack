@@ -5347,8 +5347,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "7da119d4945f3f17d2decdf852d7f414d2142b6bea12114e52759170604cb076",
-      "bytes": 17837
+      "sha256": "1d1014d536df408e413abf7ce7f382f3cb56eb49c162fd101281cdd71cb7ef57",
+      "bytes": 17843
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
@@ -5529,6 +5529,21 @@
       "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.peers.txt",
       "sha256": "5ecf82a3fc1f9007eeea79ce3bf0d9c587150219ef245bb5a5a23609cdb562fb",
       "bytes": 32
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-build.txt",
+      "sha256": "f5db7e42544b6d14f717127a34bb8a3de5ff3742279b44d1e044d4c3f27db7bd",
+      "bytes": 664
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-db-init.txt",
+      "sha256": "592eb41fd45e7cdb0f8fa96b033c1fc0f29318661291616b1ab0283f71583844",
+      "bytes": 280
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-install.txt",
+      "sha256": "751c36ce92358d15d1410607d3d9d1d3542fdcd980e514c8bee4096f7a27bcc0",
+      "bytes": 143
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.sh.txt",
@@ -17393,8 +17408,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
-      "sha256": "f75d4df55c9529a5ffe12fc96f74024c0105034f363300826dd3f77e606ea7cd",
-      "bytes": 2761
+      "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
+      "bytes": 3898
     },
     {
       "path": "docs/direct-results.md",
@@ -53140,6 +53155,11 @@
       "path": "evidence/receipts/sharp-0355-qualification-20261006.json",
       "sha256": "cbcee74c3a53fbbc940d4e2f53aa7dbf3ce112d193171bd844f54d93a2522363",
       "bytes": 6089
+    },
+    {
+      "path": "evidence/receipts/sharp-review-followup-20261006.json",
+      "sha256": "52d42721df114b9be1ea7666228e5d31acbb11694b615605b15016cc761cd6bd",
+      "bytes": 5073
     },
     {
       "path": "evidence/receipts/skills-listing-restore-20260928.json",
