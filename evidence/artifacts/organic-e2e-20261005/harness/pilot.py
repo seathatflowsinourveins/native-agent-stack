@@ -3,7 +3,7 @@
 started by block.py, which keeps its own gates (STOP and DEFER flags, S7 baseline, blackout and settle rule, Codex quota
 gate, gateway build), so a refusal stops that chain and nothing is retried.
 
-  python3 -B pilot.py --run-id <id> [--prompted stage3.json] [--to-stage N] [stage-1 options]      stages 0-1, then re-exec
+  python3 -B pilot.py --run-id <id> [--prompted stage3-oracles.json] [--to-stage N] [stage-1 options]   stages 0-1, then re-exec
   python3 -B ~/.cache/wsr/<8 hex>/bin/p.py [--from-stage N] [--to-stage M] [--allow-timing]       resume (neutral argv)
 
 Start it from a clean login shell (never from inside a Claude or Codex session, §4.1): the launcher lints every
@@ -17,7 +17,9 @@ or experiment word while sessions run.
    G1|claude-sdk, so the Claude total stays 14. Stage 1 refuses a Claude schedule above 14.
 2  Gate 0: the Codex probes and canaries (gh auth through the shell, and through ctx_batch_execute in both Codex arms;
    the exec-rules canary), the gate-0 CL3 native trial on G1, then the Claude probe if one is required; collect.py on those trials and
-   grade.py gate0. Stage 4 never starts unless gate0.json passes.
+   grade.py gate0. Stages 3 and 4 never start unless gate0.json passes.
+3  The prompted oracle runs: --prompted entries with "stage": 3 (stage3-oracles.json for the pilot), in their own
+   oracle-<base cell> cells, one block per cell.
 4  Codex blocks C1-C5 in order and, in parallel, the Claude schedule (G1 first, then the seeded order), one eval per
    test at -j 1 under the shared lock. Needs gate0.json passing and a reviewed routing-file registry (or a recorded
    development allowance); the Claude chain also needs the run's completion policy decided by a CC amendment
@@ -203,14 +205,28 @@ def main(argv=None) -> int:
                             if r.get("phase") == "launched" and r.get("ref") in stage2_refs})
         step("stage 2 collect", py + [str(root / "harness" / "collect.py"), "--run-root", str(root), "--trials", ",".join(trial_ids)], log)
         step("stage 2 gate0", py + [str(root / "harness" / "grade.py"), "gate0", "--run-root", str(root)], log)
+    if args.to_stage < 3:
+        write_log(root, log)
+        return 0
+    # Stage 2 is a gate for every later session: the stage-3 oracle runs and the stage-4 trials.
+    g0 = load_json(root / "gate0.json") if (root / "gate0.json").exists() else {}
+    if not g0.get("pass"):
+        print(json.dumps({"refused": ["gate0.json does not pass (stage 2 is a gate)"]}))
+        write_log(root, log)
+        return 2
+    if args.from_stage <= 3:
+        # Stage 3: the prompted oracle runs (cells oracle-<base cell>, lane organic-e2e-prompted), one block per cell;
+        # a refused block stops the pilot here.
+        clear_defer()
+        for cell in sorted(c for c in cfg["cells"] if c.startswith("oracle-")):
+            if run_cell("stage 3", cell):
+                write_log(root, log)
+                return 2
     if args.to_stage < 4:
         write_log(root, log)
         return 0
     if args.from_stage <= 4:
         refusals = []
-        g0 = load_json(root / "gate0.json") if (root / "gate0.json").exists() else {}
-        if not g0.get("pass"):
-            refusals.append("gate0.json does not pass (stage 2 is a gate)")
         registry = cfg.get("registry") or {}
         if registry.get("status") != "reviewed" and not registry.get("allow_provisional"):
             refusals.append("routing-file registry is provisional (prepare.py --registry-review)")

@@ -40,7 +40,8 @@ import fixture  # noqa: E402
 import suite  # noqa: E402
 
 HARNESS_FILES = ("common.py", "suite.py", "fixture.py", "arms.py", "launcher.py", "sdk_claude.py", "sdk_codex.mjs",
-                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "stage2-canaries.json")
+                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "stage2-canaries.json",
+                 "stage3-oracles.json")
 PROBE_HASHES = {"claude/CLAUDE.md": "b86ea2c4655637fa", "claude/settings.json": "861959ff0e49803f"}
 BLACKOUTS = (("10:35", "10:55"), ("13:20", "13:45"))
 GH_EMPTY = HOME / ".cache" / "ws-empty-config"   # neutral name: no experiment, tool, client, arm or task word
@@ -205,6 +206,12 @@ def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, c
     return "\n".join(cfg) + "\n"
 
 
+def prompted_cell_name(entry: dict) -> str:
+    """A prompted entry's cell: prompted-<base cell> for stage 2 (probes and canaries, checked by gate 0) and
+    oracle-<base cell> for stage 3 (the oracle runs, which pilot.py starts only after gate 0 passes)."""
+    return f"{'oracle' if int(entry.get('stage', 2)) == 3 else 'prompted'}-{entry['cell']}"
+
+
 def _normalized_oracles(oracles: dict) -> dict:
     """The oracle values G12 compares: timing out (computed_at, the unittest run's elapsed seconds)."""
     out = {k: v for k, v in oracles.items() if k != "computed_at"}
@@ -289,12 +296,19 @@ def main(argv=None) -> int:
     if (timing["blackout"] or not timing["settled"]["settled"]) and not args.allow_timing:
         print(json.dumps({"refused": "timing", **timing}))
         return 2
-    # Prompted entries: refuse a base cell that no stage runs (finding 14).
+    # Prompted entries: refuse a base cell that no stage runs (finding 14), a stage other than 2 (probes and canaries,
+    # gate 0) or 3 (oracle runs, after gate 0), and a repeated key.
     prompted_entries = load_json(Path(args.prompted)) if args.prompted else []
     bad = [e.get("key") for e in prompted_entries if e.get("cell") not in suite.PROMPTED_BASE_CELLS]
     if bad:
         print(json.dumps({"refused": "prompted entries name a base cell no stage runs", "keys": bad,
                           "allowed": list(suite.PROMPTED_BASE_CELLS)}))
+        return 2
+    bad_stage = [e.get("key") for e in prompted_entries if int(e.get("stage", 2)) not in (2, 3)]
+    keys = [e.get("key") for e in prompted_entries]
+    if bad_stage or len(set(keys)) != len(keys) or not all(keys):
+        print(json.dumps({"refused": "prompted entries need a unique key and stage 2 or 3", "stage": bad_stage,
+                          "repeated": sorted({k for k in keys if keys.count(k) > 1})}))
         return 2
     wanted_cells = [c for c in args.cells.split(",") if c]
     if "codex-native" in wanted_cells and not args.no_gate0 and "codex-native-gate0" not in wanted_cells:
@@ -321,7 +335,7 @@ def main(argv=None) -> int:
                          if task_selected(cell, item_id, instance)
                          and f"{suite.task_key(item_id, instance)}|{cell}" not in skip)
     prompted_claude = sum(1 for e in prompted_entries if suite.CELLS[e["cell"]]["client"] == "claude"
-                          and f"{e['key']}|prompted-{e['cell']}" not in skip)
+                          and f"{e['key']}|{prompted_cell_name(e)}" not in skip)
     if organic_claude + prompted_claude > CLAUDE_SESSION_CAP:
         print(json.dumps({"refused": "claude schedule exceeds the session cap", "organic": organic_claude,
                           "prompted": prompted_claude, "cap": CLAUDE_SESSION_CAP}))
@@ -477,26 +491,31 @@ def main(argv=None) -> int:
                           "gate_trial": bool(spec.get("gate_trial")), "stage": spec.get("stage", 4)})
         plan.append((cell, dict(spec), tests))
     # Prompted runs (stage 2 probes and canaries, stage 3 oracle runs): their own cells on lane organic-e2e-prompted,
-    # their own fixtures, never organic (R10). Entries: {key, cell (a base cell), prompt, sandbox?, task_id?, instance?}.
+    # their own fixtures, never organic (R10). Entries: {key, cell (a base cell), prompt, sandbox?, stage? (2 or 3),
+    # task_id?, instance?}. A prompted task's own id is always prompted/<key>, so it can never replace an organic task's
+    # prompt in tasks.json; an entry's task_id and instance are kept as oracle_for (the task an oracle run answers).
     prompted_tasks = []
     grouped = {}
     for entry in prompted_entries:
         base = suite.CELLS[entry["cell"]]
-        name = f"prompted-{entry['cell']}"
+        stage = int(entry.get("stage", 2))
+        name = prompted_cell_name(entry)
         prompt = entry["prompt"]
-        task_id, instance = entry.get("task_id") or f"prompted/{entry['key']}", entry.get("instance") or "X"
+        task_id, instance = f"prompted/{entry['key']}", "X"
+        oracle_for = f"{entry['task_id']}:{entry.get('instance') or 'N'}" if entry.get("task_id") else None
         digest = sha256_bytes(prompt.encode())
         prompted_tasks.append({"task_id": task_id, "instance": instance, "key": entry["key"], "item": entry["key"],
-                               "kind": "prompted", "prompt": prompt, "prompt_sha256": digest})
-        grouped.setdefault(name, (dict(base), []))[1].append({
+                               "kind": "prompted", "prompt": prompt, "prompt_sha256": digest, "oracle_for": oracle_for})
+        grouped.setdefault(name, (dict(base), [], stage))[1].append({
             "description": f"{entry['key']}|{name}", "test_key": f"{entry['key']}|{name}", "task_id": task_id,
             "instance": instance, "arm": base["arm"], "cell": name,
             "sandbox": entry.get("sandbox", "read-only") if base["client"] == "codex" else "none",
             "network": "off" if base["client"] == "codex" else "available", "lane": LANE_PROMPTED,
-            "prompt_sha256": digest, "task_text": prompt, "kind": "prompted", "gate_trial": False, "stage": 2,
-            "probe_key": entry["key"]})
-    for name, (spec, tests) in grouped.items():
-        spec.update({"repeat": 1, "pilot_block": "stage 2/3 (prompted)", "lane": LANE_PROMPTED, "stage": 2})
+            "prompt_sha256": digest, "task_text": prompt, "kind": "prompted", "gate_trial": False, "stage": stage,
+            "probe_key": entry["key"], "oracle_for": oracle_for})
+    for name, (spec, tests, stage) in grouped.items():
+        spec.update({"repeat": 1, "pilot_block": "stage 2 (prompted)" if stage == 2 else "stage 3 (oracle runs)",
+                     "lane": LANE_PROMPTED, "stage": stage})
         plan.append((name, spec, tests))
     cells, schedule, tests_by_ref, cell_codes = {}, [], {}, {}
     for cell, spec, tests in plan:
@@ -568,6 +587,7 @@ def main(argv=None) -> int:
     write_json(root / "schedule.json", {"seed": seed, "claude": first + rest,
                                         "claude_stage2": [s for s in schedule if s["client"] == "claude" and s["stage"] == 2],
                                         "codex_stage2": [s for s in schedule if s["client"] == "codex" and s["stage"] == 2],
+                                        "stage3": [s for s in schedule if s["stage"] == 3],
                                         "codex_blocks": sorted({s["cell"] for s in schedule if s["client"] == "codex" and s["stage"] == 4})})
     selected_pairs = wanted_tasks | {pair for pairs in cell_tasks.values() for pair in pairs}
     tasks_frozen = [{k: v for k, v in t.items()} for t in tasks if not restricted or (t["task_id"], t["instance"]) in selected_pairs
