@@ -89,13 +89,18 @@ class Round2RepairIntegrationTests(unittest.TestCase):
         rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/chat/completions",
                  "model": "gpt-6.1-sol", "requestedModel": "cx/gpt-6.1-sol"}]
         self.assertEqual(gate.observed_routes(rows), {"cx/gpt-6.1-sol"})
-        # GPT Researcher's routes since 2026-10-06: the effort rides on each alias.
-        research = [dict(rows[0], model="gpt-6.1-sol-high", requestedModel="cx/gpt-6.1-sol-high"),
-                    dict(rows[0], model="gpt-6.1-sol-xhigh", requestedModel="cx/gpt-6.1-sol-xhigh")]
-        self.assertEqual(gate.observed_routes(research), {"cx/gpt-6.1-sol-high", "cx/gpt-6.1-sol-xhigh"})
+        # GPT Researcher's routes since 2026-10-06, in the shape the call-log API returned for the session-joined run
+        # gptr-20261006T044527Z-3989681: the provider id codex/, not the requested alias cx/, and provider codex.
+        research = [dict(rows[0], model="gpt-6.1-sol-high", requestedModel="codex/gpt-6.1-sol-high", provider="codex"),
+                    dict(rows[0], model="gpt-6.1-sol-xhigh", requestedModel="codex/gpt-6.1-sol-xhigh", provider="codex")]
+        self.assertEqual(gate.observed_routes(research), {"codex/gpt-6.1-sol-high", "codex/gpt-6.1-sol-xhigh"})
         self.assertEqual({gate.ROUTES[route] for route in gate.observed_routes(research)}, {"high", "xhigh"})
+        self.assertEqual(gate.observed_routes([dict(research[1], requestedModel="cx/gpt-6.1-sol-xhigh")]),
+                         {"cx/gpt-6.1-sol-xhigh"})
         for field, value in (("status", 503), ("path", "/v1/embeddings"),
-                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max")):
+                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max"),
+                             ("requestedModel", "codex/gpt-6.1-sol-high"),  # an alias that is not the logged model
+                             ("provider", "openai")):
             with self.subTest(field=field), self.assertRaises(ValueError):
                 gate.observed_routes([dict(rows[0], **{field: value})])
         with self.assertRaisesRegex(ValueError, "no call log"):

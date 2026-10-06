@@ -1718,11 +1718,11 @@
       },
       "per_role_mechanism": "None at assafelovic/gpt-researcher@0957c301 (v3.7.0): config/variables/base.py L35 and L46 declare one LLM_KWARGS and one REASONING_EFFORT; config.py L97 reads REASONING_EFFORT from the environment only, and L225-231 accept high, medium or low; utils/llm.py L86-87 send it only for SUPPORT_REASONING_EFFORT_MODELS (llm_provider/generic/base.py L77-90, which lists no gpt-6.1 model), and L103-104 merge LLM_KWARGS into every call; config.py L205-222 split provider:model only.",
       "gateway_sources": [
-        "The running 21128 build omniroute-3.8.51-5f4b3d577-affinity-pr15167 (the composition in docs/decisions/2026-10-05-omniroute-gateway-composition.md L9-34): open-sse/executors/codex.ts L1401-1408 split the alias suffix, and L1428-1433 resolve the effort as forced, then the model suffix, then reasoning.effort, then reasoning_effort.",
-        "Same build: open-sse/executors/codex/reasoningSuffix.ts L1-9 (effort order with xhigh) and L54-58 (hyphen suffixes none through xhigh).",
-        "Same build: src/lib/usage/callLogs.ts L649-668 and src/lib/db/migrations/188_call_logs_reasoning_encrypted.sql L13-14: reasoning_effort_requested is the client body's effort verbatim (NULL when absent), and reasoning_effort_upstream is the effort the gateway sent."
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L1401-L1408 splits the alias suffix, and #L1428-L1433 resolve the effort as forced, then the model suffix, then reasoning.effort, then reasoning_effort. The file is byte-identical at PR 15167's head 0585aba55 and in the running 21128 build omniroute-3.8.51-5f4b3d577-affinity-pr15167 (docs/decisions/2026-10-05-omniroute-gateway-composition.md L9-34).",
+        "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L54-L58 parses the hyphen suffixes none through xhigh; the running build carries this file. The v3.8.51 tag has the same loop at L52-56, but its live catalog rejects gpt-6.1-sol-xhigh (see dependency).",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/callLogs.ts#L649-L668 and src/lib/db/migrations/188_call_logs_reasoning_encrypted.sql#L13-L14 (identical at 0585aba55): reasoning_effort_requested is the client body's effort verbatim and reasoning_effort_upstream the effort the gateway sent, but both are filled only when the reasoning is observed as encrypted (L661-668). NULL therefore means either no body effort or no encrypted-reasoning observation."
       ],
-      "before": "In the 24 hours before the observed run (2026-10-05T04:45:27Z to 2026-10-06T04:45:27Z), call_logs held 12 rows whose requested and upstream efforts differed: all of them GPT Researcher sessions (session_tag gptr-*) on codex/gpt-6.1-sol-high, requested xhigh, upstream high.",
+      "before": "In the 24 hours before the observed run (2026-10-05T04:45:27Z to 2026-10-06T04:45:27Z), call_logs held 12 rows whose requested and upstream efforts differed: all of them GPT Researcher sessions (session_tag gptr-*) on codex/gpt-6.1-sol-high, requested xhigh, upstream high. Because both effort columns are filled only for encrypted-reasoning rows, 12 is a lower bound.",
       "observation": {
         "kind": "one native host run through the patched wrapper; not a quality or latency measurement",
         "run": "20261006T044527Z-3989681",
@@ -1749,9 +1749,25 @@
             "reasoning_effort_upstream": "high"
           }
         ],
-        "result": "On every row the upstream effort equals the alias suffix, and no row carries a body effort; no row reached /v1/embeddings."
+        "result": "On every row of this run the upstream effort equals the alias suffix, and no row carries a body effort; no row reached /v1/embeddings.",
+        "acceptance_check": {
+          "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/config/gateway-effort-accept.py gptr-20261006T044527Z-3989681 2026-10-06T04:45:27Z 2026-10-06T04:51:31Z",
+          "observed_at_utc": "2026-10-06T05:55:54Z",
+          "exit": 0,
+          "returned": "Gateway metadata: successful Sol-route calls; join=session. Source-based expected effort (not observed wire): high, xhigh.",
+          "call_log_api_rows": "requestedModel codex/gpt-6.1-sol-xhigh (3) and codex/gpt-6.1-sol-high (1), provider codex, status 200",
+          "discriminating_control": "The same command with main's script (sha256 31eeb4c4..., cx/ keys only) and with this branch's first script (1bf7c2bf...) exits 1, because the API returns codex/, not the requested cx/ alias."
+        }
       },
-      "dependency": "A gateway without OmniRoute PR 15167 answers HTTP 400 for cx/gpt-6.1-sol-xhigh (docs/decisions/2026-10-05-omniroute-gateway-composition.md L49-51). Rolling 21128 back to such a build needs the 2026-10-05 configuration back as well.",
+      "dependency": "The -xhigh route needs OmniRoute PR 15167. A gateway without it answers HTTP 400 \"Model 'gpt-6.1-sol-xhigh' is not available in the active live catalog for provider 'codex'\" (docs/decisions/2026-10-05-omniroute-gateway-composition.md L49-51 and L88-90, receipt C7). The running 21128 build carries it. On main the plan's gpt-gateway row (install-plan.json owners[75]) still installs the published omniroute@3.8.51, which does not; #723 moves that row to the 5f4b3d577 composition. This configuration therefore lands after #723, and rolling a gateway back to a build without PR 15167 needs the 2026-10-05 configuration back as well.",
+      "alternatives_not_selected": [
+        {
+          "alternative": "Restore the measured -max alias for smart and strategic (session 80's cx/gpt-6.1-sol-max; wave2-records.json layers.gpt-runtimes.ruling.decided_default), which the PR 15167 build also serves.",
+          "reason": "The ruling concerns agreement between each request's effort and its alias, not the effort level. The recorded decisions keep smart and strategic at xhigh and give Sol/max to native Codex alone (docs/decisions/2026-10-04-final-architecture-round2.md:38; docs/decisions/2026-10-05-round2-adoption-repair.md:52-54). Changing the level is a separate model-effort decision.",
+          "overturn": "A paired research-quality comparison of -max against -xhigh on frozen research queries, through the upstream A/B harness (promptfoo), that shows better reports at acceptable latency and cost, and a dated decision that amends the native-Codex-only Sol/max rule."
+        }
+      ],
+      "owed": "After the reinstall of the research-harnesses row (install.sh L911 copies the wrapper and its configuration; L930 copies gateway-effort-accept.py), re-measure 24 hours of call_logs: zero gptr-* rows whose requested effort differs from the upstream effort (command center item task-ns2604-coop-20261006T033237Z, section 2). Installed copies still send the 2026-10-05 configuration until then.",
       "unmeasured": "No report quality or latency claim. The observation covers routing and effort agreement in one run only."
     },
     "local_reproduction": {
