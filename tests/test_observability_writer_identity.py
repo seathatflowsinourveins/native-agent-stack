@@ -38,6 +38,17 @@ OTELCOL_VERSION = next(component["version"] for component in
                        if component["id"] == "opentelemetry-collector-contrib")
 OTELCOL = Path(os.environ.get("OTELCOL_TEST_BIN", str(_TOOLS /
                f"otelcol-{OTELCOL_VERSION}/otelcol-contrib")))
+if not OTELCOL.exists() and "OTELCOL_TEST_BIN" not in os.environ:
+    OTELCOL = Path.home() / ".local/bin/otelcol-contrib"  # native WSL install-plan destination
+_OTELCOL_VERSION_OK = False
+if OTELCOL.exists():
+    try:
+        _collector_version = subprocess.run([str(OTELCOL), "--version"], capture_output=True,
+                                            text=True, timeout=5)
+        _OTELCOL_VERSION_OK = bool(re.search(r"\b" + re.escape(OTELCOL_VERSION) + r"\b",
+                                           _collector_version.stdout + _collector_version.stderr))
+    except (OSError, subprocess.TimeoutExpired):
+        pass
 # main before the launcher read ECOSYSTEM_LANE (the negative control's launcher; CI checks out full history).
 PRE_LANE_COMMIT = "1f5a791b02a230aced670c88bab3d3d0ebcf401a"
 
@@ -89,6 +100,25 @@ class CollectorProfileTests(unittest.TestCase):
         for kind in ("SUM", "HISTOGRAM", "EXPONENTIAL_HISTOGRAM"):
             self.assertIn(f"metric.type == METRIC_DATA_TYPE_{kind}", aggregate)
         self.assertNotIn("GAUGE", aggregate)
+
+    def test_native_names_are_filtered_before_aggregation_and_keep_lists_match(self):
+        groups = self.config["processors"]["transform/privacy"]["metric_statements"]
+        metric_index = next(i for i, group in enumerate(groups) if group["context"] == "metric")
+        sanitize = "\n".join(s for group in groups[:metric_index]
+                             if group["context"] == "datapoint" for s in group["statements"])
+        for name in ("server", "skill", "plugin_id", "skill.name", "agent.name",
+                     "plugin.name", "mcp_server.name", "mcp_tool.name", "invoke_type"):
+            self.assertIn('attributes["' + name + '"]', sanitize)
+        metric = statements(self.config, "transform/privacy", "metric_statements", "metric")
+        points = statements(self.config, "transform/privacy", "metric_statements", "datapoint")
+        aggregates = [quoted_list(s) for s in metric if s.startswith("aggregate_on_attributes")]
+        keeps = [quoted_list(s) for s in points if s.startswith("keep_keys(attributes")]
+        self.assertEqual(aggregates, keeps)
+        self.assertEqual(self.config["exporters"]["prometheus"]["resource_constant_labels"]["included"],
+                         ["ecosystem.lane", "ecosystem.task.id"])
+        self.assertNotIn("ecosystem.task.id", quoted_list(next(
+            s for s in statements(self.config, "transform/privacy", "metric_statements", "resource")
+            if s.startswith("keep_keys"))))
 
     def test_client_templates_send_session_ids_with_cumulative_temporality(self):
         for path in (ROOT / "observability/collector/claude-settings.json.example",
@@ -402,7 +432,7 @@ def free_port() -> int:
         return probe.getsockname()[1]
 
 
-@unittest.skipUnless(OTELCOL.exists() and HAVE_YAML,
+@unittest.skipUnless(_OTELCOL_VERSION_OK and HAVE_YAML,
                      f"requires PyYAML and otelcol-contrib {OTELCOL_VERSION}; set OTELCOL_TEST_BIN for a scratch install")
 class NativeCollectorTests(unittest.TestCase):
     """The committed metrics pipeline on the pinned otelcol-contrib, with synthetic OTLP JSON (no model call)."""
@@ -482,8 +512,13 @@ class NativeCollectorTests(unittest.TestCase):
                             "histogram": {"aggregationTemporality": 1, "dataPoints": usage}}])
         time.sleep(2)
         exported = self.scrape(self.exporter)
-        claude = {labels["instance"]: float(value) for labels, value in samples(
-            exported, "ecosystem_claude_code_token_usage_tokens_total")}
+        claude_points = list(samples(exported, "ecosystem_claude_code_token_usage_tokens_total"))
+        self.assertEqual(len(claude_points), 3)
+        self.assertEqual({labels["agent_name"] for labels, _ in claude_points},
+                         {"workflow-subagent", "general-purpose"})
+        claude = {}
+        for labels, value in claude_points:
+            claude[labels["instance"]] = claude.get(labels["instance"], 0.0) + float(value)
         self.assertEqual(claude, {"session-a": 60.0, "session-b": 14.0})
         codex = {labels["instance"]: float(value) for labels, value in samples(
             exported, "ecosystem_codex_turn_token_usage_sum") if labels.get("token_type") == "input"}
@@ -498,6 +533,21 @@ class NativeCollectorTests(unittest.TestCase):
         # The host apply reads this series back after a Collector restart to confirm the new pipeline runs.
         self.assertTrue(any(line.startswith("otelcol_processor_incoming_items{") and 'processor="groupbyattrs/session"'
                             in line for line in telemetry.splitlines()), telemetry)
+
+    def test_invalid_native_server_names_collapse_before_sum_without_losing_valid_names(self):
+        start = time.time_ns() - 5_000_000_000
+        now = time.time_ns()
+        points = []
+        for server, count in (("serena", 7), ("qmd", 11), ("private/path", 2), ("A" * 32, 3)):
+            points.append({"attributes": attrs({"server": server}), "startTimeUnixNano": str(start),
+                           "timeUnixNano": str(now), "asDouble": float(count)})
+        self.post({"service.name": "codex_exec", "service.instance.id": "native-name-test"}, "codex_otel",
+                  [{"name": "codex.mcp.call", "sum": {"aggregationTemporality": 1,
+                    "isMonotonic": True, "dataPoints": points}}])
+        time.sleep(2)
+        values = {labels["server"]: float(value) for labels, value in samples(
+            self.scrape(self.exporter), "ecosystem_codex_mcp_call_total")}
+        self.assertEqual(values, {"serena": 7.0, "qmd": 11.0, "other": 5.0})
 
     def test_lane_name_becomes_a_label_and_a_malformed_one_is_dropped(self):
         # A lane's launch exports OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<lane> (codex-identity-launcher.sh.example).

@@ -104,3 +104,50 @@ Completeness critic: identity coverage and exposure differ from nonzero event
 transport. Preserve absent roster rows as unknown, native client cohorts and
 request/result distinctions, separate Skill/read contracts and cache subsets,
 and the interrupted full-suite comparison. These remain follow-up gates.
+
+## Combined monitoring steps 6, 7 and 8 — 2026-10-06
+
+The Lanes dashboard uses uid `cc-lanes`, the existing file provider, and native
+conversation/session identities with the hcom name lookup. An `ecosystem_lane`
+environment label is not authoritative identity: a historical sampled label
+belonged to another native thread. Descendant joins remain pending. Window
+selection is 1 h or 24 h. The refreshed 160-tool inventory is this one Codex
+session's exposure and excludes connector-app discovery.
+
+The collector change preserves native bounded source, hook, connection,
+compaction and skill dimensions before metric aggregation. It keeps prompt,
+argument and result bodies private. The gateway health route is model-free;
+no gateway settings or database are read. Prometheus start-timestamp ingestion
+needs the deployed `created-timestamp-zero-ingestion` flag and a newly born
+single-turn series read-back. Until then its token panel says lower bound.
+The generic backend renderer already enables both start timestamps and anchored
+queries; that is not the observed ns2604 unit and is not a host apply receipt.
+
+Native `systemctl --user show ns2604-prometheus.service -p ExecStart` confirmed
+the deployed unit has the OTLP receiver and no created-timestamp flag. The exact
+argument-preserving proposed drop-in is
+`observability/collector/ns2604-prometheus-start-timestamps.conf.example`.
+The shared install-plan has no ExecStart text today; fixwave-defects owns its
+concurrent edit, so that mirror awaits the named handoff rather than overwriting
+it. No experimental anchored-query flag is added to the ns2604 proposal.
+
+Correction: OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink
+(`diegosouzapw/OmniRoute@v3.8.51`, `open-sse/services/routing/otel.ts:1–32`).
+The earlier assertion that no exporter exists until v3.9 is withdrawn. Enabling
+its sink environment and restart belong to CC. Gateway traces are not token
+or MCP invocations. No host application is authorized by this source change.
+
+Counter reconciliation receipts cover native Codex and Claude separately. Raw
+registered Codex BEFORE [13:55Z,18:01Z):2,208 commands,2,069 context-mode calls,
+45 ai-memory,8 chrome-devtools,1 Serena and1 promptfoo. These are not organic
+counts. All-turn task naming, referenced co-op blocks, standing guidance,
+first-turn exclusion and effective role exposure are required for organic use.
+Thirty-two named roles have unknown effective grants. No zero-use, exclusion,
+readiness or merged cross-client total is claimed.
+
+Cheap critic fixes add native errors/hooks/connections, host CPU load and memory,
+collector stream headroom and explicit pending ownership. GPU export remains with
+the vllm-embed owner, unit failures with alerting/lm-qmd, client limit headroom and
+gateway environment with CC, and the newest-complete GitHub feed with
+github-ci-finalize (step12). Clock source pipeline is distinct from invocation
+counts. Live panel query/browser read-back waits for CC ACK and host apply.

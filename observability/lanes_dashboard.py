@@ -11,6 +11,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 LOKI = {"type": "loki", "uid": "ns2604-loki"}
+PROMETHEUS = {"type": "prometheus", "uid": "ns2604-prometheus"}
 CODEX = '{service_name=~"codex-app-server|codex_exec|codex_cli_rs"}'
 CLAUDE = '{service_name="claude-code"}'
 WINDOW = '${window}'
@@ -29,8 +30,8 @@ def usage(selector, event, identity, field, extra=""):
 
 def dashboard():
     base = json.loads((REPO / 'observability/backends/templates/ecosystem-dashboard.json.example').read_text())
-    base.update(uid='lanes', title='Lanes', editable=False, tags=['native', 'lanes'],
-                refresh='1m', time={'from': 'now-1h', 'to': 'now'}, panels=[],
+    base.update(uid='cc-lanes', title='Lanes', editable=False, tags=['native', 'lanes'],
+                refresh='30s', time={'from': 'now-1h', 'to': 'now'}, panels=[],
                 templating={'list': [{'name': 'window', 'label': 'Count window', 'type': 'custom',
                                       'query': '1h,24h', 'current': {'text': '1h', 'value': '1h'},
                                       'options': [{'text': v, 'value': v, 'selected': v == '1h'}
@@ -124,6 +125,37 @@ def dashboard():
         for label, field in [('Input', 'input_tokens'), ('Output', 'output_tokens'),
                              ('Cache read', 'cache_read_tokens'), ('Cache creation', 'cache_creation_tokens')]],
         'Native API request accounting. Do not add cache categories to another inclusive token total.')
+    panel('Native API errors and rate limits', [
+        ('Claude errors', f'sum by (status_code,error_type) (count_over_time({CLAUDE} | event_name="api_error" [{WINDOW}]))'),
+        ('Codex failed tool results', f'sum by (tool_name) (count_over_time({CODEX} | event_name="codex.tool_result" | success="false" [{WINDOW}]))')],
+        'Native error records only. Missing rate-limit headroom is UNKNOWN; client status-line configuration is owned by the command center.')
+    panel('Native hook results by source and hook name', [
+        ('Codex hooks — event coverage unqualified', f'sum by (source,hook_name,hook_event,status) (count_over_time({CODEX} | event_name=~"codex.hook.*" [{WINDOW}]))'),
+        ('Claude hook completions', f'sum by (hook_name,hook_event,num_blocking) (count_over_time({CLAUDE} | event_name="hook_execution_complete" [{WINDOW}]))')],
+        'Native source and hook attributes retained by collector step 6. A hook row proves RTK only when its identity names RTK; a plural hooks counter alone does not.')
+    panel('MCP connections and compaction', [
+        ('Claude MCP connections', f'sum by (server_name,status,transport_type) (count_over_time({CLAUDE} | event_name="mcp_server_connection" [{WINDOW}]))'),
+        ('Claude compaction', f'sum by (trigger) (count_over_time({CLAUDE} | event_name="compaction" [{WINDOW}]))')],
+        'Connection transitions and compactions are not tool invocations. Names require collector step 6 read-back; absent metadata stays unknown.')
+    for title, expr, description in [
+        ('Backends up', 'up', 'Prometheus scrape health; this is not coverage of every user unit.'),
+        ('Gateway health — waits on collector step 6', 'httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx"}', 'Only the model-free health route is probed. Native http_url label observed on existing targets. Gateway settings and database routes are excluded.'),
+        ('Collector streams against limit', 'max_over_time(otelcol_deltatocumulative_streams_tracked[1h])', 'Watch the 8,000 review threshold against the configured 10,000 stream limit.'),
+        ('Codex tokens — lower bound until step 7 read-back', f'sum by (ecosystem_lane,token_type) (increase(codex_turn_token_usage_sum[{WINDOW}]))', 'Start-timestamp ingestion still needs deployed flag and a newly born single-turn series read-back. Never add this total to Loki usage.'),
+        ('Host CPU — collector observed sample', 'system_cpu_load_average_1m', 'Native hostmetrics sample; no GPU or clock-offset coverage is implied.'),
+        ('Host memory — collector observed sample', 'system_memory_usage_bytes', 'Native hostmetrics sample. Unit health, clock and GPU collectors remain separately owned gates.')]:
+        item = panel(title, [('Value', expr)], description)
+        item['datasource'] = PROMETHEUS
+        item['targets'][0]['datasource'] = PROMETHEUS
+    pending = panel('Pending monitoring sources', [], '', 'text')
+    pending['options'] = {'mode': 'markdown', 'content': (
+        '**UNKNOWN / pending:** effective per-role tool exposure and exact organic prompt exclusions; '
+        'Claude RTK rewrites and Codex skill loads; GitHub newest-complete snapshot (step 12, github-ci-finalize); '
+        'unit failures (alerting PR and lm-qmd); GPU exporter (vllm-embed owner); clock offset; '
+        'SDK task attribution and gateway optional OTLP span sink (CC environment and restart). '
+        'OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink; no claim that it lacks export until v3.9. '
+        'A newly wired zero-call tool remains unmeasured until exposure and a complete 24 h organic window are qualified.')}
+
     inventory = json.loads((REPO / 'observability/lanes-tool-inventory.json').read_text())
     observed = ('sum by (mcp_server_name,mcp_tool_name) (count_over_time('
                 '{service_name=~"codex-app-server|codex_exec|codex_cli_rs|claude-code"} '

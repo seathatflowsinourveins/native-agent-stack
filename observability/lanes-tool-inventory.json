@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "evidence_class": "installed session tool-name exposure",
-  "captured_at_utc": "2026-10-06T16:43:00Z",
-  "scope": "Selected native MCP servers exposed in overlap-token Codex; connector-app discovery and other lane/client exposure unqualified",
+  "captured_at_utc": "2026-10-06T19:04:00Z",
+  "scope": "Selected native MCP servers exposed in overlap-token Codex after GO; connector-app discovery and other lane/client exposure unqualified; first-turn calls excluded from organic counts",
   "tools": [
     {
       "server": "ai-memory",
@@ -217,71 +217,71 @@
       "tool": "wait_for"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "check_index_coverage"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "compare_graphs"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "delete_project"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "detect_changes"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "get_architecture"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "get_code_snippet"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "get_file_outline"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "get_graph_schema"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "index_repository"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "index_status"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "ingest_traces"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "list_projects"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "manage_adr"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "query_graph"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "search_code"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "search_graph"
     },
     {
-      "server": "codebase-memory",
+      "server": "codebase-memory-mcp",
       "tool": "trace_path"
     },
     {
@@ -342,6 +342,14 @@
     },
     {
       "server": "jcodemunch",
+      "tool": "announce_model"
+    },
+    {
+      "server": "jcodemunch",
+      "tool": "jcodemunch_guide"
+    },
+    {
+      "server": "jcodemunch",
       "tool": "menu"
     },
     {
@@ -351,6 +359,10 @@
     {
       "server": "jcodemunch",
       "tool": "route"
+    },
+    {
+      "server": "jcodemunch",
+      "tool": "set_tool_tier"
     },
     {
       "server": "promptfoo",
