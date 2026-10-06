@@ -5,6 +5,8 @@
 groups:
   - name: nativestack2604-services
     rules:
+      # Includes the CC-owned vllm-embed /metrics scrape. Reuse this warning rather than
+      # issue a second alert for the same up == 0 condition; endpoint health is not embedding correctness.
       - alert: EcosystemServiceUnavailable
         expr: up{job!="acceptance-fixture"} == 0
         for: 2m

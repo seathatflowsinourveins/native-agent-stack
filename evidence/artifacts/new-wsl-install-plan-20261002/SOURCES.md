@@ -1065,3 +1065,25 @@ in this builder.
   The lifecycle vocabulary comes from the official
   [hook events reference](https://code.claude.com/docs/en/hooks#hook-events)
   together with Codex's typed event enum; unknown identities are discarded.
+
+### CC-owned vLLM embedding runtime metrics (2026-10-06)
+
+- vLLM **0.31.0**, tag commit `db9527a46873454610df6dbedf79a36d6bf1a7f6`:
+  [release](https://github.com/vllm-project/vllm/releases/tag/v0.31.0) and
+  [native metrics documentation](https://github.com/vllm-project/vllm/blob/v0.31.0/docs/usage/metrics.md#L3)
+  specify the server's `/metrics` endpoint. Read-only host observation returned
+  `/version` 0.31.0 and HTTP 200 for `/health` and `/metrics` at port 28231;
+  `/v1/models` advertised one embedding-named model. No inference request or restart occurred.
+- The pinned [Prometheus logger definitions](https://github.com/vllm-project/vllm/blob/v0.31.0/vllm/v1/metrics/loggers.py#L509)
+  define `vllm:num_requests_running`, `vllm:num_requests_waiting` and `vllm:kv_cache_usage_perc` gauges,
+  `vllm:prompt_tokens` and `vllm:request_success` counters (exported with `_total`), and
+  [request latency histograms](https://github.com/vllm-project/vllm/blob/v0.31.0/vllm/v1/metrics/loggers.py#L852).
+  Those names were present in the live scrape. Generation-token, TTFT and decode series are also
+  initialized; their presence is not evidence of generative work or embedding quality.
+- `vllm-embed` is an explicit **external-runtime reference**, not a new installed engine or
+  ownership row in this plan. The scrape uses `127.0.0.1:28231/metrics`. Its `up == 0` condition
+  reuses `EcosystemServiceUnavailable` for two minutes, with the existing warning/local-ecosystem
+  routing, rather than duplicate the same outage in a second rule. The new scenario uses
+  [Prometheus 3.15.0's native rule-test format](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/unit_testing_rules.md#L6)
+  to check no firing at 115 seconds, firing at 120 seconds and recovery at 130 seconds.
+  Synthetic `up` inputs prove rule evaluation; they are not a live outage or phone-delivery receipt.

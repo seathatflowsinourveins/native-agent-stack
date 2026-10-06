@@ -659,12 +659,13 @@ def main():
     claims = collections.defaultdict(set)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
     # promtool input-series labels are references, rather than additional listening sockets.
+    # vllm-embed at 28231 is a CC-owned external runtime, not an installed owner in this 84-row plan.
     observability_references = {
         "otel.yaml": {21300, 21128, 21080, 21434, 21808},
-        "prometheus.yaml": {21090, 21093, 21888, 21889, 21300, 21301},
+        "prometheus.yaml": {21090, 21093, 21888, 21889, 21300, 21301, 28231},
         "grafana-datasources.yaml": {21090, 21300, 21093},
         "prometheus-alerts.yaml": {21128, 21080, 21434},
-        "prometheus-alerts.test.yaml": {21090, 21997, 21128, 21080, 21434},
+        "prometheus-alerts.test.yaml": {21090, 21997, 21128, 21080, 21434, 28231},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:

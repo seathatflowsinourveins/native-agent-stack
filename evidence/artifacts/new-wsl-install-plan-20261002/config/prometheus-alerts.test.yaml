@@ -33,6 +33,24 @@ tests:
         alertname: EcosystemAcceptanceTargetDown
         exp_alerts: []
 
+  - name: 'vLLM embedding metrics: two-minute scrape failure fires and a healthy scrape resolves'
+    interval: 5s
+    input_series:
+      - series: 'up{job="vllm-embed",instance="127.0.0.1:28231"}'
+        values: '0+0x25 1+0x4'
+    alert_rule_test:
+      - eval_time: 115s
+        alertname: EcosystemServiceUnavailable
+        exp_alerts: []
+      - eval_time: 120s
+        alertname: EcosystemServiceUnavailable
+        exp_alerts:
+          - exp_labels: {job: vllm-embed, instance: '127.0.0.1:28231', severity: warning, scope: local-ecosystem}
+            exp_annotations: {summary: 'Local service vllm-embed is unavailable'}
+      - eval_time: 130s
+        alertname: EcosystemServiceUnavailable
+        exp_alerts: []
+
   # ---- 2026-10-06 (docs/decisions/2026-10-06-ns2604-alerting.md): clock, service-check, Alertmanager and
   # rule-failure scenarios, and a port of tests/test_observability_backends_alerts.py RootFilesystemRuleTests
   # to system_filesystem_usage_bytes. Synthetic series; Prometheus scrapes are modelled at the stated interval,
