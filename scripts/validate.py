@@ -112,6 +112,57 @@ def is_supported_pdf_framing(content: bytes) -> bool:
             and re.search(rb"/(?:Encrypt|Prev)\b", content) is None)
 
 
+def terminal_fragment_scan_text(path: Path, content: str) -> str:
+    """Mask only validated public profile IDs; all remaining fields stay scanned.
+
+    Microsoft's stable fragment GUIDs are not session identifiers. Preserve
+    duplicate/escaped JSON values when validation fails so they cannot hide a
+    private identifier. This exception applies only to the carried fragment.
+    """
+    if path.name.lower() != "nativestack2604.json":
+        return content
+    # Keep existing standalone/file-spec callers independent of this optional
+    # carrier. Load its pure helper from the validator's own source directory.
+    import importlib.util
+    helper_spec = importlib.util.spec_from_file_location(
+        "terminal_profile_ids", Path(__file__).with_name("terminal_profile_ids.py"))
+    helper = importlib.util.module_from_spec(helper_spec)
+    helper_spec.loader.exec_module(helper)
+    FRAGMENT_FOLDER, derived_guid = helper.FRAGMENT_FOLDER, helper.derived_guid
+
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate JSON key")
+            result[key] = value
+        return result
+
+    try:
+        decoded = json.loads(content, object_pairs_hook=lambda pairs: pairs)
+    except (ValueError, TypeError):
+        return content
+    decoded_text = json.dumps(decoded, ensure_ascii=False)
+    try:
+        fragment = json.loads(content, object_pairs_hook=unique_object)
+        profiles = fragment["profiles"]
+        if not isinstance(profiles, list) or not profiles:
+            return decoded_text
+        seen = set()
+        for profile in profiles:
+            name, guid = profile["name"], profile["guid"]
+            if (not isinstance(name, str) or not isinstance(guid, str)
+                    or guid.lower() != derived_guid(FRAGMENT_FOLDER, name).lower()
+                    or guid.lower() in seen):
+                return decoded_text
+            seen.add(guid.lower())
+        for profile in profiles:
+            profile["guid"] = "<PUBLIC_TERMINAL_PROFILE_ID>"
+        return json.dumps(fragment, ensure_ascii=False)
+    except (KeyError, TypeError, ValueError, UnicodeError):
+        return decoded_text
+
+
 def scan_file_for_private_content(path: Path) -> list[str]:
     """Scan one file's bytes for PRIVATE_CONTENT patterns directly.
 
@@ -134,6 +185,7 @@ def scan_file_for_private_content(path: Path) -> list[str]:
         content = raw.decode("utf-8")
     except UnicodeError:
         content = raw.decode("latin-1")
+    content = terminal_fragment_scan_text(path, content)
     for description, pattern in PRIVATE_CONTENT:
         if pattern.search(content):
             # Never echo matched credentials or personal paths.
@@ -351,6 +403,7 @@ class Validator:
             except (OSError, UnicodeError):
                 self.error(f"{relative}: cannot inspect as UTF-8 publication text")
                 continue
+            content = terminal_fragment_scan_text(path, content)
             for description, pattern in PRIVATE_CONTENT:
                 if pattern.search(content):
                     # Never echo matched credentials or personal paths.

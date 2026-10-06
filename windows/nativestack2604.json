@@ -1,0 +1,171 @@
+{
+  "profiles": [
+    {
+      "guid": "{bdf50230-e5e7-50ba-b336-ce1e09101a2e}",
+      "name": "NativeStack2604 - Shell",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec /bin/bash -l\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "taskbar"
+      ],
+      "tabColor": "#3B8065",
+      "suppressApplicationTitle": true
+    },
+    {
+      "guid": "{245806ad-61aa-5acf-810a-8aebddac1ed5}",
+      "name": "NativeStack2604 - Claude",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec claude\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#B87645",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "environment": {
+        "COLORTERM": "truecolor"
+      }
+    },
+    {
+      "guid": "{d9e9eddd-d4c5-5438-bd05-462be53ecf10}",
+      "name": "NativeStack2604 - Claude - resume",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec claude --resume\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#B87645",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "environment": {
+        "COLORTERM": "truecolor"
+      }
+    },
+    {
+      "guid": "{479e747e-7417-557f-b984-6f6946e667c5}",
+      "name": "NativeStack2604 - Command center (resume)",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec /bin/bash ~/.local/state/native-agent-stack/lanes/command-center-resume.sh\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#B87645",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "environment": {
+        "COLORTERM": "truecolor"
+      }
+    },
+    {
+      "guid": "{27815624-4785-5106-bee9-3b2a68c41540}",
+      "name": "NativeStack2604 - Co-op (resume)",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec /bin/bash ~/.local/state/native-agent-stack/lanes/co-op-resume.sh\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#B87645",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "environment": {
+        "COLORTERM": "truecolor"
+      }
+    },
+    {
+      "guid": "{9e61aca5-231d-5dec-8085-667d8d5960d7}",
+      "name": "NativeStack2604 - Librarium course",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/librarium-course\" --exec /bin/bash -lc \"exec claude\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#B87645",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "environment": {
+        "COLORTERM": "truecolor"
+      }
+    },
+    {
+      "guid": "{495a2f10-3488-5fb2-b84e-0f66048d33b2}",
+      "name": "NativeStack2604 - Codex",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec codex\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#4C78A8",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav"
+    },
+    {
+      "guid": "{365a4633-b3c6-5686-9eba-139b6bf3b9b1}",
+      "name": "NativeStack2604 - Codex - resume",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec codex resume\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#4C78A8",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav"
+    },
+    {
+      "guid": "{6331b332-6057-534b-933c-d660df8a216b}",
+      "name": "NativeStack2604 - Codex - account pool",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec /bin/bash ~/.local/state/native-agent-stack/lanes/codex-account-pool.sh\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "audible",
+        "taskbar"
+      ],
+      "tabColor": "#4C78A8",
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav"
+    },
+    {
+      "guid": "{10f274e1-ae3d-5b4b-b91b-a44fff876582}",
+      "name": "NativeStack2604 - Operations",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec /bin/bash ~/code/native-agent-stack/windows/ops-entry.sh\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "taskbar"
+      ],
+      "tabColor": "#3B8065",
+      "suppressApplicationTitle": true
+    },
+    {
+      "guid": "{aae86722-aea4-5e05-b496-1fecca3b00dd}",
+      "name": "NativeStack2604 - Local Chat",
+      "commandline": "wsl.exe -d NativeStack2604 --cd \"~/code/native-agent-stack\" --exec /bin/bash -lc \"exec nativestack chat\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "bellStyle": [
+        "taskbar"
+      ],
+      "tabColor": "#3B8065",
+      "suppressApplicationTitle": true
+    },
+    {
+      "guid": "{598e0ad8-796c-56ed-be33-64899441babb}",
+      "name": "NativeStack2604 - Librarium",
+      "commandline": "wsl.exe -d NativeStack2604 --exec /bin/bash -lc \"exec /bin/bash ~/.local/state/native-agent-stack/lanes/librarium.sh\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": true,
+      "bellStyle": [
+        "taskbar"
+      ],
+      "tabColor": "#3B8065",
+      "suppressApplicationTitle": true
+    }
+  ]
+}
