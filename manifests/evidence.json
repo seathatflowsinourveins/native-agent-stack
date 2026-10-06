@@ -53903,8 +53903,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "ad750498ace3022cdaab34bc6cafb42300379d9a9e0f9e76f00414916c9d8a96",
-      "bytes": 128978
+      "sha256": "5181148507b7df5a53eba35e03863e2a46b55230d54b725bd7251187f745eee0",
+      "bytes": 129278
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -53930,6 +53930,11 @@
       "path": "recipes/native-upgrades-20260921.md",
       "sha256": "a398b26bd0d3c0a5de3b1addec8ff0b5d27bb013e4f1df14e5235bb26001267c",
       "bytes": 5706
+    },
+    {
+      "path": "recipes/qdrant-user-service-migration.md",
+      "sha256": "7e38144c2c301ee126b1d6562c1094393f3a98cf8cec342c1f07d3046a251876",
+      "bytes": 8181
     },
     {
       "path": "recipes/saturation-sweep.md",
