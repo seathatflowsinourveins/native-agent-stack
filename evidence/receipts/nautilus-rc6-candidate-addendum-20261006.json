@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "id": "nautilus-rc6-candidate-addendum-20261006",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "Frozen separate rc6 runner/comparator/engine-binding copies retain the original economic method and strict source, review, ABI and history gates; source and synthetic checks pass, while the independent read, actual owner records, retained inputs and native replication remain pending.",
+  "evidence_class": "source_review",
+  "limitations": [
+    "No rc6 case has run. Source/fixture controls do not establish native economic parity, risk policy, broker acceptance or a destination pin move.",
+    "An independent Opus exact-head read is pending;5f may object at the addendum read. Synthetic reviews/approvals are confined to fixtures, not actual acceptance.",
+    "The existing failed-history/owner-acceptance predicate remains active.5f must supply an actual source-bound deviation-acceptance-rc6.json; old approved fields are not copied or cleared. Missing/old approval remains a failing precondition.",
+    "The owner must stage the retained five inputs and approve the managed-Python isolation route. AAPL remains blocked; no credentials, provider, broker or orders are touched.",
+    "Old engine/source/probe/review/history evidence remains historical rc5 evidence. Initial candidate history is byte-copied; actual future rc6 attempts append only to the candidate file, preserving the originals.",
+    "The earlier24-check offline runtime acceptance remains separately dated; it does not qualify these copied sources or substitute for a native historical-case run."
+  ],
+  "state": "frozen_pending_independent_review",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "original_runtime_candidate_head": "6a5bd326577c77e38d628e037644de01c186a0ce",
+  "addendum_path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-ADDENDUM-rc6-20261006.md",
+  "protocol_label": "rc6 candidate replication",
+  "variants": [
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/run-rc6.py",
+      "sha256": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+      "bytes": 51930
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare-rc6.py",
+      "sha256": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+      "bytes": 67828
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-rc6.json",
+      "sha256": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+      "bytes": 38307
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/equity-replay/run-rc6.py",
+      "sha256": "7933183cefab05687ab25c50b19353d3ace85ef5de6d4ae4bee158aa12de28b4",
+      "bytes": 12245
+    }
+  ],
+  "allowed_delta_categories": [
+    {
+      "id": "version",
+      "scope": "Exact rc6 package/version bindings; every original rc5 guard remains unchanged."
+    },
+    {
+      "id": "extension",
+      "scope": "Recorded rc6 ABI hash in the candidate engine-binding copy."
+    },
+    {
+      "id": "engine hash",
+      "scope": "Pinned vendor rc6 commit; historical rc5 citations retained under their original engine provenance."
+    },
+    {
+      "id": "source identity",
+      "scope": "Active candidate manifest/runner/comparator/addendum reviewed-source inventories and strict sealed manifest hash; candidate receipt/verdict names; separate history and actual new owner-approval locators."
+    },
+    {
+      "id": "fee model",
+      "scope": "Explicit native MakerTakerFeeModel Decimal zero rates and truthful serializable fee descriptor; AAPL FixedFeeModel unchanged."
+    }
+  ],
+  "preserved_artifacts": [
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+      "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+      "bytes": 19081
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
+      "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "bytes": 37153
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
+      "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
+      "bytes": 8223
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+      "bytes": 2333
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "bytes": 23733
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "bytes": 10088
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "bytes": 14090
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+      "bytes": 2740
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+      "bytes": 56665
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/equity-replay/run.py",
+      "sha256": "e036aa9354a478fe270258d3d2f2cb42a5c9c072d688b21313e0a89e715d796e",
+      "bytes": 12245
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/equity-replay/plan.json",
+      "sha256": "1e3cefdab959c9ce15e6d9d07ff6135b5720f8792bed06b2e02510dd880dd805",
+      "bytes": 1269
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
+      "sha256": "deb72b1d9a54f6e1d56783ea72ee55bb176bd5862c6a6f49cc1c86e6de4c4294",
+      "bytes": 9299
+    }
+  ],
+  "retained_input_hashes": {
+    "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+    "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+    "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+    "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+    "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "evidence_class": "local_integration",
+    "returned_output": {
+      "comparator_functions_changed": [
+        "main"
+      ],
+      "comparator_main_change": "output identity only",
+      "history_copy_byte_identical": true,
+      "manifest_sha256": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+      "scope": "Source checks only; no engine or candidate imports.",
+      "status": "passed"
+    },
+    "scope": "Source/compile check: copied comparator functions byte-identical except CLI result labeling; no runtime import or engine case."
+  },
+  "blocked_bindings": [],
+  "reviews": {
+    "binding_interpretation": "J4PROCEED2026-10-06T04:36:06Z permitsQ22option1;5fmayobjectatread",
+    "independent_cross_family": "pending",
+    "actual_owner_record": "pending",
+    "native_case_runs": []
+  },
+  "sources": [
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/execution/src/models/fee.rs:183-186",
+      "claim": "rc5 default is MakerTakerFeeModel."
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "paths": [
+        "crates/execution/src/models/fee.rs:324",
+        "python/nautilus_trader/execution/__init__.pyi:190-197",
+        "docs/getting_started/quickstart.py:131,221-224"
+      ],
+      "claim": "rc6 explicitly accepts Decimalmaker/taker rates via the native execution model."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "paths": [
+        "blueprints/us-equities/engine-nautilus/spy-parity/run.py:49-55,544-580,724-725",
+        "blueprints/us-equities/engine-nautilus/equity-replay/run.py:158-159,198-199",
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md:53-95"
+      ],
+      "claim": "Original frozen case/fee/oracle and strict version-binding sources."
+    }
+  ],
+  "owner_ruling": "ns2604-coop J4RULINGS2026-10-06T03:49:15Z,5f report-native-agent-stack-5f-20261006T0100Z-j4; J4PROCEED2026-10-06T04:36:06Z, command-center item task-ns2604-coop-20261006T043449Z section2",
+  "addendum_sha256": "580fa4b9af21ac3b3caf39fd8d7ae5e9a294e655371f8e2f348062f7e08e2aa2",
+  "recipe_fixture_checks": {
+    "command": "nice -n 19 python3 -B -m unittest tests.test_nautilus_rc6_candidate tests.test_spy_parity tests.test_nautilus_equity_replay tests.test_native_nautilus_ci tests.test_trading_2604_lock",
+    "exit_code": 0,
+    "test_count": 210,
+    "returned_summary": "Ran210tests; OK",
+    "evidence_class": "synthetic",
+    "scope": "Six focused controls reuse the original comparator fixtures, plus204existing source/fixture tests. Copied comparator helpers are imported for fixtures; no candidate main/native engine is run.",
+    "retained_failed_fixture_attempt": {
+      "exit_code": 1,
+      "test_count": 6,
+      "failed": "The fee negative used unused fee_usd; changing it to authoritative fill.fee exercises the unchanged comparator. No production code/predicate/tolerance was changed."
+    }
+  },
+  "open_conditions": [
+    "Independent passing read and checkout-contained actual review record covering7immutable files.",
+    "Actual5f gate-owner deviation disposition bound to the candidate reviewed files.",
+    "Owner-staged retained inputs with exact hashes and managed-Python route approval.",
+    "SPY-only native candidate replication and full unchanged oracle/predicate verdict; AAPL remains blocked."
+  ],
+  "changed_line_table": "evidence/artifacts/nautilus-rc6-qualification-20261005/candidate-changed-lines-20261006.json",
+  "history_copy": {
+    "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
+    "sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+    "bytes_match_original_at_freeze": true
+  }
+}

@@ -1,0 +1,569 @@
+{
+  "schema_version": 1,
+  "id": "nautilus-rc6-candidate-changed-lines-20261006",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "scope": "Every removed/added line of the candidate runner/comparator/engine-binding/AAPL copies; equal lines omitted. This is source comparison, not execution.",
+  "binding_categories": [
+    "version",
+    "extension",
+    "engine hash",
+    "source identity",
+    "fee model"
+  ],
+  "files": [
+    {
+      "original_path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+      "original_sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "candidate_path": "blueprints/us-equities/engine-nautilus/spy-parity/run-rc6.py",
+      "candidate_sha256": "b8e055359169b06ee350966c0844a7a66a91026f73f7fdfcb217514e51ac3e88",
+      "changed_lines": [
+        {
+          "side": "original",
+          "line": 2,
+          "text": "\"\"\"Replay the frozen ``one_zero`` SPY case twice on native NautilusTrader 2.0.0rc5.",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 2,
+          "text": "\"\"\"Replay the frozen ``one_zero`` SPY case twice for rc6 candidate replication.",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 46,
+          "text": "MANIFEST_V2 = \"mapping-manifest-v2.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 46,
+          "text": "MANIFEST_V2 = \"mapping-manifest-rc6.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 47,
+          "text": "ADDENDUM = \"PREREGISTRATION-ADDENDUM-rc6-20261006.md\"",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 50,
+          "text": "# add_venue instead of relied on as defaults. fill_model, fee_model and",
+          "category": "fee model"
+        },
+        {
+          "side": "original",
+          "line": 51,
+          "text": "# latency_model stay None, as preregistered.",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 51,
+          "text": "# add_venue instead of relied on as defaults. fill_model and latency_model",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 52,
+          "text": "# remain None; the rc6 candidate declares rc5's implicit maker/taker model",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 53,
+          "text": "# explicitly, with the same zero rates.",
+          "category": "fee model"
+        },
+        {
+          "side": "original",
+          "line": 53,
+          "text": "         \"fill_model\": None, \"fee_model\": None, \"latency_model\": None, \"bar_execution\": True,",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 55,
+          "text": "         \"fill_model\": None,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 56,
+          "text": "         \"fee_model\": {\"class\": \"MakerTakerFeeModel\", \"maker_rate\": \"0\", \"taker_rate\": \"0\"},",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 57,
+          "text": "         \"latency_model\": None, \"bar_execution\": True,",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 161,
+          "text": "REVIEWED_HARNESS_FILES = (\"convert.py\", \"fixture_strategy.py\", \"distribution_module.py\", \"run.py\",",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 162,
+          "text": "                          \"compare.py\")",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 163,
+          "text": "REPLAY_HISTORY = \"replay-history-v2.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 165,
+          "text": "REVIEWED_HARNESS_FILES = (\"convert.py\", \"fixture_strategy.py\", \"distribution_module.py\", \"run-rc6.py\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 166,
+          "text": "                          \"compare-rc6.py\", MANIFEST_V2, ADDENDUM)",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 167,
+          "text": "REPLAY_HISTORY = \"replay-history-rc6.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 165,
+          "text": "DEVIATION_ACCEPTANCE = \"deviation-acceptance-v2.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 169,
+          "text": "DEVIATION_ACCEPTANCE = \"deviation-acceptance-rc6.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 552,
+          "text": "    from nautilus_trader.execution import MakerTakerFeeModel",
+          "category": "fee model"
+        },
+        {
+          "side": "original",
+          "line": 577,
+          "text": "                             fill_model=VENUE[\"fill_model\"], fee_model=VENUE[\"fee_model\"],",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 582,
+          "text": "                             fill_model=VENUE[\"fill_model\"],",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 583,
+          "text": "                             fee_model=MakerTakerFeeModel(maker_rate=Decimal(\"0\"),",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 584,
+          "text": "                                                        taker_rate=Decimal(\"0\")),",
+          "category": "fee model"
+        },
+        {
+          "side": "original",
+          "line": 724,
+          "text": "    if installed != \"2.0.0rc5\":",
+          "category": "version"
+        },
+        {
+          "side": "candidate",
+          "line": 731,
+          "text": "    if installed != \"2.0.0rc6\":",
+          "category": "version"
+        },
+        {
+          "side": "original",
+          "line": 771,
+          "text": "        \"id\": \"spy-parity-one-zero-v2\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 778,
+          "text": "        \"id\": \"spy-parity-one-zero-rc6-candidate-20261006\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 779,
+          "text": "        \"qualification_kind\": \"rc6 candidate replication\",",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 797,
+          "text": "                            \"sha256\": digest(SOURCE / \"PREREGISTRATION-v2.md\")},",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 805,
+          "text": "                             \"sha256\": digest(SOURCE / \"PREREGISTRATION-v2.md\")},",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 806,
+          "text": "        \"candidate_addendum\": {\"path\": ADDENDUM, \"sha256\": digest(SOURCE / ADDENDUM)},",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 802,
+          "text": "                                 \"run.py\", \"compare.py\", MANIFEST_V1, MANIFEST_V2,",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 803,
+          "text": "                                 \"tolerances.json\")",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 811,
+          "text": "                                  \"run-rc6.py\", \"compare-rc6.py\", MANIFEST_V1, MANIFEST_V2,",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 812,
+          "text": "                                  \"tolerances.json\", ADDENDUM)",
+          "category": "source identity"
+        }
+      ]
+    },
+    {
+      "original_path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "original_sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "candidate_path": "blueprints/us-equities/engine-nautilus/spy-parity/compare-rc6.py",
+      "candidate_sha256": "41e775aabbb06696862de0e5a80f03034dde0908e841b1f53f5784d28cd137c8",
+      "changed_lines": [
+        {
+          "side": "original",
+          "line": 74,
+          "text": "SEALED_V2_MANIFEST_SHA256 = \"1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 74,
+          "text": "SEALED_V2_MANIFEST_SHA256 = \"cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1\"",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 77,
+          "text": "REVIEWED_HARNESS_FILES = (\"convert.py\", \"fixture_strategy.py\", \"distribution_module.py\", \"run.py\",",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 78,
+          "text": "                          \"compare.py\")",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 77,
+          "text": "REVIEWED_HARNESS_FILES = (\"convert.py\", \"fixture_strategy.py\", \"distribution_module.py\", \"run-rc6.py\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 78,
+          "text": "                          \"compare-rc6.py\", \"mapping-manifest-rc6.json\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 79,
+          "text": "                          \"PREREGISTRATION-ADDENDUM-rc6-20261006.md\")",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 90,
+          "text": "REPLAY_HISTORY = \"replay-history-v2.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 91,
+          "text": "REPLAY_HISTORY = \"replay-history-rc6.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 93,
+          "text": "DEVIATION_ACCEPTANCE = \"deviation-acceptance-v2.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 94,
+          "text": "DEVIATION_ACCEPTANCE = \"deviation-acceptance-rc6.json\"",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 99,
+          "text": "V2_SOURCES =(\"convert.py\", \"fixture_strategy.py\", \"distribution_module.py\", \"run.py\",",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 100,
+          "text": "              \"compare.py\", \"mapping-manifest.json\", \"mapping-manifest-v2.json\", \"tolerances.json\")",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 100,
+          "text": "V2_SOURCES =(\"convert.py\", \"fixture_strategy.py\", \"distribution_module.py\", \"run-rc6.py\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 101,
+          "text": "              \"compare-rc6.py\", \"mapping-manifest.json\", \"mapping-manifest-rc6.json\", \"tolerances.json\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 102,
+          "text": "              \"PREREGISTRATION-ADDENDUM-rc6-20261006.md\")",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 1164,
+          "text": "    verdict[\"qualification_kind\"] = \"rc6 candidate replication\"",
+          "category": "source identity"
+        }
+      ]
+    },
+    {
+      "original_path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
+      "original_sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "candidate_path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-rc6.json",
+      "candidate_sha256": "cd8949921ae1d02f45a5f1e3a30fb3753abc5aaa65fc2c3fa1b7fd0ba40a4cb1",
+      "changed_lines": [
+        {
+          "side": "original",
+          "line": 3,
+          "text": "  \"id\": \"spy-parity-one-zero-mappings-v2\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 3,
+          "text": "  \"id\": \"spy-parity-one-zero-mappings-v2-rc6-20261006\",",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 5,
+          "text": "  \"drafted_utc_date\": \"2026-09-22\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 5,
+          "text": "  \"drafted_utc_date\": \"2026-10-06\",",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 9,
+          "text": "  \"run_status_note\": \"No v2 replay, no v2 comparison and no v2 verdict exists. Nothing in this file was produced by running the parity harness. The only engine executions behind it are the synthetic engine-semantics probes under probes/v2/, and the one_zero predictions below are arithmetic on the frozen, hash-pinned LEAN inputs.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 9,
+          "text": "  \"run_status_note\": \"This rc6 candidate is frozen before its first execution. No rc6 case or comparison has run. Original rc5 probes, source citations, review/deviation records and replay history retain their historical scopes; current native execution and independent review remain separate requirements.\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 23,
+          "text": "    \"package\": \"nautilus_trader\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 24,
+          "text": "    \"version\": \"2.0.0rc6\",",
+          "category": "version"
+        },
+        {
+          "side": "candidate",
+          "line": 25,
+          "text": "    \"upstream_commit_pin\": \"7b766f8825b2539c5b2ac1375e9d97b41c509edb\",",
+          "category": "engine hash"
+        },
+        {
+          "side": "candidate",
+          "line": 26,
+          "text": "    \"environment\": \"~/.cache/ns2604-j4-rc6-home/projects/us-equities-runtime/.venv\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 27,
+          "text": "    \"interpreter\": \"~/.cache/ns2604-j4-rc6-home/projects/us-equities-runtime/.venv/bin/python\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 28,
+          "text": "    \"extension_sha256\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 29,
+          "text": "      \"_libnautilus.cpython-312-x86_64-linux-gnu.so\": \"da5fd063a9f0df9f1e6d0b8dfcdfcc9d9691fe6f8d4eeb89562c96c508805178\"",
+          "category": "extension"
+        },
+        {
+          "side": "candidate",
+          "line": 30,
+          "text": "    },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 31,
+          "text": "    \"runtime_receipt\": \"evidence/receipts/nautilus-rc6-runtime-2604-20261006.json\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 32,
+          "text": "    \"source_citations\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 33,
+          "text": "      \"explicit_fee_model\": \"nautechsystems/nautilus_trader@7b766f8825b2539c5b2ac1375e9d97b41c509edb:docs/getting_started/quickstart.py:131,221-224\",",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 34,
+          "text": "      \"model_api\": \"nautechsystems/nautilus_trader@7b766f8825b2539c5b2ac1375e9d97b41c509edb:python/nautilus_trader/execution/__init__.pyi:190-197\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 35,
+          "text": "    },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 36,
+          "text": "    \"source_scope\": \"Current rc6 identity and API; the original rc5 engine/probe citations remain historical under rc5_historical_engine_provenance.\"",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 37,
+          "text": "  },",
+          "category": "source identity"
+        },
+        {
+          "side": "candidate",
+          "line": 38,
+          "text": "  \"rc5_historical_engine_provenance\": {",
+          "category": "source identity"
+        },
+        {
+          "side": "original",
+          "line": 81,
+          "text": "    \"fee_model\": null,",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 97,
+          "text": "    \"fee_model\": {",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 98,
+          "text": "      \"class\": \"MakerTakerFeeModel\",",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 99,
+          "text": "      \"maker_rate\": \"0\",",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 100,
+          "text": "      \"taker_rate\": \"0\"",
+          "category": "fee model"
+        },
+        {
+          "side": "candidate",
+          "line": 101,
+          "text": "    },",
+          "category": "source identity"
+        }
+      ]
+    },
+    {
+      "original_path": "blueprints/us-equities/engine-nautilus/equity-replay/run.py",
+      "original_sha256": "e036aa9354a478fe270258d3d2f2cb42a5c9c072d688b21313e0a89e715d796e",
+      "candidate_path": "blueprints/us-equities/engine-nautilus/equity-replay/run-rc6.py",
+      "candidate_sha256": "7933183cefab05687ab25c50b19353d3ace85ef5de6d4ae4bee158aa12de28b4",
+      "changed_lines": [
+        {
+          "side": "original",
+          "line": 198,
+          "text": "    if importlib.metadata.version(\"nautilus_trader\") != \"2.0.0rc5\":",
+          "category": "version"
+        },
+        {
+          "side": "candidate",
+          "line": 198,
+          "text": "    if importlib.metadata.version(\"nautilus_trader\") != \"2.0.0rc6\":",
+          "category": "version"
+        }
+      ]
+    }
+  ],
+  "byte_identical_copy": {
+    "original_path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
+    "candidate_path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
+    "sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+    "scope": "Inherited historical rows remain intact; append real rc6 attempts only in the new file, never in the original."
+  }
+}

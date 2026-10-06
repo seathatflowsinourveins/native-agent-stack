@@ -20,7 +20,18 @@ pins, images and adapter are retained. A15 permits an acceptance-passed draft
 while J2 inputs remain unavailable; it does not establish a replacement case
 list. A16 supplied the verified native co-op route with an explicit rootless
 Docker endpoint, while preserving the isolated HOME override after mise.
-Q17 holds candidate case-version/fee-model metadata changes for a ruling.
+The later trading-owner ruling resolves Q17 for separate candidate source
+copies: strict rc6 version guards and SPY's explicit native maker/taker model.
+The original rc5 files remain unchanged. The proposed source addendum is
+`blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-ADDENDUM-rc6-20261006.md`;
+its separate receipt freezes candidate/oracle hashes and retains the current
+execution conditions. J4PROCEED permits the strict expanded engine/fee metadata
+and active-source/review bindings in separate copies. The originals and economic
+method are intact. The added candidate-changed-lines-20261006.json records every
+removed/added source line and category; the addendum carries variant/oracle
+hashes. There is no candidate case execution or economic parity result. The
+independent read, actual source-bound owner records and staged inputs/managed
+Python route remain pending before SPY execution; AAPL stays blocked.
 
 Original runtime receipts retain their historical rc5 scopes. The selected
 `catalogs/us-equities/runtime-target.json` is unchanged; 5f owns the pin decision

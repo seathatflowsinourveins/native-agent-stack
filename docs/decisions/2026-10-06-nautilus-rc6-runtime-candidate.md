@@ -55,10 +55,28 @@ image/adapter pins and the cutoff remain unchanged.
 
 The J2 contract identifies SPY one_zero, AAPL baseline and AAPL fee_slippage_stress
 at ecfa11276. Their retained inputs and launcher mount route remain unavailable.
-Their strict rc5 guards and SPY's sealed null-fee mapping also need 5f's binding
-ruling before an rc6 rerun. A17 retains those files unchanged; a concrete
-candidate proposal belongs only in the PR description. No case result is inferred
-from the runtime checks. Open issues #5007, #5057 and #5060 remain recorded.
+The later trading-owner ruling permits separate source variants with strict rc6
+guards and SPY's explicit native maker/taker model, preserving the original rc5
+files and the economic method. The
+[proposed addendum](../../blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-ADDENDUM-rc6-20261006.md)
+freezes the literal copies and oracle hashes. This supersedes A17's earlier
+PR-body-only proposal restriction for those two change categories. AAPL's
+FixedFeeModel remains unchanged and its cases stay blocked.
+
+The co-op's later Q22 interpretation permits all strict engine/active-source
+identity bindings in separate frozen copies, including the candidate manifest,
+comparator seal and reviewed source inventories. The original files and every
+economic predicate remain unchanged. The addendum records every changed line,
+its binding category and the variant/oracle hashes. Historical rc5 citations
+stay under their original engine provenance; old approvals are not relabelled.
+
+The final addendum still needs the independent Opus exact-head read;5f may
+object there. The copied method retains the source-bound gate-owner deviation
+predicate and needs the actual new owner record, plus staged inputs and the
+approved managed-Python route. Missing conditions remain visible failures or
+blockers. The source-freeze receipt is separate from historical runtime
+acceptance. No native case result is inferred from either. Open issues #5007,
+#5057 and #5060 retain their dated source-snapshot scope.
 
 ## Consequences
 
@@ -91,4 +109,12 @@ retain rc5 until an explicit destination decision is recorded.
 - [Docker rootless client setting](https://docs.docker.com/engine/security/rootless/).
 - Private A14/A15/A16/A17 and native run `coord:j4-rc6-hostrun-20261006T000057Z/`;
   proof hashes are retained in the public sanitized artifact.
+- The trading-owner J4 ruling relayed2026-10-06T03:49:15Z and the proposed
+  addendum's hashes; upstream rc5 fee default at
+  `nautechsystems/nautilus_trader@1b0a49d2:crates/execution/src/models/fee.rs:183-186`,
+  rc6 API at `7b766f88:python/nautilus_trader/execution/__init__.pyi:190-197` and
+  official quickstart at `7b766f88:docs/getting_started/quickstart.py:131,221-224`.
+- The co-op's J4PROCEED interpretation of2026-10-06T04:36:06Z covers Q22's
+  engine and active-source identity sites; the existing gate predicates come
+  from `native-agent-stack@ecfa11276:blueprints/us-equities/engine-nautilus/spy-parity/compare.py:263-344,692-855`.
 - [MADR 4.0.0 template](https://github.com/adr/madr/blob/4.0.0/template/adr-template.md).
