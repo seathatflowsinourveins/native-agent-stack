@@ -21,20 +21,19 @@ Pass native readiness before dispatch, requiring Context Mode. Add
 selected skill in the private worker home; a new home with none installed has
 no skill requirement. Require Serena too when the task needs semantic navigation. Tell it other workers
 are present and that it must preserve their edits. Feed the task on stdin.
-The explicit endpoint flags below are interim until PR #773 lands. After it
-lands, omit those flags to use the canonical topology default:
+The commands below use the guarded canonical topology default. For a worker
+revision without that reader, pass `--base-url http://127.0.0.1:21128/v1`
+explicitly:
 
 ```sh
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
-  --base-url http://127.0.0.1:21128/v1 \
   --preflight --require-mcp context-mode \
   --timeout 60 &&
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
-  --base-url http://127.0.0.1:21128/v1 \
   --timeout 600 \
   --prompt -
 ```
@@ -42,8 +41,8 @@ rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
 Use NativeStack2604's native Responses lane at loopback port 21128. WSL
 distributions share networking, and ports 20128 and 20129 belong to NativeStack. The worker
 reads `gateway.endpoint` from the install plan's checked-out
-`config/gpt-gateway-topology.json`, with 21128 as the fallback. Until PR #773
-lands, pass the explicit `--base-url` above for bounded jobs on 2604. Keep
+`config/gpt-gateway-topology.json`, with 21128 as the fallback. An explicit
+`--base-url` selects the caller's intended endpoint. Keep
 the exact model route in the live catalog; the default Sol/max suffix requires
 an OmniRoute build carrying PR #15167. Requested effort does not establish
 gateway-forwarded effort or backend identity. Keep

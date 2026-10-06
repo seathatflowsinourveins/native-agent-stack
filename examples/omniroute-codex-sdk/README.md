@@ -55,9 +55,9 @@ qualifies the caller path; the separate Claude SDK gateway bridge remains a tria
 The default endpoint comes from `gateway.endpoint` in the checked-out install
 plan's `config/gpt-gateway-topology.json`, with loopback port 21128 as fallback.
 WSL distributions share networking; ports 20128 and 20129 belong to NativeStack,
-so implicit defaults select neither. Until PR #773 lands, bounded jobs on
-NativeStack2604 pass `--base-url http://127.0.0.1:21128/v1` explicitly. After
-landing, omit that interim flag to use the canonical default. An owned
+so implicit defaults select neither. Workers with the topology reader use the
+canonical default. For an older revision, pass
+`--base-url http://127.0.0.1:21128/v1` explicitly. An owned
 reverse observer can be supplied with `--base-url`; the worker never changes
 gateway compression engines or native coordinator configuration. The default
 model is the explicit `cx/gpt-6.1-sol-max` route, with native reasoning effort

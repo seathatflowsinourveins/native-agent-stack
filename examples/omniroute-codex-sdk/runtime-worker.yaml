@@ -9,6 +9,8 @@ env:
   - STACK_ROOT: ${STACK_ROOT}
   - WORKER_PROJECT: ${WORKER_PROJECT}
   - WORKER_CODEX_HOME: ${WORKER_CODEX_HOME}
+  # Required explicit binding; normally http://127.0.0.1:21128/v1.
+  # Both steps preserve deliberate caller overrides; unset is not a default.
   - WORKER_BASE_URL: ${WORKER_BASE_URL}
   - WORKER_RESULT: ${WORKER_RESULT}
   - WORKER_TASK_FILE: ${WORKER_TASK_FILE}

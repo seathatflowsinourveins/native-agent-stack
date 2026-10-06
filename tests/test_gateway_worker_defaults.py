@@ -11,6 +11,9 @@ import io
 import json
 import os
 from pathlib import Path
+import re
+import shlex
+from string import Template
 import sys
 import tempfile
 from types import ModuleType
@@ -172,6 +175,35 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
                 os.environ.pop("LANGGRAPH_STRICT_MSGPACK", None)
             else:
                 os.environ["LANGGRAPH_STRICT_MSGPACK"] = strict
+
+    def test_dagu_documented_binding_targets_2604_in_both_steps(self):
+        kit = ROOT / "examples/omniroute-codex-sdk"
+        # Select the documented HTTP binding, then exercise the actual CLI
+        # commands. Native Dagu validation covers YAML syntax separately.
+        endpoints = re.findall(r"`(http://[^`]+)`", (kit / "enhancements.md").read_text())
+        self.assertEqual(len(endpoints), 1)
+        graph = (kit / "runtime-worker.yaml").read_text()
+        commands = re.findall(r"(?m)^    run: >-\n((?:^      .*\n)+)", graph)
+        self.assertEqual(len(commands), 2)
+        private = tempfile.TemporaryDirectory()
+        self.addCleanup(private.cleanup)
+        bindings = {
+            "STACK_ROOT": str(ROOT), "WORKER_PROJECT": str(ROOT),
+            "WORKER_CODEX_HOME": private.name,
+            "WORKER_RESULT": str(Path(private.name) / "fixture-result.json"),
+            "WORKER_TASK_FILE": str(Path(private.name) / "fixture-task.txt"),
+        }
+        for supplied, expected in ((endpoints[0], FALLBACK), ("http://127.0.0.1:24444/v1", "http://127.0.0.1:24444/v1")):
+            for command in commands:
+                with self.subTest(binding=supplied, command=command.strip()):
+                    rendered = Template(" ".join(command.splitlines())).substitute(
+                        bindings, WORKER_BASE_URL=supplied
+                    )
+                    argv = shlex.split(rendered)
+                    argv = argv[argv.index("--workspace"):]
+                    if "<" in argv:
+                        argv = argv[:argv.index("<")]
+                    self.assertEqual(self.workers["codex"].parse_args(argv).base_url, expected)
 
 
 if __name__ == "__main__":

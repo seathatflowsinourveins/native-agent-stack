@@ -1,7 +1,7 @@
 # Worker defaults select the NativeStack2604 gateway
 
-Date: 2026-10-06. Lane: foundation. Status: draft PR #773; locally checked,
-pending command-center micro-check and owner landing.
+Date: 2026-10-06. Lane: foundation. Status: configuration selection locally
+checked; native execution limits are recorded below.
 
 Direction: command-center item `task-ns2604-coop-20261006T043449Z`, relayed in the co-op's scoped lane assignment.
 
@@ -26,10 +26,10 @@ The alternative was replacing the two literals alone. Reading the canonical
 field keeps future approved topology changes in one place while retaining a
 portable fallback for copies of the examples without that asset. Topology path
 lookup occurs inside the guarded default reader, so a shallow copy such as
-`/worker.py` also reaches the fallback. Until PR #773 lands, the skill's
-bounded-job invocations pass 21128 explicitly as the command center requested.
-After landing, omit that interim flag to use the canonical default. The two
-example README descriptions use the same removal condition.
+`/worker.py` also reaches the fallback. The skill's commands use that guarded
+default. Jobs using older worker revisions without the reader explicitly pass
+21128, as the command center requested. The two example README descriptions
+use the same revision-based condition.
 Historical trial plans and receipts keep their original addresses.
 
 At the initial reviewed head 1942acb12, four fixture tests executed the actual Codex argument parser and DeepAgents
@@ -53,8 +53,20 @@ fixture. The root's separate recheck passed all five configuration cases in
 again returned two unclosed-file ResourceWarnings; no resource-closure,
 provider or unchanged-upstream acceptance claim follows.
 
-Other stale defaults are outside this assignment and need their owners' scoped
-follow-up: `examples/claude-runtime-sdk/worker.py:46` still selects 20128, and
+The stale-default inventory also found
+`examples/omniroute-codex-sdk/enhancements.md:6,86-87` and the two explicit
+`WORKER_BASE_URL` arguments in `runtime-worker.yaml:20,29` at ecfa11276.
+The fold corrects the documented normal binding to 21128 and marks it required
+in the graph. Both commands still honor deliberate caller overrides. A focused
+fixture renders each actual command with the documented binding and exercises
+the real CLI parser; it fails against the former 20128 binding. This is
+configuration coverage, not a new Dagu graph execution.
+
+A root-env `${WORKER_BASE_URL:-...}` default was considered but rejected:
+pinned Dagu leaves unavailable variables unresolved before operator expansion.
+The supported required-binding recipe avoids claiming an unset-variable
+default. Other stale defaults remain outside this assignment and need their
+owners' scoped follow-up: `examples/claude-runtime-sdk/worker.py:46` still selects 20128, and
 `tools/sota-convergence/landscape-sweep/build_args.py:116,696` retains both its
 20128 default URL and fallback host. These source paths are at ecfa11276.
 Historical trial plans and receipts remain historical evidence. The proposed
@@ -72,6 +84,7 @@ Sources:
 - `native-agent-stack@84c79f7f92f61972a46aa470a4f299017bc82768:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh:2596` reads the checked-out asset for SkillSpector; it selects a model, not an endpoint.
 - [Endpoint reader in open draft #723](https://github.com/seathatflowsinourveins/native-agent-stack/blob/84c79f7f92f61972a46aa470a4f299017bc82768/evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs#L8) selects `gateway.endpoint`; it is a pinned source proposal.
 - [Python 3.13 pathlib parents](https://docs.python.org/3.13/library/pathlib.html#pathlib.PurePath.parents) defines the indexed ancestor sequence used by the guarded lookup; [path joining](https://docs.python.org/3.13/library/pathlib.html#operators) preserves explicit absolute topology fixtures.
-- `native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:examples/omniroute-codex-sdk/worker.py:90` provides the existing URL contract.
+- `native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:examples/omniroute-codex-sdk/worker.py:92` provides the existing URL contract.
+- [Dagu value-resolution specification](https://github.com/dagu-org/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/specs/006-value-resolution-env.md#L393) and [undefined-variable handling](https://github.com/dagu-org/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/value/expand.go#L146) support the required root-env binding.
 - [Pinned Codex SDK](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python) and the existing `native-agent-stack@ecfa11276:examples/omniroute-codex-sdk/test_worker.py:502,774` support the bounded native configuration/preflight checks.
 - [Pinned DeepAgents API](https://github.com/langchain-ai/deepagents/tree/4394bcd00b8eb46e7c423939643a0dfcfb5d8773) and [LangChain OpenAI base_url](https://github.com/langchain-ai/langchain/blob/026c3da2b615abe52f8446e37de460b844d07a43/libs/partners/openai/langchain_openai/chat_models/base.py) remain the example's supported runtime APIs.
