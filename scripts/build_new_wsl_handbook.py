@@ -42,6 +42,7 @@ ADOPTION = "adoption/manifest.json"
 ADOPTION_POINTER_FIELDS = ("source.release_tag", "source.release_commit", "updated_at")
 PROFILE = "adoption/new-wsl-profile.json"
 DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
+HOST_REQUALIFICATION = "evidence/receipts/ns2604-requalification-20261005.json"
 OUTPUTS = ("docs/new-wsl-handbook.md", "docs/new-wsl-handbook.json")
 SOURCES = (OWNERSHIP, SELECTION, EDITION, RESEARCH, TRADING, DISTRO,
            ADOPTION, PREREGISTRATION)
@@ -198,6 +199,86 @@ class Inputs:
         if override is not None:
             validate_payload(value)
         return value
+
+
+def read_host_requalification(inputs):
+    """Project the dated receipt without qualifying a host or changing a selection.
+
+    The frozen denominator and reviewed baseline follow PR #700's method.md at
+    native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff. Consistency
+    checks here do not establish the supplied current projection's truth.
+    """
+    if not safe_file(inputs.root, HOST_REQUALIFICATION).exists():
+        return None
+    receipt = inputs.read(HOST_REQUALIFICATION)
+    validate_payload(receipt)
+    require(isinstance(receipt, dict) and type(receipt.get("schema_version")) is int
+            and receipt["schema_version"] == 1
+            and receipt.get("kind") == "historical_inventory"
+            and receipt.get("id") == "ns2604-requalification-20261005",
+            "host requalification needs its schema-1 historical receipt")
+    data = receipt.get("data")
+    require(isinstance(data, dict) and data.get("host") == "NativeStack2604"
+            and data.get("publication_date_utc") == "2026-10-05",
+            "host requalification needs its dated host scope")
+    for key in ("qualification_scope", "source_class"):
+        require(isinstance(data.get(key), str) and bool(data[key].strip()),
+                f"host requalification needs {key}")
+    readiness = data.get("readiness")
+    require(isinstance(readiness, dict) and readiness.get("provisional") is True
+            and isinstance(readiness.get("formula"), str) and bool(readiness["formula"].strip()),
+            "host requalification readiness must remain provisional and name its formula")
+    for key in ("baseline", "current", "conditional"):
+        require(key in readiness, f"host requalification needs explicitly declared {key} readiness")
+        value = readiness[key]
+        if key != "baseline" and value is None:
+            continue
+        require(isinstance(value, dict) and type(value.get("numerator")) is int
+                and type(value.get("denominator")) is int and value["denominator"] == 80
+                and 0 <= value["numerator"] <= value["denominator"]
+                and type(value.get("percent")) in (int, float)
+                and value["percent"] == 100 * value["numerator"] / value["denominator"],
+                f"host requalification {key} readiness is inconsistent with its 80-slot scope")
+    require(readiness["baseline"]["numerator"] == 30,
+            "host requalification baseline must retain the reviewed 30/80")
+    for key, status in (("current", "provisional_pending_independent_review"),
+                        ("conditional", "conditional_pending_four_slot_adjudication")):
+        value = readiness[key]
+        require(value is None or value.get("status") == status,
+                "host requalification projections must retain their pending review statuses")
+    disputed = data.get("disputed_slot_ids")
+    require(isinstance(disputed, list) and len(disputed) == 4
+            and all(isinstance(slot, str) for slot in disputed)
+            and set(disputed) == {f"token-efficiency/{slot}" for slot in
+                                 ("repo-packing", "command-output", "output-compression", "code-index")},
+            "host requalification needs the four disputed token slots")
+    # New contradictory evidence can lower a projection, and disputed slots may
+    # already be counted: native-agent-stack@4c897418:docs/decisions/
+    # 2026-10-04-ns2604-verified-e2e.md:114-121. Counts are checked independently.
+    decision = data.get("decision_record")
+    require(isinstance(decision, str) and bool(decision.strip()),
+            "host requalification needs its decision record")
+    decision = public_path(decision)
+    require(decision.startswith("docs/decisions/") and decision.endswith(".md"),
+            "host requalification decision record must name a published decision")
+    require(safe_file(inputs.root, decision).is_file(), "host requalification decision record must exist")
+    inputs.read(decision, as_json=False)
+    review = data.get("independent_review")
+    require(isinstance(review, dict) and review.get("status") == "pending"
+            and isinstance(review.get("scope"), str) and bool(review["scope"].strip()),
+            "host requalification needs its pending independent review scope")
+    for source, prefix, label, kind in (
+            (readiness.get("official_source"), "evidence/receipts/", "official source", "receipt"),
+            (review.get("recorded_source_review"), "evidence/artifacts/", "recorded source review", "artifact")):
+        require(isinstance(source, str) and bool(source.strip()), f"host requalification needs its {label}")
+        source = public_path(source)
+        require(source.startswith(prefix) and source.endswith(".json"),
+                f"host requalification {label} must name a published {kind}")
+        require(safe_file(inputs.root, source).is_file(), f"host requalification {label} must exist")
+        inputs.read(source, as_json=False)
+    return {"source": HOST_REQUALIFICATION, "receipt_id": receipt["id"], "receipt_kind": receipt["kind"],
+            **{key: data[key] for key in ("host", "publication_date_utc", "readiness", "disputed_slot_ids",
+                                         "independent_review", "qualification_scope", "source_class", "decision_record")}}
 
 
 def profile_fields(entry):
@@ -697,6 +778,7 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
     owners = index_rows(ownership["layers"], OWNERSHIP)
     reference = index_rows(edition["rows"], EDITION)
     default_decisions = read_default_decisions(inputs, reference, defaults_manifest)
+    host_requalification = read_host_requalification(inputs)
     declarations = {}
     for layer_id, row in owners.items():
         for declaration in row["owns"]:
@@ -937,6 +1019,16 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
         if default_decisions is not None:
             layers[-1]["default_slots"] = default_decisions["slots"][layer_id]
             layers[-1]["default_ownership"] = default_decisions["layers"][layer_id]
+            if layer_id == "code-navigation":
+                # Definitive slots supersede the original client split:
+                # native-agent-stack@4c897418:docs/decisions/
+                # 2026-10-01-new-wsl-definitive-defaults.md:68-70,528.
+                layers[-1]["owns"] = [
+                    f"{slot['record']['default']} ({slot['record']['job']})"
+                    for slot in layers[-1]["default_slots"] if slot["installed"]
+                ]
+                layers[-1]["uses"] = layers[-1]["default_ownership"]["uses"]
+                layers[-1]["ownership_source"] = DEFAULTS_MANIFEST
     final_layers = {row["layer_id"] for row in layers if row["status"] == "final"}
     for tool in tools:
         if tool["owner_layer_id"] in final_layers and not tool["blocking_gaps"]:
@@ -982,6 +1074,8 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
         "blocking_gaps": gaps,
         "sources": sorted(inputs.sources.values(), key=lambda source: source["path"]),
     }
+    if host_requalification is not None:
+        result["host_requalification"] = host_requalification
     if default_decisions is not None:
         require_slot_inventory([slot["record"]["slot_id"] for layer in layers for slot in layer["default_slots"]],
                                [slot["record"]["slot_id"] for slots in default_decisions["slots"].values()
@@ -1062,8 +1156,40 @@ def render_markdown(data):
              f"As of {data['as_of']}. {data['evidence_class']}.", "",
              "`picked` means a repository recommendation, `head-to-head-arm` means a comparison input, and `final` requires all five gates and both packet-bound family verdicts. `pending` identifies unpublished inputs.", "",
              data["meaning"], "", data["cross_family_boundary"], "",
-             "The architecture edition supplies the row inventory and reference links only. Its source-host winners, pins and closure cells are not new-install decisions.", "",
-             "## Stage 1 and stage 2", ""]
+             "The architecture edition supplies the row inventory and reference links only. Its source-host winners, pins and closure cells are not new-install decisions.", ""]
+    if data.get("host_requalification"):
+        host = data["host_requalification"]
+        readiness = host["readiness"]
+        lines += ["## NativeStack2604 host re-qualification", "",
+                  f"Published {host['publication_date_utc']}; source: {link(host['source'])}.", "",
+                  "Official readiness remains the qualified 2026-10-04 baseline on the #700 bar: upstream acceptance, "
+                  "wiring and fresh-session use, with the harness text present. Current and conditional figures, "
+                  "when supplied, are provisional source projections without an independently verified 80-slot join.", ""]
+        for key, label in (("baseline", "Official #700-bar readiness (qualified 2026-10-04)"),
+                           ("current", "Supplied captured-status projection (provisional)"),
+                           ("conditional", "Conditional captured-status projection (provisional)")):
+            value = readiness[key]
+            if value is not None:
+                lines += [f"- {label}: **{value['numerator']}/{value['denominator']} ({value['percent']:g}%)**."]
+        if readiness["current"] is None or readiness["conditional"] is None:
+            unavailable = [key for key in ("current", "conditional") if readiness[key] is None]
+            lines += ["", "No aggregate established for: " + ", ".join(unavailable) + "."]
+        lines += ["", f"Decision record: {link(host['decision_record'])}.", "",
+                  "An updated official readiness figure requires the command center's new dated qualification "
+                  "of the same 80 slots, followed by independent review and adjudication. "
+                  "This receipt projection or its public review alone does not change the official figure.", "",
+                  "The organic native arm differs in one respect: no harness text names the tool. "
+                  "Upstream acceptance, wiring and fresh-session use remain required. Its count comes only from "
+                  "the final verified E2E (S4), independent review and adjudication.", "",
+                  f"Formula: {cell(readiness['formula']).rstrip('.')}.", "",
+                  f"Source class: {cell(host['source_class']).rstrip('.')}.", "",
+                  f"Qualification scope: {cell(host['qualification_scope']).rstrip('.')}.", "",
+                  "Recorded token-review disagreements: " + ", ".join(f"`{slot}`" for slot in host["disputed_slot_ids"]) + ".", "",
+                  f"Independent review: {cell(host['independent_review']['status'])}; "
+                  f"{cell(host['independent_review']['scope']).rstrip('.')}.", "",
+                  "This receipt projection supplies no new upstream acceptance, independently replicated host "
+                  "execution, recommendation status or finality gate.", ""]
+    lines += ["## Stage 1 and stage 2", ""]
     for stage in data["stage_order"]:
         lines += [f"### Stage {stage['stage']}", "", stage["boundary"], "", f"Source: {link(stage['source'])}.", ""]
         lines += [f"{i}. {step}" for i, step in enumerate(stage["steps"], 1)] + [""]
@@ -1105,8 +1231,9 @@ def render_markdown(data):
                   f"Ownership source: {link(row['ownership_source'])}.", ""]
         if "default_slots" in row:
             owner = row["default_ownership"]
+            owns = row["owns"] if row["layer_id"] == "code-navigation" else owner["owns"]
             lines += ["### Slot default decisions", "",
-                      "Default ownership: " + cell(owner["owns"]) + "; uses: " + cell(owner["uses"]) + ".", "",
+                      "Default ownership: " + cell(owns) + "; uses: " + cell(owner["uses"]) + ".", "",
                       "| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |",
                       "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
             for slot in row["default_slots"]:
@@ -1157,6 +1284,10 @@ def render_markdown(data):
                              f" It replaces {'; '.join(replaced)}, kept under `overturned`.")
             if overturned:
                 lines.append("")
+        if row["layer_id"] == "code-navigation" and "default_slots" in row:
+            lines += ["### Historical recommendation packet tools", "",
+                      "The following tools belong to the dated comparison packets; current defaults and exclusions "
+                      "are shown in the slot table above.", ""]
         lines += ["| Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |", "| --- | --- | --- | --- | --- | --- |"]
         for key in row["tools"]:
             tool = tools[key]
