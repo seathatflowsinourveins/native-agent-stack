@@ -696,6 +696,14 @@
   },
   {
    "gap_slot": "gpt-gateway-topology",
+   "supersession_note": {
+    "date_utc": "2026-10-05",
+    "source": "native-agent-stack@0fb32ee583589f1a0809b20d18dff40ce2f65a1c:docs/decisions/2026-10-05-omniroute-gateway-composition.md:14-15,31-38,117 (PR #744)",
+    "scope": "J-744 source parity only. All original verdict fields below remain the historical round-2 record.",
+    "change": "The plan/catalog/map now select the supplied 3.8.51 composition: PR15167@0585aba5589d5a1f49243a13a8db249558e7c9e3 plus cited affinity patch 045aa81f3, build 5f4b3d577, tarball SHA256 d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2. The explicit gateway request is Sol/max; native Codex retains Sol/max too. PR13788 is absent, standalone search stays held out, F1 forbids OAuth routing combos while the affinity patch runs, and canonical Claude routing remains owner-pending.",
+    "evidence_boundary": "Historical co-op readback retains its original false effort/header controls and one exact-correlation Sol/max join. It is integration evidence, not new native-profile qualification. Revised recipe execution, whole-cross/research acceptance and owner post-landing apply remain owed; this note claims no new host, service or provider run.",
+    "overturn": "Move to an official release carrying PR15167 after executor and independently joined live max observations; remove the affinity patch when upstream's affinity-outranks-occupancy test passes without it."
+   },
    "uphold": false,
    "final_adopt": true,
    "final_owner": "no extra install: OmniRoute (pool and fallback gateway). On the clean v3.8.51 pin, OmniRoute caps gpt-6.1-sol at xhigh, so the topology records native Codex as the only Sol/max route until an upstream OmniRoute release contains PR #15167.",

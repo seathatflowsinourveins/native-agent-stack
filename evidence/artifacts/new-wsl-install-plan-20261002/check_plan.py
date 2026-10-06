@@ -640,10 +640,11 @@ def main():
 
     # Config files: service copy_config calls and direct, preserving tool-config installs both consume plan files.
     # Ports do not collide between rows. Only the install source operand counts, never an arbitrary filename mention.
-    config = {p.name for p in (plan_dir / "config").iterdir()}
+    config = {p.relative_to(plan_dir / "config").as_posix()
+              for p in (plan_dir / "config").rglob("*") if p.is_file()}
     copied = set(re.findall(r"copy_config '([^']+)'", install_text))
     commands = "\n".join(command for row in rows for command in row["commands"])
-    copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._@-]+)" "[^"\n]+"', commands))
+    copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._@/-]+)" "[^"\n]+"', commands))
     # MinerU consumes its scoped skill manifest directly through the installer's native --manifest argument.
     if '--manifest "$plan_dir/config/mineru-skills-manifest.json"' in "\n".join(by_slot.get("mineru", {}).get("commands", [])):
         copied.add("mineru-skills-manifest.json")
@@ -656,10 +657,11 @@ def main():
         bad("base-distribution", "base-image acceptance must consume config/base-distribution-accept.sh")
     for name in sorted(copied - config):
         bad("config", f"install.sh copies config/{name}, which does not exist")
-    # Round-2 gpt-gateway-topology excludes local carries from the clean default.
+    # Historical canary assets remain available to their original regression tests.
     # Source: https://github.com/diegosouzapw/OmniRoute/pull/15167
     # These retained historical artifacts still support the canary regression
-    # tests, but the published release row must neither install nor accept them.
+    # tests, but neither the published package nor a supplied prebuilt composition
+    # installs them or treats their source-tree checker as prebuilt identity proof.
     historical_gateway_configs = set()
     gateway = by_slot.get("gpt-gateway", {})
     if gateway.get("release") == "3.8.51" and not gateway.get("source_build"):
@@ -667,7 +669,7 @@ def main():
             "omniroute-canary-check.py", "omniroute-canary-evidence.json", "omniroute-canary-install.sh",
         }
         if historical_gateway_configs & copied:
-            bad("gpt-gateway", "published clean release must not install historical canary assets")
+            bad("gpt-gateway", "selected prebuilt release must not install historical canary assets")
     for name in sorted(config - copied - historical_gateway_configs):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
@@ -683,7 +685,8 @@ def main():
         if (r.get("service") or {}).get("port") is not None:
             claims[r["service"]["port"]].add(r["slot"])
         for path in r["config_paths"]:
-            name = path.rsplit("/", 1)[-1]
+            name = next((asset for asset in sorted(config, key=len, reverse=True)
+                         if path.endswith("/" + asset)), path.rsplit("/", 1)[-1])
             if name in config:
                 config_text = (plan_dir / "config" / name).read_text()
                 if r["slot"] == "research-harnesses" and name == "deer-flow-config.yaml":
