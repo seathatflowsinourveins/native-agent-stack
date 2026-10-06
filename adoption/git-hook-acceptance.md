@@ -81,6 +81,7 @@ test "$(command -v gitleaks)" = "$eco/bin/gitleaks"
 test "$(gitleaks version)" = 8.30.1
 test "$(sha256sum "$eco/tools/gitleaks-8.30.1/gitleaks" | cut -d ' ' -f 1)" = 88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509
 command -v zizmor
+mkdir -p "$HOME/.cache/ns2604-github-ci-finalize"
 scratch="$(mktemp -d "$HOME/.cache/ns2604-github-ci-finalize/p1-git-clone.XXXXXX")"
 nice -n 19 git clone --no-hardlinks --local "$repo" "$scratch/repo"
 git -C "$scratch/repo" config --local core.hooksPath scripts/git-hooks
