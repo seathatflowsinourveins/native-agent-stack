@@ -6828,98 +6828,98 @@
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-memory-aa.json",
-      "sha256": "7438275a9bca4eec93f76daa8e9bf858c6fb8dd82bb7656e699c94041895b665",
-      "bytes": 10597
+      "sha256": "61f157581ce7e639016e84bc182a611f68cdb34f2fbc3ab9daa1d25888f6262c",
+      "bytes": 11313
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-memory-full.json",
-      "sha256": "ce72f72489f7f33e32bc6a3b6ff8f0fbcc3cb275693a9724cd1b867d7c3bf156",
-      "bytes": 10596
+      "sha256": "3384653ebb3486ffd1f18522f604e6b31b0e7c2b3200a70b6f3097c750560d07",
+      "bytes": 11312
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-aa.json",
-      "sha256": "b9541f3c2c00a4754aa9178bd06867bb3d7b243989e9fba6e15b8f513403f0f5",
-      "bytes": 11112
+      "sha256": "52e09560239d7fa24bf001ec579c25c368137841c50b0c0f4bc8944419921582",
+      "bytes": 11828
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-full.json",
-      "sha256": "191e0ea70ac345e82468e8afed0a6ac91831a73b65d45e5d76583a142b00cd7f",
-      "bytes": 11111
+      "sha256": "e98051b666b405320fc7fc7cdeb4d2dddb234637882ca6d08cf5c3c2db198283",
+      "bytes": 11827
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-ast-grep.json",
-      "sha256": "0b11552563f50626d25cbe53b9f7c589e4e44b7019f1d6ccf9587f218ddf35d2",
-      "bytes": 11136
+      "sha256": "f452266f98aa008b7c1bbed90f352caf2de3e84ee28103785b373c737bad0499",
+      "bytes": 11852
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-codebase-memory-mcp.json",
-      "sha256": "14e7245f6f783586873ab6f6e0e1b5271b4309723adcafa04857e69408c21e05",
-      "bytes": 11158
+      "sha256": "87653b7e0c062fc0a1580cdbac3e411975c494d08bd05f44930a2312a24c0188",
+      "bytes": 11874
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-context-hub.json",
-      "sha256": "3856c568a7746abfa27303bbc6e3c4d4d31c8d86303366ced710f058abbe52f4",
-      "bytes": 11142
+      "sha256": "e4dc2ab44b1eb7e9902f2962a7dcde77d5a4bb7309fd4cc106bce707e9b279ef",
+      "bytes": 11858
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-context-mode.json",
-      "sha256": "1f244b1ee5df92a251eec24d9a574b37b0bbafd84a1bcf87f42dbefe60edf885",
-      "bytes": 11144
+      "sha256": "c88b8933cda120f5ae938c0de969a4bdabbe07e03f32d8643333834ebb85db61",
+      "bytes": 11860
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-headroom.json",
-      "sha256": "6cf0d1e3875aa1e32dc625515c7c20e5479c7801027914d80c45831b8635e08f",
-      "bytes": 11136
+      "sha256": "e31c15a51794a2243ef32d872b598a6fbaf4d690523a392d6d8b9c72b1a14a98",
+      "bytes": 11852
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-jcodemunch-mcp.json",
-      "sha256": "60b11d75b3fd86e3a10920bb7d103905a74e931c3f3fecc56fd0b1d880f0ad8f",
-      "bytes": 11148
+      "sha256": "5a5d6928912f445606bb9eaaff32fd06cdb3d3656262c382fba7034ab6798185",
+      "bytes": 11864
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-markitdown.json",
-      "sha256": "64f656ad938439db41928f79bf20876e932452c0f0119feed329dcebbf9e261f",
-      "bytes": 11140
+      "sha256": "7006be20a9a6a419f61c591e886d2a1a49affef4ad4e3dcf2c68065462423970",
+      "bytes": 11856
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-qmd.json",
-      "sha256": "fd776ee36b354b09baefdec2379b4ccb1634a63545a1e3eaafada2a676c11f6c",
-      "bytes": 11126
+      "sha256": "f807ea6b2dc7edbaa08399819bacbb6b84bd1811526f809966cf0309a82c33f6",
+      "bytes": 11842
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-repomix.json",
-      "sha256": "020404e41d858a949a3fd9cc1c8714f04c9e3a29286c22f02442369886632ba1",
-      "bytes": 11134
+      "sha256": "c6ce8910faea9bb53dc3081ea8f8353a23ddea3c8d9d2dc227aa45394a972962",
+      "bytes": 11850
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-rtk.json",
-      "sha256": "101150754384dd1ba6e2c9371f3442a7a208d7095648f4e82e825e8f74248ae8",
-      "bytes": 11126
+      "sha256": "eac3d9a544a45069b0ae6f9e3f21d7527688bed87dd8135cdb1425f254d175c5",
+      "bytes": 11842
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-semble.json",
-      "sha256": "c33b936c8c0a401fc341d4f41ddbfec3333d67e00185faf9730edb5ab57bb424",
-      "bytes": 11132
+      "sha256": "da06b8773caf7c02562d485ab1835a7f7ee7a7a35075659922812e833624bb7b",
+      "bytes": 11848
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-serena.json",
-      "sha256": "c02eac22fce0a12132b958b5cce789d20d80cd10cd9aaf31a960bcd5871d7da7",
-      "bytes": 11132
+      "sha256": "3608b2392f3c146ffb71721336f81721244619342c4661d2f560f403b27563cf",
+      "bytes": 11848
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-socraticode.json",
-      "sha256": "32d73ad2f3f5a92f8b10afb12668741938a6a77982ea0474d6541d052e7dac20",
-      "bytes": 11142
+      "sha256": "8c156a5ffd7f0781caee84ec9250bb48bacfeb8c366b4bb2e5674b6faaaf5d04",
+      "bytes": 11858
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-token-lane-carriers.json",
-      "sha256": "38367b16784e96a481667f96f049f6ea343e23a38604997827287a2ccd99c7ac",
-      "bytes": 11158
+      "sha256": "e8e97d59be4d1d13b698a42db969ed738cb9c5d66a185c594271849dd7c50be2",
+      "bytes": 11874
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-toon.json",
-      "sha256": "1adaafe7221e78d3ab136755b0cf8ffc24b5c49c9292892a4fac71a3b78bbed4",
-      "bytes": 11128
+      "sha256": "9af804dc662d403293a79392ce2c5f73584142e92f70bdecd397a1bdb0e12bdc",
+      "bytes": 11844
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/inputs.json",
@@ -6933,13 +6933,13 @@
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/preregistration.md",
-      "sha256": "a63ef4e212eb695adc715bbdba46b9de30a45550a8369fbd4997ac615bdf04a0",
-      "bytes": 14948
+      "sha256": "d2473653b3b85b46bd34ffa609643aaaf20299a47459a0b152d92017527ffbba",
+      "bytes": 17823
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/source-review.json",
-      "sha256": "1904a8f56e969fb31aef8ecbb5cb279fe46a975e3a2045c57c9604a7c4f33ac1",
-      "bytes": 5265
+      "sha256": "2e5284cc0cfd005775b64610352efc85aebf58b50147b8f76128dc814834583b",
+      "bytes": 6478
     },
     {
       "path": "blueprints/convergence-practice/token-memory-ablation-20261006/tasks.json",
@@ -17398,8 +17398,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-token-memory-ablation-preregistration.md",
-      "sha256": "231a26faf7a8f10519aab6d2025aa85ff1b448bb77a6113143cf873770bf3c1c",
-      "bytes": 3970
+      "sha256": "c62208992e1b7e718e23f374bb96fb79c78e7e36bd05c6f0b6a822f8388de686",
+      "bytes": 5547
     },
     {
       "path": "docs/direct-results.md",
