@@ -35,10 +35,11 @@ GRAFANA_FILES = (
     ("grafana-research-grand.json", "ecosystem-grafana-dashboards/research-grand.json"),
     ("grafana-ecosystem-native.json", "ecosystem-grafana-dashboards/ecosystem-native.json"),
     ("grafana-native-foundation-data.json", "ecosystem-grafana-dashboards/native-foundation-data.json"),
+    ("grafana-lanes.json", "ecosystem-grafana-dashboards/lanes.json"),
     ("ns2604-research-progress.service", "systemd/ns2604-research-progress.service"),
     ("ns2604-research-progress.timer", "systemd/ns2604-research-progress.timer"),
 )
-ECOSYSTEM_DASHBOARDS = ("research-grand", "ecosystem-native", "native-foundation-data")
+ECOSYSTEM_DASHBOARDS = ("research-grand", "ecosystem-native", "native-foundation-data", "lanes")
 EMITTER_UNITS = ("ns2604-research-progress.service", "ns2604-research-progress.timer")
 UNIT_PATH_UNSAFE = re.compile(r"[\s%\"'\\$]")
 

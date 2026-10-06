@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the workstation's three ecosystem dashboards for NativeStack2604's Grafana.
+"""Render the ecosystem dashboards for NativeStack2604's Grafana.
 
 The output is the install plan's config folder (evidence/artifacts/new-wsl-install-plan-20261002/config/),
 from which the plan's `observability_config.py grafana` provisions them; this script never touches a host.
@@ -103,10 +103,12 @@ def dashboards():
     )
     foundation = module('observability/native-data/render.py', 'native_render').dashboard(
         header=NATIVE_DATA_HEADER, omit=NATIVE_DATA_OMIT)
+    lanes = module('observability/lanes_dashboard.py', 'lanes_render').dashboard()
     return {
         'grafana-research-grand.json': retarget(research),
         'grafana-ecosystem-native.json': native,
         'grafana-native-foundation-data.json': retarget(foundation),
+        'grafana-lanes.json': lanes,
     }
 
 
