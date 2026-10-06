@@ -20,12 +20,13 @@ as the prior-value receipt:
 ```powershell
 Set-Location C:\Users\apoth
 Get-FileHash .\clock-root-fix-r2.ps1 -Algorithm SHA256  # match the CC's receipt
-.\clock-root-fix-r2.ps1 -WhatIf | Tee-Object .\clock-r2-before.txt
+.\clock-root-fix-r2.ps1 -WhatIf 6>&1 | Tee-Object .\clock-r2-before.txt
 .\clock-root-fix-r2.ps1
 Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\Settings' -Name PausedQualityStatus,PausedQualityDate
 ```
 
-`-WhatIf` previews existing values and ends with `CLOCK-R2 PLAN complete`.
+Stream `6>&1` captures the script's `Write-Host` prior values in the preview
+receipt. `-WhatIf` ends with `CLOCK-R2 PLAN complete`.
 Each actual write prints an immediate read-back and stops on mismatch.
 
 | Step | Expected actual read-back |
@@ -82,4 +83,6 @@ Sources: [Automatic, 16dafadd, ms.date 2025-02-25](https://github.com/MicrosoftD
 [sc.exe config, 2023-02-03](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-config);
 [reg export, 2023-02-03](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/reg-export);
 [restart scheduling, 2025-09-30](https://learn.microsoft.com/en-us/windows/deployment/update/waas-restart);
-[PowerShell 5.1 execution policies, 9a8a7830 (2026-08-31)](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/9a8a7830dbbb55ab46555c79e800ca0b0bd0552e/reference/5.1/Microsoft.PowerShell.Core/About/about_Execution_Policies.md).
+[PowerShell 5.1 execution policies, 9a8a7830 (2026-08-31)](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/9a8a7830dbbb55ab46555c79e800ca0b0bd0552e/reference/5.1/Microsoft.PowerShell.Core/About/about_Execution_Policies.md);
+[Write-Host information stream, same pin](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/9a8a7830dbbb55ab46555c79e800ca0b0bd0552e/reference/5.1/Microsoft.PowerShell.Utility/Write-Host.md#L41-L43),
+[stream 6 redirection](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/9a8a7830dbbb55ab46555c79e800ca0b0bd0552e/reference/5.1/Microsoft.PowerShell.Core/About/about_Redirection.md#L41-L49).
