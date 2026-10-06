@@ -193,7 +193,7 @@ hook, model trial or OS-sandbox change is added to conceal it.
 
 ## Repair 2026-10-05: transport trust and measured RTK interaction
 
-Launching `hcom codex` grants trust to its per-run hooks and their pre-trusted
+**Superseded (2026-10-06)** by [the hcom relaxation](2026-10-06-hcom-relaxation.md), for this paragraph's combined-rules acceptance: Launching `hcom codex` grants trust to its per-run hooks and their pre-trusted
 current_hash values. With auto_approve=true, hcom writes its upstream allow list
 to `rules/hcom.rules`, including term, relay, config and hooks. These are per-run
 hooks; the adapter itself installs no global client hooks. After the first

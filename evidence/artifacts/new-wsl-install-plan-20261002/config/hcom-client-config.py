@@ -14,8 +14,9 @@ Native format: aannoo/hcom@2c5f343:src/config.rs:126-152.
 It writes no Claude permission rule and no Codex rule file: upstream's hcom.rules,
 which `hcom codex` writes, is the only Codex hcom policy
 (docs/decisions/2026-10-06-hcom-relaxation.md). It installs no hooks and
-launches no client. Run --check-map without touching a client home; --check
-checks the installed files; --apply writes missing settings.
+launches no client. Run --check-map without touching a client home; --apply,
+the plan's install step, writes missing settings; --check compares the
+installed files with the map, as a manual operator check that no plan stage runs.
 """
 import argparse
 import fnmatch

@@ -35,10 +35,10 @@ same pieces at PR #723's head, where they sit at other lines: map :894-951,
 | `adoption/new-wsl/client-config-map.json`, `slot_configs.agent-messaging.claude_settings.permissions.deny` (:912-963) | 52 hcom and uvx-hcom Claude deny entries | Removed, with the whole `claude_settings` object. An empty object would still pass through the settings merge. |
 | `hcom_config.launch.hints` (:977) | Peer-data sentences and "Agents may not use hcom term, relay, ..." | Peer-data sentences only |
 | `codex_rule_file` (:983) and `config/hcom-deny.rules` | Separate Codex `forbidden` rules | Both removed. Upstream `hcom.rules` is the only Codex hcom policy. |
-| `peer_instructions` (:984) | Prohibition, deny-coverage, verb-allow-list and stricter-rules sentences | Removed. The peer-data, ledger, start/listen, lane-trust and OS-sandbox sentences stay, and so does the `hcom claude` sentence (see below). |
+| `peer_instructions` (:984) | Prohibition, deny-coverage, verb-allow-list and stricter-rules sentences | Removed, with the `hcom claude` prohibition (see below). The peer-data, ledger, start/listen, lane-trust and OS-sandbox sentences stay, and a neutral route fact replaces the prohibition. |
 | `config/hcom-client-config.py` | Refused an empty deny list or an absent rules file (:61). Merged Claude settings (:98-106) and installed the rules file (:108-114). Refused to apply while any `codex` or `codex-daemon` process ran (:123-128). Ran the forbidden check (:145-150). | Checks only the inbound classification. Writes hcom's config and both peer-instruction blocks, applies while Codex runs, and runs no subprocess. |
 | `install.sh` and the row's commands | Copied `hcom-deny.rules` and passed `--rules-source` | Copy and argument removed. The apply cites hcom's config fields. |
-| post_install acceptance | Upstream-derived smoke, then the adapter's `--check` | Upstream-derived smoke only. The adapter's rc 3 for a user-owned `config.toml` would have scored as a failure. |
+| post_install acceptance | Upstream-derived smoke, then the adapter's `--check` | Upstream-derived smoke only. The adapter's rc 3 for a user-owned `config.toml` would have scored as a failure. The adapter's `--check` stays a manual operator check that no plan stage runs. |
 | after_sign_in acceptance | Required both rule files; `hcom term inject` and `hcom config` had to be `forbidden` | Exits 78 until `hcom codex` has written `hcom.rules`. Then `hcom send` must be `allow` under the native checker. |
 | `check_plan.py` contract (:179-196) | Required the deny tails, four forbidden rules, the adapter's execpolicy call and the `--check` token | Keeps the four hcom configuration values and the smoke tokens. Asserts that neither a Codex rule file nor Claude hcom settings is mapped, that both peer texts keep the data and approval sentences, and that after_sign_in checks `hcom.rules` alone. |
 
@@ -65,15 +65,19 @@ lines 109-117) still holds at hcom's current release. The checks, read on
 - **Delivery routes.** Claude Code gets automatic delivery through `hcom claude`; any other session gets manual delivery through `hcom listen` after `hcom start` ([README.md:230-246](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/README.md#L230)).
 - **Upstream main.** Main is 20 commits past the tag and unreleased. Its `src/hooks/claude.rs` diff does not touch the guard. This is information only, not the cited pin.
 
-**Result:** the plain-Claude hook gap still holds at the current release, so the
-sentence stays. The peer-instruction block now states the gap beside it.
+**Result: the sentence is dropped.**
+- **The test passes, but it is only a necessary condition.** The plain-Claude hook gap still holds at the current release, so the sentence met the task's "stays only if" test.
+- **Nothing in upstream supports the prohibition.** The gap is the cost of not launching Claude lanes through `hcom claude`, not a reason against it, because `hcom claude` is upstream's only automatic-delivery route for Claude Code. The round-2 record's lines 109-117 are a correction (plain Claude gets no automatic receive). They give no reason to forbid `hcom claude`.
+- **The command center's read of this pull request agreed.** Its read at 247d71ef1 (finding P2) offered two fixes:
+  - (a) drop the prohibition and keep the neutral route facts;
+  - (b) keep the rule on its real basis, the wave-5 transport scoping that kept Claude <-> Claude native, and add Claude lanes to the command center's orchestration decision.
+- **This change takes (a).** Option (b) would change the command center's own orchestration decision, which is not this lane's to make. Option (a) follows the user's decision to remove frictions.
 
-The logic, recorded for the command center: the gap is the cost of not launching
-Claude lanes through `hcom claude`. `hcom claude` is upstream's route to
-automatic Claude delivery, so the gap is not evidence against it. Whether the
-rule outlives the command center's pending decision on hcom-managed terminal
-launches belongs to that decision. This change adds no launch, kill, term or
-transcript recipe.
+The peer-instruction block now states the route facts:
+- a plain Claude session joins with `hcom start` and reads with `hcom listen`, which does not wake it when idle;
+- `hcom claude` is upstream's automatic-delivery route for Claude Code.
+
+Claude <-> Claude stays on native SendMessage and ListAgents. This change adds no launch, kill, term or transcript recipe. Those remain with the command center's orchestration decision.
 
 ## Sources
 
@@ -103,13 +107,18 @@ holds:
 - an observed incident shows peer text driving a terminal, configuration or identity action that the user did not want;
 - an hcom release changes the `hcom.rules` contents or `auto_approve` semantics.
 
-Drop the `hcom claude` sentence when either of these holds:
-- an hcom release gives plain Claude sessions automatic delivery, which removes its hook-gap reason under the task's test;
-- the command center's orchestration decision adopts hcom-managed Claude launches.
+Reinstate a rule against launching Claude lanes through `hcom claude` only through a new dated decision, when either of these holds:
+- the command center's orchestration decision scopes Claude lanes out of hcom-managed launches, on its transport-scoping basis;
+- an hcom release breaks automatic delivery or per-run hooks in `hcom claude` sessions.
 
 ## Host state and boundaries
 
 - **NativeStack2604.** The posture was never applied here. The command center's read-only check found 0 hcom deny entries, no `~/.codex/rules` and no managed blocks, so there is nothing to undo. No host command, install or `--only agent-messaging` run happened in this change.
+- **Expected install result on NativeStack2604.** This behavior is unchanged from base, not a regression.
+  - The user's own `~/.hcom/config.toml` already exists there.
+  - Unless it matches the mapped template's digest, `install.sh --only agent-messaging` writes the two instruction blocks, keeps that file, prints `needs_user` and exits 3. The adapter's pending path is `hcom-client-config.py` :89-96 and :124-127.
+  - `run_slot` (`install.sh:1119-1124`) scores any non-zero rc as failed, so expect `agent-messaging | install | 3`, with the four mapped values not written there.
+  - A later change could map this rc to needs_user for the row, the way `accept.sh` maps 78.
 - **Other hosts.** A host that did apply the 2026-10-04 posture keeps its hcom deny entries in `~/.claude/settings.json` and its `~/.codex/rules/hcom-deny.rules`. The adapter now neither writes nor removes them, so removal is that host owner's change. No such host is known.
 - **Out of scope.** The hcom-managed Windows Terminal launch, kill, term and transcript recipes are out of scope; they belong to the command center's orchestration decision.
 
