@@ -39508,13 +39508,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "a69d283901b99052ab209bd5f18e61ce66df02e8813b96e03a1afd76c1f831e9",
-      "bytes": 79371
+      "sha256": "a271b95eb1f0ef3eaf401bee7fb122af91f7fa1dd1284c8bba5589cd176c6be5",
+      "bytes": 80138
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "24d3893580420960e71dfe9c91bdf8ba547cb0db4d0bfbd6a047ad1fb8305f83",
-      "bytes": 171237
+      "sha256": "2776270a5115e2e21c882dfb222f7013995f19bc173dadd1fc661faa52ffc519",
+      "bytes": 173775
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39528,8 +39528,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "d7f1ffe7f003f22bbd91a513766994c2dec7ddb4899b697ffe9ca7163ddbf63f",
-      "bytes": 46477
+      "sha256": "413ead3b95e405e5bb77db8d4dd02e571514d2b037cfdef0cd73d2e5e3c187e0",
+      "bytes": 48158
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-targets.json",
@@ -39693,8 +39693,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
-      "sha256": "32359812055286d97571dc9bac9a22c2b02348b03e6f8d7987f34e0049b19fff",
-      "bytes": 11338
+      "sha256": "346664158f2a14aa55142a1f588e5bee8663cfb5bd2a5b2727be7472d423ac90",
+      "bytes": 13308
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
@@ -39753,23 +39753,23 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "abca05750aaddf9826a38686b9ea6717673e343d43b4afe7518d75ac3a7c9a26",
-      "bytes": 26270
+      "sha256": "e3634e563adfc9f5427d499b1635f7a9954ba2492537c63ee45fc795ee20d492",
+      "bytes": 31106
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
-      "sha256": "ef748a5c0ee3284ec73335826b857c321b091509d992f85c9d0adb4887303352",
-      "bytes": 1457
+      "sha256": "08c7c32c67136a3082ba9d378738761961c3d8684c9556b5395f7b20091ff26b",
+      "bytes": 49546
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.yaml",
-      "sha256": "bae729f6545d7adcb1620921f37f2975d3e683b77a21e06b30cfb62496647fdd",
-      "bytes": 801
+      "sha256": "b26ec870690dfe64b0bdbd3cf758f9c0f1bf75f6b007466dfa96b8aaff01b16b",
+      "bytes": 14452
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml",
-      "sha256": "a20c7160cf9cd39c52703315f60bedd1af5bb1d25e7624e5b297934dda8142fa",
-      "bytes": 857
+      "sha256": "df5c72360f6eb1bcadc7bf4a9df6648ab2210909462e86784090cabb4f274d71",
+      "bytes": 2166
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-0.123.1-basic.yaml",
