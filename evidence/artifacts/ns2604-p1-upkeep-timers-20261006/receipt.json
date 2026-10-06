@@ -53,7 +53,11 @@
     "coreutils/coreutils@8e075ff8ee11692c5504d8e82a48ed47a7f07ba9:doc/coreutils.texi:903",
     "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/cache.md:142-145",
     "seathatflowsinourveins/native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:observability/native-data/README.md:158-208",
-    "Installed Bash 5.3.9 manual:5513-5514, regular-file conditional"
+    "Installed Bash 5.3.9 manual:5513-5514, regular-file conditional",
+    "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/cache.md:160-164",
+    "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:crates/uv/src/commands/cache_prune.rs:31-43",
+    "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:crates/uv-fs/src/locked_file.rs:17-28",
+    "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:crates/uv-static/src/env_vars.rs:66-69,1539-1543"
   ],
   "contract": {
     "guard_timer": {
@@ -67,7 +71,7 @@
       "accuracy_seconds": 10
     },
     "guard_action": "GNU df displayed whole GiB; local alerts below 60; only upstream uv cache prune below 30. Rounded display is not an exact byte threshold.",
-    "guard_timeout": "Source unlimited oneshot startup timeout retained; active service prevents overlapping timer start.",
+    "guard_timeout": "Service startup source-unlimited; safe uv prune defaults to a300s cache-lock wait before failure. Explicit reviewed unit now sets UV_LOCK_TIMEOUT=10 (lock-only), not a total prune duration bound.",
     "guard_changes": [
       "omit process arguments",
       "private logging",
@@ -80,7 +84,8 @@
       "http://127.0.0.1:21300/loki/api/v1/push"
     ],
     "observer_default_unchanged": true,
-    "loopback_proxy_redirect_gates_preserved": true
+    "loopback_proxy_redirect_gates_preserved": true,
+    "guard_lock_source": "uv@70fe1196 cache.md:160-164; cache_prune.rs:31-43; locked_file.rs:17-28; env_vars.rs:1539-1543"
   },
   "commands": [
     {
@@ -88,8 +93,15 @@
       "exit_code": 0,
       "tests": 54,
       "seconds": 1.533,
-      "class": "local_integration",
-      "log": "touched-tests-final.log"
+      "log": "touched-tests-final.log",
+      "evidence_classes": [
+        "synthetic",
+        "local_integration"
+      ],
+      "interpreter": {
+        "selection": "PATH python3",
+        "version": "3.13.16"
+      }
     },
     {
       "command": "nice -n 19 env XDG_RUNTIME_DIR=<private-runtime> SYSTEMD_UNIT_PATH=<private-rendered-units>:/usr/lib/systemd/user systemd-analyze --user --man=no --generators=no --recursive-errors=no verify <four rendered units>",
@@ -292,5 +304,6 @@
     "raw_source_reads_private": true,
     "public_receipt_contains_no_machine_home_paths": true,
     "config_remains_private": true
-  }
+  },
+  "review_supersession": "review-repair-20261006.json preserves old attempts and records corrected cache-lock, host-binding and freshness contracts."
 }
