@@ -133,6 +133,20 @@ class SkillStateRecorderTests(unittest.TestCase):
         recorder.record("SessionStart")
         self.assertEqual(len(self.rows()), 1)
 
+    def test_alias_add_remove_does_not_duplicate_supporting_fingerprint(self):
+        directory = self.skill()
+        (directory / "support.py").write_text("print('fixture')\n")
+        self.recorder.record("SessionStart")
+        fingerprint = self.rows()[0]["after"]["folder_fingerprint"]
+        alias = self.home / ".claude/skills/example"
+        alias.parent.mkdir(parents=True)
+        alias.symlink_to(directory, target_is_directory=True)
+        self.assertFalse(self.recorder.record("FileChanged"))
+        alias.unlink()
+        self.assertFalse(self.recorder.record("FileChanged"))
+        self.assertEqual(len(self.rows()), 1)
+        self.assertEqual(self.rows()[0]["after"]["folder_fingerprint"], fingerprint)
+
     def test_visiting_other_project_does_not_remove_previous_project_skills(self):
         self.skill(root=self.project / ".agents/skills")
         self.recorder.record("SessionStart")

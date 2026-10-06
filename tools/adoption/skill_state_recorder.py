@@ -205,6 +205,7 @@ class Recorder:
         watches: dict[str, list[int] | None] = {}
         discovered: dict[Path, str] = {}
         metadata: dict[Path, list] = {}
+        visited: set[Path] = set()
         entries = 0
         for scope, root in selected:
             watches[str(root)] = stamp(root)
@@ -213,7 +214,6 @@ class Recorder:
             if root.is_symlink():
                 raise ValueError("skill_root_symlink")
             pending = [root]
-            visited: set[Path] = set()
             while pending:
                 folder = pending.pop()
                 resolved = folder.resolve()
