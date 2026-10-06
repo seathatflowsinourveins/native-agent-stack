@@ -4487,8 +4487,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "4e98e2765cd586f482059ecff1edbd677f56926e3d7b7df094f8ac37206b9e9a",
-      "bytes": 4283
+      "sha256": "c63cb14a5429dde868df2d51c46757e17f71a64e843f76e131b7eb563e3892b9",
+      "bytes": 4442
     },
     {
       "path": ".gitattributes",
@@ -17358,8 +17358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-worker-gateway-defaults.md",
-      "sha256": "53340979b6c5cf1eb3e87637035916437300f8e651363a03f86276119b03037a",
-      "bytes": 9745
+      "sha256": "5b19c7ce457a23391beac9f6f02b8ed8ac2576880b72b4997125049e50dfe96e",
+      "bytes": 10450
     },
     {
       "path": "docs/direct-results.md",
@@ -53228,8 +53228,8 @@
     },
     {
       "path": "evidence/receipts/worker-census-markers-20261006.json",
-      "sha256": "afa4fdefd2b427920c8efa65bf43a3096c52f497705cb0d552578fdd066fb37f",
-      "bytes": 5327
+      "sha256": "30dd1e814d790d28b6355a7f667d675a6968114dccfff7232530916eb3e5ed56",
+      "bytes": 6207
     },
     {
       "path": "evidence/receipts/worker-gateway-defaults-20261006.json",
@@ -53438,8 +53438,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/README.md",
-      "sha256": "2c1a3d6e38f12d3ec27f9b98ce17fea09a28d744ea4db99ca6148702dca10d45",
-      "bytes": 11079
+      "sha256": "43a46fd1f156f360ad3c5436d86dabf200b2484d4e6baae76c4d081b3722e042",
+      "bytes": 11649
     },
     {
       "path": "examples/claude-runtime-sdk/tests/check_controls.py",
@@ -53508,8 +53508,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/README.md",
-      "sha256": "583884e3980920187862f566eed8f38511fdc89cc53223357ad2517bc9456300",
-      "bytes": 15731
+      "sha256": "f2d4f98115dd4fa2b2928677e0a9fb27c537b755b591e90aed941cf948586ff3",
+      "bytes": 16093
     },
     {
       "path": "examples/deepagents-omniroute/acceptance-plan.json",
@@ -53543,8 +53543,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/worker.py",
-      "sha256": "4b5004b6f1b8b538cdae525b6590c6ac7152cd0e7a3f64397e1c6f22d0ca1e8a",
-      "bytes": 8268
+      "sha256": "62d5e6b81cc3c04c501ef51811f2db855898a5ddcbec0b8732a90a45889bb6fb",
+      "bytes": 8281
     },
     {
       "path": "examples/mcporter.json.example",
@@ -53568,8 +53568,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "cbcb4aa039a9504482804ee550bac759978246039366d0a996de623776af100f",
-      "bytes": 20757
+      "sha256": "9ace22180628bed9847146f6848bf4c9ebc797505eaa16c0909f9abdbe968afa",
+      "bytes": 22190
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -53588,8 +53588,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "d16c4e4d6cfbdb0745dacec323e42885b2c4fd6cde26ed9361a55d34cfe94cb0",
-      "bytes": 10869
+      "sha256": "c408da112980956bd1a17b2e0d32347ac63799b8f54e17ca066055db1ed288a7",
+      "bytes": 11118
     },
     {
       "path": "examples/omniroute-codex-sdk/rerun-plan.json",
