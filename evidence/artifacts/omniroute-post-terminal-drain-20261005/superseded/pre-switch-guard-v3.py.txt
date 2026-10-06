@@ -9,18 +9,14 @@ two; do not switch unless it exits 0. It answers the questions the command cente
     - no worker process of another lane (omniroute-codex-sdk/worker.py, `codex exec`, or an interactive `codex` that names the omniroute profile or the gateway port);
     - no call_logs row in the last 120 s;
     - no ACTIVE client connection to the gateway port. Every established connection (one `ss -tnpi` snapshot per sample, both ends of the loopback connection) is classified by the owner of its CLIENT end:
-        * TOLERATED: the owner is visible in this PID namespace, its cgroup unit is one of --tolerate-unit (default `omniroute-fw.service`, the 20129 framework gateway) AND the connection is EMPTY at every sample: empty receive and send
-          queues and no bytes received or sent (ss prints bytes_received and bytes_sent only when they are not zero). That is what the observed poll is: the framework gateway holds a connection to 20128 for 22-30 s and opens
-          a new one (watch of 2026-10-06 05:14Z, `checks/connection-watch-20128.txt`), with no call_logs row and no byte on it. It is NOT enough to be that unit's: the same unit forwards real inference to 20128 through a provider node,
-          so a connection of that unit that carries bytes or queued data, or whose counters change, is judged like any other client's (ACTIVE). An empty connection carries no request; a request that starts on it after the last sample
-          is invisible to any guard, which is why callers must be paused (protocol step 2). Tolerated connections are reported, never failed.
-        * every other connection (including a tolerated unit's connection that carries data) must be IDLE across the window: empty receive and send queues at every sample, unchanged bytes_received and bytes_sent between the first and the last sample, and not new during the window
+        * TOLERATED: the owner is visible in this PID namespace and its cgroup unit is one of --tolerate-unit (default `omniroute-fw.service`, the 20129 framework gateway, which opens a short connection to 20128 about every 25 s:
+          observed 2026-10-06 05:14Z, 3 connections in 75 s, owner pid in omniroute-fw.service's cgroup, no call_logs row, no stuck request). It is infrastructure traffic of a unit of the same host, not a lane's work, and is reported, never failed.
+        * every other connection must be IDLE across the window: empty receive and send queues at every sample, unchanged bytes_received and bytes_sent between the first and the last sample, and not new during the window
           (a new connection from an unknown or non-tolerated owner is a client making a request). The command center asked for "no established client connection"; that cannot hold literally on this host: idle keep-alive connections
           from clients in other PID namespaces exist at rest (nine at 2026-10-06 01:36Z, before the host restart, none with queued data; the other WSL distro shares the network namespace) and the framework gateway polls. They are
           counted and reported (`connections_total`, `connections_tolerated`) but only ACTIVE ones fail the check. Hindsight and any other service that calls 20128 must be paused before the switch (protocol step 2): its requests show up here as active.
     Informational only (never a failure): the gateway's own pending-request counter (GET /api/usage/history, counts only; on the unpatched build it keeps entries of requests whose stream was cancelled before it finished,
     so it does not return to zero), whether it changed during the window, and the running hindsight processes (a known 20128 client, to be paused by the protocol).
- An observation that fails is a FAIL of the check, never an idle host: `ss` exiting non-zero or printing lines it cannot parse, `pgrep` exiting with a status other than 0 (matches) or 1 (no match).
  The guard cannot see an interactive client that holds no connection at the moment, or a request that is silent on the wire (waiting for the upstream); announcing the restart time to 5f, c5 and the command center first,
  and their holds, are protocol steps, not checks here.
 
@@ -54,10 +50,6 @@ class Parser(argparse.ArgumentParser):
 
 def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-
-class ObservationError(Exception):
-    """An observation the guard needs failed (a command exited with an unexpected status, or printed what cannot be parsed): the check FAILS, it never reads as an idle host."""
 
 
 def sh(*args):
@@ -118,17 +110,14 @@ def unit_of(pid):
 def connections(port):
     """The established connections with the gateway port as one end, from ONE `ss -tnpi` snapshot: {client port: {"counters": (recv_q, send_q, bytes_received, bytes_sent) of the server end, "owners": [pids of the client end]}}.
     ss prints an address line and an indented info line per socket; the server end (local port = the gateway's) carries the queues and counters, the client end (peer port = the gateway's) the owner process when it is visible here."""
-    proc = sh("ss", "-Htnpi", "state", "established", f"( sport = :{port} or dport = :{port} )")
-    if proc.returncode != 0:
-        raise ObservationError(f"ss exited {proc.returncode}: {proc.stderr.strip()[:120]}")
-    lines = proc.stdout.splitlines()
+    lines = sh("ss", "-Htnpi", "state", "established", f"( sport = :{port} or dport = :{port} )").stdout.splitlines()
     out, i = {}, 0
     while i < len(lines):
         addr = lines[i].split()
         info = lines[i + 1] if i + 1 < len(lines) else ""
         i += 2
-        if len(addr) < 4 or ":" not in addr[2] or ":" not in addr[3] or not addr[0].isdigit() or not addr[1].isdigit():
-            raise ObservationError(f"ss printed a line that cannot be parsed ({len(addr)} fields)")
+        if len(addr) < 4:
+            continue
         local_port, peer_port = addr[2].rsplit(":", 1)[-1], addr[3].rsplit(":", 1)[-1]
 
         def num(key):
@@ -148,10 +137,7 @@ WORKER_PATTERN = "omniroute-codex-sdk/worker.py|codex exec|codex .*omniroute|cod
 
 def workers(pattern=WORKER_PATTERN):
     mine = str(os.getpid())
-    proc = sh("pgrep", "-af", pattern)
-    if proc.returncode not in (0, 1):   # 0: matches, 1: no process matched (an idle host); anything else is pgrep failing
-        raise ObservationError(f"pgrep exited {proc.returncode}: {proc.stderr.strip()[:120]}")
-    return [l for l in proc.stdout.splitlines()
+    return [l for l in sh("pgrep", "-af", pattern).stdout.splitlines()
             if not l.startswith(mine + " ") and "pgrep" not in l and "pre-switch-guard" not in l and "run-acceptance" not in l and "gateway-identity" not in l]
 
 
@@ -200,7 +186,7 @@ def main():
     args = ap.parse_args()
     me = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     tolerated_units = args.tolerate_unit or ["omniroute-fw.service"]
-    print(f"GUARD version=4 script_sha256={me} start={utc()} port={args.port} unit={args.unit} clean_for={args.clean_for} interval={args.interval} tolerate_units={tolerated_units}")
+    print(f"GUARD version=3 script_sha256={me} start={utc()} port={args.port} unit={args.unit} clean_for={args.clean_for} interval={args.interval} tolerate_units={tolerated_units}")
     failed = []
 
     def check(name, problems, detail=""):
@@ -224,30 +210,17 @@ def main():
     pend0 = pending_total(args.port)
     end = time.time() + args.clean_for
     while True:
+        conns, w, age = connections(args.port), workers(args.worker_pattern), last_row_age(args.db)
         samples += 1
-        now_problems = []
-        try:
-            conns = connections(args.port)
-        except ObservationError as error:
-            conns = {}
-            now_problems.append(f"the socket observation failed: {error}")
-        try:
-            w = workers(args.worker_pattern)
-        except ObservationError as error:
-            w = []
-            now_problems.append(f"the worker observation failed: {error}")
-        age = last_row_age(args.db)
-        if first is None and not now_problems:
+        if first is None:
             first = {k: v["counters"] for k, v in conns.items()}
         for client_port, c in conns.items():
             seen_all.add(client_port)
             units = {unit_of(p) for p in c["owners"]}
-            rq, sq, rb, sb = c["counters"]
-            if c["owners"] and units <= set(tolerated_units) and not (rq or sq or rb or sb):
-                tolerated.add(client_port)       # an EMPTY connection of an infrastructure unit of the same host (no bytes, no queued data): it carries no request; reported, never failed
+            if c["owners"] and units <= set(tolerated_units):
+                tolerated.add(client_port)       # an infrastructure client of the same host: reported, never failed
                 continue
-            if first is None:
-                first = {}
+            rq, sq, rb, sb = c["counters"]
             who = ",".join(sorted(str(u) for u in units)) if c["owners"] else "owner not visible"
             if rq or sq:
                 active.setdefault(client_port, f"queued data ({who})")
@@ -255,6 +228,7 @@ def main():
                 active.setdefault(client_port, f"new during the window ({who})")
             elif first[client_port][2:] != (rb, sb):
                 active.setdefault(client_port, f"traffic during the window ({who})")
+        now_problems = []
         if w:
             now_problems.append(f"{len(w)} worker or codex process(es) of another lane")
         if age is not None and age < 120:
@@ -265,7 +239,6 @@ def main():
             break
         time.sleep(args.interval)
     pend1 = pending_total(args.port)
-    tolerated -= set(active)             # a tolerated (empty) connection that later carried data is ACTIVE, not tolerated
     if active:
         reasons = sorted(set(active.values()))
         problems.append(f"{len(active)} ACTIVE connection(s) to port {args.port}: {reasons}")

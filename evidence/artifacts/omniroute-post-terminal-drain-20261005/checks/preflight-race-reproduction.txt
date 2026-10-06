@@ -1,7 +1,7 @@
 # Why build script version 3 failed twice at upstream's check:pack-boot, the host behaviour behind it, a one-minute reproduction on the installed candidate prefix, and the fix in version 4 (2026-10-06 UTC; nothing deployed, no credential involved)
 # 1. check:pack-boot (scripts/check/check-pack-boot.mjs of the composition) picks PORT = 23000 + (its own pid % 4000), starts the installed CLI and polls http://127.0.0.1:PORT/api/monitoring/health from its first second (a fetch every 2 s).
 # 2. The installed CLI's own port preflight (bin/cli/commands/serve.mjs resolveServeBusyPids -> bin/cli/utils/pid.mjs findListeningPids: `lsof -ti :PORT`) lists EVERY process with a socket on the port, clients included (the known client-socket trap of the 2026-09-30 note, omniroute-sol-max-20260930).
-# 3. On this host a connect to a closed loopback port that nothing in the network namespace has bound before HANGS (undici UND_ERR_CONNECT_TIMEOUT after 10.5 s) instead of failing at once with ECONNREFUSED; after one bind and close of the port it is refused at once (section B). The cause is not established (a WSL networking behaviour is suspected).
+# 3. On this host a connect to a closed loopback port that has no socket on it and that the probing script has not bound HANGS (undici UND_ERR_CONNECT_TIMEOUT after 10.5 s) instead of failing at once with ECONNREFUSED; after one bind and close of the port it is refused at once (section B). The cause is not established (a WSL networking behaviour is suspected).
 #    So the harness's own poll sits in SYN_SENT with remote port PORT when the CLI's preflight runs; the CLI refuses with "Port PORT is already in use by PID <the harness>" and exits 1. Both failed runs name the harness's own pid: 23149 = 23000 + 120149 % 4000 and 26495 = 23000 + 263495 % 4000.
 # 4. Version 1's real run (the recorded tarball's build) passed with upstream's defaults (how its port answered a connect at that time was not recorded; an immediate refusal would explain it). The fix in version 4 is not a retry: check:pack-boot runs with the reviewed lsof shim v2 first on PATH (sha256 b6ae9002..., the committed copy in omniroute-sol-max-20260930), which answers `lsof -ti :PORT` with exit 2 and no output,
 #    so upstream's own bind-probe fallback (#14518) decides, and a real second listener is still refused; it is the PATH the deployed prefix runs with. Mode B below and the rerun of the gate in the failed run's tree (section D) show it passing; the full version-4 run is checks/build-v4-results.txt.
@@ -60,21 +60,59 @@ boot lines:
   ✖ Port 26495 is already in use by PID 263495.
 
 ## B. How a connect to a closed loopback port behaves on this host (scripts/closed-port-connect-probe.py.txt)
-# run 2026-10-06T06:16:43Z on the NativeStack distro (the omniroute.service network namespace), kernel 6.18.40.1-microsoft-standard-WSL2
-# closed-port connect probe on this host, timeout 3.0 s; ports are picked at random from 23000-26999 with no socket on them (checked with ss), never bound by this script before
-## 1. never bound (nothing listens, nothing was sent)
-port 23322: TimeoutError after 3003 ms (second probe: TimeoutError after 3002 ms)
-port 24280: TimeoutError after 3003 ms (second probe: TimeoutError after 3003 ms)
-port 25337: TimeoutError after 3003 ms (second probe: TimeoutError after 3003 ms)
-port 23323: TimeoutError after 3003 ms (second probe: TimeoutError after 3003 ms)
+# run 2026-10-06T10:56:26Z on the NativeStack distro (the omniroute.service network namespace), kernel 6.18.40.1-microsoft-standard-WSL2
+# closed-port connect probe on this host, timeout 3.0 s; ports are picked at random from 23000-26999 with no socket on them (checked with ss) at the time of the pick and not bound by this script before the first probe; the earlier binding history of the ports is not known
+## 1. not bound by this script (no socket on the port per ss; nothing listens, nothing is sent)
+port 26822: TimeoutError after 3002 ms (second probe: TimeoutError after 3002 ms)
+port 26205: TimeoutError after 3002 ms (second probe: TimeoutError after 3002 ms)
+port 23167: TimeoutError after 3000 ms (second probe: TimeoutError after 3003 ms)
+port 23171: TimeoutError after 3000 ms (second probe: TimeoutError after 3003 ms)
 ## 2. the same ports after one bind (no listen) and close
-port 23322: ConnectionRefusedError after 1 ms
-port 24280: ConnectionRefusedError after 1 ms
-port 25337: ConnectionRefusedError after 5 ms
-port 23323: ConnectionRefusedError after 1 ms
+port 26822: ConnectionRefusedError after 0 ms
+port 26205: ConnectionRefusedError after 0 ms
+port 23167: ConnectionRefusedError after 0 ms
+port 23171: ConnectionRefusedError after 0 ms
 
-## C. Reproduction on the installed candidate prefix (scripts/preflight-race-repro.sh.txt): the CLI is started and the harness's poll loop runs beside it, on a port from the harness's range that nothing has bound
+## C. Reproduction on the installed candidate prefix, corrected configuration (scripts/preflight-race-repro.sh.txt, version 2: the CLI on loopback only with an API key required, OMNIROUTE_SERVER_HOST=127.0.0.1 and REQUIRE_API_KEY=true, as the corrected build and smoke scripts do): the CLI is started and the harness's poll loop runs beside it, on a port from the harness's range that has no socket on it and that the probing script has not bound
 ### mode A: upstream's behaviour (no shim); the PID in the message is the poller's
+# preflight race reproduction (script version 2: OMNIROUTE_SERVER_HOST=127.0.0.1, REQUIRE_API_KEY=true), mode A (no lsof shim), prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690, port 23989, 2026-10-06T10:55:41Z
+cli pid 1012994 (group 1012994), poller pid 1013003
+the CLI process exited with status 1 after about 1 s
+--- the CLI's last output lines (ANSI removed):
+  | |  | | '_ ` _ \| '_ \ |  _  // _ \| | | | __/ _ \
+  | |__| | | | | | | | | | | | \ \ (_) | |_| | ||  __/
+   \____/|_| |_| |_|_| |_|_|_|  \_\___/ \__,_|\__\___|
+  v3.8.51
+✖ Port 23989 is already in use by PID 1013003.
+  Another OmniRoute is most likely already serving there, so open http://localhost:23989 before starting a second one.
+  To replace it:    omniroute stop, then start again
+  To run alongside: omniroute serve --port <other-port>
+--- poller output so far:
+poller pid was 1013003 (compare with the PID in the CLI's message)
+scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-preflight-repro-CqZobp
+
+### mode B: the shim first on PATH
+# preflight race reproduction (script version 2: OMNIROUTE_SERVER_HOST=127.0.0.1, REQUIRE_API_KEY=true), mode B (lsof shim v2 first on PATH), prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690, port 23618, 2026-10-06T10:55:44Z
+cli pid 1013210 (group 1013210), poller pid 1013219
+the server answered /api/health after about 4 s
+--- the CLI's last output lines (ANSI removed):
+  ⏳ Starting server...
+  ✔ OmniRoute is running! (started in 6.7s)
+    Dashboard:  http://localhost:23618
+    API Base:   http://localhost:23618/v1
+    Point your CLI tool (Cursor, Cline, Codex) to:
+    http://localhost:23618/v1
+    Press Ctrl+C to stop
+  
+--- poller output so far:
+poll at +0.0 s: HTTP 200 after 3931 ms
+poll at +5.9 s: HTTP 200 after 1319 ms
+poller pid was 1013219 (compare with the PID in the CLI's message)
+scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-preflight-repro-rbvlxr
+
+## C0. The earlier configuration (script version 1, retained as it ran, superseded/preflight-race-repro-v1.sh.txt): the CLI was started WITHOUT OMNIROUTE_SERVER_HOST=127.0.0.1 and REQUIRE_API_KEY=true (the defect RC12 corrected in the build and smoke scripts: it listened on all interfaces with no key, see the exposure warning in mode A below),
+# and the elapsed-time counter was Bash's special variable $_, so the 'after about N s' numbers in these two outputs are process ids, not seconds (annotated, not rewritten). The observations (the CLI's refusal naming the poller's pid; the server starting with the shim) are the same as in section C.
+### mode A (earlier configuration)
 # preflight race reproduction, mode A (no lsof shim), prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690, port 24210, 2026-10-06T06:09:36Z
 cli pid 323999 (group 323999), poller pid 324012
 the CLI process exited with status 1 after about 323999 s
@@ -91,7 +129,7 @@ the CLI process exited with status 1 after about 323999 s
 poller pid was 324012 (compare with the PID in the CLI's message)
 scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-preflight-repro-ll9bNG
 
-### mode B: the shim first on PATH
+### mode B (earlier configuration)
 # preflight race reproduction, mode B (lsof shim v2 first on PATH), prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690, port 24640, 2026-10-06T06:09:50Z
 cli pid 324638 (group 324638), poller pid 324647
 the server answered /api/health after about 324638 s

@@ -28,10 +28,10 @@ Each file below was committed with its UUID-shaped strings (the gateway's correl
 
 | committed file | bytes (unshortened) | sha256 (unshortened) | private copy |
 | --- | --- | --- | --- |
-| `checks/acceptance-controls.txt` | 198451 | `07c6aef63bf542a0efa3246babfd8cc9443460e88e54343b2c05570d9750639b` | `raw-outputs/checks__acceptance-controls.txt.gz` |
+| `checks/acceptance-controls.txt` | 274828 | `2f3f746728725ae1aa3ff6020e8457920bef9a608ad64ee4020dc9818bc7a4f9` | `raw-outputs/checks__acceptance-controls.txt.gz` |
 | `checks/handler-e2e-session-tag-results.txt` | 5832 | `19393acdef858a66b6a2ec1fb713f4d37f0a650ddf9f8d870b35ebde6dd7fc51` | `raw-outputs/checks__handler-e2e-session-tag-results.txt.gz` |
-| `checks/live-acceptance-baseline-race.txt` | 3750 | `1f9f64345aadafacd871f5d1f6fb554a3ed319bad7715cff12b9cfa642707287` | `raw-outputs/checks__live-acceptance-baseline-race.txt.gz` |
-| `checks/live-acceptance-baseline-raw.txt` | 13183 | `f71a3f13d7a893111148daff70ba84b4382ed38eec4546209a3510362ae0be99` | `raw-outputs/checks__live-acceptance-baseline-raw.txt.gz` |
+| `checks/live-acceptance-baseline-race.txt` | 4194 | `3dce6b8d192cd8ef5efdb684e337f94501f84e024e361708d3977fa7262e8576` | `raw-outputs/checks__live-acceptance-baseline-race.txt.gz` |
+| `checks/live-acceptance-baseline-raw.txt` | 13833 | `3b39e1ea8294aa4c90291cd6ac13f0f317bf9054f3d3e4e838669b12a4f53062` | `raw-outputs/checks__live-acceptance-baseline-raw.txt.gz` |
 | `checks/live-acceptance-baseline-v1-race.txt` | 3137 | `4c4dd15ce3a3f2f9a0adc21ec05202eea344e3091c25699002adcf633e917e9e` | `raw-outputs/checks__live-acceptance-baseline-v1-race.txt.gz` |
 | `checks/live-acceptance-baseline-v1-raw.txt` | 7189 | `958f880b96a7753eceb908dd77a4bedbacce7e467b5b019834dbfbf75dca66d9` | `raw-outputs/checks__live-acceptance-baseline-v1-raw.txt.gz` |
 | `superseded/live-acceptance-baseline-attempt1-output.txt` | 6739 | `49203ff64f2f8f783b7889fcafd5388f03daf0fa3dfd81855789415c8546d3c2` | `raw-outputs/superseded__live-acceptance-baseline-attempt1-output.txt.gz` |

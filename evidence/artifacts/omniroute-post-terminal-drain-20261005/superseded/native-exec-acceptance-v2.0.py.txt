@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native `codex exec` turns through NativeStack's omniroute profile (20128), VERSION 2.1 (frozen before the canary switch; see checks/live-acceptance-protocol.md).
+"""Native `codex exec` turns through NativeStack's omniroute profile (20128), VERSION 2 (frozen before the canary switch; see checks/live-acceptance-protocol.md).
 
 Version 1 (sha256 9f511620...) is kept as superseded. A full-scope read of 2026-10-06 reproduced three defects of it: (1) with three correctly logged turns its second read counted every row from a turn's
 start to the present, so the earlier turns also counted the later turns' rows (SUMMARY FAIL 2, PASS 1); (2) its PASS ignored the client's exit status and attributed every row in the time window to the client
@@ -7,15 +7,10 @@ start to the present, so the earlier turns also counted the later turns' rows (S
 
   Identity. Each turn carries its own X-OmniRoute-Session-Id (a static provider header set per turn with `-c model_providers.omniroute.http_headers={...}`; the gateway stores a caller-supplied session id
   outright as call_logs.session_tag: open-sse/services/conversationTracker.ts `resolveConversationId`, upstream #8249). The turn's call_logs rows are `where session_tag = <this turn's id>`, at both reads,
-  whatever else runs on the gateway; its usage_history rows are the ones written with each call row (same model and token counts within 3 s of the row AND the same provider, account (connection_id, api_key_id), endpoint (= the call's path), latency within 100 ms of the call row's
-  duration and time to first token within 1 ms; ambiguity, or a look-alike that does not associate, is INCONCLUSIVE).
+  whatever else runs on the gateway; its usage_history rows are the ones written with each call row (same model and token counts within 3 s of the row; ambiguity is INCONCLUSIVE).
   Completeness. The client (`codex exec --json`) reports the turn's token usage in its `turn.completed` event. On the unpatched build on 2026-10-06 a turn whose rows were all logged had call_logs token sums equal
-  to that usage exactly (checks/native-usage-calibration.txt: 30145 input and 80 output, 30143 and 78, 30169 and 74, 15033 and 5), and the two incomplete turns of that calibration had smaller sums (a tool-call turn: 30145 input and 65 output used, 15042 and 50 stored;
-  a single-request turn: 15033 and 5 used, no rows stored; the retained baseline of the final scripts, 8 tool-call turns, found 5 incomplete). So the sums of tokens_in and tokens_out over the turn's call_logs
+  to that usage exactly (30145 input, 78 output, 25600 cached), and turns that lost the final request's rows had smaller sums (30168 input used, 15042 stored). So the sums of tokens_in and tokens_out over the turn's call_logs
   rows must EQUAL the client's input_tokens and output_tokens: fewer means a request's rows are missing, more means duplicate rows. This needs no assumption about how many requests the model made.
-
-Version 2.0 (sha256 9bd478a1..., kept as superseded) took the usage_history row of a call row by model and token counts within 3 s alone: a cross-family review of head 04e505a5d showed that one foreign request's row with the same model and counts then
-stood in for a missing row and the turn PASSED. Version 2.1 associates by provider, account, endpoint, latency and time to first token as well; no row at all with the call row's model and counts is a FAIL, a look-alike that does not associate is INCONCLUSIVE.
 
 SHAPE: astra-max (the final-request shape, one request expected) | sol-xhigh (one request expected) | two-request (the prompt asks for one shell command: a tool call, then the final answer; the turn must contain
 at least one command execution, otherwise the multi-request path was not exercised)
@@ -90,49 +85,27 @@ def mask(text):
     return text.replace(str(HOME) + "/", "$HOME/")
 
 
-LATENCY_TOLERANCE_MS = 100   # chosen from 457 live pairs of 2026-10-05/06: median difference 1 ms, maximum 51 ms
-TTFT_TOLERANCE_MS = 1.0      # the usage row keeps the fraction, the call row rounds: maximum 0.5 ms
-
-
-def associated(c, u):
-    """True when the usage_history row u carries the same request's identity as the call_logs row c: provider, account (connection_id and api_key_id), endpoint (the call's path), latency and time to first token agree."""
-    if u["provider"] != c["provider"] or u["connection_id"] != c["connection_id"] or u["api_key_id"] != c["api_key_id"] or u["endpoint"] != c["path"]:
-        return False
-    if c["duration"] is None or u["latency_ms"] is None or abs(float(u["latency_ms"]) - float(c["duration"])) > LATENCY_TOLERANCE_MS:
-        return False
-    if c["ttft_ms"] is not None and u["ttft_ms"] is not None and abs(float(u["ttft_ms"]) - float(c["ttft_ms"])) > TTFT_TOLERANCE_MS:
-        return False
-    return True
-
-
 def read_turn(db, tag):
-    """The rows of one turn: call_logs by its session id; for each call row the usage_history rows with its model and token counts within 3 s (the look-alikes) and, of those, the ones that associate with it (provider, account, endpoint, latency, time to first token)."""
+    """The rows of one turn: call_logs by its session id, usage_history by the call rows' model and token counts within 3 s."""
     con = con_ro(db)
     raw = con.execute(
-        "select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, detail_state, reasoning_effort_requested, reasoning_effort_upstream, provider, connection_id, api_key_id, duration, ttft_ms from call_logs where session_tag = ? order by timestamp",
+        "select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, detail_state, reasoning_effort_requested, reasoning_effort_upstream from call_logs where session_tag = ? order by timestamp",
         (tag,),
     ).fetchall()
     calls = [{"id8": id8(r[0]), "timestamp": r[1], "path": r[2], "status": r[3], "model": r[4], "requested_model": r[5], "tokens_in": r[6], "tokens_out": r[7],
-              "detail_state": r[8], "effort_requested": r[9], "effort_upstream": r[10], "provider": r[11], "connection_id": r[12], "api_key_id": r[13], "duration": r[14], "ttft_ms": r[15]} for r in raw]
-    usage, ambiguous, unestablished, missing = {}, False, 0, 0
+              "detail_state": r[8], "effort_requested": r[9], "effort_upstream": r[10]} for r in raw]
+    usage, ambiguous = {}, False
     for c in calls:
         rows = con.execute(
-            "select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp",
+            "select id, timestamp, model, status, tokens_input, tokens_output from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp",
             (shift(c["timestamp"], -3), shift(c["timestamp"], 3), c["model"], c["tokens_in"], c["tokens_out"]),
         ).fetchall()
-        weak = [{"id": r[0], "timestamp": r[1], "model": r[2], "status": r[3], "tokens_input": r[4], "tokens_output": r[5], "provider": r[6], "connection_id": r[7], "api_key_id": r[8], "endpoint": r[9], "latency_ms": r[10], "ttft_ms": r[11]} for r in rows]
-        strong = [u for u in weak if associated(c, u)]
-        if len(strong) > 1:
+        if len(rows) > 1:
             ambiguous = True
-        if not strong:
-            if weak:
-                unestablished += 1   # a look-alike exists but does not associate: the call row's usage row cannot be established
-            else:
-                missing += 1         # no usage row with the call row's model and counts at all
-        for u in strong:
-            usage[u["id"]] = u
+        for r in rows:
+            usage[r[0]] = {"id": r[0], "timestamp": r[1], "model": r[2], "status": r[3], "tokens_input": r[4], "tokens_output": r[5]}
     con.close()
-    return {"calls": calls, "usage": sorted(usage.values(), key=lambda u: u["timestamp"]), "ambiguous": ambiguous, "unestablished": unestablished, "missing": missing}
+    return {"calls": calls, "usage": sorted(usage.values(), key=lambda u: u["timestamp"]), "ambiguous": ambiguous}
 
 
 def parse_events(stdout):
@@ -159,7 +132,7 @@ def parse_events(stdout):
 def judge(read, info, min_rows, model):
     """One read of one turn against the client's own report: (state, reasons); state PASS, FAIL or INCONCLUSIVE."""
     if read["ambiguous"]:
-        return "INCONCLUSIVE", ["more than one usage row is associated with a call row (same provider, account, endpoint, model, token counts, latency and time to first token)"]
+        return "INCONCLUSIVE", ["more than one usage row matches a call row's model and token counts"]
     calls, usage, reasons = read["calls"], read["usage"], []
     if len(calls) < min_rows:
         reasons.append(f"call_logs rows with the turn's session id: {len(calls)} (at least {min_rows} needed)")
@@ -177,17 +150,12 @@ def judge(read, info, min_rows, model):
     if (sum_in, sum_out) != (used_in, used_out):
         why = "a request's rows are missing" if sum_in < used_in or sum_out < used_out else "more tokens are stored than the client used (duplicate rows)"
         reasons.append(f"the rows hold {sum_in} input and {sum_out} output tokens, the client used {used_in} and {used_out}: {why}")
-    if read["missing"]:
-        reasons.append(f"usage_history has no row with the model and token counts of {read['missing']} of the {len(calls)} call rows (usage rows associated: {len(usage)})")
+    if len(usage) != len(calls):
+        reasons.append(f"usage_history rows matched to the {len(calls)} call rows: {len(usage)}")
     for u in usage:
         if str(u["status"]) != "200":
             reasons.append(f"usage_history status {u['status']} (expected 200)")
-    if reasons:
-        return "FAIL", reasons
-    if read["unestablished"]:
-        return "INCONCLUSIVE", [f"for {read['unestablished']} of the {len(calls)} call rows a usage_history row with the same model and token counts exists nearby but none associates with it (provider, account, endpoint, latency or time to first token differ): "
-                                "a foreign request's row must not stand in for the turn's own, so its usage row cannot be established"]
-    return "PASS", []
+    return ("FAIL", reasons) if reasons else ("PASS", [])
 
 
 def row_key(read):
@@ -244,8 +212,8 @@ def preflight(args, template):
         problems.append(f"unknown shape(s) {unknown}; known: {sorted(SHAPES)}")
     try:
         con = con_ro(args.db)
-        con.execute("select provider, connection_id, api_key_id, duration, ttft_ms, session_tag from call_logs limit 1")
-        con.execute("select provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history limit 1")
+        con.execute("select 1 from call_logs limit 1")
+        con.execute("select 1 from usage_history limit 1")
         con.close()
     except Exception as error:
         problems.append(f"the gateway store {args.db} is not readable ({type(error).__name__})")
@@ -285,7 +253,7 @@ def main():
     template = Path(args.repo) / "adoption/templates/codex.omniroute.config.toml"
     preflight(args, template)
     runid = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S")
-    print(f"FROZEN version=2.1 script_sha256={hashlib.sha256(me).hexdigest()} argv={sys.argv[1:]} cwd={os.getcwd()} start={utc()} expect={args.expect} wait1={args.wait1} wait2={args.wait2} "
+    print(f"FROZEN version=2 script_sha256={hashlib.sha256(me).hexdigest()} argv={sys.argv[1:]} cwd={os.getcwd()} start={utc()} expect={args.expect} wait1={args.wait1} wait2={args.wait2} "
           f"quiet_timeout={args.quiet_timeout} exec_timeout={args.exec_timeout} db={args.db} run_id={runid} template_sha256={hashlib.sha256(template.read_bytes()).hexdigest()}")
     scratch = Path(args.scratch)
     scratch.mkdir(parents=True, exist_ok=True)
@@ -338,7 +306,7 @@ def main():
         turn.update({"state1": state1, "verdict": verdict})
         sums = (sum(c["tokens_in"] or 0 for c in read1["calls"]), sum(c["tokens_out"] or 0 for c in read1["calls"]))
         complete = sums == (info["usage"]["input_tokens"], info["usage"]["output_tokens"])
-        print(f"{head} exec_exit={exec_exit} elapsed_s={ended - started:.1f} {client} read1_call_logs={len(read1['calls'])} read1_usage={len(read1['usage'])} read1_usage_unestablished={read1['unestablished']} rows_tokens_in_out={sums} rows_complete={complete} verdict={verdict}"
+        print(f"{head} exec_exit={exec_exit} elapsed_s={ended - started:.1f} {client} read1_call_logs={len(read1['calls'])} read1_usage={len(read1['usage'])} rows_tokens_in_out={sums} rows_complete={complete} verdict={verdict}"
               + (f" reasons={reasons}" if reasons else ""))
         show_rows(read1)
     judged = [t for t in turns if t["judged"]]

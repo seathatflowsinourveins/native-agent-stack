@@ -37,8 +37,8 @@ while len(ports) < a.count:
     p = random.randrange(23000, 27000)
     if p not in ports and free_of_sockets(p):
         ports.append(p)
-print(f"# closed-port connect probe on this host, timeout {a.timeout} s; ports are picked at random from 23000-26999 with no socket on them (checked with ss), never bound by this script before")
-print("## 1. never bound (nothing listens, nothing was sent)")
+print(f"# closed-port connect probe on this host, timeout {a.timeout} s; ports are picked at random from 23000-26999 with no socket on them (checked with ss) at the time of the pick and not bound by this script before the first probe; the earlier binding history of the ports is not known")
+print("## 1. not bound by this script (no socket on the port per ss; nothing listens, nothing is sent)")
 for p in ports:
     r1, ms1 = probe(p)
     r2, ms2 = probe(p)

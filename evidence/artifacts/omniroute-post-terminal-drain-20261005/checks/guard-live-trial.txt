@@ -1,60 +1,31 @@
-# Two read-only trials of the pre-switch guard (version 3) against the live 20128: the first at 05:19Z while the 20129 gateway's poll of 20128 was visible (one connection, tolerated), the second at 06:12Z in a quiet window (no connection at all).
-# Neither run wrote or restarted anything; each prints the guard's own output, then the value-free table of the established connections to the port taken right after it.
+# One read-only trial of the pre-switch guard (version 4) against the live 20128, 2026-10-06T12:24:45Z, in the quiet window the re-baseline left (5f held all new launches through 20128): the guard was CLEAN with the 20129 framework gateway's EMPTY connections tolerated (no byte on them), no worker of another lane and no call_logs row in the last 120 s.
+# It wrote and restarted nothing; the guard prints its own output, then the value-free table of the established connections to the port taken right after it. The trials of guard version 3 (05:19Z and 06:12Z) are superseded/guard-live-trial-v3.txt.
 
-################ TRIAL 1
-# read-only trial of pre-switch-guard-20261006.py against the live 20128, 2026-10-06T05:19:22Z; the guard exit status is printed at the end
-GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T05:19:22.523Z port=20128 unit=omniroute.service clean_for=40.0 interval=5.0 tolerate_units=['omniroute-fw.service']
+# read-only trial of the pre-switch guard against the live 20128, 2026-10-06T12:24:45Z; the guard exit status is printed at the end
+GUARD version=4 script_sha256=b587c3a48700a7e7802e527784b5d25d76c96f358d8fc36c5bf512e4a965856f start=2026-10-06T12:24:46.038Z port=20128 unit=omniroute.service clean_for=40.0 interval=5.0 tolerate_units=['omniroute-fw.service']
 CHECK switch tool sha256: ok (97d1b87bb651)
 CHECK rollback prefix intact: ok (omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
 CHECK target prefix intact: ok (omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
-   IDENTITY label=pre-switch time=2026-10-06T05:19:23Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+   IDENTITY label=pre-switch time=2026-10-06T12:24:49Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=260 expect_prefix_ok=True expect_build_ok=True
 CHECK unit runs the rollback prefix, health ok: ok
-   sample 1 at 2026-10-06T05:19:23.455Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=846
-   sample 2 at 2026-10-06T05:19:28.491Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=851
-   sample 3 at 2026-10-06T05:19:33.524Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=856
-   sample 4 at 2026-10-06T05:19:38.557Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=861
-   sample 5 at 2026-10-06T05:19:43.592Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=866
-   sample 6 at 2026-10-06T05:19:48.625Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=871
-   sample 7 at 2026-10-06T05:19:53.658Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=876
-   sample 8 at 2026-10-06T05:19:58.691Z: connections=1 tolerated_so_far=3 active_so_far=0 workers=0 last_call_log_age_s=881
-   sample 9 at 2026-10-06T05:20:03.722Z: connections=1 tolerated_so_far=3 active_so_far=0 workers=0 last_call_log_age_s=886
-CHECK nothing in flight for 40 s (9 samples): ok (0 idle and 3 tolerated connection(s))
-INFO connections_seen=3 connections_tolerated=3 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
-GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T05:20:03.823Z
+   sample 1 at 2026-10-06T12:24:50.174Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=208
+   sample 2 at 2026-10-06T12:24:55.205Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=213
+   sample 3 at 2026-10-06T12:25:00.237Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=218
+   sample 4 at 2026-10-06T12:25:05.268Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=223
+   sample 5 at 2026-10-06T12:25:10.300Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=228
+   sample 6 at 2026-10-06T12:25:15.331Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=233
+   sample 7 at 2026-10-06T12:25:20.362Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=238
+   sample 8 at 2026-10-06T12:25:25.393Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=243
+   sample 9 at 2026-10-06T12:25:30.425Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=248
+CHECK nothing in flight for 40 s (9 samples): ok (0 idle and 2 tolerated connection(s))
+INFO connections_seen=2 connections_tolerated=2 connections_active=0 connections_idle=0 pending_total_before=260 pending_total_after=260 pending_changed=False hindsight_processes=9
+GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T12:25:30.519Z
 guard exit=0
 
 ## established connections to port 20128 right after the guard (value-free: ports, queues and counters only)
 peer_port recv_q send_q bytes_received bytes_sent lastsnd_ms lastrcv_ms
-58425 0 0 None None 9032 9032
+59367 0 0 None None 27204 27204
 connections: 1
 
 ## client-side owners visible to this PID namespace (process names only)
       1 users:(("omniroute (v16."
-
-################ TRIAL 2
-# read-only trial of the pre-switch guard against the live 20128, 2026-10-06T06:12:23Z; the guard exit status is printed at the end
-GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:12:23.163Z port=20128 unit=omniroute.service clean_for=40.0 interval=5.0 tolerate_units=['omniroute-fw.service']
-CHECK switch tool sha256: ok (97d1b87bb651)
-CHECK rollback prefix intact: ok (omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
-CHECK target prefix intact: ok (omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
-   IDENTITY label=pre-switch time=2026-10-06T06:12:28Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=13 expect_prefix_ok=True expect_build_ok=True
-CHECK unit runs the rollback prefix, health ok: ok
-   sample 1 at 2026-10-06T06:12:28.890Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=480
-   sample 2 at 2026-10-06T06:12:34.067Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=486
-   sample 3 at 2026-10-06T06:12:39.104Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=491
-   sample 4 at 2026-10-06T06:12:44.155Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=496
-   sample 5 at 2026-10-06T06:12:49.221Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=501
-   sample 6 at 2026-10-06T06:12:54.287Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=506
-   sample 7 at 2026-10-06T06:12:59.344Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=511
-   sample 8 at 2026-10-06T06:13:04.407Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=516
-   sample 9 at 2026-10-06T06:13:09.475Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=521
-CHECK nothing in flight for 40 s (9 samples): ok (0 idle and 0 tolerated connection(s))
-INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=13 pending_total_after=13 pending_changed=False hindsight_processes=10
-GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T06:13:09.635Z
-guard exit=0
-
-## established connections to port 20128 right after the guard (value-free: ports, queues and counters only)
-peer_port recv_q send_q bytes_received bytes_sent lastsnd_ms lastrcv_ms
-connections: 0
-
-## client-side owners visible to this PID namespace (process names only)

@@ -8,7 +8,10 @@ for every request, so a control driver can switch behaviour between runs:
   {"mode": "...", "tail_s": 3.0, "row_delay_s": 0.4, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
   (responses_corr_header: send X-Correlation-Id on /v1/responses too, as the real gateway does on some responses; by default only Chat Completions responses carry it, so a Responses client attributes rows by the response id)
   ("null_effort": [true, false, ...]: a list cycled over the requests that write rows; a true entry writes BOTH effort columns as NULL, as the real gateway does for a response without encrypted reasoning; without it the columns
-   carry the client's requested effort and, for a model whose id ends in -max, an upstream effort max even when the client sent none; "effort_upstream_override" replaces the upstream effort of a row that is not NULL)
+   carry the client's requested effort and, for a model whose id ends in -max, an upstream effort max even when the client sent none; "effort_upstream_override" replaces the upstream effort of a row that is not NULL;
+   "dropped_effort": [true, false, ...]: the same cycle, but a true entry writes BOTH effort columns as NULL on a row that DOES carry encrypted reasoning (reasoning_source 'encrypted'), the observable attempt that dropped the effort)
+  Rows carry what the real gateway's rows carry that the acceptance scripts read: provider, connection_id 'ctl-conn', duration (the request's measured milliseconds), ttft_ms, reasoning_source ('encrypted' when an effort column is stored, else NULL), and
+  usage_history rows carry provider, connection_id, endpoint (the call's path), latency_ms (duration + 1) and ttft_ms (the call's + 0.2), as on 457 live pairs.
 
   mode "normal"            rows are written row_delay_s after the terminal event, whether or not the client is still connected (what the patched gateway does)
   mode "lose-on-early"     rows are written only when the client stayed connected until the stream ended; a client that closes after the terminal event leaves NO row (the unpatched gateway's drop)
@@ -18,6 +21,9 @@ for every request, so a control driver can switch behaviour between runs:
   mode "no-terminal"       the stream ends without a terminal event (an error event instead); rows are written as for "normal"
   mode "http-error"        the response is http_status (default 500) with no stream and no row
   mode "unrelated-only"    the request writes NO row of its own; an unrelated request's rows (other model, other tag, other tokens) are written instead
+  mode "foreign-usage"     the call_logs row of the request is written, and the usage_history row is a FOREIGN request's look-alike: same model, token counts and timestamp, but another account and another latency (it must not stand in for the request's own)
+  mode "no-usage-row"      the call_logs row is written and NO usage_history row at all (the request's usage row is missing)
+  mode "extra-foreign-usage"  the request's own call_logs and usage_history rows, plus a foreign request's look-alike usage row (same model, counts and time, another account and latency): the own row associates, the look-alike must not matter
 
 Rows carry the correlation id (chat) or response id (responses) the client can see, the session tag from the X-OmniRoute-Session-Id request header (as the real gateway stores it), tokens_in/out and effort columns.
 Every request's header names (lower-cased) and the value of x-omniroute-session-id are appended to <db>.requests.jsonl (no other header value is kept).
@@ -61,24 +67,32 @@ def db():
     return sqlite3.connect(ARGS.db, timeout=30)
 
 
-def insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, status=200, with_usage=True, effort_up=None):
+def insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, status=200, with_usage=True, effort_up=None, source="auto", dur=4000, usage_variant=None):
     row_id = str(uuid.uuid4())
+    if source == "auto":
+        source = "encrypted" if (effort is not None or effort_up is not None) else None
     with LOCK:
         con = db()
         ts = now()
         con.execute(
-            "insert into call_logs (id, timestamp, method, path, status, model, requested_model, provider, tokens_in, tokens_out, detail_state, correlation_id, response_id, session_tag, "
-            "reasoning_effort_requested, reasoning_effort_upstream) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (row_id, ts, "POST", path, status, model, "codex/" + model, "codex", tin, tout, "ready", corr, resp_id, tag, effort, effort_up if effort_up is not None else effort),
+            "insert into call_logs (id, timestamp, method, path, status, model, requested_model, provider, connection_id, duration, ttft_ms, tokens_in, tokens_out, detail_state, correlation_id, response_id, session_tag, "
+            "reasoning_effort_requested, reasoning_effort_upstream, reasoning_source) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (row_id, ts, "POST", path, status, model, "codex/" + model, "codex", "ctl-conn", dur, 120, tin, tout, "ready", corr, resp_id, tag, effort, effort_up if effort_up is not None else effort, source),
         )
         if with_usage:
-            con.execute(
-                "insert into usage_history (provider, model, tokens_input, tokens_output, status, success, timestamp) values (?,?,?,?,?,?,?)",
-                ("codex", model, tin, tout, str(status), 1 if status == 200 else 0, ts),
-            )
+            insert_usage(con, path, model, tin, tout, status, ts, dur, usage_variant)
         con.commit()
         con.close()
     return row_id
+
+
+def insert_usage(con, path, model, tin, tout, status, ts, dur, variant=None):
+    """One usage_history row: the request's own (variant None) or a foreign request's look-alike (variant 'foreign': another account and another latency)."""
+    own = variant != "foreign"
+    con.execute(
+        "insert into usage_history (provider, model, connection_id, tokens_input, tokens_output, status, success, timestamp, endpoint, latency_ms, ttft_ms) values (?,?,?,?,?,?,?,?,?,?,?)",
+        ("codex", model, "ctl-conn" if own else "ctl-other", tin, tout, str(status), 1 if status == 200 else 0, ts, path, dur + 1 if own else dur + 6000, 120.2 if own else 77.7),
+    )
 
 
 def flip_status_later(row_id, delay):
@@ -127,6 +141,7 @@ class Handler(BaseHTTPRequestHandler):
         tail = float(cfg.get("tail_s", 3.0))
         delay = float(cfg.get("row_delay_s", 0.4))
         tag = self.headers.get("X-OmniRoute-Session-Id")
+        t_req = time.time()
         with open(ARGS.db + ".requests.jsonl", "a", encoding="utf-8") as f:
             f.write(json.dumps({"path": self.path, "header_names": sorted(k.lower() for k in self.headers.keys()), "x-omniroute-session-id": tag, "stream": bool(body.get("stream"))}) + "\n")
         if m == "http-error":
@@ -191,7 +206,7 @@ class Handler(BaseHTTPRequestHandler):
             write_own = False
         if write_own:
             effort_up = cfg.get("effort_upstream_override")
-            row_effort, null_row = effort, False
+            row_effort, null_row, dropped_row = effort, False, False
             pattern = cfg.get("null_effort")
             if pattern:
                 with LOCK:
@@ -199,18 +214,34 @@ class Handler(BaseHTTPRequestHandler):
                     null_row = bool(pattern[(ROW_COUNTER[0] - 1) % len(pattern)])
                 if null_row:
                     row_effort, effort_up = None, None
-            if not null_row and effort_up is None and row_effort is None and model.endswith("-max"):
+            pattern = cfg.get("dropped_effort")
+            if pattern:
+                with LOCK:
+                    ROW_COUNTER[0] += 1
+                    dropped_row = bool(pattern[(ROW_COUNTER[0] - 1) % len(pattern)])
+                if dropped_row:
+                    row_effort, effort_up = None, None
+            if not null_row and not dropped_row and effort_up is None and row_effort is None and model.endswith("-max"):
                 effort_up = "max"   # the model suffix carries the effort upstream although the client sent none
-            row_id = insert_rows(path, model, tin, tout, corr, resp_id, tag, row_effort, effort_up=effort_up)
+            dur = int((time.time() - t_req) * 1000)
+            usage_variant = "foreign" if m == "foreign-usage" else None
+            row_id = insert_rows(path, model, tin, tout, corr, resp_id, tag, row_effort, effort_up=effort_up, source="encrypted" if dropped_row else "auto", dur=dur,
+                                 with_usage=(m != "no-usage-row"), usage_variant=usage_variant)
             if m == "dup-usage":
                 with LOCK:
                     con = db()
-                    con.execute("insert into usage_history (provider, model, tokens_input, tokens_output, status, success, timestamp) values (?,?,?,?,?,?,?)", ("codex", model, tin, tout, "200", 1, now()))
+                    insert_usage(con, path, model, tin, tout, 200, now(), dur)
+                    con.commit()
+                    con.close()
+            if m == "extra-foreign-usage":
+                with LOCK:
+                    con = db()
+                    insert_usage(con, path, model, tin, tout, 200, now(), dur, "foreign")
                     con.commit()
                     con.close()
             if m == "double-row":
                 time.sleep(float(cfg.get("dup_s", 4)))
-                insert_rows(path, model, tin, tout, corr, resp_id, tag, row_effort, with_usage=False, effort_up=effort_up)
+                insert_rows(path, model, tin, tout, corr, resp_id, tag, row_effort, with_usage=False, effort_up=effort_up, source="encrypted" if dropped_row else "auto", dur=dur)
             if m == "status-flip":
                 flip_status_later(row_id, float(cfg.get("flip_s", 3)))
         elif m == "unrelated-only":

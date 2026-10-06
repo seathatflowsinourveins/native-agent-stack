@@ -1,48 +1,44 @@
-# baseline, native codex exec two-request (tool call) x8, frozen script v2, --expect observe; started 2026-10-06T05:48:01Z; wrapper kind=baseline
-IDENTITY label=before-live-acceptance-baseline-native-tworequest.txt time=2026-10-06T05:48:01Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=8 expect_prefix_ok=True expect_build_ok=True
-FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', '--quiet-timeout', '120', '--exec-timeout', '300', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request'] cwd=/tmp start=2026-10-06T05:48:01.536Z expect=observe wait1=12.0 wait2=60.0 quiet_timeout=120.0 exec_timeout=300.0 db=$HOME/.local/share/omniroute/storage.sqlite run_id=20261006T054801 template_sha256=a28626ab89a09e2393117069e1c9b9a0d84a44434f94824fcffd6952a4ffb978
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=13.8 client_usage={'input_tokens': 30149, 'cached_input_tokens': 28928, 'output_tokens': 76} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(15045, 50) rows_complete=False verdict=OBSERVED
-   call_logs: ('2026-10-06T05:49:10.080Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', None, None) id8=10e53b37
-   usage_history: ('2026-10-06T05:49:10.076Z', 'gpt-6-astra', '200', 15045, 50)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-2 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=11.9 client_usage={'input_tokens': 30149, 'cached_input_tokens': 29696, 'output_tokens': 74} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(15045, 48) rows_complete=False verdict=OBSERVED
-   call_logs: ('2026-10-06T05:51:21.472Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 48, 'ready', None, None) id8=77f6e9ea
-   usage_history: ('2026-10-06T05:51:21.461Z', 'gpt-6-astra', '200', 15045, 48)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-3 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=6.6 client_usage={'input_tokens': 30143, 'cached_input_tokens': 29696, 'output_tokens': 71} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(15045, 44) rows_complete=False verdict=OBSERVED
-   call_logs: ('2026-10-06T05:53:24.512Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 44, 'ready', None, None) id8=b5497588
-   usage_history: ('2026-10-06T05:53:24.507Z', 'gpt-6-astra', '200', 15045, 44)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-4 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=12.0 client_usage={'input_tokens': 30151, 'cached_input_tokens': 29696, 'output_tokens': 78} command_executions=1 events=7 read1_call_logs=2 read1_usage=2 rows_tokens_in_out=(30151, 78) rows_complete=True verdict=OBSERVED
-   call_logs: ('2026-10-06T05:55:37.445Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', None, None) id8=bd588132
-   call_logs: ('2026-10-06T05:55:42.399Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15106, 28, 'ready', 'max', 'max') id8=402d1ade
-   usage_history: ('2026-10-06T05:55:37.438Z', 'gpt-6-astra', '200', 15045, 50)
-   usage_history: ('2026-10-06T05:55:42.395Z', 'gpt-6-astra', '200', 15106, 28)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-5 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=12.1 client_usage={'input_tokens': 30151, 'cached_input_tokens': 14848, 'output_tokens': 76} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(15045, 52) rows_complete=False verdict=OBSERVED
-   call_logs: ('2026-10-06T05:57:50.228Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 52, 'ready', None, None) id8=6da9c65f
-   usage_history: ('2026-10-06T05:57:50.225Z', 'gpt-6-astra', '200', 15045, 52)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-6 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=8.4 client_usage={'input_tokens': 30149, 'cached_input_tokens': 29696, 'output_tokens': 85} command_executions=1 events=7 read1_call_logs=2 read1_usage=2 rows_tokens_in_out=(30149, 85) rows_complete=True verdict=OBSERVED
-   call_logs: ('2026-10-06T06:00:03.145Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 48, 'ready', None, None) id8=5d88cd4a
-   call_logs: ('2026-10-06T06:00:07.408Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15104, 37, 'ready', 'max', 'max') id8=55623ebf
-   usage_history: ('2026-10-06T06:00:03.139Z', 'gpt-6-astra', '200', 15045, 48)
-   usage_history: ('2026-10-06T06:00:07.403Z', 'gpt-6-astra', '200', 15104, 37)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-7 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=12.6 client_usage={'input_tokens': 30182, 'cached_input_tokens': 29696, 'output_tokens': 77} command_executions=1 events=7 read1_call_logs=2 read1_usage=2 rows_tokens_in_out=(30182, 77) rows_complete=True verdict=OBSERVED
-   call_logs: ('2026-10-06T06:02:16.768Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 49, 'ready', None, None) id8=f407986d
-   call_logs: ('2026-10-06T06:02:22.224Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15137, 28, 'ready', 'max', 'max') id8=09d019dc
-   usage_history: ('2026-10-06T06:02:16.755Z', 'gpt-6-astra', '200', 15045, 49)
-   usage_history: ('2026-10-06T06:02:22.214Z', 'gpt-6-astra', '200', 15137, 28)
-RESULT shape=two-request session_id=acceptance-20261006T054801-two-request-8 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=8.5 client_usage={'input_tokens': 30149, 'cached_input_tokens': 14848, 'output_tokens': 81} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(15045, 50) rows_complete=False verdict=OBSERVED
-   call_logs: ('2026-10-06T06:04:28.461Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', None, None) id8=e9b9a18a
-   usage_history: ('2026-10-06T06:04:28.451Z', 'gpt-6-astra', '200', 15045, 50)
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 50) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-2 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 48) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-3 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 44) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-4 read2_call_logs=2 read2_usage=2 rows_tokens_in_out=(30151, 78) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-5 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 52) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-6 read2_call_logs=2 read2_usage=2 rows_tokens_in_out=(30149, 85) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-7 read2_call_logs=2 read2_usage=2 rows_tokens_in_out=(30182, 77) changed=False verdict=OBSERVED
-LATE shape=two-request session_id=acceptance-20261006T054801-two-request-8 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 50) changed=False verdict=OBSERVED
-SUMMARY {'OBSERVED': 8} end=2026-10-06T06:05:33.228Z exit=0
+# baseline, native codex exec two-request (tool call) x8, frozen script v2, --expect observe; started 2026-10-06T12:04:43Z; wrapper kind=baseline
+IDENTITY label=before-live-acceptance-baseline-native-tworequest.txt time=2026-10-06T12:04:43Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=253 expect_prefix_ok=True expect_build_ok=True
+FROZEN version=2.1 script_sha256=db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', '--quiet-timeout', '120', '--exec-timeout', '300', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request', 'two-request'] cwd=/tmp start=2026-10-06T12:04:43.701Z expect=observe wait1=12.0 wait2=60.0 quiet_timeout=120.0 exec_timeout=300.0 db=$HOME/.local/share/omniroute/storage.sqlite run_id=20261006T120443 template_sha256=a28626ab89a09e2393117069e1c9b9a0d84a44434f94824fcffd6952a4ffb978
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=6.6 client_usage={'input_tokens': 30149, 'cached_input_tokens': 29696, 'output_tokens': 77} command_executions=1 events=8 read1_call_logs=2 read1_usage=2 read1_usage_unestablished=0 rows_tokens_in_out=(30149, 77) rows_complete=True verdict=OBSERVED
+   call_logs: ('2026-10-06T12:05:46.684Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 48, 'ready', None, None) id8=0352a086
+   call_logs: ('2026-10-06T12:05:50.254Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15104, 29, 'ready', 'max', 'max') id8=7657a2e7
+   usage_history: ('2026-10-06T12:05:46.680Z', 'gpt-6-astra', '200', 15045, 48)
+   usage_history: ('2026-10-06T12:05:50.252Z', 'gpt-6-astra', '200', 15104, 29)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-2 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=7.8 client_usage={'input_tokens': 30151, 'cached_input_tokens': 29696, 'output_tokens': 77} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 52) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:07:56.968Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 52, 'ready', None, None) id8=40e7af53
+   usage_history: ('2026-10-06T12:07:56.964Z', 'gpt-6-astra', '200', 15045, 52)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-3 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=22.8 client_usage={'input_tokens': 30149, 'cached_input_tokens': 29696, 'output_tokens': 78} command_executions=1 events=8 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 50) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:10:18.088Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', None, None) id8=5aee7dc3
+   usage_history: ('2026-10-06T12:10:18.085Z', 'gpt-6-astra', '200', 15045, 50)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-4 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=14.1 client_usage={'input_tokens': 30176, 'cached_input_tokens': 29696, 'output_tokens': 73} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 44) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:12:34.787Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 44, 'ready', None, None) id8=c06a4cca
+   usage_history: ('2026-10-06T12:12:34.786Z', 'gpt-6-astra', '200', 15045, 44)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-5 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=7.9 client_usage={'input_tokens': 30149, 'cached_input_tokens': 29696, 'output_tokens': 72} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 48) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:14:46.961Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 48, 'ready', None, None) id8=2cf7921a
+   usage_history: ('2026-10-06T12:14:46.957Z', 'gpt-6-astra', '200', 15045, 48)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-6 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=9.3 client_usage={'input_tokens': 30176, 'cached_input_tokens': 29696, 'output_tokens': 72} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 42) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:16:57.460Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 42, 'ready', None, None) id8=237e1f4d
+   usage_history: ('2026-10-06T12:16:57.457Z', 'gpt-6-astra', '200', 15045, 42)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-7 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=10.2 client_usage={'input_tokens': 30151, 'cached_input_tokens': 29824, 'output_tokens': 81} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 52) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:19:08.946Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 52, 'ready', None, None) id8=b41a1a2b
+   usage_history: ('2026-10-06T12:19:08.943Z', 'gpt-6-astra', '200', 15045, 52)
+RESULT shape=two-request session_id=acceptance-20261006T120443-two-request-8 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=8.5 client_usage={'input_tokens': 30151, 'cached_input_tokens': 29696, 'output_tokens': 73} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 52) rows_complete=False verdict=OBSERVED
+   call_logs: ('2026-10-06T12:21:22.202Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 52, 'ready', None, None) id8=189af83c
+   usage_history: ('2026-10-06T12:21:22.199Z', 'gpt-6-astra', '200', 15045, 52)
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-1 read2_call_logs=2 read2_usage=2 rows_tokens_in_out=(30149, 77) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-2 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 52) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-3 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 50) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-4 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 44) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-5 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 48) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-6 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 42) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-7 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 52) changed=False verdict=OBSERVED
+LATE shape=two-request session_id=acceptance-20261006T120443-two-request-8 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 52) changed=False verdict=OBSERVED
+SUMMARY {'OBSERVED': 8} end=2026-10-06T12:22:26.271Z exit=0
 exit=0
-IDENTITY label=after-live-acceptance-baseline-native-tworequest.txt time=2026-10-06T06:05:33Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=13 expect_prefix_ok=True expect_build_ok=True
+IDENTITY label=after-live-acceptance-baseline-native-tworequest.txt time=2026-10-06T12:22:26Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=260 expect_prefix_ok=True expect_build_ok=True
 journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
-pending_delta=5 (informational: pending_total 8 -> 13)
+pending_delta=7 (informational: pending_total 253 -> 260)
 RUN-STATUS live-acceptance-baseline-native-tworequest.txt status=0 (ok)
-# finished 2026-10-06T06:05:34Z
+# finished 2026-10-06T12:22:26Z

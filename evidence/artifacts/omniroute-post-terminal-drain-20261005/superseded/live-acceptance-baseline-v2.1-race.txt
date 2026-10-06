@@ -1,0 +1,23 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 1f9f64345aadafacd871f5d1f6fb554a3ed319bad7715cff12b9cfa642707287; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# baseline, race set (responses:early:0 x6), frozen script v2, --expect observe; started 2026-10-06T05:37:58Z; wrapper kind=baseline
+IDENTITY label=before-live-acceptance-baseline-race.txt time=2026-10-06T05:37:58Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=2 expect_prefix_ok=True expect_build_ok=True
+FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0'] cwd=/tmp start=2026-10-06T05:37:58.712Z expect=observe wait1=12.0 wait2=60.0 port=20128 db=$HOME/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.9 corr=None response_id=resp_0000ec3c99774cb6016ac48938047087d19223602cc8e6e53a read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=6.7 corr=None response_id=resp_0fa0016e80834b11016ac4894d67f48193a8a258c3b6c0b50b read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=5.1 corr=None response_id=resp_01e54ad534803abd016ac4895e39548193a449c3b24e1ae715 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=3.6 corr=1869b1de… response_id=resp_0f62b8861864638f016ac4896f8d3c87d1bd7a36e9f95bbcca read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.0 corr=21e84436… response_id=resp_0052c04ddde76b6e016ac4897ffa8c87d18b27f1291e158186 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=4.0 corr=None response_id=resp_09bc89365d32a376016ac4898ed0bc87d19ee1b01435f77e0e read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+SUMMARY {"OBSERVED": 6} end=2026-10-06T05:40:31.396Z exit=0
+exit=0
+IDENTITY label=after-live-acceptance-baseline-race.txt time=2026-10-06T05:40:31Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=8 expect_prefix_ok=True expect_build_ok=True
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
+pending_delta=6 (informational: pending_total 2 -> 8)
+RUN-STATUS live-acceptance-baseline-race.txt status=0 (ok)
+# finished 2026-10-06T05:40:32Z

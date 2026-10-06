@@ -4,10 +4,10 @@
 # (12) the gate line's mechanism: with the pinned shim first on PATH `lsof -ti :PORT` answers exit 2 with no output and another lsof call passes through.
 
 ## (1) gate() with a failing command must stop the script with exit 3 and log the failing gate
-09:51:39Z failing-gate exit=1 seconds=0
+11:08:32Z failing-gate exit=1 seconds=0
 subshell exit=3
 ## (2) gate() with a passing command logs it and continues
-09:51:39Z passing-gate exit=0 seconds=0
+11:08:32Z passing-gate exit=0 seconds=0
 reached after the passing gate
 subshell exit=0
 ## (3) compare_dry_run: the first build's recorded dry-run metadata against the kept tarball (same bytes: must succeed)
@@ -33,15 +33,15 @@ exit=1
 subshell exit=3
 ## (10) the real script with a SHIM_SOURCE that is not the pinned shim (one extra comment line): must stop with exit 2 before creating a work directory
 pinned shim sha256: b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854; the changed copy: a0366bc49ef115a1c0ea4f31ef24b1387e76bfe7cb84cdd5cbc75e648b93c3b1
-the shim source $HOME/.cache/omniroute-build-controls-maYerZ/in/lsof-shim-changed.sh.txt does not have the pinned sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
+the shim source $HOME/.cache/omniroute-build-controls-C2jGu0/in/lsof-shim-changed.sh.txt does not have the pinned sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
 script exit=2
 work directories created under the control's WORK_ROOT: 0
 ## (11) the real script with no shim file at all: must stop with exit 2 before creating a work directory
-no lsof shim source at $HOME/.cache/omniroute-build-controls-maYerZ/in/no-such-shim.sh.txt (set SHIM_SOURCE)
+no lsof shim source at $HOME/.cache/omniroute-build-controls-C2jGu0/in/no-such-shim.sh.txt (set SHIM_SOURCE)
 script exit=2
 work directories created under the control's WORK_ROOT: 0
 ## (12) the gate line's mechanism: a copy of the pinned shim first on PATH answers lsof -ti :PORT with exit 2 and no output; another lsof call passes through
-resolved lsof: $HOME/.cache/omniroute-build-controls-maYerZ/shim12/lsof
+resolved lsof: $HOME/.cache/omniroute-build-controls-C2jGu0/shim12/lsof
 lsof -ti :24999 -> status=2 output=[]
 lsof -v (pass-through to /usr/bin/lsof) -> status=0
 without the shim, the same query on a port nothing uses: status=1 (1 = no match, which upstream reads as 'free')
@@ -49,4 +49,4 @@ without the shim, the same query on a port nothing uses: status=1 (1 = no match,
 17:#        BUILD_DRAIN_SOURCE_ONLY=1 . omniroute-build-drain-20261006.sh   defines the gate, comparison and write_sums functions only (for their controls; the caller sets OUT)
 36:write_sums() { # tarball name (a file in $OUT): write SHA256SUMS there and verify it; returns the status of the write-and-verify subshell, not of tee
 100:write_sums "omniroute-3.8.51-drain-$NAME8.tgz" || { log "writing or verifying SHA256SUMS failed: stopping"; exit 3; }
-scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-build-controls-maYerZ
+scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-build-controls-C2jGu0
