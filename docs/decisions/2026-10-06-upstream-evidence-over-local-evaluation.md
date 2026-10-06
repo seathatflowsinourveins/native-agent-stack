@@ -56,7 +56,7 @@ Their recorded artifacts retain their original scope.
 
 | Superseded gate | Record or PR carrying it | Resulting work |
 | --- | --- | --- |
-| D3r4 memory head-to-head, step 8 onward | The private D3r4 protocol and Amendment 1, identified by `coordination/command-center/ITEM-ns2604-coop-20261005T053703Z.md` and the step-8 binding in `ITEM-ns2604-coop-20261006T041934Z.md`; repository settling exceptions in [repository-quality rule](2026-10-04-repository-quality-rule.md) and [final architecture, round 2](2026-10-04-final-architecture-round2.md) | Compare candidates' upstream releases, published evaluations and client fit. The installed owner remains an installation fact; the memory recommendation and CC decision use upstream evidence. StackMeasure2604 remains stopped under the CC's direction. |
+| D3r4 memory head-to-head, step 8 onward | The private D3r4 protocol and Amendment 1, identified by `coordination/command-center/ITEM-ns2604-coop-20261005T053703Z.md` and the step-8 binding in `ITEM-ns2604-coop-20261005T041934Z.md`; repository settling exceptions in [repository-quality rule](2026-10-04-repository-quality-rule.md) and [final architecture, round 2](2026-10-04-final-architecture-round2.md) | Compare candidates' upstream releases, published evaluations and client fit. The installed owner remains an installation fact; the memory recommendation and CC decision use upstream evidence. |
 | Harbor A/B for the 11 token rows | [Token layer default](2026-10-04-new-wsl-token-layer-default.md), [full-stack owner default](2026-10-04-token-full-stack-owner-default.md), the comparison/overturn rules in [definitive defaults](2026-10-01-new-wsl-definitive-defaults.md), and private `coordination/ns2604-coop/organic-e2e-20261005/protocol-v1-adjudicated.json` with `suite-v1.json` and `AMENDMENT-U1-native-arm.md` | Record each row's upstream source/release, installation, client smoke result and organic before/after counters as they become available. |
 | Code-navigation trial matrix | [PR #786](https://github.com/seathatflowsinourveins/native-agent-stack/pull/786), carrying `evidence/artifacts/organic-e2e-20261005/PROTOCOL-v1.1.md`, `PILOT-SPEC-v1.1.md` and `AMENDMENT-v1.1-20261006.md`; repository code-search exceptions in the two October 4 selection records above | Finish round 6e as a clean, pushed draft. Start no pilot or trial runs. |
 | Skills S1 promptfoo skill-used assertions | [PR #795](https://github.com/seathatflowsinourveins/native-agent-stack/pull/795); [promptfoo-skills configuration](../../evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-skills.json), [round-2 G4 plan](2026-10-04-round2-plan-g4-config.md), and the skills acceptance function in [accept.sh](../../evidence/artifacts/new-wsl-install-plan-20261002/accept.sh) | Use upstream skill evidence, installation/client wiring smoke checks and organic counters. The campaign's skill-used and not-skill-used assertions cease to gate selection or readiness. |
@@ -76,8 +76,6 @@ added to this PR or landed repository evidence. A superseded comparison is
 recorded as superseded, preserving any earlier failed or incomplete attempt.
 The 11-token-row count is the CC's declared campaign scope; historical inventories
 have different scopes, so this record supplies no invented 11-member mapping.
-The already exploratory [PR #785](https://github.com/seathatflowsinourveins/native-agent-stack/pull/785)
-keeps its exploratory status and supplies no new readiness evidence.
 
 ## Retained checks and S4
 
@@ -155,6 +153,7 @@ quoting the owner's new rule.
 
 | Existing instruction location | Sentence needing scope clarification |
 | --- | --- |
+| `AGENTS.md:9`, documented-gap candidate-choice sentence | Its foundation-selection reference to `2026-10-04-repository-quality-rule.md` should point to this [October 6 upstream-evidence rule](2026-10-06-upstream-evidence-over-local-evaluation.md), replacing the memory/code-search settling-measurement exception and locally measured overturn route. The CC owns the instruction edit. |
 | `examples/claude-native/CLAUDE.md`, opening top rule | The candidate-selection sentence requiring measured head-to-head quality/security/maintenance should use upstream evidence. |
 | `AGENTS.md`, `examples/claude-native/CLAUDE.md`, `adoption/templates/codex.AGENTS.template.md`, `adoption/scaffold/AGENTS.md` | The sentence assigning promptfoo, skill-creator and Harbor/Inspect to A/B/E2E needs application-evaluation scope; it cannot imply a component-selection campaign. |
 | The same four carriers, search-first sentence | The fallback skill-verification/A/B clause should distinguish source-backed skill choice and client smoke checks from a local selection campaign. |
