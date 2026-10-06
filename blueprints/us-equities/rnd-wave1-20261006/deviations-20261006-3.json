@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "rnd_wave1_preregistration_deviations",
+  "recorded_at_utc": "2026-10-06T11:31:49+00:00",
+  "frozen_commit": "d4601bfcbc4db74e57cd5c387bf48faebe263642",
+  "previous_deviation_commits": [
+    "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
+    "22fa80187"
+  ],
+  "kept_sha256": {
+    "PREREGISTRATION.md": "7b7f4ce3f4506abf2370938a36556dbcdb5596bcbcdf792f2a92b494671e4f96",
+    "plan.json": "36e55742ec837809cf6d41ae1b35e22237cc25a0c3abf01d0f36384cee0e1743",
+    "deviations.json": "6dfca17ac1fa1a011a36a4fd37919fcdcd29941bef4c9a359ce3675f941bae42",
+    "deviations-20261006-2.json": "b2974b6f3c76d3308d9450437dbbc015f89449ef607cffa57b049ac6a83d9ac0"
+  },
+  "found_by": "Five Codex review threads on #778 at ee01dd127 (four P1, one P2), each answered by a rule below before any R1 or R2b execution.",
+  "policy": "Earlier files stay byte-identical; D5 adds constraints and governs where it conflicts with them. R2a's own rules are unchanged except D5.1's fetch path.",
+  "deviations": [
+    {
+      "id": "D5.1",
+      "finding": "Arm A's revision 99dfec7c is not reachable from main",
+      "rule": "Arm A's refetch.py is taken from 99dfec7cf6bdd2bc49f0099206ed84fc1d88ebb1, fetched with `git fetch origin refs/pull/485/head` (GitHub keeps pull-request refs) or from origin/claude/mover-asof-recollection-20260929. Before any command, the blob's sha256 must equal plan.json R2a.arms.A_exact.refetch_sha256 (fc6d5415...). Its imports and plan.json are byte-identical between 99dfec7c and the base commit (verified when this file was written). If the blob cannot be obtained with that hash, R2a is NOT_STARTED (30)."
+    },
+    {
+      "id": "D5.2",
+      "finding": "R2b's dimensions need inputs beyond Arm A's outputs",
+      "rule": "R2b reads Arm A's results.json and labels.json plus the hash-pinned retained E2 inputs (the 7 input files of plan.json R2a.input_sha256 and the package zip a0b0aabf...), each checked against its pin first; no other data. Year comes from the event date; price and dollar-volume buckets from the retained snapshot bars of the prior session; session timing from the package's extended-hours dataset; catalyst tag from the package's category. A value these inputs do not give is counted in unknown, never fetched."
+    },
+    {
+      "id": "D5.3",
+      "finding": "Event-scope fixtures came from private data while R1 was repository-only",
+      "rule": "R1 may read two retained records by their pins, as the cited records of the event-scope reads: the package zip a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c (the extreme-gainer audit's 957-event set) and mover-coverage-asof/evidence/summary-asof-20260929.json with the retained E2 run (E2's 715 events). Every other R1 input stays repository-only. The D4.1 event fixtures stand as pinned; R1's extractor must derive them from those records."
+    },
+    {
+      "id": "D5.4",
+      "finding": "R2b's counts were not recomputed from the pinned artifacts",
+      "rule": "R2b's counts come from a deterministic, stdlib-only profile builder over D5.2's inputs. That builder is added, read cross-family and pinned by a further dated deviation before R2b starts. R2b's acceptance adds: two builder runs produce byte-identical output, and the published profile equals that output; any difference is REJECTED_RECONCILIATION (31). validate_r2b.py stays the schema and reconciliation check."
+    },
+    {
+      "id": "D5.5",
+      "finding": "The validator accepted floating-point population counts",
+      "rule": "validate_r2b.py r2 rejects non-integer populations and counts (type int only, never float or bool); its self-test grows to 8 cases. It replaces D4.3's pin.",
+      "validator": {
+        "path": "blueprints/us-equities/rnd-wave1-20261006/validate_r2b.py",
+        "sha256": "d6e017f4d79ccda4070eb3a838478fef06436877f14e4ad42b1f7f0488e0992f",
+        "previous_sha256": "af1b42494713ebf344b0654f02cd4e8be92d389441470878b4c81d84cc51a7ed"
+      }
+    },
+    {
+      "id": "D5.6",
+      "rule": "Registry: deviations-20261006-3.json and validate_r2b.py r2 are registered in the branch's last commit."
+    }
+  ],
+  "execution_gate": "R1 waits for the command center's ACK of this file, which governs its inputs. R2a may continue (D5.1 only names its fetch path). R2b waits for an accepted R1, a reproduced R2a and the pinned profile builder of D5.4."
+}

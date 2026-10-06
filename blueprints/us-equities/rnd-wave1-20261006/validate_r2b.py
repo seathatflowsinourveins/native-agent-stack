@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Frozen validator for wave 1's R2b totals-only profile (deviations-20261006-2.json D4.3; stdlib only).
+"""Frozen validator for wave 1's R2b totals-only profile (deviations-20261006-2.json D4.3, r2 in deviations-20261006-3.json
+D5.5: populations must be integers, not floats or booleans; stdlib only).
 
 Usage: python3 -I validate_r2b.py <profile.json>
        python3 -I validate_r2b.py --self-test
@@ -40,7 +41,10 @@ def check(doc):
         return "schema", "source is not Arm A's pinned outputs"
     if doc["claims"] != "insufficient_evidence":
         return "schema", "claims must be insufficient_evidence"
-    if doc["populations"] != POP:
+    pops = doc["populations"]
+    if not isinstance(pops, dict) or set(pops) != set(POP) or not all(type(v) is int for v in pops.values()):
+        return "schema", "populations must be exactly ratio_3 and ratio_2 with integer counts"
+    if pops != POP:
         return "reconciliation", "populations differ from ratio_3 97 and ratio_2 261"
     dims = doc["dimensions"]
     if not isinstance(dims, dict) or set(dims) != set(POP):
@@ -82,6 +86,10 @@ def self_test():
     cases.append(("population drift", bad, "reconciliation"))
     bad = json.loads(json.dumps(good)); bad["claims"] = "predictive"
     cases.append(("predictive claim", bad, "schema"))
+    bad = json.loads(json.dumps(good)); bad["populations"]["ratio_3"] = 97.0
+    cases.append(("float population", bad, "schema"))
+    bad = json.loads(json.dumps(good)); bad["dimensions"]["ratio_3"]["year"]["2022"] = 1.0
+    cases.append(("float bucket count", bad, "schema"))
     fails = [n for n, doc, want in cases if (check(doc) or (None,))[0] != want]
     print(json.dumps({"self_test": "pass" if not fails else "fail", "cases": len(cases), "failed": fails}))
     return 0 if not fails else 1
