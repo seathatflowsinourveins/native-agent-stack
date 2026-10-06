@@ -4487,8 +4487,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "89f3a1fdfa53ff85d7ee2c33af49d17ebedaeb2b3be845b54472d64a6787ebe3",
-      "bytes": 4361
+      "sha256": "4e98e2765cd586f482059ecff1edbd677f56926e3d7b7df094f8ac37206b9e9a",
+      "bytes": 4283
     },
     {
       "path": ".gitattributes",
@@ -17358,8 +17358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-worker-gateway-defaults.md",
-      "sha256": "09beea46cb921e943ab52d1d36576a94cc4655c7c25586e81c6fb7b7f48e1657",
-      "bytes": 6146
+      "sha256": "3dafc76f866bfac10790677d683616e21c7301900a271bf25bcddff000b56375",
+      "bytes": 7264
     },
     {
       "path": "docs/direct-results.md",
@@ -53228,8 +53228,8 @@
     },
     {
       "path": "evidence/receipts/worker-gateway-defaults-20261006.json",
-      "sha256": "2bda5d6236b82efe4f88cecfde33fbddf8e4f867c7df4ea1a5cdc12aef8fb848",
-      "bytes": 9336
+      "sha256": "3bec902a17127dbf380b80a61e9faff08a5e7e22228c330763dfb14c7b58b306",
+      "bytes": 30178
     },
     {
       "path": "evidence/receipts/worktrunk-list.json",
@@ -53503,8 +53503,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/README.md",
-      "sha256": "2256d8ab8d385f2ec0ce9ee87f68f2ca267d0ba9bae830f012252389d20e17b3",
-      "bytes": 15065
+      "sha256": "cea2995df0a41f320edc8d5f722ed0171c3c6925e926f4174c5bc2d78a5eab97",
+      "bytes": 15027
     },
     {
       "path": "examples/deepagents-omniroute/acceptance-plan.json",
@@ -53563,8 +53563,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "464da326960b8937e7dd8af38b9df3a8ee65e73f60c98c528a2a8c6849e159f8",
-      "bytes": 20795
+      "sha256": "cbcb4aa039a9504482804ee550bac759978246039366d0a996de623776af100f",
+      "bytes": 20757
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -53583,8 +53583,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "034a8e301e0f14014e744b5bb46226db79b199079ba23ffc9ae1bdfd98fcd64b",
-      "bytes": 10255
+      "sha256": "d16c4e4d6cfbdb0745dacec323e42885b2c4fd6cde26ed9361a55d34cfe94cb0",
+      "bytes": 10869
     },
     {
       "path": "examples/omniroute-codex-sdk/rerun-plan.json",
@@ -53593,8 +53593,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
-      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c",
-      "bytes": 1411
+      "sha256": "d6a3292112abbb0e14bc9436680b1e6c6ed9908b320f9559cf7296af8ec32b50",
+      "bytes": 1555
     },
     {
       "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
@@ -54908,8 +54908,8 @@
     },
     {
       "path": "tests/test_gateway_worker_defaults.py",
-      "sha256": "e23bb5e270daeb7e8f7e51bcd865b21aa8665097aab35cf245758e8f7801c22e",
-      "bytes": 8366
+      "sha256": "6144a5443c6e2e82ac2331149df03386bd2a925a1efd131c9858de0452b23053",
+      "bytes": 10090
     },
     {
       "path": "tests/test_gitleaks_config.py",
