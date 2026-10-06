@@ -1,0 +1,20 @@
+# Dagu 2.18.2 schema: dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4
+# Source function: adoption/templates/systemd/stack-currency.service
+description: "Refresh the stack currency due-file from maintained repository checks"
+schedule: "CRON_TZ=America/New_York 0 0 * * *"
+catchup_window: "2d"
+overlap_policy: latest
+hist_retention_days: 60
+timeout_sec: 900
+env:
+  NATIVE_STACK_REPOSITORY: "${HOME}/code/native-agent-stack-live"
+  PATH: "${HOME}/.local/share/mise/shims:${HOME}/.local/bin:${HOME}/.local/share/codex-ecosystem/bin:/usr/local/bin:/usr/bin:/bin"
+  PYTHONDONTWRITEBYTECODE: "1"
+steps:
+  - name: currency-due
+    run: |
+      umask 0077
+      exec /usr/bin/setpriv --no-new-privs /usr/bin/nice -n 19 /usr/bin/ionice -c 2 -n 7 \
+        /usr/bin/python3 "${NATIVE_STACK_REPOSITORY}/scripts/currency_due.py"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]

@@ -1,0 +1,22 @@
+# Dagu 2.18.2 schema: dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4
+# Source function: adoption/templates/systemd/host-requests-workstation.service
+# poll --role workstation observes requests; it does not drain or execute them.
+description: "Poll workstation host requests using the maintained live clone"
+schedule: "CRON_TZ=America/New_York */10 * * * *"
+hist_retention_days: 60
+timeout_sec: 120
+env:
+  NATIVE_STACK_REPOSITORY: "${HOME}/code/native-agent-stack-live"
+  NATIVE_STACK_MAINTENANCE_ROOT: "${HOME}/.local/lib/native-agent-stack/dagu-upkeep"
+  NATIVE_STACK_HOST_ALERT_URL: "http://127.0.0.1:21093/api/v2/alerts"
+  PATH: "${HOME}/.local/share/mise/shims:${HOME}/.local/bin:${HOME}/.local/share/codex-ecosystem/bin:/usr/local/bin:/usr/bin:/bin"
+  PYTHONDONTWRITEBYTECODE: "1"
+steps:
+  - name: poll
+    run: |
+      umask 0077
+      exec /usr/bin/setpriv --no-new-privs /usr/bin/nice -n 19 /usr/bin/ionice -c 2 -n 7 \
+        /usr/bin/python3 "${NATIVE_STACK_MAINTENANCE_ROOT}/scripts/host_requests.py" poll --role workstation \
+        --stack-root "${NATIVE_STACK_REPOSITORY}" --notify-alertmanager-url "${NATIVE_STACK_HOST_ALERT_URL}"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]

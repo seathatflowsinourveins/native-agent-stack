@@ -1,0 +1,30 @@
+# Dagu 2.18.2 schema: dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4
+# Source: NativeStack main-pin/live-clone-sync units, read 2026-10-06T04:26:27Z.
+description: "Pin the clean main checkout, then sync the live clone and QMD text index"
+schedule: "CRON_TZ=America/New_York */15 * * * *"
+hist_retention_days: 60
+timeout_sec: 360
+env:
+  NATIVE_STACK_MAIN_REPOSITORY: "${HOME}/code/native-agent-stack"
+  NATIVE_STACK_REPOSITORY: "${HOME}/code/native-agent-stack-live"
+  NATIVE_STACK_MAINTENANCE_ROOT: "${HOME}/.local/lib/native-agent-stack/dagu-upkeep"
+  PATH: "${HOME}/.local/share/mise/shims:${HOME}/.local/bin:${HOME}/.local/share/codex-ecosystem/bin:/usr/local/bin:/usr/bin:/bin"
+  GIT_TERMINAL_PROMPT: "0"
+preconditions:
+  - condition: /bin/bash "${NATIVE_STACK_MAINTENANCE_ROOT}/heavy-window-check.sh" 360
+steps:
+  - name: main-pin
+    timeout_sec: 180
+    run: |
+      exec /usr/bin/nice -n 19 /usr/bin/ionice -c 3 /bin/bash \
+        "${NATIVE_STACK_MAINTENANCE_ROOT}/main-pin.sh" "${NATIVE_STACK_MAIN_REPOSITORY}"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]
+  - name: live-clone-sync
+    depends: main-pin
+    timeout_sec: 180
+    run: |
+      exec /usr/bin/nice -n 19 /usr/bin/ionice -c 3 /bin/bash \
+        "${NATIVE_STACK_MAINTENANCE_ROOT}/live-clone-sync.sh" "${NATIVE_STACK_REPOSITORY}"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]

@@ -1,0 +1,42 @@
+# Dagu 2.18.2 schema: dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4
+# Source: NativeStack ecosystem-upkeep units/input, read 2026-10-06T04:28:26Z/04:29:26Z.
+description: "Run one bounded native Claude qualification and upkeep cycle"
+schedule: "CRON_TZ=America/New_York 45 9 * * *"
+catchup_window: "2d"
+overlap_policy: latest
+hist_retention_days: 60
+timeout_sec: 2880
+working_dir: "${HOME}/code/native-agent-stack-live"
+env:
+  NATIVE_STACK_REPOSITORY: "${HOME}/code/native-agent-stack-live"
+  NATIVE_STACK_MAINTENANCE_ROOT: "${HOME}/.local/lib/native-agent-stack/dagu-upkeep"
+  NATIVE_STACK_UPKEEP_TASK: "${HOME}/.config/native-agent-stack/upkeep-task.md"
+  NATIVE_STACK_UPKEEP_STATE: "${HOME}/.local/state/native-agent-stack-upkeep"
+  PATH: "${HOME}/.local/share/mise/shims:${HOME}/.local/bin:${HOME}/.local/share/codex-ecosystem/bin:/usr/local/bin:/usr/bin:/bin"
+  CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS: "0"
+  GIT_TERMINAL_PROMPT: "0"
+preconditions:
+  - condition: /bin/bash "${NATIVE_STACK_MAINTENANCE_ROOT}/heavy-window-check.sh" 2880
+steps:
+  - name: refresh-live-clone
+    timeout_sec: 180
+    # Source Wants/After is weak: the upkeep command still runs after a sync failure.
+    # Keep that failure visible; do not mark it successful for GREEN acceptance.
+    continue_on:
+      failure: true
+    run: |
+      exec /usr/bin/nice -n 19 /usr/bin/ionice -c 3 /bin/bash \
+        "${NATIVE_STACK_MAINTENANCE_ROOT}/live-clone-sync.sh" "${NATIVE_STACK_REPOSITORY}"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]
+  - name: upkeep
+    depends: refresh-live-clone
+    timeout_sec: 2700
+    run: |
+      umask 0077
+      mkdir -p "${NATIVE_STACK_UPKEEP_STATE}"
+      exec /usr/bin/nice -n 19 claude -p --model opus --effort max --permission-mode auto \
+        --max-turns 80 --output-format json < "${NATIVE_STACK_UPKEEP_TASK}" \
+        >> "${NATIVE_STACK_UPKEEP_STATE}/runs.log"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]

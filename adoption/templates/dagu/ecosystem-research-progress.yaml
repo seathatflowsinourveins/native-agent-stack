@@ -1,0 +1,40 @@
+# Dagu 2.18.2 schema: dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4
+# Source read 2026-10-06T04:26:27Z: 30-second inactive timer; co-op A6 confirms this mapping.
+# Scheduler minute ticks are source evidence; the co-op's real run is acceptance.
+description: "Publish two bounded public research checkpoints per minute to this host's Loki"
+schedule: "CRON_TZ=America/New_York * * * * *"
+hist_retention_days: 60
+timeout_sec: 75
+working_dir: "${HOME}/code/native-agent-stack-live"
+env:
+  NATIVE_STACK_REPOSITORY: "${HOME}/code/native-agent-stack-live"
+  NATIVE_STACK_MAINTENANCE_ROOT: "${HOME}/.local/lib/native-agent-stack/dagu-upkeep"
+  NATIVE_STACK_PROGRESS_CACHE: "${HOME}/.local/state/native-agent-stack/dagu-upkeep/progress-cache.json"
+  NATIVE_STACK_LOKI_PUSH_URL: "http://127.0.0.1:21300/loki/api/v1/push"
+  PYTHONDONTWRITEBYTECODE: "1"
+steps:
+  - name: emit-first
+    timeout_sec: 20
+    run: |
+      umask 0077
+      exec /usr/bin/setpriv --no-new-privs /usr/bin/nice -n 19 /usr/bin/ionice -c 2 -n 7 \
+        /usr/bin/python3 "${NATIVE_STACK_MAINTENANCE_ROOT}/progress.py" \
+        --repo "${NATIVE_STACK_REPOSITORY}" --cache "${NATIVE_STACK_PROGRESS_CACHE}" \
+        --loki-url "${NATIVE_STACK_LOKI_PUSH_URL}"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]
+  - name: wait-30s
+    depends: emit-first
+    timeout_sec: 35
+    run: /usr/bin/nice -n 19 /usr/bin/sleep 30
+  - name: emit-second
+    depends: wait-30s
+    timeout_sec: 20
+    run: |
+      umask 0077
+      exec /usr/bin/setpriv --no-new-privs /usr/bin/nice -n 19 /usr/bin/ionice -c 2 -n 7 \
+        /usr/bin/python3 "${NATIVE_STACK_MAINTENANCE_ROOT}/progress.py" \
+        --repo "${NATIVE_STACK_REPOSITORY}" --cache "${NATIVE_STACK_PROGRESS_CACHE}" \
+        --loki-url "${NATIVE_STACK_LOKI_PUSH_URL}"
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]

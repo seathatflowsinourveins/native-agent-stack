@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import datetime as dt
+import hashlib
 import http.client
 import json
 import os
@@ -420,6 +421,21 @@ def check_notify_url(url: str) -> str:
     return url
 
 
+def check_alertmanager_url(url: str) -> str:
+    """The existing native Alertmanager's credential-free loopback API v2 route."""
+    try:
+        parts = urllib.parse.urlsplit(url)
+        port = parts.port
+    except ValueError:
+        raise UsageError("invalid loopback Alertmanager URL") from None
+    if (parts.scheme != "http" or parts.hostname not in NOTIFY_HOSTS
+            or parts.username is not None or parts.password is not None or parts.query or parts.fragment
+            or parts.path != "/api/v2/alerts" or (port is not None and not 0 < port < 65536)):
+        raise UsageError("Alertmanager URL must be http://127.0.0.1[:PORT]/api/v2/alerts "
+                         "or http://localhost[:PORT]/api/v2/alerts")
+    return url
+
+
 def lane_hygiene(items: list[dict]) -> dict:
     """docs/lanes.md: every pull request carries exactly one of the three lane labels, and a
     lane:shared one needs the other lane's acknowledgement (listed, not checked here). An
@@ -607,6 +623,32 @@ def send_notice(url: str, message: str, opener=None) -> None:
         response.read(1024)
 
 
+def send_alertmanager_notice(url: str, message: str, opener=None) -> None:
+    """POST a bounded alert using Alertmanager v0.34.1's API v2 schema.
+
+    Sources: prometheus/alertmanager@73c6bfe7393929211294c1954f30d8ed78e4d0ad,
+    api/v2/openapi.yaml postableAlerts; the host's value-free paper-alert unit
+    supplies severity/unit/host routing labels. HTTP acceptance is not Telegram
+    delivery. No proxy, redirect, credential header, title or issue body.
+    """
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, *args, **kwargs):
+            return None
+
+    opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    alert = {"labels": {"alertname": "NativeStackHostRequest", "severity": "critical",
+                        "unit": "host-requests-workstation", "host": "NativeStack2604",
+                        "notice": hashlib.sha256(message.encode("utf-8")).hexdigest()[:16]},
+             "annotations": {"summary": message, "description": "workstation host-request state event"}}
+    request = urllib.request.Request(check_alertmanager_url(url),
+                                     data=json.dumps([alert], separators=(",", ":")).encode("utf-8"),
+                                     method="POST", headers={"Content-Type": "application/json"})
+    with opener.open(request, timeout=5) as response:
+        if response.status != 200:
+            raise OSError("Alertmanager did not acknowledge the alert")
+        response.read(1024)
+
+
 # ---------------------------------------------------------------------------------------------
 # Poll state
 
@@ -790,6 +832,9 @@ def cmd_status(args, context) -> int:
 def cmd_poll(args, context) -> int:
     if args.notify_url:
         check_notify_url(args.notify_url)
+    alertmanager_url = getattr(args, "notify_alertmanager_url", None)
+    if alertmanager_url:
+        check_alertmanager_url(alertmanager_url)
     state_file = Path(args.state_file) if args.state_file else default_state_file(args.role)
     report = role_status(context["gh"], context["roles"], args.role, context["now"])
     current = {str(entry["number"]): poll_record(entry) for entry in report["items"]}
@@ -801,14 +846,17 @@ def cmd_poll(args, context) -> int:
                              "polled_at": report["generated_at"], "truncated": report["truncated"],
                              "items": current})
     print(f"host_requests poll {args.role}: {len(current)} items, {len(events)} events", file=sys.stderr)
-    if args.notify_url:
+    if args.notify_url or alertmanager_url:
         live = [event for event in events if not event.get("baseline")]
         messages = [notice(event) for event in live[:NOTIFY_CAP]]
         if len(live) > NOTIFY_CAP:
             messages.append(f"{len(live) - NOTIFY_CAP} more host request events")
         for message in messages:
             try:
-                context["notify"](args.notify_url, message)
+                if alertmanager_url:
+                    context["notify_alertmanager"](alertmanager_url, message)
+                else:
+                    context["notify"](args.notify_url, message)
             except (OSError, http.client.HTTPException) as error:  # URLError is an OSError
                 print(f"host_requests: notice not sent: {type(error).__name__}", file=sys.stderr)
                 break
@@ -989,7 +1037,11 @@ def build_parser() -> argparse.ArgumentParser:
     poll = commands.add_parser("poll", parents=[common], help="status, diffed against the last poll (read-only on GitHub)")
     poll.add_argument("--role", required=True)
     poll.add_argument("--state-file", help="default: ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/host-requests/ROLE.json")
-    poll.add_argument("--notify-url", help="loopback ntfy topic URL for a fixed one-line notice per event")
+    notifications = poll.add_mutually_exclusive_group()
+    notifications.add_argument("--notify-url", help="loopback ntfy topic URL for a fixed one-line notice per event")
+    notifications.add_argument("--notify-alertmanager-url", help="loopback Alertmanager API v2 alert URL")
+    poll.add_argument("--stack-root", type=Path,
+                      help="repository containing current role definitions (for a reviewed runtime copy)")
     poll.set_defaults(handler=cmd_poll)
 
     lanes = commands.add_parser("lanes", parents=[common], help="lane-label hygiene of open pull requests (read-only)")
@@ -1022,12 +1074,15 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=None, *, runner=subprocess.run, notify=send_notice, now=None, root: Path = ROOT) -> int:
+def main(argv=None, *, runner=subprocess.run, notify=send_notice, notify_alertmanager=send_alertmanager_notice,
+         now=None, root: Path = ROOT) -> int:
     args = build_parser().parse_args(argv)
     try:
         if getattr(args, "repo", None) and not REPO_RE.fullmatch(args.repo):
             raise UsageError("--repo must be OWNER/NAME")
+        root = getattr(args, "stack_root", None) or root
         context = {"roles": load_roles(root), "now": now or now_utc(), "notify": notify,
+                   "notify_alertmanager": notify_alertmanager,
                    "gh": Gh(runner, repo=getattr(args, "repo", None), cwd=root)}
         return args.handler(args, context)
     except GhError as error:
