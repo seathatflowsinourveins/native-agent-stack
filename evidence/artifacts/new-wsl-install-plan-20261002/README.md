@@ -677,3 +677,19 @@ a broad rollback when another operator has changed the selected request/package.
 These are planned host steps, not a completed platform or upstream-suite
 qualification. The focused contract tests reject unknown managers, missing pins,
 source/command drift, default-dispatch leakage and undated exclusions.
+
+The complete transfer-inventory.json closes72missing filenames:30legacy bin
+names plus42bin/sbin names from all69legacy-only package records. Ten explicit
+install rows cover seven native transactions; the four pkgconf aliases share one
+pinned apt transaction. Sixty-two dated exclusions retain consumer/owner gaps.
+This count includes backup artifacts, version-specific SDK aliases and a daemon,
+not72distinct products. No OS library/ABI wholesale transfer is implied.
+
+Exact sequential host apply, native readbacks and manager-scoped rollbacks are in
+[cli-transfer.md](../../../adoption/new-wsl/cli-transfer.md). Transfer self-tests
+disable mise auto-install so absent tools fail without fetching/installing. Their
+negative option controls require both nonzero status and a native parser signal;
+the Gitleaks detector fixture stays a distinct synthetic check. Excluded rows
+require a source file at an existing full Git pin and cannot leak execution into
+default install/accept dispatch. New transfer self-tests remain UNRUN here;
+existing helper version/help observations stay separate from installation proof.

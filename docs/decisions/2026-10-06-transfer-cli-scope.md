@@ -50,3 +50,23 @@ Local contract checks are separate from future host/native self-tests. No host
 installation, configuration, privileged mount or new foundation acceptance is
 performed by this repository change.
 
+The completed read-only inventory extends the initial user-bin scope with all69
+legacy-only packages' bin/sbin filenames. It accounts for72missing names, including
+versioned SDK/backup/service artifacts rather than72products. Ten named rows use
+seven native transactions; pkgconf's four alias rows share one exact Ubuntu
+package/binary/library transaction. Sixty-two dated exclusions preserve their
+source references and open consumer/owner gaps. The checker rejects exclusion
+execution leaks, nonexistent/floating source locators, malformed origins and
+missing auto-install guards; it verifies consistency rather than consumer truth.
+
+A9B keeps Poppler26.09.0 migration open for foundation automation only if a
+retained consumer appears; current MinerU ownership excludes its two legacy CLIs.
+The later supported conda/mise source lead is retained for that owner and does not
+override the ruling. A10A excludes the two unowned legacy wrappers while keeping
+their purpose/consumer question with native-stack-migration-completion before R5.
+Source bins remain intact for retirement salvage; no equivalence is asserted.
+
+Restored service/model CLI packages do not close delivery, collection/query,
+embedding/model or GPU acceptance. Repository guard wrappers remain P1-GIT's
+paired host step. Current rootless Docker uses gvisor-tap-vsock, so a slirp4netns
+install would add an unneeded alternative and may change automatic selection.

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "id": "p1-cli-local-checks-20261006",
+  "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "evidence_class": "local_integration",
+  "commands": [
+    {
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "python3",
+        "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+      ],
+      "exit_code": 0,
+      "returned_output": "OK: 84 rows: 63 installed (60 by the default run, 3 only when named), 2 measurement-only, 19 not installed; 185 commands and 113 acceptance entries agree with the scripts (2 additional checks included)\nTransfer CLIs: 72 scoped rows, 10 named-only installs; foundation owners/defaults unchanged\n"
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_new_wsl_transfer_clis",
+        "tests.test_new_wsl_definitive_defaults",
+        "tests.test_new_wsl_client_config"
+      ],
+      "exit_code": 0,
+      "tests": 323,
+      "skipped": 3,
+      "duration_seconds": 95.518,
+      "returned_summary": "Ran 323 tests in 95.518s; OK (skipped=3)",
+      "output_sha256": "15a9cc48a45540bd9fb02fcb81f169455e8930abfb444ecbf0dd16d340a22c91"
+    }
+  ],
+  "skipped_cases": [
+    "tests.test_new_wsl_definitive_defaults.StatuslineInstallAndAcceptance.test_refresh_interval_5_is_added_only_when_absent_in_the_file_itself",
+    "tests.test_new_wsl_definitive_defaults.StatuslineInstallAndAcceptance.test_the_acceptance_passes_what_install_leaves_an_added_5_or_a_kept_earlier_value",
+    "tests.test_new_wsl_definitive_defaults.StatuslineInstallAndAcceptance.test_the_interval_check_before_the_review_rejected_the_kept_value"
+  ],
+  "input_sha256": {
+    "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py": "deebf5190c1134068905248ee40b7dafd3e9b7192b52f5375890f9b0571a41b5",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json": "2ebb3e6ca16371109cd619af3bc02ad30f9e648aac203dac12d56eb03d518823",
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh": "1bc6889c275e5bd777c876f76c6f50683471729b29e4eb64a7928c84568063a4",
+    "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh": "6d2311cb6ec96094195c2916d3ecc54f38a868db9b712edbbf43c614683a2c24",
+    "evidence/artifacts/new-wsl-install-plan-20261002/transfer-mise.toml": "df61be9d3b5c71b564b942761b48682c9f0891a9516efd90150be21087a460fc",
+    "evidence/artifacts/new-wsl-install-plan-20261002/transfer-inventory.json": "021f52b890fc29807e9e063482849bc5095eb1c6a8c3b2670d320705853b9daa",
+    "tests/test_new_wsl_transfer_clis.py": "ec0af2b2d60cdf5392de3df12da7b918638524944349d1223f1d5f2eef74a8fa",
+    "tests/test_new_wsl_definitive_defaults.py": "c5141e71b206e305923ac41dec80090484b563e46e24b9fe5efb0c9e6fd277ae",
+    "tests/test_new_wsl_client_config.py": "fc53272498f2f2222cc604cfcd485935ad20c4896fff4fc415774fb8bb78ed0f"
+  },
+  "runbook_syntax": {
+    "adoption/new-wsl/cli-transfer.md": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "adoption/new-wsl/repository-transfer.md": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "discriminating_controls": [
+    "foundation84/63 ownership preserved; extra catalog default rejected",
+    "source/command/pin drift rejected; additional apt binary/library pins checked",
+    "all missing inventory names require decisions; duplicates/pending inventories rejected",
+    "installed and excluded transfer rows cannot leak execution into default dispatch",
+    "excluded rows need dated rationale and an existing source blob at a full Git pin",
+    "malformed origin kind yields validation errors, not traceback",
+    "missing synthetic shim fails without an install marker; removing auto-install guard creates the marker"
+  ],
+  "limitations": [
+    "Local contract tests and synthetic missing-shim fixtures are not unchanged upstream suites.",
+    "New transfer native self-tests are planned and UNRUN. Existing helper version/help and metadata reads are separate host observations.",
+    "Three conditional statusline tests were skipped and are not counted as passes. Exact names recovered from the original323-character progress stream and unittest loader order, without rerunning tests.",
+    "No host install, service/config change, fresh provider/model/broker execution or merge.",
+    "Read-only source critic found no material runbook blocker; Claude read remains required before ready.",
+    "Initial validation failures and corrected checks remain in owned private runtime outputs; no failing native upstream suite was edited or skipped."
+  ]
+}

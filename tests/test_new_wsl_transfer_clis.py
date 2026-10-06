@@ -1,5 +1,10 @@
 """Discriminating local contract controls for Phase1 named-only CLI transfer."""
 import copy
+import re
+import json
+from pathlib import Path
+import subprocess
+import tempfile
 import unittest
 
 from tests import test_new_wsl_definitive_defaults as plan_checks
@@ -151,9 +156,17 @@ class TransferCLIPlanChecks(unittest.TestCase):
 
     def added_row_check(self, row):
         """Use the existing plan-copy checker; never run an installer."""
+        if not row["installed"]:
+            row.setdefault("decision_source", {
+                "path": "adoption/manifest.json",
+                "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+            })
         slot = row["slot"]
         install = row.get("commands", [])
         if row["installed"]:
+            entry = row["acceptance"]["post_install"]
+            if not entry["command"].startswith("export MISE_AUTO_INSTALL=0\n"):
+                entry["command"] = "export MISE_AUTO_INSTALL=0\n" + entry["command"]
             manager = row["prerequisite_tools"][0]
             install_function = (
                 f"{slot}() {{\\n  command -v {manager} >/dev/null || return 69\\n"
@@ -177,14 +190,19 @@ class TransferCLIPlanChecks(unittest.TestCase):
             state = "not-needed"
 
         def install_text(text):
-            text = text.replace("|transfer-cli-gitleaks) ;;", f"|transfer-cli-gitleaks|{slot}) ;;")
+            text = re.sub(r"(^  ''\|[^\n]+)(\) ;;)$",
+                          lambda match: match[1] + f"|{slot}" + match[2], text,
+                          count=1, flags=re.M)
             text = text.replace("if $list; then", install_function + "if $list; then")
-            line = "  printf '%s\\n' 'transfer-cli-gitleaks | Gitleaks | mise | planned-named-only'"
-            text = text.replace(line, line + f"\n  printf '%s\\n' '{slot} | {row['owner']} | {row['route']} | {state}'")
+            boundary = '  exit 0\nfi\ncase "$only" in'
+            text = text.replace(boundary,
+                                f"  printf '%s\\n' '{slot} | {row['owner']} | {row['route']} | {state}'\n" + boundary)
             return text.replace('exit "$failed"', install_dispatch + 'exit "$failed"')
 
         def accept_text(text):
-            text = text.replace("|transfer-cli-gitleaks) ;;", f"|transfer-cli-gitleaks|{slot}) ;;")
+            text = re.sub(r"(^  ''\|[^\n]+)(\) ;;)$",
+                          lambda match: match[1] + f"|{slot}" + match[2], text,
+                          count=1, flags=re.M)
             text = text.replace('if [[ -z "$only" || "$only" == claude-code ]]', accept_function +
                                 'if [[ -z "$only" || "$only" == claude-code ]]', 1)
             return text.replace('exit "$failed"', accept_dispatch + 'exit "$failed"')
@@ -203,6 +221,91 @@ class TransferCLIPlanChecks(unittest.TestCase):
                "reason": "Superseded by the chosen native owner", "not_needed_on": "2026-10-06"}
         code, out = self.added_row_check(row)
         self.assertEqual(code, 0, out)
+
+    def test_excluded_install_cannot_leak_into_default_execution(self):
+        code, out = self.run_check(change_install=lambda text: text.replace(
+            'exit "$failed"', "if selected 'transfer-cli-dotnet'; then run_command 'false'; fi\nexit \"$failed\""))
+        self.assertEqual(code, 1, out)
+        self.assertIn("unapproved not-needed dispatch", out)
+
+    def test_excluded_acceptance_cannot_run_without_its_selector(self):
+        code, out = self.run_check(change_accept=lambda text: text.replace(
+            'exit "$failed"', 'skipped transfer-cli-dotnet\nexit "$failed"'))
+        self.assertEqual(code, 1, out)
+        self.assertIn("unapproved not-needed dispatch", out)
+
+    def rejected_exclusion_source(self, source):
+        def mutate(plan):
+            row = next(row for row in plan["transfer_clis"] if row["cli"] == "dotnet")
+            row["decision_source"] = source
+        code, out = self.run_check(change_transfer=mutate)
+        self.assertEqual(code, 1, out)
+        self.assertIn("not-needed decision_source", out)
+        self.assertNotIn("Traceback", out)
+
+    def test_missing_exclusion_source_is_rejected(self):
+        self.rejected_exclusion_source({})
+
+    def test_exclusion_source_cannot_escape_the_repository(self):
+        self.rejected_exclusion_source({"path": "../outside.md", "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"})
+
+    def test_exclusion_source_needs_an_existing_commit_object(self):
+        self.rejected_exclusion_source({"path": "adoption/manifest.json", "revision": "f" * 40})
+
+    def test_exclusion_source_cannot_float_on_main(self):
+        self.rejected_exclusion_source({"path": "adoption/manifest.json", "revision": "main"})
+
+    def test_exclusion_source_must_be_a_file_not_a_tree(self):
+        self.rejected_exclusion_source({"path": "adoption", "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"})
+
+    def test_secondary_apt_packages_cannot_use_floating_versions(self):
+        def mutate(plan):
+            row = next(row for row in plan["transfer_clis"] if row["cli"] == "pkgconf")
+            row["additional_apt_packages"]["pkgconf-bin"] = "latest"
+        code, out = self.run_check(change_transfer=mutate)
+        self.assertEqual(code, 1, out)
+        self.assertIn("additional apt packages must have exact pins", out)
+
+    def test_secondary_apt_pin_must_match_the_native_transaction(self):
+        def mutate(plan):
+            row = next(row for row in plan["transfer_clis"] if row["cli"] == "pkgconf")
+            row["additional_apt_packages"]["pkgconf-bin"] = "2.5.1-3"
+        code, out = self.run_check(change_transfer=mutate)
+        self.assertEqual(code, 1, out)
+        self.assertIn("differs from its apt pin", out)
+
+    def test_malformed_origin_kind_is_rejected_without_traceback(self):
+        for kind in ([], {}):
+            with self.subTest(kind=kind):
+                code, out = self.run_check(change_transfer=lambda plan: plan["transfer_clis"][0]["origin"].update(kind=kind))
+                self.assertEqual(code, 1, out)
+                self.assertIn("transfer origin", out)
+                self.assertNotIn("Traceback", out)
+
+    def test_mise_self_test_must_disable_auto_install(self):
+        self.reject_row(lambda row, plan: row["acceptance"]["post_install"].update(
+            command=row["acceptance"]["post_install"]["command"].removeprefix("export MISE_AUTO_INSTALL=0\n")),
+            "disable mise auto-install")
+
+    def test_missing_mise_cli_fails_without_install_side_effect(self):
+        """Synthetic shim boundary; this is not an upstream mise acceptance test."""
+        plan = json.loads((plan_checks.PLAN / "install-plan.json").read_text())
+        row = next(row for row in plan["transfer_clis"] if row["cli"] == "gitleaks")
+        command = row["acceptance"]["post_install"]["command"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            binary = root / "gitleaks"
+            binary.write_text('#!/bin/sh\nif [ "${MISE_AUTO_INSTALL:-1}" = 0 ]; then exit 127; fi\n'
+                              'touch "$AUTO_INSTALL_MARKER"\nprintf "8.30.1\\n"\n')
+            binary.chmod(0o700)
+            marker = root / "would-install"
+            env = {"PATH": str(root) + ":/usr/bin:/bin", "HOME": str(root), "AUTO_INSTALL_MARKER": str(marker)}
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", command], env=env, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse(marker.exists())
+            subprocess.run(["bash", "-euo", "pipefail", "-c", command.removeprefix("export MISE_AUTO_INSTALL=0\n")],
+                           env=env, capture_output=True)
+            self.assertTrue(marker.exists(), "control must discriminate the missing auto-install guard")
 
     def test_inventory_cannot_silently_drop_a_missing_cli(self):
         code, out = self.run_check(change_inventory=lambda inventory: inventory.update(

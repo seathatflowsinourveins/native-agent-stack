@@ -33,7 +33,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance|transfer-cli-gitleaks) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance|transfer-cli-gitleaks|transfer-cli-grype|transfer-cli-ntfy|transfer-cli-qdrant|transfer-cli-tvly|transfer-cli-vllm|transfer-cli-agent-browser|transfer-cli-agent-relay|transfer-cli-amtool|transfer-cli-claude.bak-20260929-max-default|transfer-cli-claude.bak-20260929-max-default-v1|transfer-cli-codex-omniroute|transfer-cli-context-mode|transfer-cli-dotnet|transfer-cli-ecosystem-bounded-run|transfer-cli-gitleaks-guarded|transfer-cli-hindsight|transfer-cli-huggingface-cli|transfer-cli-kernel_keyring.py|transfer-cli-llama-cli|transfer-cli-llama-server|transfer-cli-mcp-inspector|transfer-cli-pdfinfo|transfer-cli-pdftotext|transfer-cli-promtool|transfer-cli-socraticode|transfer-cli-tiny-agents|transfer-cli-tvly-keyring|transfer-cli-pkgconf|transfer-cli-pkg-config|transfer-cli-x86_64-linux-gnu-pkgconf|transfer-cli-x86_64-linux-gnu-pkg-config|transfer-cli-apt-extracttemplates|transfer-cli-apt-ftparchive|transfer-cli-apt-sortpkgs|transfer-cli-cpan5.38-x86_64-linux-gnu|transfer-cli-cpp-13|transfer-cli-gxx-13|transfer-cli-gcc-13|transfer-cli-gcc-ar-13|transfer-cli-gcc-nm-13|transfer-cli-gcc-ranlib-13|transfer-cli-gcov-13|transfer-cli-gcov-dump-13|transfer-cli-gcov-tool-13|transfer-cli-gdk-pixbuf-csource|transfer-cli-gdk-pixbuf-pixdata|transfer-cli-gdk-pixbuf-thumbnailer|transfer-cli-lto-dump-13|transfer-cli-pdb3.12|transfer-cli-perl5.38-x86_64-linux-gnu|transfer-cli-pkcon|transfer-cli-pkmon|transfer-cli-pydoc3.12|transfer-cli-pygettext3.12|transfer-cli-session-migration|transfer-cli-slirp4netns|transfer-cli-uuidd|transfer-cli-uuidgen|transfer-cli-uuidparse|transfer-cli-x86_64-linux-gnu-cpp-13|transfer-cli-x86_64-linux-gnu-gxx-13|transfer-cli-x86_64-linux-gnu-gcc-13|transfer-cli-x86_64-linux-gnu-gcc-ar-13|transfer-cli-x86_64-linux-gnu-gcc-nm-13|transfer-cli-x86_64-linux-gnu-gcc-ranlib-13|transfer-cli-x86_64-linux-gnu-gcov-13|transfer-cli-x86_64-linux-gnu-gcov-dump-13|transfer-cli-x86_64-linux-gnu-gcov-tool-13|transfer-cli-x86_64-linux-gnu-lto-dump-13|transfer-cli-native-stack-sign-in|transfer-cli-nativestack) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -2242,11 +2242,11 @@ fi'
 }
 
 transfer-cli-gitleaks() {
-  # Phase1 transfer-only CLI; explicit --only selection required.
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md
-      check transfer-cli-gitleaks smoke 'test "$(gitleaks version)" = 8.30.1
+      check transfer-cli-gitleaks smoke 'export MISE_AUTO_INSTALL=0
+test "$(gitleaks version)" = 8.30.1
 cli_work="$(mktemp -d)"
 trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
 printf '"'"'%s\n'"'"' '"'"'This native CLI fixture contains no credentials.'"'"' > "$cli_work/README.txt"
@@ -2273,6 +2273,192 @@ assert any(row.get("RuleID") == "github-pat" for row in findings), "native findi
 PY'
       ;;
     *) skipped transfer-cli-gitleaks ;;
+  esac
+}
+
+
+transfer-cli-grype() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/jdx/mise/blob/v2026.10.1/registry/grype.toml
+      check transfer-cli-grype smoke 'export MISE_AUTO_INSTALL=0
+grype --version 2>&1 | grep -E '"'"'(^|[[:space:]])0[.]119[.]0([[:space:],]|$)'"'"'
+grype --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+grype --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-grype ;;
+  esac
+}
+
+transfer-cli-ntfy() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/binwiederhier/ntfy/blob/v2.28.0/cmd/app.go
+      check transfer-cli-ntfy smoke 'export MISE_AUTO_INSTALL=0
+ntfy --version 2>&1 | grep -E '"'"'(^|[[:space:]])2[.]28[.]0([[:space:],]|$)'"'"'
+ntfy --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+ntfy --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-ntfy ;;
+  esac
+}
+
+transfer-cli-qdrant() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/qdrant/qdrant/blob/v1.19.1/src/main.rs
+      check transfer-cli-qdrant smoke 'export MISE_AUTO_INSTALL=0
+qdrant --version 2>&1 | grep -E '"'"'(^|[[:space:]])1[.]19[.]1([[:space:],]|$)'"'"'
+qdrant --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+qdrant --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-qdrant ;;
+  esac
+}
+
+transfer-cli-tvly() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://pypi.org/project/tavily-cli/0.1.8/
+      check transfer-cli-tvly smoke 'export MISE_AUTO_INSTALL=0
+tvly --version 2>&1 | grep -E '"'"'(^|[[:space:]])0[.]1[.]8([[:space:],]|$)'"'"'
+tvly --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+tvly --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-tvly ;;
+  esac
+}
+
+transfer-cli-vllm() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/vllm/entrypoints/cli/main.py
+      check transfer-cli-vllm smoke 'export MISE_AUTO_INSTALL=0
+vllm --version 2>&1 | grep -E '"'"'(^|[[:space:]])0[.]30[.]0([[:space:],]|$)'"'"'
+vllm --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+vllm --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-vllm ;;
+  esac
+}
+
+
+transfer-cli-pkgconf() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c
+      check transfer-cli-pkgconf smoke 'export MISE_AUTO_INSTALL=0
+test "$(dpkg-query -W -f='"'"'${Version}'"'"' pkgconf-bin)" = 2.5.1-4
+test "$(pkgconf --version)" = 2.5.1
+pkgconf --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+pkgconf --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined|invalid option'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-pkgconf ;;
+  esac
+}
+
+transfer-cli-pkg-config() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c
+      check transfer-cli-pkg-config smoke 'export MISE_AUTO_INSTALL=0
+test "$(dpkg-query -W -f='"'"'${Version}'"'"' pkgconf-bin)" = 2.5.1-4
+test "$(pkg-config --version)" = 2.5.1
+pkg-config --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+pkg-config --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined|invalid option'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-pkg-config ;;
+  esac
+}
+
+transfer-cli-x86_64-linux-gnu-pkgconf() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c
+      check transfer-cli-x86_64-linux-gnu-pkgconf smoke 'export MISE_AUTO_INSTALL=0
+test "$(dpkg-query -W -f='"'"'${Version}'"'"' pkgconf-bin)" = 2.5.1-4
+test "$(x86_64-linux-gnu-pkgconf --version)" = 2.5.1
+x86_64-linux-gnu-pkgconf --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+x86_64-linux-gnu-pkgconf --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined|invalid option'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-x86_64-linux-gnu-pkgconf ;;
+  esac
+}
+
+transfer-cli-x86_64-linux-gnu-pkg-config() {
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c
+      check transfer-cli-x86_64-linux-gnu-pkg-config smoke 'export MISE_AUTO_INSTALL=0
+test "$(dpkg-query -W -f='"'"'${Version}'"'"' pkgconf-bin)" = 2.5.1-4
+test "$(x86_64-linux-gnu-pkg-config --version)" = 2.5.1
+x86_64-linux-gnu-pkg-config --help >/dev/null
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+rc=0
+x86_64-linux-gnu-pkg-config --ns-transfer-invalid-option >"$cli_work/control.log" 2>&1 || rc=$?
+test "$rc" -ne 0
+grep -F -- '"'"'ns-transfer-invalid-option'"'"' "$cli_work/control.log" >/dev/null
+grep -Ei '"'"'unknown|unexpected|unrecognized|no such|not defined|invalid option'"'"' "$cli_work/control.log" >/dev/null
+printf '"'"'native CLI invalid-option control exit=%s\n'"'"' "$rc"'
+      ;;
+    *) skipped transfer-cli-x86_64-linux-gnu-pkg-config ;;
   esac
 }
 
@@ -2351,4 +2537,75 @@ if [[ -z "$only" || "$only" == skill-vetting ]]; then skill-vetting; fi
 if [[ -z "$only" || "$only" == trajectory-analysis ]]; then trajectory-analysis; fi
 if [[ "$only" == mcp-protocol-conformance ]]; then mcp-protocol-conformance; elif [[ -z "$only" ]]; then skipped mcp-protocol-conformance; fi
 if [[ "$only" == transfer-cli-gitleaks ]]; then transfer-cli-gitleaks; fi
+if [[ "$only" == transfer-cli-grype ]]; then transfer-cli-grype; fi
+if [[ "$only" == transfer-cli-ntfy ]]; then transfer-cli-ntfy; fi
+if [[ "$only" == transfer-cli-qdrant ]]; then transfer-cli-qdrant; fi
+if [[ "$only" == transfer-cli-tvly ]]; then transfer-cli-tvly; fi
+if [[ "$only" == transfer-cli-vllm ]]; then transfer-cli-vllm; fi
+if [[ "$only" == transfer-cli-agent-browser ]]; then skipped transfer-cli-agent-browser; fi
+if [[ "$only" == transfer-cli-agent-relay ]]; then skipped transfer-cli-agent-relay; fi
+if [[ "$only" == transfer-cli-amtool ]]; then skipped transfer-cli-amtool; fi
+if [[ "$only" == transfer-cli-claude.bak-20260929-max-default ]]; then skipped transfer-cli-claude.bak-20260929-max-default; fi
+if [[ "$only" == transfer-cli-claude.bak-20260929-max-default-v1 ]]; then skipped transfer-cli-claude.bak-20260929-max-default-v1; fi
+if [[ "$only" == transfer-cli-codex-omniroute ]]; then skipped transfer-cli-codex-omniroute; fi
+if [[ "$only" == transfer-cli-context-mode ]]; then skipped transfer-cli-context-mode; fi
+if [[ "$only" == transfer-cli-dotnet ]]; then skipped transfer-cli-dotnet; fi
+if [[ "$only" == transfer-cli-ecosystem-bounded-run ]]; then skipped transfer-cli-ecosystem-bounded-run; fi
+if [[ "$only" == transfer-cli-gitleaks-guarded ]]; then skipped transfer-cli-gitleaks-guarded; fi
+if [[ "$only" == transfer-cli-hindsight ]]; then skipped transfer-cli-hindsight; fi
+if [[ "$only" == transfer-cli-huggingface-cli ]]; then skipped transfer-cli-huggingface-cli; fi
+if [[ "$only" == transfer-cli-kernel_keyring.py ]]; then skipped transfer-cli-kernel_keyring.py; fi
+if [[ "$only" == transfer-cli-llama-cli ]]; then skipped transfer-cli-llama-cli; fi
+if [[ "$only" == transfer-cli-llama-server ]]; then skipped transfer-cli-llama-server; fi
+if [[ "$only" == transfer-cli-mcp-inspector ]]; then skipped transfer-cli-mcp-inspector; fi
+if [[ "$only" == transfer-cli-pdfinfo ]]; then skipped transfer-cli-pdfinfo; fi
+if [[ "$only" == transfer-cli-pdftotext ]]; then skipped transfer-cli-pdftotext; fi
+if [[ "$only" == transfer-cli-promtool ]]; then skipped transfer-cli-promtool; fi
+if [[ "$only" == transfer-cli-socraticode ]]; then skipped transfer-cli-socraticode; fi
+if [[ "$only" == transfer-cli-tiny-agents ]]; then skipped transfer-cli-tiny-agents; fi
+if [[ "$only" == transfer-cli-tvly-keyring ]]; then skipped transfer-cli-tvly-keyring; fi
+if [[ "$only" == transfer-cli-pkgconf ]]; then transfer-cli-pkgconf; fi
+if [[ "$only" == transfer-cli-pkg-config ]]; then transfer-cli-pkg-config; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-pkgconf ]]; then transfer-cli-x86_64-linux-gnu-pkgconf; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-pkg-config ]]; then transfer-cli-x86_64-linux-gnu-pkg-config; fi
+if [[ "$only" == transfer-cli-apt-extracttemplates ]]; then skipped transfer-cli-apt-extracttemplates; fi
+if [[ "$only" == transfer-cli-apt-ftparchive ]]; then skipped transfer-cli-apt-ftparchive; fi
+if [[ "$only" == transfer-cli-apt-sortpkgs ]]; then skipped transfer-cli-apt-sortpkgs; fi
+if [[ "$only" == transfer-cli-cpan5.38-x86_64-linux-gnu ]]; then skipped transfer-cli-cpan5.38-x86_64-linux-gnu; fi
+if [[ "$only" == transfer-cli-cpp-13 ]]; then skipped transfer-cli-cpp-13; fi
+if [[ "$only" == transfer-cli-gxx-13 ]]; then skipped transfer-cli-gxx-13; fi
+if [[ "$only" == transfer-cli-gcc-13 ]]; then skipped transfer-cli-gcc-13; fi
+if [[ "$only" == transfer-cli-gcc-ar-13 ]]; then skipped transfer-cli-gcc-ar-13; fi
+if [[ "$only" == transfer-cli-gcc-nm-13 ]]; then skipped transfer-cli-gcc-nm-13; fi
+if [[ "$only" == transfer-cli-gcc-ranlib-13 ]]; then skipped transfer-cli-gcc-ranlib-13; fi
+if [[ "$only" == transfer-cli-gcov-13 ]]; then skipped transfer-cli-gcov-13; fi
+if [[ "$only" == transfer-cli-gcov-dump-13 ]]; then skipped transfer-cli-gcov-dump-13; fi
+if [[ "$only" == transfer-cli-gcov-tool-13 ]]; then skipped transfer-cli-gcov-tool-13; fi
+if [[ "$only" == transfer-cli-gdk-pixbuf-csource ]]; then skipped transfer-cli-gdk-pixbuf-csource; fi
+if [[ "$only" == transfer-cli-gdk-pixbuf-pixdata ]]; then skipped transfer-cli-gdk-pixbuf-pixdata; fi
+if [[ "$only" == transfer-cli-gdk-pixbuf-thumbnailer ]]; then skipped transfer-cli-gdk-pixbuf-thumbnailer; fi
+if [[ "$only" == transfer-cli-lto-dump-13 ]]; then skipped transfer-cli-lto-dump-13; fi
+if [[ "$only" == transfer-cli-pdb3.12 ]]; then skipped transfer-cli-pdb3.12; fi
+if [[ "$only" == transfer-cli-perl5.38-x86_64-linux-gnu ]]; then skipped transfer-cli-perl5.38-x86_64-linux-gnu; fi
+if [[ "$only" == transfer-cli-pkcon ]]; then skipped transfer-cli-pkcon; fi
+if [[ "$only" == transfer-cli-pkmon ]]; then skipped transfer-cli-pkmon; fi
+if [[ "$only" == transfer-cli-pydoc3.12 ]]; then skipped transfer-cli-pydoc3.12; fi
+if [[ "$only" == transfer-cli-pygettext3.12 ]]; then skipped transfer-cli-pygettext3.12; fi
+if [[ "$only" == transfer-cli-session-migration ]]; then skipped transfer-cli-session-migration; fi
+if [[ "$only" == transfer-cli-slirp4netns ]]; then skipped transfer-cli-slirp4netns; fi
+if [[ "$only" == transfer-cli-uuidd ]]; then skipped transfer-cli-uuidd; fi
+if [[ "$only" == transfer-cli-uuidgen ]]; then skipped transfer-cli-uuidgen; fi
+if [[ "$only" == transfer-cli-uuidparse ]]; then skipped transfer-cli-uuidparse; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-cpp-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-cpp-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gxx-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gxx-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcc-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcc-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcc-ar-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcc-ar-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcc-nm-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcc-nm-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcc-ranlib-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcc-ranlib-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcov-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcov-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcov-dump-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcov-dump-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-gcov-tool-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-gcov-tool-13; fi
+if [[ "$only" == transfer-cli-x86_64-linux-gnu-lto-dump-13 ]]; then skipped transfer-cli-x86_64-linux-gnu-lto-dump-13; fi
+if [[ "$only" == transfer-cli-native-stack-sign-in ]]; then skipped transfer-cli-native-stack-sign-in; fi
+if [[ "$only" == transfer-cli-nativestack ]]; then skipped transfer-cli-nativestack; fi
 exit "$failed"

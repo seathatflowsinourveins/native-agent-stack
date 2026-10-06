@@ -1640,7 +1640,11 @@ class InterimPlanChecks(unittest.TestCase):
                 path.write_text(change_transfer_mise(path.read_text(encoding="utf-8")), encoding="utf-8")
             if change_inventory:
                 path = plan_dir / "transfer-inventory.json"
-                data = load(path) if path.exists() else {"status": "complete", "missing_cli_names": []}
+                data = load(path) if path.exists() else {
+                    "status": "complete",
+                    "missing_cli_names": [row["cli"] for row in
+                                          load(plan_dir / "install-plan.json").get("transfer_clis", [])],
+                }
                 change_inventory(data)
                 path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
             result = subprocess.run([sys.executable, "-B", str(PLAN / "check_plan.py"), "--plan-dir", str(plan_dir),
