@@ -25,10 +25,10 @@ or experiment word while sessions run.
    development allowance); the Claude chain also needs the run's completion policy decided by a CC amendment
    (prepare.py --claude-completion ... --amendment-ref ...).
 5  collect.py.  6  grade.py trials.
-Resume: --from-stage 2 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
-launch (meter, lock, DEFER), or a Claude trial the launcher killed at its own first meter reading, is carried forward. --from-stage 2 --rerun-gate0-failures runs once more only the stage-2
-tests whose gate-0 check failed (for example a Claude probe stopped by the meter, in the next 5-hour window), then
-collects and checks gate 0 again. A DEFER.claude flag is cleared on resume once the newest meter reading allows a
+Resume: --from-stage 2, 3 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
+launch (meter, lock, DEFER), or a Claude trial the launcher killed at its own first meter reading, is carried forward.
+--from-stage 2 --rerun-gate0-failures runs once more only the stage-2 tests whose gate-0 check failed (for example a
+Claude probe stopped by the meter, in the next 5-hour window), then collects and checks gate 0 again. A DEFER.claude flag is cleared on resume once the newest meter reading allows a
 start; STOP flags stay until the operator removes them.
 """
 from __future__ import annotations
