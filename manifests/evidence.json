@@ -4817,8 +4817,8 @@
     },
     {
       "path": "adoption/hooks/claude/skill-state-recorder-proposal.md",
-      "sha256": "00bc57a14c358098eaa67ad1ccaf91d1a86584892ef9287114fbace7e03effe9",
-      "bytes": 9849
+      "sha256": "402e030a7bf6d1a1d4b0441865c83f2e62c27d9c0c510ba8e565276428a17a45",
+      "bytes": 12446
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -17360,6 +17360,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-tier-a-skill-state-recorder.md",
+      "sha256": "ad116ef5ebd69e72828fc92ccfd85bce41b0d41846d10af55626d29847a9fd57",
+      "bytes": 6135
     },
     {
       "path": "docs/direct-results.md",
@@ -46337,6 +46342,11 @@
       "bytes": 2966
     },
     {
+      "path": "evidence/artifacts/skills-tier-a-recorder-20261006/fifo-profile-correction.json",
+      "sha256": "47af92d05fd8ad608e47b4d9f5e3430c9218ae2e7704c7ba67c8568e65812af0",
+      "bytes": 7811
+    },
+    {
       "path": "evidence/artifacts/skills-tier-a-recorder-20261006/source-review.json",
       "sha256": "7482ad13600c5b70934e146c63ec5e44362b98ea2279b24a69cc567a6b316b13",
       "bytes": 6169
@@ -55413,8 +55423,8 @@
     },
     {
       "path": "tests/test_skill_state_recorder.py",
-      "sha256": "6310149faa9dcc6935543c2f4b44a5ddc475fdcef781f9c38b0d9d8d401f16fa",
-      "bytes": 15744
+      "sha256": "581825d66770db16cfd3423ce7b0464b8d8c657da0b700f2f16173ac8c528c1e",
+      "bytes": 27543
     },
     {
       "path": "tests/test_skill_usage.py",
@@ -55673,8 +55683,8 @@
     },
     {
       "path": "tools/adoption/skill_state_recorder.py",
-      "sha256": "065133f130be0d170c5524d11b187f09486321490069204d264a85f87adfbdae",
-      "bytes": 20435
+      "sha256": "78b27bf27c6de9bbee5b061abe3204acdd1c4a1e8235aa9235a699c697a4369d",
+      "bytes": 25740
     },
     {
       "path": "tools/capability-gate/README.md",
