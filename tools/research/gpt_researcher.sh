@@ -8,7 +8,12 @@
 # (2026-10-03; evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.gpt-runtimes, changes 2-5):
 # - tools/research/gpt-researcher.config.json preserves session 80's measured profile without its key, with the
 #   dated compatibility amendments in integration-resolutions.json:repair_round_4.research_configuration_amendment
-#   (unsuffixed smart/strategic aliases and explicit xhigh follow #637; this is not a new measurement).
+#   (2026-10-05) and research_configuration_amendment_2026_10_06; neither is a new measurement. Since 2026-10-06
+#   each role's effort rides on its alias suffix alone: fast cx/gpt-6.1-sol-high, smart and strategic
+#   cx/gpt-6.1-sol-xhigh, and no LLM_KWARGS.reasoning_effort. GPT Researcher has one LLM_KWARGS for all three roles
+#   (config/variables/base.py L35 at 0957c301; utils/llm.py L103-104), and the gateway lets a suffix outrank a body
+#   effort (OmniRoute 3.8.51 open-sse/executors/codex.ts L1428-1433), so a shared xhigh went upstream as high on the
+#   fast alias.
 #   Each run gets its own copy, in its own directory, with base_url set to the gateway below and one
 #   x-omniroute-session-id value, the join key of the gateway's call log
 #   (OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/handlers/chatCore.ts:1087-1090,1133).
@@ -24,7 +29,33 @@
 #   by absolute path, since the scrubbed PATH (/usr/bin:/bin) has no timeout on macOS: GNU coreutils' timeout, else
 #   gtimeout, the name Homebrew's coreutils gives it there. With neither, the research run fails closed (exit 1) before it
 #   starts; --preflight-only does not need one.
-# No credential is read or printed. It prints the upstream CLI's output, then "run directory: <path>".
+# - A source guard fails closed after the CLI exits 0. Upstream's CLI writes one report under outputs/ in its working
+#   directory (the run directory), headed by YAML frontmatter whose sources_count is len(researcher.visited_urls)
+#   (cli.py L209-245, L225, L241 and L332-336 at 0957c301). That set holds the URLs a run tried to read, not the pages it
+#   read: skills/researcher.py adds a URL when it is picked for scraping (L813-834) or after a scrape whatever its outcome
+#   (L1088-1098), and each prefetched result (L911-913, L922-924), so a count above 0 is necessary, not sufficient, for
+#   usable sources. Without exactly one report, a single sources_count line in a closed frontmatter, or with
+#   sources_count 0, the run exits 3: a report written from no sources reads as a success but is not research evidence
+#   (run 20261005T222529Z-1387309). The guard reads lines split at "\n" only, as upstream joins them (cli.py L245), and a
+#   query with a line break is refused (exit 2): cli.py's _yaml_quote (L220-222) escapes only backslashes and double
+#   quotes, so such a query could forge that line.
+# - The retriever stays duckduckgo (diagnosis of that run, 2026-10-05). At 0957c301, which is also main, it calls ddgs
+#   text() with region 'wt-wt' and ddgs's default backend 'auto', and exposes neither to configuration
+#   (gpt_researcher/retrievers/duckduckgo/duckduckgo.py L30-52); ddgs 9.16.0, the newest release, reads only DDGS_PROXY
+#   (ddgs/ddgs.py L53). An engine returns nothing and raises nothing both on an HTTP status other than 200 (ddgs/base.py
+#   L65-70, L120-121) and on a 200 without hits (engines/wikipedia.py L47-48), so a failed search reports wikipedia's
+#   DNS error for wt.wikipedia.org instead (engines/wikipedia.py L35-39; 'wt-wt' is no ddgs region, deedy5/ddgs#417).
+#   The probable cause of that run is throttling of this busy host: an unretained probe 6-10 minutes later saw brave
+#   429, duckduckgo 202, google and mojeek 403 and yahoo alone with results; arxiv, openalex and semantic_scholar gave
+#   five off-topic results, none and a 429, so adding them would hide a dead web search behind scholarly hits. The
+#   durable keyless route owed is SearXNG through the searx retriever, after its service and the 30-query measurement
+#   (docs/decisions/2026-10-01-new-wsl-definitive-defaults.md L80).
+# No credential is read or printed. It prints the upstream CLI's output, then "run directory: <path>", then the report's
+# "sources_count: <n>". Exit status: 0 with a count above 0; 2 when the wrapper refuses its arguments (not exactly one
+# non-empty, one-line query); 1 when GPT Researcher is not installed, the preflight fails or no timer is found; 3 when
+# the source guard fails. Any other status passes through unchanged from the timed CLI run, so it can repeat one of
+# these: the CLI's own (argparse's usage error is also 2), 124 when the watchdog stops it, and 125-127 when the timer or
+# env cannot run (timeout --help, "Exit status").
 # GPTR_CONFIG_SOURCE names another configuration to copy (the tests use it); the preflight holds any copy to the same rule.
 set -euo pipefail
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,6 +69,10 @@ if (( $# != 1 )) || [[ -z "$1" ]]; then
   exit 2
 fi
 query="$1"
+if [[ "$query" == *[$'\n\r']* ]]; then
+  printf 'The query must be one line: GPT Researcher writes it unescaped into its report frontmatter (cli.py L220-222), where a line break could forge the sources_count line the source guard reads.\n' >&2
+  exit 2
+fi
 if [[ ! -x "$python" || ! -f "$checkout/cli.py" ]]; then
   printf 'GPT Researcher is not installed under %s (install plan row research-harnesses).\n' "$checkout" >&2
   exit 1
@@ -83,15 +118,27 @@ if config.retrievers != ["duckduckgo"]:
     problems.append(f"retrievers {config.retrievers!r}, not ['duckduckgo']")
 if getattr(config, "context_filter", None) != "keyword":
     problems.append(f"context filter {getattr(config, 'context_filter', None)!r}, not 'keyword'")
-wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol"),
-          "strategic": ("openai", "cx/gpt-6.1-sol")}
+wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol-xhigh"),
+          "strategic": ("openai", "cx/gpt-6.1-sol-xhigh")}
 for role, pair in wanted.items():
     found = (getattr(config, f"{role}_llm_provider", None), getattr(config, f"{role}_llm_model", None))
     if found != pair:
         problems.append(f"{role} model {found!r}, not {pair!r}")
 kwargs = getattr(config, "llm_kwargs", None) or {}
-if kwargs.get("reasoning_effort") != "xhigh":
-    problems.append("gateway research reasoning_effort must be xhigh on OmniRoute 3.8.51")
+
+
+def keys(value):
+    """Every key at any depth: model_kwargs or extra_body would carry an effort into the request body as well."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from keys(item)
+
+
+efforts = sorted({key for key in keys(kwargs) if key in ("reasoning_effort", "reasoning")})
+if efforts:
+    problems.append(f"LLM_KWARGS sets {', '.join(efforts)}, which every role would send; each role's alias suffix "
+                    "carries its effort")
 base_url = kwargs.get("base_url")
 if not base_url == os.environ.get("OPENAI_BASE_URL") == gateway:
     problems.append(f"base_url {base_url!r} and OPENAI_BASE_URL {os.environ.get('OPENAI_BASE_URL')!r} are not {gateway!r}")
@@ -110,4 +157,29 @@ status=0
 "${scrub[@]}" "$timer" 1500 "$python" "$checkout/cli.py" "$query" --report_type research_report --tone objective --no-pdf --no-docx \
   || status=$?
 printf 'run directory: %s\n' "$run"
-exit "$status"
+if (( status != 0 )); then
+  exit "$status"
+fi
+# The source guard (see above), in the same scrubbed environment; any failure of it, its own included, exits 3.
+"${scrub[@]}" "$python" - "$run/outputs" <<'PY' || exit 3
+import re
+import sys
+from pathlib import Path
+
+outputs = Path(sys.argv[1])
+reports = sorted(outputs.glob("*.md")) if outputs.is_dir() else []
+if len(reports) != 1:
+    sys.exit(f"source guard failed: {len(reports)} reports in {outputs}, not one, so the run's sources cannot be counted")
+lines = reports[0].read_text(encoding="utf-8", errors="replace").split("\n")
+end = lines.index("---", 1) if lines[:1] == ["---"] and "---" in lines[1:] else 0
+counts = [int(found.group(1)) for line in lines[1:end] if (found := re.fullmatch(r"sources_count: (\d+)", line.strip()))]
+if len(counts) != 1:
+    sys.exit(f"source guard failed: {reports[0]} has no single sources_count line in a closed frontmatter, so its sources "
+             "cannot be counted")
+count = counts[0]
+if count == 0:
+    sys.exit(f"source guard failed: GPT Researcher retrieved 0 sources (sources_count: 0 in {reports[0]}). A report written "
+             "from no sources is not research evidence. The keyless search engines behind the duckduckgo retriever were "
+             "probably throttling this host; retry later.")
+print(f"sources_count: {count}")
+PY

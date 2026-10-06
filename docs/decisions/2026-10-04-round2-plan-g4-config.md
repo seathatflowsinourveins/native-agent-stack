@@ -68,6 +68,14 @@ installs. Add the installed runner's preflight and an
 effective DeerFlow endpoint/model/tool read-back. The fresh native Codex caller
 uses its native Sol/max route.
 
+Amended 2026-10-06 (the command center's effort ruling): GPT Researcher's fast
+model keeps the high suffix. Its smart and strategic models now carry xhigh on
+their own alias, `cx/gpt-6.1-sol-xhigh`, instead of the plain route plus a shared
+`LLM_KWARGS.reasoning_effort`. That shared parameter also reached the fast alias,
+where the gateway's suffix outranked it. DeerFlow is unchanged. Record:
+`evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json`,
+`repair_round_4.research_configuration_amendment_2026_10_06`.
+
 Sources: `assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:gpt_researcher/config/config.py:63`
 and `:158`; `bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:backend/packages/harness/deerflow/config/app_config.py:681`
 and `:backend/packages/harness/deerflow/client.py:1229`;

@@ -19458,8 +19458,8 @@
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json",
-      "sha256": "8dd4d08202e4f334fa0c47ebe4d210c4e4a4d96eba990b76cb09cc17203a99e9",
-      "bytes": 101093
+      "sha256": "efdf4068504ac43c7f752767a422b0e5d5a2f0ac9c67d1bce258d172893a70d1",
+      "bytes": 109788
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/landscape-verdicts.json",
@@ -39688,8 +39688,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "24d3893580420960e71dfe9c91bdf8ba547cb0db4d0bfbd6a047ad1fb8305f83",
-      "bytes": 171237
+      "sha256": "04770802710f7fbe030ccdea468c5c169e94e5acfe6b4ca9e97dfbfdc8733c78",
+      "bytes": 171606
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39803,8 +39803,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/gateway-effort-accept.py",
-      "sha256": "31eeb4c45f9f5c3d53c5294438ee0ad8a749e705035db8db57a1782bf235e6e5",
-      "bytes": 5672
+      "sha256": "d97381e26c205de60ed55848646e0cfdc89ba5be7866addd1f0807aae7c5bb42",
+      "bytes": 6527
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-client-accept.sh",
@@ -40003,8 +40003,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "5cab5a09a793a78bc48ac4d31d9ec2b409d75c58831b06426dae41776db4ba05",
-      "bytes": 387919
+      "sha256": "95662681f894a865ad54dc497edd2ed3d5922abe4f8d496c2ccc85d89044b0af",
+      "bytes": 388531
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54998,8 +54998,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "fc53272498f2f2222cc604cfcd485935ad20c4896fff4fc415774fb8bb78ed0f",
-      "bytes": 282444
+      "sha256": "f825e4a63dc1aa632161a6cec242a8b78b7c4621e2e0a3880b9bd67dc33b2743",
+      "bytes": 283467
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",

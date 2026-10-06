@@ -1,7 +1,7 @@
 {
  "FAST_LLM": "openai:cx/gpt-6.1-sol-high",
- "SMART_LLM": "openai:cx/gpt-6.1-sol",
- "STRATEGIC_LLM": "openai:cx/gpt-6.1-sol",
+ "SMART_LLM": "openai:cx/gpt-6.1-sol-xhigh",
+ "STRATEGIC_LLM": "openai:cx/gpt-6.1-sol-xhigh",
  "LLM_KWARGS": {
   "base_url": "http://127.0.0.1:21128/v1",
   "temperature": null,
@@ -11,8 +11,7 @@
   "timeout": 600,
   "default_headers": {
    "x-omniroute-session-id": "set-per-run-by-gpt_researcher.sh"
-  },
-  "reasoning_effort": "xhigh"
+  }
  },
  "RETRIEVER": "duckduckgo",
  "CONTEXT_FILTER": "keyword",

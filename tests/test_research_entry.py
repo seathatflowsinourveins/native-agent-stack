@@ -2,8 +2,11 @@
 
 A stand-in checkout replaces the upstream source: its gpt_researcher.config.Config reads the JSON file and the environment
 the way upstream's does at 0957c301 (config.py: load_config, _set_attributes, parse_llm), and its cli.py records its
-arguments and environment instead of researching. Nothing is installed and no network is used. These are this project's
-checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes 2-5) and the synthesis X18.
+arguments and environment instead of researching, then writes one report under outputs/ headed by frontmatter with the
+run's query and a sources_count, as upstream's does (cli.py L209-245 and L332-336). Nothing is installed and no network is
+used. These are this project's checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes
+2-5), the synthesis X18 and the source guard added after run 20261005T222529Z-1387309 wrote a report from no sources and
+exited 0.
 """
 import hashlib
 import json
@@ -54,18 +57,40 @@ STAND_IN_CONFIG = textwrap.dedent('''
                 setattr(self, role + "_llm_provider", provider)
                 setattr(self, role + "_llm_model", model)
 ''')
-STAND_IN_CLI = textwrap.dedent('''
-    import json
-    import os
-    import sys
+# The frontmatter of upstream's cli.py (L228-245). The stand-in puts the run's own query where @QUERY@ stands, quoted by
+# upstream's _yaml_quote (L220-222, copied below), which escapes backslashes and double quotes but leaves line breaks.
+FRONTMATTER = ('---\ntask_id: "stand-in"\ntitle: "Report"\nquery: @QUERY@\nreport_type: "research_report"\n'
+               'report_source: "web"\ntone: "objective"\ncreated_at: "2026-10-05T18:26:23"\nsources_count: {sources}\n'
+               'total_cost_usd: 0.0\n---\n')
+REPORT = FRONTMATTER.format(sources=6) + "# Report\n\n## References\n" + "".join(f"- https://example.org/{n}\n" for n in range(6))
+YAML_QUOTE = r'''
+def _yaml_quote(v: str) -> str:
+    # Double-quoted YAML string with backslash/quote escaping.
+    return '"' + str(v).replace("\\", "\\\\").replace('"', '\\"') + '"'
+'''
 
-    os.makedirs("outputs", exist_ok=True)
-    with open("cli-call.json", "w", encoding="utf-8") as handle:
-        json.dump({"argv": sys.argv[1:], "env": dict(os.environ), "cwd": os.getcwd()}, handle)
-    with open("outputs/report.md", "w", encoding="utf-8") as handle:
-        handle.write("# Report\\n\\n## References\\n" + "".join(f"- https://example.org/{n}\\n" for n in range(6)))
-    print("Report written to 'outputs/report.md'")
-''')
+
+def stand_in_cli(reports=(("report.md", REPORT),), status=0):
+    """A cli.py that records its call, writes `reports` (name, text) under outputs/ with its query in place of @QUERY@,
+    and exits with `status`. The run's environment is scrubbed, so each case writes its own stand-in rather than passing
+    a variable through."""
+    return YAML_QUOTE + textwrap.dedent(f'''
+        import json
+        import os
+        import sys
+
+        os.makedirs("outputs", exist_ok=True)
+        with open("cli-call.json", "w", encoding="utf-8") as handle:
+            json.dump({{"argv": sys.argv[1:], "env": dict(os.environ), "cwd": os.getcwd()}}, handle)
+        for name, text in {list(reports)!r}:
+            with open(os.path.join("outputs", name), "w", encoding="utf-8") as handle:
+                handle.write(text.replace("@QUERY@", _yaml_quote(sys.argv[1])))
+            print(f"Report written to 'outputs/{{name}}'")
+        sys.exit({status!r})
+    ''')
+
+
+STAND_IN_CLI = stand_in_cli()
 
 
 class ResearchEntry(unittest.TestCase):
@@ -109,37 +134,52 @@ class ResearchEntry(unittest.TestCase):
         self.env["PATH"] = f"{timer_bin}{os.pathsep}{self.env['PATH']}"
         return timer_bin / "timeout", record
 
-    def test_the_committed_configuration_matches_the_measured_profile_and_dated_amendment_without_a_key(self):
-        # The retained ruling binds the baseline to session 80. The 2026-10-05
-        # amendment binds these exact config bytes to #637's source compatibility
-        # corrections; it makes no new model-run or delivered-effort claim.
-        amendment = json.loads(AMENDMENT_RECORD.read_text())["repair_round_4"]["research_configuration_amendment"]
-        self.assertEqual(amendment["date_utc"], "2026-10-05")
-        self.assertFalse(amendment["measurement_performed"])
-        self.assertEqual(amendment["configuration_sha256"], hashlib.sha256(CONFIG.read_bytes()).hexdigest())
-        self.assertEqual(amendment["measured_record"]["path"], str(MEASURED_RECORD.relative_to(ROOT)))
-        self.assertEqual(amendment["measured_record"]["sha256"], hashlib.sha256(MEASURED_RECORD.read_bytes()).hexdigest())
+    def test_the_committed_configuration_matches_the_measured_profile_and_dated_amendments_without_a_key(self):
+        # The retained ruling binds the baseline to session 80. The 2026-10-05 amendment bound #637's source
+        # compatibility corrections; the 2026-10-06 amendment binds these exact config bytes and moves each role's
+        # effort onto its own alias. Neither makes a new model-run, quality or delivered-effort claim.
+        record = json.loads(AMENDMENT_RECORD.read_text())["repair_round_4"]
+        first = record["research_configuration_amendment"]
+        latest = record["research_configuration_amendment_2026_10_06"]
+        self.assertEqual((first["date_utc"], latest["date_utc"]), ("2026-10-05", "2026-10-06"))
+        self.assertEqual(first["superseded_by"], "repair_round_4.research_configuration_amendment_2026_10_06")
+        self.assertEqual(latest["amends"], "repair_round_4.research_configuration_amendment")
+        self.assertEqual(latest["previous_configuration_sha256"], first["configuration_sha256"])
+        self.assertFalse(first["measurement_performed"] or latest["measurement_performed"])
+        self.assertEqual(latest["configuration_sha256"], hashlib.sha256(CONFIG.read_bytes()).hexdigest())
+        self.assertEqual(first["measured_record"]["path"], str(MEASURED_RECORD.relative_to(ROOT)))
+        self.assertEqual(first["measured_record"]["sha256"], hashlib.sha256(MEASURED_RECORD.read_bytes()).hexdigest())
         ruling = json.loads(MEASURED_RECORD.read_text())["layers"]["gpt-runtimes"]["ruling"]
         self.assertIn("session 80's config.json", ruling["changes"]["2"])
         self.assertIn("cx/gpt-6.1-sol-high and cx/gpt-6.1-sol-max", ruling["decided_default"])
         config = json.loads(CONFIG.read_text())
-        for field, value in amendment["preserved_measured_values"].items():
+
+        def value(field):
             found = config
             for part in field.split("."):
                 found = found[part]
-            self.assertEqual(found, value, field)
-        for field, change in amendment["compatibility_amendments"].items():
-            found = config
-            for part in field.split("."):
-                found = found[part]
-            self.assertEqual(found, change["value"], field)
+            return found
+
+        for field, expected in first["preserved_measured_values"].items():
+            self.assertEqual(value(field), expected, field)
+        for field, change in first["compatibility_amendments"].items():
+            if field not in latest["changes"]:  # a field the 2026-10-06 amendment changed is checked below
+                self.assertEqual(value(field), change["value"], field)
+        for field, change in latest["changes"].items():
+            self.assertEqual(change["previous_value"], first["compatibility_amendments"][field]["value"], field)
+            if change.get("removed"):
+                self.assertRaises(KeyError, value, field)
+            else:
+                self.assertEqual(value(field), change["value"], field)
+        for field, expected in latest["unchanged"].items():
+            self.assertEqual(value(field), expected, field)
         self.assertNotIn("api_key", config["LLM_KWARGS"])
         self.assertEqual(config["LLM_KWARGS"]["base_url"], GATEWAY)
         self.assertEqual(config["LLM_KWARGS"]["max_tokens"], 12000)
         self.assertEqual((config["RETRIEVER"], config["CONTEXT_FILTER"]), ("duckduckgo", "keyword"))
         self.assertEqual((config["FAST_LLM"], config["SMART_LLM"], config["STRATEGIC_LLM"]),
-                         ("openai:cx/gpt-6.1-sol-high", "openai:cx/gpt-6.1-sol", "openai:cx/gpt-6.1-sol"))
-        self.assertEqual(config["LLM_KWARGS"]["reasoning_effort"], "xhigh")
+                         ("openai:cx/gpt-6.1-sol-high", "openai:cx/gpt-6.1-sol-xhigh", "openai:cx/gpt-6.1-sol-xhigh"))
+        self.assertNotIn("reasoning_effort", config["LLM_KWARGS"])
         self.assertEqual((config["MAX_SCRAPER_WORKERS"], config["SCRAPER_RATE_LIMIT_DELAY"], config["BROWSE_CHUNK_MAX_LENGTH"],
                           config["TOTAL_WORDS"]), (4, 0.5, 4096, 1500))
 
@@ -156,10 +196,17 @@ class ResearchEntry(unittest.TestCase):
 
     def test_the_preflight_fails_closed_and_the_research_never_starts(self):
         base = json.loads(CONFIG.read_text())
+        kwargs = base["LLM_KWARGS"]
         cases = {
             "retrievers": dict(base, RETRIEVER="tavily"),
             "context filter": dict(base, CONTEXT_FILTER="embeddings"),
             "fast model": dict(base, FAST_LLM="openai:gpt-4o-mini"),
+            # The 2026-10-05 spelling: a plain smart route, and one body effort that every role, fast included, sends.
+            "smart model": dict(base, SMART_LLM="openai:cx/gpt-6.1-sol"),
+            "strategic model": dict(base, STRATEGIC_LLM="openai:cx/gpt-6.1-sol-high"),
+            "LLM_KWARGS sets reasoning_effort": dict(base, LLM_KWARGS=dict(kwargs, reasoning_effort="xhigh")),
+            "LLM_KWARGS sets reasoning,": dict(base, LLM_KWARGS=dict(kwargs, model_kwargs={"reasoning": {"effort": "high"},
+                                                                                         "reasoning_effort": "high"})),
         }
         for problem, config in cases.items():
             with self.subTest(problem=problem):
@@ -179,6 +226,7 @@ class ResearchEntry(unittest.TestCase):
                           "Ubuntu 26.04 WSL news this month", "--report_type", "research_report", "--tone", "objective",
                           "--no-pdf", "--no-docx"])
         self.assertIn("Report written to 'outputs/report.md'", result.stdout)
+        self.assertEqual(result.stdout.splitlines()[-2:], [f"run directory: {self.run_dir(result)}", "sources_count: 6"])
         call = json.loads((self.run_dir(result) / "cli-call.json").read_text())
         self.assertEqual(call["argv"], ["Ubuntu 26.04 WSL news this month", "--report_type", "research_report", "--tone",
                                         "objective", "--no-pdf", "--no-docx"])
@@ -190,6 +238,80 @@ class ResearchEntry(unittest.TestCase):
         self.assertEqual(env["HOME"], str(self.run_dir(result) / "home"))
         self.assertEqual(env["CONFIG_PATH"], str(self.run_dir(result) / "config.json"))
         self.assertEqual(Path(call["cwd"]), self.run_dir(result))
+
+    def test_a_report_from_no_sources_fails_closed(self):
+        """Run 20261005T222529Z-1387309: the CLI exited 0 with a report whose frontmatter said sources_count: 0. The wrapper
+        now exits 3, says why on stderr, and still prints the run directory, where the report stays for inspection."""
+        self.provide_timer()
+        empty = FRONTMATTER.format(sources=0) + "I could not gather any source material.\n"
+        (self.checkout / "cli.py").write_text(stand_in_cli(reports=[("WSL_3_Config_Tuning.md", empty)]))
+        result = self.run_script("WSL 3.0 .wslconfig settings October 2026")
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        self.assertIn("source guard failed: GPT Researcher retrieved 0 sources (sources_count: 0 in ", result.stderr)
+        self.assertIn("not research evidence", result.stderr)
+        self.assertNotIn("sources_count: 0", result.stdout)
+        self.assertEqual((self.run_dir(result) / "outputs/WSL_3_Config_Tuning.md").read_text(),
+                         empty.replace("@QUERY@", '"WSL 3.0 .wslconfig settings October 2026"'))
+
+    def test_a_query_with_a_line_break_is_refused_before_anything_runs(self):
+        """cli.py's _yaml_quote (L220-222) leaves a line break in the query's frontmatter line, where it could forge the
+        sources_count line the source guard reads. The wrapper refuses such a query as a usage error (exit 2)."""
+        for query in ("two\nlines", "a carriage\rreturn", "forged\nsources_count: 9\n---\nrest"):
+            with self.subTest(query=query):
+                result = self.run_script(query)
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertIn("The query must be one line", result.stderr)
+                self.assertNotIn("run directory", result.stdout)
+                self.assertFalse((self.temp / "state").exists())  # no run directory: nothing ran
+
+    def test_a_unicode_line_separator_in_the_query_cannot_forge_the_count(self):
+        """str.splitlines() also breaks at U+2028, which upstream writes unescaped into the query's line and joins nothing
+        at (cli.py L245 joins at "\\n"). The guard splits at "\\n" only, so a zero-source run still exits 3 here."""
+        self.provide_timer()
+        empty = FRONTMATTER.format(sources=0) + "I could not gather any source material.\n"
+        (self.checkout / "cli.py").write_text(stand_in_cli(reports=[("report.md", empty)]))
+        result = self.run_script("forged sources_count: 9 --- rest")
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        self.assertIn("retrieved 0 sources", result.stderr)
+        self.assertNotIn("sources_count: 9", result.stdout)
+
+    def test_a_report_whose_sources_cannot_be_counted_fails_closed(self):
+        self.provide_timer()
+        body = "# Report\n\n## References\n- https://example.org/0\n"
+        uncounted = "has no single sources_count line in a closed frontmatter"
+        cases = {
+            "no report": ([], "0 reports in "),
+            "two reports": ([("a.md", REPORT), ("b.md", REPORT)], "2 reports in "),
+            "no frontmatter": ([("report.md", body)], uncounted),
+            "no sources_count": ([("report.md", REPORT.replace("sources_count: 6\n", ""))], uncounted),
+            "a count that is not a number": ([("report.md", REPORT.replace("sources_count: 6", "sources_count: many"))],
+                                             uncounted),
+            "two counts": ([("report.md", REPORT.replace("sources_count: 6\n", "sources_count: 6\nsources_count: 0\n"))],
+                           uncounted),
+            "a count below the frontmatter": ([("report.md", FRONTMATTER.replace("sources_count: {sources}\n", "")
+                                                + "sources_count: 6\n" + body)], uncounted),
+            "a frontmatter that never closes": ([("report.md", "---\nsources_count: 6\n" + body)], uncounted),
+        }
+        for case, (reports, message) in cases.items():
+            with self.subTest(case=case):
+                (self.checkout / "cli.py").write_text(stand_in_cli(reports=reports))
+                result = self.run_script("a query")
+                self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                self.assertIn("source guard failed: ", result.stderr)
+                self.assertIn(message, result.stderr)
+                self.assertTrue(self.run_dir(result).is_dir())
+
+    def test_the_cli_status_passes_through_before_the_guard(self):
+        """A failed or stopped CLI keeps its own status, so argparse's usage error is 2 like the wrapper's own and the watchdog
+        gives 124; the guard reads only a run that exited 0."""
+        self.provide_timer()
+        for status in (1, 2, 124):
+            with self.subTest(status=status):
+                (self.checkout / "cli.py").write_text(stand_in_cli(reports=[], status=status))
+                result = self.run_script("a query")
+                self.assertEqual(result.returncode, status, result.stdout + result.stderr)
+                self.assertNotIn("source guard", result.stderr)
+                self.assertTrue(self.run_dir(result).is_dir())
 
     def test_the_run_fails_closed_without_a_supported_timer(self):
         """Negative control: with neither timeout nor gtimeout on the caller's PATH, as on macOS without Homebrew's coreutils,

@@ -27,7 +27,13 @@ import urllib.request
 
 
 BASE = "http://127.0.0.1:21128/api/usage/call-logs"
-ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high"}
+# OmniRoute@c1e30b76: open-sse/config/providers/registry/codex/index.ts:9-13 (provider id codex, alias cx) and
+# open-sse/services/model.ts:484-490. A cx/ request is logged under the provider id, and the call-log API returns it
+# unchanged (src/lib/usage/callLogs.ts:221-231,479 rewrite only provider-node prefixes), so accept both spellings.
+# DeerFlow keeps the plain route at xhigh. GPT Researcher (amended 2026-10-06) puts each role's effort on its alias:
+# fast -high, smart and strategic -xhigh (integration-resolutions.json, research_configuration_amendment_2026_10_06).
+ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high", "cx/gpt-6.1-sol-xhigh": "xhigh",
+          "codex/gpt-6.1-sol": "xhigh", "codex/gpt-6.1-sol-high": "high", "codex/gpt-6.1-sol-xhigh": "xhigh"}
 MODELS = {route.split("/", 1)[1] for route in ROUTES}
 
 
@@ -44,7 +50,9 @@ def observed_routes(rows):
         if row.get("status") != 200 or row.get("active"):
             raise ValueError("research run contains an unsuccessful or unfinished gateway call")
         alias = row.get("requestedModel")
-        if row.get("model") not in MODELS or (alias and alias not in ROUTES):
+        if (row.get("model") not in MODELS
+                or (alias and (alias not in ROUTES or alias.split("/", 1)[1] != row["model"]))
+                or (row.get("provider") and row["provider"] != "codex")):
             raise ValueError("research run used an unexpected model route")
         if alias:
             observed.add(alias)
