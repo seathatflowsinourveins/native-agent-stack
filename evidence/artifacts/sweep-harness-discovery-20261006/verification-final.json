@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "local_integration",
+  "as_of": "2026-10-06",
+  "evidence_class": "synthetic",
+  "scope": "final unknown-reference wording and frozen repository/skills prompt change detectors",
+  "extends": "evidence/artifacts/sweep-harness-discovery-20261006/verification.json",
+  "correction": "Unreadable prior votes require fresh adjudication; absence=false does not establish a merit judgment. Native template detectors were regenerated and their previous values retained.",
+  "checks": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "tests.test_landscape_sweep_harness",
+      "tests.test_saturation_ledger",
+      "tests.test_convergence_contract",
+      "-v"
+    ],
+    "exit_code": 0,
+    "tests_run": 423,
+    "skipped": 4,
+    "elapsed_seconds": 107.3,
+    "log_sha256": "cf6996674b928a8c7c7aee2f1414d09553dd678a1596f272c40a38fc5ba314d0",
+    "priority": "nice -n 19 ionice -c3"
+  },
+  "source_sha256": {
+    "tools/sota-convergence/landscape-sweep/build_inputs.py": "9ba0dd5d4d3c0e35c3c9c8eb15921f65037eb622dd106668e15e1514712224a6",
+    "tools/sota-convergence/landscape-sweep/templates.json": "20e6839853a31847048e9b9817eedc2e567d1e2f09fbc33b488094a2a03a0d1d",
+    "tests/test_landscape_sweep_harness.py": "e76b876aef77480d2e60890cb45f54c45e9f01708e00f4a104d2c39e35dd5c71",
+    "tests/test_landscape_sweep_discovery_history.py": "3aea7aaa31dd4cbd537955d84439f24fefc984d5145555fb2dc815d1aa3f71a0"
+  },
+  "unchanged_history_suite": {
+    "tests_run": 9,
+    "exit_code": 0,
+    "source_sha256": "3aea7aaa31dd4cbd537955d84439f24fefc984d5145555fb2dc815d1aa3f71a0",
+    "evidence_ref": "evidence/artifacts/sweep-harness-discovery-20261006/verification.json"
+  },
+  "limits": [
+    "Source-review critic accepted after the two wording fixes; instruction presence does not establish observed source ordering or discovery quality.",
+    "Provider-native usage remains unknown for the research gather and review turns; these checks ran no model.",
+    "No historical observation, vote, run hash, saturation calculation or V2 launch guard changed."
+  ]
+}

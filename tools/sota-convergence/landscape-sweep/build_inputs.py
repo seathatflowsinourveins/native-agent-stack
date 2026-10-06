@@ -34,6 +34,14 @@ previous_sweep holds that sweep's survived and refuted repositories. A proposal 
 not return (saturation_ledger.py refuted_by_absence: no returned vote refutes it) is listed under not_adjudicated
 instead, with not_adjudicated_note, so the next discovery round does not read it as refuted on merit.
 
+Repository inputs additionally carry discovery_history: {policy_K, note, sweeps}, the last policy.K completed
+repository sweeps of this layer in ledger order, with recorded scopes and precise retained references. This does
+not change previous_sweep or the default baseline. V1 known_repositories also names that history's recorded
+survived/refuted identities for novelty only; missing-vote outcomes stay new unless independently in the catalog
+or baseline. current_dispositions preserves declared candidate/card and exact layer reconciliation observations
+from the two supplied manifests with canonical parsed-document hashes and pointers. History and dispositions are
+context, not current admission or adoption; neither enters V2's blind input or changes its field/hash rules.
+
 The skills modality (README.md, Skills modality) builds the skills-* layers of catalogs/landscape/skills-lifecycle.json
 instead, one per lifecycle task, keyed by skill (owner/repo@name) rather than repository:
 
@@ -63,6 +71,7 @@ inputs to the future script screen, never a maintenance verdict, model execution
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import re
@@ -80,6 +89,20 @@ CATALOG_FILES = (("foundation", "foundation.json"), ("us-equities", "us-equities
 REPOSITORY = "repository"  # --modality's repository modality (build_args.REPOSITORY_MODALITY)
 NOT_ADJUDICATED_NOTE = ("refuted in that sweep only because a vote did not return (a missing vote counts as refuted); "
                         "no returned vote refuted these, so they were not refuted on merit")
+DISCOVERY_HISTORY_NOTE = (
+    "The last policy.K completed repository sweeps for this layer, in their original ledger order; unrelated "
+    "layers, stopped attempts and skills sweeps do not consume this window. A missing policy.K uses the ledger's "
+    "backward-compatible default of 3. These are recorded historical outcomes, not current exclusions or adoption. "
+    "refuted_by_absence true identifies a missing-vote outcome; false does not prove a merit refutation because "
+    "the native resolver also returns false for unreadable references. Re-read the retained vote references and "
+    "current primary sources before adjudication. Changed or unknown requirement/platform hashes remain context "
+    "only. The window is discovery memory, not the ledger's consecutive-clean-sweep saturation calculation.")
+CURRENT_DISPOSITIONS_NOTE = (
+    "Exact observations from the supplied baseline and freshness manifests, with document aliases and JSON "
+    "pointers. source_document_sha256 binds complete canonical parsed JSON, not raw file bytes. Conflicting "
+    "observations remain distinct; their kind, note or label does not establish current adoption, eligibility or "
+    "refutation. Catalog inclusion and sweep survival do not establish adoption.")
+DISPOSITION_FIELDS = ("proposed_label", "review_status", "decision", "disposition", "adoption_status", "status")
 COMPONENT_FIELDS = ("id", "repository", "pin", "upstream", "pin_behind_upstream", "pin_comparison")
 # How many of a row's open gaps an input shows, and the length each is cut to.
 GAPS_SHOWN, GAP_CLIP = 5, 300
@@ -169,6 +192,138 @@ def previous_by_layer(previous_sweep: dict | None, absent=None) -> dict:
             **({"not_adjudicated": not_adjudicated, "not_adjudicated_note": NOT_ADJUDICATED_NOTE}
                if not_adjudicated else {})}
     return previous
+
+
+def history_policy_k(ledger: dict) -> int:
+    """Use the native ledger's K>=1 policy and its default 3 for older callers without that field.
+
+    Source: scripts/saturation_ledger.py at e28d0eec, empty_ledger and Checker.check.
+    """
+    policy = ledger.get("policy", {})
+    if not isinstance(policy, dict):
+        raise ValueError("ledger policy must be an object")
+    value = policy.get("K", 3)
+    if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+        raise ValueError("ledger policy.K must be an integer >= 1")
+    return value
+
+
+def refutation_absence_observation(entry: dict, absent=None) -> dict:
+    """A missing-vote classification never verifies every retained reference or proves a merit refutation.
+
+    Source: scripts/saturation_ledger.py at e28d0eec, refuted_by_absence. Its false result can include unresolved
+    references. An unavailable callback keeps that uncertainty visible without copying private exception text.
+    """
+    observation = {"refuted_by_absence": None, "reference_verification": "unknown"}
+    if absent is None:
+        return observation
+    try:
+        result = absent(entry)
+    except Exception as error:
+        observation["absence_check_error"] = type(error).__name__
+    else:
+        if isinstance(result, bool):
+            observation["refuted_by_absence"] = result
+        elif result is not None:
+            observation["absence_check_error"] = "non_boolean_result"
+    return observation
+
+
+def repository_history_by_layer(ledger: dict, scope: dict, absent=None) -> tuple[int, dict]:
+    """The last K completed repository sweeps of each layer, without changing last_completed or V2 admission.
+
+    Entries retain exact ledger/vote references and recorded scopes. The history window follows policy.K, while
+    the native ledger alone computes saturation. No retained outcome is a current exclusion or adoption.
+    """
+    limit, history = history_policy_k(ledger), {}
+    for sweep_index, sweep in enumerate(ledger.get("sweeps") or []):
+        if (not isinstance(sweep, dict) or sweep.get("status") != "completed"
+                or sweep_modality(sweep) != REPOSITORY):
+            continue
+        sweep_ref = f"catalogs/saturation/ledger.json#/sweeps/{sweep_index}"
+        for layer_index, layer in enumerate(sweep.get("layers") or []):
+            if not isinstance(layer, dict):
+                continue
+            key = (layer.get("catalog"), layer.get("layer_id"))
+            layer_ref = f"{sweep_ref}/layers/{layer_index}"
+            requirement = layer.get("requirement_sha256")
+            platform = layer.get("platform_profiles_sha256")
+            current_requirement = (scope.get("requirement_sha256") or {}).get(f"{key[0]}/{key[1]}")
+            current_platform = scope.get("platform_profiles_sha256")
+            matches = (requirement == current_requirement and platform == current_platform
+                       if all((requirement, platform, current_requirement, current_platform)) else None)
+            record = {
+                "sweep_id": sweep.get("sweep_id"), "date": sweep.get("date"), "sweep_ref": sweep_ref,
+                "ledger_ref": layer_ref, "requirement_sha256": requirement,
+                "platform_profiles_sha256": platform, "matches_current_scope": matches,
+                **{field: sweep[field] for field in ("workflow_run", "record_ref", "record_sha256", "manifest_ref",
+                                                   "manifest_sha256", "returns_ref", "returns_sha256")
+                   if field in sweep},
+                **({"discovery_ref": layer["discovery_ref"]} if "discovery_ref" in layer else {}),
+                "survived": [], "refuted": [], "not_adjudicated": [],
+            }
+            for field in ("survived", "refuted"):
+                for entry_index, entry in enumerate(layer.get(field) or []):
+                    if not isinstance(entry, dict) or not isinstance(entry.get("repo"), str):
+                        continue
+                    observation = refutation_absence_observation(entry, absent) if field == "refuted" else {
+                        "reference_verification": "unknown"}
+                    compact = {
+                        "repo": entry["repo"], "ledger_ref": f"{layer_ref}/{field}/{entry_index}",
+                        **{role: copy.deepcopy(entry[role]) for role in ("facts", "fit", "lens_votes")
+                           if role in entry}, **observation,
+                    }
+                    destination = "not_adjudicated" if observation.get("refuted_by_absence") is True else field
+                    record[destination].append(compact)
+            records = history.setdefault(key, [])
+            records.append(record)
+            del records[:-limit]
+    return limit, history
+
+
+def current_dispositions_by_layer(baseline: dict | None, freshness: dict, layer_catalog: dict) -> dict:
+    """Project declared observations only from the two supplied manifests; do not infer their status.
+
+    Generic reconciliation rows are retained verbatim by build_manifest.py at e28d0eec:1953-1958. Here they join
+    only by an exact layer and a compatible catalog. A layer-only reconciliation is unambiguous because the input
+    builder rejects duplicate layer ids across catalogs. Candidate/card rows require an explicit disposition field.
+    """
+    observations = {}
+    for label, document in (("baseline_manifest", baseline), ("freshness_manifest", freshness)):
+        if document is None:
+            continue
+        digest = sha256_bytes(json.dumps(document, sort_keys=True, ensure_ascii=False,
+                                       separators=(",", ":")).encode("utf-8"))
+
+        def retain(catalog, layer_id, record, pointer):
+            if not isinstance(layer_id, str) or layer_id not in layer_catalog or layer_catalog[layer_id] != catalog:
+                return
+            observations.setdefault((catalog, layer_id), []).append({
+                "source_document": label, "source_document_id": document.get("id"),
+                "source_checked_at": document.get("checked_at"), "source_document_sha256": digest,
+                "ref": f"{label}#{pointer}", "observation": copy.deepcopy(record),
+            })
+
+        for catalog, _ in CATALOG_FILES:
+            section = MANIFEST_SECTION[catalog]
+            for row_index, row in enumerate(document.get(section) or []):
+                if not isinstance(row, dict):
+                    continue
+                for field in ("components", "entries", "candidates", "alternatives_keep_but_compare", "alternatives"):
+                    for index, record in enumerate(row.get(field) or []):
+                        if isinstance(record, dict) and any(key in record for key in DISPOSITION_FIELDS):
+                            retain(catalog, row.get("layer"), record, f"/{section}/{row_index}/{field}/{index}")
+        for index, record in enumerate(document.get("reconciliations") or []):
+            if not isinstance(record, dict):
+                continue
+            layer_id = record.get("layer_id", record.get("layer"))
+            if not isinstance(layer_id, str):
+                continue
+            if "layer" in record and record["layer"] != layer_id:
+                continue
+            catalog = record.get("catalog", layer_catalog.get(layer_id))
+            retain(catalog, layer_id, record, f"/reconciliations/{index}")
+    return observations
 
 
 def gap_ledger_entries(repo: Path) -> tuple[list, int]:
@@ -607,7 +762,9 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope.
     ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
     refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted.
-    ``followups`` is join_gap_followups' first value; without it every open_gaps_followup is empty."""
+    ``followups`` is join_gap_followups' first value; without it every open_gaps_followup is empty. The additive
+    discovery_history records per-layer K-window provenance and unresolved references; current_dispositions
+    retains exact observations from the supplied manifests. Neither is a current admission or adoption verdict."""
     if contract_version not in (1, 2):
         raise ValueError("contract_version must be 1 or 2")
     if contract_version == 2 and not platform_requirements:
@@ -615,11 +772,15 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     followups = followups or {}
     record_sources = record_sources or {}
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
-    previous = previous_by_layer(last_completed(ledger, REPOSITORY), absent)
+    previous = previous_by_layer(last_completed(ledger, REPOSITORY),
+                                 lambda entry: refutation_absence_observation(entry, absent)["refuted_by_absence"] is True)
+    history_k, history = repository_history_by_layer(ledger, scope, absent)
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
     duplicates = sorted({layer_id for layer_id in all_ids if all_ids.count(layer_id) > 1})
     if duplicates:
         raise ValueError(f"layer ids repeat across catalogs (inputs/<layer_id>.json would collide): {duplicates}")
+    dispositions = current_dispositions_by_layer(baseline, freshness, {
+        layer["layer_id"]: catalog for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]})
     seeds = check_seeds(seeds, all_ids)
     out, missing = [], []
     for catalog, _ in CATALOG_FILES:
@@ -630,6 +791,9 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
             known = {slug(item.get("repository")) for field in ("candidates", "alternatives", "winners")
                      for item in layer.get(field) or []}
             known |= {slug(item.get("repository")) for item in baseline_rows.get(layer_id, {}).get("candidates") or []}
+            if contract_version == 1:
+                known |= {slug(entry["repo"]) for old in history.get((catalog, layer_id), [])
+                          for field in ("survived", "refuted") for entry in old[field]}
             known.discard("")
             fresh = fresh_rows.get(layer_id, {})
             components = [{field: item.get(field) for field in COMPONENT_FIELDS if field in item}
@@ -656,6 +820,10 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                 "verdict_note": VERDICT_NOTE,
                 "overturn_when": (layer.get("overturn_when") or "")[:600],
                 "previous_sweep": previous.get((catalog, layer_id), {}),
+                "discovery_history": {"policy_K": history_k, "note": DISCOVERY_HISTORY_NOTE,
+                                      "sweeps": history.get((catalog, layer_id), [])},
+                "current_dispositions": dispositions.get((catalog, layer_id), []),
+                "current_dispositions_note": CURRENT_DISPOSITIONS_NOTE,
                 "known_repositories": sorted(known),
                 "seeded_candidates": list(seeds.get(layer_id, [])),
             })

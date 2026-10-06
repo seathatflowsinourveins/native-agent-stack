@@ -544,6 +544,35 @@ provides it.
   metadata block.
 - **Registration.** Every cited file is registered in `manifests/evidence.json`.
 
+## Discovery memory and source order (2026-10-06)
+
+Repository inputs keep `previous_sweep` for compatibility and add
+`discovery_history`: the last `policy.K` completed repository sweeps covering
+that exact layer, with original scope hashes and retained vote references.
+Interleaved skills, stopped and unrelated-layer sweeps do not consume the
+window. This is a K-derived discovery policy, distinct from the ledger's
+consecutive clean-sweep count and its seven-day spacing. Historical scope
+changes stay visible; remembered outcomes are no permanent exclusion.
+An absence-only outcome is not a merit judgment. A false absence result does
+not verify merit either: unreadable vote references can produce it. Reread
+the original vote and primary sources, or retain that uncertainty explicitly.
+
+`current_dispositions` carries exact layer-matching candidate and reconciliation
+observations from the supplied manifests, with provenance. Conflicting
+observations remain visible. Neither a narrative disposition nor sweep survival
+establishes installation, adoption or native acceptance. Version 2 keeps these
+observations outside its neutral field, hash and blind fit projection; its
+runner remains pending.
+
+Discovery checks installed-client native surfaces and official vendor/maintainer
+repositories before third-party proposals. It checks canonical identity, the
+correct package release train, tag-only fallback and the existing young-repo
+warning. Model requirements also get an explicit current-model review. These
+are source-reading steps; no new transport, runtime, local comparison gate or
+candidate installation is added. The
+[dated decision](../../../docs/decisions/2026-10-06-sweep-discovery-memory-and-source-order.md)
+records the sources, alternatives, uncertainty and overturn conditions.
+
 ## Run it
 
 The prerequisites:

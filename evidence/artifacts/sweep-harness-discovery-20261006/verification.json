@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "kind": "local_integration",
+  "as_of": "2026-10-06",
+  "scope": "synthetic repository-sweep input and frozen prompt contracts",
+  "base_revision": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "evidence_class": "synthetic",
+  "commands_sanitization": "Private log destinations, checkout locations and TMPDIR omitted; every heavy command ran serially with nice -n 19 ionice -c3.",
+  "checks": [
+    {
+      "id": "harness-history-negative-control",
+      "log_sha256": "47f05091644ba8bb70fd9b4e46642b32483aeb3b3151c593dcab1c7859531c24",
+      "tests_run": 1,
+      "elapsed_seconds": 0.001,
+      "result": "failed",
+      "summary": "failures=1"
+    },
+    {
+      "id": "harness-history-tests",
+      "log_sha256": "cbdbcf4e96f1e07c66cb69d1120facb0178b100d6b30e63f8c61439942f1f6cd",
+      "tests_run": 9,
+      "elapsed_seconds": 0.106,
+      "result": "passed",
+      "summary": "all selected tests passed"
+    },
+    {
+      "id": "harness-regressions",
+      "log_sha256": "97a5632f22b47c18c28664f229cdf6d29295c2db282d93a4a2e66163ebf19e7d",
+      "tests_run": 423,
+      "elapsed_seconds": 100.47,
+      "result": "failed",
+      "summary": "failures=4, skipped=4"
+    },
+    {
+      "id": "harness-template-repair-tests",
+      "log_sha256": "e7f4f055431c41f36ba805a40c59817204dde713c8bab49fd8b9585dd1613777",
+      "tests_run": 4,
+      "elapsed_seconds": 0.079,
+      "result": "passed",
+      "summary": "all selected tests passed"
+    },
+    {
+      "id": "harness-regressions-repaired",
+      "log_sha256": "a87dc6ab97165bc66a4fba47fa5ab6f640d28a91aefda6dd90928a7472b29f46",
+      "tests_run": 423,
+      "elapsed_seconds": 99.472,
+      "result": "passed",
+      "summary": "skipped=4"
+    }
+  ],
+  "discriminating_control": {
+    "source_revision": "e28d0eec112527ac02659ac23753533b8ed39a73",
+    "test": "tests.test_landscape_sweep_discovery_history.DiscoveryHistoryTests.test_layer_history_survives_its_absence_from_latest_global_sweep",
+    "baseline_exit_code": 1,
+    "baseline_observation": "known_repositories was empty instead of the two recorded judgments for the layer omitted from the latest global sweep",
+    "changed_suite_exit_code": 0,
+    "same_oracle": true
+  },
+  "failed_attempt": {
+    "broader_suite_exit_code": 1,
+    "failures": 4,
+    "skipped": 4,
+    "expanded_args_bytes": 18006,
+    "unchanged_args_size_limit_bytes": 16000,
+    "template_snapshot_sha256": "f3bf5e482cda66493fd41a98aa2b4180bf0a8d3edec5b66c9d6a1db094bae048",
+    "retention": "Complete failed log and expanded templates retained privately; historical prompt hashes and run records unchanged."
+  },
+  "repair": {
+    "description": "Shortened repeated source-reading instructions to keep the existing 16000-byte guard; regenerated current prompt change detectors with native fill_build/prompts_sha256 while retaining their previous values.",
+    "focused_repair_exit_code": 0,
+    "broader_suite_exit_code": 0,
+    "broader_tests_run": 423,
+    "broader_skipped": 4
+  },
+  "source_sha256": {
+    "tools/sota-convergence/landscape-sweep/build_inputs.py": "9ba0dd5d4d3c0e35c3c9c8eb15921f65037eb622dd106668e15e1514712224a6",
+    "tools/sota-convergence/landscape-sweep/templates.json": "2036f52d7acc3e0d417043d1510eec2dcd876777f91db53d31d8ab6d92ee8351",
+    "tests/test_landscape_sweep_harness.py": "3ce28a98166b40c7337de3b1f56bd22bf3f7c5fb52550d2fa3ecf876048aefac",
+    "tests/test_landscape_sweep_discovery_history.py": "3aea7aaa31dd4cbd537955d84439f24fefc984d5145555fb2dc815d1aa3f71a0"
+  },
+  "commands": [
+    [
+      "python3",
+      "-m",
+      "unittest",
+      "tests.test_landscape_sweep_discovery_history.DiscoveryHistoryTests.test_layer_history_survives_its_absence_from_latest_global_sweep",
+      "-v"
+    ],
+    [
+      "python3",
+      "-m",
+      "unittest",
+      "tests.test_landscape_sweep_discovery_history",
+      "-v"
+    ],
+    [
+      "python3",
+      "-m",
+      "unittest",
+      "tests.test_landscape_sweep_harness",
+      "tests.test_saturation_ledger",
+      "tests.test_convergence_contract",
+      "-v"
+    ]
+  ],
+  "provider_usage": null,
+  "provider_usage_note": "No model was run by these checks; provider usage of the separate research gather and reviewer turns remains unknown.",
+  "limits": [
+    "Fixture execution and local contract tests do not qualify an upstream runtime or establish better future discovery quality.",
+    "Version-2 admission/hash/blind fit and launch guards remain unchanged.",
+    "History references are unverified context until reread; current_dispositions includes only the supplied baseline and freshness manifests."
+  ]
+}
