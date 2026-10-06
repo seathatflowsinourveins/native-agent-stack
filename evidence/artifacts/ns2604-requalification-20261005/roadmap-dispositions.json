@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "kind": "roadmap-documented-dispositions",
+  "as_of_utc": "2026-10-05T10:28:00Z",
+  "source_workflow": "wf_cfa1d860-ebd",
+  "roadmap_sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078",
+  "claim_boundary": "Documented BY_DESIGN exclusions, preserved for independent publication review. No new readiness numerator, installed component, upstream test or native acceptance is asserted. The final command-center80-slot qualification is still required.",
+  "slots": [
+    {
+      "slot_id": "observation-inference/phoenix",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:97",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/3/final/slots/0",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": false,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/observation-inference~1phoenix",
+      "open_items": []
+    },
+    {
+      "slot_id": "git-github-automation/claude-code-action",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:122",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/4/final/slots/4",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/git-github-automation~1claude-code-action",
+      "open_items": []
+    },
+    {
+      "slot_id": "git-github-automation/agent-structural-diff",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:123",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/4/final/slots/5",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/git-github-automation~1agent-structural-diff",
+      "open_items": []
+    },
+    {
+      "slot_id": "ci-supply-chain/codeql-sarif",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "The documented host plan excludes a separate component for this transport slot. This repository runs the zizmor CLI and pins github/codeql-action/upload-sarif directly; the earlier assertion that zizmor's own action carries the upload does not describe this repository. GitHub-hosted scanner/transport observations are separate from host-slot component acceptance.",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:109",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/5/final/slots/4",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/ci-supply-chain~1codeql-sarif",
+      "open_items": [
+        "Correct the canonical manifest-generated rationale after its owned paths are released; this supplement does not edit those paths."
+      ],
+      "correction_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/github-automation.md:47-61",
+      "workflow_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:.github/workflows/security-scan.yml:211",
+      "upstream_source": "github/codeql-action@1c5b675653bb5c22dbe9b12b556ec555138e09fd:upload-sarif/action.yml:1-6 (v4.38.1)",
+      "official_source_verification": {
+        "method": "GitHub official repository contents API at exact commit",
+        "exit_code": 0,
+        "git_blob_sha": "dae34ec52882b1358ca6ae884f7bd700a5da7aa4",
+        "scope": "source review, not action execution"
+      }
+    },
+    {
+      "slot_id": "semantic-rag/reranker-model",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:73",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/8/final/slots/4",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/semantic-rag~1reranker-model",
+      "open_items": [],
+      "scope": "The decision excludes a separate external reranker. It is not proof that QMD's in-process reranker executed. QMD and embedding-model requalification remain Job4 dependencies."
+    },
+    {
+      "slot_id": "isolation/isolation-container-boundary",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "**No additional component: rootless containers on the container engine that the hosting layer installs** (nothing additional installed)",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:67",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/9/final/slots/4",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/isolation~1isolation-container-boundary",
+      "open_items": []
+    },
+    {
+      "slot_id": "secrets-credentials/trufflehog",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:116",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/10/final/slots/1",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/secrets-credentials~1trufflehog",
+      "open_items": [
+        "Detector/Uses wording correction through the canonical manifest generator is Job5 and awaits PR713; no live detector trial or credential verification performed here."
+      ]
+    },
+    {
+      "slot_id": "web-research/trafilatura",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:76",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/13/final/slots/2",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/web-research~1trafilatura",
+      "open_items": []
+    },
+    {
+      "slot_id": "web-research/web-search-provider",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:78",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/13/final/slots/4",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/web-research~1web-search-provider",
+      "open_items": [
+        "The keyless-provider rationale is conditional on defect11. The fixwave-defects owner still reports keyless research correction pending; do not declare it repaired or score a fresh aggregate from this status."
+      ],
+      "status_is_conditional_on_defect_11": true
+    },
+    {
+      "slot_id": "code-navigation/claude-plugins-official-code-intelligence-lsp-pl",
+      "baseline_status": "BY_DESIGN",
+      "reported_status": "BY_DESIGN",
+      "provisional": true,
+      "evidence_class": "source_review",
+      "upstream_acceptance_established_by_this_record": false,
+      "decision_rationale": "Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it",
+      "decision_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:69",
+      "roadmap_source": "coordination:readiness-20261005/readiness-roadmap-20261005.json#/records/7/final/slots/1",
+      "review_scope": {
+        "blind_claude_and_gpt_with_opus_adjudication": "documentary source review",
+        "gpt_agreed": true,
+        "independent_publication_read": "pending"
+      },
+      "historical_attempts": "repo:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/code-navigation~1claude-plugins-official-code-intelligence-lsp-pl",
+      "open_items": [],
+      "scope": "Serena owns symbols and references for both clients. The official Claude LSP plugins are not installed; the isolated handbook source correction projects these definitive slots, not the older client-split ownership packet."
+    }
+  ],
+  "completeness_critic": "No omitted BY_DESIGN candidate is installed or exercised by this record. Conditional keyless research, canonical rationale wording, QMD reranker execution and historical host/hosted-run boundaries remain explicit; broader pipeline or detector adoption is out of scope.",
+  "qualification_bar": {
+    "old_bar": "the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present",
+    "scope": "The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
+    "new_bar": "Same upstream acceptance, wiring and fresh-session use, but no harness text names the tool in the organic native arm; introduced around15:12Z.",
+    "new_bar_count": null,
+    "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+  }
+}

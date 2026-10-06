@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-requalification-20261005",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-10-05T04:23:07Z",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md",
+      "change": "Claim revised at 8c1629baaf5c42b5767d66be3c9b47422efb69e2 after #715 source review: superseded 40/44 scenarios and retained 37/32 as provisional source_review proposals; official 30/80 unchanged."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "change": "Claim revised at 73d75df4b33f390c30cd435253b6d675103eb95d: superseded 37/40/44/32 proposals, retained captured-status provisional 30/80 as of 11:44Z excluding custody at 13:02Z, and deferred organic qualification to final verified E2E S4."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:28:40Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md",
+      "change": "Claim revised at bfff257c0f61be6857cdc50cf0284e57584ab873: restored the #700 qualification bar and distinguished captured-status counts and model READY source_review leads from measured qualification; official 30/80 unchanged."
+    }
+  ],
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "omniroute"
+  ],
+  "claim": "Historical NativeStack2604 documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Captured-status counts and model READY leads remain source_review. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC captured-status provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
+  "limitations": [
+    "This is historical inventory, not live verification or a new host execution. The historical 30/80 receipt remains the official readiness until the command center own new dated same-80-slot qualification, independent review and adjudication. Reviewing this PR or projection never lifts provisional.",
+    "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
+    "The former44/80 conditional scenario is superseded; no current-plus-four relationship is assumed. Original Opus READY/GPT PARTIAL token reviews and native acceptance gaps remain retained.",
+    "The first post-install census has 80 rows: 50 exit-zero, 28 skipped and two failures. The later raw census has a duplicate skill-authoring attempt; attempt rows are not distinct slots. Omitted stages and held slots remain in the denominator.",
+    "The later observations at 4c897418f are retained private source files, not a completed persistent co-op census in fixwave-4c897418f at publication. Sources and observation scope are inventoried by hash without copying raw session streams.",
+    "Session-analytics summary claims conflict with retained rerun exit-code files; later output files lack complete exit/time siblings. Alerting exit zero coexists with an explicit needs_user/sink disposition. Preserve these attempts and reported claims separately; neither implies READY.",
+    "The fixwave-defects and currency lanes were in progress at the publication boundary. No slot is declared repaired, installed or accepted by their planned changes. Their future receipts require a separate follow-up.",
+    "This publication does not execute upstream tests, host acceptance commands, provider requests, GPU checks or broker operations. Structural checks verify the documents and generators, not capability acceptance.",
+    "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
+  ],
+  "data": {
+    "publication_reconciliation": {"base":"424b8a778222ae8857aade42c49ae6f7a13b3138","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"claim_scope":"Source/generator integration only: official old-bar30 unchanged, current/conditional null; CC captured-status provisional30asof11:44Z excludes custody13:02Z. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. Old attempts do not qualify changed plan pins or organic use.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
+    "publication_date_utc": "2026-10-05",
+    "publication_base_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+    "host": "NativeStack2604",
+    "source_class": "Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record.",
+    "north_star_action": "Keep foundation readiness recoverable for complex engineering, US-equities research and historical simulation before independently qualified paper operation.",
+    "qualification_scope": "Historical documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. CC captured-status provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. No new-bar count is supplied until final verified E2E S4, independent review and adjudication. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. Evidence classes remain distinct; no new acceptance or execution.",
+    "readiness": {
+      "provisional": true,
+      "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",
+      "baseline": {
+        "numerator": 30,
+        "denominator": 80,
+        "percent": 37.5,
+        "status": "historical_adjudicated_2026-10-04"
+      },
+      "current": null,
+      "conditional": null,
+      "rounding": "Exact percentages shown; baseline PR #700 rounded 37.5% half up to 38%.",
+      "derivation_gap": "Final readiness awaits the command center own new dated same-80-slot qualification with independent review and adjudication. A complete public projection review alone never lifts provisional.",
+      "official_source": "evidence/receipts/ns2604-e2e-20261004.json",
+      "bar": "old-bar",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Final verified E2E S4"
+    },
+    "disputed_slot_ids": [
+      "token-efficiency/code-index",
+      "token-efficiency/command-output",
+      "token-efficiency/output-compression",
+      "token-efficiency/repo-packing"
+    ],
+    "independent_review": {
+      "status": "pending",
+      "scope": "The Claude source review of this public projection recorded changes required; correction re-check remains pending. This review is not a new host replication or final qualification. Only the command center own dated final same-80-slot verified E2E, independently reviewed and adjudicated, can replace official readiness 30/80 or lift provisional.",
+      "recorded_source_review": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json"
+    },
+    "observations": {
+      "revision_3e343ba6": {
+        "evidence_class": "local_integration",
+        "revision": "3e343ba6c7fc391a54f8780c87df65231f24c276",
+        "clients": {
+          "claude_code": "2.1.289",
+          "codex_cli": "0.160.0"
+        },
+        "post_install": {
+          "rows": 80,
+          "exit_zero": 50,
+          "skipped": 28,
+          "failures": [
+            {
+              "slot": "session-analytics",
+              "exit": 127
+            },
+            {
+              "slot": "otel-collector-contrib",
+              "exit": 1
+            }
+          ],
+          "wrapper_exit": 1
+        },
+        "after_sign_in": {
+          "rows": 6,
+          "exit_zero": 6,
+          "not_run": [
+            "local-model-server"
+          ]
+        },
+        "service_health": {
+          "rows": 8,
+          "exit_zero": 7,
+          "failures": [
+            {
+              "slot": "local-model-server",
+              "exit": 1
+            }
+          ],
+          "wrapper_exit": 1
+        },
+        "scope": "Plan stage observations from the retained census. Exact attempts and original hash provenance appear in the linked artifacts; zero exits are not whole-slot readiness."
+      },
+      "client_drift": {
+        "evidence_class": "source_review",
+        "original_items": 21,
+        "independent_verifier_counts": {
+          "real_drift": 11,
+          "by_design": 8,
+          "refuted": 1,
+          "unclear": 0
+        },
+        "missed_by_adjudicator": 6,
+        "count_boundary": "The 21 original items include 20 Dxx verdict rows and C01, whose real_drift disposition overlaps D02/D03. The 11 + 8 + 1 verifier categories cover those 20 Dxx rows. Six missed candidates form another view; no aggregate sum is inferred.",
+        "correction": "D20 missing-skills claim refuted: the native initial listing contained 55 skills; the later two-skill listing was incremental. Verification path: client-drift-3e343ba6.json correction.D20 and clients-native-3e343ba6.json."
+      },
+      "invoke_rate_baseline": {
+        "evidence_class": "historical_inventory",
+        "T0": "2026-10-05T01:37:41Z",
+        "items": 220,
+        "never_invoked": 107,
+        "scope": "Early install exposure window. Most token and interim MCP entries had about 38 minutes of exposure. Zero invocations do not establish failure, quality or lack of usefulness. Native counter scopes remain distinct."
+      },
+      "peer_lanes": {
+        "fixwave_defects": {
+          "status": "in_progress",
+          "accepted_slot_closures_claimed": false
+        },
+        "currency": {
+          "status": "in_progress",
+          "accepted_slot_closures_claimed": false
+        },
+        "coordination": "Private lane status files were read before publication. No peer plan, launch prompt or unmerged change is treated as acceptance evidence."
+      }
+    },
+    "evidence_classes": [
+      {
+        "class": "native_proven",
+        "scope": "Only the named native client command outputs actually retained from prior host execution; per-slot limitations remain explicit. Plan-wrapper stage checks are local_integration."
+      },
+      {
+        "class": "source_review",
+        "scope": "Model judgments, comparison with upstream recipes, drift review and adjudication leads; not new execution."
+      },
+      {
+        "class": "historical_inventory",
+        "scope": "This receipt and early invoke-rate snapshot; no acceptance status implied."
+      },
+      {
+        "class": "local_integration",
+        "scope": "Plan-wrapper census/stage checks and locally authored probes identified in per-slot records; never unchanged upstream acceptance."
+      },
+      {
+        "class": "structural_validation",
+        "scope": "Publication-time hashes, source projection, generator tests and repository validation only."
+      },
+      {
+        "class": "none_recorded",
+        "scope": "Skipped stages, absent raw proof and missing fresh whole-slot qualification."
+      }
+    ],
+    "artifacts": [
+      "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "evidence/artifacts/ns2604-requalification-20261005/sources.json",
+      "evidence/artifacts/ns2604-requalification-20261005/README.md"
+    ],
+    "baseline_method": "evidence/artifacts/ns2604-e2e-20261004/method.md",
+    "source_capture_boundary": "All 513 original-source hashes describe capture-time bytes. Independent comparison matched 512 originals; one still-written research-harnesses after-sign-in stderr source changed after capture and lacks complete exit/end evidence. Preserve its original hash and incomplete disposition; no currently recoverable immutable copy is claimed.",
+    "baseline_receipt": "evidence/receipts/ns2604-e2e-20261004.json",
+    "fixwave_source": "evidence/artifacts/new-wsl-fix-wave-20261004/README.md",
+    "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+    "sanitization": "Keep machine label and portable technical paths; omit concrete home paths, local identities, account values, raw conversations and native session streams. Private source-relative filenames and sha256 values support recovery. Credential stores were not read.",
+    "completeness_critic": "Preserve all 80 denominator slots, all attempts including duplicates and failures, both revision scopes, client-leg boundaries, four disagreements, source gaps, early invocation exposure and independent review limits. Missing modalities for the next qualification are a complete fresh 80-slot derivation, independent replication of unresolved native operations, upstream token acceptance and GPU/local-model acceptance after the authorized window. Skills follow-up is keyed to install, activate, recover and use lifecycle tasks.",
+    "publication_correction": {
+      "as_of_utc": "2026-10-05T11:44:16Z",
+      "source": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "new_qualification": false
+    },
+    "qualification_bar": {
+      "old_bar": "the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present",
+      "scope": "The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
+      "new_bar": "Same upstream acceptance, wiring and fresh-session use, but no harness text names the tool in the organic native arm; introduced around15:12Z.",
+      "new_bar_count": null,
+      "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
+    },
+    "old_bar_provisional": {
+      "source": "command_center_exact_head_ruling",
+      "reported_numerator": 30,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional pending the coordinator's final verified E2E",
+      "bar": "old-bar",
+      "as_of_utc": "2026-10-05T11:44:00Z",
+      "custody_1302_by_design_included": false,
+      "captured_status_boundary": "It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar.",
+      "ruling": "review-715-corrections.json#/bounded_repair_rulings"
+    },
+    "exact_head_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
+      "lines": [
+        14,
+        33
+      ],
+      "reviewed_head": "2432f95192a2204b0393a327e3d3134ba01b8aec",
+      "evidence_class": "source_review"
+    }
+  }
+}
