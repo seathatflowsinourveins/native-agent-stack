@@ -37,7 +37,12 @@ policy or limit changes.
 
 The installed client's new auth_storage_failure Notification type still requires
 its notification owner's dated decision (Q55); this lane chooses neither ring nor
-quiet. The qualified full retry is pending GO-RELAUNCH under command-center item
+quiet. A55 confirms it does not block #772. Carry the failing gate
+tests/test_windows_terminal_defaults.py:166-176, its DECISIONS table at
+evidence/artifacts/notification-types-20260929/notification_types_scan.py:20,
+observed Claude Code 2.1.291, and the exact returned assertion in the CI receipt.
+The full retry keeps that gate intact. The qualified full retry is pending
+GO-RELAUNCH under command-center item
 task-ns2604-coop-20261006T143738Z. No full-pass or publication claim is made from
 this checkpoint.
 

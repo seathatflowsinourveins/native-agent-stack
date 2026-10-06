@@ -257,7 +257,16 @@
     "returned_unknown_type": "auth_storage_failure",
     "result": "failure",
     "owner": "command center/notification decision owner",
-    "action": "Q55 requests its dated owner decision; no ring/quiet decision or client configuration change by this lane"
+    "action": "Carry the exact gate/table/version/failure in #772; owner decides separately. Run the full retry without excluding or weakening the gate.",
+    "gate_path": "tests/test_windows_terminal_defaults.py:166-176",
+    "decision_table_path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py:20",
+    "observed_client_version": "2.1.291 (Claude Code)",
+    "version_command": "$HOME/.local/bin/claude --version",
+    "version_exit_code": 0,
+    "version_observed_utc": "2026-10-06T15:12:17Z",
+    "exact_returned_output": "AssertionError: Lists differ: ['auth_storage_failure'] != []\n\nFirst list contains 1 additional elements.\nFirst extra element 0:\n'auth_storage_failure'\n\n- ['auth_storage_failure']\n+ [] : a type this client knows has no decision in DECISIONS",
+    "blocks_pr772": false,
+    "owner_ruling": "Co-op A55,2026-10-06T15:10:53Z: carry explicitly; CC owns ring-or-quiet and table owner; does not block #772."
   },
   "park": {
     "source_item": "task-ns2604-coop-20261006T143738Z",
@@ -265,5 +274,13 @@
     "read_utc": "2026-10-06T14:52:14Z",
     "reason": "Finish short fixes; start no new full matrix untilGO-RELAUNCH.",
     "qualified_full_retry_started": false
-  }
+  },
+  "owner_answers": [
+    {
+      "answer": "A55",
+      "time_utc": "2026-10-06T15:10:53Z",
+      "option": 1,
+      "scope": "Prerequisites, fixture preludes, CI umask, named properties and regenerable scratch converge; notification is an explicitly recorded, nonblocking owner item; full retry waits GO."
+    }
+  ]
 }
