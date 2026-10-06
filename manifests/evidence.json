@@ -14307,6 +14307,16 @@
       "bytes": 47180
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc6/PREREGISTRATION-ADDENDUM-C5-20261006.md",
+      "sha256": "bfa7559ec59354e1fde0af555f46f26cca6911c0fbe9992dc27f59c08858637c",
+      "bytes": 3066
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc6/c5-addendum.json",
+      "sha256": "3c2956d817801932e62aedf711eacd848059ad972e256a9e3e7bd37751dd049c",
+      "bytes": 3929
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
       "sha256": "e8c551a8082ebb5909ed00507d39a635b995e61d44546860710108040becb2f4",
       "bytes": 24080
@@ -15772,6 +15782,11 @@
       "bytes": 10228
     },
     {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/d6-class-review-20261006.json",
+      "sha256": "63c66ae2ec42923272b25d2b239ae60f6706c1968d9f3d9b1766cc9dad7ea071",
+      "bytes": 236389
+    },
+    {
       "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-2.json",
       "sha256": "b2974b6f3c76d3308d9450437dbbc015f89449ef607cffa57b049ac6a83d9ac0",
       "bytes": 8871
@@ -15780,6 +15795,11 @@
       "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-3.json",
       "sha256": "44f3fa81a1d6f483b4715b02c12dab5b35f23ea816acccf6b2afc825329b2d1a",
       "bytes": 6439
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-4.json",
+      "sha256": "c3eb8594f3da2acbc54ce331cf104e146e57a9418ca9b806968bae8cff3aa87c",
+      "bytes": 117590
     },
     {
       "path": "blueprints/us-equities/rnd-wave1-20261006/deviations.json",
@@ -17412,6 +17432,11 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-cc-orchestration-composition.md",
+      "sha256": "5f5a6d54e9de82ba99fda40547036677800785787d6670f449280af0cfaef964",
+      "bytes": 21371
+    },
+    {
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
@@ -17553,8 +17578,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "26ec355b96aa6bc91fba8fd4f1ff33d84b13ce7865c4eb3108d98ead4dfa534c",
-      "bytes": 225647
+      "sha256": "c7333423ba0e6ee597341ed6a23e2f00a98969b98f4f28283a99abd51b6bae5f",
+      "bytes": 229655
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -17803,8 +17828,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "e54b87c1e0ad36ed6f0533e70e80d05935c42fcd72058d1b1ed6174a4e9ecb6a",
-      "bytes": 98350
+      "sha256": "3e80098715b4c87fa6278847b18ea868a10db1971d780adc7511b410ff4fff7b",
+      "bytes": 107979
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -53362,6 +53387,11 @@
       "bytes": 1066
     },
     {
+      "path": "examples/agentsview.service.example",
+      "sha256": "76e23702d95e08282145319dccfdde79338bfe009af6a96606dd567feb67535a",
+      "bytes": 264
+    },
+    {
       "path": "examples/agentsview.toml.example",
       "sha256": "98ae8c2403a41e862f99131c86c8e3d9d525dec8f8fa7ed9eb396a86b97ab39a",
       "bytes": 553
@@ -53615,6 +53645,16 @@
       "path": "examples/deepagents-omniroute/worker.py",
       "sha256": "cc6ebc1878b4b10f295e59a18cde7afc152a6dd7bd4faf6e7f5eb64ef2ede8cd",
       "bytes": 6531
+    },
+    {
+      "path": "examples/hcom-lanes.conf",
+      "sha256": "534e68dd5093b99e45373547dae819b11226ccd9deddc77f518ad64542b4b3fd",
+      "bytes": 486
+    },
+    {
+      "path": "examples/hcom-wt-tmux.toml.example",
+      "sha256": "fa678712a77428da7e7bff2e39349471e551a29ca1671135267945b8ecba0ed2",
+      "bytes": 718
     },
     {
       "path": "examples/mcporter.json.example",
