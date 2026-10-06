@@ -485,6 +485,30 @@ class RecoveryTests(unittest.TestCase):
         for token in redacted:
             self.assertNotIn(token, text)
 
+    def test_a_home_path_inside_a_long_token_cannot_shorten_it(self):
+        # #809 delta read (P3): replacing a home path first used to leave a 20-character prefix of a 30-character
+        # token below the threshold; tokens are now found in the original text, in the message and context alike
+        from transport import TransportError
+        for root in ("home", "Users", "root"):
+            with self.subTest(root):
+                self.setUp()
+                value = "read failed " + "A" * 20 + "/" + root + "/user"
+
+                class PathPort(FakePort):
+                    async def snapshot(self):
+                        try:
+                            raise TransportError(value)
+                        except TransportError as cause:
+                            raise TransportError(value) from cause
+                self.original_buy()
+                self.port.__class__ = PathPort
+                detail = self.recover()["error_details"][0]
+                for key in ("message", "context_message"):
+                    self.assertEqual(detail[key], "read failed <redacted>")
+        import recovery
+        self.assertEqual(recovery._text("kept engine/words data/home/someone/secret_value"),
+                         "kept engine/words data<path>")  # a home path inside a kept engine word is still replaced
+
     def test_redaction_runs_before_the_length_cap(self):
         # #809 review (P3): a long token that crosses character 300 is redacted whole, never cut into a short
         # fragment, in the message and in an engine-authored context alike

@@ -32,12 +32,18 @@ _LONG_TOKEN = re.compile(r"[A-Za-z0-9+/=_-]{24,}")
 _ENGINE_WORDS = re.compile(r"[a-z]+(?:[_/][a-z]+)+")
 
 
+def _long_token(match):
+    word = match.group(0)
+    return _HOME_PATH.sub("<path>", word) if _ENGINE_WORDS.fullmatch(word) else "<redacted>"
+
+
 def _text(value):
     """Redact the whole text, then stop it at 300 characters, so a long token that crosses the cut is redacted
-    whole and never survives as a short fragment. Home paths and long tokens are redacted; the engine's own words
-    stay readable."""
-    text = _HOME_PATH.sub("<path>", str(value))
-    text = _LONG_TOKEN.sub(lambda m: m.group(0) if _ENGINE_WORDS.fullmatch(m.group(0)) else "<redacted>", text)
+    whole and never survives as a short fragment. Long tokens are found in the original text, before any home path
+    is replaced, so a path inside a token cannot shorten it below the threshold; then the remaining home paths are
+    replaced, inside a kept engine word too. The engine's own words stay readable."""
+    text = _LONG_TOKEN.sub(_long_token, str(value))
+    text = _HOME_PATH.sub("<path>", text)
     return text[:300]
 
 
