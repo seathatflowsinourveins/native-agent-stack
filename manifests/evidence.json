@@ -14257,6 +14257,16 @@
       "bytes": 47180
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc6/PREREGISTRATION-ADDENDUM-C5-20261006.md",
+      "sha256": "bfa7559ec59354e1fde0af555f46f26cca6911c0fbe9992dc27f59c08858637c",
+      "bytes": 3066
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc6/c5-addendum.json",
+      "sha256": "3c2956d817801932e62aedf711eacd848059ad972e256a9e3e7bd37751dd049c",
+      "bytes": 3929
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
       "sha256": "e8c551a8082ebb5909ed00507d39a635b995e61d44546860710108040becb2f4",
       "bytes": 24080
