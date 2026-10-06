@@ -15672,6 +15672,36 @@
       "bytes": 8769
     },
     {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/PREREGISTRATION.md",
+      "sha256": "7b7f4ce3f4506abf2370938a36556dbcdb5596bcbcdf792f2a92b494671e4f96",
+      "bytes": 10228
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-2.json",
+      "sha256": "b2974b6f3c76d3308d9450437dbbc015f89449ef607cffa57b049ac6a83d9ac0",
+      "bytes": 8871
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-3.json",
+      "sha256": "44f3fa81a1d6f483b4715b02c12dab5b35f23ea816acccf6b2afc825329b2d1a",
+      "bytes": 6439
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations.json",
+      "sha256": "6dfca17ac1fa1a011a36a4fd37919fcdcd29941bef4c9a359ce3675f941bae42",
+      "bytes": 11083
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/plan.json",
+      "sha256": "36e55742ec837809cf6d41ae1b35e22237cc25a0c3abf01d0f36384cee0e1743",
+      "bytes": 8574
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/validate_r2b.py",
+      "sha256": "d6e017f4d79ccda4070eb3a838478fef06436877f14e4ad42b1f7f0488e0992f",
+      "bytes": 6849
+    },
+    {
       "path": "blueprints/us-equities/routing/README.md",
       "sha256": "c5e0abfd9d914c46ef58810427c5bf71b2d3bf8476c8e1314b4d486a1589a2bd",
       "bytes": 20346
