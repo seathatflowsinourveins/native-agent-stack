@@ -1,5 +1,7 @@
 # Native rule format: prometheus/prometheus@v3.15.0:docs/configuration/alerting_rules.md:15.
 # Adapted from this PR: observability/backends/templates/ecosystem-prometheus-rules.yml.example:1.
+# 2026-10-06 (docs/decisions/2026-10-06-ns2604-alerting.md): service checks, clock-offset-check and the root-filesystem
+# rules. This Collector's prometheus exporter sets no namespace, so metric names carry no ecosystem_ prefix.
 groups:
   - name: nativestack2604-services
     rules:
@@ -19,3 +21,207 @@ groups:
           scope: synthetic-acceptance
         annotations:
           summary: 'Controlled local acceptance target is unavailable'
+      # Collector http_check targets (otel.yaml http_check/ecosystem), as in the template's
+      # EcosystemOmniRouteHealthUnexpected; missing data counts as unexpected. agentsview is an on-demand daemon
+      # (plan row session-analytics: started by agentsview daemon start), so it is observed without a rule.
+      - alert: EcosystemOmniRouteHealthUnexpected
+        expr: '(max(httpcheck_status{http_url="http://127.0.0.1:21128/api/health",http_status_class="2xx"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: OmniRoute
+        annotations:
+          summary: 'Local OmniRoute health response is unexpected or missing'
+          description: 'Expected 2xx at http://127.0.0.1:21128/api/health, OmniRoute''s unauthenticated liveness route; this checks transport, not provider or job execution.'
+      - alert: EcosystemDaguHealthUnexpected
+        expr: '(max(httpcheck_status{http_url="http://127.0.0.1:21080/api/v1/health",http_status_class="2xx"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: Dagu
+        annotations:
+          summary: 'Local Dagu health response is unexpected or missing'
+          description: 'Expected 2xx at http://127.0.0.1:21080/api/v1/health, the route Dagu''s installer probes; DAG runs and the login are checked separately.'
+      - alert: EcosystemOllamaHealthUnexpected
+        expr: '(max(httpcheck_status{http_url="http://127.0.0.1:21434/api/version",http_status_class="2xx"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: Ollama
+        annotations:
+          summary: 'Local Ollama server response is unexpected or missing'
+          description: 'Expected 2xx at http://127.0.0.1:21434/api/version; this checks the model server, not a loaded model.'
+      # prometheus/alertmanager@v0.34.1 doc/alertmanager-mixin/alerts.libsonnet:42-59 (alertmanagerSelector job="alertmanager").
+      - alert: AlertmanagerFailedToSendAlerts
+        expr: |
+          (
+            rate(alertmanager_notifications_failed_total{job="alertmanager"}[15m])
+          /
+            ignoring (reason) group_left rate(alertmanager_notifications_total{job="alertmanager"}[15m])
+          )
+          > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'An Alertmanager instance failed to send notifications.'
+          description: 'Alertmanager failed to send {{ $value | humanizePercentage }} of notifications to {{ $labels.integration }}. With one receiver this alert may not reach the phone; read Alertmanager''s journal and /api/v2/status.'
+      # prometheus/prometheus@v3.15.0 documentation/prometheus-mixin/alerts.libsonnet:251-263
+      # (prometheusSelector job="prometheus", config.libsonnet:6). A failing rule cannot raise its own alert.
+      - alert: PrometheusRuleFailures
+        expr: 'increase(prometheus_rule_evaluation_failures_total{job="prometheus"}[5m]) > 0'
+        for: 15m
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'Prometheus is failing rule evaluations.'
+          description: 'Rule group {{ $labels.rule_group }} has failed evaluations in the last 5 minutes for 15 minutes; its alerts cannot fire. Read /api/v1/rules for the rule whose health is err.'
+  - name: nativestack2604-clock
+    rules:
+      # Lines of ~/.local/bin/clock-offset-check counted by the Collector (otel.yaml journald/clock_offset_check, matched
+      # by SYSLOG_IDENTIFIER), per level and reason, in the last 10 minutes. A level's series is created by its first
+      # line and leaves the exporter five minutes after its last line, and this Prometheus runs without
+      # created-timestamp-zero-ingestion (api/v1/status/flags, 2026-10-06), so increase() alone misses a series' first
+      # line: the unless term counts a series that was absent ten minutes earlier. Operators:
+      # prometheus/prometheus@v3.15.0 docs/querying/operators.md (unless, or); docs/querying/basics.md (offset).
+      - record: level_reason:clock_offset_check_lines:increase10m
+        expr: |
+          (sum by (level, reason) (increase(clock_offset_check_lines_total[10m])) > 0)
+          or
+          sum by (level, reason) (clock_offset_check_lines_total unless clock_offset_check_lines_total offset 10m)
+      - alert: EcosystemClockOffsetCritical
+        expr: 'level_reason:clock_offset_check_lines:increase10m{level="crit"} > 0'
+        for: 0m
+        labels:
+          severity: critical
+          scope: local-ecosystem
+          component: clock
+        annotations:
+          summary: 'clock-offset-check logged CRIT (reason {{ $labels.reason }})'
+          description: 'A CRIT line reached Prometheus in the last 10 minutes. reason=sample: the shared WSL clock was more than 100 ms off; any other reason: chronyd is missing or runs without -x, or chronyc failed or answered malformed or empty. Read journalctl -t clock-offset-check -n 20. A Collector start without its stored cursor counts the current boot''s earlier lines again.'
+      - alert: EcosystemClockOffsetWarning
+        expr: 'level_reason:clock_offset_check_lines:increase10m{level="warn"} > 0'
+        for: 0m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: clock
+        annotations:
+          summary: 'clock-offset-check logged WARN'
+          description: 'A WARN line reached Prometheus in the last 10 minutes: the error bound passed 50 ms, the reference is missing or stale, the leap status is not Normal, or clock-change-check recorded a clock step or zone change. The line''s why= field names the cause: journalctl -t clock-offset-check -n 20.'
+      - alert: EcosystemClockOffsetCheckUnparsed
+        expr: 'level_reason:clock_offset_check_lines:increase10m{level="other"} > 0'
+        for: 0m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: clock
+        annotations:
+          summary: 'clock-offset-check logged a line that is not OK, WARN or CRIT'
+          description: 'The Collector could not classify a clock-offset-check line, so a changed output format could hide a CRIT. Compare the script with transform/clock_offset_check in otel.yaml.'
+      - alert: EcosystemClockOffsetCheckSilent
+        expr: '(sum(level_reason:clock_offset_check_lines:increase10m) or vector(0)) == 0'
+        for: 5m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: clock
+        annotations:
+          summary: 'No clock-offset-check line has reached Prometheus for 15 minutes'
+          description: 'The every-minute timer, the script, the Collector''s journald receiver or the otel-native scrape has stopped. Missing data is unknown, not a healthy clock.'
+  # Ported from observability/backends/templates/ecosystem-prometheus-rules.yml.example:62-147, the 2026-10-05 ENOSPC
+  # rules (docs/decisions/2026-10-05-disk-headroom-enospc.md:88-179), to the unprefixed system_filesystem_usage_bytes.
+  # opentelemetry-collector-contrib v0.162.0 hostmetricsreceiver filesystemscraper/metadata.yaml:29-33,52 declares
+  # the free/reserved/used states (2604's exporter shows all three for mountpoint "/").
+  - name: nativestack2604-root-filesystem
+    rules:
+      - alert: EcosystemRootFilesystemLowSpace
+        expr: 'sum(system_filesystem_usage_bytes{mountpoint="/",state="free"}) < 5368709120'
+        for: 10m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 5 GiB free'
+          description: 'Local WSL filesystem only; Windows backing-disk capacity is separate.'
+      - alert: EcosystemHostFilesystemMetricsMissing
+        expr: 'absent(system_filesystem_usage_bytes{mountpoint="/"})'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem observations are missing'
+          description: 'Missing data is unknown, not proof of available space.'
+      # Port of prometheus/node_exporter v1.12.1 node-mixin filesystem alerts:
+      # commit 6044da783597cc3b57aef7580ddcdcff58a4ee99, docs/node-mixin/alerts/alerts.libsonnet:7-80
+      # and docs/node-mixin/config.libsonnet:67-91 (annotated tag object fc12f2c0ca65).
+      # Available is free alone; sum without(state) is size, preserving filesystem/owner labels.
+      # group_left retains state="free" so the percentage and prediction vectors match.
+      # mode!="ro" carries the mixin's read-only exclusion using the OTel mount mode.
+      - alert: EcosystemRootFilesystemSpaceFillingUp
+        expr: |
+          (system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 40)
+          and predict_linear(system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[6h], 24*60*60) < 0
+        for: 1h
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to run out of space within 24 hours'
+          description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'
+      - alert: EcosystemRootFilesystemSpaceFillingUp
+        expr: |
+          (system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 20)
+          and predict_linear(system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[6h], 4*60*60) < 0
+        for: 1h
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to run out of space within four hours'
+          description: 'Less than 20% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within four hours, sustained for one hour. Inspect active scratch writers and stop recursive checkout copies.'
+      - alert: EcosystemRootFilesystemAlmostOutOfSpace
+        expr: |
+          system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 5
+        for: 30m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 5% available space'
+          description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'
+      - alert: EcosystemRootFilesystemAlmostOutOfSpace
+        expr: |
+          system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 3
+        for: 30m
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 3% available space'
+          description: 'Available bytes have stayed below 3% of total filesystem bytes for 30 minutes. Recover headroom before the Collector and Prometheus fail to persist data.'
+      # Incident-specific short-window companion, not an upstream node-mixin default.
+      # 50 GiB is approximately the mixin's 5% low-space band on a ~1 TiB root.
+      # Forecast semantics: prometheus/prometheus v3.15.0 docs/querying/functions.md:769-781.
+      # Host cadence: otel.yaml host_metrics (30s collection, 1s batch); prometheus.yaml (15s scrape/evaluation).
+      - alert: EcosystemRootFilesystemBurstFill
+        expr: |
+          predict_linear(system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[2m], 120) < 0
+          and system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"} < 53687091200
+        for: 15s
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available'
+          description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval; faster fills can exhaust the disk first, and prediction requires at least two samples. The repository''s test TMPDIR/copy guard prevents the known recursive cause; no separate headroom timer was found on NativeStack2604 on 2026-10-06. Stop the offending writer and recover headroom.'

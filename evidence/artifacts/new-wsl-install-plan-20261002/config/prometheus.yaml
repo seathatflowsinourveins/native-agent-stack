@@ -21,6 +21,29 @@ scrape_configs:
   - job_name: otel-collector
     static_configs:
       - targets: ["127.0.0.1:21888"]
+  # 2026-10-06: the observation services' own /metrics, read without a login. A stopped service reads up == 0
+  # (EcosystemServiceUnavailable). Alertmanager v0.34.1 is kept whole (about 670 series; its notification counters
+  # feed AlertmanagerFailedToSendAlerts). Loki v3.7.8 (docs/sources/reference/loki-http-api.md:1228-1238) and
+  # Grafana v13.2.3 (conf/defaults.ini:2015-2027) keep a short allowlist (configuration.md metric_relabel_configs):
+  # their full pages, about 4,500 and 5,200 series that day, would more than double this server's 6,700 head series
+  # under its 512 MB retention size.
+  - job_name: alertmanager
+    static_configs:
+      - targets: ["127.0.0.1:21093"]
+  - job_name: loki
+    static_configs:
+      - targets: ["127.0.0.1:21300"]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'loki_(build_info|panic_total|discarded_(samples|bytes)_total|distributor_(lines|bytes)_received_total|ingester_memory_streams|ingester_wal_discarded_(samples|bytes)_total)'
+        action: keep
+  - job_name: grafana
+    static_configs:
+      - targets: ["127.0.0.1:21301"]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'grafana_(build_info|stat_totals_dashboard|api_response_status_total|datasource_request_total)'
+        action: keep
   # Kept empty outside explicitly selected native delivery acceptance.
   - job_name: acceptance-fixture
     scrape_interval: 5s

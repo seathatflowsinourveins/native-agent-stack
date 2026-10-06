@@ -42,6 +42,36 @@ receivers:
     targets:
       - endpoint: http://127.0.0.1:21333/health/status
         timeout: 5s
+      # 2026-10-06: services with no /metrics that Prometheus can read without a login (probed that day).
+      # OmniRoute 3.8.51 unauthenticated liveness: diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e
+      # src/app/api/health/route.ts:3-17. Dagu v2.18.2 health, the installer's own probe:
+      # dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4 scripts/installer.sh:1987-1989 (its /api/v1/metrics
+      # needs a login unless server.metrics is public: internal/service/frontend/server.go:804-811). Ollama v0.35.0:
+      # ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84 server/routes.go:2022-2023. agentsview v0.43.0, an
+      # on-demand daemon (observed only, no alert rule): kenn-io/agentsview@9be7745ad1906ee24e04eb05bb86c872ef0939a1
+      # internal/server/huma_routes_health.go:19-23. A refused connection records httpcheck.error and status 0 without
+      # a scrape error (receiver/httpcheckreceiver/scraper.go:407-451 at v0.162.0).
+      - endpoint: http://127.0.0.1:21128/api/health
+        timeout: 5s
+      - endpoint: http://127.0.0.1:21080/api/v1/health
+        timeout: 5s
+      - endpoint: http://127.0.0.1:21434/api/version
+        timeout: 5s
+      - endpoint: http://127.0.0.1:21808/api/ping
+        timeout: 5s
+  # clock-offset-check (a user oneshot every minute, and clock-change-check on a clock step or zone change) writes one
+  # line per run to the journal: "OK|WARN|CRIT <UTC time> ...". Match SYSLOG_IDENTIFIER, never the unit: journald loses
+  # _SYSTEMD_USER_UNIT on short-lived runs (45 of 121 lines this boot on 2026-10-06; command-center correction #8).
+  # opentelemetry-collector-contrib v0.162.0 receiver/journaldreceiver/README.md:36-60,184-201 and
+  # pkg/stanza/operator/input/journald/config_linux.go:90-153,194-205: start_at beginning passes --no-tail, so the
+  # cursor kept in file_storage resumes after a restart without losing lines (start_at end passes --lines=0, which
+  # skips the lines logged while the Collector was down). The first start reads the current boot once.
+  journald/clock_offset_check:
+    matches:
+      - SYSLOG_IDENTIFIER: clock-offset-check
+    priority: info
+    start_at: beginning
+    storage: file_storage
 processors:
   memory_limiter:
     check_interval: 1s
@@ -260,6 +290,23 @@ processors:
           - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"])
           - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
           - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
+  # Level and reason of a clock-offset-check line, from the script's fixed vocabulary; an optional <0-7> syslog prefix
+  # is tolerated. Error lines name chronyd_not_observe_only, chronyc_failed, chronyc_malformed or chronyc_empty; every
+  # other line is a sample. Only these two attributes leave the Collector, as counts (connectors.count).
+  transform/clock_offset_check:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - set(attributes["level"], "other")
+          - set(attributes["level"], "ok") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?OK ")
+          - set(attributes["level"], "warn") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?WARN ")
+          - set(attributes["level"], "crit") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT ")
+          - set(attributes["reason"], "sample")
+          - set(attributes["reason"], "chronyd_not_observe_only") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyd_not_observe_only ")
+          - set(attributes["reason"], "chronyc_failed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_failed ")
+          - set(attributes["reason"], "chronyc_malformed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_malformed ")
+          - set(attributes["reason"], "chronyc_empty") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_empty ")
   delta_to_cumulative:
     max_stale: 1h
     max_streams: 10000
@@ -291,6 +338,21 @@ exporters:
       max_megabytes: 10
       max_backups: 3
     flush_interval: 1s
+connectors:
+  # opentelemetry-collector-contrib v0.162.0 connector/countconnector/README.md:66-123; counter.go:130-146 emits a
+  # monotonic delta Sum per attribute set, only once a line of that kind arrives. The exporter's metric_expiration
+  # (default 5m, exporter/prometheusexporter/README.md:29) drops a series five minutes after its last line;
+  # prometheus-alerts.yaml (group nativestack2604-clock) counts both increments and newly born series.
+  # Exported as clock_offset_check_lines_total{level, reason}.
+  count/clock_offset_check:
+    logs:
+      clock_offset_check.lines:
+        description: Journal lines logged by clock-offset-check, by level and reason.
+        attributes:
+          - key: level
+            default_value: other
+          - key: reason
+            default_value: sample
 extensions:
   file_storage:
     directory: ${env:NS2604_OBSERVABILITY_DATA}/otelcol/queue
@@ -331,4 +393,13 @@ service:
     metrics/host:
       receivers: [host_metrics]
       processors: [memory_limiter, batch]
+      exporters: [prometheus]
+    # The clock lines never leave the Collector as logs; only their counts reach Prometheus.
+    logs/clock_offset_check:
+      receivers: [journald/clock_offset_check]
+      processors: [memory_limiter, transform/clock_offset_check]
+      exporters: [count/clock_offset_check]
+    metrics/clock_offset_check:
+      receivers: [count/clock_offset_check]
+      processors: [memory_limiter, delta_to_cumulative, batch]
       exporters: [prometheus]

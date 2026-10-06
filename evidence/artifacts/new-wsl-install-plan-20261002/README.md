@@ -301,6 +301,17 @@ units; the earlier `ecosystem-*` note was not a deployed unit inventory. Existin
 operator configuration that differs from the known source is retained and
 reported for its owner to merge. This installer starts no service.
 
+Since 2026-10-06 ([decision](../../../docs/decisions/2026-10-06-ns2604-alerting.md))
+`install.sh --only alerting` also publishes `prometheus-alerts.yaml` and its unit
+tests, which earlier reached a host only when absent, once native `promtool test
+rules` passes on the new pair. The rules add a critical alert on
+`clock-offset-check` CRIT lines (counted by the Collector's journald receiver,
+matched by `SYSLOG_IDENTIFIER`), warnings for its WARN, unparsed and silent cases,
+service checks for Alertmanager, Loki, Grafana, OmniRoute, Dagu and Ollama, and
+the root-filesystem rules written after the 2026-10-05 ENOSPC incident.
+`install.sh --only otel-collector-contrib` publishes the matching `otel.yaml`.
+Restart the Collector and Prometheus units after both rows.
+
 Alerting post-install acceptance uses upstream amtool and native promtool rule
 validation/unit tests; install the Prometheus owner before selecting that check.
 Native delivery acceptance is `--only alerting --stage after_sign_in`. It prints
