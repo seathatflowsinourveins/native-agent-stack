@@ -4761,6 +4761,11 @@
       "bytes": 24095
     },
     {
+      "path": "adoption/git-hook-acceptance.md",
+      "sha256": "bcc32517fd829c6e319f382409775a11071eed6e5eaa38d6f12f55427c15d992",
+      "bytes": 6544
+    },
+    {
       "path": "adoption/hardware-profiles.json",
       "sha256": "ea2df494c8b2c60db7c9684ec67f577c9d7ef6d7b407c6993d32cd2c6ea0503c",
       "bytes": 12174
@@ -17095,6 +17100,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-06-git-hook-scanner-pin.md",
+      "sha256": "531ce888805d6b3e92b642055d045d2221eb2616005ea1e33816b3592ff6f882",
+      "bytes": 4581
     },
     {
       "path": "docs/direct-results.md",
@@ -42582,6 +42592,16 @@
       "bytes": 2
     },
     {
+      "path": "evidence/artifacts/p1-git-hook-20261006/git-scanner-prerequisite.json",
+      "sha256": "f81f1755e58d21161f8558fee7802b059b62f21bbb63c0ab689bb93d68d02e48",
+      "bytes": 269
+    },
+    {
+      "path": "evidence/artifacts/p1-git-hook-20261006/mise.toml",
+      "sha256": "52e2ee51ea87b5078a67b5f64ca6def710f6cae012a74b28e57c4e43f7744eb1",
+      "bytes": 192
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -52682,6 +52702,11 @@
       "bytes": 24256
     },
     {
+      "path": "evidence/receipts/p1-git-hook-acceptance-20261006.json",
+      "sha256": "5195a10f1c1aa7b8c219d73bc6285630941b159ed4260fecd96bbf1552db2b22",
+      "bytes": 9483
+    },
+    {
       "path": "evidence/receipts/pit-availability.json",
       "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
       "bytes": 107713
@@ -54203,8 +54228,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "c8db8b668f3f75c2ef1e13a736223e05ffcdc747861062850aa9eac3049a5f14",
-      "bytes": 41460
+      "sha256": "54e68ed5c518c2cc2ec0750893be31bc7a86c6f47ee926dab0fbb930ad948a88",
+      "bytes": 41796
     },
     {
       "path": "tests/test_adoption_launchd.py",
