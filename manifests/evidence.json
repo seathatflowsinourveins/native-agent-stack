@@ -14043,13 +14043,18 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/README.md",
-      "sha256": "643ac8e7807c1972ef5f047576cf56b4a4655511d48f906fbee951474da651d2",
-      "bytes": 33726
+      "sha256": "f1c06b44a8a0ef52e3851aeaa0b07fd25f24672209f109809eacea650ac11ef2",
+      "bytes": 36439
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.188e0078fc8f",
       "sha256": "188e0078fc8f4a36ef54eb856bf2ef2660cad1ae280332dc86e405b7a230a0f5",
       "bytes": 51113
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.5a061ff06f41",
+      "sha256": "5a061ff06f41fa1b5721f10fb01037ce790639f715481c2efdd98ea32700ee3b",
+      "bytes": 62212
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.67429251370f",
@@ -14078,8 +14083,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/run.py",
-      "sha256": "72147d8627d733b7b1dc58c45bada490f3b4d47452759f6f85036461e38a21cf",
-      "bytes": 76612
+      "sha256": "af6c817e73938bb446a9026e1713c3c35db7a519b7e5ff9162523a916f35a091",
+      "bytes": 79117
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/safety.py",
@@ -16493,8 +16498,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "d1818c3d7fea024ac0749052b6cf1213270524ddb04889f3e32e5ac7b2164447",
-      "bytes": 25990
+      "sha256": "82077f9c635c5e50f36384de017e1844d3a65320fac06c4cac2dd26ca972d554",
+      "bytes": 26205
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -54648,8 +54653,8 @@
     },
     {
       "path": "tests/test_ibkr_paper_orders_rc5.py",
-      "sha256": "fc80c9457e702be57eedcce51a3496048efa098b5cd3ddea688bab16e4ef19ad",
-      "bytes": 86230
+      "sha256": "4a058d2fbb31c6d5007035ce49941a7ee67b0cd538c408a0c9a6804fd4736475",
+      "bytes": 90541
     },
     {
       "path": "tests/test_ingest_snapshot.py",

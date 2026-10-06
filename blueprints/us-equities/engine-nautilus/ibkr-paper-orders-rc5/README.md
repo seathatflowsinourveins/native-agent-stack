@@ -130,7 +130,11 @@ rtk "$orders_env/bin/python" \
 ```
 
 The second command returns exit 0 inside the window with pinned dependencies,
-and records only structural validation. Outside regular hours it refuses.
+and records only structural validation. It refuses outside regular hours and when
+the planned order/close window reaches the liquid session end minus 25 minutes:
+run starts from 15:29 ET on a normal day refuse. `--plan-only` uses the plan's
+session end because it does not fetch broker liquid hours; an order run rechecks
+the broker's liquid session end, including early closes, before requesting a quote.
 Neither command connects or fetches a quote. The coordinator's order recipe is:
 
 ```sh
@@ -316,14 +320,22 @@ opening 15 minutes use single-width bands, correcting the earlier opening-window
 claim. Trades cannot execute outside active bands and a persistent limit state
 triggers a pause. See the [LULD Plan overview](https://www.luldplan.com/) and
 its [2021 Annual Report](https://cdn.luldplan.com/reports/LULD-2021-Annual-Report.pdf).
-Before any broker request, the runner refuses if the planned order window
-reaches 15:35:00 ET, when the Tier 1 closing-period band doubles to 10%.
+The runner's preliminary plan-session check can refuse before any broker request.
+Once the flat pre-check supplies broker `liquidHours`, admission rechecks the
+same session source used by the frozen window's `session_window` helper, before
+requesting a quote or constructing the node. The closing-period cutoff is the
+liquid session end minus 25 minutes, when the Tier 1 band doubles to 10%.
 The window extends from the parent start through `node_stop_at` plus the close
 horizon: 300 seconds plus 45 seconds of cleanup and 15 seconds of stop allowance,
-or 360 seconds total. A start at 15:28:59 ET ends at 15:34:59 and fits this guard;
-a start at 15:29:00 ET or later refuses with `refused_luld_closing_period`.
-The receipt records the refusal stage, reason, window end and 10% closing-band
-constant. This earlier admission cutoff preserves all plan numbers and prevents
+or 360 seconds total. With a normal 16:00 ET liquid end, a start at 15:28:59 ET
+ends at 15:34:59 and fits this guard; a start at 15:29:00 ET or later refuses
+with `refused_luld_closing_period`. With a 13:00 ET early close, the closing
+period starts at 12:35 ET and run starts from 12:29 ET refuse.
+The receipt's separate `closing_period_admission` records the refusal stage,
+reason, session source, liquid end, window end and 10% closing-band constant.
+`quote_admission` stays null on the preliminary refusal, or records `not_run`
+after the flat pre-check when the liquid-session cutoff prevents a quote request.
+This earlier admission cutoff preserves all plan numbers and prevents
 the order/close window from reaching double-width bands.
 The admission stress is not a guaranteed submission-time cap over 300 seconds;
 rc6 qualification moves that bound to the engine. The independent client-92
@@ -344,7 +356,12 @@ stdin payload, and requires that nonce on the child's receipt before adopting
 evidence into its existing object. A different run's receipt at the same path
 leaves this run's provisional evidence intact and yields `incomplete` with
 `child_receipt_nonce_mismatch`; independent flat proof still runs. The nonce is
-public correlation evidence, not an account identifier or a secret.
+public correlation evidence, not an account identifier or a secret. Concurrent runs on different accounts must use
+separate `--receipt` paths. With a shared path, both runs fail safe, but each can overwrite the other's evidence.
+An unreadable or malformed child receipt, including non-dict JSON, also preserves
+provisional evidence and records `child_receipt_unreadable`. Independent flat
+proof still runs: a passing proof yields `incomplete`; an unproven flat state
+retains `cleanup_required`.
 The parent marks the child launch before `Popen`. A later storage failure cannot revert to
 `not_started`: unavailable flat proof leaves `cleanup_required`, while successful
 flat proof plus a final write error yields `incomplete`. An already observed
@@ -416,7 +433,20 @@ synthetic C1–C4 mapping, quote age/delay/headroom refusals, offset validation,
 deferred and single stop, observer cleanup failures, provisional receipt timing,
 flat-proof causes and final breach statuses. Round r3 also tests shared-session
 admission, missing-callback and deadline diagnostics, farm notice routing,
-accepted entry deferral and persisted child refusals. Installed checks exercise the real
+accepted entry deferral and persisted child refusals. Rounds r5-r7 (88 tests in all) add these tests:
+- wide-spread and LULD-stress admission boundaries (942.85 admits, 942.86 refuses);
+- pending and denied own orders, and generated-identity exclusions, including an isolated started-second case;
+- lease contention, and the lease descriptor passed to the child;
+- journal durability, idempotency and scrubbing;
+- receipts preserved on refusal, and post-launch storage failures;
+- the closing-period cutoff boundary;
+- the receipt nonce.
+
+Round r8 adds normal and early-close liquid-session cutoffs, unrequested quotes
+left null or `not_run`, and a non-dict child receipt that still triggers flat proof
+(91 tests in all).
+
+Installed checks exercise the real
 config/model constructors, post-only and individual-cancel flags and logger
 config and the real builder/cache handle without starting the node. They skip
 without rc5. All network readers and node execution are
@@ -447,7 +477,7 @@ original binding, rather than by an invented Python mutation method.
 
 The run used one plan, `plan.json` (`24ffca56dfa7…`), the rc5 environment from this README (nautilus_trader
 2.0.0rc5, official ibapi 10.45.1, protobuf 5.29.6), and node client 91 with checker client 92. Every attempt is
-retained. Each receipt's `harness_sha256` resolves to `run.py` or to `evidence/harness/run.py.<12 hex>`. Run times are the
+retained. Each receipt's `harness_sha256` resolves to an archived harness, `evidence/harness/run.py.<12 hex>` (the r2, r3 and r4 bytes). Run times are the
 receipts' `started_at` and `ended_at`, truncated to the second.
 
 - **Run 1.** 17:40:15-17:40:45Z, harness `188e0078fc8f…` (r2), `evidence/receipt-20261005-run1-not-connected.json`.
@@ -462,7 +492,7 @@ receipts' `started_at` and `ended_at`, truncated to the second.
     claims external SPY orders, so the case mapping attributed those fills to C3 and C4, and the node stopped before
     ExecTester sent any order. The flat proof passed. r4 now maps cases only from orders this run submitted and
     records other orders under `reconciled_external`.
-- **Run 3.** 18:55:11-18:56:01Z (14:55 ET), harness `5a061ff06f41…` (r4), `evidence/receipt-20261005-passed.json`.
+- **Run 3.** 18:55:11-18:56:01Z (14:55 ET), harness `5a061ff06f41…` (r4, archived as `evidence/harness/run.py.5a061ff06f41`), `evidence/receipt-20261005-passed.json`.
   - Result: **passed**, exit 0.
   - Quote admission: bid 775.24, ask 775.26, fresh.
 
@@ -481,3 +511,14 @@ receipts' `started_at` and `ended_at`, truncated to the second.
 
 The Nautilus console is not redacted, so it stayed private. Acceptance steps 2-4 (reconnect with an open order,
 restart reconciliation, the kill switch) were not exercised and remain blocked upstream (#5007, #5057, #5060).
+
+**The current runner has not run natively.** Run 3 exercised the r4 harness. The r7 `run.py` (`72147d8627d7…`) added these r5-r7 changes, retained by r8:
+- the account lease and the journal;
+- the 5% LULD stress and the commission margin;
+- the closing cutoff, now derived from the liquid session end (15:29 ET run starts on a normal day);
+- the receipt nonce;
+- ownership by generated identity.
+
+Those r5-r7 changes were covered by 88 offline tests; r8 adds the liquid-session
+and malformed-receipt regressions for 91 offline tests. No native paper run of the
+current runner exists yet.

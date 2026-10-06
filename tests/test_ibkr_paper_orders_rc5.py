@@ -1046,10 +1046,12 @@ class AdmissionRefusals(unittest.TestCase):
                 with mock.patch.object(RUN, "official_admission") as admission, mock.patch.object(RUN, "official_check") as proof, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process, mock.patch.object(RUN.safety(), "AccountLease") as lease:
                     receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json"), now=now, versions=PINNED)
                 self.assertEqual((receipt["status"], receipt["exit_code"]), ("refused_luld_closing_period", 3))
-                self.assertEqual(receipt["quote_admission"]["stage"], "luld_tier1_closing_period_band")
-                self.assertEqual(receipt["quote_admission"]["reason"], "planned_order_window_overlaps_15_35_et")
-                self.assertEqual(receipt["quote_admission"]["order_horizon_seconds"], 360)
-                self.assertEqual(receipt["quote_admission"]["closing_band_fraction"], "0.10")
+                self.assertIsNone(receipt["quote_admission"])
+                closing = receipt["closing_period_admission"]
+                self.assertEqual(closing["stage"], "luld_tier1_closing_period_band")
+                self.assertEqual(closing["reason"], "planned_order_window_overlaps_luld_closing_period")
+                self.assertEqual(closing["order_horizon_seconds"], 360)
+                self.assertEqual(closing["closing_band_fraction"], "0.10")
                 self.assertIsNone(receipt["pre_check"])
                 for operation in (admission, proof, node, process, lease):
                     operation.assert_not_called()
@@ -1062,6 +1064,49 @@ class AdmissionRefusals(unittest.TestCase):
         refused = RUN.closing_period_admission(PLAN, start.replace(minute=29, second=0))
         self.assertEqual(refused["status"], "refused_luld_closing_period")
         self.assertTrue(refused["planned_order_window_end"].startswith("2026-10-05T15:35:00"))
+
+    def test_luld_cutoff_uses_the_same_liquid_session_as_the_window(self):
+        for end_hour in (16, 13):
+            with self.subTest(end_hour=end_hour):
+                start = NOW.astimezone(NY).replace(hour=end_hour - 1, minute=28, second=59)
+                sessions = RUN.frozen().parse_liquid_hours(
+                    f"20261005:0930-20261005:{end_hour:02}00", "US/Eastern", start.date())
+                admitted = RUN.closing_period_admission(PLAN, start.astimezone(timezone.utc), liquid_sessions=sessions)
+                self.assertEqual(admitted["status"], "passed")
+                self.assertEqual(admitted["session_source"], "broker_liquid_hours")
+                self.assertEqual(admitted["closing_period_start"], start.replace(minute=35, second=0).isoformat())
+                for minute in (29, 35, 43):
+                    later = start.replace(minute=minute, second=0)
+                    self.assertTrue(RUN.frozen().rth_check(later, PLAN, sessions)[0])
+                    refused = RUN.closing_period_admission(PLAN, later, liquid_sessions=sessions)
+                    self.assertEqual(refused["status"], "refused_luld_closing_period")
+
+    def test_early_close_refuses_before_quote_or_node(self):
+        for minute in (29, 35, 43):
+            with self.subTest(minute=minute), tempfile.TemporaryDirectory() as directory:
+                now = NOW.astimezone(NY).replace(hour=12, minute=minute, second=0)
+                pre = copy.deepcopy(FLAT)
+                pre.update(liquid_hours="20261005:0930-20261005:1300", time_zone_id="US/Eastern")
+                client = RUN.AdmissionState()
+                client.disconnect = mock.Mock()
+
+                class FixedDateTime(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return now.astimezone(tz) if tz is not None else now.replace(tzinfo=None)
+
+                with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN.frozen(), "run_check", return_value=(pre, FAKE_ACCOUNT)), mock.patch.object(RUN, "build_admission_client", return_value=client), mock.patch.object(RUN, "quote_check") as quote, mock.patch.object(RUN, "official_check") as proof, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process, mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory}):
+                    receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json"), now=now, versions=PINNED)
+                self.assertEqual((receipt["status"], receipt["exit_code"]), ("refused_luld_closing_period", 3))
+                self.assertEqual(receipt["pre_check"]["status"], "passed")
+                self.assertEqual(receipt["quote_admission"]["status"], "not_run")
+                closing = receipt["closing_period_admission"]
+                self.assertTrue(closing["closing_period_start"].startswith("2026-10-05T12:35:00"))
+                self.assertTrue(closing["liquid_session_end"].startswith("2026-10-05T13:00:00"))
+                self.assertEqual(closing["session_source"], "broker_liquid_hours")
+                for operation in (quote, proof, node, process):
+                    operation.assert_not_called()
+                client.disconnect.assert_called_once()
 
     def test_pins_window_ports_and_ids_refuse_without_connecting(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -1167,7 +1212,7 @@ class ChildRefusals(unittest.TestCase):
 
 class SyntheticOrchestration(unittest.TestCase):
     """Official checks, quote admission and node execution are synthetic."""
-    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT, fail_final_write=False, foreign_receipt=False):
+    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT, fail_final_write=False, foreign_receipt=False, malformed_receipt=False):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         path = Path(directory.name) / "receipt.json"
@@ -1200,6 +1245,8 @@ class SyntheticOrchestration(unittest.TestCase):
                     # the same receipt path and writes otherwise passing evidence.
                     receipt["run_nonce"] = "0" * 32
                 RUN.write_receipt(path, receipt, (FAKE_ACCOUNT,))
+                if malformed_receipt:
+                    path.write_text(json.dumps(["synthetic", "non-dict receipt"]))
                 super().close()
 
         class Process:
@@ -1268,6 +1315,19 @@ class SyntheticOrchestration(unittest.TestCase):
         self.assertIsNone(receipt["roundtrip"])
         self.assertEqual([case["outcome"] for case in receipt["cases"].values()], ["not_run"] * 4)
         self.assertTrue(any(f["reason"] == "child_receipt_nonce_mismatch" for f in receipt["failures"]))
+        self.assertEqual(receipt["flat_proof"]["status"], "passed")
+        self.assertEqual(checker.call_count, 1)
+
+    def test_list_receipt_keeps_provisional_evidence_and_runs_flat_proof(self):
+        receipt, checker = self.drive(malformed_receipt=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("incomplete", 1))
+        self.assertFalse(receipt["node"]["started"])
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertEqual(receipt["events"], [])
+        self.assertEqual(receipt["fills"], [])
+        self.assertIsNone(receipt["roundtrip"])
+        self.assertEqual([case["outcome"] for case in receipt["cases"].values()], ["not_run"] * 4)
+        self.assertTrue(any(f["reason"] == "child_receipt_unreadable" for f in receipt["failures"]))
         self.assertEqual(receipt["flat_proof"]["status"], "passed")
         self.assertEqual(checker.call_count, 1)
 
