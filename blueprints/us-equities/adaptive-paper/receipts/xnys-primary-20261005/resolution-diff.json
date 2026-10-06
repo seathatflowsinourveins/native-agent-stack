@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base_git_revision": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "baseline_scope": "Fresh resolution of the committed engine requirements at the base revision, then fully constrained; not a live-host environment snapshot.",
+  "python": "3.12.3",
+  "platform": "linux-x86_64",
+  "resolver": "uv 0.12.17",
+  "baseline_lock": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/engine-baseline.lock",
+  "baseline_lock_sha256": "4c8a9257952b0395101448d8c4060b0e9913f59cde63b54fce7f1ccb885ecf61",
+  "qualified_lock": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+  "qualified_lock_sha256": "645544edbd13e7ff2434d5459e981ec0a2506c944e30d47844b4f3c57f602db8",
+  "baseline_distributions": {
+    "alpaca-py": "0.44.0",
+    "annotated-types": "0.8.0",
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.2",
+    "idna": "3.20",
+    "msgpack": "1.2.3",
+    "nautilus-trader": "2.0.0rc5",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pydantic": "2.13.5",
+    "pydantic-core": "2.46.5",
+    "python-dateutil": "2.9.0.post0",
+    "pytz": "2026.5",
+    "requests": "2.34.2",
+    "six": "1.17.0",
+    "sseclient-py": "1.9.0",
+    "typing-extensions": "4.16.0",
+    "typing-inspection": "0.4.4",
+    "urllib3": "2.8.0",
+    "websockets": "17.2"
+  },
+  "qualified_distributions": {
+    "alpaca-py": "0.44.0",
+    "annotated-types": "0.8.0",
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.2",
+    "exchange-calendars": "4.13.2",
+    "idna": "3.20",
+    "korean-lunar-calendar": "0.4.0",
+    "msgpack": "1.2.3",
+    "nautilus-trader": "2.0.0rc5",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pydantic": "2.13.5",
+    "pydantic-core": "2.46.5",
+    "pyluach": "2.3.0",
+    "python-dateutil": "2.9.0.post0",
+    "pytz": "2026.5",
+    "requests": "2.34.2",
+    "six": "1.17.0",
+    "sseclient-py": "1.9.0",
+    "toolz": "1.1.0",
+    "typing-extensions": "4.16.0",
+    "typing-inspection": "0.4.4",
+    "tzdata": "2026.5",
+    "urllib3": "2.8.0",
+    "websockets": "17.2"
+  },
+  "changes": [
+    {
+      "name": "exchange-calendars",
+      "before": null,
+      "after": "4.13.2"
+    },
+    {
+      "name": "korean-lunar-calendar",
+      "before": null,
+      "after": "0.4.0"
+    },
+    {
+      "name": "pyluach",
+      "before": null,
+      "after": "2.3.0"
+    },
+    {
+      "name": "toolz",
+      "before": null,
+      "after": "1.1.0"
+    },
+    {
+      "name": "tzdata",
+      "before": null,
+      "after": "2026.5"
+    }
+  ],
+  "unchanged_count": 20,
+  "removed": [],
+  "imports_ok": true,
+  "imports": {
+    "nautilus-trader": "2.0.0rc5",
+    "alpaca-py": "0.44.0",
+    "exchange-calendars": "4.13.2"
+  }
+}

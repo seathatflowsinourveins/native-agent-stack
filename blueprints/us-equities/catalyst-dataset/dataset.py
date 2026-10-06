@@ -20,7 +20,7 @@ _PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", HERE.p
 _path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
 _PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 MAX_JSON = 20 * 1024 * 1024
-EDGAR_VERSION = "5.58.0"
+EDGAR_VERSION = "5.60.0"
 DUCKDB_VERSION = "1.5.5"
 LIMITATIONS = [
     "Offline metadata conversion of retained sources; no new SEC acquisition.",

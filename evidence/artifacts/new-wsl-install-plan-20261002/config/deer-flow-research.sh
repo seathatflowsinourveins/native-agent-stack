@@ -11,11 +11,23 @@ mkdir -p -m 0700 -- "$run_root"
 run="$(mktemp -d "$run_root/run.XXXXXXXX")"
 mkdir -m 0700 -- "$run/home"
 cd -- "$run"
+# Native ChatOpenAI default_headers join gateway metadata to this run.
+# OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/handlers/chatCore.ts:1087-1090,1133.
+"$tool_root/deer-flow/backend/.venv/bin/python" - "$config_root/deer-flow-config.yaml" "$run/config.yaml" "deerflow-${run##*/}" <<'CONFIG'
+import sys
+import yaml
+from pathlib import Path
+source, target, session = sys.argv[1:]
+config = yaml.safe_load(Path(source).read_text())
+model, = [model for model in config["models"] if model["name"] == "gpt-runtime"]
+model["default_headers"] = {"x-omniroute-session-id": session}
+Path(target).write_text(yaml.safe_dump(config))
+CONFIG
 # Upstream imports its generated project .env. An explicit empty JINA_API_KEY
 # survives load_dotenv(override=False), so its example key is never sent.
 env -i HOME="$run/home" PATH="$PATH" LANG="${LANG:-C.UTF-8}" JINA_API_KEY= \
   DEER_FLOW_PROJECT_ROOT="$tool_root/deer-flow" DEER_FLOW_HOME="$run/state" \
-  DEER_FLOW_CONFIG_PATH="$config_root/deer-flow-config.yaml" \
+  DEER_FLOW_CONFIG_PATH="$run/config.yaml" \
   timeout 1500 "$tool_root/deer-flow/backend/.venv/bin/python" - "$1" <<'PY'
 import os
 import re

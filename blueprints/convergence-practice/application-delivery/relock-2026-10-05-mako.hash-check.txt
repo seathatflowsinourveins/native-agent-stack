@@ -1,0 +1,4 @@
+mako==1.4.2: 2 hash lines; source https://pypi.org/pypi/mako/1.4.2/json
+  7227a060ee3af55a493af61d73d6beef13044b81dba9586736c13945f09464ce -> mako-1.4.2.tar.gz (uploaded 2026-09-22T20:40:55.060882Z, not yanked)
+  e70a2a4308952b33a21208bfd6725da79fae5a8c224578f8cfdeb60e5ace03df -> mako-1.4.2-py3-none-any.whl (uploaded 2026-09-22T20:40:56.423830Z, not yanked)
+unlisted supported artifacts: none

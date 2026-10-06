@@ -1,0 +1,554 @@
+{
+  "round": "t-cal-r2",
+  "evidence_class": "local_integration",
+  "repair_base": "92a3a20effcef142d9a9dcfb05ba7e36596f0bc0",
+  "upstream": {
+    "repository": "gerrymanoim/exchange_calendars",
+    "tag": "4.13.2",
+    "commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+    "installed_sources_match_first_round_pinned_evidence": true,
+    "source_files_sha256": {
+      "calendar_helpers.py": "26cc9e2a72e6418b8b36b4c5956500b800060da07a90930d4af609542e98457f",
+      "calendar_utils.py": "7d12d53482fe295bd5a9b272a635df2292528b8dc19538c93649fa4ee84b40e6",
+      "exchange_calendar.py": "7b8087892b698299fe448afbc4b3fb9300a34ba1605804999436525391c08de6",
+      "us_holidays.py": "a2444bd7aef3ff651faff3f9117c47a0d41e9e7c312f38ecf42403e4d996830e",
+      "exchange_calendar_xnys.py": "baa39f07163abafcf2800b69edc5d920c3db0a64f8bbb30dc7d522883d0b5bd7"
+    }
+  },
+  "environments": {
+    "engine": {
+      "python": "3.12.3",
+      "lock": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock"
+    },
+    "ci": {
+      "python": "3.12.3",
+      "lock": ".github/requirements-ci.txt"
+    },
+    "tmpdir_scope": "private scratch outside /tmp and checkout",
+    "niceness": 19,
+    "credential_fixture_ancestor_owners": {
+      "root_container_uid": 65534,
+      "home_container_uid": 65534,
+      "scratch_root_uid": 1000,
+      "caller_uid": 1000
+    }
+  },
+  "red_before_sessions_sha256": "33db6b18696da4e59b636cc4022dfeddf68d49f900c7678a8f1f07a8696c7e04",
+  "commands": [
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_ingest_snapshot.IngestSnapshotCompleteness.test_expected_latest_session_with_the_engine_calendar_skips_holidays -v",
+      "exit": 1,
+      "output_sha256": "74398abb4b2282115763f585a990d92cdfa30111b8591a69e7d335e34c8a75dd",
+      "tests": 1,
+      "elapsed_seconds": 1.205,
+      "result": "FAILED (errors=1)",
+      "failed_tests": [
+        "test_expected_latest_session_with_the_engine_calendar_skips_holidays (tests.test_ingest_snapshot.IngestSnapshotCompleteness.test_expected_latest_session_with_the_engine_calendar_skips_holidays)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_ingest_snapshot.IngestSnapshotCompleteness.test_expected_latest_session_with_the_engine_calendar_skips_holidays tests.test_ingest_snapshot.IngestSnapshotCompleteness.test_main_uses_the_engine_calendar_for_a_holiday_snapshot -v",
+      "exit": 1,
+      "output_sha256": "7ef307b6448051f108f50dd8a3f64ea428a43869b489e65d1de90ed382a68e4a",
+      "tests": 2,
+      "elapsed_seconds": 1.212,
+      "result": "FAILED (errors=2)",
+      "failed_tests": [
+        "test_expected_latest_session_with_the_engine_calendar_skips_holidays (tests.test_ingest_snapshot.IngestSnapshotCompleteness.test_expected_latest_session_with_the_engine_calendar_skips_holidays)",
+        "test_main_uses_the_engine_calendar_for_a_holiday_snapshot (tests.test_ingest_snapshot.IngestSnapshotCompleteness.test_main_uses_the_engine_calendar_for_a_holiday_snapshot)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_ingest_snapshot -v",
+      "exit": 0,
+      "output_sha256": "0d5dc336cded3c190bbb57813c6a9e60edff4c265b14d1ed39f19b9833da846c",
+      "tests": 10,
+      "elapsed_seconds": 1.293,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_engine_lock_is_registered_without_extending_the_privacy_allowlist -v",
+      "exit": 1,
+      "output_sha256": "52508ab8052f8fec7c776bb357d1eadd8f32515a6b24bedfae53b8fbf137a472",
+      "tests": 2,
+      "elapsed_seconds": 0.001,
+      "result": "FAILED (failures=2)",
+      "failed_tests": [
+        "test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests)",
+        "test_engine_lock_is_registered_without_extending_the_privacy_allowlist (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_engine_lock_is_registered_without_extending_the_privacy_allowlist)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_engine_lock_is_registered_without_extending_the_privacy_allowlist -v",
+      "exit": 0,
+      "output_sha256": "4f060015f71b33e429e1911e1ae0d4b1d2c7939d2d0b81de1af187a75f4ede8c",
+      "tests": 2,
+      "elapsed_seconds": 0.013,
+      "result": "OK"
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_hardening.SessionCalendarTestPrerequisites -v",
+      "exit": 1,
+      "output_sha256": "a08f299df6a3f078cc0df244f407d802b1f27935070c435d299d2f24ffcb1e89",
+      "tests": 1,
+      "elapsed_seconds": 0.001,
+      "result": "FAILED (errors=2)",
+      "failed_tests": [
+        "test_calendar_install_precedes_tests_in_every_mode (tests.test_workflow_hardening.SessionCalendarTestPrerequisites.test_calendar_install_precedes_tests_in_every_mode) (workflow='adoption-bootstrap.yml')",
+        "test_calendar_install_precedes_tests_in_every_mode (tests.test_workflow_hardening.SessionCalendarTestPrerequisites.test_calendar_install_precedes_tests_in_every_mode) (workflow='catalog-freshness.yml')"
+      ]
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_hardening -v",
+      "exit": 1,
+      "output_sha256": "8cb257eb51529e518c81b7e7e34ee4fd5e18d154870f4a572eff43536f5cf2aa",
+      "tests": 117,
+      "elapsed_seconds": 11.042,
+      "result": "FAILED (errors=2, skipped=2)",
+      "failed_tests": [
+        "test_calendar_install_precedes_tests_in_every_mode (tests.test_workflow_hardening.SessionCalendarTestPrerequisites.test_calendar_install_precedes_tests_in_every_mode) (workflow='adoption-bootstrap.yml')",
+        "test_calendar_install_precedes_tests_in_every_mode (tests.test_workflow_hardening.SessionCalendarTestPrerequisites.test_calendar_install_precedes_tests_in_every_mode) (workflow='catalog-freshness.yml')"
+      ]
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_hardening -v",
+      "exit": 1,
+      "output_sha256": "cc83801b6ff1351ac35cbbadfb4767947854ed0afa703b791b56f32504da40ba",
+      "tests": 117,
+      "elapsed_seconds": 10.925,
+      "result": "FAILED (failures=1, skipped=2)",
+      "failed_tests": [
+        "test_calendar_install_precedes_tests_in_every_mode (tests.test_workflow_hardening.SessionCalendarTestPrerequisites.test_calendar_install_precedes_tests_in_every_mode) (workflow='adoption-bootstrap.yml')"
+      ]
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_hardening -v",
+      "exit": 0,
+      "output_sha256": "343d11616a36a532e22a51c23418e8adfe11909db0fe4836e850aaf5d32ce642",
+      "tests": 117,
+      "elapsed_seconds": 10.778,
+      "result": "OK (skipped=2)"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_provider_delayed_open_defers_rth_and_extends_pre -v",
+      "exit": 1,
+      "output_sha256": "e4764752995c02b9d8eeec9613845d86a5edc662db979d1deeccac1eab8efbe0",
+      "tests": 1,
+      "elapsed_seconds": 0.125,
+      "result": "FAILED (failures=1)",
+      "failed_tests": [
+        "test_provider_delayed_open_defers_rth_and_extends_pre (tests.test_adaptive_paper_sessions.SessionClockTests.test_provider_delayed_open_defers_rth_and_extends_pre)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_provider_delayed_open_defers_rth_and_extends_pre -v",
+      "exit": 0,
+      "output_sha256": "62a5ee2e6c0581d95cc07c3e5d392174876d0bc3065caf7f615662b14464c751",
+      "tests": 1,
+      "elapsed_seconds": 0.139,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_alternating_query_years_reuse_bounded_calendars -v",
+      "exit": 1,
+      "output_sha256": "6765fa976db434157fceb56ebf45e4f871cb9dc4332bd0d7c48aa822706b92ae",
+      "tests": 1,
+      "elapsed_seconds": 1.251,
+      "result": "FAILED (failures=1)",
+      "failed_tests": [
+        "test_alternating_query_years_reuse_bounded_calendars (tests.test_adaptive_paper_sessions.SessionClockTests.test_alternating_query_years_reuse_bounded_calendars)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_alternating_query_years_reuse_bounded_calendars -v",
+      "exit": 0,
+      "output_sha256": "7f4fc9db9e90abd8d0e4b1f4f7e48423dde8c20e83d4f6a706a8a37717ad4a01",
+      "tests": 1,
+      "elapsed_seconds": 0.384,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_rth_query_reads_provider_close_once -v",
+      "exit": 1,
+      "output_sha256": "778b717da33892ded70e6244cd7af818a6953e9773a328d70ecc445c0b28731f",
+      "tests": 1,
+      "elapsed_seconds": 0.122,
+      "result": "FAILED (failures=1)",
+      "failed_tests": [
+        "test_rth_query_reads_provider_close_once (tests.test_adaptive_paper_sessions.SessionClockTests.test_rth_query_reads_provider_close_once)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_rth_query_reads_provider_close_once -v",
+      "exit": 0,
+      "output_sha256": "d7f4150231c88da9368e447225d7366d1378476365fb836b3aee731023a66965",
+      "tests": 1,
+      "elapsed_seconds": 0.127,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal -v",
+      "exit": 1,
+      "output_sha256": "b006e825c2a656bef8744149a0dd20ba109b668ff121eb4f2301435a42452e27",
+      "tests": 1,
+      "elapsed_seconds": 0.129,
+      "result": "FAILED (errors=4)",
+      "failed_tests": [
+        "test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal (tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal) (session_date=datetime.date(2026, 9, 26))",
+        "test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal (tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal) (session_date='2026-09-26')",
+        "test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal (tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal) (session_date=datetime.date(2026, 11, 26))",
+        "test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal (tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal) (session_date='2026-11-26')"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal -v",
+      "exit": 1,
+      "output_sha256": "a9072396554f7678947143c3ea9988d38e8c030812c656a51c1318b8998e849a",
+      "tests": 1,
+      "elapsed_seconds": 0.127,
+      "result": "FAILED (errors=2)",
+      "failed_tests": [
+        "test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal (tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal) (session_date=datetime.date(2026, 9, 26))",
+        "test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal (tests.test_adaptive_paper_mover.SessionsSizingAndTiming.test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal) (session_date=datetime.date(2026, 11, 26))"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_mover tests.test_adaptive_paper_mover_native -v",
+      "exit": 0,
+      "output_sha256": "224e42967f2140d913a3694d836aef159f867b6725a6be6346777d18e2e74849",
+      "tests": 98,
+      "elapsed_seconds": 107.744,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_module_fixture_preserves_process_clock -v",
+      "exit": 1,
+      "output_sha256": "aa5ca6727b5b0a47a51233ea53e2ebc7692e40cc544cce1228e0e002929ca645",
+      "tests": 1,
+      "elapsed_seconds": 0.001,
+      "result": "FAILED (failures=1)",
+      "failed_tests": [
+        "test_module_fixture_preserves_process_clock (tests.test_adaptive_paper_sessions.SessionClockTests.test_module_fixture_preserves_process_clock)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_module_fixture_preserves_process_clock tests.test_adaptive_paper_sessions.PreflightGuardSplitTests tests.test_adaptive_paper_sessions.SessionAwareRequireOpenTests -v",
+      "exit": 0,
+      "output_sha256": "31c5cae704a14f355f068470400809aa5f2cb11c9e7e6b409edcc6df09293a02",
+      "tests": 10,
+      "elapsed_seconds": 0.129,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions -v",
+      "exit": 0,
+      "output_sha256": "2234bafd830e9dc0f82090ab0b548e7da358121dbc0bacbb07b53851da508e63",
+      "tests": 149,
+      "elapsed_seconds": 6.8,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions.SessionClockTests -v",
+      "exit": 0,
+      "output_sha256": "ad75a26f97d0fb3e448cdde926704d011088a5a48b179f52f7ebec8b8c5bc173",
+      "tests": 33,
+      "elapsed_seconds": 2.676,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_source_hashes_manifest tests.test_ingest_snapshot tests.test_adaptive_paper_financing -v",
+      "exit": 0,
+      "output_sha256": "3a41f0273ab559c63046a281ebc63e883bf61780cb38809c43f2af94c870ca8e",
+      "tests": 30,
+      "elapsed_seconds": 0.194,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_financing tests.test_order_throughput -v",
+      "exit": 1,
+      "output_sha256": "5d066efe2f4caac6192f56e290f3636fce4b6221af915b6e0adbb5f55babaeee",
+      "tests": 88,
+      "elapsed_seconds": 10.528,
+      "result": "FAILED (errors=1)",
+      "failed_tests": [
+        "test_cli_refuses_live_base_url_from_env_file_without_network (tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_order_throughput -v",
+      "exit": 1,
+      "output_sha256": "28651f2024023ca1c6f5b7061b72f9503515c23a2e5c88f286ffbea5fc775129",
+      "tests": 76,
+      "elapsed_seconds": 10.487,
+      "result": "FAILED (errors=1)",
+      "failed_tests": [
+        "test_cli_refuses_live_base_url_from_env_file_without_network (tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_runner tests.test_adaptive_paper_native tests.test_adaptive_paper_corporate_actions -v --durations 20",
+      "exit": 1,
+      "output_sha256": "05945e00bc4e969baf9411a41736d3875d0d3cab608cdac045923f367c4152bb",
+      "tests": 310,
+      "elapsed_seconds": 70.624,
+      "result": "FAILED (failures=2, errors=4)",
+      "failed_tests": [
+        "test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o700')",
+        "test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o755')",
+        "test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials)",
+        "test_symlink_to_a_valid_target_is_resolved_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_symlink_to_a_valid_target_is_resolved_and_accepted)",
+        "test_non_ascii_content_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_non_ascii_content_is_rejected)",
+        "test_oversized_file_is_rejected_not_silently_truncated_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_oversized_file_is_rejected_not_silently_truncated_and_accepted)"
+      ]
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_native tests.test_adaptive_paper_corporate_actions -v",
+      "exit": 0,
+      "output_sha256": "531f4ce1cfd56da17cf040edf2c6d6fdf77e29cdf70e58602467b1a036ff3f43",
+      "tests": 131,
+      "elapsed_seconds": 17.033,
+      "result": "OK"
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_adaptive_paper_source_hashes_manifest tests.test_ingest_snapshot -v",
+      "exit": 0,
+      "output_sha256": "58d898591fb9cd23d2549a71f9bc73a917e128de3366f9acd36fab59be9f0154",
+      "tests": 18,
+      "elapsed_seconds": 1.392,
+      "result": "OK"
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_policy tests.test_workflow_security tests.test_workflow_security_coverage tests.test_adoption_bootstrap_macos -v",
+      "exit": 1,
+      "output_sha256": "18f731992c720a34472fe276e2c1e542c090f6a9ae03b96c452c88d1041e6fc8",
+      "tests": 179,
+      "elapsed_seconds": 14.272,
+      "result": "FAILED (errors=2, skipped=34)",
+      "failed_tests": [
+        "setUpClass (tests.test_adoption_bootstrap_macos.PlatformDependencyInstallTests)",
+        "test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field (tests.test_adoption_bootstrap_macos.RealNpmLockfileEvidenceTests.test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field)"
+      ]
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_policy tests.test_workflow_security tests.test_workflow_security_coverage -v",
+      "exit": 0,
+      "output_sha256": "4946f44076ea49fbbf93f608c5f75e5aeb19b93620f319c3e21ce487cbea7b3f",
+      "tests": 41,
+      "elapsed_seconds": 1.591,
+      "result": "OK (skipped=1)"
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_mover_early_entry_coverage tests.test_mover_early_entry_sim tests.test_mover_followup_v2 tests.test_mover_coverage_asof tests.test_sim_capacity -v",
+      "exit": 1,
+      "output_sha256": "0dc59613902c8a6a48464d6c7f8cfac2f319bfad4f9ba0558fdae66f6dbe8745",
+      "tests": 126,
+      "elapsed_seconds": 0.299,
+      "result": "FAILED (errors=2, skipped=27)",
+      "failed_tests": [
+        "test_mover_early_entry_coverage (unittest.loader._FailedTest.test_mover_early_entry_coverage)",
+        "test_mover_early_entry_sim (unittest.loader._FailedTest.test_mover_early_entry_sim)"
+      ]
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_mover_early_entry_scan tests.test_mover_early_entry_pipeline tests.test_mover_early_entry_rules tests.test_mover_early_entry_stats tests.test_mover_followup_v2 tests.test_mover_coverage_asof tests.test_sim_capacity -v",
+      "exit": 0,
+      "output_sha256": "4842947605672f059f4341f98cfc1f7b7e80104f8e36e562a2bbfbaea24b4c73",
+      "tests": 151,
+      "elapsed_seconds": 19.124,
+      "result": "OK (skipped=27)"
+    },
+    {
+      "command": "uv pip sync --python \"$ENGINE_PYTHON\" --require-hashes --only-binary :all: --index-url https://pypi.org/simple blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+      "exit": 0,
+      "output_sha256": "bb6ab7d7bf0fbcd2b8e439fa927fbc536ee619dca656fdfa8e55ebc0156129f9",
+      "output_excerpt": " + typing-inspection==0.4.4\n + tzdata==2026.5\n + urllib3==2.8.0\n + websockets==17.2"
+    },
+    {
+      "command": "uv pip install --python \"$CI_PYTHON\" --require-hashes --only-binary :all: --index-url https://pypi.org/simple -r .github/requirements-ci.txt",
+      "exit": 0,
+      "output_sha256": "26034484a97c446cd93cd9070087429a58eb11992557c8f6adbd3bc02ea39554",
+      "output_excerpt": " + six==1.17.0\n + toolz==1.1.0\n + tzdata==2026.5\n + zizmor==1.30.1"
+    },
+    {
+      "command": "$ENGINE_PYTHON -c 'import exchange_calendars, alpaca; from nautilus_trader.live import LiveNode; from alpaca.trading.client import TradingClient'",
+      "exit": 0,
+      "output_sha256": "3bad171021e95fa95c8ed6aa6131c1494af1f4a01f586d316f9d4acff665ea31",
+      "output_excerpt": "4.13.2 0.44.0"
+    },
+    {
+      "command": "uv pip sync --dry-run --python \"$ENGINE_PYTHON\" --require-hashes --only-binary :all: --index-url https://pypi.org/simple blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+      "exit": 0,
+      "output_sha256": "cc5fdff56421aef4becc21d78e00ef92a6a8015181d2a809e5044e8c94d631a0",
+      "output_excerpt": "Using Python 3.12.3 environment at: $ENGINE_VENV\nResolved 25 packages in 182ms\nChecked 25 packages in 0.52ms\nWould make no changes"
+    },
+    {
+      "command": "python3 -m pip download --only-binary=:all: --platform macosx_11_0_arm64 --python-version 3.13 --require-hashes -r .github/requirements-calendar.txt -d \"$T/w\"",
+      "exit": 0,
+      "output_sha256": "dc1a0a3459c9fb9f4d36169ffa7d25a6627a728ad2097c65e0383a8d735a4103",
+      "output_excerpt": "Saved $T/w/six-1.17.0-py2.py3-none-any.whl\nSaved $T/w/toolz-1.1.0-py3-none-any.whl\nSaved $T/w/tzdata-2026.5-py2.py3-none-any.whl\nSuccessfully downloaded exchange-calendars korean-lunar-calendar numpy pandas pyluach python-dateutil six toolz tzdata"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m timeit -n 40 -r 5 -s 'import sessions as s; from datetime import datetime, timezone; t=datetime(2026,3,10,16,0,tzinfo=timezone.utc); s.session_at(t)' 's.session_at(t)'",
+      "exit": 0,
+      "output_sha256": "cb9962d8753f03116f38a280da1572be89f76b3632553486110c8e760b4339b8",
+      "output_excerpt": "40 loops, best of 5: 190 usec per loop",
+      "notes": "Before repair; working directory: blueprints/us-equities/adaptive-paper; explicit warm-up"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m timeit -n 40 -r 5 -s 'import sessions as s; from datetime import datetime, timezone; t=datetime(2027,1,1,2,0,tzinfo=timezone.utc); s.session_at(t)' 's.session_at(t)'",
+      "exit": 0,
+      "output_sha256": "2a1c9f69c999bd32b06353339851430dd6cdba65fe55a3dc211e8a856297e951",
+      "output_excerpt": "40 loops, best of 5: 242 msec per loop",
+      "notes": "Before repair; working directory: blueprints/us-equities/adaptive-paper; explicit warm-up"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m timeit -n 40 -r 5 -s 'import sessions as s; from datetime import datetime, timezone; t=datetime(2026,3,10,16,0,tzinfo=timezone.utc); s.session_at(t)' 's.session_at(t)'",
+      "exit": 0,
+      "output_sha256": "8fa3b1a8fa3dc5ceded399c8f89f7d8868277bad92fc1fdd25130d4e022851da",
+      "output_excerpt": "40 loops, best of 5: 138 usec per loop",
+      "notes": "After repair; working directory: blueprints/us-equities/adaptive-paper; explicit warm-up"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m timeit -n 40 -r 5 -s 'import sessions as s; from datetime import datetime, timezone; t=datetime(2027,1,1,2,0,tzinfo=timezone.utc); s.session_at(t)' 's.session_at(t)'",
+      "exit": 0,
+      "output_sha256": "e7e45113fc24e1bfb4c675e2094779e67a9abcbda7724496306350b798d6c87c",
+      "output_excerpt": "40 loops, best of 5: 302 usec per loop",
+      "notes": "After repair; working directory: blueprints/us-equities/adaptive-paper; explicit warm-up"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m timeit -s \"import sessions as s; from datetime import datetime, timezone; t=datetime(2027,1,1,2,0,tzinfo=timezone.utc)\" \"s.session_at(t)\"",
+      "exit": 0,
+      "output_sha256": "50ddf0931db44d784441e35ca980bf8b3c9598b9f6bc881650afa58eb1efa999",
+      "output_excerpt": "1 loop, best of 5: 287 usec per loop"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit": 0,
+      "output_sha256": "574fcbaf89c356750f89089a050c3c661d457892c0a74ed85befd38d8a7ce2f0",
+      "output_excerpt": "{\"components\": 69, \"hashed_files\": 10103, \"profiles\": 4, \"receipts\": 202, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "command": "python3 scripts/evidence_manifest.py --check",
+      "exit": 0,
+      "output_sha256": "bda13576780a9149b609e99870e7b413d169d0850838859c48fac574c0505265",
+      "output_excerpt": "{\"files\": 10103, \"status\": \"passed\"}"
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "exit": 0,
+      "output_sha256": "8f241daedb4f7a5eaaff358e5653981120ee9436a8959c7b968eedb30dbe9a01",
+      "output_excerpt": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun."
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_adaptive_paper_sessions tests.test_workflow_hardening -v",
+      "exit": 0,
+      "tests": 266,
+      "result": "OK (skipped=34)",
+      "output_sha256": "7997b5a173bff3738f11f6f88da96b38def93add2fa628c27c46f9d8f98ca460",
+      "notes": "32 optional native-adapter cases skipped in calendar-only CI; workflow checks have the two unchanged skips."
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest tests.test_adaptive_paper_sessions tests.test_ingest_snapshot tests.test_adaptive_paper_source_hashes_manifest tests.test_adaptive_paper_financing -v",
+      "exit": 0,
+      "tests": 179,
+      "elapsed_seconds": 6.269,
+      "result": "OK",
+      "output_sha256": "0d49d02cab90b83a7f3ea8775aa528258c9eae6ea72ab2e94d8d7f34d294c6c9",
+      "notes": "Resumed turn; final source and test inputs."
+    },
+    {
+      "command": "$CI_PYTHON -m unittest tests.test_workflow_hardening -v",
+      "exit": 0,
+      "tests": 117,
+      "elapsed_seconds": 10.736,
+      "result": "OK (skipped=2)",
+      "output_sha256": "a190d1270249d16920d1137b0f5702e64c988db6e024f109250f0c4478b899dd",
+      "notes": "Resumed turn; final source and test inputs."
+    }
+  ],
+  "full_ci_suite": {
+    "command": "$CI_PYTHON -m unittest -v --durations 50",
+    "status": "interrupted_at_previous_turn_deadline",
+    "exit": null,
+    "output_sha256": "0f735cca2cf23876d2e051ee1b898269fecf22dce89e2bf5d59e0c6f87e90feb",
+    "discovered_cases": 10962,
+    "verbose_outcome_lines": 8131,
+    "last_test": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+    "failed_outcome_lines_by_module": {
+      "tests.test_adaptive_market_research": 7,
+      "tests.test_adaptive_paper_credential_race": 26,
+      "tests.test_adaptive_paper_credential_source": 35,
+      "tests.test_adaptive_paper_runner": 6,
+      "tests.test_adjudicate": 26,
+      "tests.test_adoption_bootstrap_macos": 1,
+      "tests.test_adoption_guarded_runners": 17,
+      "tests.test_alpaca_historical": 5,
+      "tests.test_alpaca_history_fixture": 1,
+      "tests.test_blind_checkout": 10,
+      "tests.test_claude_lane": 4,
+      "tests.test_codex_broker_reaper": 4,
+      "tests.test_codex_lane": 19,
+      "tests.test_credential_boot_receipt": 6,
+      "tests.test_credential_run": 97,
+      "tests.test_credential_status": 12,
+      "tests.test_credential_tools": 11,
+      "tests.test_data_lake_backfill": 27,
+      "tests.test_gitleaks_config": 1,
+      "tests.test_gpt6_family_tiering_20260926": 22,
+      "tests.test_lane_packets": 3,
+      "tests.test_lifecycle_sample": 6,
+      "tests.test_native_faults_min": 16,
+      "tests.test_order_throughput": 1,
+      "tests.test_path_safety": 1,
+      "tests.test_pre_commit_gate": 1,
+      "tests.test_pre_push_gate": 1,
+      "tests.test_research_efficiency": 4,
+      "tests.test_runtime_worker_openhands_resolver": 1
+    },
+    "notes": "No final unittest summary or process exit was captured. The old exec session no longer exists and an exact-command process lookup found no running suite. Partial outcome-line counts include subtests and omit multiline descriptions; they are not a completed-case total. The coordinator must run the full suite on a host with its required resources."
+  },
+  "limitations": [
+    "Host credential fixtures reject sandbox ancestor ownership; no credential guard was modified.",
+    "Host npm launcher returned 226 on local fixture packing; host services were not adjusted.",
+    "Actual macOS execution and live engine drift are operator/CI scope.",
+    "Full CI suite did not return a final exit before the prior turn deadline; it is an incomplete check, not a pass.",
+    "The partial full-suite run exposed additional host/scratch/launcher failures; its module counts are retained without claiming all failures were diagnosed.",
+    "Gitleaks history scan reported an error in the partial suite; per-user scan lock and host launcher access require the coordinator environment."
+  ],
+  "corrections": [
+    "Initial workflow regression helper expected a literal run block and retained adjacent comments; use the existing uncommented parser with literal workflow blocks.",
+    "Mover regression initially included string dates, but et_epoch already requires datetime.date; the corrected regression exercises native date inputs.",
+    "Optional-suite probe named two nonexistent test modules; rg --files supplied the exact four mover-early-entry module names, which passed in the corrected probe."
+  ],
+  "deployment": "Separate operator step outside paper run windows; no commit, push or live-host change.",
+  "registered_content_files": [
+    ".github/workflows/adoption-bootstrap.yml",
+    ".github/workflows/catalog-freshness.yml",
+    "README.md",
+    "blueprints/us-equities/adaptive-paper/financing.py",
+    "blueprints/us-equities/adaptive-paper/mover.py",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py",
+    "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/repair-round-2.json",
+    "blueprints/us-equities/adaptive-paper/runner.py",
+    "blueprints/us-equities/adaptive-paper/sessions.py",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json",
+    "blueprints/us-equities/data/ingest_snapshot.py",
+    "blueprints/us-equities/order-throughput/README.md",
+    "docs/decisions/2026-10-05-adaptive-paper-xnys-primary.md",
+    "tests/test_adaptive_paper_financing.py",
+    "tests/test_adaptive_paper_mover.py",
+    "tests/test_adaptive_paper_sessions.py",
+    "tests/test_adaptive_paper_source_hashes_manifest.py",
+    "tests/test_ingest_snapshot.py",
+    "tests/test_workflow_hardening.py"
+  ],
+  "registry_method": "scripts/host_receipts.py register_file Python API; finalized content files registered last; evidence manifest excludes its own bytes.",
+  "required_final_checks": [
+    "python3 scripts/validate.py",
+    "python3 scripts/evidence_manifest.py --check",
+    "python3 scripts/validate_catalogs.py",
+    "python3 scripts/validate.py --scan-file (every changed/new file)",
+    "git diff --check"
+  ],
+  "required_final_check_reporting": "Returned exit codes are retained in the builder JSON handoff; final checks run after this receipt is finalized and registered."
+}

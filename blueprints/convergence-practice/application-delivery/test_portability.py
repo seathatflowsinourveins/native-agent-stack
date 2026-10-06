@@ -111,6 +111,9 @@ class RecipeHistoryTests(unittest.TestCase):
                 self.assertEqual(accepted_hashes[row["current_path"]], row["original"]["sha256"])
                 self.assertEqual(hashlib.sha256(current.read_bytes()).hexdigest(), row["current_sha256"])
                 self.assertNotEqual(old.read_bytes(), current.read_bytes())
+                for revision in row.get("superseded_revisions", []):
+                    retained = HERE / revision["retained_path"]
+                    self.assertEqual(hashlib.sha256(retained.read_bytes()).hexdigest(), revision["sha256"])
         for name, expected in history["unchanged_historical_evidence"].items():
             self.assertEqual(hashlib.sha256((HERE / name).read_bytes()).hexdigest(), expected)
 
@@ -123,12 +126,21 @@ class RecipeHistoryTests(unittest.TestCase):
                 current = (HERE / row["record"]).read_bytes()
                 self.assertEqual(hashlib.sha256(old).hexdigest(), row["original"]["sha256"])
                 self.assertEqual(hashlib.sha256(current).hexdigest(), row["current_sha256"])
-                moved = row["relocated"]
-                # Only the path changes; the frozen hash names the same retained bytes.
-                self.assertEqual(
-                    old.replace(moved["from_path"].encode(), moved["to_path"].encode()), current)
-                self.assertEqual(
-                    hashlib.sha256((repo / moved["to_path"]).read_bytes()).hexdigest(), moved["sha256"])
+                if "pre_amendment_record" in row:
+                    prior = row["pre_amendment_record"]
+                    retained = (HERE / prior["retained_path"]).read_bytes()
+                    self.assertEqual(hashlib.sha256(retained).hexdigest(), prior["sha256"])
+                relocations = row["relocated"]
+                if isinstance(relocations, dict):
+                    relocations = [relocations]
+                amended = old
+                for moved in relocations:
+                    # Only an exact path changes; its frozen digest still names the same bytes.
+                    self.assertEqual(amended.count(moved["from_path"].encode()), 1)
+                    amended = amended.replace(moved["from_path"].encode(), moved["to_path"].encode())
+                    self.assertEqual(
+                        hashlib.sha256((repo / moved["to_path"]).read_bytes()).hexdigest(), moved["sha256"])
+                self.assertEqual(amended, current)
 
 
 if __name__ == "__main__":

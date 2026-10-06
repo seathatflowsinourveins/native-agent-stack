@@ -1,0 +1,246 @@
+{
+  "round": "t-cal-r3",
+  "evidence_class": "synthetic_local_integration",
+  "repair_base": "a832984ad6dc76c16b3b15d14f28aeba2aacaa93",
+  "north_star_action": "Conservative per-order risk when the deterministic adaptive-paper session query raises ValueError.",
+  "execution": {
+    "nice": 19,
+    "scratch_root": "$HOME/.cache/tcal3",
+    "scratch_outside_worktree": true,
+    "engine_environment": "Reused the read-only qualified r2 scratch engine; PYTHONDONTWRITEBYTECODE=1 and all test temporary writes use the r3 TMPDIR.",
+    "engine_python": "3.12.3",
+    "calendar_python": "3.13.15",
+    "command_aliases": {
+      "ENGINE_PYTHON": "qualified r2 scratch engine bin/python (3.12.3)",
+      "CALENDAR_PYTHON": "$TMPDIR/t-cal-r3/catalog/bin/python (3.13.15)"
+    }
+  },
+  "upstream": {
+    "repository": "https://github.com/gerrymanoim/exchange_calendars",
+    "tag": "4.13.2",
+    "commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+    "error_source": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/errors.py#L27-L124",
+    "errors_py_sha256": "e88aa70022beca5279f5486adb17fb65ed985868a0040fd0e16258a6e3c17617",
+    "installed_errors_match_pin": true,
+    "five_retained_pinned_calendar_source_digests_match": true,
+    "pin_read_and_comparison_exit": 0,
+    "error_semantics": "CalendarError, InvalidCalendarName and NoSessionsError are not ValueErrors. Other provider errors propagate."
+  },
+  "repairs": [
+    {
+      "finding": "P2-1",
+      "where": [
+        "blueprints/us-equities/adaptive-paper/safety.py",
+        "blueprints/us-equities/adaptive-paper/leverage.py"
+      ],
+      "how": "The three docstrings describe query-year XNYS bounds and the actual ValueError handling; other provider errors propagate.",
+      "red_before": false,
+      "behavioural_change": false
+    },
+    {
+      "finding": "P2-2",
+      "where": [
+        "blueprints/us-equities/adaptive-paper/safety.py",
+        "tests/test_adaptive_paper_safety.py"
+      ],
+      "how": "A session ValueError uses min(ordinary_cap, overnight_cap). A 200 USD ordinary cap and a 0.5 overnight multiple admit 100 USD, refuse a second 100 USD entry, and halt a held position marked at 150 USD. The two public-ledger regressions failed on the r2 implementation before the fix.",
+      "red_before": true,
+      "red_exit": 1,
+      "green_exit": 0
+    },
+    {
+      "finding": "P2-3",
+      "where": [
+        ".github/workflows/adoption-bootstrap.yml",
+        "tests/test_workflow_hardening.py",
+        "tests/test_adoption_bootstrap_macos.py"
+      ],
+      "how": "The calendar requirements path is in MACOS_PATTERNS, push paths, matching bootstrap PATTERNS, and the macOS input assertion list. The real changes script now selects full mode for a calendar-only relock; the regression selected skip against r2.",
+      "red_before": true,
+      "red_exit": 1,
+      "green_exit": 0
+    },
+    {
+      "finding": "P2-4",
+      "where": [
+        ".github/requirements-ci.txt",
+        "README.md",
+        "blueprints/us-equities/order-throughput/README.md"
+      ],
+      "how": "All three places state Python >=3.12; both recipes create their venv with python3.12.",
+      "red_before": false,
+      "behavioural_change": false
+    }
+  ],
+  "risklimits_ast_unchanged": true,
+  "frozen_trial_configs_byte_identical_to_base": true,
+  "engine_imports": {
+    "nautilus_trader": "2.0.0rc5",
+    "alpaca-py": "0.44.0",
+    "exchange-calendars": "4.13.2",
+    "exit": 0
+  },
+  "calendar_subset": {
+    "exchange_calendars": "4.13.2",
+    "korean_lunar_calendar": "0.4.0",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyluach": "2.3.0",
+    "python-dateutil": "2.9.0.post0",
+    "six": "1.17.0",
+    "toolz": "1.1.0",
+    "tzdata": "2026.5",
+    "pip_check_exit": 0
+  },
+  "commands": [
+    {
+      "command": "$CALENDAR_PYTHON -m pip install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r .github/requirements-calendar.txt",
+      "exit": 0,
+      "output_sha256": "7d54846bb72277a41564f5edb833d71329c416b88cf74f19cc90ec9e884997d1",
+      "retained_log": "$TMPDIR/t-cal-r3/calendar-install.log"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest -v tests.test_adaptive_paper_safety.SafetyTests.test_calendar_value_error_keeps_the_stricter_cap_at_entry tests.test_adaptive_paper_safety.SafetyTests.test_calendar_value_error_halts_exposure_above_the_stricter_cap",
+      "exit": 1,
+      "output_sha256": "eb526c4a61bfe5f1f1623384b0a5db8a5526b8fad4658ceeb27ac34829d3e683",
+      "retained_log": "$TMPDIR/t-cal-r3/risk-red.log",
+      "tests": 2,
+      "elapsed_seconds": 0.265,
+      "result": "FAILED (failures=2)"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest -v tests.test_adaptive_paper_safety.SafetyTests.test_calendar_value_error_keeps_the_stricter_cap_at_entry tests.test_adaptive_paper_safety.SafetyTests.test_calendar_value_error_halts_exposure_above_the_stricter_cap",
+      "exit": 0,
+      "output_sha256": "616d60300457fcfdfb4de5f62ccbb9161e035c3c67070d9c494aef85eae8ddb9",
+      "retained_log": "$TMPDIR/t-cal-r3/risk-green.log",
+      "tests": 2,
+      "elapsed_seconds": 0.421,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest -v tests.test_workflow_hardening.ChangesModeComputationTests.test_a_calendar_relock_selects_full_mode",
+      "exit": 1,
+      "output_sha256": "28c572ae8d09b49426cba1b971891d73d6c768a3543599acd0dcd3bc838256ee",
+      "retained_log": "$TMPDIR/t-cal-r3/macos-scope-red.log",
+      "tests": 1,
+      "elapsed_seconds": 0.045,
+      "result": "FAILED (failures=1)"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest -v tests.test_workflow_hardening.ChangesModeComputationTests.test_a_calendar_relock_selects_full_mode",
+      "exit": 0,
+      "output_sha256": "63f038fd92ac1778ea52b1d89aa98f6454a590450052773debff282c2359f598",
+      "retained_log": "$TMPDIR/t-cal-r3/macos-scope-green.log",
+      "tests": 1,
+      "elapsed_seconds": 0.053,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest -v tests.test_adaptive_paper_sessions tests.test_adaptive_paper_safety tests.test_adaptive_paper_leverage tests.test_adaptive_paper_financing tests.test_adaptive_paper_mover tests.test_adaptive_paper_mover_native tests.test_ingest_snapshot tests.test_adaptive_paper_source_hashes_manifest",
+      "exit": 0,
+      "output_sha256": "121bc02a3bf47304ca4166909723ffbdae0bf1844ff6b7a3b9609d19c3917f04",
+      "retained_log": "$TMPDIR/t-cal-r3/engine-targeted.log",
+      "tests": 420,
+      "elapsed_seconds": 129.418,
+      "result": "OK"
+    },
+    {
+      "command": "$ENGINE_PYTHON -m unittest -v tests.test_workflow_hardening",
+      "exit": 0,
+      "output_sha256": "e4f92bde520c3102475f05fbd2f934d5839f4ced5de7a5ff932271a9b88c44ba",
+      "retained_log": "$TMPDIR/t-cal-r3/workflow-hardening.log",
+      "tests": 118,
+      "elapsed_seconds": 10.582,
+      "result": "OK (skipped=2)"
+    },
+    {
+      "command": "timeout --signal=ABRT --kill-after=10s 5m $ENGINE_PYTHON -m unittest -v tests.test_adoption_bootstrap_macos",
+      "exit": 1,
+      "output_sha256": "5272ec78eaa503ba16d35904e254adf3c0c7ecb49236c8c403e3e03d43f53dfd",
+      "retained_log": "$TMPDIR/t-cal-r3/macos-bootstrap.log",
+      "tests": 138,
+      "elapsed_seconds": 11.965,
+      "result": "FAILED (errors=2, skipped=33)"
+    },
+    {
+      "command": "timeout --signal=ABRT --kill-after=10s 2m $ENGINE_PYTHON -m unittest -v tests.test_gitleaks_config",
+      "exit": 1,
+      "output_sha256": "0cbcab558fa5fd5af6f36fa4ea0f6661e653e75be69ee545a1f769d712a580b0",
+      "retained_log": "$TMPDIR/t-cal-r3/gitleaks-tests.log",
+      "tests": 37,
+      "elapsed_seconds": 0.341,
+      "result": "FAILED (errors=26, skipped=1)"
+    },
+    {
+      "command": "timeout 30s gitleaks dir . --redact --no-banner",
+      "exit": 1,
+      "output_sha256": "363709a8c055f312e2270a1f2f3bc2fb4f0b80fc32125e03df3a08929e2b9f99",
+      "retained_log": "$TMPDIR/t-cal-r3/gitleaks-publication.log"
+    },
+    {
+      "command": "timeout --signal=ABRT --kill-after=10s 8m $CALENDAR_PYTHON -m unittest --durations 50",
+      "exit": 124,
+      "output_sha256": "e839f3f39325b2d19eab94e6d28b25e6cca1de14dedc1e6bb94be204fb0e0305",
+      "retained_log": "$TMPDIR/t-cal-r3/catalog-freshness-suite.log",
+      "result": "Timeout; no final unittest summary",
+      "budget_seconds": 480,
+      "stopped_in": "tests.test_canary_proof.FifoTests.test_f_m5_database_swap_and_dumper_stall",
+      "final_tree_qualification": false
+    },
+    {
+      "command": "$CALENDAR_PYTHON -m unittest -v tests.test_adaptive_paper_sessions tests.test_adaptive_paper_financing tests.test_ingest_snapshot tests.test_adaptive_paper_source_hashes_manifest tests.test_workflow_hardening",
+      "exit": 0,
+      "output_sha256": "d453d218f0c83cc1817f4b0c472aa961fe9c88452165fc6746a66a8007fe456f",
+      "retained_log": "$TMPDIR/t-cal-r3/catalog-targeted.log",
+      "tests": 297,
+      "elapsed_seconds": 16.262,
+      "result": "OK (skipped=34)"
+    }
+  ],
+  "limitations": [
+    "The full Python 3.13 suite was budgeted at eight minutes, returned timeout status 124, and has no final unittest summary. Its input preceded final registration, so it is not final-tree full CI acceptance. It stopped in the canary-proof dumper-stall fixture; full hosted CI remains required.",
+    "The supplemental macOS-bootstrap module returned 1: two unchanged npm pack fixtures returned 226; 33 tests skipped for optional PyYAML, real bash 3.2, and host/platform prerequisites. The coordinator must rerun it on its qualified host.",
+    "Gitleaks tests returned 1 (26 scanner errors) and the publication scan returned 1 because the guarded launcher could not write its read-only host lock. Host scans remain required; no launcher guard was bypassed.",
+    "The standalone Python 3.13 calendar selection passed 297 cases with 34 optional-runtime skips. The qualified engine selection passed all 420 cases without skips, including 98 mover/mover-native cases.",
+    "Hosted validate-macos full mode and macos-15 wheel tag selection were not executed in this Linux sandbox.",
+    "Authenticated freshness metadata, live engine drift and the Alpaca early-close POST receipt require separate operator/host work under the existing network and live-resource constraints."
+  ],
+  "deployment": "No live paper process, timer, credential or host service was operated. Live deployment is a separate operator step outside the paper run windows; no commit or push was performed.",
+  "content_input_sha256": {
+    ".github/requirements-ci.txt": "0b37433fb0fb165c893737e8e887581a07a6469683fbdf67ada1a08288758605",
+    ".github/workflows/adoption-bootstrap.yml": "a5a61ef48d7be71aee55dbc9e1c79b2dc970a753e04cff1f671a09543b41164c",
+    "README.md": "81459545301d187ab97ee106f60ec9805cca26cbd884a05a3f056833af5e2def",
+    "blueprints/us-equities/adaptive-paper/leverage.py": "6a72d9f66b5c6de176cb9ff6fca235908e151d9c0107f631dc9f8aa0100ad753",
+    "blueprints/us-equities/adaptive-paper/safety.py": "bfec57e021b65aee058c8d2e7c0cbafad46f6203edbe9396eec739c8546b0fd9",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json": "a6cc50ee9102eb31a0d5620a691a9597d47ab97add11d8244008e5a204d8a7e6",
+    "blueprints/us-equities/order-throughput/README.md": "2566538eb7fcdca0ed08f2177c8da75c1127c221a32e30498f7553ca3cd2fda1",
+    "tests/test_adaptive_paper_safety.py": "dda093e5428a58ac667ae4d9a620acbf7ee78b8b26db83fccf08b530f1e58c7e",
+    "tests/test_adoption_bootstrap_macos.py": "9c62a6bbd07bf32a9af5627725f6e925bd2ba4eecd29066b20955b523251d021",
+    "tests/test_workflow_hardening.py": "77086c6f6d24060b36021e1667dce09ef272bc076e99c8dd14798722bb94f9e6"
+  },
+  "registered_content_files": [
+    ".github/requirements-ci.txt",
+    ".github/workflows/adoption-bootstrap.yml",
+    "README.md",
+    "blueprints/us-equities/adaptive-paper/leverage.py",
+    "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/repair-round-3.json",
+    "blueprints/us-equities/adaptive-paper/safety.py",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json",
+    "blueprints/us-equities/order-throughput/README.md",
+    "tests/test_adaptive_paper_safety.py",
+    "tests/test_adoption_bootstrap_macos.py",
+    "tests/test_workflow_hardening.py"
+  ],
+  "registry_method": "scripts.host_receipts.register_file(Path.cwd(), relative_path), after every content file is finalized; manifests/evidence.json is the registry, not its own entry.",
+  "required_final_checks": [
+    "python3 scripts/validate.py",
+    "python3 scripts/evidence_manifest.py --check",
+    "python3 scripts/validate_catalogs.py",
+    "python3 scripts/validate_foundation.py --root . --json",
+    "python3 scripts/landscape.py --root .",
+    "python3 scripts/validate_convergence.py --all-recorded --root . --json",
+    "python3 scripts/validate.py --scan-file (every changed/new file)",
+    "git diff --check"
+  ],
+  "final_check_reporting": "Final post-registration exit codes are returned in the round JSON; this receipt is not edited afterward."
+}

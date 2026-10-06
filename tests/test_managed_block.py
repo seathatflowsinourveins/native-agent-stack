@@ -165,7 +165,7 @@ class CodexMdBlockTests(ManagedBlockCase):
         super().setUp()
         self.codex_home = self.home / ".codex"
         self.target = self.codex_home / "AGENTS.md"
-        self.template = managed_block.CODEX_TEMPLATE.read_text(encoding="utf-8")
+        self.template = managed_block.codex_block(managed_block.CODEX_TEMPLATE.read_text(encoding="utf-8"))
 
     def apply(self, *extra):
         return run("--home", str(self.home), *extra, "codex-md", "--codex-home", str(self.codex_home))
@@ -278,6 +278,21 @@ class CodexMdBlockTests(ManagedBlockCase):
             code, _, err = run("codex-md", "--codex-home", "~/.codex")
         self.assertEqual(code, 0, err)
         self.assertEqual(self.target.read_text(), self.template)
+
+    def test_native_awareness_include_is_exact_and_rendering_is_idempotent(self):
+        fragment = self.home / managed_block.RTK_AWARENESS_REL
+        fragment.parent.mkdir(parents=True)
+        native = b"# RTK\n\nExact upstream bytes.\n"
+        fragment.write_bytes(native)
+        source = "before\n" + managed_block.RTK_INCLUDE + "\nafter\n"
+        rendered = managed_block.codex_block(source, root=self.home)
+        self.assertEqual(rendered.encode(), b"before\n" + native + b"\nafter\n")
+        self.assertEqual(managed_block.codex_block(rendered, root=self.home), rendered)
+        with self.assertRaises(managed_block.Refused):
+            managed_block.codex_block(source + managed_block.RTK_INCLUDE, root=self.home)
+        fragment.unlink()
+        with self.assertRaises(FileNotFoundError):
+            managed_block.codex_block(source, root=self.home)
 
     def test_source_must_be_one_whole_canonical_block(self):
         for template in ["", self.template + "extra\n", "extra\n" + self.template, self.template + self.template]:

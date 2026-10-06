@@ -14,6 +14,7 @@ import contextlib
 import fnmatch
 import hashlib
 import io
+import importlib.util
 import json
 import os
 import random
@@ -46,6 +47,260 @@ from tests import test_wsl_new_distro_recipe as recipe_tests  # noqa: E402
 MAP = ROOT / cfg.MAP_REL
 MANIFEST = ROOT / cfg.MANIFEST_REL
 PLAN = ROOT / cfg.PLAN_REL
+
+
+class Round2RepairIntegrationTests(unittest.TestCase):
+    """Local synthetic controls; never producer, provider or destination acceptance."""
+
+    @staticmethod
+    def source_module(name):
+        spec = importlib.util.spec_from_file_location(name.replace("-", "_"), PLAN / "config" / name)
+        module = importlib.util.module_from_spec(spec)
+        with mock.patch.object(sys, "dont_write_bytecode", True):
+            spec.loader.exec_module(module)
+        return module
+
+    def test_hcom_apply_never_grants_inbound_authorization_or_requires_codex(self):
+        adapter = self.source_module("hcom-client-config.py")
+        for inbound in (None, "accept", "hold"):
+            with self.subTest(inbound=inbound), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                claude = root / "claude"
+                claude.mkdir()
+                settings = {} if inbound is None else {"crossSessionInbound": inbound}
+                (claude / "settings.json").write_text(json.dumps(settings))
+                env = {"CLAUDE_CONFIG_DIR": str(claude), "CODEX_HOME": str(root / "codex"),
+                       "HCOM_DIR": str(root / "hcom")}
+                with mock.patch.dict(os.environ, env), mock.patch.object(sys, "argv", [
+                        "adapter", "--repo-root", str(ROOT), "--apply"]), \
+                        mock.patch.object(cfg, "running_codex_pids", return_value=[]), \
+                        mock.patch.object(adapter.subprocess, "run") as native, \
+                        contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(adapter.main(), 0)
+                native.assert_not_called()
+                after = json.loads((claude / "settings.json").read_text())
+                if inbound is None:
+                    self.assertNotIn("crossSessionInbound", after)
+                else:
+                    self.assertEqual(after["crossSessionInbound"], inbound)
+
+    def test_gateway_default_metadata_is_observed_without_pipeline_capture(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/chat/completions",
+                 "model": "gpt-6.1-sol", "requestedModel": "cx/gpt-6.1-sol"}]
+        self.assertEqual(gate.observed_routes(rows), {"cx/gpt-6.1-sol"})
+        for field, value in (("status", 503), ("path", "/v1/embeddings"),
+                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max")):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                gate.observed_routes([dict(rows[0], **{field: value})])
+        with self.assertRaisesRegex(ValueError, "no call log"):
+            gate.observed_routes([])
+
+    def test_gateway_paging_stops_at_old_persisted_rows_and_joins_the_run(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        started, finished = "2026-10-05T04:00:00+00:00", "2026-10-05T04:01:00+00:00"
+        fresh = {"id": "fresh", "timestamp": "2026-10-05T04:00:20Z", "sessionTag": "synthetic-run",
+                 "status": 200, "path": "/v1/chat/completions", "model": "gpt-6.1-sol",
+                 "requestedModel": "cx/gpt-6.1-sol"}
+        # An old active row heads the native API list; only persisted rows give
+        # the paging cutoff. Retention may be far larger than 6,400 entries.
+        active = dict(fresh, id="active", active=True, timestamp="2026-10-04T00:00:00Z")
+        page = [active, fresh] + [dict(fresh, id=f"other-{i}", sessionTag="other") for i in range(99)]
+        old = dict(fresh, id="old", timestamp="2026-10-05T03:59:59Z")
+        with mock.patch.object(gate, "get_json", side_effect=[page, [old]]) as native:
+            rows, join = gate.run_rows("synthetic-run", started, finished)
+        self.assertEqual((rows, join), ([fresh], "session"))
+        self.assertEqual(native.call_count, 2)
+        with mock.patch.object(gate, "get_json", return_value=[dict(fresh, sessionTag=None)]):
+            rows, join = gate.run_rows("synthetic-run", started, finished)
+        self.assertEqual(join, "time-window-plus-model")
+        with mock.patch.object(gate, "get_json", return_value=[old]):
+            with self.assertRaisesRegex(ValueError, "no call log"):
+                gate.observed_routes(gate.run_rows("synthetic-run", started, finished)[0])
+
+    def test_plan_owned_rules_refresh_without_overwriting_operator_configuration(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "install.sh").read_text())["copy_config"]
+        with tempfile.TemporaryDirectory() as scratch:
+            config = Path(scratch)
+            rules = config / "hcom-deny.rules"
+            rules.write_text("# stale copied deny policy\n")
+            operator = config / "deer-flow-config.yaml"
+            operator.write_text("# operator choice\n")
+            done = subprocess.run(["bash", "-euo", "pipefail", "-c",
+                                   "copy_config() {\n" + body + "\n}\n"
+                                   "copy_config hcom-deny.rules\ncopy_config deer-flow-config.yaml"],
+                                  env={"PATH": os.environ["PATH"], "config_root": str(config),
+                                       "plan_dir": str(PLAN)}, capture_output=True, text=True)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            self.assertEqual(rules.read_bytes(), (PLAN / "config/hcom-deny.rules").read_bytes())
+            self.assertEqual(operator.read_text(), "# operator choice\n")
+
+    def test_alerting_without_destination_reports_needs_user(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "accept.sh").read_text())["alerting"]
+        script = ("stage=after_sign_in; failed=0; config_root=unused; plan_dir=unused\n"
+                  "python3() { return 78; }\n"
+                  "check() { echo 'unexpected delivery check'; return 1; }\n"
+                  "skipped() { echo skipped; }\nalerting() {\n" + body + "\n}\n"
+                  "alerting\nprintf 'failed=%s\\n' \"$failed\"\n")
+        done = subprocess.run(["bash", "-euo", "pipefail", "-c", script], capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("alerting | after_sign_in | needs_user (78)", done.stdout)
+        self.assertIn("failed=0", done.stdout)
+
+    def test_claude_registration_accepts_the_native_indented_fields(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "accept.sh").read_text())["playwright-cli"]
+        program, = [command for stage, _, _, command in checker.checks_of(body) if stage == "after_sign_in"]
+        checks = "\n".join(line for line in program.splitlines() if "grep -Eq" in line and "claude-registration.txt" in line)
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "claude-registration.txt"
+            for package, expected in (("1.10.1", 0), ("1.10.0", 1)):
+                path.write_text("  Command: npx\n  Args: -y chrome-devtools-mcp@" + package +
+                                " --headless --isolated --no-usage-statistics --no-performance-crux\n")
+                done = subprocess.run(["bash", "-euo", "pipefail", "-c", checks],
+                                      env={"PATH": os.environ["PATH"], "native_probe": scratch}, capture_output=True)
+                self.assertEqual(done.returncode, expected)
+
+    def test_cross_family_review_receives_the_bounded_diff_on_stdin(self):
+        line, = [line for line in (PLAN / "accept.sh").read_text().splitlines()
+                 if line.startswith("claude -p --model opus --effort max --permission-mode plan")]
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch)
+            diff = "diff --git a/example b/example\n-old\n+new\n"
+            (path / "gpt-authored.diff").write_text(diff)
+            script = 'claude() { cat > "$run_dir/seen.diff"; }\n' + line
+            done = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
+                                  env={"PATH": os.environ["PATH"], "run_dir": scratch,
+                                       "gpt_base": "synthetic-base", "gpt_head": "synthetic-head"}, capture_output=True)
+            self.assertEqual(done.returncode, 0)
+            self.assertEqual((path / "seen.diff").read_text(), diff)
+
+    def test_chrome_acceptance_allows_updates_and_requires_the_google_origin(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "accept.sh").read_text())["playwright-cli"]
+        program, = [command for stage, _, _, command in checker.checks_of(body) if stage == "post_install"]
+        prefix = program.split('cd "$tool_root/chrome-devtools-mcp-source"', 1)[0]
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch)
+            sources = path / "sources"
+            sources.mkdir()
+            (sources / "native-stack-google-chrome.sources").write_text(
+                "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796\n")
+            prefix = prefix.replace("/etc/apt/sources.list.d/", str(sources) + "/")
+            # CI 37320629278, full-suite-macos.log:12587-12617: macOS has no dpkg.
+            # Stub the WSL-only comparator and require its exact production arguments (accept.sh:541 at main 2d849ba1f).
+            stubs = ('google-chrome-stable() { printf "Chrome %s\\n" "$build"; }\n'
+                     'dpkg-query() { printf "%s" "$build"; }\n'
+                     'dpkg() { [[ "$1" == --compare-versions && "$2" == "$build" && "$3" == ge && '
+                     '"$4" == 154.0.8037.97-1 ]] && return "$version_status"; }\n'
+                     'apt-cache() { printf "google-chrome-stable | %s | %s stable/main amd64 Packages\\n" "$build" "$origin"; }\n')
+            for build, origin, expected in (("154.0.8037.97-1", "https://dl.google.com/linux/chrome/deb/", 0),
+                                            ("155.0.9000.1-1", "https://dl.google.com/linux/chrome/deb/", 0),
+                                            ("153.0.1.1-1", "https://dl.google.com/linux/chrome/deb/", 1),
+                                            ("155.0.9000.1-1", "https://other.invalid/chrome/deb/", 1)):
+                with self.subTest(build=build, origin=origin):
+                    done = subprocess.run(["bash", "-euo", "pipefail", "-c", stubs + prefix],
+                                          env={"PATH": os.environ["PATH"], "XDG_STATE_HOME": scratch,
+                                                "build": build, "origin": origin,
+                                                "version_status": "1" if build.startswith("153.") else "0"},
+                                          capture_output=True, text=True)
+                    self.assertEqual(done.returncode, expected, done.stderr)
+
+    def test_harbor_openhands_adapter_must_match_the_installed_producer(self):
+        text = (PLAN / "config/harbor-worker-telemetry-accept.sh").read_text()
+        start = text.index("<<'PY'", text.index('python3 - "$HARBOR_TELEMETRY_JOB_CONFIG"')) + len("<<'PY'\n")
+        script = text[start:text.index("\nPY", start)]
+        job = {"agents": [
+            {"name": "codex", "model_name": "gpt-6.1-sol", "kwargs": {"version": "0.160.0",
+             "config": {"model_provider": "openai", "model_reasoning_effort": "max"}}},
+            {"name": "openhands-sdk", "model_name": "synthetic-model", "kwargs": {"version": "1.50.1"}},
+            {"name": "deerflow", "model_name": "synthetic-model", "kwargs": {"repo_ref": "v2.1.0"}},
+        ]}
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "public-job.json"
+            for adapter, wanted in (("1.50.1", 0), ("1.51.0", 78)):
+                job["agents"][1]["kwargs"]["version"] = adapter
+                path.write_text(json.dumps(job))
+                done = subprocess.run([sys.executable, "-c", script, str(path)],
+                                      env={"producer_version": "1.50.1"}, capture_output=True, text=True)
+                self.assertEqual(done.returncode, wanted, done.stderr)
+                if wanted:
+                    self.assertIn("needs_user", done.stderr)
+
+    def test_harbor_refuses_auth_store_upload_before_launch(self):
+        for name in ("CODEX_AUTH_JSON_PATH", "CODEX_FORCE_AUTH_JSON"):
+            with self.subTest(name=name):
+                done = subprocess.run(["bash", str(PLAN / "config/harbor-worker-telemetry-accept.sh")],
+                                      env={"PATH": os.environ["PATH"], name: ""}, capture_output=True, text=True)
+                self.assertEqual(done.returncode, 78, done.stderr)
+                self.assertIn("auth-store upload is forbidden", done.stderr)
+
+
+class Round3AlertReceiverRepairTests(unittest.TestCase):
+    """Local receiver controls; no credential values or live delivery are used."""
+
+    def test_selected_receivers_use_native_templates_without_reading_private_files(self):
+        adapter = Round2RepairIntegrationTests.source_module("observability_config.py")
+        for mode in ("webhook", "telegram", "on-host"):
+            with self.subTest(receiver=mode), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                store = root / "private/native-agent-stack"
+                store.mkdir(parents=True, mode=0o700)
+                names = ({"@BOT_TOKEN_FILE@": "alertmanager-telegram-token",
+                          "@CHAT_ID_FILE@": "alertmanager-telegram-chat-id"}
+                         if mode == "telegram" else {"@URL_FILE@": "alertmanager-webhook-url"})
+                pointers = {marker: store / name for marker, name in names.items()}
+                for pointer in pointers.values():
+                    pointer.touch(mode=0o600)  # Empty synthetic metadata fixtures.
+                config = root / "config"
+                config.mkdir()
+                template_name = "alertmanager-telegram.yaml" if mode == "telegram" else "alertmanager-webhook.yaml"
+                rendered = (PLAN / "config" / template_name).read_text()
+                for marker, pointer in pointers.items():
+                    rendered = rendered.replace(marker, json.dumps(str(pointer)))
+                (config / "alertmanager.yaml").write_text(rendered)
+                read_text, read_bytes = Path.read_text, Path.read_bytes
+
+                def guarded_text(path, *args, **kwargs):
+                    self.assertNotIn(path, pointers.values(), "private destination contents must remain unread")
+                    return read_text(path, *args, **kwargs)
+
+                def guarded_bytes(path, *args, **kwargs):
+                    self.assertNotIn(path, pointers.values(), "private destination contents must remain unread")
+                    return read_bytes(path, *args, **kwargs)
+
+                environment = {"PATH": os.environ["PATH"], "HOME": str(root),
+                               "XDG_CONFIG_HOME": str(root / "private"),
+                               "NATIVE_STACK_ALERT_RECEIVER": mode, "GIT_OPTIONAL_LOCKS": "0"}
+                argv = ["observability_config.py", "alerting-ready", "--config-root", str(config),
+                        "--source-root", str(PLAN / "config")]
+                with mock.patch.dict(os.environ, environment, clear=True), mock.patch.object(sys, "argv", argv), \
+                        mock.patch.object(Path, "read_text", guarded_text), mock.patch.object(Path, "read_bytes", guarded_bytes):
+                    self.assertEqual(adapter.destination(), (mode, pointers, True))
+                    self.assertEqual(adapter.main(), 0)
+
+    def test_missing_receiver_pointers_remain_needs_user_for_every_mode(self):
+        adapter = Round2RepairIntegrationTests.source_module("observability_config.py")
+        for mode in ("webhook", "telegram", "on-host"):
+            with self.subTest(receiver=mode), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                environment = {"HOME": str(root), "XDG_CONFIG_HOME": str(root / "private"),
+                               "NATIVE_STACK_ALERT_RECEIVER": mode}
+                argv = ["observability_config.py", "alerting-ready", "--config-root", str(root / "config")]
+                with mock.patch.dict(os.environ, environment, clear=True), mock.patch.object(sys, "argv", argv), \
+                        contextlib.redirect_stderr(io.StringIO()) as returned:
+                    self.assertEqual(adapter.main(), 78)
+                self.assertIn("needs_user", returned.getvalue())
 
 
 class ObservabilityMigrationRepairTests(unittest.TestCase):
@@ -373,7 +628,7 @@ def make_catalog(tmp: Path) -> Path:
     files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
              *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
-             cfg.SKILLS_MANIFEST_REL]
+             cfg.SKILLS_MANIFEST_REL, cfg.managed_block.RTK_AWARENESS_REL]
     # The dated records that the map's `directive` fields name: --check requires each to be a file of the checkout.
     files += sorted({entry["directive"] for entry in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"]
                      if "directive" in entry})
@@ -721,8 +976,8 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        # The 56 wave-3 installs plus the wave-4 Promptfoo owner default (the repository-quality rule).
-        self.assertEqual(len(planned), 57)
+        # 57 after wave 4; round 2 adds four rows and installs both former split owners.
+        self.assertEqual(len(planned), 63)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -791,7 +1046,7 @@ class ManifestRuleTests(unittest.TestCase):
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
                           "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
                           "container-engine", "command-output", "output-compression", "code-index", "code-graph",
-                          "api-docs"})
+                          "api-docs", "playwright-cli"})
         self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
@@ -890,7 +1145,7 @@ class RenderTests(unittest.TestCase):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
         self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
-                                         "jcodemunch", "semble"])
+                                         "jcodemunch", "semble", "chrome-devtools"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
@@ -906,7 +1161,11 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         # semble comes from the new distribution's additions, merged after the shared template's servers.
         self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
-                                                      "qmd", "context-mode", "jcodemunch", "semble"])
+                                                      "qmd", "context-mode", "jcodemunch", "semble", "chrome-devtools"])
+        # Round-2 browser verdict: one stdio server serves automation and diagnostics.
+        chrome_args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
+        self.assertEqual(servers["chrome-devtools"], {"type": "stdio", "command": "npx", "args": chrome_args})
+        self.assertEqual(config["mcp_servers"]["chrome-devtools"], {"command": "npx", "args": chrome_args})
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
         self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
@@ -939,9 +1198,9 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         self.assertIs(config["features"]["daemon_auto_start"], False)
         # The changelog parity of 2026-10-04: the experimental allowance-history feature (the shared template's, on both hosts)
-        # and the fast service tier (this distribution's additions; NativeStack runs both).
+        # and the standard tier chosen in its 2026-10-05 amendment (this distribution's additions).
         self.assertIs(config["features"]["analytics_plan_history"], True)
-        self.assertEqual(config["service_tier"], "fast")
+        self.assertEqual(config["service_tier"], "default")
         eco = json.loads((ROOT / "adoption/hosts/example.json").read_text())["ECO_ROOT"]
         self.assertEqual(config["shell_environment_policy"]["set"]["PATH"].split(":")[0], eco + "/bin")
         self.assertNotIn("projects", config)
@@ -997,8 +1256,21 @@ class RenderTests(unittest.TestCase):
 
     def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
-        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "hcom", "openai-codex"} <= {
-            n.lower() for n in names}, names)
+        # Reproduced failure: hcom was still asserted unwired after wave 5 made
+        # it an installed owner. Keep the original name set and verify both
+        # partitions against that decision, rather than dropping its name.
+        referenced = {"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "hcom", "openai-codex"}
+        consensus = json.loads((ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json").read_text())
+        adopted = next(e["owner_default"] for e in consensus["wave5"]["amend_rows"]
+                       if e["slot_id"] == "agent-messaging")
+        messaging = foundation_rows()["agent-messaging"]
+        self.assertEqual(messaging["default"], adopted["default"])
+        self.assertFalse(messaging["installs_nothing_extra"])
+        self.assertTrue(cfg.installs(messaging))
+        installed_names = {adopted["default"].split()[0].lower()}
+        self.assertEqual(installed_names, {"hcom"})
+        self.assertEqual(referenced & {n.lower() for n in names}, referenced - installed_names)
+        self.assertEqual(installed_names & {n.lower() for n in names}, set())
         # The owner defaults and interim installs are wired, so their names are no longer scanned for.
         self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk", "socraticode", "headroom",
                           "codebase-memory", "jcodemunch", "chub"} & {n.lower() for n in names}, set())
@@ -1132,7 +1404,7 @@ SENTENCE_STOP = r"[.!?][\"')\]`*_]*"
 
 
 def source_lines(piece: str) -> list:
-    return (ROOT / cfg.BLOCK_TEXT_REL[piece]).read_text(encoding="utf-8").split("\n")
+    return cfg.block_text(ROOT, piece).split("\n")
 
 
 def generated_text(piece: str) -> str:
@@ -1631,6 +1903,27 @@ class ApplyCase(unittest.TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
         self.eco = self.home / ".local/share/codex-ecosystem"
+        native_run = subprocess.run
+
+        def synthetic_rtk(command, **kwargs):
+            home = Path(kwargs.get("env", {}).get("HOME", str(self.home)))
+            if command == [str(home / ".local/share/codex-ecosystem/bin/rtk"), "init", "-g", "--no-patch"]:
+                self.assertTrue(home.is_relative_to(self.base), "synthetic native init escaped the temporary home")
+                target = home / ".claude"
+                target.mkdir(exist_ok=True)
+                (target / "RTK.md").write_text("Synthetic native RTK awareness.\n")
+                path = target / "CLAUDE.md"
+                current = path.read_text() if path.exists() else ""
+                if "@RTK.md" not in current.splitlines():
+                    path.write_text(current + ("\n" if current and not current.endswith("\n") else "") + "@RTK.md\n")
+                return subprocess.CompletedProcess(command, 0, "Synthetic RTK init.\n", "")
+            return native_run(command, **kwargs)
+
+        # Cover direct run_main calls and alternate temporary homes as well as
+        # this helper, without executing a real RTK installation in integration tests.
+        patcher = mock.patch.object(subprocess, "run", side_effect=synthetic_rtk)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def apply(self, *extra: str, dry: bool = False, claude: Path | None = None):
         argv = ["--apply", "--host", EXAMPLE_HOST, "--home", str(self.home), "--claude-bin", str(claude or self.claude),
@@ -1646,7 +1939,265 @@ class ApplyCase(unittest.TestCase):
         write_exe(self.home / ".local/share/mise/shims/qmd", "#!/bin/sh\necho qmd\n")
 
 
+class CodexOwnedMigrationTests(ApplyCase):
+    """Scratch profiles and a synthetic native config writer; no native account or provider is used."""
+
+    def setUp(self):
+        super().setUp()
+        self.installed_state()
+        self.config = self.home / ".codex/config.toml"
+        self.config.parent.mkdir()
+        self.migration_marker = self.config.parent / ".native-agent-stack-migrations/service-tier-fast-to-default-20261005.json"
+        self.edits = []
+        case = self
+
+        class SyntheticAppServer:
+            def __init__(self, codex, env, cwd):
+                case.assertEqual(Path(env["CODEX_HOME"]), case.config.parent)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *error):
+                return False
+
+            def user_layer(self):
+                return hashlib.sha256(case.config.read_bytes()).hexdigest(), tomllib.loads(case.config.read_text())
+
+            def batch_write(self, edits, expected_version):
+                version, data = self.user_layer()
+                case.assertEqual(version, expected_version)
+                case.edits.extend(edits)
+                for edit in edits:
+                    case.assertEqual(edit["key"], ["service_tier"])
+                    data["service_tier"] = edit["value"]
+                case.config.write_text(cfg.emit_toml(data, "# synthetic native writer\n"))
+                return {"status": "ok", "version": self.user_layer()[0]}
+
+        self.synthetic_server = SyntheticAppServer
+        patcher = mock.patch.object(cfg.lane, "AppServer", SyntheticAppServer)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def fast_config(self):
+        original = b"service_tier = 'fast'\nmodel = 'operator-model'\n[features]\ndaemon_auto_start = false\n"
+        self.config.write_bytes(original)
+        return original
+
+    def test_fresh_host_gets_default_and_a_marker_that_preserves_later_fast(self):
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        data = tomllib.loads(self.config.read_text())
+        self.assertEqual(data["service_tier"], "default")
+        self.assertTrue(self.migration_marker.is_file())
+        data["service_tier"] = "fast"  # A later native /fast choice.
+        self.config.write_text(cfg.emit_toml(data, ""))
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "fast")
+        self.assertEqual(self.edits, [])
+
+    def test_upgraded_fast_migrates_once_with_backup_and_native_version_guard(self):
+        before = self.fast_config()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "default")
+        self.assertTrue(self.migration_marker.is_file())
+        self.assertEqual(self.edits, [{"key": ["service_tier"], "value": "default"}])
+        self.assertIn("service_tier", out)
+        self.assertIn("migration", out)
+        self.assertEqual([p.read_bytes() for p in self.config.parent.glob("config.toml.bak.*")], [before])
+        once = tree(self.home)
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tree(self.home), once)
+        self.assertEqual(len(self.edits), 1)
+
+    def test_fast_with_marker_stays_as_a_conflict(self):
+        self.fast_config()
+        self.migration_marker.parent.mkdir()
+        self.migration_marker.write_text("completed\n")  # Presence alone; never parse marker values.
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "fast")
+        self.assertIn("service_tier", out)
+        self.assertIn("conflicts kept", out)
+        self.assertEqual(self.edits, [])
+
+    def test_dry_run_reports_migration_without_writes_or_native_calls(self):
+        self.fast_config()
+        before = tree(self.home)
+        code, out, err = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertIn("would migrate service_tier", out)
+        self.assertEqual(tree(self.home), before)
+        self.assertFalse(self.migration_marker.exists())
+        self.assertFalse(self.marker.exists())
+        self.assertEqual(self.edits, [])
+
+    def test_other_scalars_still_conflict_while_owned_fast_is_migrated(self):
+        self.fast_config()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        data = tomllib.loads(self.config.read_text())
+        self.assertEqual(data["model"], "operator-model")
+        self.assertEqual(data["service_tier"], "default")
+        self.assertIn("conflicts kept", out)
+
+    def test_already_default_adoption_stamps_completion_without_native_edit(self):
+        self.config.write_text("service_tier = 'default'\n[features]\ndaemon_auto_start = false\n")
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertTrue(self.migration_marker.is_file())
+        self.assertEqual(self.edits, [])
+
+    def test_marker_failure_restores_config_and_does_not_mark_migration_done(self):
+        before = self.fast_config()
+        native_write = cfg.lane.atomic_write
+
+        def fail_marker(path, *args, **kwargs):
+            if path == self.migration_marker:
+                raise OSError("synthetic marker write failure")
+            return native_write(path, *args, **kwargs)
+
+        with mock.patch.object(cfg.lane, "atomic_write", side_effect=fail_marker):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertFalse(self.migration_marker.exists())
+        self.assertIn("the file is back as it was", out)
+
+    def test_native_precheck_rejection_keeps_the_concurrent_choice(self):
+        self.fast_config()
+        native_read = self.synthetic_server.user_layer
+
+        def changed_before_read(server):
+            data = tomllib.loads(self.config.read_text())
+            data["service_tier"] = "flex"
+            self.config.write_text(cfg.emit_toml(data, ""))
+            return native_read(server)
+
+        with mock.patch.object(self.synthetic_server, "user_layer", changed_before_read):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "flex")
+        self.assertFalse(self.migration_marker.exists())
+        self.assertEqual(self.edits, [])
+
+    def test_native_version_rejection_keeps_concurrent_unowned_edits(self):
+        self.fast_config()
+
+        def reject_write(*args):
+            data = tomllib.loads(self.config.read_text())
+            data["operator_after_read"] = "keep"
+            self.config.write_text(cfg.emit_toml(data, ""))
+            raise cfg.lane.AppServerError("config/batchWrite", {"message": "synthetic version rejection", "code": 1})
+
+        with mock.patch.object(self.synthetic_server, "batch_write", side_effect=reject_write):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["operator_after_read"], "keep")
+        self.assertFalse(self.migration_marker.exists())
+
+    def test_fresh_marker_failure_is_failed_adoption_and_can_retry_at_default(self):
+        native_write = cfg.lane.atomic_write
+
+        def fail_marker(path, *args, **kwargs):
+            if path == self.migration_marker:
+                raise OSError("synthetic marker write failure")
+            return native_write(path, *args, **kwargs)
+
+        with mock.patch.object(cfg.lane, "atomic_write", side_effect=fail_marker):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "default")
+        self.assertFalse(self.migration_marker.exists())
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertTrue(self.migration_marker.is_file())
+
+    def test_native_written_version_must_match_readback_before_completion(self):
+        self.fast_config()
+        native_write = self.synthetic_server.batch_write
+
+        def wrong_version(server, edits, expected_version):
+            result = native_write(server, edits, expected_version)
+            result["version"] = "synthetic-intervening-version"
+            return result
+
+        with mock.patch.object(self.synthetic_server, "batch_write", wrong_version):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertFalse(self.migration_marker.exists())
+        self.assertIn("native migration version changed", out)
+
+    def test_preserved_flex_is_marked_and_a_later_fast_choice_is_kept(self):
+        self.config.write_text("service_tier = 'flex'\n[features]\ndaemon_auto_start = false\n")
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "flex")
+        self.assertTrue(self.migration_marker.is_file())
+        data = tomllib.loads(self.config.read_text())
+        data["service_tier"] = "fast"  # Native /fast persists this spelling from another tier.
+        self.config.write_text(cfg.emit_toml(data, ""))
+        before = self.config.read_bytes()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.edits, [])
+
+    def test_native_requirement_rejection_reports_the_local_error_text(self):
+        self.fast_config()
+        rejection = cfg.lane.AppServerError("config/batchWrite", {
+            "message": "synthetic service tier requirement is readonly",
+            "data": {"config_write_error_code": "ConfigRequirementReadonly"},
+        })
+        with mock.patch.object(self.synthetic_server, "batch_write", side_effect=rejection):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-600:] + err)
+        self.assertTrue("synthetic service tier requirement is readonly" in out)
+        self.assertTrue("ConfigRequirementReadonly" in out)
+        self.assertFalse(self.migration_marker.exists())
+
+    def test_a_dry_run_without_a_native_migration_writer_refuses_without_writes(self):
+        self.fast_config()
+        before = tree(self.home)
+        native_binary = cfg.Apply.binary
+
+        def no_codex(apply, name, explicit):
+            return None if name == "codex" else native_binary(apply, name, explicit)
+
+        with mock.patch.object(cfg.Apply, "binary", no_codex):
+            code, out, err = self.apply(dry=True)
+        self.assertEqual(code, 1, out[-600:] + err)
+        self.assertTrue("needs the native Codex app-server writer" in out)
+        self.assertEqual(tree(self.home), before)
+        self.assertEqual(self.edits, [])
+
+
 class ApplyTests(ApplyCase):
+    def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
+        self.installed_state()
+        target = self.home / ".claude/settings.json"
+        target.parent.mkdir()
+        original = {"skillListingBudgetFraction": 0.05, "hostOnly": {"keep": 1}}
+        target.write_text(json.dumps(original) + "\n", encoding="utf-8")
+        before = target.read_bytes()
+        code, out, _ = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(target.read_bytes(), before)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        settings = json.loads(target.read_text())
+        self.assertEqual(settings["skillListingBudgetFraction"], 0.05)
+        self.assertEqual(settings["hostOnly"], {"keep": 1})
+        backups = list(target.parent.glob("settings.json.bak.*"))
+        self.assertEqual([p.read_bytes() for p in backups], [before])
+        once = tree(self.home)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tree(self.home), once)
+
     def test_a_dry_run_writes_nothing_and_runs_no_client(self):
         self.installed_state()
         before = tree(self.home)
@@ -1677,7 +2228,14 @@ class ApplyTests(ApplyCase):
         for step in ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "claude-md",
                      "codex-config", "codex-files", "codex-md", "login-path"):
             self.assertIn(f"{step} current", summary)
-        self.assertEqual([p for p in self.home.rglob("*") if ".bak." in p.name], [])
+        # Native RTK first creates the import; adopting our managed block backs
+        # that original file up once. The complete tree comparison above proves
+        # the second adoption neither changes files nor adds another backup.
+        backups = [p for p in self.home.rglob("*") if ".bak." in p.name]
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].parent, self.home / ".claude")
+        self.assertTrue(backups[0].name.startswith("CLAUDE.md.bak."))
+        self.assertEqual(backups[0].read_text(encoding="utf-8"), "@RTK.md\n")
 
     def test_the_first_run_writes_what_the_wired_pieces_name_and_nothing_else(self):
         self.installed_state()
@@ -1690,7 +2248,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "chrome-devtools", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
@@ -1702,7 +2260,7 @@ class ApplyTests(ApplyCase):
         self.assertEqual(stat.S_IMODE(codex.stat().st_mode), 0o700)
         self.assertEqual(stat.S_IMODE((codex / "config.toml").stat().st_mode), 0o600)
         # No role carrier (the map leaves them out), so no agents directory; the Codex block is the whole AGENTS.md.
-        self.assertEqual(sorted(p.name for p in codex.iterdir()), ["AGENTS.md", "config.toml", "omniroute.config.toml",
+        self.assertEqual(sorted(p.name for p in codex.iterdir()), [".native-agent-stack-migrations", "AGENTS.md", "config.toml", "omniroute.config.toml",
                                                                     "stack-worker.config.toml"])
         self.assertIn(f"{self.home}/.local/share/mise/shims", (codex / "config.toml").read_text())
         launcher = self.eco / "bin" / "claude"
@@ -1710,7 +2268,8 @@ class ApplyTests(ApplyCase):
         self.assertEqual((codex / "AGENTS.md").read_text(), generated_text(cfg.CODEX_MD_PIECE))
         self.assertNotIn("never rewritten", out)
         claude_md = (self.home / ".claude" / "CLAUDE.md").read_text()
-        self.assertTrue(claude_md.startswith(managed_block.CLAUDE_BEGIN_LINE + "\n"))
+        self.assertTrue(claude_md.startswith("@RTK.md\n\n" + managed_block.CLAUDE_BEGIN_LINE + "\n"))
+        self.assertEqual(claude_md.splitlines().count("@RTK.md"), 1)
         self.assertTrue(claude_md.endswith(generated_text(cfg.CLAUDE_MD_PIECE).rstrip("\n") + "\n" + managed_block.CLAUDE_END + "\n"))
         self.assertEqual(name_hits(claude_md + (codex / "AGENTS.md").read_text(), unwired_names_independently()), [])
 
@@ -2021,11 +2580,12 @@ class AuthorizationTests(ApplyCase):
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
-    # The tool approval modes of six MCP servers, each tied to its installed owner's slot; wave 3 installs them all.
+    # Wave 5 adds Chrome's scoped approval piece to the existing owner approvals.
     APPROVAL = ("codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/config/mcp_servers.semble.default_tools_approval_mode",
                 "codex/config/mcp_servers.context-mode.default_tools_approval_mode",
                 "codex/config/mcp_servers.jcodemunch.default_tools_approval_mode",
+                "codex/config/mcp_servers.chrome-devtools.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode")
@@ -2035,10 +2595,12 @@ class AuthorizationTests(ApplyCase):
     ALL = STANDALONE + TRUST + APPROVAL + ALLOW
     SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
                                           ("context-supply", "context-mode"), ("code-index", "jcodemunch"),
+                                          ("playwright-cli", "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, "
+                                           "in both clients; it also serves browser diagnostics)"),
                                           ("memory-owner", "ai-memory"),
                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
-    WAITING = APPROVAL[5:]                        # negative-control fixtures remove these two installed owners
+    WAITING = APPROVAL[6:]                        # the same two negative-control owners, after Chrome's insertion
     WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
@@ -2123,7 +2685,8 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
                           if "default_tools_approval_mode" in server},
-                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve"})
+                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve",
+                          "chrome-devtools": "approve"})
         # One trust grant, for the host's main checkout (PROJECT_ROOT) and nothing else: no parent directory, and not
         # the publication checkout the shared template also names.
         project_root = json.loads((ROOT / "adoption/hosts/example.json").read_text())["PROJECT_ROOT"]
@@ -2138,6 +2701,7 @@ class AuthorizationTests(ApplyCase):
                  ("mcp_servers", "semble", "default_tools_approval_mode"),
                  ("mcp_servers", "context-mode", "default_tools_approval_mode"),
                  ("mcp_servers", "jcodemunch", "default_tools_approval_mode"),
+                 ("mcp_servers", "chrome-devtools", "default_tools_approval_mode"),
                  ("projects", project_root, "trust_level")]))
             self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
             self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
@@ -2152,6 +2716,7 @@ class AuthorizationTests(ApplyCase):
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
                     "Codex mcp_servers.semble.default_tools_approval_mode, "
+                    "Codex mcp_servers.chrome-devtools.default_tools_approval_mode, "
                     'Codex projects."${PROJECT_ROOT}".trust_level')
     STACK_WORKER = ("Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode, "
@@ -3085,6 +3650,79 @@ class CodexMergeTests(unittest.TestCase):
         write_exe(directory / "pgrep", "#!/bin/sh\n" + body)
         return mock.patch.dict(os.environ, {"PATH": f"{directory}{os.pathsep}{os.environ['PATH']}"})
 
+    def prepare_marker_only_default(self):
+        self.put(DESTINATION_CODEX)
+        self.assertEqual(self.apply()[0], 0)
+        migration = self.codex_home / ".native-agent-stack-migrations/service-tier-fast-to-default-20261005.json"
+        migration.unlink()
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "default")
+        return migration, self.config.read_bytes(), self.backups(), self.calls()
+
+    def test_marker_only_default_completes_while_a_process_runs_without_guard_or_backup(self):
+        migration, before, backups, calls = self.prepare_marker_only_default()
+        sleeper = subprocess.Popen(["sleep", "120"])
+        self.addCleanup(lambda: (sleeper.kill(), sleeper.wait()))
+        for _ in range(100):
+            if str(sleeper.pid) in cfg.lane.codex_processes("sleep"):
+                break
+            time.sleep(0.05)
+        self.assertIsNone(sleeper.poll())
+        with mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply(name="sleep")
+        self.assertEqual(code, 0, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+        self.assertTrue(migration.is_file())
+        self.assertIn("codex-config current", self.summary(out))
+        self.assertIn("one-time migration recorded", out)
+
+    def test_marker_only_default_completes_without_invoking_a_failing_pgrep(self):
+        migration, before, backups, calls = self.prepare_marker_only_default()
+        with self.stand_in_pgrep("exit 2\n"), mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+        self.assertTrue(migration.is_file())
+        self.assertIn("codex-config current", self.summary(out))
+        self.assertIn("one-time migration recorded", out)
+
+    def test_marker_only_dry_run_needs_no_process_check_and_writes_nothing(self):
+        migration, before, backups, calls = self.prepare_marker_only_default()
+        with self.stand_in_pgrep("exit 2\n"), mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertFalse(migration.exists())
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+        self.assertIn("would record one-time migration completion", out)
+
+    def test_marker_only_completion_verifies_actual_readback_and_keeps_a_concurrent_tier(self):
+        migration, _, backups, calls = self.prepare_marker_only_default()
+        native_pending = cfg.Apply.pending_codex_migrations
+
+        def concurrent_choice(apply, rendered):
+            pending = native_pending(apply, rendered)
+            data = tomllib.loads(self.config.read_text())
+            data["service_tier"] = "flex"
+            self.config.write_text(cfg.emit_toml(data, ""))
+            return pending
+
+        with mock.patch.object(cfg.Apply, "pending_codex_migrations", concurrent_choice), mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertFalse(migration.exists())
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "flex")
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+
     def test_a_pgrep_that_fails_stops_the_merge_and_the_creation_and_the_message_names_the_status(self):
         calls = []
         real_tool = cfg.Apply.tool
@@ -3854,9 +4492,10 @@ class RecordTests(unittest.TestCase):
 
     def test_the_counts_that_the_record_states_are_the_ones_check_prints(self):
         text = " ".join(self.RECORD.read_text(encoding="utf-8").split())
-        match = re.search(r"Today: (\d+) pieces, (\d+) wired \((\d+) practice, (\d+) through a slot\), (\d+) not wired "
-                          r"\((\d+) through a slot that does not install, (\d+) by their own entry\) and (\d+) authorization "
-                          r"pieces", text)
+        matches = list(re.finditer(r"Today: (\d+) pieces, (\d+) wired \((\d+) practice, (\d+) through a slot\), (\d+) not wired "
+                                  r"\((\d+) through a slot that does not install, (\d+) by their own entry\) and (\d+) authorization "
+                                  r"pieces", text))
+        match = matches[-1] if matches else None  # Latest dated projection; historical counts remain intact.
         self.assertIsNotNone(match, "Decision 2 no longer states the counts in that shape")
         rows = json.loads(run_main("--check", "--json")[1])
 
@@ -3914,6 +4553,51 @@ class RecipeCommandTests(unittest.TestCase):
             for word in command.split():
                 if word.endswith((".sh", ".py")) and "/" in word:
                     self.assertTrue((ROOT / word.strip("'")).is_file(), word)
+
+
+
+class RtkNativeLayoutTests(unittest.TestCase):
+    def apply(self, temporary, dry=False, wired=True):
+        args = cfg.build_parser().parse_args(["--apply", "--home", str(temporary)] + (["--dry-run"] if dry else []))
+        runner = cfg.Apply(args)
+        runner.eco = Path(temporary) / "eco"
+        runner.wired = {"step/rtk-claude-init": True} if wired else {}
+        return runner
+
+    def test_dry_run_and_unwired_slot_do_not_execute_the_native_installer(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(subprocess, "run") as run:
+            for dry, wired, expected in ((True, True, "planned"), (False, False, "left out")):
+                runner = self.apply(tmp, dry, wired)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    runner.step_rtk_claude_init()
+                self.assertEqual(runner.outcomes, [("rtk-claude-init", expected)])
+            run.assert_not_called()
+
+    def test_native_global_default_is_used_and_its_files_are_read_back(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = self.apply(tmp)
+            def native(argv, **kwargs):
+                self.assertEqual(argv, [str(runner.eco / "bin/rtk"), "init", "-g", "--no-patch"])
+                self.assertEqual(kwargs["env"]["HOME"], tmp)
+                target = Path(tmp) / ".claude"
+                target.mkdir()
+                (target / "RTK.md").write_text("Native synthetic RTK instructions.\n")
+                (target / "CLAUDE.md").write_text("@RTK.md\n")
+                return subprocess.CompletedProcess(argv, 0, "Native init succeeded.\n", "")
+            with mock.patch.object(subprocess, "run", side_effect=native), contextlib.redirect_stdout(io.StringIO()):
+                runner.step_rtk_claude_init()
+            self.assertEqual(runner.outcomes, [("rtk-claude-init", "applied")])
+
+    def test_exit_zero_without_the_native_import_fails_readback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = self.apply(tmp)
+            target = Path(tmp) / ".claude"
+            target.mkdir()
+            (target / "RTK.md").write_text("Synthetic file without import.\n")
+            with mock.patch.object(subprocess, "run", return_value=subprocess.CompletedProcess([], 0, "", "")), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                runner.step_rtk_claude_init()
+            self.assertEqual(runner.outcomes, [("rtk-claude-init", "failed")])
 
 
 if __name__ == "__main__":

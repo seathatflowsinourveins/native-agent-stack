@@ -1,0 +1,97 @@
+Actual final guard outputs. Known private worktree/scratch paths replaced; negative exits are expected synthetic controls.
+
+== clean.out ==
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK
+
+== stale-receipt.out ==
+.F.
+======================================================================
+FAIL: test_each_grant_is_recorded_by_the_receipt_it_names (tests.test_openhands_lock_binding.GrantEvidenceTests.test_each_grant_is_recorded_by_the_receipt_it_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/mutants/stale-receipt/tests/test_openhands_lock_binding.py", line 37, in test_each_grant_is_recorded_by_the_receipt_it_names
+    self.assertTrue(receipt_binds(receipt_text, lock_path, grant["sha256"]),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"{grant['evidence']} does not record {lock_path} with sha256 {grant['sha256'][:12]}...: write or update the receipt of the review that covers these bytes")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : evidence/receipts/osv-openhands-litellm-relock-20260930.json does not record blueprints/runtime-workers/openhands/requirements.lock with sha256 2837036a2bb8...: write or update the receipt of the review that covers these bytes
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=1)
+
+== zero-pins.out ==
+..F
+======================================================================
+FAIL: test_pins_record_the_digests_of_the_two_lock_files (tests.test_openhands_lock_binding.PinsDigestTests.test_pins_record_the_digests_of_the_two_lock_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/mutants/zero-pins/tests/test_openhands_lock_binding.py", line 30, in test_pins_record_the_digests_of_the_two_lock_files
+    self.assertEqual(pins[key], actual, f"pins.json {key} is not the sha256 of {name}: record the new digest with the relock (the host.py preflight refuses to run otherwise)")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '0000000000000000000000000000000000000000000000000000000000000000' != '2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401'
+- 0000000000000000000000000000000000000000000000000000000000000000
++ 2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401
+ : pins.json requirements_sha256 is not the sha256 of requirements.lock: record the new digest with the relock (the host.py preflight refuses to run otherwise)
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=1)
+
+== other-lock.out ==
+.F.
+======================================================================
+FAIL: test_each_grant_is_recorded_by_the_receipt_it_names (tests.test_openhands_lock_binding.GrantEvidenceTests.test_each_grant_is_recorded_by_the_receipt_it_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/mutants/other-lock/tests/test_openhands_lock_binding.py", line 37, in test_each_grant_is_recorded_by_the_receipt_it_names
+    self.assertTrue(receipt_binds(receipt_text, lock_path, grant["sha256"]),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"{grant['evidence']} does not record {lock_path} with sha256 {grant['sha256'][:12]}...: write or update the receipt of the review that covers these bytes")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : evidence/receipts/osv-openhands-fsspec-relock-20261005.json does not record evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml with sha256 f1c707b8295e...: write or update the receipt of the review that covers these bytes
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=1)
+
+== bad-hash.out ==
+fsspec==2026.6.0: 2 hash lines; source https://pypi.org/pypi/fsspec/2026.6.0/json
+  0000000000000000000000000000000000000000000000000000000000000000 -> NO FILE OF THIS RELEASE HAS THIS SHA256
+  0000000000000000000000000000000000000000000000000000000000000000 -> NO FILE OF THIS RELEASE HAS THIS SHA256
+unlisted supported artifacts: ['fsspec-2026.6.0-py3-none-any.whl', 'fsspec-2026.6.0.tar.gz']
+
+== bad-install.out ==
+Using CPython 3.13.16 interpreter at: <python-install>/bin/python3.13
+Creating virtual environment at: .local/fsspec-relock-20261005/u3/venv
+venv exit: 0
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3
+build-requirements install exit: 0
+
+         Computed:
+           sha256:02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1
+runtime lock install exit: 1
+Checked 177 packages in 4ms
+Found 1 incompatibility
+The package `huggingface-hub` requires `fsspec>=2023.5.0`, but it's not installed
+uv pip check exit: 1
++----------------------------------------------------------------------+
+
+SDK/tools 1.49.6 imports passed; no model request
+sdk import exit: 0
+    import importlib.metadata as m; import fsspec, multidict; assert m.version("fsspec") == "2026.6.0"; assert m.version("multidict") == "6.9.1"; assert m.version("huggingface-hub") == "0.35.3"; print("fsspec", m.version("fsspec"), "multidict", m.version("multidict"), "huggingface-hub", m.version("huggingface-hub"), "litellm", m.version("litellm"))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'fsspec'
+fixed-package imports exit: 1
+done, status 1
+
+Actual final wrapper exit0; clean0, stale-receipt1, zero-pins1, other-lock1, digest-pipeline1, bad-hash1, bad-install1. All negatives expected.

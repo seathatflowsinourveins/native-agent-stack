@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "round": "t-pr4-r3",
+  "observed_at_utc": "2026-10-05T07:58:37.912257+00:00",
+  "recorded_separately_at_utc": "2026-10-05T09:56:59.502538+00:00",
+  "scope": "Round-3 additions to the immutable round-2 native review. Earlier CLI/release observations remain in the parent review.",
+  "parent_review": {
+    "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
+    "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
+    "bytes": 15859
+  },
+  "sources": [
+    {
+      "pin": "systemd/systemd@v255",
+      "locator": "man/systemctl.xml:541-549,2377-2388",
+      "sha256": "7f06242ce06d9d895bf7445e3d29680f8e6a7284004122b4e209097b8313b6d5"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/service/frontend/api/v1/dagruns.go:2066-2096",
+      "sha256": "f07b1b89d784251594bd68478a1120f88111a7f538081158826f7a99cb62f75f"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/service/frontend/api/v1/transformer.go:362,371",
+      "sha256": "923e6b2e76fa03473cde1c4ed82d9106acfc99f3e95e7fe961d21e0d11849d31"
+    }
+  ],
+  "native_choices": [
+    {
+      "glue": "drill_process_restart.py",
+      "upstream_outcome": "kept",
+      "checked": "systemd Restart=on-failure and unit-addressed systemctl kill; Dagu history, REST run-details, original status records, handlers/retries.",
+      "gap_citation": "systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388; dagucloud/dagu@v2.16.6:internal/service/frontend/api/v1/transformer.go:362,371",
+      "why": "Upstreams deliver the fault and supervise; acceptance glue guards identity/time/holiday and correlates the exact due slot. Original status bytes avoid HTTP/auth and require revalidation on pin moves."
+    },
+    {
+      "glue": "drill_process_restart.py signal delivery",
+      "upstream_outcome": "replaced",
+      "checked": "Installed systemctl 255.4 help and systemd v255 unit-addressed kill.",
+      "gap_citation": "systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388",
+      "why": "Use native systemctl --user kill --kill-whom=main --signal=SIGKILL rather than os.kill after a PID lookup."
+    }
+  ],
+  "corrections": [
+    "Round 3 unavailable-input tokens exit 1 so native Dagu fails the run; holidays/before-close still skip.",
+    "Round 3 source journal_mode must be WAL unless explicit opt-in accepts rollback-journal writer blocking.",
+    "Round 3 control backups use a distinct host/tag; controls remain disposable-repository only."
+  ],
+  "native_review": {
+    "scope": "Unit-addressed fault delivery and supported run-details API; earlier native observations remain historical.",
+    "systemctl_version": "255.4",
+    "systemctl_help_exit": 0,
+    "systemctl_version_exit": 0
+  }
+}

@@ -121,3 +121,12 @@ items; no current native sign-in or identity request is needed for the recorded 
 The commit message is `.bounded-fix-wave-g8-base-gateway/msg-1.txt`; no commit command was run.
 
 > **Coordinator note (2026-10-05).** The host stack pin move named here was withdrawn from PR #704 before landing: `manifests/stack.json` keeps its receipted pin until the currency PR moves it with a qualification receipt. See "Host stack pins withdrawn from this PR" in `docs/decisions/2026-10-04-2604-e2e-fix-wave.md`.
+
+
+Superseded 2026-10-04 by round 2: the published OmniRoute 3.8.51 selection
+qualified in #637 replaces this record's destination canary and rollback-only
+recommendation. The old composition and rationale above remain historical
+evidence. The operative topology caps Sol at xhigh; native Codex supplies
+Sol/max until the upstream correction ships. Sources: this PR,
+docs/decisions/2026-10-04-final-architecture-round2.md:36 and
+docs/decisions/2026-10-04-round2-plan-g4-config.md (gateway correction).

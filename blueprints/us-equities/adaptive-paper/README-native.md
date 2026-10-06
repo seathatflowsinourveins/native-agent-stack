@@ -6,6 +6,18 @@ portfolio and cache processing. This is not a backtest engine or a separate
 strategy loop. The injected port alone owns credentials, API calls, streaming,
 durable intent/rate/risk gates and observed broker state.
 
+The engine requires exchange-calendars 4.13.2's XNYS calendar for session dates
+and RTH closes. `sessions.py` passes December 1 of the previous query year and
+January 31 of the following year explicitly; calendar errors propagate. PRE/POST
+windows remain engine policy. The [qualification decision](../../../docs/decisions/2026-10-05-adaptive-paper-xnys-primary.md)
+records the upstream pin, migration parity and environment checks.
+
+For Linux x86_64 / Python 3.12, install the complete environment with
+`uv pip sync --python "$ENGINE_PYTHON" --require-hashes blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock`.
+`ENGINE_PYTHON` must identify the intended engine venv. Other platforms must
+qualify their own lock. Deployment changes both engine code and environment and
+is a separate operator step outside paper run windows.
+
 The original upstream `examples/live/_template/{factories,data,execution}.py`,
 `python/nautilus_trader/live/clients.py` and
 `python/tests/integration/test_python_adapter_template.py` were inspected at

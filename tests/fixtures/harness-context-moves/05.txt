@@ -1,0 +1,1 @@
+- Keep the public grand-dashboard checkpoint current when accepted work changes a lane, worker or gate. Its timer publishes bounded metadata; emitter freshness is distinct from checkpoint age and process liveness.

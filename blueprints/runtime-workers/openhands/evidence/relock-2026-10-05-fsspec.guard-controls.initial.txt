@@ -1,0 +1,49 @@
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK
+clean actual exit: 0; expected: 0
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : evidence/receipts/osv-openhands-litellm-relock-20260930.json does not record blueprints/runtime-workers/openhands/requirements.lock with sha256 2ec63fb527bf...: write or update the receipt of the review that covers these bytes
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=1)
+stale-receipt actual exit: 1; expected: 1
++ 2ec63fb527bf9b47f3e3fb80444e628338a574eca021eb8795d5dec5feba169f
+ : pins.json requirements_sha256 is not the sha256 of requirements.lock: record the new digest with the relock (the host.py preflight refuses to run otherwise)
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=1)
+zero-pins actual exit: 1; expected: 1
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : evidence/receipts/osv-openhands-fsspec-relock-20261005.json does not record blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock with sha256 a8dce0af2b20...: write or update the receipt of the review that covers these bytes
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=1)
+other-lock actual exit: 1; expected: 1
+- [('blueprints/runtime-workers/openhands/requirements.lock',
+-   '0000000000000000000000000000000000000000000000000000000000000000',
+-   '2ec63fb527bf9b47f3e3fb80444e628338a574eca021eb8795d5dec5feba169f')] : these allowed locks changed after their reachability review (path, reviewed sha256, current sha256). Re-review whether each changed lock reaches the advisories listed for it, then record its new sha256 and the evidence path of that review in IGNORE_ALLOWED_LOCKS, or remove the entry and the affected pins.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)
+digest-pipeline actual exit: 1; expected: 1
+fsspec==2026.6.0: 2 hash lines; source https://pypi.org/pypi/fsspec/2026.6.0/json
+  0000000000000000000000000000000000000000000000000000000000000000 -> NO FILE OF THIS RELEASE HAS THIS SHA256
+  0000000000000000000000000000000000000000000000000000000000000000 -> NO FILE OF THIS RELEASE HAS THIS SHA256
+unlisted supported artifacts: ['fsspec-2026.6.0-py3-none-any.whl', 'fsspec-2026.6.0.tar.gz']
+bad-hash actual exit: 1; expected: 1
+runtime lock install exit: 1
+uv pip check exit: 1
+done, status 1
+bad-install actual exit: 1; expected: 1
+guard controls status 0

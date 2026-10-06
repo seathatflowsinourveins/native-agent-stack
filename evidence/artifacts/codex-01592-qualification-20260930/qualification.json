@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "id": "codex-01592-qualification-20260930",
+  "recorded_at": "2026-09-30",
+  "local_source": {
+    "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "owned_sha256": {
+      "tools/adoption/apply_codex_lane.py": "cc507cdc51907822b7d3866baf1ef0f6941ffee2da043f88899a8e4c3de41ab1",
+      "tests/test_codex_worker_lane.py": "69c2453d64f09df69f0d98b87dccba06d56852977828aa0d4b4a62cbdbbaee90",
+      "adoption/pins-linux-x86_64.json": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0"
+    }
+  },
+  "decision": "Adopt the qualified Linux npm 0.159.2 pin and require that exact client version in the existing native config updater.",
+  "upstream": {
+    "repository": "https://github.com/openai/codex",
+    "tag": "rust-v0.159.2",
+    "annotated_tag": "8b9fa496bbf2c47aebd62e85a080b9a522a455b5",
+    "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "release": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+    "release_published_at": "2026-09-29T23:57:16Z",
+    "sources": [
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/config_manager_service.rs",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server-protocol/schema/json/v2/ConfigBatchWriteParams.json",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/core/src/config/edit.rs",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/config/src/config_toml.rs",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/protocol/src/openai_models.rs",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/features/src/lib.rs",
+      "https://developers.openai.com/codex/app-server"
+    ]
+  },
+  "scope": {
+    "evidence_classes": [
+      "upstream native operation",
+      "local integration check",
+      "synthetic fixture",
+      "independent file observation"
+    ],
+    "platform": "Linux x86_64",
+    "input": "Synthetic CODEX_HOME, native account store set to file, isolated outer home, no sign-in files copied.",
+    "global_apply_performed": false,
+    "active_clients_restarted_or_killed": false,
+    "model_calls_performed": false,
+    "provider_usage": null,
+    "scratch_process_guard_name": "codex-q1592",
+    "guard_note": "The supported process-name option scopes the idle check to this isolated fixture. The default global idle guard and exact-version guard remain intact.",
+    "claim_boundary": "Current native config/update/rollback behavior and npm artifacts on the exercised host; no provider, whole-stack or other-platform acceptance.",
+    "backend_evidence": "The template model values and prompt-input readbacks establish local configuration. This qualification and earlier model-route artifacts do not attest a provider backend execution."
+  },
+  "installed_client": {
+    "version": {
+      "command": "rtk codex --version",
+      "exit_code": 0,
+      "stdout": "codex-cli 0.159.2"
+    },
+    "help": {
+      "command": "rtk codex --help",
+      "exit_code": 0
+    },
+    "app_server_help": {
+      "command": "rtk codex app-server --help",
+      "exit_code": 0,
+      "observed_transport": "stdio://"
+    },
+    "scratch_features": {
+      "command": "rtk <qualified-npm-codex> features list",
+      "exit_code": 0,
+      "stdout_excerpt": "daemon_auto_start                        stable             false"
+    },
+    "immutable_tag_resolution": {
+      "command": "rtk gh api repos/openai/codex/git/tags/8b9fa496bbf2c47aebd62e85a080b9a522a455b5",
+      "exit_code": 0
+    },
+    "release_read": {
+      "command": "rtk gh api repos/openai/codex/releases/tags/rust-v0.159.2",
+      "exit_code": 0
+    }
+  },
+  "installation": {
+    "wrapper": {
+      "version": "0.159.2",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2.tgz",
+      "bytes": 4904,
+      "sha256": "cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2",
+      "integrity": "sha512-SE13C3nZCYoVL569BdegoOl6vwjb7o2sXOo7ivwVzaVoY0cswwi0/6pIE0TyO/C0vIkQh3jslExitET7PBTfIg==",
+      "observed_integrity_matches_download": true
+    },
+    "platform_archive": {
+      "version": "0.159.2-linux-x64",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2-linux-x64.tgz",
+      "bytes": 162475310,
+      "sha256": "84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba",
+      "integrity": "sha512-RrCZ1X52wpa1lOsXtCtSyhjOFdQPh7LH5Ccv8HsKmd/2UXbUwxXFqWXFK3JzatquUNGtW/TLox5Y7qVOGkV0/Q==",
+      "observed_integrity_matches_download": true
+    },
+    "native_binary": {
+      "archive_path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+      "sha256": "1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e",
+      "independent_installed_host_binary_hash_matches": true
+    },
+    "registry_install": {
+      "command": "rtk npm install --prefix <scratch-registry-prefix> --ignore-scripts --no-audit --no-fund @openai/codex@0.159.2",
+      "exit_code": 0,
+      "stdout": "added 2 packages in 5s"
+    },
+    "bootstrap_install_mode": {
+      "command": "rtk npm install --global --no-audit --no-fund --prefix <scratch-bootstrap-prefix> <verified-codex-0.159.2.tgz>",
+      "exit_code": 0,
+      "stdout": "added 2 packages in 5s"
+    },
+    "bootstrap_version_probe": {
+      "command": "rtk <scratch-bootstrap-prefix>/bin/codex --version",
+      "exit_code": 0,
+      "stdout": "codex-cli 0.159.2"
+    },
+    "generic_bootstrap": "adoption/bootstrap-linux.sh reads the Codex version/URL/SHA from adoption/pins-linux-x86_64.json; no bootstrap source change is needed.",
+    "signatures": {
+      "command": "rtk npm audit signatures --json --include-attestations --prefix <scratch-registry-prefix>",
+      "exit_code": 0,
+      "verified_packages": [
+        "@openai/codex@0.159.2",
+        "@openai/codex@0.159.2-linux-x64"
+      ],
+      "invalid_count": 0,
+      "missing_count": 0,
+      "provenance": {
+        "predicate_type": "https://slsa.dev/provenance/v1",
+        "workflow": ".github/workflows/rust-release.yml",
+        "repository": "https://github.com/openai/codex",
+        "ref": "refs/tags/rust-v0.159.2",
+        "resolved_git_commit": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+      }
+    }
+  },
+  "native_config_contract": {
+    "operation": "Existing apply_codex_lane.AppServer initialize/initialized/config/read/config/batchWrite against installed 0.159.2 in synthetic state.",
+    "returned_write": {
+      "status": "ok",
+      "version": "sha256:7e8703c35df9e6a364cbbeed4de9faee470f3814afc7b4baced584257831918c",
+      "overriddenMetadata": null
+    },
+    "returned_stale_error": {
+      "code": -32600,
+      "data": {
+        "config_write_error_code": "configVersionConflict"
+      },
+      "message": "Configuration was modified since last read. Fetch latest version and retry."
+    },
+    "returned_invalid_type_error": {
+      "code": -32600,
+      "data": {
+        "config_write_error_code": "configValidationError"
+      },
+      "message": "Invalid configuration: invalid type: unit variant, expected string only\nin `history.persistence`\n"
+    },
+    "returned_rollback": {
+      "status": "ok",
+      "version": "sha256:668d25cf489eb0f6e861dcc7ffd38e24b28e99b29c80f2a1254c5222ba672e14",
+      "overriddenMetadata": null
+    },
+    "independent_observation": {
+      "write_readback": true,
+      "outside_owned_preserved": true,
+      "stale_write_left_bytes_unchanged": true,
+      "invalid_write_left_bytes_unchanged": true,
+      "null_rollback_restored_semantics": true,
+      "daemon_auto_start_remained_false": true
+    }
+  },
+  "reviewed_current_checkout_inputs": {
+    "adoption/templates/codex.config.template.toml": "25a0f116152d6c791d39e7ccbe84652ce494ee61ee052c7f211a39c2a2460ea3",
+    "adoption/templates/codex.stack-worker.config.toml": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
+    "adoption/templates/codex.AGENTS.template.md": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d",
+    "note": "The worker worktree started at HEAD. Its updater was loaded with these read-only current-checkout template paths for qualification; the templates and prover were not edited."
+  },
+  "native_updater": {
+    "driver": "Load the owned updater; set its template constants to the reviewed current-checkout inputs; invoke main(argv).",
+    "common_argv": [
+      "--codex",
+      "<installed-codex>",
+      "--codex-home",
+      "<scratch-codex-home>",
+      "--eco-root",
+      "<installed-ecosystem-prefix>",
+      "--host-path",
+      "/usr/bin:/bin",
+      "--state-dir",
+      "<scratch-state>",
+      "--codex-process-name",
+      "codex-q1592"
+    ],
+    "command_results": [
+      {
+        "action": "dry-run --keep-rehearsal",
+        "exit_code": 0
+      },
+      {
+        "action": "--apply --expect-config-sha256 <reviewed-original> --expect-agents-sha256 <reviewed-original>",
+        "exit_code": 0,
+        "stdout_excerpt": [
+          "config.toml: written and read back",
+          "AGENTS.md: written and read back",
+          "stack-worker.config.toml: in place"
+        ]
+      },
+      {
+        "action": "second --apply with current hashes",
+        "exit_code": 0,
+        "stdout_excerpt": "already in place: nothing to do"
+      },
+      {
+        "action": "--rollback <scratch-run-record>",
+        "exit_code": 0,
+        "stdout_excerpt": [
+          "profile: removed",
+          "agents: restored from the backup",
+          "config: 6 keys restored"
+        ]
+      }
+    ],
+    "returned_write_status": "ok",
+    "returned_rollback_record_status": "rolled-back",
+    "returned_prompt_input": {
+      "no_spawn_unless_asked": false,
+      "prefix_rule": 1,
+      "proactive_delegation": true,
+      "rtk_exceptions": 1,
+      "top_rule": 1
+    },
+    "returned_prompt_input_profile": {
+      "no_spawn_unless_asked": true,
+      "prefix_rule": 1,
+      "proactive_delegation": false,
+      "rtk_exceptions": 1,
+      "top_rule": 1
+    },
+    "independent_observation": {
+      "dry_run_left_original_bytes_unchanged": true,
+      "foreign_server_preserved": true,
+      "foreign_environment_setting_preserved": true,
+      "daemon_auto_start_false": true,
+      "worker_model": "gpt-6.1-sol",
+      "worker_effort": "max",
+      "worker_profile_matches_reviewed_template": true,
+      "rollback_config_byte_exact": true,
+      "rollback_agents_byte_exact": true,
+      "rollback_created_profile_removed": true
+    }
+  },
+  "repository_validation": {
+    "command": "rtk python3 scripts/validate.py",
+    "exit_code": 1,
+    "returned_errors": [
+      "adoption/pins-linux-x86_64.json: SHA-256 mismatch",
+      "adoption/pins-linux-x86_64.json: byte count mismatch",
+      "tests/test_codex_worker_lane.py: SHA-256 mismatch",
+      "tests/test_codex_worker_lane.py: byte count mismatch",
+      "tools/adoption/apply_codex_lane.py: SHA-256 mismatch",
+      "tools/adoption/apply_codex_lane.py: byte count mismatch",
+      "evidence/artifacts/codex-01592-qualification-20260930/qualification.json: evidence file is not hash-listed"
+    ],
+    "integration_requirement": "The coordinator owns the shared evidence manifest; re-register changed source hashes and the new artifact, then rerun validation after integration."
+  },
+  "tests": [
+    {
+      "evidence_class": "local synthetic/structural checks",
+      "command": "rtk python3 -m unittest discover -s tests -p test_codex_worker_lane.py -v",
+      "exit_code": 0,
+      "returned_summary": "Ran 59 tests in 25.893s\nOK (skipped=9)",
+      "native_integration_flag": "unset"
+    },
+    {
+      "evidence_class": "local native integration checks",
+      "command": "NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest test_codex_worker_lane.CodexIntegrationTests.test_real_app_server_conflicts_validation_and_null_rollback test_codex_worker_lane.CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback -v",
+      "cwd": "tests",
+      "exit_code": 0,
+      "returned_summary": "Ran 2 tests in 24.299s\nOK",
+      "upstream_tests": false
+    }
+  ],
+  "preserved_failed_attempts": [
+    {
+      "action": "Initial direct native negative fixture and rollback",
+      "exit_code": 1,
+      "failure": "The arbitrary invalid-effort string was accepted; rollback using the pre-edit version correctly returned configVersionConflict.",
+      "correction": "ReasoningEffort::Custom accepts nonempty unknown strings (protocol/src/openai_models.rs:69-71,154-155 at the pinned commit). The invalid-type fixture now uses history.persistence=123.",
+      "recovery": "Fresh config/read version followed by owned-key rollback returned ok; synthetic state restored.",
+      "recovery_exit_code": 0
+    },
+    {
+      "action": "First full updater dry-run",
+      "exit_code": 3,
+      "failure": "Synthetic base state omitted MCP server definitions that the worker profile amends.",
+      "observation": "Original synthetic config and AGENTS bytes were unchanged.",
+      "correction": "Supply the selected lane's synthetic base definitions before the next native rehearsal."
+    },
+    {
+      "action": "First full updater apply after passing rehearsal",
+      "exit_code": 3,
+      "failure": "The scratch CODEX_HOME omitted RTK.md, which adoption_status uses to independently confirm the inline instructions.",
+      "recovery": "Native rollback returned 0; original config and AGENTS bytes restored, created profile removed.",
+      "correction": "Copy the explicitly referenced installed RTK instruction file into synthetic state; final apply/readback/idempotence/rollback returned 0."
+    }
+  ],
+  "retained_private_evidence_sha256": {
+    "native-config-attempt1-failure-recovery.json": "acc90ffbbcd90f6301d1e693d14e22f93d9f2a32d51d665f94be52453bff3573",
+    "native-config-rpc-returned.json": "4e81b5c09a626c9eb0dd17ce90d9f11359f26bea9fe2ccdac839d43e05eb8b1a",
+    "updater-qualification-private.json": "a4c29ee74d495cd342cefd0d4d19ea2ae191b7eda02839ef902d6eb33ff4ebf8",
+    "npm-registry-audit-signatures.json": "7a5d99711b07f5bdce2c5f10180456dd17f5553d5ba88083b1b3a6dc814211df",
+    "slsa-0.159.2.json": "01ef8b345f0955ff38ef99b1b17172b36de2e567552da0c9ff26a28f26b238f2",
+    "slsa-0.159.2-linux-x64.json": "ecedda9c48fc16795ffa99f23c4529ceebde252df2ef503905ec3dbf09520946",
+    "native-binary-comparison.json": "417ae30d7ff20e79ad5131ac763d26ce293d6dabaf4672a21f3d5b4ce0a58f41"
+  }
+}

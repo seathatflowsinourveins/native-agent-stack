@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "codex-01592-host-finalization-20260930",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-30T06:50:00Z",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Current Linux/WSL Codex 0.159.2 package provenance and native scratch config/updater lifecycle qualified at rust-v0.159.2. The installed binary matches the verified native package; production clients were not restarted or killed.",
+  "limitations": [
+    "One Linux/WSL host; second-machine checks explicitly deferred by user.",
+    "Scratch native acceptance is separate from production global rollout and live provider acceptance.",
+    "No unchanged upstream cargo test suite ran; repository tests and scratch client probes are integration checks.",
+    "The invalid-effort fixture was corrected after tagged source and native behavior established forward-compatible ReasoningEffort::Custom support; failed attempts remain in the artifact.",
+    "Active client processes and differing owned profile are guarded; production rollout must use the qualified ownership migration and idle guard."
+  ],
+  "host_scope": {
+    "profile": "linux-wsl2-x86_64",
+    "platform": "current Linux/WSL host",
+    "identity": "one host; native sign-ins preserved"
+  },
+  "data": {
+    "qualified_version": "0.159.2",
+    "source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "artifact": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+    "evidence_class": "native-scratch-config-and-package-provenance",
+    "provider_attestation": false,
+    "daemon_auto_start": false,
+    "global_profile_rollout": "separate finalization receipt"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+      "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
+      "byte_identical_to_run_copy": true
+    }
+  ]
+}

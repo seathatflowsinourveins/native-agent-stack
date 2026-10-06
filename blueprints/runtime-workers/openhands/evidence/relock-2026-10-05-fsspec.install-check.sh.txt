@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Documentary #562 install sequence in its own scratch venv, not a host install.
+# Source: native-stack@74cc5468:.../relock-2026-09-30-litellm.install-check.sh.txt.
+# Usage: bash <script> <owned-scratch> <tree> <rtk-binary> <uv-binary>
+set -uo pipefail
+rc=0
+R=$1; W=$2; RTK=$3; UV=$4
+OH=$W/blueprints/runtime-workers/openhands; V=$R/u3/venv
+export UV_CACHE_DIR=$R/uv-cache UV_PYTHON_DOWNLOADS=never UV_NO_CONFIG=1 TMPDIR=$R/tmp
+step() { echo "$1 exit: $2"; [ "$2" -eq 0 ] || rc=1; }
+"$RTK" mkdir -p "$TMPDIR"
+"$RTK" rm -rf "$V"
+"$RTK" "$UV" venv --python 3.13 "$V" 2>&1 | "$RTK" tail -2; step venv "${PIPESTATUS[0]}"
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r "$OH/build-requirements.lock" 2>&1 | "$RTK" tail -3; step 'build-requirements install' "${PIPESTATUS[0]}"
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r "$OH/requirements.lock" 2>&1 | "$RTK" tail -3; step 'runtime lock install' "${PIPESTATUS[0]}"
+"$RTK" "$UV" pip check --python "$V/bin/python" 2>&1 | "$RTK" tail -3; step 'uv pip check' "${PIPESTATUS[0]}"
+"$RTK" "$V/bin/python" -c 'import importlib.metadata as m; assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.49.6"; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; from openhands.tools.file_editor import FileEditorTool; print("SDK/tools 1.49.6 imports passed; no model request")' 2>&1 | "$RTK" tail -3; step 'sdk import' "${PIPESTATUS[0]}"
+"$RTK" "$V/bin/python" -c 'import importlib.metadata as m; import fsspec, multidict; assert m.version("fsspec") == "2026.6.0"; assert m.version("multidict") == "6.9.1"; assert m.version("huggingface-hub") == "0.35.3"; print("fsspec", m.version("fsspec"), "multidict", m.version("multidict"), "huggingface-hub", m.version("huggingface-hub"), "litellm", m.version("litellm"))' 2>&1 | "$RTK" tail -3; step 'fixed-package imports' "${PIPESTATUS[0]}"
+echo "done, status $rc"
+exit "$rc"

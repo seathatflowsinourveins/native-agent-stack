@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Documentary supported pnpm12.4.2 selective update and #587/#252 qualification.
+# Sources: pnpm/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4:
+# pnpm/crates/cli/src/cli_args/update.rs; native-stack@798ac445/c96c2555.
+# Usage: bash <script> <project> <owned-scratch> <rtk> <corepack>
+set -euo pipefail
+P=$1; R=$2; RTK=$3; COREPACK=$4
+export COREPACK_HOME=$R/corepack NEXT_TELEMETRY_DISABLED=1
+cd "$P"
+"$RTK" "$COREPACK" pnpm update source-map-js --no-save --lockfile-only --ignore-scripts --store-dir "$R/pnpm-store" --state-dir "$R/pnpm-state"
+"$RTK" "$COREPACK" pnpm install --frozen-lockfile --ignore-scripts --store-dir "$R/pnpm-store" --state-dir "$R/pnpm-state"
+"$RTK" "$COREPACK" pnpm peers check
+"$RTK" "$COREPACK" pnpm typecheck
+"$RTK" "$COREPACK" pnpm build

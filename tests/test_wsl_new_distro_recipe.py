@@ -1419,7 +1419,10 @@ class StageTwoTests(unittest.TestCase):
     def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
         owners = plan_after_sign_in_slots()
         # tobi-qmd's after-provisioning check joined with the wave-2 records (2026-10-03; wave-2 qmd ruling, change 16).
-        self.assertEqual(owners, ['codex', 'claude-agent-sdk', 'codex-sdk-and-codex-exec-app-server', 'mcp-inspector', 'sandbox-runtime-srt', 'serena', 'tobi-qmd', 'mineru', 'ccusage', 'grafana', 'local-model-server', 'alerting', 'session-analytics', 'inspect-ai', 'promptfoo', 'worktrunk', 'difftastic', 'cross-family-review', 'gpt-gateway', 'agent-runtime-worker', 'research-harnesses'])
+        # command-output's check joined with the Codex hook decision (2026-10-04): a fresh codex exec must run its command through the hook.
+        # Wave 5 (round-2 adoption and repair, this PR) adds the after-sign-in checks of agent-messaging, playwright-cli, harbor-containerized-agent-e2e-runner,
+        # lm-program-optimization, skill-vetting, trajectory-analysis and mcp-protocol-conformance, in plan order.
+        self.assertEqual(owners, ['codex', 'claude-agent-sdk', 'codex-sdk-and-codex-exec-app-server', 'mcp-inspector', 'agent-messaging', 'sandbox-runtime-srt', 'serena', 'tobi-qmd', 'mineru', 'playwright-cli', 'ccusage', 'command-output', 'grafana', 'local-model-server', 'alerting', 'session-analytics', 'inspect-ai', 'harbor-containerized-agent-e2e-runner', 'promptfoo', 'worktrunk', 'difftastic', 'cross-family-review', 'gpt-gateway', 'agent-runtime-worker', 'research-harnesses', 'lm-program-optimization', 'skill-vetting', 'trajectory-analysis', 'mcp-protocol-conformance'])
         script = read(PLAN_DIR / "accept.sh")
         for part in ("--only)", "--stage)", "post_install|service_health|after_sign_in) ;;"):
             self.assertIn(part, script)

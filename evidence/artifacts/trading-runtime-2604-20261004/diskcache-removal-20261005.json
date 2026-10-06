@@ -1,0 +1,600 @@
+{
+  "schema_version": 1,
+  "id": "trading-2604-diskcache-removal-20261005",
+  "observed_utc": "2026-10-05T10:24:41Z",
+  "base_commit": "ac5ca66581251e677d885dac62d441a79dedafd7",
+  "decision": "remove",
+  "evidence_class": "local_integration",
+  "claim": "Remove unused DVC and its exclusive dependency closure from the runtime; retain all surviving distribution versions and archive metadata. The pinned OSV-Scanner reproduces the advisory before removal and passes both exhaustive CI inventory groups afterward.",
+  "advisory": {
+    "id": "PYSEC-2026-2447",
+    "aliases": [
+      "GHSA-w8v5-vhqr-4h9v",
+      "CVE-2025-69872"
+    ],
+    "affected": "diskcache <=5.6.3; OSV range introduced 0, last_affected 5.6.3; no fixed event",
+    "path": "Cache.get/__getitem__ -> Disk.fetch in MODE_PICKLE -> pickle.load; cache-key decoding also uses pickle.load in Disk.get.",
+    "trigger": "An attacker must write a crafted pickle to the SQLite cache or value file before the victim reads it. The default Disk implementation has no deserialization allowlist.",
+    "impact": "Code execution in the cache reader process, if those attacker-write and victim-read conditions hold.",
+    "assessment": "Confirmed package/advisory match. Runtime exploitability was not demonstrated; the recipe only imports DVC, and no DVC cache operation is called. Removal avoids depending on a reachability exception.",
+    "poc_sketch": "Attacker with cache write access inserts a pickle whose reduce operation selects a callable; victim Cache.get reads MODE_PICKLE data; Disk.fetch calls pickle.load, invoking that callable. No exploit payload was executed.",
+    "sources": [
+      "https://api.osv.dev/v1/vulns/PYSEC-2026-2447",
+      "https://api.osv.dev/v1/vulns/GHSA-w8v5-vhqr-4h9v",
+      "https://github.com/advisories/GHSA-w8v5-vhqr-4h9v",
+      "https://github.com/EthanKim88/ethan-cve-disclosures/blob/main/CVE-2025-69872-DiskCache-Pickle-Deserialization.md",
+      "https://github.com/grantjenks/python-diskcache/blob/323787f507a6456c56cce213156a78b17073fe00/diskcache/core.py#L165-L177",
+      "https://github.com/grantjenks/python-diskcache/blob/323787f507a6456c56cce213156a78b17073fe00/diskcache/core.py#L254-L284"
+    ],
+    "returned_advisory_sha256": {
+      "diskcache-advisory-pysec.json": "6efd893c0ed2c5922d529cd94bf43f54283daba41a5da4a9f133611e816946cd",
+      "diskcache-advisory-ghsa.json": "7c618c2702ac1efa9c9386505147e307d66580bb79166e702a13d2e1da9fef4e"
+    }
+  },
+  "remedy_search_in_order": [
+    {
+      "package": "diskcache",
+      "latest_pypi": "5.6.3",
+      "source_commit": "323787f507a6456c56cce213156a78b17073fe00",
+      "result": "No newer published release; OSV lists no fixed version.",
+      "metadata": "https://pypi.org/pypi/diskcache/json"
+    },
+    {
+      "package": "dvc-data",
+      "latest_pypi": "3.18.3",
+      "source_commit": "56af66a26d8c140b812e6a75b3f0cc0c6e77628d",
+      "requires": "diskcache>=5.2.1",
+      "result": "Latest release still requires diskcache.",
+      "metadata": "https://pypi.org/pypi/dvc-data/json",
+      "source": "https://github.com/treeverse/dvc-data/blob/56af66a26d8c140b812e6a75b3f0cc0c6e77628d/pyproject.toml#L29"
+    },
+    {
+      "package": "dvc",
+      "latest_pypi": "3.67.1",
+      "source_commit": "356dfa03278058b02df42124f243c2c345329dae",
+      "requires": "dvc-data>=3.18.2,<3.19.0",
+      "result": "Latest release still requires dvc-data.",
+      "metadata": "https://pypi.org/pypi/dvc/json",
+      "source": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/pyproject.toml#L44"
+    },
+    {
+      "scope": "this runtime",
+      "result": "DVC appears in the direct dependency matrix and its import/version probe, but has no functional use in the runtime scripts or examples. Remove the direct dvc dependency; uv prunes dvc-data and diskcache.",
+      "repository_search": "rg -n -i \"dvc|dvc-data|diskcache\" blueprints/us-equities/runtime-2604 tests",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/ac5ca66581251e677d885dac62d441a79dedafd7/blueprints/us-equities/runtime-2604/accept-trading-2604.sh#L27"
+    }
+  ],
+  "lock": {
+    "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+    "old_sha256": "4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2",
+    "new_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+    "old_entries": 242,
+    "new_entries": 188,
+    "removed": [
+      {
+        "name": "aiohttp-retry",
+        "version": "2.9.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "amqp",
+        "version": "5.4.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "antlr4-python3-runtime",
+        "version": "4.9.3",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "appdirs",
+        "version": "1.4.4",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "asyncssh",
+        "version": "2.24.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "atpublic",
+        "version": "8.0.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "billiard",
+        "version": "4.3.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "celery",
+        "version": "5.6.3",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "click-didyoumean",
+        "version": "0.3.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "click-plugins",
+        "version": "1.1.1.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "click-repl",
+        "version": "0.4.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "configobj",
+        "version": "5.0.9",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dictdiffer",
+        "version": "0.10.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "diskcache",
+        "version": "5.6.3",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "distro",
+        "version": "1.9.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dpath",
+        "version": "2.2.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dulwich",
+        "version": "1.2.17",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc",
+        "version": "3.67.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc-data",
+        "version": "3.18.3",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc-http",
+        "version": "2.32.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc-objects",
+        "version": "5.2.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc-render",
+        "version": "1.0.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc-studio-client",
+        "version": "0.23.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "dvc-task",
+        "version": "0.40.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "entrypoints",
+        "version": "0.4",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "flatten-dict",
+        "version": "0.5.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "flufl-lock",
+        "version": "9.2.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "fsspec",
+        "version": "2026.9.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "funcy",
+        "version": "2.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "grandalf",
+        "version": "0.8",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "gto",
+        "version": "1.10.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "hydra-core",
+        "version": "1.3.7",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "iterative-telemetry",
+        "version": "0.0.10",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "kombu",
+        "version": "5.6.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "networkx",
+        "version": "3.7",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "omegaconf",
+        "version": "2.3.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "pathspec",
+        "version": "1.1.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "prompt-toolkit",
+        "version": "3.0.53",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "psutil",
+        "version": "7.2.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "pydot",
+        "version": "4.0.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "pygit2",
+        "version": "1.20.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "pygtrie",
+        "version": "2.6.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "ruamel-yaml",
+        "version": "0.19.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "scmrepo",
+        "version": "3.6.2",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "semver",
+        "version": "3.1.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "setuptools",
+        "version": "84.0.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "shortuuid",
+        "version": "1.0.13",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "shtab",
+        "version": "1.12.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "sqltrie",
+        "version": "0.11.3",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "tomlkit",
+        "version": "0.15.1",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "tzlocal",
+        "version": "5.4.4",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "vine",
+        "version": "5.1.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "voluptuous",
+        "version": "0.16.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      },
+      {
+        "name": "zc-lockfile",
+        "version": "4.0",
+        "why": "Exclusive dependency closure of removed DVC"
+      }
+    ],
+    "added": [],
+    "version_moves": [],
+    "source_build_census": [],
+    "build_constraint": "Removed the now-unused setuptools build constraint and manifest entry because antlr4-python3-runtime and runtime setuptools are in the pruned DVC closure.",
+    "retained_distribution_entries_identical": 187
+  },
+  "resolution": {
+    "uv_version": "0.12.17",
+    "route": "Native executable $HOME/.local/share/codex-ecosystem/tools/uv-0.12.17/uv; no mise route used.",
+    "remove": "uv --no-config remove dvc --frozen --offline --project $TMPDIR/dvc-removal-project --python 3.12.3 --no-python-downloads",
+    "remove_exit": 0,
+    "relock": "uv --no-config lock --project $TMPDIR/dvc-removal-project --python 3.12.3 --no-python-downloads --prerelease if-necessary --default-index https://pypi.org/simple --exclude-newer 2026-10-06T04:00:00Z",
+    "relock_exit": 0,
+    "check": "uv --no-config lock --check --offline --project blueprints/us-equities/runtime-2604/trading-2604-runtime --python 3.12.3 --no-python-downloads --prerelease if-necessary --default-index https://pypi.org/simple --exclude-newer 2026-10-06T04:00:00Z",
+    "check_exit": 0,
+    "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/dependencies.md#L92-L104"
+  },
+  "scanner": {
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "inventory": ".github/osv-scanner-lockfiles.json",
+    "inventory_sha256": "351111b2dbb0fc8f35fb3e8d8f5c63fced3f3aa72dbdadcfda50a563bffbdb13",
+    "inventory_entries": 59,
+    "source": ".github/workflows/security-scan.yml",
+    "ignore_added": false,
+    "config_changes": false,
+    "before": [
+      {
+        "phase": "before",
+        "group": "ordinary",
+        "entries": 58,
+        "command": [
+          "$TMPDIR/osv-scanner",
+          "scan",
+          "source",
+          "--config",
+          ".github/osv-scanner.toml",
+          "--no-resolve",
+          "--lockfile=uv.lock:examples/claude-runtime-sdk/worker.py.lock",
+          "--lockfile=uv.lock:examples/omniroute-codex-sdk/worker.py.lock",
+          "--lockfile=uv.lock:examples/omniroute-codex-sdk/test_worker.py.lock",
+          "--lockfile=requirements.txt:examples/deepagents-omniroute/requirements.lock",
+          "--lockfile=requirements.txt:examples/openhands-native-capabilities/requirements.lock",
+          "--lockfile=requirements.txt:examples/openhands-native-capabilities/cli-constraints.txt",
+          "--lockfile=requirements.txt:.github/requirements-ci.txt",
+          "--lockfile=requirements.txt:blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+          "--lockfile=requirements.txt:adoption/sdk/accepted-constraints.txt",
+          "--lockfile=requirements.txt:adoption/sdk/requirements-linux-x86_64-py313.lock",
+          "--lockfile=:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+          "--lockfile=:blueprints/convergence-practice/application-delivery/uv.lock",
+          "--lockfile=:blueprints/memory-stack/native-qualification/uv.lock",
+          "--lockfile=:blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+          "--lockfile=:blueprints/us-equities/adaptive-paper/requirements.txt",
+          "--lockfile=requirements.txt:blueprints/us-equities/catalyst-provenance/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/data/requirements.in",
+          "--lockfile=requirements.txt:blueprints/us-equities/data/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock",
+          "--lockfile=packages.lock.json:blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
+          "--lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.in",
+          "--lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.lock",
+          "--lockfile=:blueprints/us-equities/workers/requirements.txt",
+          "--lockfile=requirements.txt:tools/mlx-smoke/requirements.in",
+          "--lockfile=requirements.txt:tools/mlx-smoke/requirements.lock.txt",
+          "--lockfile=requirements.txt:blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/mover-v3/data-tools/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/mover-v3/study/runtime-requirements.txt",
+          "--lockfile=requirements.txt:evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+          "--lockfile=requirements.txt:blueprints/native-skill-practice/p1/requirements-scoring.in",
+          "--lockfile=requirements.txt:blueprints/native-skill-practice/p1/requirements-scoring.lock"
+        ],
+        "exit": 1,
+        "lines": [
+          "Total 1 package affected by 1 known vulnerability (0 Critical, 0 High, 1 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+          "| https://osv.dev/PYSEC-2026-2447     | 5.2  | PyPI      | diskcache | 5.6.3   | --            | blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock |",
+          "| https://osv.dev/GHSA-w8v5-vhqr-4h9v |      |           |           |         |               |                                                                  |"
+        ]
+      },
+      {
+        "phase": "before",
+        "group": "frozen-macos",
+        "entries": 1,
+        "command": [
+          "$TMPDIR/osv-scanner",
+          "scan",
+          "source",
+          "--config",
+          ".github/osv-scanner-frozen-macos.toml",
+          "--no-resolve",
+          "--lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+        ],
+        "exit": 0,
+        "lines": [
+          "No issues found"
+        ]
+      }
+    ],
+    "after": [
+      {
+        "phase": "after",
+        "group": "ordinary",
+        "entries": 58,
+        "command": [
+          "$TMPDIR/osv-scanner",
+          "scan",
+          "source",
+          "--config",
+          ".github/osv-scanner.toml",
+          "--no-resolve",
+          "--lockfile=uv.lock:examples/claude-runtime-sdk/worker.py.lock",
+          "--lockfile=uv.lock:examples/omniroute-codex-sdk/worker.py.lock",
+          "--lockfile=uv.lock:examples/omniroute-codex-sdk/test_worker.py.lock",
+          "--lockfile=requirements.txt:examples/deepagents-omniroute/requirements.lock",
+          "--lockfile=requirements.txt:examples/openhands-native-capabilities/requirements.lock",
+          "--lockfile=requirements.txt:examples/openhands-native-capabilities/cli-constraints.txt",
+          "--lockfile=requirements.txt:.github/requirements-ci.txt",
+          "--lockfile=requirements.txt:blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+          "--lockfile=requirements.txt:adoption/sdk/accepted-constraints.txt",
+          "--lockfile=requirements.txt:adoption/sdk/requirements-linux-x86_64-py313.lock",
+          "--lockfile=:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+          "--lockfile=:blueprints/convergence-practice/application-delivery/uv.lock",
+          "--lockfile=:blueprints/memory-stack/native-qualification/uv.lock",
+          "--lockfile=:blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+          "--lockfile=:blueprints/us-equities/adaptive-paper/requirements.txt",
+          "--lockfile=requirements.txt:blueprints/us-equities/catalyst-provenance/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/data/requirements.in",
+          "--lockfile=requirements.txt:blueprints/us-equities/data/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock",
+          "--lockfile=packages.lock.json:blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
+          "--lockfile=:blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
+          "--lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.in",
+          "--lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.lock",
+          "--lockfile=:blueprints/us-equities/workers/requirements.txt",
+          "--lockfile=requirements.txt:tools/mlx-smoke/requirements.in",
+          "--lockfile=requirements.txt:tools/mlx-smoke/requirements.lock.txt",
+          "--lockfile=requirements.txt:blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/mover-v3/data-tools/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/mover-v3/study/runtime-requirements.txt",
+          "--lockfile=requirements.txt:evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+          "--lockfile=requirements.txt:blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+          "--lockfile=requirements.txt:blueprints/native-skill-practice/p1/requirements-scoring.in",
+          "--lockfile=requirements.txt:blueprints/native-skill-practice/p1/requirements-scoring.lock"
+        ],
+        "exit": 0,
+        "lines": [
+          "No issues found"
+        ]
+      },
+      {
+        "phase": "after",
+        "group": "frozen-macos",
+        "entries": 1,
+        "command": [
+          "$TMPDIR/osv-scanner",
+          "scan",
+          "source",
+          "--config",
+          ".github/osv-scanner-frozen-macos.toml",
+          "--no-resolve",
+          "--lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+        ],
+        "exit": 0,
+        "lines": [
+          "No issues found"
+        ]
+      }
+    ]
+  },
+  "qualification": {
+    "command": "python3 -m unittest tests.test_trading_2604_lock",
+    "red_after_dependency_removal_exit": 1,
+    "red_line": "FAILED (failures=2, errors=3): the prior source-build contract required the removed setuptools/ANTLR dependencies.",
+    "green_exit": 0,
+    "green_line": "Ran 12 tests; OK.",
+    "current_offline_check_count": 24,
+    "destination_host": "Pending separate NativeStack2604 installation and offline acceptance on the new lock; the existing 25/25 receipt covers lock 4c98672d14147a1b only."
+  },
+  "setup_corrections": [
+    {
+      "command": "uv --no-config python find --system --no-project --no-python-downloads 3.12.3",
+      "exit": 2,
+      "line": "Could not acquire lock: read-only default cache.",
+      "correction": "Use UV_CACHE_DIR under TMPDIR; discovery succeeds with CPython 3.12.3 at /usr/bin/python3.12."
+    },
+    {
+      "command": "uv remove dvc --frozen --no-sync --offline",
+      "exit": 2,
+      "line": "error: the argument --no-sync cannot be used with --frozen",
+      "correction": "Use --frozen alone for removal without relocking, then uv lock with the shared resolution settings."
+    },
+    {
+      "command": "uv lock --offline with an empty scratch metadata cache",
+      "exit": 1,
+      "line": "alpaca-py was not found in the cache",
+      "correction": "Read PyPI metadata with the unchanged resolution settings; relock exits 0 and a subsequent offline --check exits 0."
+    }
+  ],
+  "limitations": [
+    "Packaging-worker advisory/source reads, structural lock comparison and OSV scans only; no destination-host install, offline example execution, SEC, broker, paper or provider call occurred.",
+    "The OSV results reflect the database at observation time; later advisories can fail CI again.",
+    "Existing host receipts and their independent-review limitations remain unchanged. The changed runtime needs a new NativeStack2604 receipt.",
+    "The wheel census checks presence of any wheel, not target-compatible wheel coverage under Linux markers.",
+    "No destination-host cache permissions were observed or claimed; no reachability ignore was added."
+  ]
+}

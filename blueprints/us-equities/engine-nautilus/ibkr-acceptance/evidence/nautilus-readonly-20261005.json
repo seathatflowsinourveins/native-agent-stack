@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "nautilus_trader.adapters.interactive_brokers.HistoricalInteractiveBrokersClient",
+  "host": "127.0.0.1",
+  "port": 4002,
+  "client_id": 76,
+  "generated_at": "2026-10-05T13:35:09.628355+00:00",
+  "paper_check": {
+    "ibapi_receipt": {
+      "sha256": "0199aefb1b311b82cf3c4925644856cfe1b0ed43f1c26a03a17312a24bcca469",
+      "generated_at": "2026-10-05T13:35:05.192621+00:00"
+    }
+  },
+  "status": "passed",
+  "evidence_class": "native_paper_readonly",
+  "observed": {
+    "nautilus_trader": "2.0.0rc5",
+    "instrument": {
+      "id": "SPY.ARCA",
+      "class": "Equity",
+      "price_increment": "0.01",
+      "conId": 756733,
+      "primaryExchange": "ARCA",
+      "currency": "USD",
+      "elapsed_s": 0.008
+    },
+    "bars": [
+      {
+        "spec": "1-DAY-LAST",
+        "end": "2026-10-04T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 5,
+        "first": "SPY.ARCA-1-DAY-LAST-EXTERNAL,768.38,769.54,763.71,765.61,28128340,1790639999999999999",
+        "last": "SPY.ARCA-1-DAY-LAST-EXTERNAL,770.55,772.65,767.14,769.64,30335237,1790985599999999999",
+        "elapsed_s": 0.126
+      },
+      {
+        "spec": "5-MINUTE-LAST",
+        "end": "2026-10-04T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 390,
+        "first": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,768.38,768.61,767.49,767.77,1302401,1790602500000000000",
+        "last": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,769.54,769.73,769.17,769.65,2093360,1790971200000000000",
+        "elapsed_s": 0.317
+      }
+    ]
+  },
+  "exit_code": 0,
+  "publication": {
+    "source_artifact": "nautilus-receipt.json",
+    "source_sha256": "edb7318e785429b64dea84b76705052adfcd07d6ec915cc196927bdc18e6facf",
+    "sanitization": "Allowlist projection with no account identifiers, balances, private paths or session text.",
+    "paper_check_binding": "paper_check.ibapi_receipt.sha256 is the unchanged binding to the private original ibapi-receipt.json used by the native client; the public ibapi projection has a different hash recorded in the consolidated receipt."
+  }
+}

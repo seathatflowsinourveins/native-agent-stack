@@ -255,7 +255,7 @@ def profile_servers_without_base(profile_bytes: bytes, base_servers: list) -> li
 
 def codex_user_instructions(repo_root: Path) -> str:
     """The Codex user instructions a host installs as $CODEX_HOME/AGENTS.md: the managed block of
-    adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk v0.50.0's hooks/rtk-awareness-full.md
+    adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk v0.51.0's hooks/rtk-awareness-full.md
     verbatim, and the RTK exactness exceptions), read through tools/adoption/apply_codex_lane.py's agents_block(),
     never a copy of it. Codex reads $CODEX_HOME/AGENTS.md as global instructions, so a lane home without it gives
     its model neither the top rule nor RTK's instructions, which the native lane's workers get from ~/.codex."""

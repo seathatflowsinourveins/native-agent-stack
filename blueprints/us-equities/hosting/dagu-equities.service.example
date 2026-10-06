@@ -1,13 +1,19 @@
 [Unit]
-Description=Local research workflow history (Dagu)
+Description=NYSE post-close research evidence (Dagu 2.16.6)
 After=network.target
 
 [Service]
 Type=simple
-# Install the pinned binary and private config first; see README.md.
-ExecStart=/usr/bin/env -i HOME=%h PATH=/usr/bin:/bin DAGU_HOME=%h/.local/share/codex-ecosystem/dagu-equities %h/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu server
+# Adapt these placeholder paths on the operating host (user decision 2).
+# dagucloud/dagu@v2.16.6:internal/cmd/startall.go:32-45
+# coordinator.enabled: false belongs in config.yaml, not Environment=.
+# coreutils/coreutils@v9.4:src/env.c:824-838 discards inherited Environment=.
+# The four job variables belong in the private DAG's env: block; see README.md.
+ExecStart=/usr/bin/env -i HOME=/path/to/research-home PATH=/usr/bin:/bin TMPDIR=/path/to/private-tmp DAGU_HOME=/path/to/dagu-home /path/to/dagu-2.16.6 start-all --config /path/to/dagu-home/config.yaml --dags /path/to/dagu-home/dags
+# systemd/systemd@v255:man/systemd.service.xml:830-836
 Restart=on-failure
 RestartSec=5
+Nice=19
 UMask=0077
 NoNewPrivileges=true
 

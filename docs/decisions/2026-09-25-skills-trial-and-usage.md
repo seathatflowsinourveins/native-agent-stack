@@ -118,11 +118,11 @@ The manifest applies one rule per candidate, in order:
 
 | Name | Source @ ref | Status | Listing | Codex | Gap |
 | --- | --- | --- | --- | --- | --- |
-| typesafe-ai | typesafe-ai/skills@65a39f3 | kept | name-only | yes | Verdict winner (`instructions-skills`): typed semantic judgments for evidence review, used by the semantic-evidence-reviewer role. |
+| typesafe-ai | typesafe-ai/skills@65a39f3 | kept | on | yes | Verdict winner (`instructions-skills`): typed semantic judgments for evidence review, used by the semantic-evidence-reviewer role. |
 | gh-fix-ci | openai/skills@49f948f | kept | on | yes | Verdict winner: triage failing GitHub Actions checks on this repo's 18 workflows and 7 required checks. |
 | security-best-practices | openai/skills@49f948f | kept | on | yes | Verdict winner: language-specific secure-coding review for `scripts/` and `tools/`, used by the security-reviewer role. |
-| iterative-retrieval | affaan-m/ECC@2b6e839 | kept | name-only | yes | Verdict winner (ECC): staged retrieval for subagent context under the small-context rule. |
-| search-first | affaan-m/ECC@2b6e839 | kept | name-only | yes | Verdict winner (ECC): research existing upstream tools before writing code (AGENTS.md research-first rule). |
+| iterative-retrieval | affaan-m/ECC@2b6e839 | kept | on | yes | Verdict winner (ECC): staged retrieval for subagent context under the small-context rule. |
+| search-first | affaan-m/ECC@2b6e839 | kept | on | yes | Verdict winner (ECC): research existing upstream tools before writing code (AGENTS.md research-first rule). |
 | diagnosing-bugs | mattpocock/skills@c55ee46 | trial | on | yes | No debugging procedure is installed; failing tests, CI and paper-engine faults are diagnosed ad hoc. |
 | tdd | mattpocock/skills@c55ee46 | trial | on | yes | New scripts land with unittest suites but no test-first procedure is loaded. |
 | codebase-design | mattpocock/skills@c55ee46 | trial | on | no | Large single-file validators (`scripts/validate.py`, `scripts/landscape.py`) lack a shared module vocabulary for refactors. |
@@ -142,8 +142,8 @@ The manifest applies one rule per candidate, in order:
 | fp-check | trailofbits/skills@0cc1c73 | trial | on | no | Open Scorecard/zizmor/CodeQL alerts need false-positive triage with retained reasoning. |
 | mcp-builder | anthropics/skills@3337550 | trial | on | no | 22 files wire MCP servers; building or fixing one has no procedure. |
 | frontend-design | anthropics/skills@3337550 | trial | on | no | The generated ecosystem guide and grand dashboard (19 HTML files) are hand-styled. |
-| agent-browser | vercel-labs/agent-browser@d01253d | trial | name-only | no | Browser acceptance uses the pinned `agent-browser` CLI; the skill documents its commands (925-char description). |
-| find-skills | vercel-labs/skills@7407f38 | trial | user-invocable-only | no | User-invoked registry search; anything it finds still needs pinning in this manifest before install. |
+| agent-browser | vercel-labs/agent-browser@d01253d | trial | on | no | Browser acceptance uses the pinned `agent-browser` CLI; the skill documents its commands (925-char description). |
+| find-skills | vercel-labs/skills@7407f38 | trial | on | yes | Registry discovery the model invokes; anything it finds still needs pinning in this manifest before install. |
 
 ## Excluded groups
 
@@ -523,7 +523,7 @@ enforcement residual).
 
 | Name | Source @ ref | Status | Listing | Codex | Gap |
 | --- | --- | --- | --- | --- | --- |
-| security-audit | cloudflare/security-audit-skill@c1c8a8c | trial | name-only | no | No installed procedure audits the whole repository with a coverage ledger and a `confirmed`/`needs_validation`/`rejected` verdict contract (restated below). |
+| security-audit | cloudflare/security-audit-skill@c1c8a8c | trial | on | no | No installed procedure audits the whole repository with a coverage ledger and a `confirmed`/`needs_validation`/`rejected` verdict contract (restated below). |
 
 Pin facts, read with `gh api` at the pin:
 
@@ -1763,3 +1763,5 @@ adds the [held state](../../adoption/skills/lifecycle.md#held).
 **Not established.** No host ran these changes; the destination's removal of the three folders and the re-pin of the
 mattpocock skills are the coordinator's steps (wave-2 synthesis 1.6). The overturn conditions are in each retired
 entry; for agent-browser, the browser-tool measurement's result.
+
+> **Amendment 2026-10-05 (pinned Listing column):** the five rows that read `name-only` (typesafe-ai, iterative-retrieval, search-first, agent-browser, security-audit) now read `on`, the state the user's every-skill-on directive set on 2026-09-30 ([2026-09-30-skills-llm-native-listing.md](2026-09-30-skills-llm-native-listing.md), :43) and that `adoption/skills/manifest.json` already carries. The find-skills row now reads `on` and Codex `yes`, matching the manifest's `claude_listing: "on"` and `codex_enabled: true`; its gap names model-invoked registry discovery ([manifest at main `2d849ba1f`, :542-564](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/adoption/skills/manifest.json#L542-L564)). The table is the pinned listing source that `tests/test_install_claude_profile.py` reads.

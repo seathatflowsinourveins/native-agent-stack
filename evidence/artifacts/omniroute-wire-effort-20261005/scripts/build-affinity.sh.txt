@@ -1,0 +1,28 @@
+#!/bin/bash
+# Pre-flight build for the user's option B (2026-10-05): published OmniRoute v3.8.51 (tag commit c1e30b7676975feb298b49eff6ff58923c04b89e) plus only the
+# session-affinity patch 045aa81f3, built with upstream's own release scripts (npm ci; build:release; check:pack-artifact; npm pack), as the 2026-10-02 Mac rebuild did.
+# No live unit is touched. Every step logs to $B/<step>.log and appends one line to $B/progress.txt. Run niced.
+set -u
+B=$HOME/.cache/omniroute-build-20261005
+SRCREPO=$HOME/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904
+TAG=c1e30b7676975feb298b49eff6ff58923c04b89e
+export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+mkdir -p "$B/tmp"
+export TMPDIR="$B/tmp"
+step() { local name="$1"; shift; local t0; t0=$(date +%s); "$@" > "$B/$name.log" 2>&1; local rc=$?; echo "$(date -u +%H:%M:%SZ) $name exit=$rc seconds=$(( $(date +%s) - t0 ))" | tee -a "$B/progress.txt"; return $rc; }
+step fetch-tag git -C "$SRCREPO" fetch origin "+refs/tags/v3.8.51:refs/tags/v3.8.51" || exit 1
+peeled=$(git -C "$SRCREPO" rev-parse "v3.8.51^{commit}")
+echo "$(date -u +%H:%M:%SZ) tag v3.8.51 peels to $peeled (expected $TAG)" | tee -a "$B/progress.txt"
+[ "$peeled" = "$TAG" ] || { echo "tag commit mismatch" | tee -a "$B/progress.txt"; exit 2; }
+if [ ! -d "$B/src" ]; then step worktree git -C "$SRCREPO" worktree add --detach "$B/src" "$TAG" || exit 1; fi
+cd "$B/src" || exit 2
+if ! git log -1 --format=%B | grep -q "cherry picked from commit 045aa81f3"; then step cherry-pick git -c user.name=Scout -c user.email=scout@local cherry-pick -x 045aa81f3 || exit 1; fi
+git log --oneline -2 | tee -a "$B/progress.txt"
+step npm-ci nice -n 19 npm ci --no-audit --no-fund || exit 1
+step build-release nice -n 19 npm run build:release || exit 1
+step check-pack-artifact env OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact || exit 1
+rm -f "$B"/omniroute-*.tgz
+step pack npm pack --pack-destination "$B" || exit 1
+echo "BUILD_SHA $(cat dist/BUILD_SHA)" | tee -a "$B/progress.txt"
+sha256sum "$B"/omniroute-*.tgz | tee -a "$B/progress.txt"
+echo "$(date -u +%H:%M:%SZ) BUILD DONE" | tee -a "$B/progress.txt"

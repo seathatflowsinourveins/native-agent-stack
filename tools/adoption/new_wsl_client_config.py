@@ -64,6 +64,9 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              written), a value that differs stays (shown beside the render's, each value cut to
              300 characters with `...` in the display only, and the step ends `merged with conflicts kept`), the file is
              backed up first, read back with tomllib after the write and put back when it is not the merge.
+             One declared owned-value migration changes the previous managed service_tier from fast to default through
+             Codex's native version-guarded writer. A create-only completion marker preserves later /fast choices;
+             fresh or already-default adoption also records completion. No general overwrite option is provided.
              features.daemon_auto_start goes through Codex's own writer. A running Codex (`pgrep -x`) stops either write of
              config.toml, the merge and the creation of a file that is absent (close the sessions, run again; the message
              also names a running app-server daemon and how to stop it, read from /proc, or from `ps -ww -o command=`
@@ -154,7 +157,7 @@ GENERATED_BLOCKS = {CLAUDE_MD_PIECE: "adoption/new-wsl/claude-user-instructions.
                     CODEX_MD_PIECE: "adoption/new-wsl/codex-user-instructions.md"}
 RENDERED_BLOCKS = {CLAUDE_MD_PIECE: "claude-user-instructions.md", CODEX_MD_PIECE: "codex-user-instructions.md"}
 STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims",
-               "step/codex-remote-plugin-rules")
+               "step/codex-remote-plugin-rules", "step/rtk-claude-init")
 REMOTE_PLUGIN_PIECE = STEP_PIECES[5]
 # The account's remote plugins, which no row of the definitive manifest selects: Codex keeps their bundles under
 # <Codex home>/plugins/cache/<marketplace>/<plugin>/<version>/ (core-plugin-common/src/installed.rs PLUGINS_CACHE_DIR,
@@ -194,7 +197,7 @@ AUTHORIZATION_STEP = {"claude/settings": "claude-settings", "claude/overlay": "c
 EXAMPLE_HOST = "example"   # the host value file whose render --check scans
 LAUNCHER_PIECE, PATH_BLOCK_PIECE = STEP_PIECES[0], STEP_PIECES[1]
 # The steps --apply runs, in order; --skip names one.
-STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "claude-md",
+STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "rtk-claude-init", "claude-md",
          "codex-config", "codex-files", "codex-md", "login-path", "verify")
 # Command words a practice hook may run besides the files the repository copies: the shell's own words, python3 (the
 # interpreter of every tool in tools/adoption/) and jq (F4 of adoption/platforms/linux-wsl2-new-distro.md installs it and
@@ -205,9 +208,11 @@ LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 HEADING = re.compile(r"^(#{1,6})\s")
 SENTENCE_BREAK = re.compile(r"(?<=[.!?])(\s+)(?=[A-Z`\[(<\"'*_])")
 SENTENCE_END = re.compile(r"[.!?][\"')\]`*_]*$")
-# The wrap width of the RTK awareness text that adoption/templates/codex.AGENTS.template.md carries verbatim
-# (rtk-ai/rtk hooks/rtk-awareness-full.md): a run of lines that are all this short, with a sentence running on from
-# one line into the next, is one wrapped paragraph; longer lines are one statement each.
+# Wrap width of the verbatim rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md.
+# The rendered Codex carrier is 8,373 bytes; the local 8,192-byte test covers only
+# adoption/templates/codex.AGENTS.template.md's compact source (7,307 bytes).
+# A run of lines this short with a sentence running into the next line is one
+# wrapped paragraph; longer lines are one statement each.
 WRAP_WIDTH = 80
 HOST_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")  # the bootstrap's --host rule
 # What the repository's tools print when they change something (install_claude_profile, apply_claude_settings,
@@ -708,7 +713,8 @@ def scan_names(text: str, names: list) -> list:
 
 
 def block_text(root: Path, piece_key: str) -> str:
-    return (root / BLOCK_TEXT_REL[piece_key]).read_text(encoding="utf-8")
+    text = (root / BLOCK_TEXT_REL[piece_key]).read_text(encoding="utf-8")
+    return managed_block.codex_block(text, root=root) if piece_key == CODEX_MD_PIECE else text
 
 
 @dataclasses.dataclass(frozen=True)
@@ -1599,6 +1605,12 @@ def drop_path(node: dict, path: tuple) -> bool:
 # file's own, and never takes the two lists for a conflict.
 RULE_LISTS = {("skills", "config")}
 
+# The user's normal-by-default amendment supersedes this one previous managed value. A marker makes later native
+# /fast choices permanent: openai/codex@a956835d, codex-rs/tui/src/config_update.rs:105-121,154-170.
+CODEX_OWNED_MIGRATIONS = {
+    (("service_tier",), "fast", "default"): "service-tier-fast-to-default-20261005",
+}
+
 
 @dataclasses.dataclass
 class MergePlan:
@@ -2161,16 +2173,19 @@ class Apply:
                 drop_path(wanted, tuple(path))
             else:
                 found[verdict.piece.key] = "added"
+        # Keep the configured listing fraction under the 2026-09-30 directive.
+        # An omitted host key stays through main's ordinary settings merge.
         merged = file_io.merge_settings(current, wanted)
         if target.is_file() and merged == current:
             self.record("claude-settings", "current", f"{target} already holds the wired settings")
         elif self.dry:
-            changed = sorted(key for key in merged if merged.get(key) != current.get(key))
+            changed = sorted(key for key in merged.keys() | current.keys() if merged.get(key) != current.get(key))
             self.record("claude-settings", "planned", f"would merge into {target}: {', '.join(changed)}")
         else:
             (self.stage / "settings.merged.json").write_text(json.dumps(wanted, indent=2) + "\n", encoding="utf-8")
-            ok = self.tool("claude-settings", [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
-                                               str(self.stage / "settings.merged.json"), "--target", str(target)])
+            argv = [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
+                    str(self.stage / "settings.merged.json"), "--target", str(target)]
+            ok = self.tool("claude-settings", argv)
             self.done("claude-settings", ok)
         if self.outcomes[-1][1] != "failed":
             self.authorization.update({key: status for key, status in found.items() if is_authorization_piece(key)})
@@ -2210,6 +2225,29 @@ class Apply:
         argv = [str(ROOT / "tools/adoption/managed_block.py"), "--home", str(self.home)]
         argv += ["--dry-run"] if self.dry else []
         self.done(step, self.tool(step, argv + subcommand))
+
+    def step_rtk_claude_init(self) -> None:
+        """RTK 0.51.0's native global default owns RTK.md and the @RTK.md import.
+        Source: rtk-ai/rtk@e001f773:src/hooks/init/claude.rs:305. No local RTK file renderer.
+        """
+        step = "rtk-claude-init"
+        if "step/rtk-claude-init" not in self.wired:
+            self.record(step, "left out", "the command-output slot does not wire RTK")
+            return
+        argv = [str(self.eco / "bin" / "rtk"), "init", "-g", "--no-patch"]
+        if self.dry:
+            self.record(step, "planned", "would run " + shlex.join(argv))
+            return
+        result = subprocess.run(argv, env=self.env(), stdin=subprocess.DEVNULL,
+                                capture_output=True, text=True, timeout=300)
+        for line in (result.stdout + result.stderr).splitlines():
+            self.say(step, "  " + line)
+        target = self.home / ".claude"
+        current, _ = managed_block.read_target(target / "CLAUDE.md")
+        ready = (result.returncode == 0 and (target / "RTK.md").is_file()
+                 and any(managed_block.RTK_IMPORT.fullmatch(line) for line in current.splitlines()))
+        self.record(step, "applied" if ready else "failed",
+                    f"native init exit {result.returncode}; RTK.md and @RTK.md " + ("present" if ready else "not verified"))
 
     def step_claude_md(self) -> None:
         self.instruction_step("claude-md", CLAUDE_MD_PIECE, [
@@ -2265,6 +2303,14 @@ class Apply:
         if codex:
             argv += ["--codex", codex]
         self.done("codex-config", self.tool("codex-config", argv + (["--dry-run"] if self.dry else [])))
+        if self.outcomes[-1][1] != "failed" and not self.dry:
+            try:
+                current = tomllib.loads(config.read_text(encoding="utf-8"))
+                rendered = tomllib.loads(self.files["codex.config.toml"])
+                pending = self.pending_codex_migrations(rendered)
+                self.complete_codex_migrations(pending, current, rendered)
+            except (MergeError, OSError, ValueError, lane.Failed) as error:
+                self.record("codex-config", "failed", f"migration marker: {error}")
         if self.outcomes[-1][1] != "failed":
             self.authorization.update({v.piece.key: "added" for v in self.results
                                        if v.authorization and v.wired and v.piece.group == "codex/config"})
@@ -2274,7 +2320,8 @@ class Apply:
         added, and a value that differs stays (shown beside the render's). The file is backed up first, read back after
         the write and put back from memory when it is not the merge. `features.daemon_auto_start` goes through Codex's
         own writer when a codex binary is at hand, as codex_home.py does; every other key is a text edit that the
-        read-back proves. A running Codex writes the same file, so the write waits until none runs."""
+        read-back proves. Only CODEX_OWNED_MIGRATIONS may replace a previous managed value once, through the native
+        app-server writer. A running Codex writes the same file, so the write waits until none runs."""
         step = "codex-config"
         try:
             rendered = tomllib.loads((self.stage / "codex.config.toml").read_text(encoding="utf-8"))
@@ -2287,6 +2334,18 @@ class Apply:
             except (UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
                 raise MergeError(f"{config} is not valid UTF-8 TOML ({error}); fix it, then run again") from None
             plan = plan_merge(existing, rendered)
+            pending = self.pending_codex_migrations(rendered)
+            migrations = [rule for rule, _ in pending
+                          if strict_equal(lane.get_path(existing, list(rule[0])), (True, rule[1]))]
+            for path, previous, new in migrations:
+                plan.conflicts = [conflict for conflict in plan.conflicts if conflict[0] != path]
+                holder = plan.expected
+                for part in path[:-1]:
+                    holder = holder[part]
+                holder[path[-1]] = new
+            migration_writer = self.binary("codex", self.args.codex_bin) if migrations else None
+            if migrations and not migration_writer:
+                raise MergeError("owned-value migration needs the native Codex app-server writer; nothing written")
             adds_daemon = (not lane.get_path(existing, list(DAEMON_PATH))[0]
                            and lane.get_path(plan.expected, list(DAEMON_PATH))[0])
             writer = self.binary("codex", self.args.codex_bin) if adds_daemon else None
@@ -2295,6 +2354,11 @@ class Apply:
             if text_plan.keys or text_plan.tables or text_plan.appends:
                 new_text = merge_toml_text(original.decode("utf-8"), text_plan)
                 wanted = copy.deepcopy(plan.expected)
+                for path, previous, _ in migrations:
+                    holder = wanted
+                    for part in path[:-1]:
+                        holder = holder[part]
+                    holder[path[-1]] = previous  # The native writer changes this after the additive edit.
                 if writer:
                     drop_path(wanted, DAEMON_PATH)
                 difference = first_difference(tomllib.loads(new_text), wanted)
@@ -2306,6 +2370,9 @@ class Apply:
             return
         for line in merge_report(plan):
             self.say(step, f"  {line}")
+        for path, previous, new in migrations:
+            self.say(step, f"  {'would' if self.dry else 'will'} migrate {lane.key_path(list(path))}: "
+                     f"{shown(path, previous)} -> {shown(path, new)} (one-time owned value)")
         found = {}
         for verdict in self.results:
             if verdict.authorization and verdict.wired and verdict.piece.group == "codex/config":
@@ -2316,10 +2383,20 @@ class Apply:
                 have = lane.get_path(existing, path)
                 found[verdict.piece.key] = ("added" if not have[0] else "same" if strict_equal(
                     have[1], lane.get_path(rendered, path)[1]) else "kept")
-        changes = new_text is not None or writer is not None
+        changes = new_text is not None or writer is not None or bool(migrations)
         label = "merged with conflicts kept" if plan.conflicts else "applied"
         if not changes:
-            self.record(step, "merged with conflicts kept" if plan.conflicts else "current",
+            if pending:
+                if self.dry:
+                    self.say(step, "  DRY RUN: would record one-time migration completion; config.toml unchanged")
+                else:
+                    try:
+                        current = tomllib.loads(config.read_text(encoding="utf-8"))
+                        self.complete_codex_migrations(pending, current, plan.expected)
+                    except (MergeError, OSError, ValueError, lane.Failed) as error:
+                        self.record(step, "failed", f"migration marker: {error}")
+                        return
+            self.record(step, "current" if pending else "merged with conflicts kept" if plan.conflicts else "current",
                         f"{config} already holds every key of the render"
                         + (f"; {len(plan.conflicts)} value(s) differ and stay as the file has them" if plan.conflicts
                            else ""))
@@ -2338,28 +2415,88 @@ class Apply:
         mode = stat.S_IMODE(config.stat().st_mode)
         backup = file_io.write_backup(config)
         touched = False
+        rollback_sha = lane.sha256_bytes(original)
         try:
             if new_text is not None:
                 lane.atomic_write(config, new_text.encode("utf-8"), mode, lane.sha256_bytes(original))
                 touched = True
+                rollback_sha = lane.sha256_bytes(new_text.encode("utf-8"))
             if writer:
                 touched = True
                 self.codex_disable_daemon(writer)
-            difference = first_difference(tomllib.loads(config.read_bytes().decode("utf-8")), plan.expected)
+                rollback_sha = lane.sha256_file(config)
+            if migrations:
+                rollback_sha = self.migrate_owned_codex_values(migrations, migration_writer, rollback_sha, plan.expected)
+                touched = True
+            current = tomllib.loads(config.read_bytes().decode("utf-8"))
+            difference = first_difference(current, plan.expected)
             if difference is not None:
                 raise MergeError(f"read-back: the file does not equal the merge (it differs at "
-                                 f"{lane.key_path(list(difference))})")
+                                  f"{lane.key_path(list(difference))})")
+            self.complete_codex_migrations(pending, current, plan.expected)
         except (MergeError, OSError, subprocess.SubprocessError, lane.Failed, tomllib.TOMLDecodeError,
                 UnicodeDecodeError) as error:
             if not touched:   # the file changed under this run before anything was written: leave it as it now is
                 self.record(step, "failed", f"{error} (backup {backup})")
                 return
-            restored = self.restore_config(config, original, mode)
+            restored = (self.restore_config(config, original, mode, expected_sha=rollback_sha) if migrations
+                        else self.restore_config(config, original, mode))
             self.record(step, "failed", f"{error}; " + ("the file is back as it was" if restored else
-                        "THE RESTORE FAILED: copy the backup over the file") + f" (backup {backup})")
+                        "THE RESTORE FAILED OR WAS REFUSED: current bytes kept; inspect the backup") + f" (backup {backup})")
             return
         self.record(step, label, f"merged into {config} (backup {backup})")
         self.authorization.update(found)
+
+    def pending_codex_migrations(self, rendered: dict) -> list:
+        """The rendered policy qualifies every tier; only literal previous values migrate. Markers are presence-only."""
+        pending = []
+        for rule, name in CODEX_OWNED_MIGRATIONS.items():
+            path, previous, new = rule
+            marker = self.codex_home / ".native-agent-stack-migrations" / f"{name}.json"
+            if not os.path.lexists(marker) and strict_equal(lane.get_path(rendered, list(path)), (True, new)):
+                pending.append((rule, marker))
+        return pending
+
+    def migrate_owned_codex_values(self, migrations: list, codex: str, expected_sha: str, expected: dict) -> str:
+        """Reuse apply_codex_lane.py:1257-1273's native version guard and readback; no scalar text writer."""
+        try:
+            with lane.AppServer(codex, lane.codex_env(self.codex_home, self.env()), self.stage) as server:
+                version, before = server.user_layer()
+                if lane.sha256_file(self.codex_home / "config.toml") != expected_sha:
+                    raise MergeError("config changed before native migration; nothing written by this writer")
+                for path, previous, _ in migrations:
+                    if not strict_equal(lane.get_path(before, list(path)), (True, previous)):
+                        raise MergeError(f"{lane.key_path(list(path))} changed before native migration")
+                result = server.batch_write([{"key": list(path), "value": new} for path, _, new in migrations], version)
+                after_version, after = server.user_layer()
+                if after_version != result.get("version"):
+                    raise MergeError("native migration version changed before readback")
+            owned = [list(path) for path, _, _ in migrations]
+            if first_difference(lane.without_owned(before, owned), lane.without_owned(after, owned)) is not None:
+                raise MergeError("native migration changed an unowned key")
+            for path, _, new in migrations:
+                if not strict_equal(lane.get_path(after, list(path)), (True, new)):
+                    raise MergeError(f"native migration readback differs at {lane.key_path(list(path))}")
+            snapshot = (self.codex_home / "config.toml").read_bytes()
+            if first_difference(tomllib.loads(snapshot.decode("utf-8")), expected) is not None:
+                raise MergeError("native migration disk snapshot differs from the intended config")
+            return lane.sha256_bytes(snapshot)  # Hash the same bytes that were validated, not a later read.
+        except (lane.AppServerError, lane.Failed) as error:
+            raise MergeError(f"native migration writer failed ({type(error).__name__}): {error}") from None
+
+    def complete_codex_migrations(self, pending: list, current: dict, expected: dict) -> None:
+        """Confirm actual readback against the merge, including any preserved tier, so a later /fast survives."""
+        for (path, previous, new), marker in pending:
+            have, want = lane.get_path(current, list(path)), lane.get_path(expected, list(path))
+            if have[0] != want[0] or not strict_equal(have[1], want[1]):
+                raise MergeError(f"cannot record migration before {lane.key_path(list(path))} reads back as intended")
+            if marker.parent.is_symlink():
+                raise MergeError("migration marker directory is a symlink")
+            marker.parent.mkdir(parents=True, exist_ok=True)
+            record = {"path": list(path), "previous": previous, "new": new}
+            lane.atomic_write(marker, (json.dumps(record, sort_keys=True) + "\n").encode(), 0o600, None,
+                              create_only=True)
+            self.say("codex-config", f"  one-time migration recorded: {lane.key_path(list(path))}")
 
     def codex_disable_daemon(self, codex: str) -> None:
         """Codex's own writer for features.daemon_auto_start (codex-rs/cli/src/main.rs disable_feature_in_config)."""
@@ -2370,9 +2507,9 @@ class Apply:
             raise MergeError(f"`codex features disable daemon_auto_start` exited {result.returncode}: "
                              f"{lane.last_line(result.stderr) or lane.last_line(result.stdout)}")
 
-    def restore_config(self, config: Path, original: bytes, mode: int) -> bool:
+    def restore_config(self, config: Path, original: bytes, mode: int, expected_sha: str | None = None) -> bool:
         try:
-            lane.atomic_write(config, original, mode, lane.sha256_file(config))
+            lane.atomic_write(config, original, mode, expected_sha if expected_sha is not None else lane.sha256_file(config))
             return config.read_bytes() == original
         except (OSError, lane.Failed):
             return False

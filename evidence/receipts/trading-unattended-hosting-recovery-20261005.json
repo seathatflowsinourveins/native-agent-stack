@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "id": "trading-unattended-hosting-recovery-20261005",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "dagu",
+    "restic"
+  ],
+  "evidence_class": "local_integration",
+  "source_git_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "observed_at_utc": "2026-10-05T03:51:24.642607+00:00",
+  "claim": "Native restic 0.19.1 backed up two synthetic SQLite WAL journals copied by the stdlib Online Backup API during committed writes, read subset 1/1 (2/2 packs), restored 802816 identical journal bytes with matching external inventory and required state, and refused both snapshot and restore controls. Dagu 2.16.6 validated the scheduled research DAG offline; operating-host and off-host gates remain open.",
+  "limitations": [
+    "Scratch local integration with synthetic research journals; not an unchanged upstream test suite or a real market/broker journal.",
+    "Per-journal Online Backup is independently consistent; no atomic cross-journal transaction or research consumer application restart was accepted.",
+    "Historical one-part check 1/1 read 2/2 packs. Round 1 enforced strict daily gaps in its synthetic rotation test; round 2 replaces that policy with a whole seven-subset rotation within seven days.",
+    "Operating host and independent alert path are user decision 2. No systemd unit was installed, enabled or started; no process-restart drill or scheduler was run.",
+    "A process-restart drill is not reboot, missed-run or independent-alert acceptance. permissions.run_dags scheduler behavior is source-reviewed and awaits the later host drill.",
+    "Off-host recovery stays open until user decision 3 chooses an independent destination and key recovery and a consumer restores on a second host against the independent inventory and required state.",
+    "Recovery-time objective, independent alerting and retention deletion remain unaccepted. No broker, credentials, live mode, model calls, commit or push was used.",
+    "Historical round 1 cited an unlanded calendar bundle. Round 2 uses the on-base SDK_ENV lock adoption/sdk/requirements-linux-x86_64-py313.lock:241 and executes the already installed exchange-calendars 4.13.2 for real-calendar regressions; no new installation is claimed."
+  ],
+  "tool_versions": {
+    "dagu": "2.16.6",
+    "restic": "0.19.1",
+    "python_executed": "3.13.15",
+    "cpython_reference": "v3.12.3",
+    "exchange_calendars_selected": "4.13.2"
+  },
+  "upstream_sources": [
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmd/startall.go:32-45; internal/cmn/config/loader.go:1311-1319; internal/spec/dag.go:1663-1673; internal/runtime/runner.go:1633-1648,1267-1281; internal/ir/schedule.go:281-305"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/040_backup.rst:787-806; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/sqlite3.rst:1107-1155; Modules/_sqlite/connection.c:2067-2077"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "exchange_calendars/exchange_calendar.py:1012-1016,1263-1279; exchange_calendars/exchange_calendar_xnys.py:157-165"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-scheduler-comparison.json",
+      "sha256": "c15ac08f09f324a6c1106f167c21cb013bc6c58fefbb04a3092ec68cc8cf43c7",
+      "bytes": 12307
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-validation.json",
+      "sha256": "ca499670b89b1dfc19745e1e8e5338196fc03e31a53f53c9dd7fa9bace7feccc",
+      "bytes": 444
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof.json",
+      "sha256": "1d2aea2c11578aab27fb20d6d549241cd9b0c1b7b709c9f5081025ff612a7ce4",
+      "bytes": 10383
+    }
+  ],
+  "integration_source_sha256": {
+    "blueprints/us-equities/hosting/config.yaml.example": "46c546745cb2ac2a5fd72642241cb0e82d300ae628c740d7197d73ca80061848",
+    "blueprints/us-equities/hosting/dagu-equities.service.example": "327f5500f6d02d96508c35a1e512d7adcb2018427067a286b51603bebdd6bd41",
+    "blueprints/us-equities/hosting/equity-research-evidence.yaml": "cf9fcce2d08b6f0973fa7cf5d1070c5ac7d78befa39ae6a2ff76b03214a6e15d",
+    "blueprints/us-equities/hosting/session_day.py": "2e3e106c9273ab2e0b221d1510481e7d33e9fc33c25a1cabc10c0bf389113945",
+    "blueprints/us-equities/hosting/journal_recovery.py": "aac19598a40fd0c0df85b25174512b25121493bacce192010fed7e019fbfa0a4",
+    "blueprints/us-equities/hosting/drill_local_recovery.py": "fc8549c0178fc23fb04bdd9e247e3313e8613cb764b99cfa1f1563a8af02350c",
+    "blueprints/us-equities/hosting/drill_process_restart.py": "931ef44cc35da41ed8dd3b8c0a2919f9f2d2f98357fb9e5e33fa93dcc379521b",
+    "tests/test_us_equities_hosting.py": "935d03e8a00320904f414a2db9f958456415f68e4c11009fff78b53fe02ee566"
+  },
+  "commands": [
+    {
+      "cmd": "rtk env TMPDIR=<private-scratch-root> nice -n 19 python3 blueprints/us-equities/hosting/drill_local_recovery.py --restic-bin <restic-0.19.1> --scratch-root <private-scratch-root> --output <private-output>",
+      "exit": 0,
+      "returned_output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "checked_subset": "1/1",
+            "matched_journals": 2,
+            "restore_control_exit": 1,
+            "result": "passed",
+            "snapshot_control_exit": 1,
+            "throwaway_password_deleted": true
+          }
+        ]
+      },
+      "started_at_utc": "2026-10-05T03:51:15.065593+00:00",
+      "completed_at_utc": "2026-10-05T03:51:24.642607+00:00",
+      "invocation_proxy": "Historical builder used rtk env through its fallback. This is an execution record, not a portable prerequisite; the current README recipes use plain env TMPDIR=... nice -n 19 python3 ... ."
+    },
+    {
+      "cmd": "python3 -m unittest tests.test_us_equities_hosting",
+      "exit": 0,
+      "returned_output": "......................\n----------------------------------------------------------------------\nRan 22 tests in 1.842s\n\nOK\n",
+      "class": "stdlib local contract and synthetic fault tests"
+    },
+    {
+      "cmd": "dagu validate --context local --dagu-home <scratch> --config <scratch>/config.yaml <checkout>/blueprints/us-equities/hosting/equity-research-evidence.yaml",
+      "exit": 0,
+      "returned_output": "time=2026-10-04T23:56:06.918-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-04T23:56:07.022-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n",
+      "class": "native offline structural validation; no DAG execution"
+    },
+    {
+      "cmd": "dagu start-all --help",
+      "exit": 0,
+      "observed": "Installed help describes UI/scheduler/coordinator and the config-file coordinator override. No service started."
+    }
+  ],
+  "controls": {
+    "restore": {
+      "procedure_exit": 1,
+      "native_exits": [
+        {
+          "command": "version",
+          "exit": 0
+        },
+        {
+          "command": "backup",
+          "exit": 0
+        },
+        {
+          "command": "check",
+          "exit": 0
+        },
+        {
+          "command": "restore",
+          "exit": 0
+        }
+      ],
+      "returned_output": {
+        "reason": "file inventory mismatch (missing or extra files)",
+        "result": "refused"
+      }
+    },
+    "snapshot": {
+      "procedure_exit": 1,
+      "native_exits": [
+        {
+          "command": "version",
+          "exit": 0
+        },
+        {
+          "command": "backup",
+          "exit": 3
+        }
+      ],
+      "returned_output": {
+        "reason": "restic backup refused (exit 3)",
+        "result": "refused"
+      }
+    }
+  },
+  "independent_observation": [
+    {
+      "bytes": 401408,
+      "integrity_check": "ok",
+      "path": "journals/evidence.sqlite3",
+      "row_counts": {
+        "runs": 97
+      },
+      "sha256": "d3da8b7140827e3247d8a3bc647c9e9828d6b587fcf4bfcea7a170837bcc45f3"
+    },
+    {
+      "bytes": 401408,
+      "integrity_check": "ok",
+      "path": "journals/research.sqlite3",
+      "row_counts": {
+        "events": 97
+      },
+      "sha256": "7712822fae54114f0124caf9fb0d8604fcc9dddfda05e511aad364174df61159"
+    }
+  ],
+  "sanitization": "Native command args and output replace the private executable and scratch root with explicit placeholders. Password contents were never output; no host name, login name or host path is published. Native timestamps, restic snapshot IDs and fixture hashes remain. Raw returned output stays in private scratch custody. JSON command output is stored as parsed_json_lines records with all original JSON fields preserved; non-JSON lines remain text and raw formatting stays in private custody.",
+  "prior_attempts": [
+    {
+      "command": "python3 -m unittest tests.test_us_equities_hosting",
+      "exit": 0,
+      "tests": 22,
+      "note": "Initial pass emitted a ResourceWarning for a test-only sqlite connection. The test now explicitly closes that connection; the retained final run passed without that warning."
+    }
+  ],
+  "operational_status": {
+    "unit_installed": false,
+    "scheduler_started": false,
+    "process_restart_drill_run": false,
+    "off_host_recovery_gate_closed": false,
+    "unattended_hosting_gate_closed": false,
+    "throwaway_password_deleted": true,
+    "pin_moved": false
+  },
+  "review": {
+    "kind": "self",
+    "scope": "Original source comparison, independent restored bytes/state observation and completeness critic in the dated decision; coordinator review remains separate."
+  }
+}

@@ -503,9 +503,9 @@ class TargetRulesetTests(unittest.TestCase):
     def test_target_requires_the_security_gates_from_github_actions(self):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
-        for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
-                        "verdict-review-gate", "validate-macos"):
-            self.assertEqual(contexts.get(context), 15368, context)
+        required = ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
+                    "verdict-review-gate", "sota-sources")
+        self.assertEqual(contexts, {context: 15368 for context in required})
         self.assertEqual(len(self.rule("code_scanning")), 1)
 
 
@@ -898,6 +898,26 @@ class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
         self.assertEqual(unittest_invocations("run: python3 -m unittest -v >full.log 2>&1\n"), [["-v"]])
         wrapped = 'timeout --signal=ABRT --kill-after=60s 55m \\\n  python3 -m unittest -v --durations 50 2>&1 | tee "$log"\n'
         self.assertEqual(unittest_invocations(wrapped), [["-v", "--durations", "50"]])
+
+
+class SessionCalendarTestPrerequisites(unittest.TestCase):
+    """Both additional suite interpreters install the pinned calendar before testing."""
+
+    def test_calendar_install_precedes_tests_in_every_mode(self):
+        install_name = "Install the hash-locked session calendar"
+        install_command = ("python3 -m pip install --require-hashes --only-binary=:all: "
+                           "-r .github/requirements-calendar.txt")
+        for workflow, job_id, test_steps in (
+                ("adoption-bootstrap.yml", "validate-macos",
+                 ("Run the full test suite (gating on macOS)", CHANGED_TESTS_STEP)),
+                ("catalog-freshness.yml", "freshness", ("Run project test suite",))):
+            with self.subTest(workflow=workflow):
+                job = jobs((WORKFLOWS / workflow).read_text(encoding="utf-8"))[job_id]
+                step = step_block(job, install_name)
+                self.assertEqual(uncommented(run_block(step)).strip(), install_command)
+                self.assertIsNone(block_if(step), "the dependency is required in every test mode")
+                for test_step in test_steps:
+                    self.assertLess(job.index(step), job.index(step_block(job, test_step)))
 
 
 class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
@@ -1424,24 +1444,17 @@ def changes_script(text=None):
 
 
 def validate_macos_mode(outputs, result="success", event="pull_request"):
-    """The mode docs/decisions/2026-10-03-macos-ci-scope.md (section 2) gives validate-macos for the ``changes``
-    outputs ``outputs``, its ``result`` and the triggering ``event``: full off a pull_request; on a pull_request
-    full when `changes` did not succeed, whatever it wrote, or when its ``macos`` is anything but 'false' (an empty
-    one included); otherwise changed-tests for a nonempty ``macos_tests`` and skipped for an empty one. The
-    job-level ``if:`` and ``VALIDATE_MACOS_MODE`` are pinned as text in AdoptionBootstrapMacosRequiredTests and
-    evaluated against this table in ValidateMacosGateEvaluationTests."""
+    """The historical path selector of docs/decisions/2026-10-03-macos-ci-scope.md, retained for its controls
+    and measurements. This is a classification of `changes` outputs, not the advisory job's execution policy:
+    docs/decisions/2026-10-05-macos-ci-advisory.md skips every macOS job on pull_request."""
     if event != "pull_request" or result != "success" or outputs.get("macos", "") != "false":
         return "full"
     return "changed-tests" if outputs.get("macos_tests", "") else "skip"
 
 
-class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
-    """validate-macos stays a required check (docs/decisions/2026-09-22-github-automation-closure.md,
-    "validate-macos required (2026-09-25)"), scoped on pull_request by docs/decisions/2026-10-03-macos-ci-scope.md:
-    it runs full, changed-tests or not at all, as the `changes` job decides. It still reports on every pull
-    request: a job skipped by its own `if:` reports success to a required check, while a workflow skipped by a
-    `paths:` filter would leave it pending. The three real-install bootstrap-* jobs stay path-gated, and the two
-    macOS ones run on a pull_request only when validate-macos runs in full (B+, D5)."""
+class AdoptionBootstrapMacosAdvisoryTests(unittest.TestCase):
+    """No macOS job runs on pull_request. Main pushes, nightly schedules and dispatches still run them,
+    while `changes` keeps bootstrap-linux path-gated (docs/decisions/2026-10-05-macos-ci-advisory.md)."""
 
     text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8")
     job_map = jobs(text)
@@ -1457,35 +1470,36 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         mode = re.search(r"(?m)^    env:\n(?:[ \t]+#[^\n]*\n)*      VALIDATE_MACOS_MODE: ([^\n]+)$", header)
         return header, block_if(header), None if mode is None else mode.group(1)
 
-    def assert_validate_macos_gate(self, condition, mode):
-        """The gate of docs/decisions/2026-10-03-macos-ci-scope.md, section 6.3 (D9): a status function, so the job
-        is evaluated when `changes` is skipped (every push, schedule and dispatch run) or failed; full on every
-        event but pull_request; on a pull_request full unless `changes` succeeded and wrote macos=false, and
-        changed-tests only with a nonempty module list; a `changes` result other than success runs the full job
-        whatever outputs it wrote (section 6.8: outputs and result are separate `needs` properties); `!= 'false'`,
-        never `== 'true'`, so an empty output runs the full job; and 'full' as the mode's fallback branch."""
-        self.assertIsNotNone(condition, "validate-macos needs its job-level if:")
-        self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
-                         "an implicit success() from `needs: changes` would skip the required check whenever "
-                         "changes is skipped or fails")
-        for term in ("github.event_name != 'pull_request'", "needs.changes.result != 'success'",
-                     "needs.changes.outputs.macos != 'false'", "needs.changes.outputs.macos_tests != ''"):
-            self.assertIn(term, condition)
-        self.assertNotIn("== 'true'", condition, "an empty output (changes failed or cancelled) must run in full")
-        self.assertIsNotNone(mode, "validate-macos's job-level env defines VALIDATE_MACOS_MODE")
-        self.assertIn("github.event_name == 'pull_request' && needs.changes.result == 'success' && "
-                      "needs.changes.outputs.macos == 'false'", mode,
-                      "changed-tests only when changes succeeded: a failed changes job may have written macos=false")
-        self.assertRegex(mode, r"&& 'changed-tests' \|\| 'full' \}\}$", "'full' is the fallback branch")
+    def assert_macos_event_policy(self, condition, job_id):
+        self.assertIsNotNone(condition, f"{job_id} needs its job-level if:")
+        # `needs: changes` would otherwise apply success(), skipping every non-PR run because changes skips.
+        self.assertRegex(condition, r"!cancelled\(\)|always\(\)", job_id)
+        for event, result, bootstrap, macos, modules in itertools.product(
+                ("pull_request", "push", "schedule", "workflow_dispatch"),
+                ("success", "failure", "cancelled", "skipped"), ("true", "false", ""),
+                ("true", "false", ""), ("", "tests.test_zz_probe")):
+            context = {"github.event_name": event, "cancelled()": False, "needs.changes.result": result,
+                       "needs.changes.outputs.bootstrap": bootstrap, "needs.changes.outputs.macos": macos,
+                       "needs.changes.outputs.macos_tests": modules}
+            # Raise directly so negative controls can exercise this helper with assertRaises.
+            self.assertEqual(expression_truthy(evaluate_expression(condition, context)),
+                             event != "pull_request", f"{job_id}: macOS event policy failed for {context}")
 
-    def test_validate_macos_gate_fails_safe(self):
-        # Replaces test_validate_macos_is_reachable_on_every_pull_request (2026-09-25), which forbade `needs:` and a
-        # job-level `if:` here; docs/decisions/2026-10-03-macos-ci-scope.md (D9) changes that expectation.
-        header, condition, mode = self.validate_macos_gate()
-        self.assertRegex(header, r"(?m)^    needs: changes$")
-        self.assert_validate_macos_gate(condition, mode)
+    def test_macos_jobs_skip_pull_requests_and_run_off_them(self):
+        for job_id in ("validate-macos", "bootstrap-macos", "bootstrap-macos-brew"):
+            with self.subTest(job=job_id):
+                header = self.job_map[job_id].split("\n    steps:\n", 1)[0]
+                self.assertRegex(header, r"(?m)^    needs: changes$", job_id)
+                self.assert_macos_event_policy(block_if(header), job_id)
 
-    def test_bootstrap_jobs_stay_path_gated_on_pull_request_and_still_run_off_it(self):
+    def test_nightly_schedule_is_daily_off_the_hour_and_half_hour(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\njobs:\n", 1)[0]
+        schedule = trigger.split("\n  schedule:\n", 1)[1].split("\n  workflow_dispatch:", 1)[0]
+        self.assertEqual(re.findall(r"(?m)^    - cron: '([^']+)'", schedule), ["47 6 * * *"])
+        self.assertRegex(trigger, r"(?m)^  push:\n    branches: \[main\]$")
+        self.assertRegex(trigger, r"(?m)^  workflow_dispatch:\s*$")
+
+    def test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it(self):
         # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
         # (independent review of this branch, 2026-09-25): `needs: changes` alone applies
         # an implicit `success()`, and `changes` itself only runs `if:
@@ -1502,7 +1516,7 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         # job that itself failed or was cancelled (empty output, not the string
         # `'false'`) still runs these jobs (`changes`' own fail-safe default is
         # `bootstrap=true`, never a skip).
-        for job_id in ("bootstrap-linux", "bootstrap-macos", "bootstrap-macos-brew"):
+        for job_id in ("bootstrap-linux",):
             job = self.job_map[job_id]
             self.assertIn("needs: changes", job, job_id)
             condition = block_if(job)
@@ -1517,12 +1531,6 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
                               f"missing/empty output (changes skipped, failed or cancelled) needs "
                               f"'!= \\'false\\'' to avoid")
             self.assertIn("github.event_name != 'pull_request'", condition, job_id)
-        # B+ (docs/decisions/2026-10-03-macos-ci-scope.md, D5): on a pull_request the two macOS bootstrap jobs run
-        # only when validate-macos runs in full, with the same fail-safe spelling; bootstrap-linux is unchanged.
-        for job_id in ("bootstrap-macos", "bootstrap-macos-brew"):
-            condition = block_if(self.job_map[job_id])
-            self.assertIn("needs.changes.outputs.macos != 'false'", condition, job_id)
-            self.assertNotIn("needs.changes.outputs.macos == 'true'", condition, job_id)
         self.assertNotIn("outputs.macos", block_if(self.job_map["bootstrap-linux"]))
 
     def test_the_pre_fix_condition_text_fails_this_tests_own_assertions(self):
@@ -1534,26 +1542,15 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
             self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
         with self.assertRaises(AssertionError):
             self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
-        # 2026-10-03 (docs/decisions/2026-10-03-macos-ci-scope.md, D9): the same proof for validate-macos's gate. The
-        # text `needs.changes.outputs.macos == 'true'`, and each other single weakening, must fail the assertions
-        # that the workflow's own text passes.
-        _, condition, mode = self.validate_macos_gate()
-        controls = {
-            "macos == 'true'": (condition.replace("needs.changes.outputs.macos != 'false'",
-                                                  "needs.changes.outputs.macos == 'true'"), mode),
-            "no status function": (condition.replace("!cancelled() && ", ""), mode),
-            "no changed-tests term": (condition.replace(" || needs.changes.outputs.macos_tests != ''", ""), mode),
-            "changed-tests as the fallback": (condition, mode.replace("&& 'changed-tests' || 'full'",
-                                                                      "&& 'full' || 'changed-tests'")),
-            # Codex root review of 0eceddab, finding 2: the gate and the mode must each read the changes result.
-            "no result term in the gate": (condition.replace(" || needs.changes.result != 'success'", ""), mode),
-            "no result term in the mode": (condition, mode.replace(" && needs.changes.result == 'success'", "")),
-        }
-        for label, (weak_condition, weak_mode) in controls.items():
-            with self.subTest(label):
-                self.assertNotEqual((weak_condition, weak_mode), (condition, mode), "the mutation applies")
+        for job_id in ("validate-macos", "bootstrap-macos", "bootstrap-macos-brew"):
+            with self.subTest(job=job_id):
+                condition = block_if(self.job_map[job_id])
+                without_status_function = condition.replace("!cancelled() && ", "")
+                self.assertNotEqual(without_status_function, condition, "the mutation applies")
                 with self.assertRaises(AssertionError):
-                    self.assert_validate_macos_gate(weak_condition, weak_mode)
+                    self.assert_macos_event_policy(without_status_function, job_id)
+                with self.assertRaises(AssertionError):
+                    self.assert_macos_event_policy("${{ !cancelled() }}", job_id)
 
     def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
         job = self.job_map["changes"]
@@ -1587,7 +1584,7 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         # diff` must still write bootstrap=true (never leave the job to fail and skip
         # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
         # so a non-ASCII quoted filename still matches a PATTERNS glob. Since 2026-10-03 every
-        # failure path calls fail_safe, which also writes macos=true (full mode for validate-macos).
+        # failure path calls fail_safe, which also writes macos=true for the historical full-mode classifier.
         job = self.job_map["changes"]
         script = step_block(job, CHANGES_STEP)
         (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
@@ -1621,7 +1618,7 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
     def test_fail_safe_writes_full_mode_and_macos_is_always_written_last(self):
         # The fail_safe body writes bootstrap=true, macos=true and an empty macos_tests (D9). `macos` is the last
         # write there and on the normal path, so a script that stops part way leaves it empty, which the
-        # needs-gated jobs read as full mode, never a macos=false with its module list still unwritten.
+        # historical classifier reads as full mode, never a macos=false with its module list still unwritten.
         script = changes_script(self.text)
         body = re.search(r"(?ms)^fail_safe\(\) \{\n(.*?)^\}$", script)
         self.assertIsNotNone(body, "the changes script defines fail_safe")
@@ -1727,17 +1724,15 @@ def evaluate_expression(expression, context):
 
 
 class ValidateMacosGateEvaluationTests(unittest.TestCase):
-    """validate-macos's job-level ``if:`` and ``VALIDATE_MACOS_MODE``, evaluated with evaluate_expression for every
-    event, `changes` result and output combination, give validate_macos_mode's mode (docs/decisions/
-    2026-10-03-macos-ci-scope.md, sections 2 and 6.8). In particular a `changes` job that did not succeed runs the
-    full job whatever outputs it wrote (Codex root review of 0eceddab, finding 2). The negative control is the gate
-    and mode at 0eceddab, which read the outputs only."""
+    """The advisory job gate skips every PR regardless of `changes` result or outputs, and the retained mode
+    selector gives full on all other events. The previous workflow's gate is a discriminating control."""
 
-    # validate-macos's gate and mode at 0eceddab0cec33d8ff4f55233a097093cf4e5ac1, before the repair.
-    OUTPUTS_ONLY_GATE = ("${{ !cancelled() && (github.event_name != 'pull_request' || "
-                         "needs.changes.outputs.macos != 'false' || needs.changes.outputs.macos_tests != '') }}")
-    OUTPUTS_ONLY_MODE = ("${{ (github.event_name == 'pull_request' && needs.changes.outputs.macos == 'false') && "
-                         "'changed-tests' || 'full' }}")
+    # The workflow before the advisory change, as shipped by #677 (2026-10-03-macos-ci-scope.md).
+    PRE_ADVISORY_GATE = ("${{ !cancelled() && (github.event_name != 'pull_request' || "
+                         "needs.changes.result != 'success' || needs.changes.outputs.macos != 'false' || "
+                         "needs.changes.outputs.macos_tests != '') }}")
+    PRE_ADVISORY_MODE = ("${{ (github.event_name == 'pull_request' && needs.changes.result == 'success' && "
+                         "needs.changes.outputs.macos == 'false') && 'changed-tests' || 'full' }}")
     EVENTS = ("pull_request", "push", "schedule", "workflow_dispatch")
     # The values of needs.<job_id>.result (github/docs@2bd66de8, contexts.md:779).
     RESULTS = ("success", "failure", "cancelled", "skipped")
@@ -1775,26 +1770,34 @@ class ValidateMacosGateEvaluationTests(unittest.TestCase):
         for event, result, macos, modules in self.cases():
             with self.subTest(event=event, result=result, macos=macos, modules=modules):
                 self.assertEqual(self.run_mode(self.gate, self.mode_text, event, result, macos, modules),
-                                 validate_macos_mode({"macos": macos, "macos_tests": modules}, result, event))
+                                 "skip" if event == "pull_request" else "full")
 
-    def test_a_changes_job_that_failed_after_writing_macos_false_runs_in_full(self):
+    def test_a_failed_changes_job_never_enables_macos_on_a_pull_request(self):
         for result in ("failure", "cancelled"):
             for modules in self.MODULES:
                 with self.subTest(result=result, modules=modules):
                     self.assertEqual(self.run_mode(self.gate, self.mode_text, "pull_request", result, "false",
-                                                   modules), "full")
+                                                   modules), "skip")
 
-    def test_control_the_outputs_only_gate_and_mode_scope_or_skip_a_failed_changes_job(self):
-        self.assertNotIn("needs.changes.result", self.OUTPUTS_ONLY_GATE + self.OUTPUTS_ONLY_MODE)
+    def test_control_the_previous_workflow_runs_prs_the_advisory_policy_skips(self):
         disagreements = {case for case in self.cases()
-                         if self.run_mode(self.OUTPUTS_ONLY_GATE, self.OUTPUTS_ONLY_MODE, *case)
-                         != validate_macos_mode({"macos": case[2], "macos_tests": case[3]}, case[1], case[0])}
-        self.assertEqual(disagreements, {("pull_request", result, "false", modules)
-                                         for result in ("failure", "cancelled", "skipped") for modules in self.MODULES})
-        self.assertEqual(self.run_mode(self.OUTPUTS_ONLY_GATE, self.OUTPUTS_ONLY_MODE, "pull_request", "failure",
+                         if self.run_mode(self.PRE_ADVISORY_GATE, self.PRE_ADVISORY_MODE, *case)
+                         != ("skip" if case[0] == "pull_request" else "full")}
+        previously_skipped = ("pull_request", "success", "false", "")
+        self.assertEqual(disagreements, {case for case in self.cases()
+                                         if case[0] == "pull_request" and case != previously_skipped})
+        self.assertEqual(self.run_mode(self.PRE_ADVISORY_GATE, self.PRE_ADVISORY_MODE, "pull_request", "success",
+                                       "true", ""), "full")
+        self.assertEqual(self.run_mode(self.PRE_ADVISORY_GATE, self.PRE_ADVISORY_MODE, "pull_request", "success",
                                        "false", "tests.test_zz_probe"), "changed-tests")
-        self.assertEqual(self.run_mode(self.OUTPUTS_ONLY_GATE, self.OUTPUTS_ONLY_MODE, "pull_request", "failure",
-                                       "false", ""), "skip")
+
+    def test_cancelled_workflows_never_start_a_macos_job(self):
+        for job_id in ("validate-macos", "bootstrap-macos", "bootstrap-macos-brew"):
+            gate = block_if(jobs(ADOPTION_BOOTSTRAP.read_text(encoding="utf-8"))[job_id])
+            for event in self.EVENTS:
+                with self.subTest(job=job_id, event=event):
+                    self.assertFalse(expression_truthy(evaluate_expression(
+                        gate, {"github.event_name": event, "cancelled()": True})))
 
 
 def macos_job_inputs():
@@ -1811,7 +1814,8 @@ def macos_job_inputs():
 
 class MacosPatternsTests(unittest.TestCase):
     """MACOS_PATTERNS, the `changes` job's list of macOS-relevant paths (docs/decisions/2026-10-03-macos-ci-scope.md,
-    section 6.2): a pull request that changes a listed path runs validate-macos in full. The list holds this
+    section 6.2): a pull request that changes a listed path is classified as full by the historical selector;
+    the advisory event gate skips every macOS job on PRs. The list holds this
     workflow and only live patterns, covers every script and gate module validate-macos runs and every input that
     tests/test_adoption_bootstrap_macos.py lists except the evidence manifest (D8), and a drift guard holds every
     non-test file with a Darwin branch, macOS path handling or a non-Linux refusal to the list or to a recorded
@@ -1845,10 +1849,12 @@ class MacosPatternsTests(unittest.TestCase):
             "validators. It stays in the push paths: as the post-merge net (D11).",
         "blueprints/convergence-practice/wsl-native-tools/pins.json": "WSL tool pins with no macOS consumer.",
         "adoption/templates/*":
-            "Data the listed render_config.py consumes; listing it would add full-suite PR jobs with no macOS-only "
+            "Data the listed render_config.py consumes; historically, listing it would have added full-suite PR "
+            "selections with no macOS-only "
             "failure observed, and adoption/** push runs cover it after merge.",
         "adoption/hosts/*":
-            "Data the listed render_config.py consumes; listing it would add full-suite PR jobs with no macOS-only "
+            "Data the listed render_config.py consumes; historically, listing it would have added full-suite PR "
+            "selections with no macOS-only "
             "failure observed, and adoption/** push runs cover it after merge.",
     }
 
@@ -1988,7 +1994,7 @@ class PushNetTests(unittest.TestCase):
 
 class ValidateMacosModeTests(unittest.TestCase):
     """How validate-macos runs each mode (docs/decisions/2026-10-03-macos-ci-scope.md, sections 6.1 and 6.3): every
-    step after setup-python runs in full mode only, except the changed-tests step and the always() upload; the
+    step after setup-python runs in full mode only, except the calendar install, changed-tests step and always() upload; the
     changed-tests step reads its modules only through env and refuses a selection that runs no test; and the
     changes script admits only well-formed top-level test modules that still exist."""
 
@@ -2003,13 +2009,14 @@ class ValidateMacosModeTests(unittest.TestCase):
     def step_name(step):
         return re.search(r"(?m)^      - name: (.+)$", step).group(1).strip("'\"")
 
-    def test_every_step_after_setup_python_runs_in_full_mode_only_except_two(self):
+    def test_every_step_after_setup_python_runs_in_full_mode_only_except_three(self):
         steps = [(self.step_name(step), block_if(step)) for step in self.steps()]
         names = [name for name, _ in steps]
         setup = names.index("Set up the manifest-supported Python line")
         self.assertEqual([condition for _, condition in steps[:setup + 1]], [None] * (setup + 1),
                          "harden-runner, checkout and setup-python run in every mode")
-        exceptions = {CHANGED_TESTS_STEP: CHANGED_TESTS_IF, "Upload the full test suite result": "always()"}
+        exceptions = {"Install the hash-locked session calendar": None,
+                      CHANGED_TESTS_STEP: CHANGED_TESTS_IF, "Upload the full test suite result": "always()"}
         for name, condition in steps[setup + 1:]:
             with self.subTest(name):
                 self.assertEqual(condition, exceptions.get(name, FULL_MODE_IF))
@@ -2060,7 +2067,8 @@ def write_tree(root, files):
 
 @unittest.skipUnless(shutil.which("bash") and shutil.which("git"), "the changes step needs bash and git, as the runner has")
 class ChangesModeComputationTests(unittest.TestCase):
-    """The `changes` script executed as GitHub runs a `shell: bash` step (`bash --noprofile --norc -eo pipefail`)
+    """The retained historical classifier in `changes`, executed as a GitHub `shell: bash` step
+    (`bash --noprofile --norc -eo pipefail`), independent of the advisory job gate:
     against a scratch repository (docs/decisions/2026-10-03-macos-ci-scope.md, sections 2 and 6.1): a listed
     path selects full mode; top-level test modules alone select changed-tests mode with exactly those modules;
     anything else under tests/ selects full mode; a change that touches neither, or only deletes a test module,
@@ -2136,6 +2144,11 @@ class ChangesModeComputationTests(unittest.TestCase):
         self.assert_mode(outputs, "full", bootstrap="true")
         self.assertIn("- `adoption/bootstrap-macos.sh`", summary)
 
+    def test_a_calendar_relock_selects_full_mode(self):
+        outputs, summary = self.run_changes({".github/requirements-calendar.txt": "# calendar relock\n"})
+        self.assert_mode(outputs, "full", bootstrap="true")
+        self.assertIn("- `.github/requirements-calendar.txt`", summary)
+
     def test_a_listed_test_module_selects_full_mode(self):
         outputs, _ = self.run_changes({"tests/test_workflow_hardening.py": "# changed\n"})
         self.assert_mode(outputs, "full", bootstrap="false")
@@ -2146,7 +2159,8 @@ class ChangesModeComputationTests(unittest.TestCase):
         self.assert_mode(outputs, "changed-tests", modules="tests.test_unlisted_a tests.test_unlisted_b",
                          bootstrap="false")
         self.assertIn("changed-tests mode", summary)
-        self.assertIn("not a macOS full-suite pass", summary)
+        self.assertIn("This selection does not run a macOS job on the pull request", summary)
+        self.assertIn("all macOS jobs are skipped on pull requests", summary)
 
     def test_anything_else_under_tests_selects_full_mode(self):
         for label, changes in (("nested data", {"tests/fixtures/data.json": "{}\n"}),
@@ -2162,7 +2176,8 @@ class ChangesModeComputationTests(unittest.TestCase):
     def test_a_change_touching_neither_is_skipped_as_untested(self):
         outputs, summary = self.run_changes({"docs/a.md": "a, changed\n", "README.md": "changed\n"})
         self.assert_mode(outputs, "skip", bootstrap="false")
-        self.assertIn("skipped: no Mac-relevant change; this is not a macOS pass", summary)
+        self.assertIn("Historical validate-macos selection: skipped", summary)
+        self.assertIn("all macOS jobs are skipped on pull requests", summary)
         self.assertIn("untested, not passed", summary)
 
     def test_a_pull_request_that_only_deletes_a_test_module_is_skipped(self):
