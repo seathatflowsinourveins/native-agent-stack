@@ -61,8 +61,9 @@ class Rc6CandidateTests(unittest.TestCase):
         old_history = json.loads(original.read_text())
         new_history = json.loads((SOURCE / "replay-history-rc6.json").read_text())
         self.assertEqual(new_history["replays"][:len(old_history["replays"])], old_history["replays"])
-        self.assertEqual(new_history["replays"][-2]["engine_version"], "2.0.0rc5")
-        self.assertEqual(new_history["replays"][-1]["engine_version"], "2.0.0rc5")
+        appended = {row["id"]: row for row in new_history["replays"][len(old_history["replays"]):]}
+        self.assertEqual(appended["j2-rc5-runtime-env-20261006"]["engine_version"], "2.0.0rc5")
+        self.assertEqual(appended["j2-rc5-documented-env-20261006"]["engine_version"], "2.0.0rc5")
 
     def test_existing_synthetic_full_method_passes_with_candidate_identity(self):
         receipt, context = candidate_fixture()
