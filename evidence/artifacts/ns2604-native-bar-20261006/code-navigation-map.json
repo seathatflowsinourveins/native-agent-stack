@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "source_review_code_navigation_contract_map",
+  "recorded_at_utc": "2026-10-06T15:47:07Z",
+  "owner_lane": "readiness-runner",
+  "claim_boundary": "Inherited baseline task nominations and pending comparisons; no current native preference, comparative-quality win, exclusion or client configuration change is established by this map.",
+  "source": {
+    "locator": "coordination:ns2604-coop/lanes/overlap-codenav.status.md",
+    "section": "Owner map, lines174-208",
+    "sha256_at_read": "20a1523fb79c7311fbcc4c9f084fb735415d39230fbbce4b3e0187eb578ae543"
+  },
+  "contracts": [
+    {
+      "task": "Known path/window; exact original source bytes",
+      "baseline": "Native source read (Claude Read; Codex bounded command read)",
+      "boundary": "Index discovery does not satisfy an additional contract when the original path/window is already known."
+    },
+    {
+      "task": "Literal filename/path discovery",
+      "baseline": "Native filename search; Codex rg --files",
+      "boundary": "Fresh-client exposure must identify the actual Claude primitive; do not infer Glob from older sessions."
+    },
+    {
+      "task": "Literal identifier/error/regex lookup",
+      "baseline": "Native content search; Codex rg",
+      "boundary": "Text matches do not establish language-aware reference identity, graph edges or AST constraints."
+    },
+    {
+      "task": "Language-aware symbol definitions and references",
+      "baseline": "Serena",
+      "boundary": "Fresh exposure, authentic controls and valid organic/correct outcomes remain pending.",
+      "alternatives": [
+        "jcodemunch/SCIP",
+        "SocratiCode graph",
+        "codebase-memory"
+      ]
+    },
+    {
+      "task": "Static multi-hop call/dependency graph",
+      "baseline": "codebase-memory",
+      "boundary": "Compare actual edges/hop depth/languages/freshness; similarity and lexical hits do not prove graph relationships.",
+      "alternatives": [
+        "SocratiCode graph",
+        "jcodemunch hierarchy"
+      ]
+    },
+    {
+      "task": "Syntax-shaped structural pattern search",
+      "baseline": "ast-grep",
+      "boundary": "A measured language-bounded native AST owner may cover a declared scope. No chosen complete-contract covering owner is established; lexical overlap is insufficient."
+    },
+    {
+      "task": "Conceptual code search",
+      "baseline": null,
+      "status": "UNRESOLVED",
+      "alternatives": [
+        "Semble",
+        "SocratiCode",
+        "ColGREP",
+        "native lexical baseline"
+      ],
+      "boundary": "Organic selection alone does not settle quality. Matched corpus/query/freshness and the approved confirmatory design are required."
+    },
+    {
+      "task": "Scoped indexed Markdown discovery and original-source recovery",
+      "baseline": "QMD",
+      "boundary": "Match documents/index scope and recovery against alternatives; captured-output processing has a different contract."
+    },
+    {
+      "task": "Large selected output processing/filter/aggregation/recovery",
+      "baseline": "context-mode (overlap-token)",
+      "boundary": "Composition with lexical search does not replace LSP, graph or structural semantics."
+    }
+  ],
+  "native_evidence": {
+    "frozen_executor": "Authorized #786 v1.1/G13; exact run locator and active gates pending",
+    "independent_trials": false,
+    "old_48_start_and_T1_T10_proposals": "DORMANT, not an active assignment",
+    "serena_controls": "Consume from owner named by wf_5e8f452c-484; historical grader replay is supplementary integration only.",
+    "client_holds": "CC owns configuration; seven-tool hold plus Serena plan hold remain until released."
+  },
+  "exclusion": {
+    "established": [],
+    "per_client": true,
+    "all_required": [
+      "Completed full-run zero unprompted choice with valid exposure",
+      "A chosen slot covering the same complete task contract",
+      "One upstream-native routing fix and matched rerun changing nothing"
+    ],
+    "uncovered_zero_use": "NOT-READY with gap, not excluded",
+    "overturn": [
+      "Later valid organic choice",
+      "Chosen covering owner regression",
+      "Upstream-harness paired comparison favoring the candidate"
+    ]
+  },
+  "custody": {
+    "frozen_pr": 780,
+    "head": "50bf3c544db95c5121efd3229938148e21763b67",
+    "changes": "No pushes, rebases or closing until CC revival",
+    "not_owned_pr": 758
+  },
+  "next_sweep_leads": [
+    "Confirm current own-skill delivery and per-client exposure.",
+    "Compare matched conceptual corpus/freshness, including ColGREP.",
+    "First-party experimental ast-grep MCP rule development remains an unaccepted discovery modality.",
+    "Join authentic controls, G13 decontamination and native task correctness; retain invalid/censored cells."
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "native_bar_operational_recount",
-  "recorded_at_utc": "2026-10-06T14:17:29Z",
+  "recorded_at_utc": "2026-10-06T15:47:07Z",
   "host_scope": "NativeStack2604",
   "source_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
   "north_star_action": "Finish the native foundation used for US-equities research and historical simulation; research and paper operation continue under their separate gates.",
@@ -138,7 +138,19 @@
     "proposed_open_dispatches": 0,
     "configuration_and_scope_decisions": "Command center/user retain their existing authority; naming a lane never authorizes configuration, credentials, trust, sudo or merges.",
     "co_op_accepted_dispatches": 18,
-    "individual_lane_acknowledgments": "not independently verified"
+    "individual_lane_acknowledgments": "not independently verified",
+    "scope_absorptions": [
+      {
+        "from": "overlap-codenav",
+        "to": "readiness-runner",
+        "slots": [
+          "code-navigation/serena",
+          "code-navigation/structural-search"
+        ],
+        "source": "codenav-absorption",
+        "qualification_effect": "none"
+      }
+    ]
   },
   "eta_to_79": {
     "assessment_at_utc": "2026-10-06T14:17:29Z",
@@ -382,6 +394,13 @@
       "sha256": "88710bdadfbf75139c8902d2488c6c67e280990c9b4fd1b74a76a12bd589ae86",
       "evidence_class": "source_review",
       "scope": "CC workflow prepares the seven-tool install plan; client wiring/installs held while backend/index/PR work may continue."
+    },
+    {
+      "id": "codenav-absorption",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/codenav-absorption.json",
+      "sha256": "170fb4618e7142b169d819c2b26dcff2eb4b27defee6550ef659bf981c5457d6",
+      "evidence_class": "source_review",
+      "scope": "Frozen accepted scope/custody transfer, exact input digests, separate native gates and conjunctive exclusion rule; no native execution."
     }
   ],
   "slots": [
@@ -713,7 +732,7 @@
       "slot": "code-navigation/serena",
       "state": "NOT_STARTED",
       "closed": false,
-      "owner": "overlap-codenav",
+      "owner": "readiness-runner",
       "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
@@ -729,9 +748,14 @@
         {
           "source": "accepted-owner-dispatch",
           "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "codenav-absorption",
+          "scope": "Accepted scope transfer only; both slots remain open awaiting the selected frozen executor and named install-owner outputs."
         }
       ],
-      "remaining_gate": "Persist condition-absent controls; delete harness text naming serena (PLAN:139) and re-measure organic choice"
+      "remaining_gate": "Consume authentic native condition-absent controls/evaluator outputs from the owner named by CC Serena plan wf_5e8f452c-484, plus frozen #786 v1.1/G13 decontamination and per-client fresh exposure/organic symbol-reference correctness. Exact run locator and active gates are pending. Historical grader replay is supplementary integration; no independent trial or local harness/client edit.",
+      "owner_transfer_source": "codenav-absorption"
     },
     {
       "slot": "code-navigation/claude-plugins-official-code-intelligence-lsp-pl",
@@ -757,7 +781,7 @@
       "slot": "code-navigation/structural-search",
       "state": "NOT_STARTED",
       "closed": false,
-      "owner": "overlap-codenav",
+      "owner": "readiness-runner",
       "owner_assignment": "co_op_dispatch_accepted",
       "baseline_state": "NOT_STARTED",
       "foundation_prerequisite": true,
@@ -773,9 +797,14 @@
         {
           "source": "accepted-owner-dispatch",
           "scope": "Co-op accepted and is delivering the named handoff; individual lane acknowledgment is not independently verified."
+        },
+        {
+          "source": "codenav-absorption",
+          "scope": "Accepted scope transfer only; both slots remain open awaiting the selected frozen executor and named install-owner outputs."
         }
       ],
-      "remaining_gate": "Dated exclusion (overlaps Grep/rg and serena search_for_pattern) or routing fix (ADJ fix_lever)"
+      "remaining_gate": "Consume the frozen #786 v1.1 run's valid per-client AST task outcomes/exposure and G13 evidence. Exclusion requires full-run zero unprompted choice AND a chosen owner covering the complete AST contract AND one upstream-native routing fix plus rerun unchanged, per client. Uncovered zero-use remains NOT-READY. Exact run locator pending; no independent trials.",
+      "owner_transfer_source": "codenav-absorption"
     },
     {
       "slot": "semantic-rag/code-search",
@@ -2170,5 +2199,21 @@
     ],
     "allowed_work": "Backend, index and PR work continues, including Qdrant/Nemotron, qmd named-index blue/green and countable hook/panel source work.",
     "release_condition": "The CC's ordered install plan names the step owners; the CC applies client configuration."
+  },
+  "codenav_evidence_plan": {
+    "owner": "readiness-runner",
+    "frozen_pilot_pr": 786,
+    "run_locator": null,
+    "run_locator_status": "Await exact frozen locator from the run owner; do not infer or launch a run.",
+    "serena_install_owner_plan": "wf_5e8f452c-484",
+    "independent_trials": false,
+    "both_slots_closed": false,
+    "owner_exclusion_map": "code-navigation-map.json",
+    "frozen_research_draft": {
+      "pr": 780,
+      "head": "50bf3c544db95c5121efd3229938148e21763b67",
+      "allowed_changes": "none until CC revival"
+    },
+    "not_owned_pr": 758
   }
 }

@@ -1,6 +1,6 @@
 # NativeStack2604 operational native-bar board
 
-Recorded at 2026-10-06T14:17:29Z against main `0d5e6506434fab598dee861c749a22e628beb75a`.
+Recorded at 2026-10-06T15:47:07Z against main `0d5e6506434fab598dee861c749a22e628beb75a`.
 
 **27/80 operational closures: 13 READY and 14 BY_DESIGN.** There are 53 open slots; 52 more closures reach the 79/80 ceiling. Base-distribution remains the external upstream hold. The seven progress changes below do not add closures.
 
@@ -35,9 +35,9 @@ Each row names one lane. The co-op has accepted and is delivering all 18 previou
 | cross:gpt6-harnesses/gpt-gateway | IN_PROGRESS | [Row 13](board.json) | github-ci-finalize (co-op handoff accepted) |
 | cross:runtime-workers/agent-runtime-worker | IN_PROGRESS | [Row 14](board.json) | fixwave-defects |
 | cross:runtime-workers/research-harnesses | IN_PROGRESS | [Row 15](board.json) | convergence-practice |
-| code-navigation/serena | NOT_STARTED | [Row 16](board.json) | overlap-codenav (co-op handoff accepted) |
+| code-navigation/serena | NOT_STARTED | [Row 16](board.json) | readiness-runner (scope absorbed) |
 | code-navigation/claude-plugins-official-code-intelligence-lsp-pl | BY_DESIGN | [Row 17](board.json) | overlap-codenav |
-| code-navigation/structural-search | NOT_STARTED | [Row 18](board.json) | overlap-codenav (co-op handoff accepted) |
+| code-navigation/structural-search | NOT_STARTED | [Row 18](board.json) | readiness-runner (scope absorbed) |
 | semantic-rag/code-search | BLOCKED | [Row 19](board.json) | memory-h2h |
 | semantic-rag/embedding-model | IN_PROGRESS | [Row 20](board.json) | memory-h2h |
 | semantic-rag/reranker-model | BY_DESIGN | [Row 21](board.json) | memory-h2h |
@@ -102,6 +102,12 @@ Each row names one lane. The co-op has accepted and is delivering all 18 previou
 | cross:convergence-practice/convergence-validators | READY | [Row 80](board.json) | convergence-practice |
 
 The JSON row contains its exact census pointer, source references, source classes and remaining gate. Mutable lane reports are bound through immutable sanitized source excerpts, with omissions explicit; their original full-source digests describe capture provenance. Private coordination locators are portable aliases; private paths, prompts, account values and raw event data are excluded.
+
+## Code-navigation scope handoff
+
+Readiness-runner absorbs Serena and structural-search from the closed overlap-codenav lane. Both retain `closed=false` and their existing state; the count remains 27/80. The [contract/exclusion map](code-navigation-map.json) preserves lexical, symbol/reference, graph, AST, conceptual, Markdown and processing distinctions. Consume only the authorized frozen #786 v1.1/G13 and the install owner named by the CC Serena plan; the exact run locator is pending. No independent trial, local harness edit or client change is authorized here.
+
+Serena retains authentic native failure-control and exposure/organic-correctness gates. Structural-search exclusion requires, per client, completed full-run zero organic choice, a chosen owner covering the complete AST contract, and one upstream-native fix/rerun changing nothing. An uncovered zero-use contract stays NOT-READY. Old 48-start/T1–T10 proposals are dormant. #780 remains frozen at `50bf3c544db95c5121efd3229938148e21763b67`; no push, rebase or closing unless CC revives it. #758 stays with co-op/5f. This transfer changes custody, not native qualification.
 
 ## Landing reconciliation
 
