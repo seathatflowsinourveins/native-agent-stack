@@ -33,14 +33,24 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (append_jsonl, clean_login_env, current_s7_baseline, gateway_build, gateway_get, load_json,  # noqa: E402
-                    rebaseline_cost_ok, rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change,
-                    sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp,
-                    write_json)
+from common import (append_jsonl, classify_provider_error, clean_login_env, clone_trust_view,  # noqa: E402
+                    current_s7_baseline, gateway_build, gateway_get, load_json, read_jsonl, rebaseline_cost_ok,
+                    rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change, sha256_file,
+                    stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp, write_json)
 
 
 def stop_flags(root: Path, client: str, cell: str | None = None) -> list[str]:
     return [name for name in stop_flag_names(client, cell) if (root / name).exists()]
+
+
+def app_server_exit_reason(failed: bool, provider: list) -> tuple[str | None, str | None]:
+    """(reason, provider error class) for a CL7b attempt. GPT read of 5aa2bfdc, finding 4: the provider's own rate-limit
+    error marks the attempt rate_limited (carried forward and re-run) and stops the Codex chain as a Codex launcher
+    trial's limit error does (§9.2); the block's account-wide gateway counts never mark a trial on their own."""
+    error_class = next((t.get("error_class") for t in provider or [] if t.get("error")), None)
+    if not failed:
+        return None, error_class
+    return ("rate_limited" if error_class == "rate_limit" else "app_server_provider_error"), error_class
 
 
 def straddled_rebaseline(root: Path, started: str, ended: str) -> str | None:
@@ -102,8 +112,11 @@ def promptfoo_attempts(results_path: Path) -> dict:
         if isinstance(parsed, dict) and "trial_id" in parsed:
             trials.append({k: parsed.get(k) for k in ("trial_id", "rc", "censored", "reason")})
         elif output is not None or row.get("error"):
+            # GPT read of 5aa2bfdc, finding 4: keep a sanitized class of the provider's own error (never its text), so a
+            # CL7b rate limit is marked and re-run like any other.
+            error = row.get("error") or (row.get("response") or {}).get("error")
             trials.append({"provider_output_sha256": __import__("hashlib").sha256(str(output).encode()).hexdigest(),
-                           "app_server": True, "error": bool(row.get("error"))})
+                           "app_server": True, "error": bool(error), "error_class": classify_provider_error(error)})
     return {"rows": len(rows), "per_test": per_test, "trials": trials, "provider_errors": errors,
             "eval_id": data.get("evalId")}
 
@@ -175,11 +188,12 @@ def main(argv=None) -> int:
     row["s7_reads_pre"] = pre_read
     row["s7_baseline_used"] = Path(baseline_path).name
     if not host["equal"] or any(host["new_trust"].values()):
-        # Decision 7: a change between blocks costs no trial, so it becomes the run's in-run re-baseline if allowed.
-        done, why = (False, "stop flags set") if flags else try_rebaseline(
-            root, host, any(host["new_trust"].values()), pre, {"trigger": "block-start", "cell": cell_name, "arm": cell["arm"]})
-        row["rebaseline"] = why
-        if done:
+        # Decision 7: a change between blocks costs no trial, so it becomes the run's in-run re-baseline if allowed; the
+        # reconciliation inside the lock (finding 2) also accepts a change another chain's exit has just absorbed.
+        status, why = ("refused", "stop flags set") if flags else try_rebaseline(
+            root, cfg, pre, False, {"trigger": "block-start", "cell": cell_name, "arm": cell["arm"]})
+        row["rebaseline"], row["rebaseline_status"] = why, status
+        if status in ("rebaselined", "absorbed"):
             baseline, baseline_path = current_s7_baseline(cfg, root)
             row["s7_baseline_used"] = Path(baseline_path).name
         else:
@@ -211,11 +225,18 @@ def main(argv=None) -> int:
     (work / "o").mkdir(parents=True, exist_ok=True)
     stamp = utc_stamp()
     if cell["kind"] == "app-server":
+        launched_ids = {r.get("trial_id") for r in read_jsonl(root / "ledger.jsonl") if r.get("phase") == "launched"}
         for trial in cell.get("trials", []):
             if ref and trial["ref"] != ref:
                 continue
-            config = work / "p" / Path(trial["config_neutral"]).name
-            configs.append((config, work / "o" / f"{config.stem}-{stamp}.json", trial))
+            attempt = trial
+            if trial["trial_id"] in launched_ids and not args.dry_run:
+                # GPT read of 5aa2bfdc, finding 5: stage 1 built the first attempt; every later one (a re-run after a
+                # carry-forward) gets its own trial id, fixture, clone and provider config under the same test ref.
+                from prepare import allocate_app_server_attempt
+                attempt = allocate_app_server_attempt(cfg, root, cell_name, cell, trial)
+            config = work / "p" / Path(attempt["config_neutral"]).name
+            configs.append((config, work / "o" / f"{config.stem}-{stamp}.json", attempt))
     else:
         suffix = f"-{ref}" if ref else ""
         configs.append((work / "p" / f"{code}.yaml", work / "o" / f"{code}{suffix}-{stamp}.json", None))
@@ -231,13 +252,25 @@ def main(argv=None) -> int:
         if args.dry_run:
             outcomes.append({"command": command, "dry_run": True})
             continue
+        clone_before = None
         if trial:
+            if not (trial.get("clone_gate") or {}).get("pass", True):
+                append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
+                                                     "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
+                                                     "test_key": trial["test_key"], "phase": "exit", "at": started,
+                                                     "rc": None, "censored": True, "reason": "clone_gate", "launched": False})
+                outcomes.append({"trial_id": trial["trial_id"], "refused": "clone_gate"})
+                continue
+            # Finding 1: the attempt's clone trust (hooks_state, projects, trusted set) before and after, as the
+            # launcher's S7 snapshot judges the other Codex cells.
+            clone_before = clone_trust_view(work / "clones" / trial["trial_id"])
             # CL7b has no launcher, so its launched row carries the gateway build (CL9, G11) the launcher records for
-            # the other Codex cells.
+            # the other Codex cells, and the attempt's config name, by which a resume finds a still-running attempt.
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
                                                  "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
                                                  "test_key": trial["test_key"], "phase": "launched", "at": started,
-                                                 "gateway_build": row.get("gateway_build"),
+                                                 "gateway_build": row.get("gateway_build"), "config_name": config.name,
+                                                 "attempt": trial.get("attempt", 1),
                                                  "launched_by": "block.py (CL7b: promptfoo's own provider, no launcher)"})
         with open(log, "wb") as handle:
             proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)
@@ -253,8 +286,10 @@ def main(argv=None) -> int:
             outcome["trial_id"] = trial["trial_id"]
             provider = (attempts or {}).get("trials") or [{}]
             failed = proc.returncode not in (0, 100) or not kept.exists() or any(t.get("error") for t in provider)
-            reason = "app_server_provider_error" if failed else None
-            rebaselined = straddled_rebaseline(root, started, ended)
+            reason, error_class = app_server_exit_reason(failed, provider)
+            clone_after = clone_trust_view(work / "clones" / trial["trial_id"])
+            clone_changed = sorted(k for k in clone_before if clone_before[k] != clone_after.get(k)) if clone_before else []
+            rebaselined = None if clone_changed else straddled_rebaseline(root, started, ended)
             cost_ok, cost = rebaseline_cost_ok(root, {"client": "codex", "cell": cell_name, "arm": cell["arm"],
                                                       "trial_id": trial["trial_id"]}) if rebaselined else (True, None)
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
@@ -264,7 +299,15 @@ def main(argv=None) -> int:
                                                  "reason": "host_change_rebaselined" if rebaselined else reason,
                                                  "reason_before_rebaseline": reason if rebaselined else None,
                                                  "rebaseline": rebaselined, "rebaseline_cost": cost,
+                                                 "provider_error_class": error_class, "rate_limited": reason == "rate_limited",
+                                                 "host_s7_clone_trust_changed": [f"/clone_config/{k}" for k in clone_changed],
+                                                 "attempt": trial.get("attempt", 1),
                                                  "provider_output_sha256": provider[0].get("provider_output_sha256")})
+            if reason == "rate_limited":
+                (root / "STOP.codex").write_text(f"{utc_now()} rate_limit_error_from_provider {trial['trial_id']}\n")
+            if clone_changed:
+                (root / "STOP").write_text(f"{utc_now()} {trial['trial_id']}: clone trust changed during the attempt: "
+                                           f"{clone_changed}\n")
             if not cost_ok:
                 (root / "STOP").write_text(f"{utc_now()} in-run re-baseline cost exceeded at {trial['trial_id']}: {cost}\n")
         if client == "codex":

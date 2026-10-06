@@ -648,6 +648,7 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
     result = {"trial_id": trial_id, "rc": None, "censored": True, "reason": None}
     fixture = None
     lock_fd = None
+    launched_at, exit_written = None, False
     try:
         if frozen_sha and frozen_sha != prompt_sha:
             raise Censored("prompt_mismatch")
@@ -771,7 +772,7 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             (root / f"HOLD.{cell}").write_text(f"{utc_now()} {trial_id}: no result event by T = {t_seconds} s ({reason}); "
                                                "read its no_result_diagnosis in ledger.jsonl, then remove this flag\n")
             exit_row["held_cell"] = cell
-        judged, rebaselined, rebase_done = None, None, False
+        judged, rebaselined, stop_reason = None, None, None
         try:
             # A launched trial always gets its exit row: a failure here is recorded, and G4 then fails for want of the
             # host comparison instead of the trial vanishing from the ledger.
@@ -783,15 +784,28 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             # Decision 7: a re-baseline recorded while this trial ran (by another chain's trial or block), or a
             # persistent change this trial saw that the run may still absorb, makes it a re-run; else the run stops.
             during = rebaselines_between(root, launched_at, utc_now())
-            if judged["persistent"]:
-                new_trust = any(judged["within"]["new_trust"].values()) or any(judged["vs_baseline"]["new_trust"].values())
-                done, why = try_rebaseline(root, judged["vs_baseline"], new_trust, after,
-                                           {"trigger": "trial", "trial_id": trial_id, "cell": cell, "arm": arm})
-                if done:
-                    rebaselined, rebase_done = why, True
-                else:
+            if judged["clone_trust_changed"]:
+                # GPT read of 5aa2bfdc, finding 1: a hook or project trust change in the trial's own clone is fatal on
+                # its own; no re-baseline absorbs it.
+                stop_reason = f"clone trust changed during the trial: {judged['clone_trust_changed']}"
+            elif judged["persistent"]:
+                # Finding 2: reconciled inside the lock against the baseline in force now, so a change another exit
+                # already absorbed is recognised, and only an additional or refused change stops the run.
+                status, why = try_rebaseline(root, cfg, after, any(judged["within"]["new_trust"].values()),
+                                             {"trigger": "trial", "trial_id": trial_id, "cell": cell, "arm": arm})
+                exit_row["rebaseline_status"] = status
+                if status == "refused":
                     exit_row["rebaseline_refused"] = why
-            if during and not rebaselined:
+                    stop_reason = (f"host exposure or trust changed: {judged['vs_baseline']['changed'][:6]} "
+                                   f"new_trust={judged['vs_baseline']['new_trust']}; no in-run re-baseline: {why}")
+                else:
+                    rebaselined = why
+                    baseline_now, baseline_path = current_s7_baseline(cfg, root)
+                    judged = s7_persistent_change(baseline_now, before, after)   # refreshed against the re-baseline
+                    exit_row["s7_baseline_used"] = Path(baseline_path).name
+                    if judged["persistent"]:
+                        stop_reason = f"a change remains after the re-baseline: {judged['vs_baseline']['changed'][:6]}"
+            if during and not rebaselined and not judged["clone_trust_changed"]:
                 rebaselined = f"re-baselined during the trial ({str(during[-1].get('baseline', '')).rsplit('/', 1)[-1]})"
             if rebaselined:
                 # Point 4 of the 11:43Z confirmations: the re-runs stay within one Claude trial and one Codex cell (else
@@ -801,7 +815,8 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                 exit_row.update({**result, "reason_before_rebaseline": reason, "rebaseline": rebaselined,
                                  "rebaseline_cost": cost})
                 if not cost_ok:
-                    (root / "STOP").write_text(f"{utc_now()} in-run re-baseline cost exceeded at {trial_id}: {cost}\n")
+                    stop_reason = stop_reason or f"in-run re-baseline cost exceeded: {cost}"
+            exit_row["host_s7_clone_trust_changed"] = judged["clone_trust_changed"]
             host_compare = judged["within"]
             fixture_manifest = tree_manifest(fixture)
             write_json(root / "manifests" / f"{trial_id}.fixture.json", fixture_manifest, 0o600)
@@ -827,19 +842,25 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             exit_row["bookkeeping_error"] = f"{type(error).__name__}: {str(error)[:300]}"
             with open(root / "launcher-errors.log", "a") as handle:
                 handle.write(f"{utc_now()} {trial_id} after exit: {traceback.format_exc()}\n")
+        if not stop_reason and judged is not None and judged["persistent"] and not rebaselined:
+            stop_reason = "a persistent host change was not reconciled (see bookkeeping_error)"
         ledger(root, {**exit_row, "at": utc_now()})
-        if judged is not None and judged["persistent"] and not rebase_done:
-            vs_base = judged["vs_baseline"]
-            (root / "STOP").write_text(f"{utc_now()} host exposure or trust changed during {trial_id}: "
-                                       f"{vs_base['changed'][:6]} new_trust={vs_base['new_trust']} "
-                                       f"within={judged['within']['changed'][:6]}; "
-                                       f"no in-run re-baseline: {exit_row.get('rebaseline_refused')}\n")
+        exit_written = True
+        if stop_reason:
+            (root / "STOP").write_text(f"{utc_now()} {trial_id}: {stop_reason}\n")
         return result
     except Censored as censor:
         result.update({"censored": True, "reason": censor.reason})
         ledger(root, {**base, "phase": "exit", "at": utc_now(), **result, "launched": False,
                       "fixture_private": str(fixture) if fixture else None})
         return result
+    except Exception as error:  # noqa: BLE001
+        # GPT read of 5aa2bfdc, finding 3: a failure after the launch row still leaves the attempt's exit, carried
+        # forward, so a resume re-runs it instead of counting it as done.
+        if launched_at and not exit_written:
+            ledger(root, {**base, "phase": "exit", "at": utc_now(), "trial_id": trial_id, "rc": None, "censored": True,
+                          "reason": "launcher_error_after_launch", "launched": True, "error": type(error).__name__})
+        raise
     finally:
         if lock_fd is not None:
             fcntl.flock(lock_fd, fcntl.LOCK_UN)

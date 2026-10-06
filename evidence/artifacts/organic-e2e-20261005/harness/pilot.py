@@ -28,9 +28,11 @@ or experiment word while sessions run.
    first Claude block with usable meter readings, the expected usage per trial (0.15 of a window to start) becomes the
    measured p90 per trial, written to meter-calibration.json in the run root (recalibrate_meter; confirmed at 11:43Z).
 5  collect.py.  6  grade.py trials.
-Resume: --from-stage 2, 3 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
-launch (meter, lock, DEFER, HOLD), or a trial carried forward (common.CARRY_FORWARD_REASONS: killed at its own first
-meter reading, rate-limited, or re-run after an in-run re-baseline), runs again.
+Resume: --from-stage 2, 3 or 4 runs only tests whose completed or still-running attempts are fewer than their repeat;
+a test refused before launch (meter, lock, DEFER, HOLD), or an attempt carried forward (common.CARRY_FORWARD_REASONS:
+killed at its own first meter reading, rate-limited, re-run after an in-run re-baseline, interrupted, or a launcher
+error after launch), runs again. An attempt that launched but has no exit row and no live process is first given its
+interrupted exit (reconcile_orphans). Each attempt has its own trial id, CL7b's included.
 --from-stage 2 --rerun-gate0-failures runs once more only the stage-2 tests whose gate-0 check failed (for example a
 Claude probe stopped by the meter, in the next 5-hour window), then collects and checks gate 0 again. A DEFER.claude
 flag is cleared on resume once the newest meter reading leaves headroom for the run's expected usage (decision 6);
@@ -51,7 +53,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, HOME, METER_CALIBRATION, RUNS_ROOT,  # noqa: E402
-                    headroom_allows, load_json, meter_calibration, newest_meter_reading, read_jsonl,
+                    append_jsonl, headroom_allows, load_json, meter_calibration, newest_meter_reading, read_jsonl,
                     run_expected_usage, sha256_file, utc_now, write_json)
 
 PROTOCOL_PREFIXES = {HOME / ".claude/CLAUDE.md": "b86ea2c4655637fa", HOME / ".claude/settings.json": "861959ff0e49803f"}
@@ -74,14 +76,68 @@ def step(label: str, cmd: list[str], log: list) -> int:
 
 
 def launched_by_ref(root: Path) -> dict:
-    """Launched trials per test ref, less those carried forward (common.CARRY_FORWARD_REASONS)."""
+    """Attempts per test ref that use up its repeat (GPT read of 5aa2bfdc, findings 3 and 5). Each attempt (trial id)
+    counts on its own: when its last exit row is terminal and not carried forward (common.CARRY_FORWARD_REASONS), or,
+    with no exit row yet, while it is still in flight (reconcile_orphans() gives an ended one its interrupted exit
+    first). A carried attempt therefore never suppresses a later attempt of the same ref, and an attempt that launched
+    without an exit is never taken for a completed one. The launcher's Claude session cap still counts every launch."""
     rows = read_jsonl(root / "ledger.jsonl")
-    carried = {r.get("trial_id") for r in rows if r.get("phase") == "exit" and r.get("reason") in CARRY_FORWARD_REASONS}
-    counts = {}
+    last_exit = {}
     for row in rows:
-        if row.get("phase") == "launched" and row.get("ref") and row.get("trial_id") not in carried:
-            counts[row["ref"]] = counts.get(row["ref"], 0) + 1
-    return counts
+        if row.get("phase") == "exit" and row.get("trial_id"):
+            last_exit[row["trial_id"]] = row
+    attempts: dict = {}
+    for row in rows:
+        if row.get("phase") != "launched" or not row.get("ref"):
+            continue
+        exit_row = last_exit.get(row.get("trial_id"))
+        if exit_row is None or exit_row.get("reason") not in CARRY_FORWARD_REASONS:
+            attempts.setdefault(row["ref"], set()).add(row.get("trial_id"))
+    return {ref: len(ids) for ref, ids in attempts.items()}
+
+
+def running_trials(markers: dict) -> set:
+    """Trial ids with a live process of this user whose argv names one of the attempt's markers: its trial id (every
+    launcher line carries it: --session-id, otel.environment, --trial-id) or a CL7b attempt's config name."""
+    found = set()
+    uid = os.getuid()
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit():
+            continue
+        try:
+            if os.stat(f"/proc/{entry}").st_uid != uid:
+                continue
+            argv = Path(f"/proc/{entry}/cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace")
+        except OSError:
+            continue
+        found.update(tid for tid, marks in markers.items() if any(m and m in argv for m in marks))
+    return found
+
+
+def reconcile_orphans(root: Path, log: list) -> list:
+    """Finding 3: an attempt with a launched row and no exit row, whose processes have ended (the pilot, the launcher
+    or the host stopped mid-trial), gets its exit: interrupted, censored and carried forward, so a resume re-runs it.
+    One still running is left alone and still counts. Launched rows are never removed, so every actual Claude launch
+    stays in the session-cap count."""
+    rows = read_jsonl(root / "ledger.jsonl")
+    exited = {r.get("trial_id") for r in rows if r.get("phase") == "exit"}
+    orphans = {r["trial_id"]: r for r in rows if r.get("phase") == "launched" and r.get("trial_id")
+               and r["trial_id"] not in exited}
+    if not orphans:
+        return []
+    running = running_trials({tid: [tid, r.get("config_name")] for tid, r in orphans.items()})
+    reconciled = []
+    for tid, row in orphans.items():
+        if tid in running:
+            continue
+        append_jsonl(root / "ledger.jsonl", {k: row.get(k) for k in ("run_id", "trial_id", "cell", "client", "arm", "task",
+                                                                      "instance", "lane", "ref", "test_key")}
+                     | {"phase": "exit", "at": utc_now(), "rc": None, "censored": True, "reason": "interrupted",
+                        "launched": True, "reconciled_by": "pilot.py (launched, no exit, no live process)"})
+        reconciled.append(tid)
+    log.append({"at": utc_now(), "step": "orphan reconciliation", "reconciled": reconciled,
+                "still_running": sorted(running & set(orphans))})
+    return reconciled
 
 
 def recalibrate_meter(root: Path, cfg: dict, log: list, after: str) -> dict | None:
@@ -220,6 +276,8 @@ def main(argv=None) -> int:
     def gate_key(test: dict) -> str:
         return test.get("probe_key") or ("gate0-G1" if test.get("gate_trial") else test.get("test_key"))
 
+    if args.from_stage <= 4:
+        reconcile_orphans(root, log)   # finding 3: before any stage counts attempts
     if args.from_stage <= 2:
         clear_defer()
         if args.rerun_gate0_failures and (root / "gate0.json").exists():

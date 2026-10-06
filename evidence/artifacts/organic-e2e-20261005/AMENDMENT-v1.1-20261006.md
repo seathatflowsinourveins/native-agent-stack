@@ -29,9 +29,43 @@ Item `task-ns2604-coop-20261006T114319Z` confirms the five points, with three ad
    - G4 reports the cost (`rebaseline_cost`).
 5. **0.15 of a window per trial is the starting default.**
    - After the first stage-4 Claude block that yields an organic trial with two meter readings, `pilot.py` recalibrates it to the measured p90 per trial, per window (`meter_calibration()`: nearest rank, account-wide deltas, at least the meter's 0.01 resolution). It writes the result to `meter-calibration.json` in the run root, with the value it replaced.
+   - Left out of the calibration:
+     - a trial with fewer than two in-stream readings (its first reading is also its last, so its delta would be a false 0);
+     - a window whose `resetsAt` differs between the two readings (it rolled over mid-trial).
    - The operator step is `grade.py meter-calibration --run-root <root> [--write]`.
    - The value each trial started with is recorded in its ledger rows (`expected_usage`, `meter_expected_usage`) and in the grade (`meter_expected_usage`, with the calibration and the current p90).
    - On smoke-20261006c's three organic Claude trials, the p90 would be 0.06 (five-hour) and 0.01 (seven-day).
+
+## Fixes from the GPT first-pass read of 5aa2bfdc (2026-10-06)
+
+That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-VERDICT-5aa2bfdc9.md`, outside the repository). Each is fixed in the harness:
+
+1. **Clone hook-trust changes passed G4.**
+   - A hook or project trust change in the trial's own clone (`CLONE_TRUST_KEYS`) is now persistent on its own (`s7_persistent_change` reports `clone_trust_changed`). The launcher stops the run for it, and no re-baseline absorbs it.
+   - G4 fails on it for every launched trial (`clone_trust_changed_trials`), re-baselined ones included.
+   - CL7b compares its clone's trust before and after each attempt (`clone_trust_view`) and stops the run on a change.
+2. **Concurrent exits could stop an accepted re-baseline.**
+   - `try_rebaseline` now judges the change again inside the lock, against the baseline in force at that moment. An exit whose change another exit already absorbed gets `absorbed` and is re-run without a STOP. The launcher then refreshes its S7 judgement against that baseline.
+   - Only an additional change, a refused key or a new trust entry stops the run.
+3. **A resume counted interrupted attempts as done.**
+   - An attempt now counts toward its test's repeat only when its last exit is terminal and not carried forward, or while it is still running.
+   - On resume, `reconcile_orphans()` gives an attempt that launched without an exit, and whose processes have ended, an `interrupted` exit, and carries it forward.
+   - A launcher failure after the launch row writes `launcher_error_after_launch`, also carried forward.
+   - Launch rows are never removed, so the Claude session cap still counts every actual launch.
+4. **CL7b rate limits were consumed.**
+   - The block keeps a sanitized class of the provider's own error (`classify_provider_error`; never its text).
+   - A CL7b rate-limit error marks the attempt `rate_limited`, sets STOP.codex as a Codex launcher trial's limit error does, and is carried forward.
+   - The block's account-wide gateway counts never mark a trial on their own.
+5. **CL7b re-runs reused the first attempt's identity.**
+   - Every CL7b attempt after the one stage 1 built gets its own trial id, fixture, clone and provider config, under the same test ref (`allocate_app_server_attempt`), with its own ledger rows.
+   - Attempts are counted per trial id, so a carried attempt never suppresses a later one, and G10 reads the re-run, not the carried attempt.
+6. **G13 invalidated mentions and failed reads.**
+   - The reach classifier now keeps each call's status, access type and returned content (`call_access`).
+   - Only a successful read that returned content can make an answer source invalidate a trial. A path that is mentioned, listed, written, or read without success stays a tag (`answer_source_mentions`).
+   - That is the 11:43Z principle: reading the oracle's output is what invalidates.
+7. **G11 passed with no forwarded effort.**
+   - `g11_trial_ok` requires an observed, nonempty forwarded-effort value.
+   - Pipeline exposure is reported apart, and the calls with no value are listed (`gateway_calls_missing_forwarded_effort`).
 
 ## 1. Censoring (finding 3)
 
@@ -201,15 +235,25 @@ Item `task-ns2604-coop-20261006T114319Z` confirms the five points, with three ad
 ## Verification (offline; no pilot or smoke)
 
 - **Static checks:** every harness module parses (`ast.parse`) and imports. A stdlib `symtable` check found no undefined global names.
-- **Synthetic checks:** 91 checks of the decision helpers, all passing. The script is kept outside the repository.
-  - They cover headroom and resets, rate-limit hits, completion reasons, the hold flag, exposure, answer sources, effort-only fields, the re-baseline bound, each refused key class and the CL7b re-run rule.
-  - 35 of them cover the 11:43Z confirmations:
+- **Synthetic checks:** 96 checks of the decision helpers, all passing. The script is kept outside the repository.
+  - They cover headroom and resets, rate-limit hits, completion reasons, the hold flag, exposure, answer sources, effort-only fields, the re-baseline bound, each refused key class, the absorbed concurrent exit and the CL7b re-run rule.
+  - 37 of them cover the 11:43Z confirmations:
     - the hold rule on every Claude cell of the run of record;
     - the vendor-skill stratum and its counting;
     - each answer-source reason, and that sources and oracle inputs stay tags;
     - the re-baseline cost bound and its fallback;
-    - the p90 calibration, the pilot hook and per-window headroom.
+    - the p90 calibration with its single-reading and rollover exclusions, the pilot hook and per-window headroom.
   - Eight of the checks run on smoke-20261006c's own streams and rollout, and one reads its run.json.
+- **Red-green checks for the seven P2 findings:** 10 checks, kept outside the repository.
+  - On the harness at 536487a4 all 10 fail; on this one all 10 pass.
+  - They cover: the clone trust change (judgement, CL7b view, grader); the absorbed concurrent exit; the orphan reconciliation and counting; the CL7b rate-limit class; the fresh CL7b attempt and its counting; mentions, failed and empty reads; and G11's forwarded-effort value.
 - **Operator step:** `grade.py meter-calibration` ran read-only on smoke-20261006c and wrote nothing in the run root. Its `--write` form was exercised on a copy of the ledger.
 - **Re-grade:** a read-only re-grade of smoke-20261006c with this `grade.py`, with its output kept outside the run root. Every gate matches the 10:48Z grade except G13, which now passes, as described under decision 3.
-- **Not yet run live:** the launcher's final-turn and hold paths, the headroom start rule, rate-limit re-runs, the in-run re-baseline with its cost check, and the pilot's meter recalibration. The first pilot or smoke under these commits will be the first time they execute.
+- **Not yet run live:**
+  - the launcher's final-turn and hold paths;
+  - the headroom start rule and rate-limit re-runs;
+  - the in-run re-baseline with its cost check and in-lock reconciliation;
+  - the pilot's meter recalibration and orphan reconciliation;
+  - CL7b's fresh attempts, clone trust comparison and rate-limit marking.
+
+  The first pilot or smoke under these commits will be the first time they execute.

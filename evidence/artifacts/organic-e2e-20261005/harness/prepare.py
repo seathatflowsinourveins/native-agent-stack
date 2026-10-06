@@ -40,8 +40,8 @@ sys.path.insert(0, str(HERE))
 from common import (CC_V11_DECISIONS, CLAUDE_COMPLETION_DEFAULT, CLAUDE_SESSION_CAP, CODEX_HOME_REAL,  # noqa: E402
                     EXPECTED_TRIAL_USAGE, FREEZE_COMMIT, HOME, LANE, LANE_PROMPTED, METER_CEILING, NEUTRAL_ROOT,
                     POST_RESULT_GRACE_S, PROTOCOL_ID, RUNS_ROOT, T_SECONDS, TRIAL_ROOT_BASE, append_jsonl, gateway_build,
-                    headroom_allows, load_json, login_path, newest_meter_reading, parse_stream_text, run, s7_snapshot,
-                    sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
+                    headroom_allows, load_json, login_path, newest_meter_reading, parse_stream_text, read_jsonl, run,
+                    s7_snapshot, sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
 import arms  # noqa: E402
 import fixture  # noqa: E402
 import suite  # noqa: E402
@@ -209,6 +209,47 @@ def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, c
            "    metadata:", f"      ref: {yaml_quote(test['ref'])}", "    vars:",
            f"      ref: {yaml_quote(test['ref'])}", f"      task_text: {yaml_quote(test['task_text'])}"]
     return "\n".join(cfg) + "\n"
+
+
+def allocate_app_server_attempt(cfg: dict, root: Path, cell_name: str, cell: dict, trial: dict) -> dict:
+    """GPT read of 5aa2bfdc, finding 5: a CL7b attempt after the first one stage 1 built (a re-run after a carry-forward)
+    gets its own trial id, fixture, clone and provider config, while the test ref stays the same, and its own pre-launch
+    and prepared ledger rows, so one attempt's draft, telemetry or carried exit never mixes with another's."""
+    import uuid as _uuid
+    root = Path(root)
+    work = Path(cfg["trial_root"])
+    test = dict((cfg.get("tests_by_ref") or {}).get(trial["ref"]) or {})
+    tasks = {(t["task_id"], t["instance"]): t for t in load_json(root / "tasks.json")["tasks"]}
+    task_text = (tasks.get((test.get("task_id"), test.get("instance"))) or {}).get("prompt") or ""
+    if sha256_bytes(task_text.encode()) != test.get("prompt_sha256"):
+        raise ValueError("CL7b attempt: the task text does not match its frozen prompt hash")
+    test["task_text"] = task_text
+    trial_id = str(_uuid.uuid4())
+    fixture_dir = fixture.extract_fixture(Path(cfg["fixture"]["tar_path"]), cfg["fixture"]["tar_sha256"])
+    clone = work / "clones" / trial_id
+    rules_text = (root / "codex-rules" / "organic-e2e.rules").read_text(encoding="utf-8")
+    gh_dir = Path(cfg["gh_config_dir"])
+    clone_record = arms.build_clone(clone, cell["arm"], gh_dir, rules_text)
+    t_seconds = int((cfg.get("claude_completion") or {}).get("t_seconds") or T_SECONDS)
+    text = app_server_config(cell.get("code") or cell_name, trial_id, test, fixture_dir, clone, gh_dir,
+                             cfg.get("login_path") or "", t_seconds, cfg.get("codex_profile_layer"))
+    earlier = {r.get("trial_id") for r in read_jsonl(root / "ledger.jsonl")
+               if r.get("phase") == "launched" and r.get("ref") == trial["ref"]}
+    neutral = work / "p" / f"{cell.get('code') or 'c'}-{trial_id[:8]}.yaml"
+    neutral.write_text(text, encoding="utf-8")
+    record = {"trial_id": trial_id, "ref": trial["ref"], "test_key": trial["test_key"], "config_neutral": str(neutral),
+              "config_sha256": sha256_bytes(text.encode()), "fixture_private": str(fixture_dir),
+              "clone_gate": clone_record["gate"], "attempt": len(earlier) + 1, "first_attempt": trial["trial_id"]}
+    base = {"run_id": cfg["run_id"], "trial_id": trial_id, "cell": cell_name, "client": "codex", "arm": cell["arm"],
+            "ref": trial["ref"], "test_key": trial["test_key"]}
+    append_jsonl(root / "ledger.jsonl", {**base, "task": test.get("task_id"), "instance": test.get("instance"),
+                                         "lane": test.get("lane"), "phase": "pre-launch", "at": utc_now(),
+                                         "prebuilt_by": f"block.py (CL7b attempt {record['attempt']})",
+                                         "fixture_private": str(fixture_dir), "clone": clone_record,
+                                         "hashes": {"fixture_tar": cfg["fixture"]["tar_sha256"], "prompt": test["prompt_sha256"]}})
+    append_jsonl(root / "ledger.jsonl", {**base, "phase": "prepared", "at": utc_now(), "fixture_private": str(fixture_dir),
+                                         "clone": clone_record})
+    return record
 
 
 def prompted_cell_name(entry: dict) -> str:

@@ -70,8 +70,11 @@ def stop_flag_names(client: str, cell: str | None = None) -> tuple[str, ...]:
 # - meter_headroom_first_event (meter_prior_first_event before the amendment): killed at the trial's own first
 #   in-stream meter reading, so it never did the task;
 # - rate_limited (decision 6): the trial hit a rate limit, so it is marked and re-run;
-# - host_change_rebaselined (decision 7): the host changed while it ran and the run re-baselined, so it is re-run.
-CARRY_FORWARD_REASONS = ("meter_prior_first_event", "meter_headroom_first_event", "rate_limited", "host_change_rebaselined")
+# - host_change_rebaselined (decision 7): the host changed while it ran and the run re-baselined, so it is re-run;
+# - interrupted, launcher_error_after_launch (GPT read of 5aa2bfdc, finding 3): the attempt launched but its outcome was
+#   never recorded (the pilot or host stopped, or the launcher failed after the launch row), so it is re-run.
+CARRY_FORWARD_REASONS = ("meter_prior_first_event", "meter_headroom_first_event", "rate_limited", "host_change_rebaselined",
+                         "interrupted", "launcher_error_after_launch")
 
 # §9.1 Claude meter, amended by decision 6. A start compares the trial's expected usage with the remaining headroom of
 # each window (1.0 minus its utilization; a window whose resetsAt has passed counts as fresh). There is no quiet-account
@@ -467,15 +470,31 @@ def s7_host_only(snap: dict) -> dict:
     return {k: v for k, v in snap.items() if k not in ("clone_config", "trial_files")}
 
 
+# The trust-bearing parts of a per-trial Codex clone's config.toml (S7's clone_config view). The baseline holds no
+# clone, so a change to these during a trial is judged on its own (GPT read of 5aa2bfdc, finding 1): it is always
+# persistent, never transient, and an in-run re-baseline never absorbs it.
+CLONE_TRUST_KEYS = ("/clone_config/hooks_state", "/clone_config/projects", "/clone_config/trusted_projects")
+
+
 def s7_persistent_change(baseline: dict, before: dict, after: dict) -> dict:
-    """The S7 judgement for one trial or block: a persistent change is an `after` view that differs from the stage-1
-    baseline, or any new trust entry (against `before` or the baseline). A `before` that differs from both `after` and
-    the baseline is a transient another session left mid-write, recorded, never a STOP."""
+    """The S7 judgement for one trial or block: a persistent change is an `after` view that differs from the baseline
+    in force, any new trust entry (against `before` or the baseline), or any change to the trial clone's hook or
+    project trust (clone_trust_changed). A `before` that differs from both `after` and the baseline only in host keys is
+    a transient another session left mid-write, recorded, never a STOP."""
     within = s7_compare(before, after)
     vs_base = s7_compare(s7_host_only(baseline), s7_host_only(after))
+    clone_trust = sorted(p for p in within["changed"] if p.startswith(CLONE_TRUST_KEYS))
     new_trust = any(within["new_trust"].values()) or any(vs_base["new_trust"].values())
-    return {"within": within, "vs_baseline": vs_base, "persistent": (not vs_base["equal"]) or new_trust,
-            "transient_before": (not within["equal"]) and vs_base["equal"]}
+    return {"within": within, "vs_baseline": vs_base, "clone_trust_changed": clone_trust,
+            "persistent": (not vs_base["equal"]) or new_trust or bool(clone_trust),
+            "transient_before": (not within["equal"]) and vs_base["equal"] and not clone_trust}
+
+
+def clone_trust_view(clone: Path | str) -> dict:
+    """The trust-bearing parts of a clone's config.toml, for a cell without a launcher (CL7b): compared before and
+    after each attempt as the launcher's S7 snapshot compares them for the other cells (finding 1)."""
+    parts = codex_config_parts(Path(clone) / "config.toml")
+    return {key: parts.get(key) for key in ("projects", "hooks_state", "trusted_projects")}
 
 
 def s7_compare(before: dict, after: dict) -> dict:
@@ -563,29 +582,40 @@ def rebaselines_between(root: Path, since_iso: str | None, until_iso: str | None
             if (not since_iso or r.get("at", "") >= since_iso) and (not until_iso or r.get("at", "") <= until_iso)]
 
 
-def try_rebaseline(root: Path, vs_baseline: dict, new_trust: bool, after: dict, trigger: dict) -> tuple[bool, str]:
-    """Record an in-run re-baseline when decision 7 allows it, under a lock (the Claude and Codex chains run in
-    parallel). Returns (re-baselined, why). `after` becomes the baseline; `trigger` names the trial or block."""
+def try_rebaseline(root: Path, cfg: dict, after: dict, within_new_trust: bool, trigger: dict) -> tuple[str, str]:
+    """Reconcile a persistent host change with the run's baseline under a lock (the Claude and Codex chains run in
+    parallel, and several Codex trials can exit at once). Inside the lock the change is judged again against the
+    baseline in force *now* (GPT read of 5aa2bfdc, finding 2), so an exit that computed its difference before another
+    exit's re-baseline is not stopped for the same change. Returns (status, why):
+    - "absorbed": the baseline in force already equals `after` (another exit recorded this change);
+    - "rebaselined": this exit recorded the run's one re-baseline (decision 7); `after` becomes the baseline;
+    - "refused": a new trust entry, a key a re-baseline never absorbs, or a change beyond the run's one re-baseline."""
     root = Path(root)
-    if new_trust:
-        return False, "a new trust entry needs a reviewed baseline"
-    refused = sorted({key for path in vs_baseline.get("changed") or [] for key in REBASELINE_REFUSED_S7_KEYS
-                      if path == key or path.startswith(key + "/")})
-    if refused:
-        return False, f"a change a re-baseline never absorbs: {refused}"
     lock_path = root / "rebaselines.lock"
     with open(lock_path, "a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            rows = read_jsonl(root / REBASELINE_LOG)
+            baseline_now, path_now = current_s7_baseline(cfg, root)
+            vs_now = s7_compare(s7_host_only(baseline_now), s7_host_only(after))
+            new_trust = within_new_trust or any(vs_now["new_trust"].values())
+            if vs_now["equal"] and not new_trust:
+                return "absorbed", f"the baseline in force ({Path(path_now).name}) already holds this change"
+            if new_trust:
+                return "refused", "a new trust entry needs a reviewed baseline"
+            refused = sorted({key for path in vs_now["changed"] for key in REBASELINE_REFUSED_S7_KEYS
+                              if path == key or path.startswith(key + "/")})
+            if refused:
+                return "refused", f"a change a re-baseline never absorbs: {refused}"
+            rows = [r for r in read_jsonl(root / REBASELINE_LOG) if r.get("baseline")]
             if len(rows) >= REBASELINES_PER_RUN:
-                return False, f"the run already used its {REBASELINES_PER_RUN} in-run re-baseline"
+                return "refused", (f"a change beyond the run's {REBASELINES_PER_RUN} in-run re-baseline: "
+                                   f"{vs_now['changed'][:8]} against {Path(path_now).name}")
             path = root / "s7" / f"baseline-r{len(rows) + 1}.json"
             sha = write_json(path, s7_host_only(after), 0o600)
             append_jsonl(root / REBASELINE_LOG, {"at": utc_now(), "baseline": str(path), "baseline_sha256": sha,
-                                                 "changed": (vs_baseline.get("changed") or [])[:20], **trigger,
+                                                 "changed": vs_now["changed"][:20], **trigger,
                                                  "decision": f"{CC_V11_DECISIONS} #7"})
-            return True, f"re-baselined to {path.name}"
+            return "rebaselined", f"re-baselined to {path.name}"
         finally:
             fcntl.flock(lock, fcntl.LOCK_UN)
 
@@ -735,16 +765,20 @@ def resume_after(reading: dict | None, expected=EXPECTED_TRIAL_USAGE) -> str | N
 def meter_calibration(root: Path | str) -> dict:
     """Point 5 of the 11:43Z confirmations: the measured p90 of each window's per-trial meter delta (the protocol's
     m_p90, §9.1) over the run's organic Claude trials so far. The deltas are account-wide, so another session's use can
-    only raise them; trials carried forward, never launched or without both readings are left out; a p90 below the
-    meter's resolution is raised to it. Nearest-rank p90."""
+    only raise them. Left out: trials carried forward or never launched, trials with fewer than two in-stream readings
+    (their first reading is also their last, so the delta would be a false 0), and a window whose resetsAt differs
+    between the two readings (it rolled over mid-trial, so the delta is not the trial's usage). A p90 below the meter's
+    resolution is raised to it. Nearest-rank p90."""
     deltas: dict[str, list[float]] = {w: [] for w in METER_WINDOWS}
     trial_ids = []
     for row in read_jsonl(Path(root) / "ledger.jsonl"):
         if row.get("phase") != "exit" or row.get("client") != "claude" or row.get("launched") is False \
-                or row.get("lane") != LANE or row.get("reason") in CARRY_FORWARD_REASONS:
+                or row.get("lane") != LANE or row.get("reason") in CARRY_FORWARD_REASONS \
+                or not isinstance(row.get("meter_readings"), int) or row["meter_readings"] < 2:
             continue
         first, last = row.get("meter_first") or {}, row.get("meter_last") or {}
-        windows = [w for w in METER_WINDOWS if isinstance(first.get(w), (int, float)) and isinstance(last.get(w), (int, float))]
+        windows = [w for w in METER_WINDOWS if isinstance(first.get(w), (int, float)) and isinstance(last.get(w), (int, float))
+                   and first.get(f"{w}_resets_at") == last.get(f"{w}_resets_at")]
         for window in windows:
             deltas[window].append(round(max(0.0, last[window] - first[window]), 4))
         if windows:
@@ -757,6 +791,22 @@ def meter_calibration(root: Path | str) -> dict:
     return {"expected_usage": {w: p90(v) for w, v in deltas.items() if v}, "trials": len(trial_ids),
             "trial_ids": trial_ids, "deltas": deltas,
             "method": "nearest-rank p90 of meter_last - meter_first per window over the run's organic Claude trials"}
+
+
+PROVIDER_ERROR_CLASSES = (
+    ("rate_limit", re.compile(r"rate.?limit|usage limit|session limit|too many requests|\b429\b|quota", re.I)),
+    ("timeout", re.compile(r"time.?out|timed out|deadline", re.I)),
+    ("auth", re.compile(r"\b401\b|\b403\b|unauthori[sz]ed|forbidden|auth", re.I)),
+)
+
+
+def classify_provider_error(error) -> str | None:
+    """A sanitized class for a provider's error text (finding 4: CL7b keeps the class, never the text): rate_limit,
+    timeout, auth or other; None when there is no error."""
+    if not error:
+        return None
+    text = error if isinstance(error, str) else json.dumps(error, default=str)
+    return next((name for name, pattern in PROVIDER_ERROR_CLASSES if pattern.search(text)), "other")
 
 
 def rate_limit_hit(event: dict) -> bool:

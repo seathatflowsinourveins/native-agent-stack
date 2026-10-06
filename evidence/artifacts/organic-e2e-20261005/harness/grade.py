@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,  # noqa: E402
-                    CLI_VENDOR_SKILL_SURFACES, CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS, METER_CALIBRATION,
+                    CLI_VENDOR_SKILL_SURFACES, CLI_WRAPPERS, CLONE_TRUST_KEYS, HOME, MARKERS, MCP_SERVER_ITEMS, METER_CALIBRATION,
                     REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows, load_json, meter_calibration,
                     parse_stream_text, read_jsonl, run_expected_usage, sha256_bytes, sha256_file, trial_dir, utc_now,
                     write_json)
@@ -1292,6 +1292,8 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
               "gateway_forwarded": sorted({str(v) for c in exposed for v in _forwarded_efforts(c) if v}) or None,
               "gateway_forwarded_exposed": bool(exposed),
               "gateway_calls_with_pipeline": len(exposed),
+              # GPT read of 5aa2bfdc, finding 7: the calls whose record holds no forwarded effort value, exposed or not.
+              "gateway_calls_missing_forwarded_effort": [c.get("id") for c in calls if not any(_forwarded_efforts(c))],
               "gateway_service_tier": sorted({str(c.get("received_service_tier")) for c in calls}),
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
               "gateway_calls": len(calls), "gateway_build": ledger_rows.get("pre-launch", {}).get("gateway_build")
@@ -1446,6 +1448,76 @@ def _call_texts(graded: dict, client: str) -> list[tuple[str, str]]:
             for item in graded.get("all_items") or graded["items"]]
 
 
+# GPT read of 5aa2bfdc, finding 6: an answer source invalidates a trial only through a successful read that returned
+# content; a path mentioned, listed, written or read without success stays a tag.
+READ_LIKE_PROGRAMS = READ_PROGRAMS | {"jq", "yq", "python", "python3", "node", "ruby", "perl", "awk", "gawk", "cut", "wc",
+                                      "diff", "cmp", "xxd", "od", "hexdump", "strings", "tac", "sort", "uniq", "base64",
+                                      "zcat", "gzip", "gunzip", "unzip", "tar", "cp", "rsync", "scp", "sqlite3", "view", "vim",
+                                      "nano", "emacs", "readlink", "realpath", "file", "difft", "markitdown", "toon"}
+CODE_READ_API = re.compile(r"\bopen\s*\(|readFileSync|readFile\s*\(|read_text\s*\(|read_bytes\s*\(|\.read\s*\(|"
+                           r"json\.load|createReadStream|fs\.promises", re.I)
+MCP_READ_TOOL = re.compile(r"read|get|view|open|cat|fetch|file|search|find|grep|symbol|outline|content|index|quote|chunk",
+                           re.I)
+CLAUDE_READ_TOOLS = {"Read": ("file_path",), "NotebookRead": ("notebook_path",), "Grep": ("path",)}
+
+
+def shell_read_texts(text: str) -> list[str]:
+    """The simple commands of a shell text that read file content: a reading program (or one copying content), a
+    find that runs one, or an input redirection."""
+    out = []
+    for tokens in segments(text or ""):
+        program = os.path.basename(tokens[0])
+        if program in READ_LIKE_PROGRAMS or "<" in tokens or (program == "find" and any(
+                os.path.basename(t) in READ_PROGRAMS for t in tokens[1:])):
+            out.append(" ".join(tokens))
+    return out
+
+
+def call_access(call: dict, client: str) -> dict:
+    """{ok, returned_chars, read_texts} for one Claude call or Codex item: whether it succeeded, how much it returned,
+    and the parts of its input that read file content (finding 6)."""
+    if client == "claude":
+        name, args = call.get("name") or "", call.get("input") or {}
+        ok = call.get("status") == "ok"
+        returned = len(((call.get("result") or {}).get("text")) or "")
+        reads = [str(args.get(key)) for key in CLAUDE_READ_TOOLS.get(name, ()) if args.get(key)]
+        if name == "Bash":
+            reads += shell_read_texts(args.get("command") or "")
+        elif name.startswith("mcp__"):
+            tool = name.split("__", 2)[-1]
+            reads += _mcp_read_texts(tool, args)
+    else:
+        kind = call.get("type")
+        ok = call.get("status") == "completed" and (call.get("exit_code") in (0, None)) and not call.get("error")
+        returned = len(codex_item_output(call) or "") if ok else 0
+        reads = []
+        if kind in ("command_execution", "CommandExecution"):
+            reads = shell_read_texts(unwrap_command(call.get("command")))
+        elif kind in ("mcp_tool_call", "McpToolCall"):
+            reads = _mcp_read_texts(call.get("tool") or "", _json_arg(call.get("arguments")))
+    return {"ok": ok, "returned_chars": returned, "read_texts": reads}
+
+
+def _mcp_read_texts(tool: str, args) -> list[str]:
+    """The input parts of an MCP call that read content: context-mode's nested shell, code that opens files and
+    ctx_execute_file's path; for another server, the whole input of a tool whose name reads, gets or searches."""
+    args = args if isinstance(args, dict) else {}
+    if "ctx_" in tool:
+        out = []
+        for nested in ctx_nested(tool, args):
+            if nested["kind"] in ("shell", "program"):
+                out += shell_read_texts(nested["text"]) if nested["kind"] == "shell" else [nested["text"]]
+            elif nested["kind"] == "file":
+                out.append(nested["text"])
+        code = args.get("code") or ""
+        if code and CODE_READ_API.search(code):
+            out.append(code)
+        if tool.endswith("ctx_index") and args.get("path"):
+            out.append(str(args["path"]))
+        return out
+    return [json.dumps(args)] if MCP_READ_TOOL.search(tool) else []
+
+
 def answer_source_reasons(text: str, same_task_fixtures: set[str], same_task_trials: set[str],
                           declared: list[str]) -> list[str]:
     """Why a call's input reads an answer source (decision 3 as confirmed at 11:43Z), or [] for a source or a tag."""
@@ -1476,18 +1548,35 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixture
     own = [p for p in (cwd, f"{HOME}/.claude/projects/{_claude_slug(cwd)}" if cwd else None) if p]
     work = cfg.get("trial_root")
     declared = [str(p).replace("~/", f"{HOME}/", 1) for p in cfg.get("answer_source_paths") or []]
-    found = []
-    for call_id, text in _call_texts(graded, client):
+    fixtures, trials = same_task_fixtures or set(), same_task_trials or set()
+
+    def clean(text: str) -> str:
         text = text.replace("~/", f"{HOME}/").replace('"~"', f'"{HOME}"')
         for path in own:
             text = text.replace(path, "<own>")
         if work:
             text = re.sub(re.escape(work) + r"/[a-z]+/" + re.escape(trial_id) + r"[^\s\"']*", "<own-trial-file>", text)
+        return text
+
+    found = []
+    calls = graded["calls"] if client == "claude" else (graded.get("all_items") or graded["items"])
+    for call in calls:
+        raw = (call.get("input") or {}) if client == "claude" else (call.get("command") or call.get("arguments") or "")
+        text = clean(json.dumps(raw))
         cats = sorted(name for name, pattern in REACH.items() if pattern.search(text))
-        reasons = answer_source_reasons(text, same_task_fixtures or set(), same_task_trials or set(), declared)
-        if cats or reasons:
-            found.append({"call_id": call_id, "categories": cats or ["answer-source"], "answer_source": bool(reasons),
-                          "answer_source_reasons": reasons, "same_task_fixture": "same-task fixture" in reasons})
+        mentions = answer_source_reasons(text, fixtures, trials, declared)
+        if not (cats or mentions):
+            continue
+        # Finding 6: an answer source needs a successful read that returned content; a mention, listing, write or
+        # failed read stays a tag (answer_source_mentions).
+        access = call_access(call, client)
+        reasons = sorted({r for part in access["read_texts"] for r in answer_source_reasons(clean(part), fixtures, trials, declared)}) \
+            if access["ok"] and access["returned_chars"] > 0 else []
+        found.append({"call_id": call.get("id"), "categories": cats or ["answer-source mention"],
+                      "answer_source": bool(reasons), "answer_source_reasons": reasons,
+                      "answer_source_mentions": mentions, "read_ok": access["ok"],
+                      "returned_chars": access["returned_chars"], "read_parts": len(access["read_texts"]),
+                      "same_task_fixture": "same-task fixture" in reasons})
     return found
 
 
@@ -1571,6 +1660,23 @@ def ledger_by_trial(root: Path) -> dict:
                 if row.get(key) is not None:
                     ledger[row["trial_id"]][key] = row[key]
     return ledger
+
+
+def clone_trust_from_exit(exit_row: dict) -> list:
+    """GPT read of 5aa2bfdc, finding 1: the trial clone's hook or project trust change, as the launcher or CL7b's block
+    recorded it, else read from the trial's own before/after comparison (rows written before the field existed)."""
+    recorded = exit_row.get("host_s7_clone_trust_changed")
+    if recorded is not None:
+        return list(recorded)
+    return sorted(p for p in ((exit_row.get("host_s7") or {}).get("changed") or []) if p.startswith(CLONE_TRUST_KEYS))
+
+
+def g11_trial_ok(effort: dict) -> bool:
+    """G11 for one Codex trial (PILOT-SPEC: requested and forwarded effort and the gateway build recorded). Finding 7 of
+    the GPT read of 5aa2bfdc: the forwarded effort must be an observed, nonempty value; pipeline exposure alone is not
+    the record (it is reported apart, with the calls that hold no value)."""
+    return bool(effort.get("requested_turn_context")) and bool(effort.get("gateway_build")) \
+        and (effort.get("gateway_calls") or 0) > 0 and bool(effort.get("gateway_forwarded"))
 
 
 def cli_exposure(item: str, client: str, graded: dict) -> dict:
@@ -1690,6 +1796,7 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     record["host_s7"] = exit_row.get("host_s7")
     record["host_s7_vs_baseline"] = exit_row.get("host_s7_vs_baseline")
     record["host_s7_persistent_change"] = exit_row.get("host_s7_persistent_change")
+    record["host_s7_clone_trust_changed"] = clone_trust_from_exit(exit_row)
     record["host_s7_transient_before"] = exit_row.get("host_s7_transient_before")
     record["nested_clients"] = exit_row.get("nested_clients")
     record["argv_lint"] = (rows.get("prepared", {}).get("argv_lint") or {}).get("hits")
@@ -1952,15 +2059,19 @@ def grade_run(root: Path) -> dict:
         gate_rows["G8"].append(record["kept"]["draft_copy"] and record["kept"]["fixture_exists"])
         if trial.get("client") == "codex":
             effort = graded["effort"]
-            # Finding 11: G11 needs the forwarded effort, not only the requested one.
-            ok = bool(effort["requested_turn_context"]) and bool(effort["gateway_build"]) and effort["gateway_calls"] > 0 \
-                and effort["gateway_forwarded_exposed"]
-            gate_rows["G11"].append(ok)
+            # Finding 11: G11 needs the forwarded effort, not only the requested one. GPT read of 5aa2bfdc, finding 7:
+            # an observed, nonempty forwarded effort value is the record; pipeline exposure alone is not, and is
+            # reported apart, with the calls that hold no value listed.
+            gate_rows["G11"].append(g11_trial_ok(effort))
             if not effort["gateway_forwarded_exposed"]:
                 gaps.append({"gate": "G11", "trial_id": tid, "gap": "forwarded effort not exposed: the gateway call log has "
                              "no pipeline details (pipelinePayloads null); under decision 8 (RP4) the co-op turns them on "
                              "only for pilot runs, and this run's record says: "
                              f"{(cfg.get('gateway_pipeline_details') or {}).get('declared') or 'not declared'}"})
+            elif effort["gateway_calls_missing_forwarded_effort"]:
+                gaps.append({"gate": "G11", "trial_id": tid, "gap": "calls without a forwarded effort value although the "
+                             "pipeline details were exposed",
+                             "calls": effort["gateway_calls_missing_forwarded_effort"][:20]})
         # G13 (decision 3): no trial read the task's gold or a fixture answer source; other reaches are tags.
         gate_rows["G13"].append(not record["answer_source_reads"])
         gate_rows["G14"].append(all(u.get("tag") for u in uses))
@@ -2018,9 +2129,14 @@ def grade_run(root: Path) -> dict:
     # recorded in-run re-baseline (or that ran across it) is carried forward and re-run, so it is listed, not failed.
     per_trial = [r for r in table if r.get("launched") and r.get("cell") != "codex-app-server"]
     rebaselines = [r for r in read_jsonl(root / REBASELINE_LOG) if r.get("baseline")]
-    rebaselined = {r["trial_id"] for r in per_trial if r.get("reason") == "host_change_rebaselined" and r.get("rebaseline")}
+    # GPT read of 5aa2bfdc, finding 1: a trust change in a trial's own clone fails G4 on its own, for every launched
+    # trial, CL7b's per-attempt comparison and re-baselined trials included; no re-baseline excuses it.
+    clone_trust = sorted(r["trial_id"] for r in table if r.get("launched") and r.get("host_s7_clone_trust_changed"))
+    rebaselined = {r["trial_id"] for r in per_trial if r.get("reason") == "host_change_rebaselined" and r.get("rebaseline")
+                   and not r.get("host_s7_clone_trust_changed")}
     gates["G4"] = {"pass": all(host_unchanged(b, block=True) for b in blocks if b.get("outcomes"))
-                   and all(host_unchanged(r) for r in per_trial if r["trial_id"] not in rebaselined),
+                   and all(host_unchanged(r) for r in per_trial if r["trial_id"] not in rebaselined) and not clone_trust,
+                   "clone_trust_changed_trials": clone_trust,
                    "blocks": len([b for b in blocks if b.get("outcomes")]),
                    "trials_without_host_comparison": [r["trial_id"] for r in per_trial if not r.get("host_s7")],
                    "transient_states_recorded": sum(1 for r in per_trial if r.get("host_s7_transient_before"))
@@ -2125,6 +2241,8 @@ def sdk_parity(cfg: dict, graded_by: dict) -> dict:
     the clone's configured list stands in for it."""
     by_cell = {}
     for tid, (record, graded) in graded_by.items():
+        if record.get("carried_forward"):
+            continue   # finding 5: a carried attempt is re-run under its own trial id; the parity check reads the re-run
         by_cell.setdefault(record.get("cell"), []).append((record, graded))
     out, checks = {}, []
 
