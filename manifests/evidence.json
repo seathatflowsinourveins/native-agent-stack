@@ -15722,6 +15722,11 @@
       "bytes": 10228
     },
     {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/d6-class-review-20261006.json",
+      "sha256": "63c66ae2ec42923272b25d2b239ae60f6706c1968d9f3d9b1766cc9dad7ea071",
+      "bytes": 236389
+    },
+    {
       "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-2.json",
       "sha256": "b2974b6f3c76d3308d9450437dbbc015f89449ef607cffa57b049ac6a83d9ac0",
       "bytes": 8871
@@ -15730,6 +15735,11 @@
       "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-3.json",
       "sha256": "44f3fa81a1d6f483b4715b02c12dab5b35f23ea816acccf6b2afc825329b2d1a",
       "bytes": 6439
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-4.json",
+      "sha256": "c3eb8594f3da2acbc54ce331cf104e146e57a9418ca9b806968bae8cff3aa87c",
+      "bytes": 117590
     },
     {
       "path": "blueprints/us-equities/rnd-wave1-20261006/deviations.json",
