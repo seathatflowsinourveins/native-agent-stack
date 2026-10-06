@@ -49,6 +49,6 @@ Sources:
 
 - [Original path-only relocation](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c96c2555c2d84683d9e519623354c814aeb6a584/blueprints/convergence-practice/application-delivery/history/recipe-revisions.json#L121), PR #252.
 - [Recipe supersession](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/blueprints/convergence-practice/application-delivery/history/recipe-revisions.json#L99), PR #587.
-- `native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/convergence-practice/application-delivery/test_portability.py:101-131` checks original/current mappings and path-only byte equality.
+- `native-agent-stack@c1300c15b42f1a6643f3dc4172f40c01d99abdcd:blueprints/convergence-practice/application-delivery/test_portability.py:100-143` checks original/current mappings and path-only byte equality.
 - Same pin, `scripts/validate_convergence.py:60-71,203-243` checks every declared frozen input; `contract.schema.json:6` in the convergence blueprint preserves the existing schema.
 - Same pin, `tests/test_osv_lockfile_coverage.py:36-43` defines tracked active lockfile names; `tests/test_frozen_macos_variant_no_use.py:30` preserves the captured macOS boundary.

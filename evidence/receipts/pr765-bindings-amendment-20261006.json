@@ -8,7 +8,7 @@
   "sources": [
     "native-agent-stack@c96c2555c2d84683d9e519623354c814aeb6a584:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:121-139",
     "native-agent-stack@798ac445307e2cd8eba6e74d7722ac0e16da02c7:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:99-137",
-    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/convergence-practice/application-delivery/test_portability.py:101-131",
+    "native-agent-stack@c1300c15b42f1a6643f3dc4172f40c01d99abdcd:blueprints/convergence-practice/application-delivery/test_portability.py:100-143",
     "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:scripts/validate_convergence.py:60-71,203-243"
   ],
   "preserved": {
@@ -57,6 +57,21 @@
     "Pre-existing native systemd property-order test correction belongs to P1-GIT#767 and is not silently imported here."
   ],
   "after_checks": {
+    "landed_portability_pin_repair": {
+      "source_revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+      "source_sha256": "495033afa1e0670c656b40ca47f72855f688f2d79124414458ef93ea9b50af5d",
+      "extract_command": "git show c1300c15b42f1a6643f3dc4172f40c01d99abdcd:blueprints/convergence-practice/application-delivery/test_portability.py",
+      "extracted_to": ".local/fix782-20261006/test_portability-c1300c15.py",
+      "compare_command": "cmp .local/fix782-20261006/test_portability-c1300c15.py blueprints/convergence-practice/application-delivery/test_portability.py",
+      "compare_exit_code": 0,
+      "command": "nice -n 19 python3 blueprints/convergence-practice/application-delivery/test_portability.py",
+      "environment": "Task-private external TMPDIR; no account or model calls",
+      "exit_code": 0,
+      "tests": 6,
+      "stdout": "",
+      "stderr": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.063s\n\nOK\n",
+      "scope": "The executed working-tree test is byte-identical to the extracted landed source; native path resolution reads the recorded ledger and retained inputs. Local integration and synthetic fixtures, not new historical-trial or hosted acceptance."
+    },
     "validate": {"exit_code": 0, "hashed_files": 10315, "scope": "working-tree amendment integrity before this result supplement"},
     "all_recorded_convergence": {"exit_code": 0, "records": 32, "invalid": 0},
     "native_maintenance": {"exit_code": 0, "tests": 29},
