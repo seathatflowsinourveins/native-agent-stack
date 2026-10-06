@@ -1,10 +1,18 @@
-# Publish the October 6 landscape assessments
+# First-pass October 6 landscape assessments
 
 Date: 2026-10-06. This decision publishes two completed foundation sweeps as
-catalog assessments. It serves the north-star research and historical simulation
+first-pass catalog assessments: best of what was searched. It serves the north-star research and historical simulation
 by preserving the alternatives, exclusions and comparisons needed for later
 foundation decisions. It changes no installation, runtime pin or native
 acceptance status.
+
+The vendor-official follow-up is `landscape-sweep-20261006-vendor`: workers
+smoke `wf_fba23622-d34`, then the full thirteen ordered layers. Its converted
+manifest will join the same PR before the GPT read and command-center ACK.
+The command center then synthesizes all three sweeps per layer: adopt through
+clean upstream installation, a smoke test and organic counters in a quiet
+window; keep as a catalog candidate; or exclude. Local head-to-head or A/B
+campaigns do not gate a row under the owner's rule of 2026-10-06.
 
 ## Comparison and decision
 
@@ -14,7 +22,7 @@ manifest would require inventing merge semantics for the singular completeness
 critic. The native builder accepts separate output paths and IDs; the saturation
 ledger accepts separate registered manifests on the same date.
 
-| Sweep | Workflow | Foundation layers | Proposed | Survived | Refuted |
+| Sweep | Workflow | Foundation layers | Proposed | Historical assessments surviving refutation | Refuted |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Runtimes | `wf_eed0e74b-ba4` | 7 | 102 | 22 | 80 |
 | Roles | `wf_dd41894e-66a` | 4 | 59 | 17 | 42 |
@@ -31,11 +39,23 @@ The surviving assessments retain these explicit catalog dispositions:
 | Runtimes | 9 | 7 | 6 |
 | Roles | 11 | 2 | 4 |
 
-Survival means the proposed assessment withstood the recorded fact and fit
-refutations. It includes accepted negative assessments: `batrachianai/toad`
-remains `not_adopted_confirmed`, with the returned maintenance exclusion.
-`gethamster/horde` retains its “TOO NEW TO ASSESS (<90 days)” warning. A surviving
-assessment does not qualify a tool for installation or native use.
+Historical survival means the proposed assessment withstood the recorded fact
+and fit refutations. It includes accepted negative assessments. Current
+eligibility is separate: `batrachianai/toad` is **EXCLUDED** as verified stale,
+not a current survivor. A new primary default-branch query again returned no
+commits since 2026-07-08. Preserve its original negative-assessment votes;
+rewriting them as a refutation would contradict the retained evidence.
+`gethamster/horde`, created 2026-09-08, retains **TOO NEW TO ASSESS (<90 days)**.
+The historical 22/17 counts therefore coexist with one current stale exclusion;
+the remaining 22/16 assessments keep their individual negative or provisional
+dispositions. None is an installation or native-use qualification.
+
+The dated [selection reconciliations](../../catalogs/sota-convergence/reconciliations-20261006-first-pass.json)
+carry the first-pass status, current exclusion and age warning through the
+native generator. Both RESULT carriers note these limits. All eleven reviewed
+layers reopen with `selection_changed` for the vendor follow-up, with additional
+Toad/Horde references on their layers. The native ledger preserves historical
+outcome bindings rather than inventing a later vote.
 
 Each candidate's comparison, verdict and supporting returned evidence are
 retained in `foundation[].candidates[]` in the two manifests. The field
@@ -81,7 +101,9 @@ than the incumbent.
 ## Completeness and next sweep
 
 Both original critics triggered bounded follow-up work in every reviewed layer;
-the converted records have no lost workers or reopened layers. Preserve the
+the original conversion had no lost workers or retained-failure reopens. This
+publication now reopens the reviewed layers for the vendor-first selection
+follow-up. Preserve the
 critics' general directions as inputs to the next relevant landscape sweep:
 vendor-first native interfaces; previous exclusions and named changed
 conditions; version trains and tag-only releases; Codeberg, closed first-party
@@ -98,9 +120,11 @@ retained failure invalidates a clean result. Preserve the old verdict and
 usage; do not rewrite the historical record.
 
 Change this publication design if the maintained harness gains explicit,
-tested multi-sweep critic and provenance merge semantics. A subsequent adoption
-decision still requires the candidate's stated measured comparison, maintained
-primary sources and the organic native-use bar. Catalog membership alone never
+tested multi-sweep critic and provenance merge semantics. Retained candidate
+comparisons are historical overturn proposals, not mandatory local campaigns.
+The subsequent command-center adoption synthesis uses maintained primary
+sources, clean upstream installation, smoke and organic counters.
+Catalog membership alone never
 overturns the incumbent or authorizes installation.
 
 ## SOTA sources
@@ -118,6 +142,11 @@ overturns the incumbent or authorizes installation.
 - The upstream repository, full `reviewed_commit`, README path and observed
   source excerpts for each surviving assessment are in its source-review
   receipt, referenced by the corresponding `RESULT.json` layer entry.
+- Toad's current maintenance check: `toad-maintenance-metadata.json` and
+  `toad-maintenance-commits.json` under the role artifacts retain the actual
+  primary API returns. Horde's `horde-age-metadata.json` under the runtime
+  artifacts retains its creation date. Their exact API endpoints and overturn
+  conditions are in the dated reconciliation carrier.
 - `native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a`:
   `docs/acceptance-evidence-policy.md:24-33` (claim boundaries) and
   `docs/lanes.md:94-128` (shared hot-file and registry protocol).

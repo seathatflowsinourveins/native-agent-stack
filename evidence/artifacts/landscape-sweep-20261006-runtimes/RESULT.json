@@ -9,6 +9,9 @@
  "usage_ref": "evidence/artifacts/landscape-sweep-20261006-runtimes-attempts/child-usage-wf_eed0e74b-ba4.json",
  "lower_bound_usage": false,
  "returns_ref": "evidence/artifacts/landscape-sweep-20261006-runtimes/returns.json",
+ "notes": [
+  "First pass; vendor-official follow-up landscape-sweep-20261006-vendor (workers smoke wf_fba23622-d34, then 13 layers) remains required. Historical assessment survival is distinct from current eligibility: Toad is EXCLUDED as stale; Horde is TOO NEW TO ASSESS. Dated selection reconciliations record these conditions without altering original votes."
+ ],
  "layers": [
   {
    "catalog": "foundation",
@@ -208,7 +211,12 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -411,7 +419,16 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    },
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/14"
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -617,7 +634,12 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -826,7 +848,12 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -990,7 +1017,12 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -1195,7 +1227,12 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    }
+   ]
   },
   {
    "catalog": "foundation",
@@ -1399,7 +1436,12 @@
      }
     }
    ],
-   "reopen": []
+   "reopen": [
+    {
+     "trigger": "selection_changed",
+     "ref": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json#/reconciliations/12"
+    }
+   ]
   }
  ]
 }
