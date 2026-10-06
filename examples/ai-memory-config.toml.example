@@ -1,10 +1,16 @@
-# Merge these top-level fields into the default data directory's config.toml.
+# Inactive NativeStack2604 profile; merge into the owner's accepted config.toml.
 # Leave llm_provider and reranker unset; literal llm_provider="none" is invalid.
-# Upstream keyless semantic-memory default: checksum-pinned local MiniLM,
-# 384 dimensions; first start downloads about 87 MiB and embeds existing pages.
-# Use "none" for a deliberately FTS-only profile. This is separate from the
-# SocratiCode/Nemotron code index and does not enable LLM consolidation.
-embedding_provider = "local"
+# akitaonrails/ai-memory@v2.5.2 docs/llm-providers.md L374-379 supports these keys.
+# nvidia/Nemotron-3-Embed-8B-BF16@d1f2f25730bbd775b99b29185134bc86653bf2d1
+# README.md L112, L148 defines the 4096-d query/passage profile.
+# A provider/dimension change needs the owner's embedding-identity migration;
+# this example neither backfills stored pages nor proves that migration ran.
+embedding_provider = "openai-compat"
+embedding_model = "nvidia/Nemotron-3-Embed-8B-BF16"
+embedding_base_url = "http://127.0.0.1:28231/v1"
+embedding_dim = 4096
+embedding_query_prefix = "query: "
+embedding_document_prefix = "passage: "
 backfill_on_start = false
 capture_assistant = false
 consolidate_on_session_end = false

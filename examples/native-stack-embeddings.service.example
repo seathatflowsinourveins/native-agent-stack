@@ -1,12 +1,17 @@
 # Inactive systemd USER unit. Replace every absolute placeholder.
-# vLLM 0.25.0 is the working WSL pin; 0.29.0 failed real UVA startup there.
+# Selected NativeStack2604 source configuration; this is not host acceptance.
+# vllm-project/vllm@v0.31.0 vllm/engine/arg_utils.py L996 and
+# vllm/config/pooler.py L16, L50-63 define the explicit mean-pooling fields.
+# nvidia/Nemotron-3-Embed-8B-BF16@d1f2f25730bbd775b99b29185134bc86653bf2d1
+# README.md L112, L148, L501 defines 4096-d vectors and query/passage inputs.
+# Qualify GPU capacity and the endpoint before enabling a copy on another host.
 [Unit]
 Description=Selected local Nemotron embedding endpoint
 
 [Service]
 Type=simple
 WorkingDirectory=/ABSOLUTE/STACK_HOME
-ExecStart=/ABSOLUTE/STACK_HOME/tools/vllm-0.25.0/bin/vllm serve /ABSOLUTE/STACK_HOME/models/nemotron-3-embed-1b-c0c9fea --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests
+ExecStart=/ABSOLUTE/STACK_HOME/tools/vllm-0.31.0/bin/vllm serve /ABSOLUTE/STACK_HOME/models/nemotron-3-embed-8b-d1f2f25 --served-model-name nvidia/Nemotron-3-Embed-8B-BF16 --host 127.0.0.1 --port 28231 --max-model-len 8192 --max-num-seqs 4 --gpu-memory-utilization 0.62 --enforce-eager --pooler-config '{"seq_pooling_type":"MEAN","use_activation":true}' --no-enable-log-requests
 Restart=no
 UMask=0077
 

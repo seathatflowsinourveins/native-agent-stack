@@ -2,6 +2,9 @@
 # No account, model, approval, sandbox or feature settings are changed here.
 # The socraticode path names the linux-x86_64 pin, socraticode-1.15.0; on macos-arm64 use
 # socraticode-1.14.0 until a Mac qualifies 1.15.0 (adoption/pins-macos-arm64.json).
+# The endpoint below is the selected NativeStack2604 profile, not a Mac change.
+# nvidia/Nemotron-3-Embed-8B-BF16@d1f2f25730bbd775b99b29185134bc86653bf2d1,
+# README.md L112, L148: 4096 dimensions, query/passage prefixes.
 [mcp_servers.serena]
 command = "/ABSOLUTE/UVX_EXECUTABLE"
 args = ["--from", "git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143", "serena", "start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "false", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
@@ -17,11 +20,11 @@ startup_timeout_sec = 120
 
 [mcp_servers.socraticode.env]
 QDRANT_MODE = "external"
-QDRANT_URL = "http://127.0.0.1:16333"
+QDRANT_URL = "http://127.0.0.1:21633"
 EMBEDDING_PROVIDER = "lmstudio"
-LMSTUDIO_URL = "http://127.0.0.1:8231/v1"
-EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-1B-BF16"
-EMBEDDING_DIMENSIONS = "2048"
+LMSTUDIO_URL = "http://127.0.0.1:28231/v1"
+EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-8B-BF16"
+EMBEDDING_DIMENSIONS = "4096"
 EMBEDDING_CONTEXT_LENGTH = "4096"
 EMBEDDING_QUERY_PREFIX = "query: "
 EMBEDDING_DOCUMENT_PREFIX = "passage: "

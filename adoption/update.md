@@ -183,7 +183,8 @@ gh api repos/astral-sh/uv/releases/latest \
   > "$PRIVATE_RUN_DIR/uv-release.json"
 gh api repos/mksglu/context-mode/commits/main \
   > "$PRIVATE_RUN_DIR/context-mode-main.json"
-hf models info nvidia/Nemotron-3-Embed-1B-BF16
+hf models info nvidia/Nemotron-3-Embed-8B-BF16 \
+  --revision d1f2f25730bbd775b99b29185134bc86653bf2d1
 ```
 
 These examples read changing metadata; they are **not** installers or automatic upgrades. Verify current native CLI help before applying a changed upstream command. The HF model identity is an example from the catalog; preserve exact publisher ID/revision/task/pooling/dimensions when selecting the actual model. For HF endpoints not supported by the installed CLI, use its documented Python Hub client rather than inventing flags.
@@ -220,17 +221,53 @@ CI validates public artifacts and code behavior. It does not log in, place broke
 
 ## Refresh only adopted retrieval
 
-On a host that already adopted the named index:
+The selected NativeStack2604 profile uses qmd for keyword search and document
+retrieval, with `native-agent-stack-catalog-lex` on CPU. Meaning-based catalog
+search uses SocratiCode's `codebase_search` through the shared Nemotron 8B
+endpoint. This source correction does not assert that the two-client qmd cutover
+or Claude's embedding registration has run; those owner-applied changes and
+their fresh-session known-answer checks are separate gates in the
+[dated local-model decision](../docs/decisions/2026-10-06-retrieval-first-local-models.md).
+
+Once the owner has accepted that cutover, refresh only the adopted lexical index:
 
 ```sh
-qmd --index native-agent-stack-catalog update
-qmd --index native-agent-stack-catalog status   # read "Vectors: N embedded"
-qmd --index native-agent-stack-catalog embed    # only when N is above 0
-qmd --index native-agent-stack-catalog search "native worker" \
+env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex update
+env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex status
+env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex search "native worker" \
   -c us-equities-foundation -n 3 --format json
 ```
 
-`update` re-indexes changed files and computes no vectors. Where the index carries embeddings (`status` reports `Vectors:` above 0), `embed` then embeds only the documents still lacking current vectors, such as new or changed ones (`embed -f` would re-embed everything); without it, the `vec` and `hyde` arms of `query` miss those documents. The lexical profile of [native catalog setup](../catalogs/us-equities/native-workflows.md) carries no vectors and skips `embed`; it also avoids a plain `query`, which expands the text with one model and reranks with another, both downloaded on first use. A `query` made of typed lexical searches with `rerank` off is model-free ([recipes](../recipes/README.md)). `update`'s closing "Run 'qmd embed'" notice prints on any index with unembedded documents, lexical ones included, so it is not the signal. Sources, qmd `v2.8.3`: README [L556](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L556), [L644-L651](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L644-L651) and [L1016-L1018](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1016-L1018); `src/cli/qmd.ts` [L561](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L561) and [L994-L1002](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L994-L1002); `src/store.ts` [L1974-L1978](https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1974-L1978).
+`update` re-indexes changed text and computes no vectors. Never run `qmd embed`
+or `qmd pull` on the selected lexical index. The selected operating policy is
+keyword search without embedding generation. A plain `query` can expand the text and rerank with models;
+typed lexical searches with `rerank` off are model-free ([recipes](../recipes/README.md)).
+`update`'s closing "Run 'qmd embed'" notice prints for unembedded documents and
+does not authorize generating embeddings. Retain the old vector index as dated
+evidence or the owner's conditional fallback until the cutover's checks pass;
+do not infer its deletion from this source change. Sources, qmd `v2.8.3`: README
+[L644](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L644),
+[L1016](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1016),
+[L1151](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1151);
+`src/cli/qmd.ts` [L994](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L994).
+
+The inactive MCP and service examples select
+`nvidia/Nemotron-3-Embed-8B-BF16@d1f2f25730bbd775b99b29185134bc86653bf2d1`,
+4096 dimensions, `query: ` and `passage: ` prefixes, with vLLM 0.31.0.
+Their NativeStack2604 endpoint examples are `127.0.0.1:28231/v1` and Qdrant
+`127.0.0.1:21633`; the Codex template retains its existing host-bound endpoint
+substitutions. The Claude template retains literal endpoint fields: its renderer
+does not substitute ordinary MCP template fields, so another host supplies its
+own accepted registration rather than inheriting these ports automatically.
+The NativeStack2604 collection namespace is `ns2604_lm20261006_8b_`, set by the
+owner's registration, rather than a namespace inferred for another host. These
+generic examples introduce no automatic namespace binding; the owner must check
+the stored collection profile and preserve that namespace at deploy/read-back.
+SocratiCode's watcher, ignore rules and document-path prefix remain unchanged.
+The publisher's [pinned model card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md#usage)
+defines the dimensions and prefixes; the
+[upstream consumer configuration](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/embedding-config.ts#L349)
+defines the registered model and dimension fields.
 
 Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. A host that adopted the index before 2026-09-27 adds the two foundation collections, `foundation-adoption` and `foundation-docs`, once with the commands there; the carrier names all four collections in every `query`. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
 
@@ -413,12 +450,12 @@ selective installed-registry command is supplied by this repository.
 For an adopted catalog QMD index, verify its selected collection roots point to
 this source revision first. Follow [catalog retrieval](../docs/catalog-retrieval.md)
 for a path-only relocation that preserves masks, contexts, models and unrelated
-collections; `update` alone does not move an old root. Then:
+collections; `update` alone does not move an old root. After the NativeStack2604
+lexical cutover is accepted, use:
 
 ```sh
-qmd --index native-agent-stack-catalog update
-qmd --index native-agent-stack-catalog status
-qmd --index native-agent-stack-catalog embed   # only if this adopted index already carries vectors
+env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex update
+env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex status
 ```
 
 A source/text/index refresh is not a runtime re-pin or promotion. Retain reported

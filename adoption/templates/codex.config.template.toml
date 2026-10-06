@@ -96,8 +96,10 @@ QDRANT_MODE = "external"
 QDRANT_URL = "http://${QDRANT_URL}"
 EMBEDDING_PROVIDER = "lmstudio"
 LMSTUDIO_URL = "http://${EMBED_URL}/v1"
-EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-1B-BF16"
-EMBEDDING_DIMENSIONS = "2048"
+# nvidia/Nemotron-3-Embed-8B-BF16@d1f2f25730bbd775b99b29185134bc86653bf2d1:
+# README.md L112, L148; endpoint values remain host substitutions.
+EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-8B-BF16"
+EMBEDDING_DIMENSIONS = "4096"
 EMBEDDING_CONTEXT_LENGTH = "4096"
 EMBEDDING_QUERY_PREFIX = "query: "
 EMBEDDING_DOCUMENT_PREFIX = "passage: "
@@ -132,7 +134,12 @@ command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 
 [mcp_servers.qmd]
 command = "${ECO_ROOT}/bin/qmd"
-args = ["--index", "native-agent-stack-catalog", "mcp"]
+args = ["--index", "native-agent-stack-catalog-lex", "mcp"]
+
+# Selected lexical cutover; deploy only after its two-client acceptance.
+# tobi/qmd@v2.8.3 README.md L1151. Do not pass INDEX_PATH, embed or pull.
+[mcp_servers.qmd.env]
+QMD_FORCE_CPU = "1"
 
 # context-mode's plugin server (.codex-plugin/mcp.json: `node ./start.mjs`, cwd ".") starts in the plugin
 # root, because Codex joins a plugin server's relative cwd to that root. Upstream start.mjs then sets no
