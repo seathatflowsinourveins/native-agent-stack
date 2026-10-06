@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "kind": "rnd_wave1_preregistration_deviations",
- "recorded_at_utc": "2026-10-06T17:31:38+00:00",
+ "recorded_at_utc": "2026-10-06T18:01:31+00:00",
  "frozen_commit": "d4601bfcbc4db74e57cd5c387bf48faebe263642",
  "previous_deviation_commits": [
   "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
@@ -82,7 +82,7 @@
   {
    "id": "D6.2",
    "finding": "The same class holds 47 further in-window reads outside every known read (a record with disjoint recorded windows gives one entry per window).",
-   "rule": "R1 adds each entry below. Verdict rule (COUNTS): COUNTS: a completed read of real market data (bars, quotes, trades, snapshots, auctions, screeners, corporate actions or news served by a market-data API; OPRA; FINRA short volume), or a real paper or broker session that consumed it, whose data dates fall inside the window and which no known_reads item covers. Window membership is judged by the dates of the data read, not the run date. OUT: synthetic or fixture-only, not run, data dated outside the window, no market data (filings, documents, account state), covered by a known_reads item, a local re-read inside a bound item's scope, or a wrapper of another record. Access kind: data_read: the record shows only data, counts or coverage. result_inspected: the record shows per-case results (fills, realized P&L, flags, ranks). outcome_selected: names were chosen by a realized outcome (a gain or move threshold, a ranking by realized return, a known mover). Where one scope mixes kinds and the record cannot split it, the stronger kind is proposed and flagged. Where a record cannot split a scope, the stronger access kind is bound. Step 3's conservative rule (PREREGISTRATION.md:51-52) applies to every universe-wide entry, whatever its access kind.",
+   "rule": "R1 adds each entry below. Verdict rule (COUNTS): COUNTS: a completed read of real market data (bars, quotes, trades, snapshots, auctions, screeners, corporate actions or news served by a market-data API; OPRA; FINRA short volume), or a real paper or broker session that consumed it, whose data dates fall inside the window and which no known_reads item covers. Window membership is judged by the dates of the data read, not the run date. OUT (a market-data classification only; it never removes a required inspection binding, which D6.3 makes for every recorded in-window read): synthetic content (made-up data; a real record kept as a test fixture is not synthetic), not run, data dated outside the window, no market data (filings, documents, account state), covered by a known_reads item, a local re-read inside a bound item's scope, or a wrapper of another record. Access kind: data_read: the record shows only data, counts or coverage. result_inspected: the record shows per-case results (fills, realized P&L, flags, ranks). outcome_selected: names were chosen by a realized outcome (a gain or move threshold, a ranking by realized return, a known mover). Where one scope mixes kinds and the record cannot split it, the stronger kind is proposed and flagged. Where a record cannot split a scope, the stronger access kind is bound. Step 3's conservative rule (PREREGISTRATION.md:51-52) applies to every universe-wide entry, whatever its access kind.",
    "entries": [
     {
      "id": "D6-C02",
@@ -116,7 +116,7 @@
      "data_class": "market_data",
      "reason": "Completed read-only probe of real overnight market data inside the window, separate from the watch run. The README calls the probe outputs scratch, not evidence; that describes evidence quality, not exposure.",
      "flags": [
-      "Start date and full symbol set unknown: under D1 an unknown field covers every case in the potential scope (all earlier dates for these names). The reviewer may bound it to the named securities and the stated dates.",
+      "Start date and full symbol set unknown: under D1 an unknown field covers every case in the potential scope (all earlier dates for these names).",
       "An endpoint is unknown in the record and is recorded as unknown (frozen D1: an entry with an unknown field covers every case that could fall within its scope)."
      ]
     },
@@ -449,7 +449,7 @@
      "scope_kind": "universe_date_range",
      "identifiers_or_universe": "every symbol-day with a previous daily row in the broad-universe daily dataset (pre-market scan), the candidate union (daily or pre-market high at least 1.20 x the previous low) and its intraday collections",
      "date_range": [
-      "2026-01-02",
+      "2021-01-04",
       "2026-09-25"
      ],
      "access_kind": "outcome_selected",
@@ -502,11 +502,11 @@
       ]
      },
      "data_class": "market_data",
-     "reason": "Residual of known_reads[1]: D4.1 binds 2021-01-04..2025-12-31, but candidate selection and collection covered every session to 2026-09-18, the protocol's holdout included, plus a corporate-action page for 2026-09-21..25.",
+     "reason": "Candidate selection by realized high and collection covered every session 2021-01-04..2026-09-18, the protocol's holdout included, plus a corporate-action page for 2026-09-21..25. It is bound over the full period as an ADDITIONAL outcome_selected binding: it overlaps known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays unchanged, so the stronger annotation is kept for the whole selection period.",
      "flags": [
       "Judgment for the command center: D4.1 ends known_reads[1] at 2025-12-31 deliberately. The record shows holdout-session data was collected and filtered by realized high, though post-entry outcomes were not computed (README.md:22).",
-      "The same candidate filter within 2021-01-04..2025-12-31 is a selection by realized high, which could argue for outcome_selected rather than the result_inspected D4.1 pins; noted, not changed.",
-      "Residual only: 2026-01-02..2026-09-25 lies beyond known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays the binding for the earlier range (class verdict rule: a read covered by a known_reads item is OUT)."
+      "The same candidate filter within 2021-01-04..2025-12-31 is a selection by realized high, so the earlier interval carries outcome_selected through this additional binding; D4.1's result_inspected fixture is not changed (the stronger kind is never dropped for any range).",
+      "Additional binding over the full selection period, 2021-01-04..2026-09-25, outcome_selected. It overlaps known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays unchanged: the record selects by realized high over the whole period, and the access-kind rule binds the stronger kind where kinds cannot be split (frozen D1 makes access_kind gate-bearing). The stronger annotation is never dropped for any range."
      ]
     },
     {
@@ -2672,10 +2672,10 @@
   {
    "id": "D6.4",
    "finding": "Judgment calls the class review flagged.",
-   "rule": "Each is resolved conservatively and proposed for the command center's confirmation at its ACK. (1) D6-C05 and D6-C08 are universe-wide data reads; the conservative rule applies with no access-kind exception. (2) D6-C07 and D6-C10 bind only the residual data beyond the ranges D4.1 pins for known_reads[0] and [1] (C10: 2026-01-02..2026-09-25); the pinned ranges stay the known reads' bindings. (3) D6-G02's LEAN-bundled bars reach 2021-03-31; it is bound beyond known_reads[4]'s ETF control. (4) outcome_selected is applied across a whole universe where its selected subset is private or partly named. (5) Code-derived request windows are bound as derived; an endpoint the record does not determine is recorded as unknown (frozen D1, deviations.json rule.unknown), never replaced by the window endpoint. (6) Fixtures, synthetic data, runs that observed nothing, data outside the window and wrapper records stay out.",
+   "rule": "Each is resolved conservatively and proposed for the command center's confirmation at its ACK. (1) D6-C05 and D6-C08 are universe-wide data reads; the conservative rule applies with no access-kind exception. (2) D6-C07 binds only the residual beyond the range D4.1 pins for known_reads[0]. D6-C10 is an ADDITIONAL binding over 2021-01-04..2026-09-25 with the stronger access kind outcome_selected: it overlaps known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays unchanged, so the stronger annotation is kept for the whole selection period; it is never dropped for any range. (3) D6-G02's LEAN-bundled bars reach 2021-03-31; it is bound beyond known_reads[4]'s ETF control. (4) outcome_selected is applied across a whole universe where its selected subset is private or partly named. (5) Code-derived request windows are bound as derived; an endpoint the record does not determine is recorded as unknown (frozen D1, deviations.json rule.unknown), never replaced by the window endpoint. (6) The market-data OUT classification (synthetic content, runs that observed nothing, data outside the window, wrapper records) is separate from the required inspection bindings: a real record kept as a test fixture is not synthetic, and every recorded in-window read is bound (D6.3) whatever its market-data verdict.",
    "judgment_calls_as_reviewed": [
     "D6-C05: a universe-wide data_read 2016-01-04..2026-09-18 marks every v1 case inspected under the conservative rule; confirm that data_read entries carry that effect.",
-    "D6-C07 and D6-C10: residuals beyond the exact ranges D4.1 pins for known_reads[0] (exit closes to 2026-09-18) and known_reads[1] (holdout-session collection); the command center decides whether to bind them.",
+    "D6-C07: a residual beyond the exact range D4.1 pins for known_reads[0] (exit closes to 2026-09-18). D6-C10: an additional full-range outcome_selected binding over known_reads[1]'s unchanged D4.1 fixture (the command center's ruling, item task-native-agent-stack-5f-20261006T175928Z).",
     "D6-C08, D6-C12, D6-C13: news and corporate actions counted as market data because a market-data API served them; filings and issuer documents (D6-O-N01..N03) are OUT as non-market data although PREREGISTRATION.md:40 says every recorded read.",
     "access_kind outcome_selected for D6-C01, C03, C06 and the mover trials applies the strongest kind over a universe whose outcome-selected subset is private or only partly named.",
     "D6-C02 and the code-derived request windows (D6-C01, C03, T12-T19) rely on code at the base commit or leave a field unknown.",
@@ -2697,7 +2697,7 @@
  ],
  "class_review": {
   "receipt": "d6-class-review-20261006.json",
-  "receipt_sha256": "bbb31c62c677e2f3cbe36f53d87cbe252fab62264d9cd95cef8f3e6bf7541800",
+  "receipt_sha256": "63c66ae2ec42923272b25d2b239ae60f6706c1968d9f3d9b1766cc9dad7ea071",
   "items_reviewed": 100,
   "counts": {
    "COUNTS": 48,
@@ -2721,7 +2721,7 @@
    "History before the base commit (deleted or rewritten files, other branches, unmerged PR heads) was not searched.",
    "Dates written in other forms (month names, quarters such as 2021Q1, compact YYYYMMDD inside prose) were searched only where a record was already open.",
    "Request windows taken from code (watch.py, monitor.py, mover_scan.py) are what the code at the base commit requests; the run records do not restate them.",
-   "The critic's own span hashes were not supplied, so the critic span check compares the file hash only."
+   "Superseded earlier snapshot (the first review, before 2026-10-06T17:31:26Z): the critic's span hashes were not supplied then, so that review compared the file hash only. Closed by critic_span_check.critic_comparison at 2026-10-06T17:31:26Z: all seven fields equal."
   ]
  },
  "out_items": [
