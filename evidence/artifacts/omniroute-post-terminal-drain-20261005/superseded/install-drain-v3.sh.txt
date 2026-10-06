@@ -1,8 +1,5 @@
 #!/bin/bash
 # Install the drain-patched tarball (patch v2, patched tree b7c6869001ce, BUILD_SHA 2a41147b7) into its own prefix next to the live ones; no live unit is touched.
-# Version 4 (2026-10-06): the dependency-graph observation's status is enforced (full-scope read of 8f9d89662, P3-5). Version 3 piped `npm ls` into a parser whose failure it never read, so an unavailable graph printed an empty fingerprint with exit 0 in --deps-hash and an install that ended with "installed and verified".
-# `npm ls` exits 1 with a complete JSON tree when it reports problems (ELSPROBLEMS: an invalid, extraneous or missing dependency; both NativeStack prefixes do, 2 problems each), which is an observation (the line says how npm ended and how many problems it listed); any other status, empty or unparsable output or a tree without
-# dependencies is UNAVAILABLE: --deps-hash exits 5, and the install path, after its pinned checks have passed, says so and exits 6 (the prefix stands; rerun --deps-hash) instead of claiming a verified install with no fingerprint.
 # Version 3 (2026-10-06): usable on another host. The tools directory (TOOLS_DIR), the node directory (NODE_BIN_DIR) and the source of the lsof shim are overridable; the shim now comes by default from the repository's
 # committed copy (evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt, sha256 checked against the pinned value BEFORE anything is installed) instead of from a live prefix, and every one of these inputs is checked
 # before `npm install` creates the prefix, so a missing input cannot leave a half-made prefix behind (version 2 failed at the shim copy AFTER npm install on a host without the NativeStack prefix layout).
@@ -16,7 +13,7 @@
 # 5. A hash of the installed dependency graph (sorted name@version of `npm ls -g --all --json`) is printed: the tarball bundles its server build, but npm resolves the runtime dependencies at install time,
 #    so another host compares this hash after its own install (the tarball's sha256 does not pin them).
 # usage: omniroute-install-drain-b7c68690-20261005.sh                    copy, verify, install, verify the prefix
-#        omniroute-install-drain-b7c68690-20261005.sh --deps-hash NAME       print the dependency-graph hash of an installed prefix (exit 5 when the graph cannot be observed)
+#        omniroute-install-drain-b7c68690-20261005.sh --deps-hash NAME       print the dependency-graph hash of an installed prefix
 #        omniroute-install-drain-b7c68690-20261005.sh --verify-prefix NAME   verify an installed prefix under tools/ (BUILD_SHA, shim, marker)
 set -u
 set -o pipefail
@@ -47,37 +44,21 @@ verify_prefix() { # directory name under tools/
   [ "$shim" = "$EXPECTED_SHIM_SHA256" ] || fail "shim sha256 of $1 is not the reviewed shim v2 ($EXPECTED_SHIM_SHA256)"
   [ "$marker" -ge 1 ] || fail "the drain marker is absent from the compiled server chunks of $1: not the drain build"
 }
-deps_hash() { # installed prefix directory (full path): prints "<packages> <sha256 of the sorted name@version list> (<how npm ls ended>)" and returns 0 when the graph was observed; prints "UNAVAILABLE (<reason>)" and returns 5 when it was not
-  local tmp rc prc
-  tmp=$(mktemp) || { echo "UNAVAILABLE (no temporary file)"; return 5; }
-  npm ls -g --all --json --prefix "$1" > "$tmp" 2> "$tmp.err"; rc=$?
-  if [ "$rc" -gt 1 ]; then echo "UNAVAILABLE (npm ls exit $rc: $(head -c 120 "$tmp.err" | tr '\n' ' '))"; rm -f "$tmp" "$tmp.err"; return 5; fi
-  python3 - "$tmp" "$rc" <<'PYEOF2'
-import hashlib, json, sys
+deps_hash() { # installed prefix directory (full path): packages and sha256 of the sorted name@version list
+  npm ls -g --all --json --prefix "$1" 2>/dev/null | python3 -c '
+import json, sys
 def walk(node, out):
     for name, dep in (node.get("dependencies") or {}).items():
         out.add(name + "@" + str(dep.get("version", "?")))
         walk(dep, out)
-try:
-    tree = json.load(open(sys.argv[1]))
-    out = set()
-    walk(tree, out)
-    if not isinstance(tree.get("dependencies"), dict) or not out:
-        raise ValueError("no dependencies in the tree")
-except Exception as error:
-    print(f"UNAVAILABLE (npm ls exit {sys.argv[2]}, output not usable: {type(error).__name__}: {str(error)[:80]})")
-    sys.exit(5)
-problems = tree.get("problems") or []
-print(len(out), hashlib.sha256("\n".join(sorted(out)).encode()).hexdigest(), f"(npm ls exit {sys.argv[2]}, {len(problems)} problem(s) reported, the tree is complete)")
-PYEOF2
-  prc=$?
-  rm -f "$tmp" "$tmp.err"
-  return $prc
+out = set()
+walk(json.load(sys.stdin), out)
+print(len(out), __import__("hashlib").sha256("\n".join(sorted(out)).encode()).hexdigest())
+'
 }
 if [ "${1:-}" = "--deps-hash" ]; then
-  out=$(deps_hash "$TOOLS/${2:?prefix name}"); rc=$?
-  echo "dependency graph of $2: $out"
-  exit $rc
+  echo "dependency graph of $2: $(deps_hash "$TOOLS/${2:?prefix name}")"
+  exit 0
 fi
 if [ "${1:-}" = "--verify-prefix" ]; then
   verify_prefix "${2:?prefix name}"
@@ -108,11 +89,7 @@ nice -n 19 npm install -g --prefix "$P" --no-audit --no-fund "$A/$TGZ_NAME" > "$
 echo "$(date -u +%H:%M:%SZ) npm install exit=0"
 mkdir -p "$P/shim" && cp "$SHIM_SOURCE" "$P/shim/lsof" && chmod 755 "$P/shim/lsof" || fail "copy of the lsof shim from $SHIM_SOURCE"
 verify_prefix "$PREFIX_NAME"
-DEPS=$(deps_hash "$P"); DEPS_RC=$?
+DEPS=$(deps_hash "$P")
 echo "installed dependency graph: packages and sha256 of the sorted name@version list: $DEPS"
 du -sb "$P" | cut -f1 | sed 's/^/bytes: /'
-if [ "$DEPS_RC" -ne 0 ]; then
-  echo "the prefix $PREFIX_NAME passed every pinned check, but its dependency graph could not be observed, so another host has nothing to compare: rerun --deps-hash $PREFIX_NAME" >&2
-  exit 6
-fi
 echo "installed and verified: $PREFIX_NAME"

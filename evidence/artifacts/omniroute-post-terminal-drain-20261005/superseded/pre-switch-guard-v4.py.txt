@@ -8,7 +8,7 @@ two; do not switch unless it exits 0. It answers the questions the command cente
  3. Is nothing in flight? For --clean-for seconds (default 30), sampled every --interval seconds (default 5), ALL of:
     - no worker process of another lane (omniroute-codex-sdk/worker.py, `codex exec`, or an interactive `codex` that names the omniroute profile or the gateway port);
     - no call_logs row in the last 120 s;
-    - no ACTIVE client connection to the gateway port. Every established connection (one `ss -O -tnpi` snapshot per sample, both ends of the loopback connection) is classified by the owner of its CLIENT end:
+    - no ACTIVE client connection to the gateway port. Every established connection (one `ss -tnpi` snapshot per sample, both ends of the loopback connection) is classified by the owner of its CLIENT end:
         * TOLERATED: the owner is visible in this PID namespace, its cgroup unit is one of --tolerate-unit (default `omniroute-fw.service`, the 20129 framework gateway) AND the connection is EMPTY at every sample: empty receive and send
           queues and no bytes received or sent (ss prints bytes_received and bytes_sent only when they are not zero). That is what the observed poll is: the framework gateway holds a connection to 20128 for 22-30 s and opens
           a new one (watch of 2026-10-06 05:14Z, `checks/connection-watch-20128.txt`), with no call_logs row and no byte on it. It is NOT enough to be that unit's: the same unit forwards real inference to 20128 through a provider node,
@@ -21,26 +21,17 @@ two; do not switch unless it exits 0. It answers the questions the command cente
     Informational only (never a failure): the gateway's own pending-request counter (GET /api/usage/history, counts only; on the unpatched build it keeps entries of requests whose stream was cancelled before it finished,
     so it does not return to zero), whether it changed during the window, and the running hindsight processes (a known 20128 client, to be paused by the protocol).
  An observation that fails is a FAIL of the check, never an idle host: `ss` exiting non-zero or printing lines it cannot parse, `pgrep` exiting with a status other than 0 (matches) or 1 (no match).
- Version 5 (full-scope read of 8f9d89662, P2-2 and P2-3): the `ss` parse is strict and the connections are keyed by their full endpoint tuple.
-    * `ss -O -Htnpi` prints ONE record per line (iproute2 6.1.0 here): `Recv-Q Send-Q Local Peer [users:(("name",pid=N,fd=M)[,...])] <tcp info>`. A line that is not that shape, a users field that does not parse, a record whose info lacks `mss:` and `cwnd:` (an established TCP socket always has both,
-      so a record without them has no counters: unavailable, not zero), a `bytes_received` or `bytes_sent` that is repeated or not all digits, and a blank line are an ObservationError. ss prints bytes_sent and bytes_received only when they are not zero (iproute2 misc/ss.c), so an ABSENT key on a well-formed record is a real zero.
-    * The listeners of the port are observed first (`ss -Htln`): the guard's classification relies on the unit listening on loopback only, so a listener on any other address, or none, is an ObservationError. A connection is the pair of its two records, matched on the FULL normalized
-      (client address, client port, server address, server port) tuple (IPv4-mapped IPv6 normalized to IPv4); the server end (local = a listener address) carries the queues and counters, the client end (peer = a listener address) the owner. Two records of the same end for one tuple, a record with the
-      listener address at both ends, and a connection seen on one end only (a connection closing during the snapshot, or a socket whose other end `ss` cannot show) are an ObservationError: rerun the guard. A record whose two addresses are not the listener's (another host's port 20128) is unrelated and only counted.
-    * --idle-only runs only the idle observation (no switch tool, rollback or target prefix checks; the identity read-back expects no build) and ends with IDLE-RESULT instead of GUARD-RESULT, so an idle-only receipt cannot pass for the pre-switch gate: it is the pre-arm check of the census gate after the switch,
-      where the full mode's identity check (it expects the ROLLBACK prefix) cannot hold. An `&&` chain in front of `switch_gateways.py --apply` uses the full mode.
  The guard cannot see an interactive client that holds no connection at the moment, or a request that is silent on the wire (waiting for the upstream); announcing the restart time to 5f, c5 and the command center first,
  and their holds, are protocol steps, not checks here.
 
 Exit status: 0 all checks hold (GUARD-RESULT clean=True), 4 any check fails (clean=False), 3 usage error. It writes nothing and restarts nothing.
-usage: pre-switch-guard-20261006.py (--switch-tool FILE | --idle-only) [--port 20128] [--tools DIR] [--db FILE] [--unit omniroute.service] [--clean-for 30] [--interval 5]
+usage: pre-switch-guard-20261006.py --switch-tool FILE [--port 20128] [--tools DIR] [--db FILE] [--unit omniroute.service] [--clean-for 30] [--interval 5]
        [--rollback-prefix NAME] [--rollback-build SHA] [--target-prefix NAME] [--target-build SHA] [--shim-sha256 HEX] [--switch-sha256 HEX] [--pid N] [--identity-script FILE] [--worker-pattern REGEX] [--tolerate-unit UNIT]
 (every default below is the frozen value; the offline controls override them with scratch values, a live run passes none of them except --switch-tool)
 """
 import argparse
 import datetime as dt
 import hashlib
-import ipaddress
 import json
 import os
 import re
@@ -124,118 +115,32 @@ def unit_of(pid):
     return None
 
 
-def parse_endpoint(text):
-    """(address, port) of an `ss` address:port field with the address normalized (an IPv4-mapped IPv6 address becomes IPv4; `*` stays); an ObservationError when it cannot be parsed."""
-    try:
-        if text.startswith("["):
-            host, sep, port = text[1:].partition("]:")
-        else:
-            host, sep, port = text.rpartition(":")
-        if not sep or not port.isdigit() or not 0 < int(port) < 65536:
-            raise ValueError("not address:port")
-        if host == "*":
-            return "*", int(port)
-        ip = ipaddress.ip_address(host)
-        if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
-            ip = ip.ipv4_mapped
-        return str(ip), int(port)
-    except ValueError as error:
-        raise ObservationError(f"cannot parse the address {text[:60]!r} ({error})")
-
-
-def listeners(port):
-    """The addresses the gateway port listens on, from `ss -Htln`. The guard's classification relies on the unit listening on loopback only, so a listener on any other address, or none at all, is an ObservationError."""
-    proc = sh("ss", "-Htln", f"sport = :{port}")
-    if proc.returncode != 0:
-        raise ObservationError(f"ss (listeners) exited {proc.returncode}: {proc.stderr.strip()[:120]}")
-    found = set()
-    for line in proc.stdout.splitlines():
-        fields = line.split()
-        if len(fields) < 5 or fields[0] != "LISTEN":
-            raise ObservationError(f"ss printed a listener line that cannot be parsed ({len(fields)} fields)")
-        ip, lport = parse_endpoint(fields[3])
-        if lport != port:
-            raise ObservationError(f"ss printed a listener on port {lport}, not {port}")
-        if ip == "*" or not ipaddress.ip_address(ip).is_loopback:
-            raise ObservationError(f"port {port} listens on {ip}, not on loopback only: the guard's connection classification does not hold")
-        found.add((ip, lport))
-    if not found:
-        raise ObservationError(f"nothing listens on port {port}")
-    return found
-
-
-USERS_RE = re.compile(r'users:\(\("[^"]*",pid=\d+,fd=\d+\)(?:,\("[^"]*",pid=\d+,fd=\d+\))*\)')
-RECORD_RE = re.compile(r"^(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(.+)$")
-
-
-def counter(info, key):
-    """The value of `key:N` in an ss info string: 0 when the key is absent (ss prints bytes_sent and bytes_received only when they are not zero); an ObservationError when it is repeated or not all digits."""
-    hits = re.findall(r"(?:^|\s)" + key + r":(\S*)", info)
-    if not hits:
-        return 0
-    if len(hits) > 1 or not re.fullmatch(r"\d+", hits[0]):
-        raise ObservationError(f"the {key} counter is repeated or malformed ({hits[:2]!r})")
-    return int(hits[0])
-
-
-def parse_record(line):
-    """One `ss -O -Htnpi state established` record: queues, both endpoints, the owner pids of the end when ss shows them, and the byte counters; an ObservationError for anything else."""
-    m = RECORD_RE.match(line)
-    if not m:
-        raise ObservationError("ss printed a line that is not a connection record")
-    rest, owners = m.group(5), []
-    if rest.startswith("users:("):
-        um = USERS_RE.match(rest)
-        if not um:
-            raise ObservationError("the users field of a record cannot be parsed")
-        owners = sorted({int(p) for p in re.findall(r"pid=(\d+)", um.group(0))})
-        rest = rest[um.end():].strip()
-    if "users:(" in rest:
-        raise ObservationError("a users field sits in an unexpected position")
-    if not re.search(r"(?:^|\s)mss:\d+", rest) or not re.search(r"(?:^|\s)cwnd:\d+", rest):
-        raise ObservationError("a record has no TCP info (no mss: and cwnd:), so its byte counters are unavailable, not zero")
-    return {"recvq": int(m.group(1)), "sendq": int(m.group(2)), "local": parse_endpoint(m.group(3)), "peer": parse_endpoint(m.group(4)), "owners": owners,
-            "bytes_received": counter(rest, "bytes_received"), "bytes_sent": counter(rest, "bytes_sent")}
-
-
-class Connections(dict):
-    """{client endpoint -> server endpoint: {"counters": (recv_q, send_q, bytes_received, bytes_sent) of the server end, "owners": pids of the client end}} plus `unrelated`, the number of records that are not the gateway's."""
-    unrelated = 0
-
-
 def connections(port):
-    """The established connections with the gateway as the server end, from ONE `ss -O -Htnpi` snapshot, paired from both ends on the full normalized endpoint tuple (see the docstring of this file, version 5)."""
-    gateway = listeners(port)
-    proc = sh("ss", "-O", "-Htnpi", "state", "established", f"( sport = :{port} or dport = :{port} )")
+    """The established connections with the gateway port as one end, from ONE `ss -tnpi` snapshot: {client port: {"counters": (recv_q, send_q, bytes_received, bytes_sent) of the server end, "owners": [pids of the client end]}}.
+    ss prints an address line and an indented info line per socket; the server end (local port = the gateway's) carries the queues and counters, the client end (peer port = the gateway's) the owner process when it is visible here."""
+    proc = sh("ss", "-Htnpi", "state", "established", f"( sport = :{port} or dport = :{port} )")
     if proc.returncode != 0:
         raise ObservationError(f"ss exited {proc.returncode}: {proc.stderr.strip()[:120]}")
-    ends, unrelated = {}, 0
-    lines = proc.stdout.split("\n")
-    if lines and lines[-1] == "":
-        lines.pop()   # the final newline; a blank line anywhere else fails parse_record
-    for line in lines:
-        rec = parse_record(line)
-        at_server, at_client = rec["local"] in gateway, rec["peer"] in gateway
-        if at_server and at_client:
-            raise ObservationError("a record has the gateway's listener address at both ends")
-        if not (at_server or at_client):
-            unrelated += 1
-            continue
-        key = (rec["peer"], rec["local"]) if at_server else (rec["local"], rec["peer"])   # (client endpoint, server endpoint)
-        side = "server" if at_server else "client"
-        slot = ends.setdefault(key, {})
-        if side in slot:
-            raise ObservationError(f"two {side}-end records for the connection {key[0][0]}:{key[0][1]} -> {key[1][0]}:{key[1][1]}: conflicting observations")
-        slot[side] = rec
-    out = Connections()
-    out.unrelated = unrelated
-    for key, slot in ends.items():
-        name = f"{key[0][0]}:{key[0][1]} -> {key[1][0]}:{key[1][1]}"
-        if "server" not in slot or "client" not in slot:
-            raise ObservationError(f"the connection {name} was observed on its {'client' if 'server' not in slot else 'server'} end only: the other end is missing (a connection closing during the snapshot, or a socket ss cannot show); rerun")
-        s, c = slot["server"], slot["client"]
-        out[name] = {"counters": (s["recvq"], s["sendq"], s["bytes_received"], s["bytes_sent"]), "owners": c["owners"]}
-    return out
+    lines = proc.stdout.splitlines()
+    out, i = {}, 0
+    while i < len(lines):
+        addr = lines[i].split()
+        info = lines[i + 1] if i + 1 < len(lines) else ""
+        i += 2
+        if len(addr) < 4 or ":" not in addr[2] or ":" not in addr[3] or not addr[0].isdigit() or not addr[1].isdigit():
+            raise ObservationError(f"ss printed a line that cannot be parsed ({len(addr)} fields)")
+        local_port, peer_port = addr[2].rsplit(":", 1)[-1], addr[3].rsplit(":", 1)[-1]
+
+        def num(key):
+            m = re.search(key + r":(\d+)", info)
+            return int(m.group(1)) if m else 0
+
+        if local_port == str(port):          # the server end: its peer port identifies the connection
+            out.setdefault(peer_port, {"counters": None, "owners": []})["counters"] = (int(addr[0]), int(addr[1]), num("bytes_received"), num("bytes_sent"))
+        elif peer_port == str(port):         # the client end: its local port identifies the connection
+            owners = [int(p) for _, p in re.findall(r'\("([^"]*)",pid=(\d+)', " ".join(addr))]
+            out.setdefault(local_port, {"counters": None, "owners": []})["owners"] = sorted(set(owners))
+    return {k: v for k, v in out.items() if v["counters"] is not None}
 
 
 WORKER_PATTERN = "omniroute-codex-sdk/worker.py|codex exec|codex .*omniroute|codex .*20128"
@@ -275,8 +180,7 @@ def hindsight_count():
 
 def main():
     ap = Parser()
-    ap.add_argument("--switch-tool")
-    ap.add_argument("--idle-only", action="store_true", help="only the idle observation: no switch tool, rollback or target prefix checks; ends with IDLE-RESULT (never GUARD-RESULT)")
+    ap.add_argument("--switch-tool", required=True)
     ap.add_argument("--port", type=int, default=20128)
     ap.add_argument("--tools", default=str(Path.home() / ".local/share/codex-ecosystem/tools"))
     ap.add_argument("--db", default=str(Path.home() / ".local/share/omniroute/storage.sqlite"))
@@ -294,11 +198,9 @@ def main():
     ap.add_argument("--worker-pattern", default=WORKER_PATTERN, help="pgrep -f pattern of another lane's client processes (the offline controls narrow it to isolate from other sessions; a live run never passes it)")
     ap.add_argument("--identity-script", default=str(HERE / "gateway-identity-20261006.py"))
     args = ap.parse_args()
-    if not args.idle_only and not args.switch_tool:
-        ap.error("--switch-tool is required unless --idle-only")
     me = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     tolerated_units = args.tolerate_unit or ["omniroute-fw.service"]
-    print(f"GUARD version=5 mode={'idle-only' if args.idle_only else 'full'} script_sha256={me} start={utc()} port={args.port} unit={args.unit} clean_for={args.clean_for} interval={args.interval} tolerate_units={tolerated_units}")
+    print(f"GUARD version=4 script_sha256={me} start={utc()} port={args.port} unit={args.unit} clean_for={args.clean_for} interval={args.interval} tolerate_units={tolerated_units}")
     failed = []
 
     def check(name, problems, detail=""):
@@ -307,27 +209,18 @@ def main():
         if not ok:
             failed.append(name)
 
-    if args.idle_only:
-        ident = [sys.executable, args.identity_script, "--label", "idle-only", "--unit", args.unit, "--port", str(args.port), "--tools", args.tools]
-        if args.pid:
-            ident += ["--pid", args.pid]
-        proc = subprocess.run(ident, capture_output=True, text=True)
-        print("   " + (proc.stdout.strip() or proc.stderr.strip()))
-        check("unit healthy (identity read-back, no build expectation)", [] if proc.returncode == 0 else [f"identity read-back exit {proc.returncode}"])
-    else:
-        tool_sha = sha256(args.switch_tool)
-        check("switch tool sha256", [] if tool_sha == args.switch_sha256 else [f"{tool_sha} is not the pinned {args.switch_sha256}"], tool_sha[:12])
-        check("rollback prefix intact", check_prefix(args.tools, args.rollback_prefix, args.rollback_build, args.shim_sha256, False), f"{args.rollback_prefix}: bin/omniroute, BUILD_SHA {args.rollback_build}, shim v2")
-        check("target prefix intact", check_prefix(args.tools, args.target_prefix, args.target_build, args.shim_sha256, True), f"{args.target_prefix}: bin/omniroute, BUILD_SHA {args.target_build}, shim v2, drain marker")
-        ident = [sys.executable, args.identity_script, "--label", "pre-switch", "--unit", args.unit, "--port", str(args.port), "--tools", args.tools, "--expect-prefix", args.rollback_prefix, "--expect-build", args.rollback_build]
-        if args.pid:
-            ident += ["--pid", args.pid]
-        proc = subprocess.run(ident, capture_output=True, text=True)
-        print("   " + (proc.stdout.strip() or proc.stderr.strip()))
-        check("unit runs the rollback prefix, health ok", [] if proc.returncode == 0 else [f"identity read-back exit {proc.returncode}"])
+    tool_sha = sha256(args.switch_tool)
+    check("switch tool sha256", [] if tool_sha == args.switch_sha256 else [f"{tool_sha} is not the pinned {args.switch_sha256}"], tool_sha[:12])
+    check("rollback prefix intact", check_prefix(args.tools, args.rollback_prefix, args.rollback_build, args.shim_sha256, False), f"{args.rollback_prefix}: bin/omniroute, BUILD_SHA {args.rollback_build}, shim v2")
+    check("target prefix intact", check_prefix(args.tools, args.target_prefix, args.target_build, args.shim_sha256, True), f"{args.target_prefix}: bin/omniroute, BUILD_SHA {args.target_build}, shim v2, drain marker")
+    ident = [sys.executable, args.identity_script, "--label", "pre-switch", "--unit", args.unit, "--port", str(args.port), "--tools", args.tools, "--expect-prefix", args.rollback_prefix, "--expect-build", args.rollback_build]
+    if args.pid:
+        ident += ["--pid", args.pid]
+    proc = subprocess.run(ident, capture_output=True, text=True)
+    print("   " + (proc.stdout.strip() or proc.stderr.strip()))
+    check("unit runs the rollback prefix, health ok", [] if proc.returncode == 0 else [f"identity read-back exit {proc.returncode}"])
 
     first, active, tolerated, seen_all, problems, samples = None, {}, set(), set(), [], 0
-    unrelated_seen = 0
     pend0 = pending_total(args.port)
     end = time.time() + args.clean_for
     while True:
@@ -335,7 +228,6 @@ def main():
         now_problems = []
         try:
             conns = connections(args.port)
-            unrelated_seen = max(unrelated_seen, conns.unrelated)
         except ObservationError as error:
             conns = {}
             now_problems.append(f"the socket observation failed: {error}")
@@ -379,8 +271,8 @@ def main():
         problems.append(f"{len(active)} ACTIVE connection(s) to port {args.port}: {reasons}")
     idle = len(seen_all) - len(tolerated) - len(active)
     check(f"nothing in flight for {args.clean_for:.0f} s ({samples} samples)", sorted(set(problems)), f"{idle} idle and {len(tolerated)} tolerated connection(s)")
-    print(f"INFO unrelated_remote_records={unrelated_seen} connections_seen={len(seen_all)} connections_tolerated={len(tolerated)} connections_active={len(active)} connections_idle={idle} pending_total_before={pend0} pending_total_after={pend1} pending_changed={pend0 != pend1} hindsight_processes={hindsight_count()}")
-    print(f"{'IDLE' if args.idle_only else 'GUARD'}-RESULT clean={not failed} failed_checks={failed} end={utc()}")
+    print(f"INFO connections_seen={len(seen_all)} connections_tolerated={len(tolerated)} connections_active={len(active)} connections_idle={idle} pending_total_before={pend0} pending_total_after={pend1} pending_changed={pend0 != pend1} hindsight_processes={hindsight_count()}")
+    print(f"GUARD-RESULT clean={not failed} failed_checks={failed} end={utc()}")
     sys.exit(0 if not failed else 4)
 
 

@@ -4,28 +4,12 @@
 # fails if the listening address is not 127.0.0.1 or if the server prints its exposure warning.
 # The child runs in its own process group (set -m). Success needs a health reply (status exactly "ok") while the child is alive AND a listener on the port that belongs to that group,
 # so another OmniRoute instance on any port can neither make this smoke pass nor be killed by it (cleanup signals only the owned process group, never a name match),
-# and the smoke succeeds only when that group is OBSERVED empty again afterwards (members are selected on the real PGID column, not with `ps -g`, which selects by session). Version 5: a `ps` that fails, or whose listing does not even contain this shell,
-# is an UNAVAILABLE observation (members() returns 2, group_state says `unavailable`), never an empty group, so a failed final observation fails the smoke instead of proving the cleanup (version 4's members() returned the awk status after `2>/dev/null`, so a failing `ps` read as an empty group).
+# and the smoke succeeds only when that group is empty again afterwards (members are selected on the real PGID column, not with `ps -g`, which selects by session).
 # usage: omniroute-smoke-20261005.sh <prefix directory name under tools/>   e.g. omniroute-3.8.51-npm
-#        SMOKE_SOURCE_ONLY=1 . omniroute-smoke-20261005.sh   defines owned_listener, members, group_state and member_count for the ownership and observation controls only
+#        SMOKE_SOURCE_ONLY=1 . omniroute-smoke-20261005.sh   defines owned_listener and members for the ownership control only
 set -u
 set -m
-members() { # the pids of the owned process group $PGID, one per line; status 0 = the observation succeeded (an empty list is then a real empty group), 2 = it failed or came back garbled
-  local out
-  out=$(ps -eo pid=,pgid= 2>/dev/null) || return 2
-  printf '%s\n' "$out" | awk -v me="$$" '$1 == me { seen = 1 } END { exit seen ? 0 : 1 }' || return 2   # a listing without this very shell is not a process listing
-  printf '%s\n' "$out" | awk -v g="$PGID" '$2 == g { print $1 }'
-}
-group_state() { # empty | alive | unavailable
-  local m
-  m=$(members) || { echo unavailable; return; }
-  if [ -z "$m" ]; then echo empty; else echo alive; fi
-}
-member_count() { # the number of members, or `unavailable`
-  local m
-  m=$(members) || { echo unavailable; return; }
-  printf '%s' "$m" | grep -c . || true
-}
+members() { ps -eo pid=,pgid= 2>/dev/null | awk -v g="$PGID" '$2 == g { print $1 }'; }
 owned_listener() { # yes when a listener on $PORT belongs to the process group $PGID
   local p
   for p in $(ss -ltnpH "sport = :$PORT" 2>/dev/null | grep -o 'pid=[0-9]*' | cut -d= -f2 | sort -u); do
@@ -74,18 +58,17 @@ loopback=no
 warned=no
 grep -q "SECURITY: listening on" "$S/serve.log" 2>/dev/null && warned=yes
 echo "prefix=$NAME port=$PORT health_ok=$ok listener_owned_by_child=$owned listening_address=${listen:-none} loopback_only=$loopback exposure_warning_printed=$warned body=${body:-none} child_alive=$(kill -0 "$PID" 2>/dev/null && echo yes || echo no)"
-echo "processes in the owned process group $PGID before cleanup: $(member_count)"
+echo "processes in the owned process group $PGID before cleanup: $(members | wc -l)"
 echo "--- first log lines:"
 head -c 1500 "$S/serve.log" | head -14
 kill -- "-$PGID" 2>/dev/null
-for _ in 1 2 3 4 5 6 7 8 9 10; do [ "$(group_state)" = empty ] && break; sleep 0.5; done
-if [ "$(group_state)" != empty ]; then
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -z "$(members)" ] && break; sleep 0.5; done
+if [ -n "$(members)" ]; then
   kill -9 -- "-$PGID" 2>/dev/null
-  for _ in 1 2 3 4 5 6; do [ "$(group_state)" = empty ] && break; sleep 0.5; done
+  for _ in 1 2 3 4 5 6; do [ -z "$(members)" ] && break; sleep 0.5; done
 fi
 wait "$PID" 2>/dev/null
-final=$(group_state)
-left=$(member_count)
-echo "processes left in the owned process group $PGID: $left (final observation: $final)"
+left=$(members | wc -l)
+echo "processes left in the owned process group $PGID: $left"
 echo "scratch dir: $S (remove with rm -rf after reading)"
-[ "$ok" = yes ] && [ "$loopback" = yes ] && [ "$warned" = no ] && [ "$final" = empty ]
+[ "$ok" = yes ] && [ "$loopback" = yes ] && [ "$warned" = no ] && [ "$left" -eq 0 ]

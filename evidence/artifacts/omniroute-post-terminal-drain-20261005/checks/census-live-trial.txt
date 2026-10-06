@@ -1,0 +1,89 @@
+# The census on a live quiet window of the UNPATCHED 20128 (build `cf6748d04`, MainPID 341 throughout), 2026-10-06 17:20:02Z-17:26:36Z, with the guard 5 --idle-only receipt of 17:20:33Z (checks/guard-live-trial.txt) taken immediately before the first arm; runner: scripts/census-live-trial.sh.txt.
+# Three real arms through the frozen scripts (client requests of a trivial prompt through the Codex lane: A two requests, B two requests, C one native tool-call turn; the slot was agreed with 5f, whose own launches were held): A raw `responses:eof chat:eof`, B raw `responses:early:0` x2, C one native tool-call turn. The arms' outputs are checks/census-live-trial-arm-*.txt (ids shortened).
+# Result 1, the census on arm A alone (PASS, exit 0): 2 own call rows, 2 usage rows, 2 unique components, 0 foreign rows, 0 orphans, over the window from the guard's end to 5 s after the arm's end. This is the census's exact-match PASS on the live gateway.
+# Result 2, the census on the three arms together (INCONCLUSIVE, exit 2): the same zero foreign rows and zero orphans, and three problems that ARE the bug the patch fixes: the two `responses:early:0` requests of arm B left no call row, and the native tool-call turn of arm C left one of its two call rows. (The scripts judge those: arm B FAIL 2, arm C FAIL 1; the census says INCONCLUSIVE and never FAIL.)
+# In the runner's log the line `ACTIVE control ... exit=4` is the mid-arm guard run: it was not clean by the call_logs recency rule, not because it saw an active connection (checks/guard-live-trial.txt).
+# The runner's own log, then the two census outputs, raw (home directory written $HOME; 8-hex ids only).
+
+## runner log (scripts/census-live-trial.sh.txt)
+trial start 2026-10-06T17:20:02Z
+identity before: exit=0 IDENTITY label=trial-before time=2026-10-06T17:20:02Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=92 
+guard idle-only #1: exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-06T17:20:33.262Z
+ACTIVE control 2026-10-06T17:20:58Z: guard idle-only with the first request of arm A in flight
+guard idle-only #2 (mid-request): exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 10 s (3 samples)'] end=2026-10-06T17:21:08.808Z
+arm A done 2026-10-06T17:24:05Z: SUMMARY {"PASS": 2} end=2026-10-06T17:24:05.012Z exit=0
+arm B done 2026-10-06T17:25:25Z: SUMMARY {"FAIL": 2} end=2026-10-06T17:25:25.262Z exit=1
+arm C done 2026-10-06T17:26:36Z: SUMMARY {'FAIL': 1} end=2026-10-06T17:26:36.548Z exit=1
+identity after: exit=0 IDENTITY label=trial-after time=2026-10-06T17:26:36Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=95 
+trial end 2026-10-06T17:26:36Z
+
+## census on arm A alone: python3 window-census.py --guard-receipt guard-idle-1.txt --require-arms 1 arm-A-raw.txt
+CENSUS version=1 script_sha256=e6bcf75da93e61eeb5f05b8935a16a47a718a2ae55db45141abc940478924944 db=~/.local/share/omniroute/storage.sqlite arms=1 required_arms=1 guard_receipt=guard-idle-1.txt diagnostic=False
+INPUT arm=1 file=arm-A-raw.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=2 start=2026-10-06T17:20:33.000Z end=2026-10-06T17:24:05.012Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
+GUARD file=guard-idle-1.txt version=5 mode=idle-only clean_for=30.0 start=2026-10-06T17:20:02.625Z end=2026-10-06T17:20:33.262Z clean=True
+IDENTITY-CHECK guard MainPID=341 started=Tue_2026-10-06_09:51:19_EDT; compared with 0 of 1 arm(s) (a direct run carries no identity line)
+GUARD-TO-FIRST-ARM gap_s=0.1 (the guard's end to the first script's own start; needed: 0 <= gap <= 600)
+WINDOW start=2026-10-06T17:20:33.262Z end=2026-10-06T17:24:10.012Z (the guard receipt end .. the last arm end + 5 s); usage rows read 2026-10-06T17:20:30.262Z .. 2026-10-06T17:24:13.012Z (the window padded by the 3 s of the scripts' candidate query)
+TILES 1: arm-A-raw.txt 2026-10-06T17:20:33.262Z..2026-10-06T17:24:10.012Z
+CLOCKS arm intervals: the host clock (the wrapper's date -u stamps, the scripts' datetime.now(UTC)); rows: the gateway process's own clock (new Date() in UTC), same machine; own rows must lie inside their arm's interval with a margin of 2 s; the guard's end is the host clock
+IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)
+QUERY own-raw: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where (correlation_id is not null and correlation_id = ?) or (response_id is not null and response_id = ?) order by timestamp
+QUERY own-native: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where session_tag = ? order by timestamp
+QUERY window-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id
+QUERY window-usage: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? order by timestamp, id
+QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp
+QUERY odd-calls: select count(*) from call_logs where timestamp like ? and timestamp not glob ?
+QUERY odd-usage: select count(*) from usage_history where timestamp like ? and timestamp not glob ?
+BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T17:20:33.262Z, 2026-10-06T17:24:10.012Z); window-usage: (2026-10-06T17:20:30.262Z, 2026-10-06T17:24:13.012Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; odd-*: (the date + '%', '????-??-??T??:??:??.???Z') for each date of the padded window
+STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro)
+FORMAT dates=['2026-10-06'] call_logs_rows_with_another_timestamp_format=0 usage_history_rows_with_another_timestamp_format=0
+OWN call rows=2 per arm={1: 2}
+CLOCK arm=1 own_rows=2 min_s_after_arm_start=6.1 min_s_before_arm_end=126.0
+WINDOW-ROWS call_logs=2 own=2 foreign=0; usage_history=2
+MATCHING own_call_rows=2 components=2 statuses={'unique': 2} own_call_rows_without_usage_row=0 look_alike_usage_rows_that_do_not_associate=0
+ORPHANS usage_rows_in_window=2 associated_with_an_own_call_row=2 orphans=0
+COUNTS own call rows by (connection, path, model): [(('f687e62f', '/v1/chat/completions', 'gpt-6-astra'), 1), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
+COUNTS usage rows of the window by (connection, endpoint, model): [(('f687e62f', '/v1/chat/completions', 'gpt-6-astra'), 1), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
+TILE 1: foreign_calls=0, orphans=0, own_calls=2, usage=2
+NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata equal to an own request's, standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)
+CENSUS-RESULT PASS exit=0 problems=0
+
+## census on arms A, B and C: python3 window-census.py --guard-receipt guard-idle-1.txt --require-arms 3 arm-A-raw.txt arm-B-race.txt arm-C-native.txt
+CENSUS version=1 script_sha256=e6bcf75da93e61eeb5f05b8935a16a47a718a2ae55db45141abc940478924944 db=~/.local/share/omniroute/storage.sqlite arms=3 required_arms=3 guard_receipt=guard-idle-1.txt diagnostic=False
+INPUT arm=1 file=arm-A-raw.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=2 start=2026-10-06T17:20:33.000Z end=2026-10-06T17:24:05.012Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
+INPUT arm=2 file=arm-B-race.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=2 start=2026-10-06T17:24:05.000Z end=2026-10-06T17:25:25.262Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
+INPUT arm=3 file=arm-C-native.txt kind=native script_version=2.1 script_sha256=db2a4d42d6ca requests=1 start=2026-10-06T17:25:25.000Z end=2026-10-06T17:26:36.548Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
+GUARD file=guard-idle-1.txt version=5 mode=idle-only clean_for=30.0 start=2026-10-06T17:20:02.625Z end=2026-10-06T17:20:33.262Z clean=True
+IDENTITY-CHECK guard MainPID=341 started=Tue_2026-10-06_09:51:19_EDT; compared with 0 of 3 arm(s) (a direct run carries no identity line)
+GUARD-TO-FIRST-ARM gap_s=0.1 (the guard's end to the first script's own start; needed: 0 <= gap <= 600)
+WINDOW start=2026-10-06T17:20:33.262Z end=2026-10-06T17:26:41.548Z (the guard receipt end .. the last arm end + 5 s); usage rows read 2026-10-06T17:20:30.262Z .. 2026-10-06T17:26:44.548Z (the window padded by the 3 s of the scripts' candidate query)
+TILES 1: arm-A-raw.txt 2026-10-06T17:20:33.262Z..2026-10-06T17:24:05.012Z | 2: arm-B-race.txt 2026-10-06T17:24:05.012Z..2026-10-06T17:25:25.262Z | 3: arm-C-native.txt 2026-10-06T17:25:25.262Z..2026-10-06T17:26:41.548Z
+CLOCKS arm intervals: the host clock (the wrapper's date -u stamps, the scripts' datetime.now(UTC)); rows: the gateway process's own clock (new Date() in UTC), same machine; own rows must lie inside their arm's interval with a margin of 2 s; the guard's end is the host clock
+IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)
+QUERY own-raw: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where (correlation_id is not null and correlation_id = ?) or (response_id is not null and response_id = ?) order by timestamp
+QUERY own-native: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where session_tag = ? order by timestamp
+QUERY window-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id
+QUERY window-usage: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? order by timestamp, id
+QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp
+QUERY odd-calls: select count(*) from call_logs where timestamp like ? and timestamp not glob ?
+QUERY odd-usage: select count(*) from usage_history where timestamp like ? and timestamp not glob ?
+BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T17:20:33.262Z, 2026-10-06T17:26:41.548Z); window-usage: (2026-10-06T17:20:30.262Z, 2026-10-06T17:26:44.548Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; odd-*: (the date + '%', '????-??-??T??:??:??.???Z') for each date of the padded window
+STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro)
+FORMAT dates=['2026-10-06'] call_logs_rows_with_another_timestamp_format=0 usage_history_rows_with_another_timestamp_format=0
+PROBLEM arm 2 request 1 (responses:early:0, corr e0c91234, response 45523cc1): 0 own call row(s) (exactly 1 is needed)
+PROBLEM arm 2 request 2 (responses:early:0, corr ab8ed6a6, response aced4bc1): 0 own call row(s) (exactly 1 is needed)
+PROBLEM arm 3 turn 1 (two-request, session fdebb41c): 1 own call row(s) (at least 2 are needed)
+OWN call rows=3 per arm={1: 2, 3: 1}
+CLOCK arm=1 own_rows=2 min_s_after_arm_start=6.1 min_s_before_arm_end=126.0
+CLOCK arm=2 own_rows=0
+CLOCK arm=3 own_rows=1 min_s_after_arm_start=4.0 min_s_before_arm_end=67.6
+WINDOW-ROWS call_logs=3 own=3 foreign=0; usage_history=3
+MATCHING own_call_rows=3 components=3 statuses={'unique': 3} own_call_rows_without_usage_row=0 look_alike_usage_rows_that_do_not_associate=0
+ORPHANS usage_rows_in_window=3 associated_with_an_own_call_row=3 orphans=0
+COUNTS own call rows by (connection, path, model): [(('c598365c', '/v1/responses', 'gpt-6-astra'), 1), (('f687e62f', '/v1/chat/completions', 'gpt-6-astra'), 1), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
+COUNTS usage rows of the window by (connection, endpoint, model): [(('c598365c', '/v1/responses', 'gpt-6-astra'), 1), (('f687e62f', '/v1/chat/completions', 'gpt-6-astra'), 1), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
+TILE 1: foreign_calls=0, orphans=0, own_calls=2, usage=2
+TILE 2: foreign_calls=0, orphans=0, own_calls=0, usage=0
+TILE 3: foreign_calls=0, orphans=0, own_calls=1, usage=1
+NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata equal to an own request's, standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)
+CENSUS-RESULT INCONCLUSIVE exit=2 problems=3

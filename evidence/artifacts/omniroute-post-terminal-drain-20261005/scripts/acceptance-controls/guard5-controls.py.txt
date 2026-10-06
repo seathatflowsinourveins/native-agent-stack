@@ -1,0 +1,236 @@
+#!/usr/bin/env python3
+"""Controls for pre-switch guard version 5 (full-scope read of 8f9d89662, P2-2 and P2-3): the strict `ss` parse and the full-tuple connection keys, on fixtures built from records CAPTURED on the live host (2026-10-06, `ss -O -Htnpi state established '( sport = :20128 or dport = :20128 )'`).
+Guard version 4 (pre-switch-guard-20261006-v4.py, superseded) runs on the same records in its own two-line format where a control reproduces a defect the review named. Part K: the connection parser in-process (the module is loaded without its trailing main() call and `sh` is replaced by a fixture, so no host state is read);
+part E: the whole guard in --idle-only mode as a subprocess with an `ss` shim first on PATH, a stub identity script and a scratch database.
+usage: guard5-controls.py [--guard5 FILE] [--guard4 FILE]
+"""
+import argparse
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+COORD = Path.home() / ".local/state/native-agent-stack/coordination/peer-99-20261004"
+ap = argparse.ArgumentParser()
+ap.add_argument("--guard5", default=str(COORD / "pre-switch-guard-20261006.py"))
+ap.add_argument("--guard4", default=str(COORD / "pre-switch-guard-20261006-v4.py"))
+args = ap.parse_args()
+UNEXPECTED = []
+
+
+def load(path):
+    """The guard module's functions without running its main(): everything above the trailing `try: main()` block."""
+    text = Path(path).read_text(encoding="utf-8")
+    head = text.split("\ntry:\n    main()")[0]
+    ns = {"__file__": str(path), "__name__": "guard_under_test"}
+    exec(compile(head, str(path), "exec"), ns)
+    return ns
+
+
+G5, G4 = load(args.guard5), load(args.guard4)
+
+# ---- records captured on the live host (the info strings are the real ones; only ports and pids are replaced below)
+REAL_INFO_IDLE = "cubic wscale:10,10 rto:200 rtt:0.293/0.146 mss:1448 pmtu:1500 rcvmss:536 advmss:1448 cwnd:10{tx} bytes_acked:1{rx} segs_out:2 segs_in:1 send 395000000bps lastsnd:20516 lastrcv:20516 lastack:20516 pacing_rate 790000000bps delivered:1 app_limited reordering:15 rcv_space:14480 rcv_ssthresh:64088 minrtt:0.293 snd_wnd:64512"
+NAME_SERVER, NAME_CLIENT = "omniroute (v16.", "omniroute (v16."
+
+
+def info(tx=0, rx=0):
+    return REAL_INFO_IDLE.format(tx=f" bytes_sent:{tx}" if tx else "", rx=f" bytes_received:{rx}" if rx else "")
+
+
+def rec(side, cip, cport, sip="127.0.0.1", sport=20128, recvq=0, sendq=0, rx=0, tx=0, owner=None, tcp_info=True, info_text=None):
+    """A record of the connection (cip:cport -> sip:sport): the SERVER end (local = server) or the CLIENT end (local = client), as ss prints it. rx/tx are the END's own bytes_received and bytes_sent."""
+    local, peer = (f"{sip}:{sport}", f"{cip}:{cport}") if side == "server" else (f"{cip}:{cport}", f"{sip}:{sport}")
+    users = f' users:(("{owner[0]}",pid={owner[1]},fd={owner[2]}))' if owner else ""
+    text = info_text if info_text is not None else (info(tx, rx) if tcp_info else "")
+    return f"{recvq:<6} {sendq:<6} {local} {peer}{users} {text}".rstrip()
+
+
+def to_two_line(lines):
+    """The same records in guard 4's format (`ss -Htnpi`: an address line, then the info line indented by a tab)."""
+    out = []
+    for line in lines:
+        m = re.match(r"^(\d+\s+\d+\s+\S+\s+\S+)(\s+users:\(\(.*?\)\))?\s*(.*)$", line)
+        out += [m.group(1) + (m.group(2) or ""), "\t " + m.group(3)]
+    return out
+
+
+LISTEN_OK = "LISTEN 0      511    127.0.0.1:20128 0.0.0.0:*"
+
+
+def fake_sh(listen_lines, record_lines, two_line=False, ss_rc=0, listen_rc=0):
+    def sh(*a):
+        if a[0] == "ss" and a[1] == "-Htln":
+            return subprocess.CompletedProcess(a, listen_rc, "\n".join(listen_lines) + ("\n" if listen_lines else ""), "ss: fixture failure" if listen_rc else "")
+        if a[0] == "ss":
+            lines = to_two_line(record_lines) if two_line else record_lines
+            return subprocess.CompletedProcess(a, ss_rc, "\n".join(lines) + ("\n" if lines else ""), "ss: fixture failure" if ss_rc else "")
+        raise AssertionError(f"unexpected command {a}")
+    return sh
+
+
+def run_guard(ns, records, listen=(LISTEN_OK,), two_line=False, **kw):
+    ns["sh"] = fake_sh(list(listen), records, two_line=two_line, **kw)
+    try:
+        c = ns["connections"](20128)
+        return "OK", {k: (v["counters"], v["owners"]) for k, v in c.items()}, getattr(c, "unrelated", None)
+    except ns["ObservationError"] as e:
+        return "ObservationError", str(e)[:150], None
+    except Exception as e:  # a guard that crashes is not an observation either
+        return "CRASH", f"{type(e).__name__}: {str(e)[:100]}", None
+
+
+def show(case, title, expect5, records, expect4=None, **kw):
+    """Run guard 5 on the records (and guard 4 on the same records in its format when expect4 is given); expect5 / expect4 are 'OK' or 'ObservationError' or a predicate on the result."""
+    print(f"### {case}: {title}")
+    kind5, res5, unrel = run_guard(G5, records, **kw)
+    ok5 = (kind5 == expect5) if isinstance(expect5, str) else bool(expect5(kind5, res5, unrel))
+    print(f"    guard 5: {kind5} {res5}" + (f" (unrelated records: {unrel})" if unrel else "") + f"   [{'as expected' if ok5 else 'UNEXPECTED'}]")
+    if not ok5:
+        UNEXPECTED.append(case)
+    if expect4 is not None:
+        kind4, res4, _ = run_guard(G4, records, two_line=True, **{k: v for k, v in kw.items() if k != "listen"})
+        ok4 = expect4(kind4, res4) if callable(expect4) else (kind4 == expect4)
+        print(f"    guard 4 (the defect): {kind4} {res4}   [{'as expected' if ok4 else 'UNEXPECTED'}]")
+        if not ok4:
+            UNEXPECTED.append(case + "/v4")
+    return kind5, res5
+
+
+FW = ("omniroute (v16.", 2335, 34)
+SRV = ("omniroute (v16.", 2311, 36)
+CODEX = ("codex", 1521275, 20)
+
+
+def conn(cip, cport, rx_server=0, tx_server=0, recvq=0, client_owner=FW, server_owner=SRV, **kw):
+    """Both records of one connection. rx_server/tx_server are the SERVER end's bytes_received/bytes_sent (the counters the guard reads)."""
+    return [rec("server", cip, cport, rx=rx_server, tx=tx_server, recvq=recvq, owner=server_owner, **kw), rec("client", cip, cport, rx=tx_server, tx=rx_server, owner=client_owner, **kw)]
+
+
+print("# guard 5 controls: the connection parser on records captured on the live host")
+print(f"# guard 5: sha256 {__import__('hashlib').sha256(Path(args.guard5).read_bytes()).hexdigest()}; guard 4 (superseded): sha256 {__import__('hashlib').sha256(Path(args.guard4).read_bytes()).hexdigest()}")
+print(f"# started {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; python {sys.version.split()[0]}\n")
+
+# K1: record orders ------------------------------------------------------------------------------------------------------------------------------
+A, B = conn("127.0.0.1", 57989), conn("127.0.0.1", 59077, rx_server=729017, tx_server=1559298, client_owner=CODEX)
+same = lambda kind, res, unrel: kind == "OK" and len(res) == 2 and res["127.0.0.1:59077 -> 127.0.0.1:20128"] == ((0, 0, 729017, 1559298), [1521275]) and res["127.0.0.1:57989 -> 127.0.0.1:20128"] == ((0, 0, 0, 0), [2335])
+show("K1a", "an idle connection and a busy one (the real sample's shape), server end printed first", same, A + B, expect4="OK")
+show("K1b", "the same records, client end printed first", same, [A[1], A[0], B[1], B[0]], expect4="OK")
+show("K1c", "the same records interleaved and in reverse order", same, [B[1], A[0], B[0], A[1]], expect4="OK")
+
+# K2: the same client port from two client addresses ------------------------------------------------------------------------------------------------
+IDLE127 = conn("127.0.0.1", 50000)
+BUSY2 = conn("127.0.0.2", 50000, rx_server=4096, tx_server=0, recvq=512, client_owner=None)
+two = lambda kind, res, unrel: kind == "OK" and len(res) == 2 and res["127.0.0.2:50000 -> 127.0.0.1:20128"][0] == (512, 0, 4096, 0) and res["127.0.0.1:50000 -> 127.0.0.1:20128"][0] == (0, 0, 0, 0)
+hides = lambda kind, res: kind == "OK" and len(res) == 1
+show("K2a", "the same client PORT from two client addresses (127.0.0.1:50000 idle, 127.0.0.2:50000 with queued data), idle one first: two connections with their own counters; guard 4 keys by the client port alone and sees ONE", two, IDLE127 + BUSY2, expect4=hides)
+show("K2b", "the same records, the busy connection first (guard 4's single entry is whichever record came last)", two, BUSY2 + IDLE127, expect4=hides)
+
+# K3-K5: incomplete and malformed records -------------------------------------------------------------------------------------------------------------
+show("K3", "a server-end record with NO TCP info at all (users field only): guard 4 reads its counters as zero (an idle connection); guard 5 refuses",
+     "ObservationError", [rec("server", "127.0.0.1", 51000, owner=SRV, tcp_info=False), rec("client", "127.0.0.1", 51000, owner=FW)], expect4="OK")
+show("K4", "a server-end record whose info lacks mss: and cwnd: (a truncated line): guard 4 reads zeros; guard 5 refuses",
+     "ObservationError", [rec("server", "127.0.0.1", 51001, owner=SRV, info_text="cubic wscale:10,10 rto:200"), rec("client", "127.0.0.1", 51001, owner=FW)], expect4="OK")
+for case, bad in (("K5a", "bytes_received:abc"), ("K5b", "bytes_sent:"), ("K5c", "bytes_sent:12x"), ("K5d", "bytes_received:-5"), ("K5e", "bytes_sent:1 bytes_sent:2")):
+    srv = rec("server", "127.0.0.1", 51002, owner=SRV, info_text=REAL_INFO_IDLE.format(tx="", rx="") + " " + bad)
+    show(case, f"malformed counter `{bad}` on the server end: guard 4 reads it as zero (or ignores it); guard 5 refuses", "ObservationError", [srv, rec("client", "127.0.0.1", 51002, owner=FW)], expect4=lambda k, r: k == "OK")
+show("K5f", "bytes_sent and bytes_received ABSENT on a well-formed record (ss omits them when zero): a real zero, accepted, with the right counters", lambda k, r, u: k == "OK" and list(r.values())[0][0] == (0, 0, 0, 0), conn("127.0.0.1", 51003))
+show("K5g", "queues that are not numbers", "ObservationError", ["x      0      127.0.0.1:20128 127.0.0.1:51004 " + info(), rec("client", "127.0.0.1", 51004)])
+
+# K6-K7: unmatched and conflicting ends ----------------------------------------------------------------------------------------------------------------
+show("K6a", "a CLIENT-end record whose server end is missing: guard 4 drops it silently (no connection reported); guard 5 fails closed", "ObservationError", [rec("client", "127.0.0.1", 52000, owner=CODEX)], expect4=lambda k, r: k == "OK" and r == {})
+show("K6b", "a SERVER-end record whose client end is missing: guard 4 reports a connection with no owner (an idle keep-alive from another PID namespace); guard 5 fails closed", "ObservationError", [rec("server", "127.0.0.1", 52001, owner=SRV, rx=10)], expect4=lambda k, r: k == "OK" and len(r) == 1)
+show("K7", "two server-end records for the SAME tuple with different counters (a conflicting observation): guard 4 keeps the last; guard 5 fails closed", "ObservationError",
+     [rec("server", "127.0.0.1", 53000, owner=SRV), rec("server", "127.0.0.1", 53000, owner=SRV, rx=999), rec("client", "127.0.0.1", 53000, owner=FW)], expect4=lambda k, r: k == "OK")
+show("K7b", "two client-end records for the same tuple", "ObservationError", [rec("server", "127.0.0.1", 53001, owner=SRV), rec("client", "127.0.0.1", 53001, owner=FW), rec("client", "127.0.0.1", 53001, owner=CODEX)])
+show("K7c", "a record with the listener's address at both ends", "ObservationError", [rec("server", "127.0.0.1", 20128, sip="127.0.0.1", sport=20128, owner=SRV)])
+
+# K8: unrelated remote :20128, IPv6 and mapped addresses -----------------------------------------------------------------------------------------------
+unrel = lambda kind, res, u: kind == "OK" and res == {} and u == 1
+show("K8a", "another host's port 20128 (10.0.0.5:44444 -> 10.0.0.9:20128): not the gateway's, ignored and counted (an unrelated remote :20128 must not fail the guard)", unrel, [rec("client", "10.0.0.5", 44444, sip="10.0.0.9", owner=CODEX)])
+show("K8b", "an IPv6 loopback connection to [::1]:20128 (the gateway does not listen there): unrelated, counted",
+     unrel, ["0      0      [::1]:44445 [::1]:20128 " + info()])
+mapped = [rec("server", "127.0.0.1", 54000, owner=SRV), "0      0      [::ffff:127.0.0.1]:54000 [::ffff:127.0.0.1]:20128 " + info()]
+show("K8c", "an IPv4-mapped IPv6 client end paired with its plain IPv4 server end: the addresses are normalized, ONE connection", lambda k, r, u: k == "OK" and len(r) == 1, mapped)
+
+# K9: listeners ----------------------------------------------------------------------------------------------------------------------------------------
+show("K9a", "the port listens on 0.0.0.0 (not loopback only): the classification does not hold, refused", "ObservationError", conn("127.0.0.1", 55000), listen=["LISTEN 0      511    0.0.0.0:20128 0.0.0.0:*"])
+show("K9b", "the port listens on * (all addresses): refused", "ObservationError", conn("127.0.0.1", 55001), listen=["LISTEN 0      511    *:20128 *:*"])
+show("K9c", "nothing listens on the port: refused", "ObservationError", conn("127.0.0.1", 55002), listen=[])
+show("K9d", "`ss -Htln` fails (exit 1): refused", "ObservationError", conn("127.0.0.1", 55003), listen_rc=1)
+show("K9e", "`ss` (the connection query) fails (exit 2): refused", "ObservationError", conn("127.0.0.1", 55004), ss_rc=2)
+show("K9f", "two listeners, one non-loopback: refused", "ObservationError", conn("127.0.0.1", 55005), listen=[LISTEN_OK, "LISTEN 0      511    192.168.1.5:20128 0.0.0.0:*"])
+
+# K10-K11: users field and framing -------------------------------------------------------------------------------------------------------------------
+show("K10a", "no users field on the client end (an owner in another PID namespace): accepted, owners []", lambda k, r, u: k == "OK" and list(r.values())[0][1] == [], conn("127.0.0.1", 56000, client_owner=None))
+bad_users = [rec("server", "127.0.0.1", 56001, owner=SRV), '0      0      127.0.0.1:56001 127.0.0.1:20128 users:(("x",pid=,fd=3)) ' + info()]
+show("K10b", "a users field with an empty pid", "ObservationError", bad_users)
+late = [rec("server", "127.0.0.1", 56002, owner=SRV), "0      0      127.0.0.1:56002 127.0.0.1:20128 " + info() + ' users:(("x",pid=5,fd=3))']
+show("K10c", "a users field after the info (an unexpected position)", "ObservationError", late)
+show("K11a", "a blank line between records", "ObservationError", [conn("127.0.0.1", 57000)[0], "", conn("127.0.0.1", 57000)[1]])
+show("K11b", "no connections at all (empty output): an idle gateway, accepted", lambda k, r, u: k == "OK" and r == {}, [])
+show("K11c", "a line that is not a record (an error text on stdout)", "ObservationError", ["RTNETLINK answers: Invalid argument"] + conn("127.0.0.1", 57001))
+
+# ---- part E: the whole guard (idle-only) as a subprocess ------------------------------------------------------------------------------------------------
+print("\n### part E: the whole guard 5 in --idle-only mode against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1)")
+work = Path(tempfile.mkdtemp(prefix="guard5-controls-", dir=Path.home() / ".cache"))
+os.chmod(work, 0o700)
+db = work / "calls.sqlite"
+con = sqlite3.connect(db)
+con.execute("create table call_logs (id text, timestamp text)")
+con.execute("insert into call_logs values ('x', '2026-01-01T00:00:00.000Z')")   # a row far older than 120 s: the recency check holds
+con.commit()
+con.close()
+ident = work / "identity-stub.py"
+ident.write_text("import sys\nprint('IDENTITY label=idle-only stub health=ok')\nsys.exit(0)\n")
+shim_dir = work / "shim"
+shim_dir.mkdir()
+(shim_dir / "ss").write_text('#!/bin/sh\ncase "$1" in\n  -Htln) cat "$SS_LISTEN" ;;\n  *) cat "$SS_RECORDS" ;;\nesac\nexit "${SS_RC:-0}"\n')
+(shim_dir / "ss").chmod(0o755)
+listen_file = work / "listen.txt"
+listen_file.write_text(LISTEN_OK + "\n")
+
+
+def unit_segment():
+    for line in open("/proc/self/cgroup", encoding="utf-8"):
+        if line.startswith("0::"):
+            return line.strip()[3:].rsplit("/", 1)[-1]
+    return ""
+
+
+MY_UNIT = unit_segment()
+MINE = ("bash", os.getppid(), 3)   # an owner pid whose cgroup is this session's own unit (visible here), used as the tolerated unit's process
+
+
+def guard_e(case, title, records, expect_exit, expect_text, extra=()):
+    rf = work / f"records-{case}.txt"
+    rf.write_text("\n".join(records) + ("\n" if records else ""))
+    env = dict(os.environ, PATH=f"{shim_dir}:{os.environ['PATH']}", SS_LISTEN=str(listen_file), SS_RECORDS=str(rf))
+    cmd = [sys.executable, args.guard5, "--idle-only", "--identity-script", str(ident), "--db", str(db), "--worker-pattern", "nonexistent-process-pattern-for-the-controls", "--clean-for", "2", "--interval", "1", "--tolerate-unit", MY_UNIT, *extra]
+    p = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=120)
+    out = p.stdout
+    last = [l for l in out.splitlines() if l.startswith(("IDLE-RESULT", "GUARD-RESULT"))][-1:]
+    fails = [l.strip()[:200] for l in out.splitlines() if "the socket observation failed" in l or "ACTIVE connection" in l][:1]
+    ok = p.returncode == expect_exit and (expect_text in out or not expect_text)
+    print(f"### {case}: {title}\n    exit={p.returncode} {last[0] if last else p.stderr.strip()[:160]}" + (f"\n    {fails[0]}" if fails else "") + f"   [{'as expected' if ok else 'UNEXPECTED'}]")
+    if not ok:
+        UNEXPECTED.append(case)
+
+
+guard_e("E1", "an idle gateway (one empty connection of the tolerated unit): exit 0, IDLE-RESULT clean=True (and never a GUARD-RESULT line)", [r for r in conn("127.0.0.1", 58000, client_owner=MINE)], 0, "IDLE-RESULT clean=True")
+guard_e("E2", "a server-end record with no TCP info: the guard FAILS (exit 4), where guard 4 would have read zeros", [rec("server", "127.0.0.1", 58001, owner=SRV, tcp_info=False), rec("client", "127.0.0.1", 58001, owner=MINE)], 4, "the socket observation failed")
+guard_e("E3", "a client-only record: the guard FAILS (exit 4)", [rec("client", "127.0.0.1", 58002, owner=MINE)], 4, "the socket observation failed")
+guard_e("E4a", "the same client port from two client addresses: an empty connection of the tolerated unit and a connection with queued data, idle one first: the busy one is ACTIVE (exit 4)", conn("127.0.0.1", 58003, client_owner=MINE) + conn("127.0.0.2", 58003, recvq=300, client_owner=None), 4, "ACTIVE connection")
+guard_e("E4b", "the same records, the busy connection first: the same verdict", conn("127.0.0.2", 58003, recvq=300, client_owner=None) + conn("127.0.0.1", 58003, client_owner=MINE), 4, "ACTIVE connection")
+guard_e("E5", "an unrelated remote :20128 record next to an idle gateway: exit 0 (not a failure)", [rec("client", "10.0.0.5", 44444, sip="10.0.0.9", owner=MINE)], 0, "IDLE-RESULT clean=True")
+p = subprocess.run([sys.executable, args.guard5, "--identity-script", str(ident)], capture_output=True, text=True)
+print(f"### E6: without --switch-tool and without --idle-only the guard refuses to start (usage error, exit 3)\n    exit={p.returncode} {p.stderr.strip()[:120]}   [{'as expected' if p.returncode == 3 else 'UNEXPECTED'}]")
+if p.returncode != 3:
+    UNEXPECTED.append("E6")
+print(f"\n# scratch directory (remove with rm -rf after reading): {work}")
+print(f"# finished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; scenarios not as expected: {UNEXPECTED or 'none'}")
+sys.exit(1 if UNEXPECTED else 0)

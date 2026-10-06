@@ -1,13 +1,10 @@
 #!/bin/bash
-# Controls for the exit-code logic of scripts/build-drain.sh.txt (version 5): gate(), compare_dry_run(), write_sums() and tree_clean_gate() are SOURCED (BUILD_DRAIN_SOURCE_ONLY=1) and exercised with failing and passing inputs. Raw output goes to the file named by $1.
+# Controls for the exit-code logic of scripts/build-drain.sh.txt (version 4): gate(), compare_dry_run() and write_sums() are SOURCED (BUILD_DRAIN_SOURCE_ONLY=1) and exercised with failing and passing inputs. Raw output goes to the file named by $1.
 # (1) a failing gate stops the script with exit 3; (2) a passing gate continues; (3) the first build's recorded dry-run metadata equals the kept tarball; (4) a one-byte-corrupted tarball and (5) altered metadata both fail the comparison;
 # (6) write_sums on a writable directory writes and verifies SHA256SUMS (status 0); (7) write_sums when SHA256SUMS cannot be written (a read-only directory) fails; (8) write_sums for a tarball that is not there fails; (9) the exit-3 path of the main flow:
 # the same function result inside the script's own `|| { log ...; exit 3; }` wrapper stops a subshell with exit 3;
 # (10) the real script with a SHIM_SOURCE whose sha256 is not the pinned one stops with exit 2 before it creates a work directory; (11) the same with no shim file at all; (12) the mechanism of the check:pack-boot gate line: with a copy of the pinned shim first on PATH,
 # `lsof -ti :PORT` answers exit 2 with no output (the status upstream's findListeningPids reports as null, so its bind probe decides) and another lsof call passes through to the real lsof.
-# Version 5 adds (13) tree_clean_gate() on a clean repository (succeeds), (14) with an untracked file and (15) with a modified tracked file (both stop with exit 3), (16) with `git status` failing and printing nothing (a git fixture first on PATH; stops with exit 3, while version 4's own
-# line, run on the same fixture, reads the failure as zero lines and passes), (17) with `git diff --quiet HEAD` exiting 1 while `git status` prints nothing (stops), (18) with `git diff` failing (exit 128; stops and says so), and (19) compare_dry_run with a changed entryCount: still succeeds,
-# because the entry count is printed as reported and not compared (what its comment now says).
 set -u
 S=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-build-drain-20261006.sh
 ART=$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005
@@ -68,42 +65,6 @@ PYEOF
   mkdir -p "$W/shim12"; cp "$PINNED_SHIM" "$W/shim12/lsof"; chmod 755 "$W/shim12/lsof"
   env PATH="$W/shim12:$PATH" sh -c 'echo "resolved lsof: $(command -v lsof)"; out=$(lsof -ti :24999); echo "lsof -ti :24999 -> status=$? output=[$out]"; lsof -v > /dev/null 2>&1; echo "lsof -v (pass-through to /usr/bin/lsof) -> status=$?"'
   echo "without the shim, the same query on a port nothing uses: $(lsof -ti :24999 > /dev/null 2>&1; echo "status=$?") (1 = no match, which upstream reads as 'free')"
-  echo "## (13) tree_clean_gate on a clean repository: must succeed"
-  REAL_GIT=$(command -v git)
-  mkdir -p "$W/repo13"; "$REAL_GIT" -C "$W/repo13" init -q; echo one > "$W/repo13/a.txt"; "$REAL_GIT" -C "$W/repo13" add a.txt; "$REAL_GIT" -c user.name=Scout -c user.email=scout@local -c core.hooksPath=/dev/null -C "$W/repo13" commit -q -m one
-  : > "$OUT/progress.txt"; T=$W/repo13; tree_clean_gate; echo "exit=$?"
-  echo "## (14) an untracked file: must stop with exit 3 and list it"
-  echo two > "$W/repo13/b.txt"; tree_clean_gate; echo "exit=$?"; rm -f "$W/repo13/b.txt"
-  echo "## (15) a modified tracked file: must stop with exit 3 and list it"
-  echo changed >> "$W/repo13/a.txt"; tree_clean_gate; echo "exit=$?"; "$REAL_GIT" -C "$W/repo13" checkout -q -- a.txt
-  mkdir -p "$W/gitstub"
-  cat > "$W/gitstub/git" <<'STUBEOF'
-#!/bin/bash
-# fixture git: STUB_GIT_STATUS_RC makes `status` print nothing on stdout and exit with that status, STUB_GIT_DIFF_RC makes `diff` exit with that status; everything else is the real git
-args=("$@"); i=0
-while [ "$i" -lt "${#args[@]}" ]; do case "${args[$i]}" in -c|-C) i=$((i + 2));; *) break;; esac; done
-case "${args[$i]:-}" in
-  status) [ -n "${STUB_GIT_STATUS_RC:-}" ] && { echo "fatal: simulated git status failure" >&2; exit "$STUB_GIT_STATUS_RC"; };;
-  diff) [ -n "${STUB_GIT_DIFF_RC:-}" ] && exit "$STUB_GIT_DIFF_RC";;
-esac
-exec "${STUB_GIT_REAL:?}" "$@"
-STUBEOF
-  chmod 755 "$W/gitstub/git"
-  echo "## (16) git status FAILS (exit 128) and prints nothing: version 5 must stop with exit 3; version 4's own line on the same fixture reads the failure as zero lines and passes (the defect)"
-  ( export PATH="$W/gitstub:$PATH" STUB_GIT_REAL="$REAL_GIT" STUB_GIT_STATUS_RC=128; : > "$OUT/progress.txt"; tree_clean_gate; echo "version 5: exit=$?"
-    set -o pipefail; DIRTY=$(G status --porcelain --untracked-files=all | wc -l | tr -d ' '); echo "version 4's line: DIRTY=$DIRTY; its test [ \"\$DIRTY\" = \"0\" ] $([ "$DIRTY" = "0" ] && echo PASSES, so version 4 went on to the build || echo fails)" )
-  echo "## (17) git diff --quiet HEAD exits 1 while git status prints nothing (fixture): must stop with exit 3"
-  ( export PATH="$W/gitstub:$PATH" STUB_GIT_REAL="$REAL_GIT" STUB_GIT_DIFF_RC=1; : > "$OUT/progress.txt"; tree_clean_gate; echo "exit=$?" )
-  echo "## (18) git diff FAILS (exit 128): must stop with exit 3 and say the tree cannot be compared"
-  ( export PATH="$W/gitstub:$PATH" STUB_GIT_REAL="$REAL_GIT" STUB_GIT_DIFF_RC=128; : > "$OUT/progress.txt"; tree_clean_gate; echo "exit=$?" )
-  echo "## (19) compare_dry_run with a changed entryCount (sha1, integrity and size equal): must still succeed, because the entry count is printed as reported, not compared"
-  python3 - "$DRY" "$W/entries.json" <<'PYEOF2'
-import json, sys
-d = json.load(open(sys.argv[1]))
-d[0]["entryCount"] = 1
-json.dump(d, open(sys.argv[2], "w"))
-PYEOF2
-  compare_dry_run "$W/entries.json" "$ART/omniroute-3.8.51-drain-b7c68690.tgz"; echo "exit=$?"
 } > "$OUTF" 2>&1
 grep -n "write_sums" "$S" | cut -c1-200 >> "$OUTF"
 echo "scratch directory (remove with rm -rf after reading): $W" >> "$OUTF"

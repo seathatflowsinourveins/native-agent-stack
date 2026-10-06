@@ -1,0 +1,11 @@
+# Output of one arm of the census live trial, 2026-10-06 UTC (scripts/census-live-trial.sh.txt): native two-request turn x1, native script 2.1, --expect all-logged (script verdict FAIL: the final request's rows were dropped). The runner added the header, journal and footer lines the wrapper would. No id of this output needed shortening.
+# trial, native codex exec two-request x1, frozen script v2.1, --expect all-logged; started 2026-10-06T17:25:25Z; wrapper kind=trial
+FROZEN version=2.1 script_sha256=db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd argv=['--expect', 'all-logged', '--wait1', '12', '--wait2', '60', 'two-request'] cwd=$WORK start=2026-10-06T17:25:25.549Z expect=all-logged wait1=12.0 wait2=60.0 quiet_timeout=120.0 exec_timeout=300.0 db=$HOME/.local/share/omniroute/storage.sqlite run_id=20261006T172525 template_sha256=a28626ab89a09e2393117069e1c9b9a0d84a44434f94824fcffd6952a4ffb978
+RESULT shape=two-request session_id=acceptance-20261006T172525-two-request-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=2 exec_exit=0 elapsed_s=11.0 client_usage={'input_tokens': 30175, 'cached_input_tokens': 14848, 'output_tokens': 68} command_executions=1 events=7 read1_call_logs=1 read1_usage=1 read1_usage_unestablished=0 rows_tokens_in_out=(15045, 44) rows_complete=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 1 (at least 2 needed)", "the rows hold 15045 input and 44 output tokens, the client used 30175 and 68: a request's rows are missing"]
+   call_logs: ('2026-10-06T17:25:28.966Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 44, 'ready', None, None) id8=307cca8e
+   usage_history: ('2026-10-06T17:25:28.963Z', 'gpt-6-astra', '200', 15045, 44)
+LATE shape=two-request session_id=acceptance-20261006T172525-two-request-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 44) changed=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 1 (at least 2 needed)", "the rows hold 15045 input and 44 output tokens, the client used 30175 and 68: a request's rows are missing"]
+SUMMARY {'FAIL': 1} end=2026-10-06T17:26:36.548Z exit=1
+exit=1
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
+# finished 2026-10-06T17:26:36Z

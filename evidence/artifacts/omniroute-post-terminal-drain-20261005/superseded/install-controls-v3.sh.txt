@@ -1,14 +1,10 @@
 #!/bin/bash
-# Controls and positive runs for scripts/install-drain.sh.txt, VERSION 4 (the install script of the drain build). Raw output goes to the file named by $1; every run prints its exit code.
+# Controls and positive runs for scripts/install-drain.sh.txt, VERSION 3 (the install script of the drain build). Raw output goes to the file named by $1; every run prints its exit code.
 # (1)-(2) the identity check of an installed prefix; (3) a corrupted tarball; (4) the dependency-graph hash; (5)-(7) inputs missing BEFORE npm install (no shim source, a shim source with the wrong hash, no node): each must stop with exit 3
 # and create no prefix; (8) a full positive run into a SCRATCH tools directory that has no NativeStack prefix layout (the situation on 2604: no prefix under the tools directory, the node directory elsewhere), taking the shim from the
 # repository's committed copy; (9) the same positive run's installed prefix verified with --verify-prefix.
-# Version 4 adds the dependency-graph observation's status (full-scope read of 8f9d89662, P3-5), with an `npm` stub first on the script's PATH (NODE_BIN_DIR): (11) --deps-hash with npm exit 1 and an EMPTY output, (12) npm exit 0 with garbage output, (13) npm exit 2 with a valid tree,
-# (14) npm exit 0 with a valid tree that has no dependencies: each must print UNAVAILABLE and exit 5 (version 3's script, run on the same stub in (11), prints an empty fingerprint and exits 0); (15) a full install into a scratch tools directory whose npm stub passes `install` through to the real npm but fails `ls`: the prefix passes every pinned check,
-# the script says the graph could not be observed and exits 6 and does NOT print `installed and verified`; (16) that scratch prefix still verifies with --verify-prefix (the install stands).
 set -u
 S=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-install-drain-b7c68690-20261006.sh
-S3=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-install-drain-b7c68690-20261006.v3.sh
 TOOLS=$HOME/.local/share/codex-ecosystem/tools
 NEWP=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690
 OLDP=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
@@ -56,30 +52,6 @@ cp "$ART/omniroute-3.8.51-drain-b7c68690.tgz" "$SCRATCH/artifacts/"
   echo
   echo "## (10) the dependency-graph hash of that scratch install, next to the NativeStack install's from (4): the tarball does not pin it"
   TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$TOOLS/node-24.21.0/bin bash "$S" --deps-hash ctl-2604-style; echo "exit=$?"
-  echo
-  mkdir -p "$SCRATCH/stub-npm-run" "$SCRATCH/stub-npm-pass"
-  printf '#!/bin/sh\n[ -n "${STUB_NPM_STDOUT:-}" ] && cat "$STUB_NPM_STDOUT"\necho "npm error simulated" >&2\nexit "${STUB_NPM_RC:-0}"\n' > "$SCRATCH/stub-npm-run/npm"
-  chmod 755 "$SCRATCH/stub-npm-run/npm"
-  : > "$SCRATCH/empty.json"; echo "this is not json {" > "$SCRATCH/garbage.json"; echo '{"name": "lib", "dependencies": {"a": {"version": "1.0.0"}}}' > "$SCRATCH/valid.json"; echo '{"name": "lib"}' > "$SCRATCH/nodeps.json"
-  echo "## (11) --deps-hash with an npm stub that exits 1 and prints nothing: version 4 must say UNAVAILABLE and exit 5; version 3, on the same stub, prints an empty fingerprint and exits 0 (the defect)"
-  STUB_NPM_RC=1 STUB_NPM_STDOUT=$SCRATCH/empty.json TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$SCRATCH/stub-npm-run bash "$S" --deps-hash anyprefix; echo "version 4 exit=$?"
-  STUB_NPM_RC=1 STUB_NPM_STDOUT=$SCRATCH/empty.json TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$SCRATCH/stub-npm-run bash "$S3" --deps-hash anyprefix 2>&1 | tail -n 3; echo "version 3 exit=${PIPESTATUS[0]}"
-  echo "## (12) npm exits 0 but prints garbage: UNAVAILABLE, exit 5"
-  STUB_NPM_RC=0 STUB_NPM_STDOUT=$SCRATCH/garbage.json TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$SCRATCH/stub-npm-run bash "$S" --deps-hash anyprefix; echo "exit=$?"
-  echo "## (13) npm exits 2 with a valid tree (a status other than 0 or 1 is not an observation): UNAVAILABLE, exit 5"
-  STUB_NPM_RC=2 STUB_NPM_STDOUT=$SCRATCH/valid.json TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$SCRATCH/stub-npm-run bash "$S" --deps-hash anyprefix; echo "exit=$?"
-  echo "## (14) npm exits 0 with a valid tree that has no dependencies: UNAVAILABLE, exit 5; and with a one-package tree and exit 1 (the ELSPROBLEMS shape) it is an observation: exit 0"
-  STUB_NPM_RC=0 STUB_NPM_STDOUT=$SCRATCH/nodeps.json TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$SCRATCH/stub-npm-run bash "$S" --deps-hash anyprefix; echo "exit=$?"
-  STUB_NPM_RC=1 STUB_NPM_STDOUT=$SCRATCH/valid.json TOOLS_DIR=$SCRATCH/tools NODE_BIN_DIR=$SCRATCH/stub-npm-run bash "$S" --deps-hash anyprefix; echo "exit=$?"
-  echo
-  echo "## (15) a full install into the scratch tools directory with an npm stub that passes install through to the real npm but fails ls: every pinned check passes, then the script must say the graph could not be observed, exit 6, and not print 'installed and verified'"
-  printf '#!/bin/sh\ncase "$1" in ls) echo "npm error simulated ls failure" >&2; exit 1;; esac\nexec "$REAL_NPM" "$@"\n' > "$SCRATCH/stub-npm-pass/npm"
-  chmod 755 "$SCRATCH/stub-npm-pass/npm"
-  ln -sf "$TOOLS/node-24.21.0/bin/node" "$SCRATCH/stub-npm-pass/node"
-  REAL_NPM=$TOOLS/node-24.21.0/bin/npm TOOLS_DIR=$SCRATCH/tools ARTIFACT_DIR=$SCRATCH/artifacts PREFIX_NAME_OVERRIDE=ctl-deps-unavailable NODE_BIN_DIR=$SCRATCH/stub-npm-pass bash "$S"; echo "exit=$?"
-  echo
-  echo "## (16) the prefix of (15) still verifies (the install stands)"
-  TOOLS_DIR=$SCRATCH/tools bash "$S" --verify-prefix ctl-deps-unavailable; echo "exit=$?"
 } > "$OUTF" 2>&1
 echo "scratch directory (remove with rm -rf after reading): $SCRATCH" >> "$OUTF"
 echo "written $OUTF"

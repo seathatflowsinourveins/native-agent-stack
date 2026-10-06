@@ -29,11 +29,19 @@ Each file below was committed with its UUID-shaped strings (the gateway's correl
 | committed file | bytes (unshortened) | sha256 (unshortened) | private copy |
 | --- | --- | --- | --- |
 | `checks/acceptance-controls.txt` | 274917 | `989f0e8882ffd32e07c289637fff9d794375efec91c902bf711012c152801496` | `raw-outputs/checks__acceptance-controls.txt.gz` |
+| `checks/census-live-trial-arm-A-raw.txt` | 2247 | `9a219172d7e65339616e21a14976c258c17b38b250a114304e3bf9ba794b438b` | `raw-outputs/checks__census-live-trial-arm-A-raw.txt.gz` |
+| `checks/census-live-trial-arm-B-race.txt` | 2325 | `58f71eb9ff0556cff63f88962151061c3d26a6ab3fb2960c58e670daa25d8a0b` | `raw-outputs/checks__census-live-trial-arm-B-race.txt.gz` |
 | `checks/handler-e2e-session-tag-results.txt` | 5832 | `19393acdef858a66b6a2ec1fb713f4d37f0a650ddf9f8d870b35ebde6dd7fc51` | `raw-outputs/checks__handler-e2e-session-tag-results.txt.gz` |
 | `checks/live-acceptance-baseline-race.txt` | 4194 | `3dce6b8d192cd8ef5efdb684e337f94501f84e024e361708d3977fa7262e8576` | `raw-outputs/checks__live-acceptance-baseline-race.txt.gz` |
 | `checks/live-acceptance-baseline-raw.txt` | 13833 | `3b39e1ea8294aa4c90291cd6ac13f0f317bf9054f3d3e4e838669b12a4f53062` | `raw-outputs/checks__live-acceptance-baseline-raw.txt.gz` |
 | `checks/live-acceptance-baseline-v1-race.txt` | 3137 | `4c4dd15ce3a3f2f9a0adc21ec05202eea344e3091c25699002adcf633e917e9e` | `raw-outputs/checks__live-acceptance-baseline-v1-race.txt.gz` |
 | `checks/live-acceptance-baseline-v1-raw.txt` | 7189 | `958f880b96a7753eceb908dd77a4bedbacce7e467b5b019834dbfbf75dca66d9` | `raw-outputs/checks__live-acceptance-baseline-v1-raw.txt.gz` |
+| `superseded/acceptance-controls-v2.0.txt` | 132676 | `dd8648aa15689c13c2e0d671d89a07892afa72fd32e7582a01fac9a8b60c8520` | `raw-outputs/superseded__acceptance-controls-v2.0.txt.gz` |
+| `superseded/acceptance-controls-v2.1.txt` | 198451 | `07c6aef63bf542a0efa3246babfd8cc9443460e88e54343b2c05570d9750639b` | `raw-outputs/superseded__acceptance-controls-v2.1.txt.gz` |
 | `superseded/live-acceptance-baseline-attempt1-output.txt` | 6739 | `49203ff64f2f8f783b7889fcafd5388f03daf0fa3dfd81855789415c8546d3c2` | `raw-outputs/superseded__live-acceptance-baseline-attempt1-output.txt.gz` |
 | `superseded/live-acceptance-baseline-v2.0-race.txt` | 4264 | `8662d411eb5f22c6e88e2563d5f9f0107aecfa832674be35fd416a29d97dac38` | `raw-outputs/superseded__live-acceptance-baseline-v2.0-race.txt.gz` |
 | `superseded/live-acceptance-baseline-v2.0-raw.txt` | 8357 | `e49c1d74e3027dd16995558901bf45adac7628e51e8adcc9dd05272a8d932c5b` | `raw-outputs/superseded__live-acceptance-baseline-v2.0-raw.txt.gz` |
+| `superseded/live-acceptance-baseline-v2.1-race.txt` | 3750 | `1f9f64345aadafacd871f5d1f6fb554a3ed319bad7715cff12b9cfa642707287` | `raw-outputs/superseded__live-acceptance-baseline-v2.1-race.txt.gz` |
+| `superseded/live-acceptance-baseline-v2.1-raw.txt` | 13183 | `f71a3f13d7a893111148daff70ba84b4382ed38eec4546209a3510362ae0be99` | `raw-outputs/superseded__live-acceptance-baseline-v2.1-raw.txt.gz` |
+
+Round 11 (after the full-scope read of `8f9d89662`, P3): the four superseded files the manifest had not listed are now listed, with their private copy where it could be rebuilt with the recorded hash (the row says `not retained` where it could not), and the shortened outputs of the census live trial are listed.

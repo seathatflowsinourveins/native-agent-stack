@@ -1,0 +1,27 @@
+# Control for the smoke script's process-group observation (version 5; scripts/smoke-observation-control.sh.txt; 2026-10-06 UTC). A-E exercise the sourced functions on a real process group with a surviving descendant: with `ps` working the group is alive; with `ps` failing while the descendant survives the state is `unavailable` (never `empty`); with `ps` printing nothing it is `unavailable`;
+# version 4's members() on the failing `ps` reads the group as EMPTY although its descendant is alive (the defect); with the group killed and `ps` working it is empty. F1-F3 run the whole smoke against a FIXTURE prefix (a fake `omniroute serve` that answers {"status":"ok"}) with a `ps` fixture that fails once the server has been signalled:
+# F1 without the failure exits 0, F2 (version 5) exits non-zero with `final observation: unavailable`, F3 (version 4) exits 0, the false proof of cleanup. Raw output, home directory written $HOME.
+
+== A-E: the functions, sourced
+a real process group: leader 21969, pgid 21969, with a surviving descendant (the sleep)
+A. ps works, group alive: group_state=alive member_count=2 (expected: alive, 2)
+B. ps FAILS (exit 1, no output) while the descendant survives: group_state=unavailable member_count=unavailable (expected: unavailable, unavailable; never empty)
+C. ps exits 0 with an empty listing: group_state=unavailable (expected: unavailable)
+D. version 4's members() on the failing ps: [] -> the test [ -z "$(members)" ] is TRUE, so version 4 reads the group as EMPTY although its descendant is alive
+[1]+  Terminated              bash -c 'sleep 300 & wait'
+E. the group killed and ps working: group_state=empty member_count=0 (expected: empty, 0)
+== F1-F3: the whole smoke against a fixture prefix in a scratch HOME
+F1. version 5, the fixture prefix, no failing ps (expected exit 0: the fixture is a valid prefix): smoke exit=0
+    prefix=fixtureprefix port=54264 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:54264 loopback_only=yes exposure_warning_printed=no body={"status":"ok"} child_alive=yes
+    processes in the owned process group 22582 before cleanup: 2
+    processes left in the owned process group 22582: 0 (final observation: empty)
+F2. version 5, ps fails once the server is signalled (expected: non-zero, final observation: unavailable): smoke exit=1
+    prefix=fixtureprefix port=53988 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:53988 loopback_only=yes exposure_warning_printed=no body={"status":"ok"} child_alive=yes
+    processes in the owned process group 23339 before cleanup: 2
+    processes left in the owned process group 23339: unavailable (final observation: unavailable)
+F3. version 4, the same failing ps (exit 0: the failed observation was read as an empty group): smoke exit=0
+    prefix=fixtureprefix port=53646 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:53646 loopback_only=yes exposure_warning_printed=no body={"status":"ok"} child_alive=yes
+    processes in the owned process group 23918 before cleanup: 2
+    processes left in the owned process group 23918: 0
+fixture processes left running: 0
+scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-smoke-observation-0Iq7e5

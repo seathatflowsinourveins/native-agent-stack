@@ -1,8 +1,5 @@
 #!/bin/bash
 # Build the composition with the drain patch (v3.8.51 tag + affinity patch + PR 15167 + drain-after-terminal) with upstream's own release scripts, in a scratch tree this script builds itself (nothing is deployed).
-# Version 5 (2026-10-06) closes two findings of the full-scope read of 8f9d89662: the clean-tree gate is a function, tree_clean_gate() (sourceable for its controls), that checks the exit status of `git status --porcelain --untracked-files=all` BEFORE it reads the output
-# (version 4 counted the lines of a failed `git status` as zero, so an unobserved tree passed) and enforces `git diff --quiet HEAD` (exit 0 clean, 1 differences, any other status a git failure; version 4 printed that result without acting on it);
-# and compare_dry_run's comment and output label now say what it enforces (sha1, integrity and size; the entry count is npm's reported metadata, printed and not compared).
 # Version 4 (2026-10-06) runs check:pack-boot with the reviewed lsof shim v2 (sha256 pinned below, a copy in $OUT/shim) first on PATH. Why: the harness (scripts/check/check-pack-boot.mjs) polls http://127.0.0.1:PORT/api/monitoring/health from its first second, with PORT = 23000 + pid % 4000,
 # while the CLI it started runs its port preflight (`lsof -ti :PORT`, which lists CLIENT sockets too); on this host a connect to a closed loopback port that has no socket on it and that the probing script has not bound hangs for 10.5 s instead of being refused, so the harness's own poll is
 # listed and the CLI refuses with "Port PORT is already in use by PID <the harness>" (version 3's two real runs, and checks/preflight-race-reproduction.txt, which reproduces it in a minute and shows the shim passing). The shim is the PATH the deployed prefix runs with:
@@ -10,17 +7,17 @@
 # Version 3 (2026-10-06) adds: the SHA256SUMS write-and-verify step is a function, write_sums(), whose status decides the exit status (version 2 logged "every gate exited 0" whatever the step returned), sourceable for its own controls
 # (a failed write, a missing tarball); the reference to the first version's path is corrected, and the usage line names this file.
 # Version 2 (the first version ran for the recorded tarball with fixed paths and without exit-code propagation: superseded/build-drain-v1-as-ran.sh.txt). This version:
-#   - builds in its own mktemp tree: composition (tree id checked), the patch applied (tree id checked), npm ci, then tree_clean_gate(): `git status --porcelain --untracked-files=all` must succeed and be empty and `git diff --quiet HEAD` must exit 0 (both recorded) before the build;
-#   - lets every gate decide the exit status: build:release, check:pack-artifact, npm pack, check:pack-boot, npm pack --dry-run and the comparison of its sha1, integrity (sha512) and size with the packed tarball (its entry count is printed, not compared);
+#   - builds in its own mktemp tree: composition (tree id checked), the patch applied (tree id checked), npm ci, then `git status --porcelain --untracked-files=all` must be empty (recorded) before the build;
+#   - lets every gate decide the exit status: build:release, check:pack-artifact, npm pack, check:pack-boot, npm pack --dry-run and the comparison of its sha1, integrity (sha512), size and entry count with the packed tarball;
 #     the first failing gate stops the script with exit 3;
 #   - runs check:pack-boot with OMNIROUTE_SERVER_HOST=127.0.0.1 and REQUIRE_API_KEY=true (upstream's scratch server then binds loopback and requires a key; on Linux it ignores HOST and HOSTNAME) and, since version 4, with the lsof shim first on PATH;
 #   - runs check:pack-artifact with OMNIROUTE_ALLOW_CANARY_BUILD=1, upstream's own override for a build that is not a release tag; the result line says so;
 #   - copies the tarball (npm's name omniroute-3.8.51.tgz is also the name of the first composition tarball) to omniroute-3.8.51-drain-<tree8>.tgz in $OUT and writes SHA256SUMS there.
 # usage: DRAIN_DIR=<directory with drain-after-terminal.patch> EV=<evidence folder of omniroute-wire-effort-20261005> EXPECT_TREE=<tree id of the patched tree> [SHIM_SOURCE=<lsof-shim-v2.sh.txt>] omniroute-build-drain-20261006.sh
-#        BUILD_DRAIN_SOURCE_ONLY=1 . omniroute-build-drain-20261006.sh   defines the gate, comparison, write_sums and tree_clean_gate functions only (for their controls; the caller sets OUT and, for tree_clean_gate, T)
+#        BUILD_DRAIN_SOURCE_ONLY=1 . omniroute-build-drain-20261006.sh   defines the gate, comparison and write_sums functions only (for their controls; the caller sets OUT)
 set -u
 set -o pipefail
-compare_dry_run() { # dry-run json, tarball: print the comparison and succeed only when sha1, integrity (sha512) and size are all equal; the entry count is printed as npm reports it and is not compared
+compare_dry_run() { # dry-run json, tarball: print the comparison and succeed only when sha1, integrity, size and entry count are all equal
   python3 - "$1" "$2" <<'PYEOF'
 import base64, hashlib, json, sys
 d = json.load(open(sys.argv[1]))[0]
@@ -28,7 +25,7 @@ t = open(sys.argv[2], "rb").read()
 sha1 = hashlib.sha1(t).hexdigest()
 sri = "sha512-" + base64.b64encode(hashlib.sha512(t).digest()).decode()
 ok = d.get("shasum") == sha1 and d.get("integrity") == sri and d.get("size") == len(t)
-print("dry-run shasum", d.get("shasum"), "| kept sha1", sha1, "| integrity equal:", d.get("integrity") == sri, "| size", d.get("size"), len(t), "| entries (as reported by npm, not compared)", d.get("entryCount"), "| equal:", ok)
+print("dry-run shasum", d.get("shasum"), "| kept sha1", sha1, "| integrity equal:", d.get("integrity") == sri, "| size", d.get("size"), len(t), "| entries", d.get("entryCount"), "| equal:", ok)
 sys.exit(0 if ok else 1)
 PYEOF
 }
@@ -39,17 +36,6 @@ gate() { local name=$1; shift; local t0; t0=$(date +%s); ( cd "$T" && "$@" > "$O
 write_sums() { # tarball name (a file in $OUT): write SHA256SUMS there and verify it; returns the status of the write-and-verify subshell, not of tee
   ( cd "$OUT" && sha256sum "$1" > SHA256SUMS && sha256sum -c SHA256SUMS ) 2>&1 | tee -a "$OUT/progress.txt"
   return "${PIPESTATUS[0]}"
-}
-tree_clean_gate() { # the tree $T must be clean: `git status --porcelain --untracked-files=all` must SUCCEED and print nothing, and `git diff --quiet HEAD` must exit 0 (1 = differences, any other status = git failed); returns 0 only then, 3 otherwise; logs what it saw
-  local status_out status_rc diff_rc lines
-  status_out=$(G status --porcelain --untracked-files=all); status_rc=$?
-  if [ "$status_rc" -ne 0 ]; then log "git status exited $status_rc: the tree cannot be observed, so it is not known to be clean: stopping"; return 3; fi
-  lines=$(printf '%s' "$status_out" | grep -c '')
-  G diff --quiet HEAD; diff_rc=$?
-  log "git status --porcelain --untracked-files=all exit $status_rc, $lines line(s) before the build; git diff --quiet HEAD exit $diff_rc ($([ "$diff_rc" -eq 0 ] && echo clean || { [ "$diff_rc" -eq 1 ] && echo DIRTY || echo FAILED; }))"
-  if [ "$diff_rc" -gt 1 ]; then log "git diff exited $diff_rc: the tree cannot be compared with HEAD: stopping"; return 3; fi
-  if [ "$lines" != 0 ] || [ "$diff_rc" -ne 0 ]; then printf '%s\n' "$status_out" | head -5; log "the tree is not clean: stopping"; return 3; fi
-  return 0
 }
 if [ "${BUILD_DRAIN_SOURCE_ONLY:-0}" = "1" ]; then return 0 2>/dev/null || exit 0; fi
 M=${MIRROR:-$HOME/.cache/omniroute-upstream-mirror-20261005.git}
@@ -88,7 +74,9 @@ step "commit patch under test" G commit -q -m "drain patch under test"
 PATCHED=$(G rev-parse 'HEAD^{tree}')
 if [ "$PATCHED" = "$EXPECT_TREE" ]; then log "patched tree=$PATCHED equals the expected tree"; else log "patched tree=$PATCHED DIFFERS from the expected tree $EXPECT_TREE: stopping"; exit 3; fi
 gate npm-ci nice -n 19 npm ci --no-audit --no-fund
-tree_clean_gate || exit 3
+DIRTY=$(G status --porcelain --untracked-files=all | wc -l | tr -d ' ')
+log "git status --porcelain --untracked-files=all lines before the build: $DIRTY; git diff --quiet HEAD: $(G diff --quiet HEAD && echo clean || echo DIRTY)"
+[ "$DIRTY" = "0" ] || { G status --porcelain --untracked-files=all | head -5; log "the tree is not clean: stopping"; exit 3; }
 BUILD_SHA_HEAD=$(G rev-parse --short=9 HEAD)
 log "HEAD $BUILD_SHA_HEAD tree $PATCHED"
 gate build-release nice -n 19 npm run build:release

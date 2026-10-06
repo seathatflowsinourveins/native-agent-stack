@@ -1,0 +1,656 @@
+#!/usr/bin/env python3
+"""Offline controls of the window census gate (omniroute-window-census-20261006.py, version 1; new, not frozen). Nothing here touches a live gateway: every scenario builds a scratch SQLite store from the gateway's schema, synthetic arm outputs in the formats of the frozen scripts
+(raw 2.2 and native 2.1, with or without the wrapper's lines) and a guard 5 --idle-only receipt, and runs the census as a subprocess (exit status and receipt are what the protocol consumes).
+usage: census-controls.py --work DIR --schema FILE --census FILE --raw-script FILE --native-script FILE
+Run it as `uv run --with scipy==1.18.1 --with numpy==2.5.3 python census-controls.py ...` so that the matching cross-check against scipy's maximum_bipartite_matching runs (without scipy that line says NOT RUN).
+Each scenario prints `CONTROL-RESULT <id> expected_exit=N observed_exit=M OK|UNEXPECTED` and the census's PROBLEM and CENSUS-RESULT lines (the reasons it gave). The scenarios, by the command center's required list:
+  exact match (P1, P2), unique 2x2 (P3), replacement case (R1 distinguishable, R2 identical with a foreign call row, R3 identical with the foreign call row also dropped: the RESIDUAL, expected PASS), one row short (I1), one foreign call row (I2), the gateway's own provider-test rows (I3),
+  two candidates (I4), complete 2x2 (I5), an orphan (I6), an unreadable store (U1-U4), and the guard, input, clock, tiling and format controls; X1-X3 check predicate parity with the frozen scripts (by AST, never by importing them: they run their main at import) and the matching functions
+  against a brute force and scipy.
+Exit status 0 when every scenario behaved as expected."""
+import argparse
+import ast
+import datetime as dt
+import hashlib
+import importlib.util
+import itertools
+import random
+import re
+import sqlite3
+import subprocess
+import sys
+from pathlib import Path
+
+RAW_SHA = "52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75"
+NATIVE_SHA = "db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd"
+FAILED = []
+ARGS = None
+
+
+def utc(t):
+    return t.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def stamp(t):
+    return t.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def at(s):
+    return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)
+
+
+T0 = at("2026-10-06T20:00:00.000Z")
+
+
+def plus(seconds):
+    return T0 + dt.timedelta(seconds=seconds)
+
+
+def corr_id(tag):
+    h = hashlib.sha256(tag.encode()).hexdigest()
+    return f"{h[:8]}-{h[8:12]}-4{h[13:16]}-8{h[17:20]}-{h[20:32]}"
+
+
+def resp_id(tag):
+    return "resp_" + hashlib.sha256(("r" + tag).encode()).hexdigest()[:50]
+
+
+# ---------------------------------------------------------------- the world: a spec that is materialized as a store, arm outputs and a guard receipt
+def call(ts, tin, tout, duration, path="/v1/responses", ttft=500, status=200, model="gpt-6-astra", provider="codex", conn="conn-a", key="key-1"):
+    return {"ts": ts, "tin": tin, "tout": tout, "duration": duration, "path": path, "ttft": ttft, "status": status, "model": model, "provider": provider, "conn": conn, "key": key}
+
+
+def usage_for(c, latency=None, ttft=500.2, ts=None, tin=None, tout=None):
+    """The usage row the gateway writes with a call row: same model, counts, provider, account and endpoint, latency 1 ms longer, time to first token with a fraction."""
+    return {"ts": ts or c["ts"] - dt.timedelta(milliseconds=4), "tin": c["tin"] if tin is None else tin, "tout": c["tout"] if tout is None else tout, "latency": (c["duration"] + 1) if latency is None else latency, "ttft": ttft,
+            "endpoint": c["path"], "model": c["model"], "provider": c["provider"], "conn": c["conn"], "key": c["key"], "status": "200"}
+
+
+def default_spec(name):
+    spec = {"name": name, "guard": {"start": plus(-35), "end": plus(0), "clean": True, "version": "5", "mode": "idle-only", "failed": "[]", "result": True}, "arms": [], "foreign_calls": [], "foreign_usage": [], "odd_calls": []}
+    reqs = []
+    for i, (mode, off, tin, tout, dur) in enumerate([("responses:eof", 20.0, 22, 21, 1000), ("chat:eof", 60.0, 23, 20, 1200), ("responses:early:0", 100.0, 22, 30, 900)], 1):
+        tag = f"{name}-raw-{i}"
+        path = "/v1/chat/completions" if mode.startswith("chat") else "/v1/responses"
+        c = call(plus(off + 0.1), tin, tout, dur, path)
+        reqs.append({"kind": "raw", "mode": mode, "corr": corr_id(tag), "rid": None if mode.startswith("chat") else resp_id(tag), "calls": [c], "usage": [usage_for(c)]})
+    spec["arms"].append({"file": "arm-1-raw.txt", "kind": "raw", "version": "2.2", "sha": RAW_SHA, "wrapper_start": plus(5.0), "script_start": plus(5.3), "script_end": plus(175.2), "wrapper_end": plus(176.0),
+                         "journal": "0", "summary": True, "run_status": 0, "requests": reqs, "db_override": None})
+    nreqs = []
+    c1 = call(plus(195.2), 15036, 5, 7000)
+    nreqs.append({"kind": "native", "shape": "astra-max", "tag": f"acceptance-20261006T200300-astra-max-{name[:6]}-1", "min_rows": 1, "judged": True, "calls": [c1], "usage": [usage_for(c1)]})
+    c2, c3 = call(plus(215.0), 15100, 40, 3000), call(plus(216.5), 15150, 37, 2500)
+    nreqs.append({"kind": "native", "shape": "two-request", "tag": f"acceptance-20261006T200300-two-request-{name[:6]}-2", "min_rows": 2, "judged": True, "calls": [c2, c3], "usage": [usage_for(c2), usage_for(c3)]})
+    spec["arms"].append({"file": "arm-2-native.txt", "kind": "native", "version": "2.1", "sha": NATIVE_SHA, "wrapper_start": plus(180.0), "script_start": plus(180.4), "script_end": plus(330.2), "wrapper_end": plus(331.0),
+                         "journal": "0", "summary": True, "run_status": 0, "requests": nreqs, "db_override": None})
+    return spec
+
+
+def write_guard(path, g):
+    L = [f"GUARD version={g['version']} mode={g['mode']} script_sha256={'6' * 64} start={utc(g['start'])} port={g.get('port', 20128)} unit={g.get('unit', 'omniroute.service')} clean_for={g.get('clean_for', 30.0)} interval=5.0 tolerate_units={g.get('tolerated', "['omniroute-fw.service']")}",
+         "   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok",
+         "CHECK nothing in flight for 30 s (7 samples): " + ("ok (0 idle and 0 tolerated connection(s))" if g["clean"] else "FAIL ['an active connection']")]
+    if g["result"]:
+        if g["version"] == "4":
+            L.append(f"GUARD-RESULT clean={g['clean']} failed_checks={g['failed']} end={utc(g['end'])}")
+        else:
+            L.append(f"IDLE-RESULT clean={g['clean']} failed_checks={g['failed']} end={utc(g['end'])}")
+    path.write_text("\n".join(L) + "\n")
+
+
+def write_arm(path, arm, db):
+    dbp = arm["db_override"] or str(db)
+    db_field = "" if arm.get("no_db") else f" db={dbp}"
+    L = []
+    wrapper = arm["wrapper_start"] is not None
+    if wrapper:
+        L.append(f"# trial arm ({arm['kind']}); started {stamp(arm['wrapper_start'])}; wrapper kind={arm.get('wrapper_kind', 'canary')}")
+        L.append(f"IDENTITY label=before-x time=x unit=omniroute.service MainPID={arm.get('pid', 1)} ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok")
+    if arm["kind"] == "raw":
+        L.append(f"FROZEN version={arm['version']} script_sha256={arm['sha']} argv=['--expect', 'all-logged'] cwd=/tmp start={utc(arm['script_start'])} expect=all-logged wait1=12.0 wait2=60.0 port=20128{db_field} effort_close_after=10.0 baseline=None baseline_sha256=None")
+    else:
+        L.append(f"FROZEN version={arm['version']} script_sha256={arm['sha']} argv=['--expect', 'all-logged'] cwd=/tmp start={utc(arm['script_start'])} expect=all-logged wait1=12.0 wait2=60.0 quiet_timeout=120.0 exec_timeout=300.0{db_field} run_id=20261006T200300 template_sha256={'7' * 64}")
+    for r in arm["requests"]:
+        n, m = len(r["calls"]), len(r["usage"])
+        if r["kind"] == "raw":
+            L.append(f"RESULT mode={r['mode']} http=200 terminal=True closed_early={str(r['mode'].startswith('responses:early')).title()} stream_s=3.4 corr={r['corr'] or 'None'} response_id={r['rid'] or 'None'} read1_call_logs={n} read1_usage={m} window_call_logs={n} window_usage={m} read1_usage_lookalikes=0 verdict=PASS")
+        elif r["judged"]:
+            L.append(f"RESULT shape={r['shape']} session_id={r['tag']} quiet=True recent_call_logs=0 other_workers=0 min_rows={r['min_rows']} exec_exit=0 elapsed_s=7.5 client_usage={{'input_tokens': 1, 'cached_input_tokens': 0, 'output_tokens': 1}} command_executions=1 events=5 read1_call_logs={n} read1_usage={m} read1_usage_unestablished=0 rows_tokens_in_out=(1, 1) rows_complete=True verdict=PASS")
+        else:
+            L.append(f"RESULT shape={r['shape']} session_id={r['tag']} quiet=True recent_call_logs=0 other_workers=0 min_rows={r['min_rows']} exec_exit=1 timed_out=False elapsed_s=2.0 client_usage=None command_executions=0 events=0 rows_with_session_id={n} verdict=INCONCLUSIVE reasons=['the exec did not complete']")
+    if arm["summary"]:
+        L.append(f"SUMMARY {{\"PASS\": {len(arm['requests'])}}} end={utc(arm['script_end'])} exit=0")
+    if wrapper:
+        L.append("exit=0")
+        if arm["journal"] != "missing":
+            L.append(f"journal_failed_to_save_call_log={arm['journal']} (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')")
+        L.append(f"RUN-STATUS {Path(path).name} status={arm['run_status']} ({'VOID' if arm['run_status'] == 4 else 'ok'})")
+        L.append(f"# finished {stamp(arm['wrapper_end'])}")
+    elif arm["journal"] != "missing":
+        L.append(f"journal_failed_to_save_call_log={arm['journal']} (direct run)")
+    path.write_text("\n".join(L) + "\n")
+
+
+def materialize(spec, work):
+    work = Path(work)
+    db = work / f"{spec['name']}.sqlite"
+    if db.exists():
+        db.unlink()
+    con = sqlite3.connect(db)
+    con.executescript(Path(ARGS.schema).read_text())
+    n = [0]
+
+    def put_call(c, corr=None, rid=None, session=None):
+        n[0] += 1
+        con.execute("insert into call_logs (id, timestamp, path, status, model, requested_model, provider, connection_id, api_key_id, duration, ttft_ms, tokens_in, tokens_out, correlation_id, response_id, session_tag) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (f"call-{spec['name']}-{n[0]}", c["ts"] if isinstance(c["ts"], str) else utc(c["ts"]), c["path"], c["status"], c["model"], "codex/" + c["model"], c["provider"], c["conn"], c["key"], c["duration"], c["ttft"], c["tin"], c["tout"], corr, rid, session))
+
+    def put_usage(u):
+        con.execute("insert into usage_history (provider, model, connection_id, api_key_id, tokens_input, tokens_output, status, latency_ms, ttft_ms, timestamp, endpoint) values (?,?,?,?,?,?,?,?,?,?,?)",
+                    (u["provider"], u["model"], u["conn"], u["key"], u["tin"], u["tout"], u["status"], u["latency"], u["ttft"], utc(u["ts"]), u["endpoint"]))
+
+    for arm in spec["arms"]:
+        for r in arm["requests"]:
+            for c in r["calls"]:
+                put_call(c, corr=r.get("corr"), rid=r.get("rid"), session=r.get("tag"))
+            for u in r["usage"]:
+                put_usage(u)
+    for c in spec["foreign_calls"]:
+        put_call(c, corr=corr_id("foreign-" + str(c["ts"])), rid=None)
+    for c in spec["odd_calls"]:
+        put_call(c)
+    for u in spec["foreign_usage"]:
+        put_usage(u)
+    con.commit()
+    con.close()
+    files = []
+    for arm in spec["arms"]:
+        p = work / f"{spec['name']}-{arm['file']}"
+        write_arm(p, arm, db)
+        files.append(p)
+    guard = work / f"{spec['name']}-guard.txt"
+    write_guard(guard, spec["guard"])
+    return db, files, guard
+
+
+def run_census(db, files, guard, diagnostic=False, no_guard_arg=False, extra=None):
+    cmd = [sys.executable, ARGS.census]
+    if diagnostic:
+        cmd.append("--diagnostic")
+    elif not no_guard_arg:
+        cmd += ["--guard-receipt", str(guard)]
+    extra = list(extra or [])
+    if "@NO_REQUIRE_ARMS@" in extra:
+        extra.remove("@NO_REQUIRE_ARMS@")   # run with the census's own default
+    elif "--require-arms" not in extra:
+        extra += ["--require-arms", str(len(files))]   # the fixtures have two arms
+    cmd += ["--db", str(db)] + [str(guard) if x == "@GUARD@" else x for x in extra] + [str(f) for f in files]
+    p = subprocess.run(cmd, capture_output=True, text=True)
+    return p.returncode, p.stdout, p.stderr
+
+
+def check(sid, desc, rc, out, err, want, must=(), mustnot=()):
+    text = out + err
+    missing = [m for m in must if m not in text]
+    present = [m for m in mustnot if m in text]
+    ok = rc == want and not missing and not present
+    print(f"CONTROL-RESULT {sid} expected_exit={want} observed_exit={rc} {'OK' if ok else 'UNEXPECTED'} :: {desc}")
+    home = str(Path.home())
+    for line in out.splitlines():
+        if line.startswith("PROBLEM ") or line.startswith("CENSUS-RESULT"):
+            print("    " + line[:260].replace(home, "~"))
+    for line in err.splitlines()[:3]:
+        print("    stderr: " + line[:200].replace(home, "~"))
+    if not ok:
+        FAILED.append(sid)
+        print(f"    expected text missing: {missing}; unexpected text present: {present}")
+    print(flush=True)
+    return ok
+
+
+def scenario(sid, desc, mutate=None, want=2, must=(), mustnot=(), diagnostic=False, no_guard_arg=False, db_arg=None, extra=None, post=None):
+    spec = default_spec(sid.lower())
+    if mutate:
+        mutate(spec)
+    if db_arg is not None:
+        for arm in spec["arms"]:
+            arm["db_override"] = str(db_arg)   # the scripts read the store under test: the unreadable store is the only fault of these controls
+    db, files, guard = materialize(spec, ARGS.work)
+    if post:
+        post(db, files, guard)
+    rc, out, err = run_census(db_arg or db, files, guard, diagnostic=diagnostic, no_guard_arg=no_guard_arg, extra=extra)
+    return check(sid, desc, rc, out, err, want, must, mustnot)
+
+
+# ---------------------------------------------------------------- mutations
+def drop_usage(spec, arm, req):
+    spec["arms"][arm]["requests"][req]["usage"] = []
+
+
+def add_foreign(spec, ts=120.0, tin=40, tout=7, dur=800, path="/v1/responses", with_usage=True, model="gpt-6-astra"):
+    c = call(plus(ts), tin, tout, dur, path, model=model)
+    spec["foreign_calls"].append(c)
+    if with_usage:
+        spec["foreign_usage"].append(usage_for(c))
+
+
+def main():
+    global ARGS
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--work", required=True)
+    ap.add_argument("--schema", required=True)
+    ap.add_argument("--census", required=True)
+    ap.add_argument("--raw-script", required=True)
+    ap.add_argument("--native-script", required=True)
+    ARGS = ap.parse_args()
+    Path(ARGS.work).mkdir(parents=True, exist_ok=True)
+    census_bytes = Path(ARGS.census).read_bytes()
+    try:
+        import scipy
+        import numpy
+        scipy_line = f"scipy {scipy.__version__}, numpy {numpy.__version__}"
+    except ImportError:
+        scipy_line = "NOT AVAILABLE (the scipy cross-check X3 will say NOT RUN)"
+    print(f"# Offline controls of the window census gate, version 1 (new, not frozen); python {sys.version.split()[0]}; {scipy_line}")
+    print(f"# census: sha256 {hashlib.sha256(census_bytes).hexdigest()}")
+    print(f"# this controls script: sha256 {hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}")
+    print(f"# raw script 2.2 (frozen, parsed never imported): sha256 {hashlib.sha256(Path(ARGS.raw_script).read_bytes()).hexdigest()}; native script 2.1: sha256 {hashlib.sha256(Path(ARGS.native_script).read_bytes()).hexdigest()}")
+    print(f"# started {dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}\n", flush=True)
+
+    # ---- PASS controls
+    def p1_post(db, files, guard):
+        p1_post.before = hashlib.sha256(db.read_bytes()).hexdigest()
+    ok = scenario("P1", "exact match: 3 raw requests and 3 native call rows, each with its usage row, guard clean, no foreign row: PASS, and the receipt holds the exact queries, the window, the clocks, the counts and no full id",
+                  want=0, must=["CENSUS-RESULT PASS", "foreign=0", "orphans=0", "statuses={'unique': 6}", "QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp",
+                                          "WINDOW start=2026-10-06T20:00:00.000Z end=2026-10-06T20:05:36.000Z", "CLOCK arm=1", "CLOCK arm=2", "COUNTS own call rows", "TILE 2:", "IDLE-MEANING", "NOT-EXCLUDED"],
+                  mustnot=["/home/", "resp_", "call-"], post=p1_post)
+    # the receipt holds no full uuid, and the census leaves the store untouched (read-only)
+    db1 = Path(ARGS.work) / "p1.sqlite"
+    rc, out, err = run_census(db1, [Path(ARGS.work) / "p1-arm-1-raw.txt", Path(ARGS.work) / "p1-arm-2-native.txt"], Path(ARGS.work) / "p1-guard.txt")
+    same = hashlib.sha256(db1.read_bytes()).hexdigest() == p1_post.before and not list(Path(ARGS.work).glob("p1.sqlite-*"))
+    uuid = re.search(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", out)
+    good = rc == 0 and same and not uuid
+    print(f"CONTROL-RESULT P1b expected_exit=0 observed_exit={rc} {'OK' if good else 'UNEXPECTED'} :: the same run again: the store file is byte-identical afterwards and no -wal/-journal file appeared (read-only: {same}); no uuid in the receipt ({not uuid})\n")
+    if not good:
+        FAILED.append("P1b")
+
+    def direct(spec):
+        for arm in spec["arms"]:
+            arm["wrapper_start"], arm["wrapper_end"] = None, None
+            arm["journal"] = "0"   # the line the live trial's runner appends; the frozen scripts print none
+    scenario("P2b", "the frozen scripts run DIRECTLY (no wrapper lines) with the journal count line a runner adds (a frozen script itself prints none): the arm interval comes from FROZEN start= and SUMMARY end=: PASS", mutate=direct, want=0, must=["CENSUS-RESULT PASS", "the script's FROZEN start= and SUMMARY end="])
+
+    def p3(spec):
+        # two own raw requests 1 s apart with the same model and counts; c1 (duration 1000) is within 100 ms of both usage rows, c2 (duration 1150) only of the second: edges c1-{u1,u2}, c2-{u2}: ONE perfect matching
+        reqs = spec["arms"][0]["requests"]
+        c1, c2 = reqs[0]["calls"][0], reqs[2]["calls"][0]
+        c2.update({"tin": c1["tin"], "tout": c1["tout"], "ts": c1["ts"] + dt.timedelta(seconds=1), "duration": 1150})
+        reqs[0]["usage"] = [usage_for(c1, latency=1000)]
+        reqs[2]["usage"] = [usage_for(c2, latency=1080)]
+    scenario("P3", "unique 2x2: edges c1-{u1,u2} and c2-{u2} have exactly one perfect matching: PASS", mutate=p3, want=0, must=["CENSUS-RESULT PASS", "statuses={'unique': 5}"])
+
+    def residual(spec):
+        # four coincident faults: own request 2's usage row was dropped AND a foreign usage row with identical metadata exists whose foreign call row was never written
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        drop_usage(spec, 0, 1)
+        spec["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+    scenario("R3", "RESIDUAL (expected PASS: the documented limit): own usage row dropped + a foreign usage row with identical metadata whose foreign call row was also never written; the named check is the journal scan", mutate=residual, want=0,
+             must=["CENSUS-RESULT PASS", "NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written"])
+
+    # ---- INCONCLUSIVE controls
+    scenario("I1", "one row short: request 2's usage row is missing", mutate=lambda s: drop_usage(s, 0, 1), want=2, must=["CENSUS-RESULT INCONCLUSIVE", "has no associated usage row"])
+    scenario("I2", "one foreign call row (with its usage row) in the window", mutate=lambda s: add_foreign(s), want=2, must=["foreign=1", "1 foreign call row(s) in the window", "FOREIGN tile=1"])
+    scenario("I3", "the gateway's own /api/providers/test rows in the window (no exemption)", mutate=lambda s: [add_foreign(s, ts=100.0 + i * 0.2, tin=0, tout=0, dur=100, path="/api/providers/test", with_usage=False, model="connection-test") for i in range(7)], want=2,
+             must=["foreign=7", "path=/api/providers/test status=200 model=connection-test rows=7"])
+
+    def i4(spec):
+        c = spec["arms"][0]["requests"][0]["calls"][0]
+        spec["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=1)))
+    scenario("I4", "two candidates: a second usage row with the identical metadata exists for own call 1 (no call row for it)", mutate=i4, want=2, must=["no unique perfect matching (status unequal)", "1 own call row(s) and 2 usage row(s)"])
+
+    def i5(spec):
+        reqs = spec["arms"][0]["requests"]
+        c1, c3 = reqs[0]["calls"][0], reqs[2]["calls"][0]
+        c3.update({"tin": c1["tin"], "tout": c1["tout"], "ts": c1["ts"] + dt.timedelta(seconds=1), "duration": c1["duration"]})
+        reqs[2]["usage"] = [usage_for(c3)]
+    scenario("I5", "complete 2x2: two own calls with identical metadata 1 s apart, both usage rows associate with both: not unique", mutate=i5, want=2, must=["no unique perfect matching (status multiple)"])
+
+    scenario("I6", "an orphan usage row (no call row, distinguishable metadata) in the window", mutate=lambda s: s["foreign_usage"].append(usage_for(call(plus(120.0), 99, 9, 500), ts=plus(120.0))), want=2, must=["orphans=1", "1 orphan usage row(s)"])
+
+    def r1(spec):
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        drop_usage(spec, 0, 1)
+        spec["foreign_usage"].append(usage_for(c, latency=c["duration"] + 500, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+    scenario("R1", "replacement, distinguishable: own request 2's usage row dropped, a foreign usage row with the same model and counts but another latency (+500 ms): the per-request script sees a look-alike that does not associate; the census: no usage row for the call AND an orphan",
+             mutate=r1, want=2, must=["has no associated usage row", "1 orphan usage row(s)", "look_alike_usage_rows_that_do_not_associate=1"])
+
+    def r2(spec):
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        drop_usage(spec, 0, 1)
+        f = call(c["ts"] + dt.timedelta(milliseconds=500), c["tin"], c["tout"], c["duration"], c["path"])
+        spec["foreign_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(f, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+    scenario("R2", "replacement, identical metadata, the foreign request's call row EXISTS: the foreign usage row would stand in for the own one (a per-request script passes); the census sees the foreign call row", mutate=r2, want=2, must=["foreign=1", "1 foreign call row(s) in the window"])
+
+    # ---- the store
+    scenario("U1", "unreadable store: the database file does not exist", want=2, must=["the gateway store cannot be read", "readable=False", "CENSUS-RESULT INCONCLUSIVE"], db_arg=Path(ARGS.work) / "no-such-store.sqlite")
+    garbage = Path(ARGS.work) / "garbage.sqlite"
+    garbage.write_bytes(b"this is not a sqlite database\n" * 50)
+    scenario("U2", "unreadable store: the file is not a database", want=2, must=["the gateway store cannot be read", "DatabaseError"], db_arg=garbage)
+    empty = Path(ARGS.work) / "empty.sqlite"
+    empty.write_bytes(b"")
+    scenario("U3", "unreadable store: an empty file (no tables)", want=2, must=["the gateway store cannot be read", "OperationalError"], db_arg=empty)
+    nocol = Path(ARGS.work) / "nocolumn.sqlite"
+    if nocol.exists():
+        nocol.unlink()
+    con = sqlite3.connect(nocol)
+    con.executescript(Path(ARGS.schema).read_text().replace("session_tag TEXT DEFAULT NULL,", "").replace("CREATE INDEX idx_cl_session_tag ON call_logs(session_tag);", ""))
+    con.close()
+    scenario("U4", "unreadable store: a store without the session_tag column", want=2, must=["the gateway store cannot be read", "OperationalError"], db_arg=nocol)
+
+    # ---- the guard receipt
+    def g(**kw):
+        def m(spec):
+            spec["guard"].update(kw)
+        return m
+    scenario("G1", "no --guard-receipt and no --diagnostic: a usage error", want=3, must=["--guard-receipt is required"], no_guard_arg=True)
+    scenario("G1b", "the guard receipt file does not exist: a usage error", want=3, must=["not a readable file"], extra=None, post=lambda db, files, guard: guard.unlink())
+    scenario("G2", "stale guard: it ended 700 s before the first arm", mutate=g(start=plus(-735), end=plus(-695)), want=2, must=["more than 600 s", "GUARD-TO-FIRST-ARM gap_s=700"])
+    scenario("G2b", "a guard that ended 599 s before the first arm is enough", mutate=g(start=plus(-634), end=plus(-594)), want=0, must=["CENSUS-RESULT PASS", "GUARD-TO-FIRST-ARM gap_s=599"],
+             post=None)
+    scenario("G3", "the guard ended AFTER the first arm began", mutate=g(start=plus(-5), end=plus(8)), want=2, must=["AFTER the first arm began"])
+    scenario("G3b", "the guard ended 0.3 s after the first script's own start (FROZEN start=), although the wrapper's whole-second stamp reads earlier: judged on the script's own start: INCONCLUSIVE", mutate=g(start=plus(-25), end=plus(5.6)), want=2, must=["AFTER the first arm began"])
+    scenario("G8", "the guard ended 0.1 s BEFORE the first script's own start (plus the wrapper's truncated stamp 20:00:05Z, which reads 0.2 s before the guard's end): accepted (the stamps are whole seconds)", mutate=g(start=plus(-25), end=plus(5.2)), want=0, must=["CENSUS-RESULT PASS", "GUARD-TO-FIRST-ARM gap_s=0.1"])
+    scenario("G9", "an idle observation of 10 s (clean_for=10): shorter than the 30 s the protocol requires", mutate=g(clean_for=10.0), want=2, must=["shorter than the 30 s"])
+    scenario("G9b", "an idle observation of exactly 30 s is enough", mutate=g(clean_for=30.0), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("R4", "the default --require-arms 4 with only two arm outputs (an omitted arm): INCONCLUSIVE", extra=["@NO_REQUIRE_ARMS@"], want=2, must=["2 arm output(s) given, 4 required"])
+    scenario("R5", "--require-arms 3 with two arm outputs", extra=["--require-arms", "3"], want=2, must=["2 arm output(s) given, 3 required"])
+
+    def shift_arm(arm, seconds):
+        delta = dt.timedelta(seconds=seconds)
+        for key in ("wrapper_start", "script_start", "script_end", "wrapper_end"):
+            arm[key] = arm[key] + delta
+        for r in arm["requests"]:
+            for row in r["calls"] + r["usage"]:
+                row["ts"] = row["ts"] + delta
+
+    def four_arms(spec, last_kind="native", wrapper_kind="canary"):
+        n = spec["name"]
+        shift_arm(spec["arms"][1], 100)   # the one-request/tool-call native arm now starts at +280 s
+        reqs = []
+        for i, off in enumerate((190.0, 215.0), 1):
+            tag = f"{n}-race-{i}"
+            c = call(plus(off + 0.1), 22, 30, 900)
+            reqs.append({"kind": "raw", "mode": "responses:early:0", "corr": corr_id(tag), "rid": resp_id(tag), "calls": [c], "usage": [usage_for(c)]})
+        spec["arms"].insert(1, {"file": "arm-2-race.txt", "kind": "raw", "version": "2.2", "sha": RAW_SHA, "wrapper_start": plus(180.0), "script_start": plus(180.3), "script_end": plus(270.2), "wrapper_end": plus(271.0),
+                                "journal": "0", "summary": True, "run_status": 0, "requests": reqs, "db_override": None, "wrapper_kind": wrapper_kind})
+        spec["arms"][2]["file"] = "arm-3-native.txt"
+        c2, c3 = call(plus(470.0), 15100, 40, 3000), call(plus(471.5), 15150, 37, 2500)
+        nreqs = [{"kind": "native", "shape": "two-request", "tag": f"acceptance-20261006T200800-two-request-{n[:6]}-4", "min_rows": 2, "judged": True, "calls": [c2, c3], "usage": [usage_for(c2), usage_for(c3)]}]
+        if last_kind == "raw":   # a wrong shape: the fourth arm is a raw arm
+            c4 = call(plus(470.0), 22, 21, 1000)
+            nreqs = [{"kind": "raw", "mode": "responses:eof", "corr": corr_id(n + "-last"), "rid": resp_id(n + "-last"), "calls": [c4], "usage": [usage_for(c4)]}]
+        spec["arms"].append({"file": "arm-4-last.txt", "kind": last_kind, "version": "2.1" if last_kind == "native" else "2.2", "sha": NATIVE_SHA if last_kind == "native" else RAW_SHA, "wrapper_start": plus(440.0), "script_start": plus(440.4), "script_end": plus(520.2), "wrapper_end": plus(521.0),
+                             "journal": "0", "summary": True, "run_status": 0, "requests": nreqs, "db_override": None})
+    scenario("P4", "four arms in the canary's order (raw, race, native one-request, native tool-call) with the census's own default --require-arms 4: PASS", mutate=four_arms, extra=["@NO_REQUIRE_ARMS@"], want=0, must=["CENSUS-RESULT PASS", "required_arms=4", "TILE 4:"])
+    scenario("K1", "four arms, but the last one is a raw arm (not the canary's shape): INCONCLUSIVE", mutate=lambda s: four_arms(s, last_kind="raw"), extra=["@NO_REQUIRE_ARMS@"], want=2, must=["the canary's are ['raw', 'raw', 'native', 'native']"])
+    scenario("K2", "four arms whose wrapper header says `baseline` (the baseline's outputs fed to a canary census): INCONCLUSIVE", mutate=lambda s: four_arms(s, wrapper_kind="baseline"), extra=["@NO_REQUIRE_ARMS@"], want=2, must=["is a wrapper `baseline` run, not a canary run"])
+    scenario("G10", "the idle receipt is for port 20129, not 20128", mutate=g(port=20129), want=2, must=["the receipt's port is '20129'"])
+    scenario("G10b", "the idle receipt names another unit", mutate=g(unit="omniroute-fw.service"), want=2, must=["the receipt's unit is 'omniroute-fw.service'"])
+    scenario("G10c", "the idle receipt tolerated another unit than the default", mutate=g(tolerated="['other.service']"), want=2, must=["the receipt's tolerated units is \"['other.service']\""])
+
+    def bad_latency(spec):
+        spec["arms"][0]["requests"][0]["usage"][0]["latency"] = "slow"   # sqlite stores the text: the association must not crash the census
+    scenario("N3", "a usage row whose latency is not a number: INCONCLUSIVE (exit 2) with a receipt, not a crash (exit 3)", mutate=bad_latency, want=2, must=["is not a number", "CENSUS-RESULT INCONCLUSIVE"])
+    def restarted(spec):
+        spec["arms"][1]["pid"] = 2   # the second arm's wrapper saw another MainPID than the idle receipt
+    scenario("I7", "the gateway was restarted between the idle receipt and an arm (another MainPID in the arm's identity line)", mutate=restarted, want=2, must=["a restart between them voids the idle claim"])
+    scenario("G4", "the guard was not clean", mutate=g(clean=False, failed="['nothing in flight for 30 s (7 samples)']"), want=2, must=["the idle check was not clean"])
+    scenario("G5", "a guard version 4 receipt (GUARD-RESULT, no IDLE-RESULT)", mutate=g(version="4", mode="full"), want=2, must=["not from guard version 5", "not an --idle-only receipt", "0 IDLE-RESULT line(s)"])
+    scenario("G6", "a full-mode guard 5 receipt (mode=full) is not an idle-only receipt", mutate=g(mode="full"), want=2, must=["not an --idle-only receipt"])
+    scenario("G7", "--diagnostic with an otherwise perfect world: measured and printed, never PASS", diagnostic=True, want=2, must=["PASS is not possible", "foreign=0", "orphans=0", "statuses={'unique': 6}"])
+    scenario("G7b", "--diagnostic WITH a clean guard receipt and an otherwise perfect world (the same world as P1, which PASSes without the flag): still never PASS", diagnostic=True, extra=["--guard-receipt", "@GUARD@"], want=2, must=["PASS is not possible"])
+
+    # ---- the arm inputs
+    def ids(fn):
+        def m(spec):
+            fn(spec["arms"][0]["requests"])
+        return m
+
+    def short(reqs):
+        reqs[0]["corr"] = reqs[0]["corr"][:8]
+    scenario("A1", "a shortened correlation id (a committed copy): refused as an input, not skipped", mutate=ids(short), want=2, must=["carries a shortened id"])
+
+    def none_ids(reqs):
+        reqs[1]["corr"], reqs[1]["rid"] = None, None
+    scenario("A2", "a request with neither id (corr=None response_id=None) cannot be attributed", mutate=ids(none_ids), want=2, must=["carries neither a correlation id nor a response id"])
+
+    def shared(reqs):
+        reqs[2]["corr"] = reqs[0]["corr"]
+    scenario("A11", "two requests of one arm print the same correlation id (a request without the header prints None, but nothing guarantees uniqueness): the call row is claimed twice, and the census says so", mutate=ids(shared), want=2, must=["is claimed by 2 requests"])
+
+    def dup(reqs):
+        c = reqs[0]["calls"][0]
+        reqs[0]["calls"].append(call(c["ts"] + dt.timedelta(seconds=1), 1, 1, 100))
+    scenario("A3", "two own call rows for one raw request (exactly one is needed)", mutate=ids(dup), want=2, must=["2 own call row(s) (exactly 1 is needed)"])
+
+    def native_short(spec):
+        r = spec["arms"][1]["requests"][1]
+        r["calls"], r["usage"] = r["calls"][:1], r["usage"][:1]
+    scenario("A4", "a two-request native turn with one call row (min_rows=2 as printed)", mutate=native_short, want=2, must=["1 own call row(s) (at least 2 are needed)"])
+
+    def unjudged(spec):
+        spec["arms"][1]["requests"][0]["judged"] = False
+    scenario("A5", "a native turn the script did not judge (the exec did not complete)", mutate=unjudged, want=2, must=["the script did not judge this turn"])
+
+    def journal(value):
+        def m(spec):
+            spec["arms"][0]["journal"] = value
+        return m
+    scenario("A6", "journal_failed_to_save_call_log=1 in an arm (the named check of the residual)", mutate=journal("1"), want=2, must=["journal_failed_to_save_call_log=1 (0 is needed"])
+    scenario("A6b", "the journal line is missing (the check was not done)", mutate=journal("missing"), want=2, must=["journal_failed_to_save_call_log=missing"])
+    scenario("A6c", "the journal query was unavailable", mutate=journal("unavailable"), want=2, must=["journal_failed_to_save_call_log=unavailable"])
+
+    def arm_edit(**kw):
+        def m(spec):
+            spec["arms"][0].update(kw)
+        return m
+    scenario("A7", "a script that is not the frozen one (sha256 differs)", mutate=arm_edit(sha="0" * 64), want=2, must=["not the frozen 52b1d749dc6b"])
+    scenario("A7b", "an output of an unknown script version", mutate=arm_edit(version="2.0"), want=2, must=["no FROZEN line of a frozen script (version '2.0')"])
+    scenario("A8", "no SUMMARY line (an interrupted run is not a verdict)", mutate=arm_edit(summary=False), want=2, must=["no SUMMARY line"])
+    scenario("A9", "the wrapper voided the run (RUN-STATUS status=4)", mutate=arm_edit(run_status=4), want=2, must=["VOID"])
+    scenario("A10", "the script read another store than the census", mutate=arm_edit(db_override=str(Path(ARGS.work) / "another.sqlite")), want=2, must=["the script read the store"])
+
+    # ---- clocks, tiling, the window's edges
+    def row_at(arm, req, seconds):
+        def m(spec):
+            r = spec["arms"][arm]["requests"][req]
+            for c, u in zip(r["calls"], r["usage"]):
+                c["ts"] = plus(seconds)
+                u["ts"] = plus(seconds - 0.004)
+        return m
+    scenario("C1", "an own call row 1.5 s BEFORE its arm's start (inside the 2 s margin): accepted", mutate=row_at(0, 0, 3.5), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("C2", "an own call row 3 s before its arm's start (the clocks disagree)", mutate=row_at(0, 0, 2.0), want=2, must=["lies outside the arm's interval"])
+    scenario("C3", "an own call row 4 s after its arm's end", mutate=row_at(0, 2, 180.0), want=2, must=["lies outside the arm's interval"])
+
+    def overlap(sec):
+        def m(spec):
+            spec["arms"][1]["wrapper_start"] = plus(sec)
+            spec["arms"][1]["script_start"] = plus(sec + 0.4)
+        return m
+    scenario("C4", "arms overlap by 2 s (the second starts before the first ends)", mutate=overlap(174.0), want=2, must=["arms overlap"])
+    scenario("C4b", "arms overlap by 1 s of stamp truncation: tolerated", mutate=overlap(175.0), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("C5", "a foreign call row in the gap between the two arms (tiled window)", mutate=lambda s: add_foreign(s, ts=177.5), want=2, must=["FOREIGN tile=2"])
+    scenario("C6", "a foreign call row 3 s after the last arm's end (inside the 5 s settle)", mutate=lambda s: add_foreign(s, ts=334.0), want=2, must=["foreign=1"])
+    scenario("C6b", "a foreign call row 10 s after the last arm's end (outside the window): not counted", mutate=lambda s: add_foreign(s, ts=341.0), want=0, must=["CENSUS-RESULT PASS", "foreign=0"])
+    scenario("C7", "a foreign request 2 s BEFORE the window (before the guard's end): its call row is outside the window and not counted, but its usage row lies in the 3 s pad that is read, and is an orphan", mutate=lambda s: add_foreign(s, ts=-2.0), want=2, must=["1 orphan usage row(s)"])
+    scenario("C7b", "a foreign call row 20 s before the window (its usage row too): not counted", mutate=lambda s: add_foreign(s, ts=-20.0), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("F1", "a call_logs row on the window's date whose timestamp lacks the milliseconds (a string bound would skip it silently)", mutate=lambda s: s["odd_calls"].append(call("2026-10-06T20:01:30Z", 5, 5, 100)), want=2,
+             must=["another timestamp format=1".replace("another timestamp format=1", "call_logs_rows_with_another_timestamp_format=1"), "would skip them silently"])
+
+    def nulltok(spec):
+        c = spec["arms"][0]["requests"][0]["calls"][0]
+        c["tin"], c["tout"] = None, None
+    scenario("N1", "an own call row with NULL token counts (the candidate query cannot match it)", mutate=nulltok, want=2, must=["has no associated usage row"])
+
+    scenario("A12", "the FROZEN line names no store (db=): the census cannot check which store the script read", mutate=arm_edit(no_db=True), want=2, must=["names no store"])
+
+    def own_odd(spec):
+        c = spec["arms"][0]["requests"][0]["calls"][0]
+        c["ts"] = "2026-10-06T20:00:20Z"   # an OWN call row whose timestamp lacks the milliseconds
+    scenario("N2", "an own call row whose timestamp lacks the milliseconds: INCONCLUSIVE (exit 2), not a crash (exit 3)", mutate=own_odd, want=2, must=["is not ????-??-??T??:??:??.???Z", "its candidate usage rows cannot be looked up"])
+
+    # ---- X1: predicate parity with the frozen scripts, by AST (the frozen scripts run main() at import: never import them)
+    census_text = Path(ARGS.census).read_text()
+    raw_text, native_text = Path(ARGS.raw_script).read_text(), Path(ARGS.native_script).read_text()
+
+    def func_source(text, name):
+        for node in ast.walk(ast.parse(text)):
+            if isinstance(node, ast.FunctionDef) and node.name == name:
+                return ast.get_source_segment(text, node)
+        return None
+
+    def const_assign(text, name):
+        for node in ast.parse(text).body:
+            if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in node.targets):
+                return ast.get_source_segment(text, node.value)
+        return None
+
+    def strings(text):
+        return [n.value for n in ast.walk(ast.parse(text)) if isinstance(n, ast.Constant) and isinstance(n.value, str)]
+
+    mine = {n: func_source(census_text, n) for n in ("associated", "shift", "id8")}
+    parity = []
+    for label, text in (("raw 2.2", raw_text), ("native 2.1", native_text)):
+        parity.append((f"associated() identical to {label}", mine["associated"] is not None and mine["associated"] == func_source(text, "associated")))
+        parity.append((f"shift() identical to {label}", mine["shift"] is not None and mine["shift"] == func_source(text, "shift")))
+        parity.append((f"id8() identical to {label}", mine["id8"] is not None and mine["id8"] == func_source(text, "id8")))
+        parity.append((f"LATENCY_TOLERANCE_MS and TTFT_TOLERANCE_MS equal {label}'s", const_assign(text, "LATENCY_TOLERANCE_MS") == const_assign(census_text, "LATENCY_TOLERANCE_MS") == "100" and const_assign(text, "TTFT_TOLERANCE_MS") == const_assign(census_text, "TTFT_TOLERANCE_MS") == "1.0"))
+    spec_mod = importlib.util.spec_from_file_location("omniroute_census", ARGS.census)
+    census = importlib.util.module_from_spec(spec_mod)
+    spec_mod.loader.exec_module(census)   # importing must not run main (it would exit): reaching the next line proves it
+    parity.append(("the census module imports without running main", hasattr(census, "main") and hasattr(census, "matching_status")))
+    parity.append(("candidate query SQL_CANDIDATES is a string constant of raw 2.2 and of native 2.1, byte for byte", census.SQL_CANDIDATES in strings(raw_text) and census.SQL_CANDIDATES in strings(native_text)))
+    raw_pred = "where (correlation_id is not null and correlation_id = ?) or (response_id is not null and response_id = ?) order by timestamp"
+    native_pred = "where session_tag = ? order by timestamp"
+    parity.append(("own-row predicate (raw): the same text as raw 2.2's read_rows query, in the census's SQL_OWN_RAW", any(raw_pred in s for s in strings(raw_text)) and raw_pred in census.SQL_OWN_RAW))
+    parity.append(("own-row predicate (native): the same text as native 2.1's read_turn query, in the census's SQL_OWN_NATIVE", any(native_pred in s for s in strings(native_text)) and native_pred in census.SQL_OWN_NATIVE))
+    parity.append(("candidate window of the scripts: shift(..., -3) and shift(..., 3) in both scripts, CANDIDATE_SECONDS == 3", len(re.findall(r'shift\(c\["timestamp"\], -3\), shift\(c\["timestamp"\], 3\)', raw_text)) == 1 and len(re.findall(r'shift\(c\["timestamp"\], -3\), shift\(c\["timestamp"\], 3\)', native_text)) == 1 and census.CANDIDATE_SECONDS == 3))
+    bad = [label for label, ok in parity if not ok]
+    for label, ok in parity:
+        print(f"CONTROL-RESULT X1 {'OK' if ok else 'UNEXPECTED'} :: {label}")
+    print()
+    if bad:
+        FAILED.append("X1")
+
+    # ---- X2: the census's associated() against the frozen scripts' own, executed from their extracted source (never imported), on random and boundary rows
+    rng = random.Random(20261006)
+    ns = {}
+    exec(const_assign(raw_text, "LATENCY_TOLERANCE_MS") and f"LATENCY_TOLERANCE_MS = {const_assign(raw_text, 'LATENCY_TOLERANCE_MS')}\nTTFT_TOLERANCE_MS = {const_assign(raw_text, 'TTFT_TOLERANCE_MS')}\n" + func_source(raw_text, "associated"), ns)
+    mismatches, trues, falses = 0, 0, 0
+    for _ in range(40000):
+        c = {"provider": rng.choice(["codex", "other"]), "connection_id": rng.choice(["a", "b", None]), "api_key_id": rng.choice(["k", None]), "path": rng.choice(["/v1/responses", "/v1/chat/completions"]),
+             "duration": rng.choice([None, 0, 1000, 1000.0, 1234]), "ttft_ms": rng.choice([None, 500, 500.5, 0])}
+        u = dict(provider=c["provider"] if rng.random() < 0.8 else "x", connection_id=c["connection_id"] if rng.random() < 0.8 else "z", api_key_id=c["api_key_id"] if rng.random() < 0.9 else "q",
+                 endpoint=c["path"] if rng.random() < 0.9 else "/other", latency_ms=rng.choice([None, 0, 900, 999.99, 1000, 1099.99, 1100, 1100.01, 1134, 1334, 1233.9, 1334.01, 2000]),
+                 ttft_ms=rng.choice([None, 0, 499.0, 499.5, 500.0, 500.5, 501.5, 501.51, 0.99, 1.0, 1.01]))
+        a, b = ns["associated"](c, u), census.associated(c, u)
+        mismatches += a != b
+        trues += a
+        falses += not a
+    ok = mismatches == 0 and trues > 1000 and falses > 1000
+    print(f"CONTROL-RESULT X2 {'OK' if ok else 'UNEXPECTED'} :: associated() of the census and of raw 2.2 (executed from its extracted source) agree on 40000 random and boundary pairs: mismatches={mismatches}, true={trues}, false={falses}\n")
+    if not ok:
+        FAILED.append("X2")
+
+    # ---- X3: the matching functions against a brute force (all permutations) and, when scipy is available, scipy's maximum_bipartite_matching plus its edge-removal uniqueness test
+    try:
+        import numpy as np
+        from scipy.sparse import csr_matrix
+        from scipy.sparse.csgraph import maximum_bipartite_matching
+        have_scipy = True
+    except ImportError:
+        have_scipy = False
+
+    def brute(nc, nu, edge_set):
+        if nc != nu:
+            return "unequal"
+        count = 0
+        for perm in itertools.permutations(range(nu)):
+            if all((i, perm[i]) in edge_set for i in range(nc)):
+                count += 1
+                if count > 1:
+                    break
+        return {0: "none", 1: "unique"}.get(count, "multiple")
+
+    def scipy_status(nc, nu, edge_set):
+        if nc != nu:
+            return "unequal"
+
+        def matrix(edges):
+            return csr_matrix((np.ones(len(edges), dtype=np.int8), ([i for i, _ in edges], [j for _, j in edges])), shape=(nc, nu))
+
+        def size(edges):
+            return int((maximum_bipartite_matching(matrix(edges), perm_type="column") >= 0).sum()) if edges else 0
+        if size(sorted(edge_set)) < nc:
+            return "none"
+        m = maximum_bipartite_matching(matrix(sorted(edge_set)), perm_type="column")
+        for i, j in [(i, int(j)) for i, j in enumerate(m)]:
+            if size(sorted(edge_set - {(i, j)})) == nc:
+                return "multiple"
+        return "unique"
+
+    rng = random.Random(757)
+    seen = {}
+    bad_graphs = []
+    for trial in range(8000):
+        nc = rng.randint(1, 7)
+        nu = nc if rng.random() < 0.8 else rng.randint(1, 7)
+        p = rng.choice([0.15, 0.25, 0.35, 0.5, 0.7, 0.9])
+        edge_set = {(i, j) for i in range(nc) for j in range(nu) if rng.random() < p}
+        roll = rng.random()
+        if roll < 0.3 and nc == nu:   # force a perfect matching so that 'unique' and 'multiple' are both common
+            perm = list(range(nu))
+            rng.shuffle(perm)
+            edge_set |= {(i, perm[i]) for i in range(nc)}
+        elif roll < 0.55 and nc == nu and nc >= 3:   # a Hall violation inside one component: two calls whose only neighbour is usage row 0, a third call connecting everything
+            edge_set = {(i, j) for (i, j) in edge_set if i > 1}
+            edge_set |= {(0, 0), (1, 0), (2, 0)}
+            edge_set |= {(2, j) for j in range(nu)} if rng.random() < 0.5 else set()
+        adj = {f"c{i}": sorted(f"u{j}" for (a, j) in edge_set if a == i) for i in range(nc)}
+        used = sorted({f"u{j}" for (_a, j) in edge_set})
+        # the census's components() takes the usage rows that have an edge; matching_status() takes one component: compare on the whole graph when it is one component, else per component
+        comps = census.components(adj)
+        expected_parts, got_parts = [], []
+        for calls, usages in comps:
+            sub = {c: adj[c] for c in calls}
+            idx_c = {c: k for k, c in enumerate(calls)}
+            idx_u = {u: k for k, u in enumerate(usages)}
+            sub_edges = {(idx_c[c], idx_u[u]) for c in calls for u in adj[c]}
+            got = census.matching_status(sub, calls, usages)[0]
+            ref = brute(len(calls), len(usages), sub_edges)
+            if have_scipy:
+                sp = scipy_status(len(calls), len(usages), sub_edges)
+                if sp != ref:
+                    bad_graphs.append(("scipy", ref, sp, sorted(sub_edges)))
+            if got != ref:
+                bad_graphs.append(("census", ref, got, sorted(sub_edges)))
+            seen[ref] = seen.get(ref, 0) + 1
+    # a few deliberate shapes
+    deliberate = [("path (unique)", {"c0": ["u0"], "c1": ["u0", "u1"], "c2": ["u1", "u2"]}, "unique"), ("complete 2x2", {"c0": ["u0", "u1"], "c1": ["u0", "u1"]}, "multiple"), ("Hall violation", {"c0": ["u0"], "c1": ["u0"], "c2": ["u0", "u1", "u2"]}, "none")]
+    for label, adj, want in deliberate:
+        for calls, usages in census.components(adj):
+            got = census.matching_status({c: adj[c] for c in calls}, calls, usages)[0]
+            if got != want:
+                bad_graphs.append((label, want, got, adj))
+    ok = not bad_graphs and all(seen.get(k, 0) >= 100 for k in ("unique", "multiple", "none", "unequal"))
+    print(f"CONTROL-RESULT X3 {'OK' if ok else 'UNEXPECTED'} :: matching_status() against a brute force over all permutations on 8000 random bipartite graphs (components of up to 7+7 nodes), outcomes seen {dict(sorted(seen.items()))}; scipy cross-check "
+          + ("RAN (maximum_bipartite_matching with the edge-removal uniqueness test agrees with the brute force on every component)" if have_scipy else "NOT RUN (scipy not available in this interpreter)") + f"; disagreements: {bad_graphs[:3]}\n")
+    if not ok:
+        FAILED.append("X3")
+    print(f"# finished {dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}; scenarios not as expected: {FAILED or 'none'}")
+    sys.exit(1 if FAILED else 0)
+
+
+if __name__ == "__main__":
+    main()

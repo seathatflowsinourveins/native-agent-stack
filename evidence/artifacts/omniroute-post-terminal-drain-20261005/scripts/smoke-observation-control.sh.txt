@@ -1,0 +1,84 @@
+#!/bin/bash
+# Control for the smoke script's process-group observation (version 5; full-scope read r9, P2-5): a failed process-group observation must be UNAVAILABLE, never an empty group, and an unavailable final observation must fail the smoke.
+# SMOKE_SCRIPT selects the version under test (scripts/smoke.sh.txt), SMOKE_V4 version 4 for the defect demonstration (superseded/smoke-v4.sh.txt). Raw output goes to stdout.
+# A-E exercise the sourced functions on a real process group with a surviving descendant: A `ps` works (alive), B `ps` exits 1 while the descendant survives (must be unavailable, not empty), C `ps` exits 0 with an empty listing (unavailable: the listing lacks this shell),
+#   D version 4's members() on the failing `ps` (reads it as an empty group: the defect), E the group killed and `ps` working (empty).
+# F1-F3 run the whole smoke script against a FIXTURE prefix (a scratch HOME with a fake `omniroute serve` that listens on loopback and answers {"status":"ok"}, and a `ps` fixture first on the smoke's PATH that fails once the fake server's SIGTERM handler has created a marker file):
+#   F1 without the failure (exit 0 expected: the fixture is a valid prefix), F2 version 5 with the failing final observation (must exit non-zero and say `final observation: unavailable`), F3 version 4 with the same failure (exits 0: the false proof of cleanup).
+set -u
+set -m
+SMOKE=${SMOKE_SCRIPT:?set SMOKE_SCRIPT to the smoke script under test (scripts/smoke.sh.txt)}
+SMOKE_V4=${SMOKE_V4:?set SMOKE_V4 to the version 4 smoke script (superseded/smoke-v4.sh.txt)}
+REAL_PS=$(command -v ps)
+W=$(mktemp -d "$HOME/.cache/omniroute-smoke-observation-XXXXXX") || exit 2
+chmod 700 "$W"
+echo "== A-E: the functions, sourced"
+SMOKE_SOURCE_ONLY=1 . "$SMOKE"
+bash -c 'sleep 300 & wait' &
+LEADER=$!
+sleep 0.5
+PGID=$(ps -o pgid= -p "$LEADER" | tr -d ' ')
+echo "a real process group: leader $LEADER, pgid $PGID, with a surviving descendant (the sleep)"
+echo "A. ps works, group alive: group_state=$(group_state) member_count=$(member_count) (expected: alive, 2)"
+mkdir -p "$W/psfail" "$W/psempty"
+printf '#!/bin/sh\necho "ps: simulated failure" >&2\nexit 1\n' > "$W/psfail/ps"
+printf '#!/bin/sh\nexit 0\n' > "$W/psempty/ps"
+chmod 755 "$W/psfail/ps" "$W/psempty/ps"
+echo "B. ps FAILS (exit 1, no output) while the descendant survives: group_state=$(PATH="$W/psfail:$PATH" group_state) member_count=$(PATH="$W/psfail:$PATH" member_count) (expected: unavailable, unavailable; never empty)"
+echo "C. ps exits 0 with an empty listing: group_state=$(PATH="$W/psempty:$PATH" group_state) (expected: unavailable)"
+v4_members() { ps -eo pid=,pgid= 2>/dev/null | awk -v g="$PGID" '$2 == g { print $1 }'; }
+echo "D. version 4's members() on the failing ps: [$(PATH="$W/psfail:$PATH" v4_members)] -> the test [ -z \"\$(members)\" ] is $([ -z "$(PATH="$W/psfail:$PATH" v4_members)" ] && echo TRUE, so version 4 reads the group as EMPTY although its descendant is alive || echo false)"
+kill -- "-$PGID" 2> /dev/null
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ "$(group_state)" = empty ] && break; sleep 0.5; done
+wait "$LEADER" 2> /dev/null
+echo "E. the group killed and ps working: group_state=$(group_state) member_count=$(member_count) (expected: empty, 0)"
+echo "== F1-F3: the whole smoke against a fixture prefix in a scratch HOME"
+H=$W/home
+PREFIX=$H/.local/share/codex-ecosystem/tools/fixtureprefix
+mkdir -p "$PREFIX/bin" "$PREFIX/shim" "$H/.cache"
+cat > "$PREFIX/bin/omniroute" <<'FAKEEOF'
+#!/bin/bash
+# fixture `omniroute serve --port P`: a health server on 127.0.0.1:P; its SIGTERM handler creates $FAKE_MARK (when set) and exits
+PORT=""
+while [ $# -gt 0 ]; do case "$1" in --port) PORT=$2; shift 2;; *) shift;; esac; done
+python3 - "$PORT" "${FAKE_MARK:-}" <<'PYEOF' &
+import http.server, os, signal, sys
+port, mark = int(sys.argv[1]), sys.argv[2]
+class H(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        body = b'{"status":"ok"}'
+        self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+    def log_message(self, *a):
+        pass
+def term(*a):
+    if mark:
+        open(mark, "w").close()
+    os._exit(0)
+signal.signal(signal.SIGTERM, term)
+http.server.HTTPServer(("127.0.0.1", port), H).serve_forever()
+PYEOF
+wait
+FAKEEOF
+chmod 755 "$PREFIX/bin/omniroute"
+cat > "$PREFIX/shim/ps" <<PSEOF
+#!/bin/sh
+# fixture ps: fails (exit 1, no output) once \$FAKE_MARK exists; otherwise the real ps
+if [ -n "\${FAKE_MARK:-}" ] && [ -e "\$FAKE_MARK" ]; then echo "ps: simulated failure" >&2; exit 1; fi
+exec $REAL_PS "\$@"
+PSEOF
+chmod 755 "$PREFIX/shim/ps"
+run_smoke() { # label, script, marker file or empty
+  local label=$1 script=$2 mark=$3 out rc
+  out=$(env HOME="$H" FAKE_MARK="$mark" bash "$script" fixtureprefix 2>&1); rc=$?
+  echo "$label: smoke exit=$rc"
+  echo "$out" | grep -E '^prefix=|^processes (in|left)' | cut -c1-260 | sed 's/^/    /'
+  rm -rf "$H"/.cache/omniroute-smoke-*
+}
+run_smoke "F1. version 5, the fixture prefix, no failing ps (expected exit 0: the fixture is a valid prefix)" "$SMOKE" ""
+rm -f "$W/marker2"
+run_smoke "F2. version 5, ps fails once the server is signalled (expected: non-zero, final observation: unavailable)" "$SMOKE" "$W/marker2"
+rm -f "$W/marker3"
+run_smoke "F3. version 4, the same failing ps (exit 0: the failed observation was read as an empty group)" "$SMOKE_V4" "$W/marker3"
+leftover=$(pgrep -f "$H" | wc -l)
+echo "fixture processes left running: $leftover"
+echo "scratch directory (remove with rm -rf after reading): $W"

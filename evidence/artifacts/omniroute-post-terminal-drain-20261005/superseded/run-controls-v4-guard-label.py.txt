@@ -648,12 +648,12 @@ def wrapper_round9(fx, base_env, native_args, fake, out, want):
 def guard_round9(fx, common, proc, tools, tool, shim_sha, want):
     """G13-G16: the tolerance covers EMPTY connections of the tolerated unit only, and a failing ss or pgrep is a FAIL (guard version 3 reproduces both defects)."""
     if want("G13"):
-        print("### G13: a connection of the TOLERATED unit that carries a request (a slow request in pieces, as inference forwarded through the 20129 gateway would): version 3 exempted every connection of the unit and exited 0, version 5 judges it ACTIVE (exit 4)", flush=True)
+        print("### G13: a connection of the TOLERATED unit that carries a request (a slow request in pieces, as inference forwarded through the 20129 gateway would): version 3 exempted every connection of the unit and exited 0, version 4 judges it ACTIVE (exit 4)", flush=True)
         scope = f"ctl-poller-req-{os.getpid()}"
         fx.reset({"mode": "normal"})
         poller = subprocess.Popen(["systemd-run", "--user", "--scope", "--quiet", f"--unit={scope}", sys.executable, str(HERE / "poller.py"), "--port", str(fx.port), "--duration", "120", "--mode", "request", "--hold", "40"])
         time.sleep(1.5)
-        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v5", 4)):
+        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v4", 4)):
             run(fx, "G13", label, [script, *common[1:], "--tolerate-unit", f"{scope}.scope"], expected, defect=(script == GUARD_V3))
         poller.terminate()
         try:
@@ -668,21 +668,21 @@ def guard_round9(fx, common, proc, tools, tool, shim_sha, want):
         f.write_text(body)
         f.chmod(0o755)
     if want("G14"):
-        print("### G14: `ss` fails (exit 2, empty stdout): version 3 read the empty output as an idle host and exited 0, version 5 FAILS the check (exit 4)", flush=True)
+        print("### G14: `ss` fails (exit 2, empty stdout): version 3 read the empty output as an idle host and exited 0, version 4 FAILS the check (exit 4)", flush=True)
         fx.reset({"mode": "normal"})
         env = {"PATH": f"{sub('ss')}:{os.environ['PATH']}"}
-        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v5", 4)):
+        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v4", 4)):
             run(fx, "G14", label, [script, *common[1:]], expected, env_extra=env, defect=(script == GUARD_V3))
     if want("G15"):
-        print("### G15: `pgrep` fails (exit 2, empty stdout): version 3 read it as no worker present and exited 0, version 5 FAILS the check (exit 4)", flush=True)
+        print("### G15: `pgrep` fails (exit 2, empty stdout): version 3 read it as no worker present and exited 0, version 4 FAILS the check (exit 4)", flush=True)
         fx.reset({"mode": "normal"})
         env = {"PATH": f"{sub('pgrep')}:{os.environ['PATH']}"}
-        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v5", 4)):
+        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v4", 4)):
             run(fx, "G15", label, [script, *common[1:]], expected, env_extra=env, defect=(script == GUARD_V3))
     if want("G16"):
-        print("### G16: `pgrep` exits 1 (no process matched, an idle host) and prints nothing: that is NOT a failure, version 5 exits 0", flush=True)
+        print("### G16: `pgrep` exits 1 (no process matched, an idle host) and prints nothing: that is NOT a failure, version 4 exits 0", flush=True)
         fx.reset({"mode": "normal"})
-        run(fx, "G16", "v5", [GUARD, *common[1:]], 0, env_extra={"PATH": f"{sub('pgrep-nomatch')}:{os.environ['PATH']}"})
+        run(fx, "G16", "v4", [GUARD, *common[1:]], 0, env_extra={"PATH": f"{sub('pgrep-nomatch')}:{os.environ['PATH']}"})
 
 
 def main():
@@ -698,7 +698,7 @@ def main():
     print("# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.2 (frozen; versions 2.0 and 2.1, guard version 3 and the earlier wrapper appear where a control reproduces a defect a review found), on the stub gateway and a scratch database. Nothing here touches a live gateway.")
     print(f"# started {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; {codex_version}; python {sys.version.split()[0]}")
     for name, p in (("live-acceptance v1", V1_RAW), ("live-acceptance v2.0 (superseded)", V20_RAW), ("live-acceptance v2.1 (superseded; R10)", V21_RAW), ("live-acceptance v2.2", V2_RAW), ("native-exec v1", V1_NAT), ("native-exec v2.0 (superseded; N10)", V20_NAT), ("native-exec v2.1", V2_NAT), ("show-log-receipt v2", V2_RCP),
-                    ("gateway-identity", IDENT), ("pre-switch-guard v5", GUARD), ("pre-switch-guard v3 (superseded; G13-G15)", GUARD_V3), ("pre-switch-guard v2 (superseded; G12)", GUARD_V2), ("run-acceptance wrapper", WRAPPER), ("run-acceptance wrapper before the re-freeze (superseded; W7-W12)", WRAPPER_V21), ("switch tool copy (committed evidence file)", SWITCH_TOOL_COPY),
+                    ("gateway-identity", IDENT), ("pre-switch-guard v4", GUARD), ("pre-switch-guard v3 (superseded; G13-G15)", GUARD_V3), ("pre-switch-guard v2 (superseded; G12)", GUARD_V2), ("run-acceptance wrapper", WRAPPER), ("run-acceptance wrapper before the re-freeze (superseded; W7-W12)", WRAPPER_V21), ("switch tool copy (committed evidence file)", SWITCH_TOOL_COPY),
                     ("stub-gateway", HERE / "stub-gateway.py"), ("fake-codex", HERE / "fake-codex.py"), ("health-server", HERE / "health-server.py"), ("poller", HERE / "poller.py"), ("run-controls", Path(__file__).resolve())):
         print(f"# {name}: sha256 {sha(p)}")
     print()
