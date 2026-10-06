@@ -26,16 +26,22 @@ are present and that it must preserve their edits. Feed the task on stdin:
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
+  --base-url http://127.0.0.1:21128/v1 \
   --preflight --require-mcp context-mode \
   --timeout 60 &&
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
+  --base-url http://127.0.0.1:21128/v1 \
   --timeout 600 \
   --prompt -
 ```
 
-Use the selected gateway's native Responses lane at loopback port 20128. Keep
+Use NativeStack2604's native Responses lane at loopback port 21128. WSL
+distributions share networking, and port 20128 belongs to NativeStack. The worker
+reads `gateway.endpoint` from the install plan's checked-out
+`config/gpt-gateway-topology.json`, with 21128 as the fallback. Pass the explicit
+`--base-url` above for bounded jobs on 2604. Keep
 the exact model route in the live catalog; the default Sol/max suffix requires
 an OmniRoute build carrying PR #15167. Requested effort does not establish
 gateway-forwarded effort or backend identity. Keep

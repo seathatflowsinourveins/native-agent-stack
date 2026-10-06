@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "worker-gateway-defaults-20261006",
+  "kind": "local_integration",
+  "component_ids": [
+    "codex",
+    "omniroute"
+  ],
+  "checked_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "claim": "Both actual worker argument/configuration paths select canonical gateway.endpoint or21128fallback without an explicit --base-url; default selection avoids legacy20128. Explicit override behavior is preserved.",
+  "source_refs": [
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json:9",
+    "native-agent-stack@84c79f7f92f61972a46aa470a4f299017bc82768:evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs:8-14",
+    "native-agent-stack@84c79f7f92f61972a46aa470a4f299017bc82768:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh:2596-2600",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:sdk/python",
+    "langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py"
+  ],
+  "evidence_classes": {
+    "configuration_tests": "local_integration with synthetic SDK/provider import fixtures",
+    "native_sdk_checks": "local_integration with real0.160.0SDK/bundledCLI and synthetic catalog/observer",
+    "upstream_tests": "Not run; repository cases are not unchanged upstream tests",
+    "provider_or_gateway_acceptance": "Not run",
+    "cross_distribution_namespace": "Command-center reported observation; no new host/interop measurement by this lane"
+  },
+  "checks": [
+    {
+      "command": "nice -n19 python3 -m unittest tests.test_gateway_worker_defaults (external TMPDIR)",
+      "exit_code": 0,
+      "output": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.034s\n\nOK\n"
+    },
+    {
+      "command": "nice -n19 uv run --locked --no-build --python <Python3.13.16> --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_gateway_runtime_config_keeps_native_catalog_matching NativeTransportTests.test_preflight_discovers_native_mcp_skill_and_roles_without_inference (task-private UV_CACHE_DIR/external TMPDIR)",
+      "exit_code": 0,
+      "output": "Downloading pydantic-core (2.0MiB)\nDownloading openai-codex-cli-bin (133.0MiB)\n Downloaded pydantic-core\n Downloaded openai-codex-cli-bin\nInstalled 8 packages in 31ms\ntest_gateway_runtime_config_keeps_native_catalog_matching (__main__.NativeTransportTests.test_gateway_runtime_config_keeps_native_catalog_matching) ... ok\ntest_preflight_discovers_native_mcp_skill_and_roles_without_inference (__main__.NativeTransportTests.test_preflight_discovers_native_mcp_skill_and_roles_without_inference) ... <python-runtime>/lib/python3.13/concurrent/futures/thread.py:59: ResourceWarning: unclosed file <_io.TextIOWrapper name=<fd> encoding='utf-8'>\n  result = self.fn(*self.args, **self.kwargs)\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n<python-runtime>/lib/python3.13/concurrent/futures/thread.py:59: ResourceWarning: unclosed file <_io.TextIOWrapper name=<fd> encoding='utf-8'>\n  result = self.fn(*self.args, **self.kwargs)\nResourceWarning: Enable tracemalloc to get the object allocation traceback\nok\n\n----------------------------------------------------------------------\nRan 2 tests in 1.543s\n\nOK\n",
+      "model_inference_submitted": false,
+      "gateway_http_requests": 0
+    }
+  ],
+  "review_correction": "Initial helper accepted malformed URL candidates such as missingport; source critic found it, defaults now follow existing Codex gateway_url contract and expanded cases passed. Initial4-case pass did not cover those added conditions.",
+  "limitations": [
+    "New configuration tests stub third-party constructors; they do not accept SDK/provider execution.",
+    "Native cases use realSDK/CLI metadata with synthetic observer/catalog fixtures, not live-provider/model acceptance.",
+    "Two unclosed-file ResourceWarnings in native passing run retained; not a claim of complete resource closure.",
+    "No gateway/config/client/host state is changed by the lane; installed/client configuration copies are not read.",
+    "No bounded model job or live gateway request is launched; source policy for2604jobs passes explicit21128."
+  ],
+  "sanitization": "Actual returned outputs retained; private Python runtime prefix and native file-descriptor identifiers replaced with placeholders.",
+  "recorded_at_utc": "2026-10-06T04:52:04Z"
+}

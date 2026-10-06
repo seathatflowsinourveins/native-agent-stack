@@ -39,7 +39,11 @@ from openai_codex.types import ReasoningEffort
 SDK_VERSION = "0.160.0"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
-DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
+DEFAULT_BASE_URL = "http://127.0.0.1:21128/v1"
+GATEWAY_TOPOLOGY = (
+    Path(__file__).resolve().parents[2]
+    / "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json"
+)
 # OmniRoute 0585aba5589d5a1f49243a13a8db249558e7c9e3:
 # open-sse/executors/codex/reasoningSuffix.ts: suffix tokens for a lexical
 # fail-closed guard, independent of gateway alias sets.
@@ -48,6 +52,19 @@ GATEWAY_EFFORT_SUFFIXES = (
 )
 CLEANUP_TIMEOUT = 5.0
 _CLEANUP_TASKS: set[asyncio.Task] = set()
+
+
+def default_gateway_base_url() -> str:
+    # Same gateway.endpoint field as #723's native Promptfoo config (84c79f7f).
+    try:
+        endpoint = json.loads(GATEWAY_TOPOLOGY.read_text(encoding="utf-8"))["gateway"]["endpoint"]
+        if isinstance(endpoint, str):
+            # WSL distributions share networking; 20128 belongs to NativeStack.
+            if urlsplit(endpoint).port != 20128:
+                return gateway_url(endpoint)
+    except (OSError, ValueError, KeyError, TypeError, argparse.ArgumentTypeError):
+        pass
+    return DEFAULT_BASE_URL
 
 
 def _cleanup_finished(task: asyncio.Task) -> None:
@@ -541,7 +558,7 @@ def parse_args(argv=None) -> argparse.Namespace:
             "ultra requires a suffixless --model (e.g. cx/gpt-6.1-sol)"
         ),
     )
-    parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
+    parser.add_argument("--base-url", type=gateway_url, default=default_gateway_base_url())
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)
     parser.add_argument("--timeout", type=positive_seconds, default=300.0)
     parser.add_argument(

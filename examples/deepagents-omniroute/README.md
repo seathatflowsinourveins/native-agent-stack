@@ -20,11 +20,15 @@ provider execution or promote this candidate to a default.
   [`FilesystemBackend`](https://github.com/langchain-ai/deepagents/blob/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/deepagents/backends/filesystem.py)
   and supported harness profiles.
 - LangChain OpenAI **1.6.7**, [source `026c3da2`](https://github.com/langchain-ai/langchain/blob/026c3da2b615abe52f8446e37de460b844d07a43/libs/partners/openai/langchain_openai/chat_models/base.py).
-  Each `ChatOpenAI` instance uses the supplied `--base-url` (default child lane
-  `http://127.0.0.1:20128/v1`), `cx/gpt-6.1-sol-max`, Responses, reasoning
+  Each `ChatOpenAI` instance uses the supplied `--base-url` (default from the
+  checked-out install plan's `config/gpt-gateway-topology.json` gateway.endpoint,
+  fallback `http://127.0.0.1:21128/v1`), `cx/gpt-6.1-sol-max`, Responses, reasoning
   `{"effort": "max"}`, `use_previous_response_id=False`, request timeout 120
   seconds and zero retries. The caller supplies an existing credential through
   an environment-variable name; the recipe does not copy native client sign-ins.
+  WSL distributions share networking; implicit defaults avoid NativeStack's
+  port 20128. Bounded jobs on NativeStack2604 explicitly pass
+  `--base-url http://127.0.0.1:21128/v1`.
 - SQLite checkpoint package **3.1.1**, [matched release source `b2926a0f`](https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite).
   The published wheel SHA-256 is
   `8505c54c94a658080525d7e6780fdd4e0c078ff2566b30d399c02cc9f9af1c63`;

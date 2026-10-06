@@ -3,8 +3,10 @@
 
 import argparse
 import importlib.metadata
+import json
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 os.environ["LANGGRAPH_STRICT_MSGPACK"] = "true"
 
@@ -20,8 +22,36 @@ from langchain_core.load import dumps
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-BASE_URL = "http://127.0.0.1:20128/v1"
+BASE_URL = "http://127.0.0.1:21128/v1"
+GATEWAY_TOPOLOGY = (
+    Path(__file__).resolve().parents[2]
+    / "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json"
+)
 MODEL = "cx/gpt-6.1-sol-max"
+
+
+def default_gateway_base_url():
+    # Same gateway.endpoint field as #723's native Promptfoo config (84c79f7f).
+    try:
+        endpoint = json.loads(GATEWAY_TOPOLOGY.read_text(encoding="utf-8"))["gateway"]["endpoint"]
+        if isinstance(endpoint, str):
+            parsed = urlsplit(endpoint)
+            # WSL distributions share networking; 20128 belongs to NativeStack.
+            # Match the existing Codex worker gateway_url contract for defaults.
+            if (
+                parsed.scheme == "http"
+                and parsed.hostname in {"127.0.0.1", "localhost", "::1"}
+                and parsed.port not in {None, 20128}
+                and parsed.username is None
+                and parsed.password is None
+                and not parsed.query
+                and not parsed.fragment
+                and parsed.path.rstrip("/") == "/v1"
+            ):
+                return endpoint.rstrip("/")
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return BASE_URL
 
 
 def emit(event, native):
@@ -84,6 +114,7 @@ def build_graph(workspace, skills, saver, api_key_env, base_url):
 
 
 def main():
+    default_base_url = default_gateway_base_url()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -96,7 +127,7 @@ def main():
     )
     parser.add_argument("--api-key-env", default="OPENAI_API_KEY")
     parser.add_argument(
-        "--base-url", default=BASE_URL, help="Explicit child endpoint or owned observer"
+        "--base-url", default=default_base_url, help="Explicit child endpoint or owned observer"
     )
     parser.add_argument("--prompt-file", type=Path)
     parser.add_argument(
@@ -126,7 +157,7 @@ def main():
                     )
                 },
                 "base_url": args.base_url,
-                "underlying_lane": BASE_URL,
+                "underlying_lane": default_base_url,
                 "model": MODEL,
                 "reasoning": {"effort": "max"},
                 "api_key_env": args.api_key_env,
