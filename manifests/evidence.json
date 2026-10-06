@@ -17437,6 +17437,11 @@
       "bytes": 21371
     },
     {
+      "path": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
+      "sha256": "af2bcb90307943b619cb7791cec66ff502b9f9a84689679b30e36cf6124cc768",
+      "bytes": 7428
+    },
+    {
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
@@ -17848,8 +17853,8 @@
     },
     {
       "path": "docs/upstream-surface-watch.md",
-      "sha256": "b2f5d71f0a7d931166dd53b00ec91bb2728a2829df1e335c25363035464da7a5",
-      "bytes": 20291
+      "sha256": "f6a26af19fcca7610ab0fea3a51dce9a5ee5d275626efec42dda8eb34e0e24f4",
+      "bytes": 20312
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -40895,6 +40900,11 @@
       "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
       "sha256": "b13ffd5fe0995830da568e5582f1bd3fdea77d3b16d651d660d16c4fa56628ef",
       "bytes": 23333
+    },
+    {
+      "path": "evidence/artifacts/ns2604-context-audit-20261006/review.json",
+      "sha256": "17bceefe97b5e78810b69d9db2b02041e45c4193cca03820f544ef51cfc19ef3",
+      "bytes": 8309
     },
     {
       "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
