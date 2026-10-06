@@ -46,6 +46,8 @@ INVENTORY = "adoption/credential-inventory.json"
 EXPECTED_HOOKS_PATH = "scripts/git-hooks"
 AGE_WARNING_DAYS = 90
 STORE_ROOT = "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack"
+REQUIRED_POINTERS = ("PAPER_ENV_FILE", "PAPER_ENV_FILE_2", "SEC_CONTACT_ENV", "PIT_ALPACA_ENV_PATH", "PIT_SEC_ENV_PATH",
+                     "IBKR_PAPER_LOGIN_ENV", "IBKR_PAPER_TWS_FILE", "IBKR_PAPER_VNC_FILE")
 
 LOCAL_KINDS = {"private_env_file", "private_file", "native_store"}
 NONLOCAL_KINDS = {"interactive_login", "github_actions"}
@@ -540,8 +542,24 @@ def client_guards(env, root: Path = ROOT) -> dict:
     return result
 
 
+def pointer_status(inventory: dict, env) -> list[dict]:
+    """Compare pointer metadata only: no target read, stat, resolution or expanded-path output.
+
+    The canonical paths and aliases belong to credential-inventory.json; optional credential-file presence is separate.
+    """
+    rows = []
+    for name in REQUIRED_POINTERS:
+        entries = [entry for entry in inventory["entries"] if name in entry.get("pointer_variables", [])]
+        declared = len(entries) == 1
+        value = env.get(name)
+        matches = bool(value) and declared and Path(value) == expand_template(entries[0]["store"]["path_template"], env)
+        rows.append({"name": name, "inventory_id": entries[0]["id"] if declared else None,
+                     "inventory_declared": declared, "set": bool(value), "matches_inventory": bool(matches)})
+    return rows
+
+
 def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
-            with_client_guards=False, proc_keys: Path | None = None) -> dict:
+            with_client_guards=False, proc_keys: Path | None = None, require_pointers=False) -> dict:
     """The report. proc_keys is the kernel's key list to scan (the CLI passes PROC_KEYS); None skips it."""
     env = os.environ if env is None else env
     uid = os.getuid() if uid is None else uid
@@ -575,6 +593,11 @@ def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
                                  if next(e for e in entries if e["id"] == i)["status"] == "required"]
     report["unsafe_stored"] = unsafe_stored
     report["result"] = "unsafe" if unsafe_stored else "ok"
+    if require_pointers:
+        report["pointers"] = pointer_status(inventory, env)
+        report["pointer_failures"] = [row["name"] for row in report["pointers"] if not row["matches_inventory"]]
+        if report["pointer_failures"] and not unsafe_stored:
+            report["result"] = "pointer_mismatch"
     return report
 
 
@@ -603,6 +626,9 @@ def render_text(report: dict) -> str:
     lines.append("environment must_not_be_set present: " + (",".join(env_names) or "none"))
     overrides = report["environment"]["native_store_path_overrides_present"]
     lines.append("environment native store path overrides present: " + (",".join(overrides) or "none"))
+    for pointer in report.get("pointers", []):
+        lines.append(f"pointer {pointer['name']}: set={pointer['set']} matches_inventory={pointer['matches_inventory']} "
+                     f"inventory_declared={pointer['inventory_declared']} inventory_id={pointer['inventory_id']}")
     repo = report["repository"]
     tracked = repo["tracked_sensitive_names"]
     lines.append("tracked sensitive names: " + ("unknown (not a git checkout)" if tracked is None else (",".join(tracked) or "none")))
@@ -624,6 +650,8 @@ def main(argv=None) -> int:
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--inventory", type=Path)
     parser.add_argument("--json", action="store_true", help="print the JSON report")
+    parser.add_argument("--require-pointers", action="store_true",
+                        help="require all eight PAPER/SEC/PIT/IBKR path pointers to match the inventory (booleans only)")
     parser.add_argument("--client-guards", action="store_true",
                         help="also check user-level Claude/Codex settings for the guard keys, "
                              "Claude telemetry content logging and whether the installed guard matches "
@@ -642,9 +670,10 @@ def main(argv=None) -> int:
     if errors:
         print("invalid inventory:\n" + "\n".join(errors), file=sys.stderr)
         return 2
-    report = inspect(args.root, inventory, with_client_guards=args.client_guards, proc_keys=args.proc_keys)
+    report = inspect(args.root, inventory, with_client_guards=args.client_guards, proc_keys=args.proc_keys,
+                     require_pointers=args.require_pointers)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_text(report))
-    return 1 if report["unsafe_stored"] else 0
+    return 1 if report["unsafe_stored"] or report.get("pointer_failures") else 0
 
 
 if __name__ == "__main__":

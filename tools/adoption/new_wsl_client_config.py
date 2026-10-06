@@ -116,7 +116,7 @@ import codex_roles  # noqa: E402
 import install_claude_profile as icp  # noqa: E402
 import managed_block  # noqa: E402
 import render_config  # noqa: E402
-from scripts import adoption_status  # noqa: E402
+from scripts import adoption_status, credential_status  # noqa: E402
 
 MAP_REL = "adoption/new-wsl/client-config-map.json"
 MAP_SCHEMA = "native-agent-stack/new-wsl-client-config-map/v1"
@@ -157,7 +157,10 @@ GENERATED_BLOCKS = {CLAUDE_MD_PIECE: "adoption/new-wsl/claude-user-instructions.
                     CODEX_MD_PIECE: "adoption/new-wsl/codex-user-instructions.md"}
 RENDERED_BLOCKS = {CLAUDE_MD_PIECE: "claude-user-instructions.md", CODEX_MD_PIECE: "codex-user-instructions.md"}
 STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims",
-               "step/codex-remote-plugin-rules", "step/rtk-claude-init")
+               "step/codex-remote-plugin-rules", "step/rtk-claude-init", "step/login-env-block")
+ENVIRONMENT_TEMPLATE = "adoption/templates/environment.d/60-native-agent-stack.conf"
+ENVIRONMENT_RENDER = "60-native-agent-stack.conf"
+ENVIRONMENT_KEYS = (*credential_status.REQUIRED_POINTERS, "RTK_TELEMETRY_DISABLED")
 REMOTE_PLUGIN_PIECE = STEP_PIECES[5]
 # The account's remote plugins, which no row of the definitive manifest selects: Codex keeps their bundles under
 # <Codex home>/plugins/cache/<marketplace>/<plugin>/<version>/ (core-plugin-common/src/installed.rs PLUGINS_CACHE_DIR,
@@ -198,7 +201,7 @@ EXAMPLE_HOST = "example"   # the host value file whose render --check scans
 LAUNCHER_PIECE, PATH_BLOCK_PIECE = STEP_PIECES[0], STEP_PIECES[1]
 # The steps --apply runs, in order; --skip names one.
 STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "rtk-claude-init", "claude-md",
-         "codex-config", "codex-files", "codex-md", "login-path", "verify")
+         "codex-config", "codex-files", "codex-md", "login-path", "login-env", "verify")
 # Command words a practice hook may run besides the files the repository copies: the shell's own words, python3 (the
 # interpreter of every tool in tools/adoption/) and jq (F4 of adoption/platforms/linux-wsl2-new-distro.md installs it and
 # adoption/bootstrap-linux.sh requires it). Any other word is a tool outside the repository.
@@ -1112,9 +1115,36 @@ def wired_path_dirs(results: list) -> list:
             and v.wired]
 
 
+def pointer_environment(root: Path, values: dict) -> dict:
+    """The nine-entry assignment intersection of environment.d, POSIX shell and stdlib TOML.
+
+    This is a fixed template renderer, not a general environment-file parser. No command substitutions/default operators.
+    systemd/systemd@b3d8fc43:man/environment.d.xml:59-74; Python tomllib; existing render_config substitution practice.
+    """
+    data = tomllib.loads((root / ENVIRONMENT_TEMPLATE).read_text(encoding="utf-8"))
+    if (tuple(data) != ENVIRONMENT_KEYS or type(data["RTK_TELEMETRY_DISABLED"]) is not int
+            or data["RTK_TELEMETRY_DISABLED"] != 1 or any(not isinstance(data[key], str) for key in credential_status.REQUIRED_POINTERS)):
+        raise ConfigError("pointer template must define exactly the eight ordered pointers and telemetry disabled")
+    known, rendered = dict(values), {}
+    for key, value in data.items():
+        value = str(value)
+        if not re.fullmatch(r"[A-Za-z0-9_./${}-]+", value):
+            raise ConfigError(f"unsupported pointer template syntax at {key}")
+        variables = re.findall(r"\$\{([A-Z_][A-Z0-9_]*)\}", value)
+        if "$" in re.sub(r"\$\{[A-Z_][A-Z0-9_]*\}", "", value) or any(name not in known for name in variables):
+            raise ConfigError(f"unsupported or undefined pointer template variable at {key}")
+        resolved = string.Template(value).substitute(known)
+        if any(ord(char) < 32 or ord(char) == 127 or char in '$`\\"' for char in resolved):
+            raise ConfigError(f"pointer render contains unsupported shell characters at {key}")
+        known[key] = rendered[key] = resolved
+    return rendered
+
+
 def render(root: Path, results: list, plan: dict, values: dict, manifest: dict | None = None) -> dict:
     """{file name: text} of the wired pieces."""
     wired = {v.piece.key: v for v in results if v.wired}
+    pointers = pointer_environment(root, values)
+    values = {**values, **pointers}
 
     def keep_of(group: str):
         """(the paths of the group's wired pieces, {path: replacement value} for those an entry overrides or rewrites)."""
@@ -1125,6 +1155,10 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
         return {v.piece.path for v in kept}, replaced
 
     files = {}
+    if "step/login-env-block" in wired:
+        files[ENVIRONMENT_RENDER] = "# Generated pointer metadata only; contains no credential values.\n" + "".join(
+            f"{key}={toml_value(value) if key != 'RTK_TELEMETRY_DISABLED' else '1'}\n"
+            for key, value in pointers.items())
     # Claude settings (placeholders filled) and the WSL overlay (applied as it is, as the bootstrap applies it).
     keep, replaced = keep_of("claude/settings")
     template = template_data(root, "claude/settings")
@@ -1151,6 +1185,8 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
     data = prune_toml(template_data(root, "codex/config"), keep, replaced)
     interim = emit_toml(data, "")
     parsed = dedupe_paths(tomllib.loads(substitute(interim, values, ".toml")))
+    if "RTK_TELEMETRY_DISABLED" in parsed.get("shell_environment_policy", {}).get("set", {}):
+        parsed["shell_environment_policy"]["set"]["RTK_TELEMETRY_DISABLED"] = pointers["RTK_TELEMETRY_DISABLED"]
     files["codex.config.toml"] = emit_toml(parsed, header("codex/config"))
     keep, replaced = keep_of("codex/hooks")
     hooks = prune_settings(template_data(root, "codex/hooks"), keep, replaced)
@@ -1549,6 +1585,40 @@ def cmd_render(args: argparse.Namespace) -> int:
     if note:
         print(f"note: {note}")
     return 0
+
+
+def cmd_check_login_env(args: argparse.Namespace) -> int:
+    """Read back only non-secret configuration metadata; never source a host file or read a credential store."""
+    if not args.host or not HOST_NAME.fullmatch(args.host):
+        print("--check-login-env needs --host NAME", file=sys.stderr)
+        return 2
+    try:
+        results, manifest, plan, errors, _ = analyse(args.root)
+        if errors:
+            raise ConfigError("repository wiring check failed")
+        home = Path(args.home) if args.home else Path.home()
+        values = host_values(args.host, plan, home, wired_path_dirs(results))
+        files = render(args.root, results, plan, values, manifest)
+        target = home / ".config/environment.d" / ENVIRONMENT_RENDER
+        source, _ = managed_block.read_target(target)
+        profile, _ = managed_block.read_target(home / ".profile")
+        span = managed_block.block_span(profile, managed_block.PROFILE_ENV_BEGIN, managed_block.PROFILE_ENV_END)
+        config, _ = managed_block.read_target(home / ".codex/config.toml")
+        policy = tomllib.loads(config).get("shell_environment_policy", {})
+        expected = pointer_environment(args.root, values)
+        checks = {
+            "environment_source": source == files.get(ENVIRONMENT_RENDER),
+            "profile_reader": span is not None and profile[span[0]:span[1]] == managed_block.profile_env_block(str(target), str(home)),
+            "profile_not_shadowed": not any((home / name).is_file() for name in (".bash_profile", ".bash_login")),
+            "codex_inherit_none": policy.get("inherit") == "none",
+            "codex_pointer_values": all(policy.get("set", {}).get(key) == value for key, value in expected.items()),
+            "codex_pointer_filters": not policy.get("include_only") and not policy.get("filters") and not policy.get("rules"),
+        }
+        print(json.dumps({"checks": checks, "result": "passed" if all(checks.values()) else "failed"}, sort_keys=True))
+        return 0 if all(checks.values()) else 1
+    except (ConfigError, OSError, ValueError, managed_block.Refused) as error:
+        print(f"login-env check failed ({type(error).__name__})", file=sys.stderr)
+        return 1
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -2574,6 +2644,38 @@ class Apply:
             problems.append(f"claude resolves to {found['claude']}, not the launcher {launcher}")
         self.record("verify", "failed" if problems else "verified", "; ".join(problems))
 
+    def step_login_env(self) -> None:
+        """Install the one non-secret pointer source and its profile reader. Never source a credential file."""
+        step = "login-env"
+        if "step/login-env-block" not in self.wired:
+            self.record(step, "left out", "the map does not wire the pointer environment block")
+            return
+        target = self.home / ".config/environment.d" / ENVIRONMENT_RENDER
+        current, mode = managed_block.read_target(target)
+        expected_sha = lane.sha256_bytes(current.encode("utf-8")) if mode is not None else None
+        wanted = self.files[ENVIRONMENT_RENDER]
+        changed = current != wanted
+        if changed:
+            if self.dry:
+                self.say(step, f"  would write pointer environment file {target}")
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                try:
+                    if lane.sha256_file(target) != expected_sha:
+                        raise lane.Failed("pointer environment file changed since it was read; nothing written")
+                    if mode is not None:
+                        self.say(step, f"  backed up pointer environment file -> {file_io.write_backup(target)}")
+                    lane.atomic_write(target, wanted.encode(), mode if mode is not None else 0o644, expected_sha)
+                except lane.Failed as error:
+                    self.record(step, "failed", str(error))
+                    return
+                if target.read_text(encoding="utf-8") != wanted:
+                    raise ConfigError("pointer environment readback differs from its render")
+        argv = [str(ROOT / "tools/adoption/managed_block.py"), "--home", str(self.home)]
+        argv += ["--dry-run"] if self.dry else []
+        ok = self.tool(step, argv + ["profile-env", "--env-file", str(target)])
+        self.record(step, "failed" if not ok else "planned" if self.dry else "applied" if changed or self.changed else "current")
+
 
 def launcher_bytes(bootstrap: Path) -> bytes:
     """The ecosystem `claude` launcher exactly as adoption/bootstrap-linux.sh's install_native writes it: that function
@@ -2629,6 +2731,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="check the map against the manifest, plan and templates")
+    mode.add_argument("--check-login-env", action="store_true",
+                      help="--host NAME: read back pointer source, profile reader and Codex policy (booleans only)")
     mode.add_argument("--render", action="store_true", help="write the wired pieces for --host into --out")
     mode.add_argument("--apply", action="store_true", help="put the wired pieces in place for --host")
     mode.add_argument("--write-blocks", action="store_true",
@@ -2637,7 +2741,7 @@ def build_parser() -> argparse.ArgumentParser:
                         help="the catalog checkout whose map, templates, manifest and plan are read (default: this one)")
     parser.add_argument("--host", help="adoption/hosts/<name>.json, the host value file")
     parser.add_argument("--out", type=Path, help="--render: the directory to write")
-    parser.add_argument("--home", help="--apply: the home directory to configure (default: the current user's)")
+    parser.add_argument("--home", help="--apply or --check-login-env: the home directory (default: the current user's)")
     parser.add_argument("--claude-bin", help="--apply: the claude binary (default: the native installer's, from PATH)")
     parser.add_argument("--codex-bin", help="--apply: the codex binary (default: the native installer's, from PATH)")
     parser.add_argument("--dry-run", action="store_true", help="--apply: report each step; run no client, write nothing")
@@ -2694,6 +2798,8 @@ def main(argv: list | None = None) -> int:
         return cmd_write_blocks(args)
     if args.check:
         return cmd_check(args)
+    if args.check_login_env:
+        return cmd_check_login_env(args)
     if args.render:
         return cmd_render(args)
     return Apply(args).run()

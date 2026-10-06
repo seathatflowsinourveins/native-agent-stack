@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "unit": "P1-ENV",
+  "lane": "foundation",
+  "base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "decision": "docs/decisions/2026-10-06-pointer-environment-transfer.md",
+  "scope": {"host_apply": false, "credentials_read": false, "provider_calls": 0, "old_distribution_started": false},
+  "sources": [
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/environment.d.xml:59-74",
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.environment-generator.xml:116-121",
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:src/basic/env-file.c:526-559",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/shell_environment_policy.rs:23,35,106-108,161",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/protocol/src/shell_environment.rs:100-147",
+    "containers/bubblewrap@124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe:bwrap.xml:50-59,230-233,309-314,409-415",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:tools/adoption/managed_block.py:93-114,319-338",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:scripts/credential_status.py:198-209,241-311",
+    "https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html",
+    "https://docs.python.org/3.13/library/tomllib.html"
+  ],
+  "executions": [
+    {"class": "local_integration", "command": "nice -n 19 python3 -m unittest tests.test_credential_status -q", "exit": 0, "tests": 48, "seconds": 2.590},
+    {"class": "synthetic", "phase": "initial fixture coverage", "command": "nice -n 19 python3 -m unittest tests.test_managed_block tests.test_new_wsl_client_config -q", "exit": 1, "tests": 230, "failures": 13, "errors": 3, "seconds": 67.290, "reason": "New source missing from old copied fixture catalogs and stale file/count/backup expectations."},
+    {"class": "synthetic", "phase": "first extended suites", "command": "nice -n 19 python3 -m unittest tests.test_managed_block tests.test_new_wsl_client_config tests.test_credential_status -q", "exit": 1, "tests": 285, "failures": 7, "seconds": 72.356, "reason": "Remaining inventory/count/backup expectations and a quoting error in the synthetic shell probe."},
+    {"class": "local_integration", "command": "nice -n 19 python3 -m unittest tests.test_managed_block tests.test_new_wsl_client_config tests.test_credential_status -q", "exit": 0, "tests": 285, "seconds": 69.840},
+    {"class": "local_integration", "phase": "write/filter/control regression suite", "command": "nice -n 19 python3 -m unittest tests.test_managed_block tests.test_new_wsl_client_config tests.test_credential_status -q", "exit": 0, "tests": 288, "seconds": 79.243},
+    {"class": "synthetic", "phase": "canonical filter regression fixture", "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.LoginEnvironmentTests -q", "exit": 1, "tests": 7, "errors": 2, "seconds": 6.315, "reason": "Missing copy import in test fixture; corrected."},
+    {"class": "local_integration", "phase": "canonical filter controls", "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.LoginEnvironmentTests -q", "exit": 0, "tests": 7, "seconds": 6.267},
+    {
+      "class": "native_proven",
+      "scope": "installed v259.5 generator with synthetic input in isolated bubblewrap filesystem",
+      "command": "env -i PATH=/usr/bin:/bin bwrap --unshare-all --die-with-parent --ro-bind /usr /usr --tmpfs /usr/local --tmpfs /usr/lib/environment.d --symlink usr/lib /lib --symlink usr/lib64 /lib64 --symlink usr/bin /bin --dir /etc --dir /run --ro-bind <owned-synthetic-fixture> /fixture --chdir /fixture --clearenv --setenv HOME /fixture --setenv XDG_CONFIG_HOME /fixture/.config --setenv PATH /usr/bin:/bin --setenv LANG C /usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator",
+      "exit": 0,
+      "returned": "PAPER_ENV_FILE=/fixture/.config/native-agent-stack/alpaca-paper.env\nPAPER_ENV_FILE_2=/fixture/.config/native-agent-stack/alpaca-paper-2.env\nSEC_CONTACT_ENV=/fixture/.config/native-agent-stack/sec-contact.env\nPIT_ALPACA_ENV_PATH=/fixture/.config/native-agent-stack/alpaca-paper.env\nPIT_SEC_ENV_PATH=/fixture/.config/native-agent-stack/sec-contact.env\nRTK_TELEMETRY_DISABLED=1",
+      "keys": 6,
+      "host_environment_and_system_configs_hidden": true
+    },
+    {
+      "class": "native_proven",
+      "scope": "installed Bash automatic login startup in same isolated fixture with synthetic passwd/HOME",
+      "command": "bwrap <same isolation, synthetic passwd at /etc/passwd> /bin/bash --login -c '<assert exact six expected metadata values>'",
+      "exit": 0,
+      "returned": "",
+      "real_user_profile_read": false
+    },
+    {
+      "class": "native_proven",
+      "scope": "value-free store metadata only",
+      "command": "python3 -B scripts/credential_status.py --json",
+      "exit": 0,
+      "observation": {"id": "grafana-admin", "state": "ok", "findings": [], "mode": "0600", "directory_mode": "0700"},
+      "values_read": false,
+      "producer_or_service_acceptance": false
+    }
+  ],
+  "review": {
+    "class": "source_review",
+    "kind": "bounded independent source and completeness review",
+    "final_verdict": "accepted within conventional HOME, base Codex and Phase 1 repository scope; no remaining material findings",
+    "final_review_executed_tests": false,
+    "final_review_read_host_state": false,
+    "next_sweep": ["user-manager child, Dagu execution context and fresh native clients", "landed IBKR security and rootless-container readers", "partial rollback including absent-source manager state", "maintained upstream environment-file/shared-renderer and filter changes"],
+    "fixed": ["canonical Codex filters detection", "original-byte hash/absence write guard", "normal lane.Failed reporting", "C0/DEL rejection", "test-only IBKR metadata reuses landed owner declarations"],
+    "limits": ["conventional HOME and base Codex scope", "custom filters fail conservatively", "profile shadow detection does not edit operator files", "partial multi-file apply requires explicit owner rollback", "Grafana producer provenance not asserted"]
+  },
+  "host_owner_steps": ["F9 apply after landing", "guarded legacy bashrc pointer-line cleanup", "systemctl --user daemon-reload", "systemctl --user restart dagu.service", "fresh login and user-manager pointer checks"],
+  "all_pointer_extension": {
+    "directive": "2026-10-06 owner clarification A7: preserve all PAPER/SEC/PIT/IBKR pointers before legacy cleanup",
+    "ibkr_source_pin": "bf1d143cd62f57445f85aa9415247974a70cb3bc",
+    "ibkr_source_paths": ["adoption/credential-inventory.json", "docs/secret-storage.md:297-299,647-649"],
+    "ibkr_owner_rows_copied": false,
+    "host_dependency": "IBKR owner's inventory/security changes must land for the strict eight-pointer gate",
+    "native_generator_exit": 0,
+    "native_generator_keys": 9,
+    "native_generator_returned": "PAPER_ENV_FILE=/fixture/.config/native-agent-stack/alpaca-paper.env\nPAPER_ENV_FILE_2=/fixture/.config/native-agent-stack/alpaca-paper-2.env\nSEC_CONTACT_ENV=/fixture/.config/native-agent-stack/sec-contact.env\nPIT_ALPACA_ENV_PATH=/fixture/.config/native-agent-stack/alpaca-paper.env\nPIT_SEC_ENV_PATH=/fixture/.config/native-agent-stack/sec-contact.env\nIBKR_PAPER_LOGIN_ENV=/fixture/.config/native-agent-stack/ibkr-paper-login.env\nIBKR_PAPER_TWS_FILE=/fixture/.config/native-agent-stack/ibkr-paper-tws.password\nIBKR_PAPER_VNC_FILE=/fixture/.config/native-agent-stack/ibkr-paper-vnc.password\nRTK_TELEMETRY_DISABLED=1",
+    "automatic_bash_login_exit": 0,
+    "automatic_bash_login_class": "native_proven",
+    "automatic_bash_login_contract": "test \"$PAPER_ENV_FILE\" = /fixture/.config/native-agent-stack/alpaca-paper.env && test \"$PAPER_ENV_FILE_2\" = /fixture/.config/native-agent-stack/alpaca-paper-2.env && test \"$SEC_CONTACT_ENV\" = /fixture/.config/native-agent-stack/sec-contact.env && test \"$PIT_ALPACA_ENV_PATH\" = /fixture/.config/native-agent-stack/alpaca-paper.env && test \"$PIT_SEC_ENV_PATH\" = /fixture/.config/native-agent-stack/sec-contact.env && test \"$IBKR_PAPER_LOGIN_ENV\" = /fixture/.config/native-agent-stack/ibkr-paper-login.env && test \"$IBKR_PAPER_TWS_FILE\" = /fixture/.config/native-agent-stack/ibkr-paper-tws.password && test \"$IBKR_PAPER_VNC_FILE\" = /fixture/.config/native-agent-stack/ibkr-paper-vnc.password && test \"$RTK_TELEMETRY_DISABLED\" = 1",
+    "automatic_bash_login_returned": {"stdout": "", "stderr": ""},
+    "focused_checks": {"tests": 55, "exit": 0, "seconds": 9.067},
+    "retained_failed_fixture": {"tests": 55, "exit": 1, "seconds": 9.362, "reason": "Synthetic IBKR inventory IDs contained underscores; corrected to supported hyphen syntax."}
+  },
+  "final_checks": {
+    "class": "local_integration",
+    "command": "TMPDIR=<owned-cache> PYTHONDONTWRITEBYTECODE=1 rtk proxy nice -n 19 python3 -B -m unittest tests.test_credential_status tests.test_managed_block tests.test_new_wsl_client_config",
+    "tests": 289,
+    "exit": 0,
+    "seconds": 77.380,
+    "prior_eight_pointer_full_suite": {"tests": 288, "exit": 0, "seconds": 79.454},
+    "own_check": {
+      "class": "native_proven",
+      "command": "python3 -B tools/adoption/new_wsl_client_config.py --check-login-env --host example --home /home/example (bwrap isolated readonly synthetic HOME and repository, private TMPDIR=/scratch)",
+      "exit": 0,
+      "returned": {"checks": {"codex_inherit_none": true, "codex_pointer_filters": true, "codex_pointer_values": true, "environment_source": true, "profile_not_shadowed": true, "profile_reader": true}, "result": "passed"},
+      "limits": "Synthetic configuration read-back through the native CLI; no real F9 host apply or fresh provider session",
+      "retained_setup_failures": "Two isolated attempts returned FileNotFoundError because no writable temporary directory was mounted; the diagnostic attempt also failed. Adding a private /scratch TMPDIR corrected the isolated invocation; shared /tmp was never used."
+    },
+    "legacy_cleanup_stdin": {"class": "synthetic", "names": 4, "all_exact_guards_passed": true, "other_name_preserved": true, "compound_lines_rejected": true, "gnu_sed": "4.9", "gnu_grep": "3.12", "gnu_coreutils": "9.7", "remote_manual_fetch": "timeout; installed help and stdin execution used"},
+    "repository_validation": {"command": "TMPDIR=<owned-cache> PYTHONDONTWRITEBYTECODE=1 rtk proxy nice -n 19 python3 -B scripts/validate.py", "exit": 0, "returned": {"components": 69, "hashed_files": 10276, "profiles": 4, "receipts": 212, "status": "passed"}, "limits": "Integrity and scope checks only; no live provider or GPU execution."},
+    "generated_handbook": {"command": "rtk proxy nice -n 19 python3 -B scripts/build_new_wsl_handbook.py --write", "exit": 0, "changed": false},
+    "f9_map_check": {"command": "nice -n 19 python3 -B tools/adoption/new_wsl_client_config.py --check", "exit": 0, "pieces": 407, "wired": 367, "not_wired": 24, "authorization": 16, "existing_warnings": ["mcp-inspector manifest/plan mismatch for Claude MCP_AUTO_OPEN_ENABLED", "mcp-inspector manifest/plan mismatch for Codex MCP_AUTO_OPEN_ENABLED"]},
+    "generated_reports": {"component_matrix_exit": 0, "new_host_grand_list_exit": 0, "status_flips": 0},
+    "whitespace": {"command": "rtk git diff --check", "exit": 0}
+  },
+  "owner_procedure": "evidence/artifacts/pointer-environment-transfer-20261006/README.md",
+  "conditions": {"generation_key": "only if its service moves", "fw_lane_store": "only if Phase 3 selects an actual 20129 lane", "paper_units": "future 2026-10-07 units direct --env-file; 2026-10-06 unchanged"}
+}
