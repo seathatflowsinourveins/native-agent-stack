@@ -41,8 +41,21 @@
    }
   ],
   "convention_equivalence": "Each span hash equals `git show ecfa11276:<path> | sed -n \"a,bp\" | sha256sum` (checked for these three spans); the file has no CR bytes and ends with a newline.",
-  "critic_hashes_compared": false,
-  "open_item": "The brief gives the critic's file sha256 and line ranges but not its span hashes, and none were found locally. A comparison against the critic's own span hashes is still open."
+  "critic_hashes_compared": true,
+  "critic_comparison": {
+   "proposal": "research/rnd-wave1-20261006/r1/deviation-proposal-20261006-completeness.json (the R1 lane's private research state)",
+   "proposal_sha256": "7e7bd262eb8c8fec17f07311d410433b427653e67daf25fe193ddc3f775c2bfd",
+   "fields_compared": [
+    "finding.source_path",
+    "finding.source_sha256",
+    "finding.source_spans[0..2].lines",
+    "finding.source_spans[0..2].span_sha256"
+   ],
+   "method": "exact string and list equality against item D6-C01 (7 comparisons)",
+   "equal": true,
+   "compared_at_utc": "2026-10-06T17:31:26Z",
+   "compared_by": "session 5f, after the command center's adjudication of #796 (item task-native-agent-stack-5f-20261006T165010Z, P2)"
+  }
  },
  "verdict_rule": "COUNTS: a completed read of real market data (bars, quotes, trades, snapshots, auctions, screeners, corporate actions or news served by a market-data API; OPRA; FINRA short volume), or a real paper or broker session that consumed it, whose data dates fall inside the window and which no known_reads item covers. Window membership is judged by the dates of the data read, not the run date. OUT: synthetic or fixture-only, not run, data dated outside the window, no market data (filings, documents, account state), covered by a known_reads item, a local re-read inside a bound item's scope, or a wrapper of another record.",
  "access_kind_rule": "data_read: the record shows only data, counts or coverage. result_inspected: the record shows per-case results (fills, realized P&L, flags, ranks). outcome_selected: names were chosen by a realized outcome (a gain or move threshold, a ranking by realized return, a known mover). Where one scope mixes kinds and the record cannot split it, the stronger kind is proposed and flagged.",

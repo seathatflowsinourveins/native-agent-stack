@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "kind": "rnd_wave1_preregistration_deviations",
- "recorded_at_utc": "2026-10-06T15:40:06+00:00",
+ "recorded_at_utc": "2026-10-06T17:31:38+00:00",
  "frozen_commit": "d4601bfcbc4db74e57cd5c387bf48faebe263642",
  "previous_deviation_commits": [
   "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
@@ -89,7 +89,7 @@
      "scope_kind": "universe_date_range",
      "identifiers_or_universe": "the securities named at README.md:49-53 (one index ETF and one large-cap stock); the probe's full symbol set and 1Day request windows are not recorded",
      "date_range": [
-      "2021-01-01",
+      "unknown",
       "2026-09-29"
      ],
      "access_kind": "data_read",
@@ -117,7 +117,7 @@
      "reason": "Completed read-only probe of real overnight market data inside the window, separate from the watch run. The README calls the probe outputs scratch, not evidence; that describes evidence quality, not exposure.",
      "flags": [
       "Start date and full symbol set unknown: under D1 an unknown field covers every case in the potential scope (all earlier dates for these names). The reviewer may bound it to the named securities and the stated dates.",
-      "An endpoint is unknown in the record ([\"unknown\", \"2026-09-29\"]); the window endpoint is pinned (conservative)."
+      "An endpoint is unknown in the record and is recorded as unknown (frozen D1: an entry with an unknown field covers every case that could fall within its scope)."
      ]
     },
     {
@@ -449,7 +449,7 @@
      "scope_kind": "universe_date_range",
      "identifiers_or_universe": "every symbol-day with a previous daily row in the broad-universe daily dataset (pre-market scan), the candidate union (daily or pre-market high at least 1.20 x the previous low) and its intraday collections",
      "date_range": [
-      "2021-01-04",
+      "2026-01-02",
       "2026-09-25"
      ],
      "access_kind": "outcome_selected",
@@ -505,7 +505,8 @@
      "reason": "Residual of known_reads[1]: D4.1 binds 2021-01-04..2025-12-31, but candidate selection and collection covered every session to 2026-09-18, the protocol's holdout included, plus a corporate-action page for 2026-09-21..25.",
      "flags": [
       "Judgment for the command center: D4.1 ends known_reads[1] at 2025-12-31 deliberately. The record shows holdout-session data was collected and filtered by realized high, though post-entry outcomes were not computed (README.md:22).",
-      "The same candidate filter within 2021-01-04..2025-12-31 is a selection by realized high, which could argue for outcome_selected rather than the result_inspected D4.1 pins; noted, not changed."
+      "The same candidate filter within 2021-01-04..2025-12-31 is a selection by realized high, which could argue for outcome_selected rather than the result_inspected D4.1 pins; noted, not changed.",
+      "Residual only: 2026-01-02..2026-09-25 lies beyond known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays the binding for the earlier range (class verdict rule: a read covered by a known_reads item is OUT)."
      ]
     },
     {
@@ -2558,8 +2559,8 @@
   },
   {
    "id": "D6.3",
-   "finding": "Two in-window reads of non-market data: SEC filing metadata, and issuer and exchange documents.",
-   "rule": "Step 1 (PREREGISTRATION.md:40) enumerates every recorded read, so both are bound conservatively as data_read. This resolution is proposed for the command center's confirmation at its ACK.",
+   "finding": "Three in-window reads of non-market data: SEC filing metadata, issuer and exchange documents, and one real 8-K filing kept as a test fixture.",
+   "rule": "Step 1 (PREREGISTRATION.md:40-42) enumerates every recorded read, and H1.1 (:57-58) adds a miss as a dated deviation, never silently; neither allows a fixture exception. All three are bound as data_read; their market-data verdicts stay OUT in the class review.",
    "entries": [
     {
      "id": "D6-O-N01",
@@ -2635,13 +2636,43 @@
       "Bound conservatively under PREREGISTRATION.md:40 (every recorded read), proposed for the command center's confirmation.",
       "The record gives the events' year; the calendar year is pinned (conservative)."
      ]
+    },
+    {
+     "id": "D6-O-N03",
+     "scope_kind": "event",
+     "identifiers_or_universe": "the one historical 8-K filing (event date 2021-03-29, Items 8.01 and 9.01) vendored as an upstream test fixture, at the cited lines",
+     "date_range": [
+      "2021-03-29",
+      "2021-03-29"
+     ],
+     "access_kind": "data_read",
+     "purpose": "catalyst-provenance: one real 8-K filing parsed locally by the native parser",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/catalyst-provenance/README.md:30-44",
+     "source_sha256": "9c49080c900c5c8101f6c0208cc923d499959099664a914741b58be97a29968e",
+     "source_spans": [
+      {
+       "lines": [
+        30,
+        44
+       ],
+       "span_sha256": "7ca9a355a08fb0f369d0a1391dfd0b4841ad692a19c63a594af32e38cdb022cc"
+      }
+     ],
+     "dates_as_recorded": null,
+     "data_class": "filings",
+     "reason": "No market data observed: one vendored upstream test-fixture 8-K (event date 2021-03-29, Items 8.01 and 9.01, not the Item 1.01 v1 catalyst), parsed locally.",
+     "flags": [
+      "Judgment: a real 2021 filing inside the window. If filing reads count, bind it as one event entry, data_read.",
+      "Bound under PREREGISTRATION.md:40-42 and :57-58 (every recorded read; a miss is added, never excluded): neither the frozen enumeration rule nor the deviation procedure allows a fixture exception (the command center's adjudication of #796, P1-1). Its market-data verdict stays OUT."
+     ]
     }
    ]
   },
   {
    "id": "D6.4",
    "finding": "Judgment calls the class review flagged.",
-   "rule": "Each is resolved conservatively and proposed for the command center's confirmation at its ACK. (1) D6-C05 and D6-C08 are universe-wide data reads; the conservative rule applies with no access-kind exception. (2) D6-C07 and D6-C10 bind data beyond the ranges D4.1 pins for known_reads[0] and [1]; they are bound as residuals. (3) D6-G02's LEAN-bundled bars reach 2021-03-31; it is bound beyond known_reads[4]'s ETF control. (4) outcome_selected is applied across a whole universe where its selected subset is private or partly named. (5) Code-derived request windows are bound as derived; an unknown endpoint takes the window endpoint. (6) Fixtures, synthetic data, runs that observed nothing, data outside the window and wrapper records stay out.",
+   "rule": "Each is resolved conservatively and proposed for the command center's confirmation at its ACK. (1) D6-C05 and D6-C08 are universe-wide data reads; the conservative rule applies with no access-kind exception. (2) D6-C07 and D6-C10 bind only the residual data beyond the ranges D4.1 pins for known_reads[0] and [1] (C10: 2026-01-02..2026-09-25); the pinned ranges stay the known reads' bindings. (3) D6-G02's LEAN-bundled bars reach 2021-03-31; it is bound beyond known_reads[4]'s ETF control. (4) outcome_selected is applied across a whole universe where its selected subset is private or partly named. (5) Code-derived request windows are bound as derived; an endpoint the record does not determine is recorded as unknown (frozen D1, deviations.json rule.unknown), never replaced by the window endpoint. (6) Fixtures, synthetic data, runs that observed nothing, data outside the window and wrapper records stay out.",
    "judgment_calls_as_reviewed": [
     "D6-C05: a universe-wide data_read 2016-01-04..2026-09-18 marks every v1 case inspected under the conservative rule; confirm that data_read entries carry that effect.",
     "D6-C07 and D6-C10: residuals beyond the exact ranges D4.1 pins for known_reads[0] (exit closes to 2026-09-18) and known_reads[1] (holdout-session collection); the command center decides whether to bind them.",
@@ -2666,13 +2697,19 @@
  ],
  "class_review": {
   "receipt": "d6-class-review-20261006.json",
-  "receipt_sha256": "b8a4b39d6c82ce3d9ec8022691e92e8402f9a2237dbd599411fe8a09a3fe4033",
+  "receipt_sha256": "bbb31c62c677e2f3cbe36f53d87cbe252fab62264d9cd95cef8f3e6bf7541800",
   "items_reviewed": 100,
   "counts": {
    "COUNTS": 48,
    "OUT": 52
   },
   "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "bound_conservatively_despite_out_verdict": [
+   "D6-O-N01",
+   "D6-O-N02",
+   "D6-O-N03"
+  ],
+  "critic_hashes_compared": true,
   "span_hash_convention": "sha256 over the exact lines a..b (1-based, inclusive) joined with \"\\n\" plus one trailing \"\\n\"; for LF files this is byte-identical to `git show <rev>:<path> | sed -n \"a,bp\" | sha256sum`. File hashes are sha256 of `git show <rev>:<path>`.",
   "not_searched": [
    "tests/** (320 files) not reviewed: synthetic by construction; tests/test_pit_availability.py is known to freeze three real filing headers (see D6-O-N01).",
@@ -2762,11 +2799,6 @@
    "id": "D6-O-K15",
    "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
    "reason": "Source of known_reads[4]; the blueprint's own receipt is a synthetic contract exercise (catalyst-experiment/receipt.json)."
-  },
-  {
-   "id": "D6-O-N03",
-   "path": "blueprints/us-equities/catalyst-provenance/README.md",
-   "reason": "No market data observed: one vendored upstream test-fixture 8-K (event date 2021-03-29, Items 8.01 and 9.01, not the Item 1.01 v1 catalyst), parsed locally."
   },
   {
    "id": "D6-O-N04",
