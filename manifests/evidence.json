@@ -4816,6 +4816,11 @@
       "bytes": 1137
     },
     {
+      "path": "adoption/hooks/claude/skill-state-recorder-proposal.md",
+      "sha256": "00bc57a14c358098eaa67ad1ccaf91d1a86584892ef9287114fbace7e03effe9",
+      "bytes": 9849
+    },
+    {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
       "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
       "bytes": 2888
@@ -46327,6 +46332,11 @@
       "bytes": 17035
     },
     {
+      "path": "evidence/artifacts/skills-tier-a-recorder-20261006/source-review.json",
+      "sha256": "7482ad13600c5b70934e146c63ec5e44362b98ea2279b24a69cc567a6b316b13",
+      "bytes": 6169
+    },
+    {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
       "sha256": "0f3d4e68227108db70730487a65991c71bad01544147962263b3b996f722e2f2",
       "bytes": 11280
@@ -55397,6 +55407,11 @@
       "bytes": 103131
     },
     {
+      "path": "tests/test_skill_state_recorder.py",
+      "sha256": "bce68682ee1287a5a1e451f42c86d52cfb793efa7dd24d1002ae3e8990a83c44",
+      "bytes": 15016
+    },
+    {
       "path": "tests/test_skill_usage.py",
       "sha256": "994cc7796bf7995137a1cb117f96705e38fcf10fb9b43d970eca0292b93bc85f",
       "bytes": 249557
@@ -55650,6 +55665,11 @@
       "path": "tools/adoption/runtime_skill_freshness.py",
       "sha256": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
       "bytes": 8628
+    },
+    {
+      "path": "tools/adoption/skill_state_recorder.py",
+      "sha256": "b4ef03aa20a94c1349afa8771cfa6fb454dd85ce698a5226a21e976624baef7d",
+      "bytes": 20439
     },
     {
       "path": "tools/capability-gate/README.md",
