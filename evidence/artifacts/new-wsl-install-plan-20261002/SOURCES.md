@@ -986,3 +986,99 @@ in this builder.
   `needs_user` and no trial is invented. ATIF schema acceptance is separate from
   the native telemetry-contract assertions described in
   `config/harbor-worker-telemetry-contract.md`.
+
+## Phase 1 transfer-CLI sources (2026-10-06)
+
+- Existing maintained plan at ecfa112764c664d35377dd66b8cfcb67e5a94d60:
+  install.sh native run_command/--only dispatch, accept.sh native check, and
+  check_plan.py source/command equality. The supplemental namespace fills the
+  demonstrated strict-foundation-row gap without new default decisions.
+- Mise [v2026.10.1 use](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md),
+  [unuse](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/unuse.md) and
+  [uninstall](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/uninstall.md).
+  Pins use native mise use -g TOOL@VERSION. The separate pin TOML is checked
+  without running a task or granting trust.
+- Gitleaks [v8.30.1 release](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1)
+  and [README](https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md):
+  version, directory scan, --no-banner and full --redact. The generated nonsecret
+  planted-value check is a local integration control, bound to the upstream
+  [github-pat rule](https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml).
+  This compatibility pin was required by A8/P1-GIT;
+  it is not described as a newly released version.
+- UV [0.12.22 tools](https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/tools.md):
+  native pinned tool installation and isolated tool environments.
+- APT installed3.2.0; [apt-get manual](https://manpages.debian.org/apt/apt-get.8.en.html),
+  reviewed2026-10-06: explicit package=version install. Exact target-compatible
+  candidate versions must be observed from the 2604 package metadata; old
+  distribution package revisions are not copied blindly.
+- Source choice: mise tasks can run serial native commands, but config
+  environments overlay the base and post-dependencies run after failure.
+  [Task TOML](https://github.com/jdx/mise/blob/v2026.10.1/docs/tasks/toml-tasks.md),
+  [configuration environments](https://github.com/jdx/mise/blob/v2026.10.1/docs/configuration/environments.md),
+  [task configuration](https://github.com/jdx/mise/blob/v2026.10.1/docs/tasks/task-configuration.md).
+  Reusing this plan preserves its existing slot coverage and source checks with
+  fewer installation/trust semantics. Plain safe mise TOML does not universally
+  require a trust prompt; [trust docs](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/trust.md).
+## Phase 1 complete transfer inventory (2026-10-06)
+
+The separate transfer inventory is a local observation/consistency record, not a
+new foundation default or an upstream suite. It covers the80legacy bin filenames
+and all69legacy-only packages' bin/sbin paths:72missing filenames,10named install
+rows for7native transactions,62dated exclusions. Backup artifacts, versioned
+language/compiler aliases and a service program are counted as filenames, not
+distinct products. Every exclusion binds a repository source file at ecfa11276.
+
+Additional installed-source pins:
+
+- Grype0.119.0 is already selected in catalogs/foundation/automation.json;
+  [misev2026.10.1 registry/grype.toml](https://github.com/jdx/mise/blob/v2026.10.1/registry/grype.toml)
+  documents aqua:anchore/grype and the native version test. CLI parsing is not CVE
+  detection; no database update or upstream scanner suite is run here.
+- [ntfyv2.28.0 cmd/app.go](https://github.com/binwiederhier/ntfy/blob/v2.28.0/cmd/app.go)
+  and [Aqua e831e00a registry](https://github.com/aquaproj/aqua-registry/blob/e831e00a99f512934dd18533d8a1447b86b3aefd/pkgs/binwiederhier/ntfy/registry.yaml).
+- [Qdrantv1.19.1 src/main.rs](https://github.com/qdrant/qdrant/blob/v1.19.1/src/main.rs)
+  parses version/help before service startup;
+  [Aqua d15f84b9 registry](https://github.com/aquaproj/aqua-registry/blob/d15f84b9327535e6ded365a22f96b7316497a1bb/pkgs/qdrant/qdrant/registry.yaml)
+  selects its Linux musl archive. Full Aqua identifiers are required: bare
+  ntfy/qdrant registry aliases were not found by installed mise.
+- [vLLM0.30.0 CLI](https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/vllm/entrypoints/cli/main.py)
+  and [pyproject](https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/pyproject.toml)
+  support Python3.13 and version/help. No serve/model download/GPU inference runs.
+- [Tavily CLI0.1.8 on PyPI](https://pypi.org/project/tavily-cli/0.1.8/), reviewed
+  2026-10-06. Official published sdist SHA256
+  3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08;
+  pyproject.toml exposes tvly/supports3.13; cli.py version/help parsing precedes
+  auth/REPL commands. Guessed official GitHub tag paths returned404; PyPI is the
+  authoritative package source. No auth/status/provider command is invoked.
+- [pkgconf2.5.1 CLI](https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c);
+  Ubuntu resolute/main candidates pkgconf/pkgconf-bin/libpkgconf7 are each2.5.1-4,
+  absent at readback. Official [pkgconf](https://packages.ubuntu.com/resolute/amd64/pkgconf/filelist)
+  and [binary](https://packages.ubuntu.com/resolute/amd64/pkgconf-bin/filelist)
+  file lists, reviewed2026-10-06, supply all4named aliases. One pinned native apt
+  transaction covers them; native version/help/parser controls are planned,
+  not a compiler/linker correctness suite.
+
+Process-only MISE_AUTO_INSTALL=0 follows
+[misev2026.10.1 settings.toml:283–287](https://github.com/jdx/mise/blob/v2026.10.1/settings.toml#L283)
+and [exec.rs:248–255](https://github.com/jdx/mise/blob/v2026.10.1/src/cli/exec.rs#L248).
+Without it a PATH shim can fetch a missing tool, invalidating a read-only native
+acceptance claim. The local missing-shim control is synthetic and separate from
+upstream mise tests. Native invalid-option controls require the option name and
+parser diagnostic, not merely any failing process.
+
+Reuse/exclusion references include
+[HF2.1.1 entrypoints](https://github.com/huggingface/huggingface_hub/blob/v2.1.1/setup.py#L117),
+[context-mode6f0cc684 executable](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/package.json#L58),
+and the existing ecfa11276 profile/owner rows. The observed rootless Docker driver
+is gvisor-tap-vsock, supported by
+[Moby docker-v29.8.2](https://github.com/moby/moby/blob/docker-v29.8.2/contrib/dockerd-rootless.sh#L13);
+no fresh network qualification or slirp4netns install is claimed.
+
+A9B retains the separate Poppler26.09.0/no-consumer gap; a future source-reviewed
+mise conda route uses
+[misev2026.10.1 conda backend](https://github.com/jdx/mise/blob/v2026.10.1/docs/dev-tools/backends/conda.md)
+and [feedstock13d784d7](https://github.com/conda-forge/poppler-feedstock/blob/13d784d77510e73d6066a75a79cd8e6040a6a261/recipe/meta.yaml),
+matching the selected upstream tar SHA. It is not applied in this PR. A10A keeps
+legacy wrapper purpose/consumer questions open before retirement. Host apply,
+readbacks and rollback are in adoption/new-wsl/cli-transfer.md and
+repository-transfer.md; their syntax checks do not execute host changes.

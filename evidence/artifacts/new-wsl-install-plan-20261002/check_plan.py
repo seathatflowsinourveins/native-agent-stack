@@ -313,6 +313,279 @@ def browser_contract(by_slot, install_funcs, bad):
         bad("playwright-cli", "fresh native-client navigation/snapshot/console checks must remain gated on native sign-in")
 
 
+def transfer_source_reference(source):
+    """A primary source has a complete URL and a nonblank pin or real ISO date."""
+    if not isinstance(source, dict) or not isinstance(source.get("url"), str):
+        return False
+    if not source["url"].startswith("https://"):
+        return False
+    pin = source.get("pin")
+    if isinstance(pin, str) and pin.strip() and pin.lower() not in {"latest", "main", "master"}:
+        return True
+    try:
+        from datetime import date
+        date.fromisoformat(source.get("reviewed_on", ""))
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def transfer_mentions(text, slot, allowed_lines):
+    """Reject extra literal CLI dispatch in another function or top-level guard."""
+    current, unapproved, definitions = None, [], 0
+    token = re.compile(r"(?<![A-Za-z0-9_.-])" + re.escape(slot) + r"(?![A-Za-z0-9_.-])")
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            continue
+        match = FUNCTION.match(line) if current is None else None
+        if match:
+            name = match.group(1)
+            if name == slot:
+                definitions += 1
+            if name != slot and token.search(line):
+                unapproved.append(stripped)
+            if not match.group(2).rstrip().endswith("}"):
+                current = name
+            continue
+        if current is not None:
+            if current != slot and token.search(line):
+                unapproved.append(stripped)
+            if line == "}":
+                current = None
+        elif token.search(line) and line not in allowed_lines and not line.startswith("  ''|"):
+            unapproved.append(stripped)
+    return definitions, unapproved
+
+
+
+def transfer_cli_contract(plan_dir, plan, install_text, accept_text, install_funcs, accept_funcs, bad):
+    """Phase1 named-only transfer slots; foundation ownership remains unchanged."""
+    raw = plan.get("transfer_clis", [])
+    if not isinstance(raw, list):
+        bad("transfer-cli", "transfer_clis must be a list")
+        return []
+    foundation = {row["slot"] for row in plan["owners"]}
+    foundation_mise = {row.get("mise_tool") for row in plan["owners"] if row.get("mise_tool")}
+    rows, ids, cli_names = [], set(), set()
+    expected_mise = {}
+    decision_sources = {}
+    for row in raw:
+        if not isinstance(row, dict):
+            bad("transfer-cli", "each transfer row must be an object")
+            continue
+        slot, cli = row.get("slot"), row.get("cli")
+        if not isinstance(slot, str) or not re.fullmatch(r"transfer-cli-[a-z0-9][a-z0-9._-]*", slot):
+            bad("transfer-cli", "slot must use the transfer-cli- namespace")
+            continue
+        rows.append(row)
+        if not isinstance(row.get("owner"), str) or not row["owner"].strip():
+            bad("transfer-cli", f"{slot}: owner is required")
+        if slot in foundation or slot in ids:
+            bad("transfer-cli", f"duplicate or foundation-colliding slot {slot}")
+        ids.add(slot)
+        if not isinstance(cli, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+-]*", cli):
+            bad("transfer-cli", f"{slot}: missing or invalid native CLI name")
+        elif cli in cli_names:
+            bad("transfer-cli", f"{slot}: duplicate CLI {cli}")
+        else:
+            cli_names.add(cli)
+        origin = row.get("origin", {})
+        if (not isinstance(origin, dict) or not isinstance(origin.get("kind"), str)
+                or origin.get("kind") not in {"missing-cli", "approved-prerequisite"}
+                or not isinstance(origin.get("source"), str) or not origin["source"].strip()):
+            bad("transfer-cli", f"{slot}: missing observed/approved transfer origin")
+        if type(row.get("installed")) is not bool:
+            bad("transfer-cli", f"{slot}: installed must be boolean")
+        if not row.get("installed"):
+            if row.get("route") != "none" or row.get("commands") != [] or row.get("acceptance") != {}:
+                bad("transfer-cli", f"{slot}: not-needed row must run no install or acceptance")
+            if not isinstance(row.get("reason"), str) or not row["reason"].strip():
+                bad("transfer-cli", f"{slot}: not-needed row needs a reason")
+            try:
+                from datetime import date
+                date.fromisoformat(row.get("not_needed_on", ""))
+            except (TypeError, ValueError):
+                bad("transfer-cli", f"{slot}: not-needed row needs an ISO date")
+            reference = row.get("decision_source", {})
+            path = reference.get("path") if isinstance(reference, dict) else None
+            revision = reference.get("revision") if isinstance(reference, dict) else None
+            valid = (isinstance(path, str) and re.fullmatch(r"[A-Za-z0-9._/-]+", path)
+                     and not pathlib.Path(path).is_absolute() and ".." not in pathlib.Path(path).parts
+                     and isinstance(revision, str) and re.fullmatch(r"[0-9a-f]{40}", revision))
+            if valid:
+                locator = (path, revision)
+                if locator not in decision_sources:
+                    try:
+                        observed = subprocess.run(["git", "cat-file", "-t", revision + ":" + path],
+                                                  cwd=pathlib.Path(__file__).resolve().parents[3],
+                                                  capture_output=True, text=True, timeout=10)
+                        decision_sources[locator] = observed.returncode == 0 and observed.stdout.strip() == "blob"
+                    except (OSError, subprocess.TimeoutExpired):
+                        decision_sources[locator] = False
+                valid = decision_sources[locator]
+            if not valid:
+                bad("transfer-cli", f"{slot}: not-needed decision_source needs a repository path at an existing full commit pin")
+            if slot in install_funcs or slot in accept_funcs:
+                bad("transfer-cli", f"{slot}: not-needed row must have no executable function")
+            if f"if named '{slot}'; then printf '%s | install | not-needed\\n' '{slot}'; fi" not in install_text:
+                bad("transfer-cli", f"{slot}: not-needed installation must report its disposition")
+            if f'if [[ "$only" == {slot} ]]; then skipped {slot}; fi' not in accept_text:
+                bad("transfer-cli", f"{slot}: not-needed acceptance must report skipped")
+            listed = f"  printf '%s\\n' {shlex.quote(slot + ' | ' + str(row.get('owner', '')) + ' | none | not-needed')}"
+            for script, text, allowed in (
+                    ("install.sh", install_text, {listed, f"if named '{slot}'; then printf '%s | install | not-needed\\n' '{slot}'; fi"}),
+                    ("accept.sh", accept_text, {f'if [[ "$only" == {slot} ]]; then skipped {slot}; fi'})):
+                definitions, leaked = transfer_mentions(text, slot, allowed)
+                if definitions or leaked:
+                    bad("transfer-cli", f"{slot}: unapproved not-needed dispatch in {script}: {leaked}")
+            continue
+
+        route, release = row.get("route"), row.get("release")
+        if not isinstance(route, str) or route not in {"mise", "uv-tool", "apt"}:
+            bad("transfer-cli", f"{slot}: transfer install route must be mise, uv-tool or apt")
+            route = ""
+        if (row.get("version_pinned") is not True or not isinstance(release, str)
+                or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:+~/-]*", release)
+                or release.lower() in {"latest", "stable", "main", "master"}):
+            bad("transfer-cli", f"{slot}: install needs an exact release pin")
+        if not isinstance(row.get("repository"), str) or not row["repository"].startswith("https://"):
+            bad("transfer-cli", f"{slot}: missing maintained upstream repository")
+        for name in ("install_source", "upstream_source"):
+            source = row.get(name, {})
+            if not transfer_source_reference(source):
+                bad("transfer-cli", f"{slot}: {name} needs URL and pin/date")
+        commands = row.get("commands", [])
+        if not isinstance(commands, list) or not commands or any(not isinstance(c, str) or not c for c in commands):
+            bad("transfer-cli", f"{slot}: missing native install command")
+            commands = []
+        if route == "mise":
+            tool = row.get("mise_tool")
+            if (not isinstance(tool, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:+/@-]*", tool)
+                    or tool in RUNTIME_PINS or tool in foundation_mise):
+                bad("transfer-cli", f"{slot}: invalid transfer mise_tool")
+            else:
+                if tool in expected_mise:
+                    bad("transfer-cli", f"{slot}: duplicate transfer mise tool {tool}")
+                expected_mise[tool] = release
+                if commands[:1] != [f"mise use -g {tool}@{release}"]:
+                    bad("transfer-cli", f"{slot}: first install command differs from its mise pin")
+        elif route == "uv-tool":
+            package = row.get("uv_package", "")
+            if not isinstance(package, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*(?:\[[A-Za-z0-9,._-]+\])?", package):
+                bad("transfer-cli", f"{slot}: missing pinned UV package")
+            if commands[:1] != [f"uv tool install --python 3.13.16 {package}=={release}"]:
+                bad("transfer-cli", f"{slot}: first install command differs from its UV pin")
+        elif route == "apt":
+            package = row.get("apt_package", "")
+            if not isinstance(package, str) or not re.fullmatch(r"[a-z0-9][a-z0-9+.-]*", package):
+                bad("transfer-cli", f"{slot}: missing pinned apt package")
+            additional = row.get("additional_apt_packages", {})
+            if (not isinstance(additional, dict) or any(
+                    not isinstance(name, str) or not re.fullmatch(r"[a-z0-9][a-z0-9+.-]*", name)
+                    or not isinstance(pin, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.+:~_-]*", pin)
+                    or pin.lower() in {"latest", "stable", "main", "master"}
+                    for name, pin in additional.items())):
+                bad("transfer-cli", f"{slot}: additional apt packages must have exact pins")
+                additional = {}
+            packages = [f"{package}={release}"] + [f"{name}={additional[name]}" for name in sorted(additional)]
+            if commands[:1] != ["sudo apt-get install -y --no-install-recommends " + " ".join(packages)]:
+                bad("transfer-cli", f"{slot}: first install command differs from its apt pin")
+        prerequisites = row.get("prerequisite_tools", [])
+        manager = {"mise": "mise", "uv-tool": "uv", "apt": "apt-get"}.get(route)
+        if not isinstance(prerequisites, list) or manager not in prerequisites:
+            bad("transfer-cli", f"{slot}: native manager prerequisite is not declared")
+            prerequisites = []
+        body = install_funcs.get(slot, "")
+        if not body:
+            bad("transfer-cli", f"{slot}: missing install function")
+        else:
+            if run_commands(slot, install_funcs, set()) != commands:
+                bad("transfer-cli", f"{slot}: install function differs from native commands")
+            if sourced(body, "run_command "):
+                bad("transfer-cli", f"{slot}: install command lacks source comment")
+            source_url = row.get("install_source", {}).get("url", "") if isinstance(row.get("install_source"), dict) else ""
+            if not source_url or source_url not in re.findall(r"Source:\s+(https?://\S+)", body):
+                bad("transfer-cli", f"{slot}: install source differs from its declared source")
+            for tool in prerequisites:
+                if not isinstance(tool, str) or not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", tool):
+                    bad("transfer-cli", f"{slot}: invalid prerequisite tool")
+                elif f"command -v {tool} >/dev/null || return 69" not in body:
+                    bad("transfer-cli", f"{slot}: native prerequisite {tool} is not checked")
+        if f"if named '{slot}'; then run_slot '{slot}'; fi" not in install_text:
+            bad("transfer-cli", f"{slot}: install must dispatch only when named")
+        if re.search(r"if selected '?"+re.escape(slot)+r"'?; then", install_text):
+            bad("transfer-cli", f"{slot}: transfer row leaked into default installation")
+        acceptance = row.get("acceptance", {})
+        entry = acceptance.get("post_install", {}) if isinstance(acceptance, dict) else {}
+        if (not isinstance(acceptance, dict) or set(acceptance) != {"post_install"}
+                or not isinstance(entry, dict) or entry.get("kind") != "smoke"
+                or not isinstance(entry.get("command"), str) or not entry["command"].strip()):
+            bad("transfer-cli", f"{slot}: a native post_install self-test is required")
+        if not isinstance(entry, dict):
+            entry = {}
+        if not str(entry.get("command", "")).startswith("export MISE_AUTO_INSTALL=0\n"):
+            bad("transfer-cli", f"{slot}: native self-test must disable mise auto-install")
+        source = entry.get("source", {}) if isinstance(entry, dict) else {}
+        if not transfer_source_reference(source):
+            bad("transfer-cli", f"{slot}: self-test needs upstream source pin/date")
+        body = accept_funcs.get(slot, "")
+        expected = [("post_install", slot, entry.get("kind"), entry.get("command"))]
+        try:
+            actual = checks_of(body)
+        except ValueError:
+            actual = []
+            bad("transfer-cli", f"{slot}: malformed native acceptance shell quotation")
+        if not body or actual != expected:
+            bad("transfer-cli", f"{slot}: native self-test differs from accept.sh")
+        if sourced(body, "check "):
+            bad("transfer-cli", f"{slot}: self-test lacks source comment")
+        source_url = source.get("url", "") if isinstance(source, dict) else ""
+        if not source_url or source_url not in re.findall(r"Source:\s+(https?://\S+)", body):
+            bad("transfer-cli", f"{slot}: self-test source differs from its declared source")
+        if f'if [[ "$only" == {slot} ]]; then {slot}; fi' not in accept_text:
+            bad("transfer-cli", f"{slot}: acceptance must dispatch only when named")
+        if f'if [[ -z "$only" || "$only" == {slot} ]]' in accept_text:
+            bad("transfer-cli", f"{slot}: transfer acceptance leaked into default run")
+        listed = f"  printf '%s\\n' {shlex.quote(slot + ' | ' + str(row.get('owner', '')) + ' | ' + str(row.get('route', '')) + ' | planned-named-only')}"
+        for script, text, allowed in (
+                ("install.sh", install_text, {listed, f"if named '{slot}'; then run_slot '{slot}'; fi"}),
+                ("accept.sh", accept_text, {f'if [[ "$only" == {slot} ]]; then {slot}; fi'})):
+            definitions, leaked = transfer_mentions(text, slot, allowed)
+            if definitions != 1 or leaked:
+                bad("transfer-cli", f"{slot}: unapproved transfer dispatch in {script}: {leaked}")
+
+    if raw:
+        path = plan_dir / "transfer-mise.toml"
+        try:
+            config = tomllib.loads(path.read_text())
+            if set(config) != {"tools"} or config["tools"] != expected_mise:
+                bad("transfer-cli", "transfer-mise.toml must contain exactly the transfer mise pins")
+        except (OSError, tomllib.TOMLDecodeError):
+            bad("transfer-cli", "missing or invalid separate transfer-mise.toml")
+    inventory_path = plan_dir / "transfer-inventory.json"
+    if inventory_path.is_file():
+        try:
+            inventory = json.loads(inventory_path.read_text())
+            missing = inventory.get("missing_cli_names")
+            if (inventory.get("status") != "complete" or not isinstance(missing, list)
+                    or any(not isinstance(name, str) for name in missing)
+                    or len(missing) != len(set(missing))):
+                bad("transfer-cli", "transfer inventory must have a complete unique CLI roster")
+            else:
+                uncovered = set(missing) - cli_names
+                if uncovered:
+                    bad("transfer-cli", f"missing CLI decisions: {sorted(uncovered)}")
+                for row in rows:
+                    origin = row.get("origin", {})
+                    if isinstance(origin, dict) and origin.get("kind") == "missing-cli" and row.get("cli") not in missing:
+                        bad("transfer-cli", f"{row['slot']}: decision has no inventory CLI")
+        except (OSError, ValueError, AttributeError):
+            bad("transfer-cli", "invalid scoped transfer inventory")
+    return rows
+
+
+
 def main():
     here = pathlib.Path(__file__).resolve().parent
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -332,6 +605,8 @@ def main():
     manifest = {s["slot_id"]: s for s in json.loads(args.manifest.read_text())["slots"] if s["catalog"] == "foundation"}
     install_text, accept_text = (plan_dir / "install.sh").read_text(), (plan_dir / "accept.sh").read_text()
     install_funcs, accept_funcs = functions(install_text), functions(accept_text)
+    transfer_rows = transfer_cli_contract(plan_dir, plan, install_text, accept_text,
+                                         install_funcs, accept_funcs, bad)
 
     slots = [r["slot"] for r in rows]
     for slot, count in collections.Counter(slots).items():
@@ -347,7 +622,7 @@ def main():
         if (r["slot"] != "cross-family-review" or r["installed"] or r.get("measurement_only")
                 or r["route"] != "none" or r["commands"] or set(r["acceptance"]) != {"after_sign_in"}):
             bad("rows", f"row {r['slot']}: acceptance_only is reserved for native cross-family-review after sign-in")
-    by_slot = {r["slot"]: r for r in rows}
+    by_slot = {r["slot"]: r for r in rows + transfer_rows}
     agent_messaging_contract(plan_dir, by_slot, bad)
     code_docs_contract(plan_dir, by_slot, bad)
     browser_contract(by_slot, install_funcs, bad)
@@ -503,7 +778,7 @@ def main():
     # --only lists and dispatch cover every row
     for script, text in (("install.sh", install_text), ("accept.sh", accept_text)):
         match = re.search(r"^case \"\$only\" in\n  ''\|([^)]*)\) ;;", text, re.M)
-        if not match or match.group(1).split("|") != slots:
+        if not match or match.group(1).split("|") != slots + [r["slot"] for r in transfer_rows]:
             bad("dispatch", f"{script}: the --only slot list is not the slots of install-plan.json, in order")
     for r in selected + measured:
         slot = r["slot"]
@@ -559,6 +834,8 @@ def main():
         printed.append((parts[0], " | ".join(parts[1:-2]), parts[-2], parts[-1]) if len(parts) >= 4 else (line, "", "", ""))
     expected = [(r["slot"], r["owner"], r["route"], "planned" if r["installed"] else "measurement-only" if r.get("measurement_only") else "excluded")
                 for r in rows]
+    expected += [(r["slot"], r.get("owner", ""), r.get("route", ""), "planned-named-only" if r.get("installed") is True else "not-needed")
+                 for r in transfer_rows]
     if printed != expected:
         missing = [e[0] for e in expected if e not in printed]
         extra = [p[0] for p in printed if p not in expected]
@@ -678,6 +955,9 @@ def main():
     print(f"OK: {len(rows)} rows: {len(selected)} installed ({len(selected) - len(named_only)} by the default run, {len(named_only)} only when named), "
           f"{len(measured)} measurement-only, {len(excluded)} not installed; "
           f"{sum(len(r['commands']) for r in rows)} commands and {sum(len(r['acceptance']) for r in rows) + additional_count} acceptance entries agree with the scripts ({additional_count} additional checks included)")
+    if transfer_rows:
+        print(f"Transfer CLIs: {len(transfer_rows)} scoped rows, "
+              f"{sum(r.get('installed') is True for r in transfer_rows)} named-only installs; foundation owners/defaults unchanged")
     return 0
 
 

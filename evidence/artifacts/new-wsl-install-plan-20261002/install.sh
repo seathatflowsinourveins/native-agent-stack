@@ -987,6 +987,70 @@ mcp-protocol-conformance() {
   run_command 'source_dir="$tool_root/mcp-conformance-source-0.2.0-alpha.11"; if [[ ! -d "$source_dir/.git" ]]; then git clone --filter=blob:none --no-checkout https://github.com/modelcontextprotocol/conformance.git "$source_dir"; fi; [[ "$(git -C "$source_dir" config --get remote.origin.url)" == https://github.com/modelcontextprotocol/conformance.git ]]; if [[ -f "$source_dir/.git/index" ]]; then git -C "$source_dir" diff --quiet; git -C "$source_dir" diff --cached --quiet; fi; git -C "$source_dir" fetch --depth 1 origin c321dd32035556e6769d3724a8ee97d87c3faaac; git -C "$source_dir" checkout --detach c321dd32035556e6769d3724a8ee97d87c3faaac; [[ "$(git -C "$source_dir" rev-parse HEAD)" == c321dd32035556e6769d3724a8ee97d87c3faaac ]]' || return "$?"
 }
 
+transfer-cli-gitleaks() {
+  # Phase1 transfer-only CLI; foundation owner/default is unchanged.
+  command -v mise >/dev/null || return 69
+  # Source: https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md
+  run_command 'mise use -g aqua:gitleaks/gitleaks@8.30.1'
+}
+
+
+transfer-cli-grype() {
+  command -v mise >/dev/null || return 69
+  # Source: https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md
+  run_command 'mise use -g aqua:anchore/grype@0.119.0'
+}
+
+transfer-cli-ntfy() {
+  command -v mise >/dev/null || return 69
+  # Source: https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md
+  run_command 'mise use -g aqua:binwiederhier/ntfy@2.28.0'
+}
+
+transfer-cli-qdrant() {
+  command -v mise >/dev/null || return 69
+  # Source: https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md
+  run_command 'mise use -g aqua:qdrant/qdrant@1.19.1'
+}
+
+transfer-cli-tvly() {
+  command -v uv >/dev/null || return 69
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/tools.md
+  run_command 'uv tool install --python 3.13.16 tavily-cli==0.1.8'
+}
+
+transfer-cli-vllm() {
+  command -v uv >/dev/null || return 69
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/tools.md
+  run_command 'uv tool install --python 3.13.16 vllm==0.30.0'
+}
+
+
+transfer-cli-pkgconf() {
+  command -v apt-get >/dev/null || return 69
+  # Source: https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html
+  run_command 'sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4'
+}
+
+transfer-cli-pkg-config() {
+  command -v apt-get >/dev/null || return 69
+  # Source: https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html
+  run_command 'sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4'
+}
+
+transfer-cli-x86_64-linux-gnu-pkgconf() {
+  command -v apt-get >/dev/null || return 69
+  # Source: https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html
+  run_command 'sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4'
+}
+
+transfer-cli-x86_64-linux-gnu-pkg-config() {
+  command -v apt-get >/dev/null || return 69
+  # Source: https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html
+  run_command 'sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4'
+}
+
+
 if $list; then
   printf '%s\n' 'claude-code | Claude Code | native-installer | planned'
   printf '%s\n' 'codex | Codex | native-installer | planned'
@@ -1072,10 +1136,82 @@ if $list; then
   printf '%s\n' 'skill-vetting | SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook) | uv-tool | planned'
   printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.23.0 for ATIF import) | uv-tool-owner-extension | planned'
   printf '%s\n' 'mcp-protocol-conformance | MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08) | npx-on-demand | planned'
+  printf '%s\n' 'transfer-cli-gitleaks | Gitleaks | mise | planned-named-only'
+  printf '%s\n' 'transfer-cli-grype | Grype | mise | planned-named-only'
+  printf '%s\n' 'transfer-cli-ntfy | ntfy | mise | planned-named-only'
+  printf '%s\n' 'transfer-cli-qdrant | Qdrant | mise | planned-named-only'
+  printf '%s\n' 'transfer-cli-tvly | Tavily CLI | uv-tool | planned-named-only'
+  printf '%s\n' 'transfer-cli-vllm | vLLM | uv-tool | planned-named-only'
+  printf '%s\n' 'transfer-cli-agent-browser | Selected browser route | none | not-needed'
+  printf '%s\n' 'transfer-cli-agent-relay | Selected native messaging | none | not-needed'
+  printf '%s\n' 'transfer-cli-amtool | Existing Alertmanager bundle | none | not-needed'
+  printf '%s\n' 'transfer-cli-claude.bak-20260929-max-default | Inactive launcher backup | none | not-needed'
+  printf '%s\n' 'transfer-cli-claude.bak-20260929-max-default-v1 | Inactive launcher backup | none | not-needed'
+  printf '%s\n' 'transfer-cli-codex-omniroute | Native Codex profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-context-mode | Existing scoped context-mode | none | not-needed'
+  printf '%s\n' 'transfer-cli-dotnet | Selected Nautilus runtime | none | not-needed'
+  printf '%s\n' 'transfer-cli-ecosystem-bounded-run | P1-GIT owned containment pair | none | not-needed'
+  printf '%s\n' 'transfer-cli-gitleaks-guarded | P1-GIT owned containment pair | none | not-needed'
+  printf '%s\n' 'transfer-cli-hindsight | Destination memory owner | none | not-needed'
+  printf '%s\n' 'transfer-cli-huggingface-cli | Maintained HF executable | none | not-needed'
+  printf '%s\n' 'transfer-cli-kernel_keyring.py | Credential custody helper | none | not-needed'
+  printf '%s\n' 'transfer-cli-llama-cli | Selected local-model owner | none | not-needed'
+  printf '%s\n' 'transfer-cli-llama-server | Selected local-model owner | none | not-needed'
+  printf '%s\n' 'transfer-cli-mcp-inspector | Existing on-demand Inspector | none | not-needed'
+  printf '%s\n' 'transfer-cli-pdfinfo | MinerU document owner | none | not-needed'
+  printf '%s\n' 'transfer-cli-pdftotext | MinerU document owner | none | not-needed'
+  printf '%s\n' 'transfer-cli-promtool | Existing Prometheus bundle | none | not-needed'
+  printf '%s\n' 'transfer-cli-socraticode | Existing scoped SocratiCode | none | not-needed'
+  printf '%s\n' 'transfer-cli-tiny-agents | Selected native worker | none | not-needed'
+  printf '%s\n' 'transfer-cli-tvly-keyring | Credential custody helper | none | not-needed'
+  printf '%s\n' 'transfer-cli-pkgconf | pkgconf native aliases | apt | planned-named-only'
+  printf '%s\n' 'transfer-cli-pkg-config | pkgconf native aliases | apt | planned-named-only'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-pkgconf | pkgconf native aliases | apt | planned-named-only'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-pkg-config | pkgconf native aliases | apt | planned-named-only'
+  printf '%s\n' 'transfer-cli-apt-extracttemplates | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-apt-ftparchive | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-apt-sortpkgs | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-cpan5.38-x86_64-linux-gnu | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-cpp-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gxx-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcc-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcc-ar-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcc-nm-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcc-ranlib-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcov-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcov-dump-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gcov-tool-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gdk-pixbuf-csource | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gdk-pixbuf-pixdata | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-gdk-pixbuf-thumbnailer | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-lto-dump-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-pdb3.12 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-perl5.38-x86_64-linux-gnu | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-pkcon | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-pkmon | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-pydoc3.12 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-pygettext3.12 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-session-migration | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-slirp4netns | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-uuidd | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-uuidgen | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-uuidparse | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-cpp-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gxx-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcc-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcc-ar-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcc-nm-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcc-ranlib-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcov-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcov-dump-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-gcov-tool-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-x86_64-linux-gnu-lto-dump-13 | Destination base profile | none | not-needed'
+  printf '%s\n' 'transfer-cli-native-stack-sign-in | Legacy wrapper purpose owner | none | not-needed'
+  printf '%s\n' 'transfer-cli-nativestack | Legacy wrapper purpose owner | none | not-needed'
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance|transfer-cli-gitleaks|transfer-cli-grype|transfer-cli-ntfy|transfer-cli-qdrant|transfer-cli-tvly|transfer-cli-vllm|transfer-cli-agent-browser|transfer-cli-agent-relay|transfer-cli-amtool|transfer-cli-claude.bak-20260929-max-default|transfer-cli-claude.bak-20260929-max-default-v1|transfer-cli-codex-omniroute|transfer-cli-context-mode|transfer-cli-dotnet|transfer-cli-ecosystem-bounded-run|transfer-cli-gitleaks-guarded|transfer-cli-hindsight|transfer-cli-huggingface-cli|transfer-cli-kernel_keyring.py|transfer-cli-llama-cli|transfer-cli-llama-server|transfer-cli-mcp-inspector|transfer-cli-pdfinfo|transfer-cli-pdftotext|transfer-cli-promtool|transfer-cli-socraticode|transfer-cli-tiny-agents|transfer-cli-tvly-keyring|transfer-cli-pkgconf|transfer-cli-pkg-config|transfer-cli-x86_64-linux-gnu-pkgconf|transfer-cli-x86_64-linux-gnu-pkg-config|transfer-cli-apt-extracttemplates|transfer-cli-apt-ftparchive|transfer-cli-apt-sortpkgs|transfer-cli-cpan5.38-x86_64-linux-gnu|transfer-cli-cpp-13|transfer-cli-gxx-13|transfer-cli-gcc-13|transfer-cli-gcc-ar-13|transfer-cli-gcc-nm-13|transfer-cli-gcc-ranlib-13|transfer-cli-gcov-13|transfer-cli-gcov-dump-13|transfer-cli-gcov-tool-13|transfer-cli-gdk-pixbuf-csource|transfer-cli-gdk-pixbuf-pixdata|transfer-cli-gdk-pixbuf-thumbnailer|transfer-cli-lto-dump-13|transfer-cli-pdb3.12|transfer-cli-perl5.38-x86_64-linux-gnu|transfer-cli-pkcon|transfer-cli-pkmon|transfer-cli-pydoc3.12|transfer-cli-pygettext3.12|transfer-cli-session-migration|transfer-cli-slirp4netns|transfer-cli-uuidd|transfer-cli-uuidgen|transfer-cli-uuidparse|transfer-cli-x86_64-linux-gnu-cpp-13|transfer-cli-x86_64-linux-gnu-gxx-13|transfer-cli-x86_64-linux-gnu-gcc-13|transfer-cli-x86_64-linux-gnu-gcc-ar-13|transfer-cli-x86_64-linux-gnu-gcc-nm-13|transfer-cli-x86_64-linux-gnu-gcc-ranlib-13|transfer-cli-x86_64-linux-gnu-gcov-13|transfer-cli-x86_64-linux-gnu-gcov-dump-13|transfer-cli-x86_64-linux-gnu-gcov-tool-13|transfer-cli-x86_64-linux-gnu-lto-dump-13|transfer-cli-native-stack-sign-in|transfer-cli-nativestack) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
@@ -1211,4 +1347,76 @@ if selected 'lm-program-optimization'; then run_slot 'lm-program-optimization'; 
 if selected 'skill-vetting'; then run_slot 'skill-vetting'; fi
 if selected 'trajectory-analysis'; then run_slot 'trajectory-analysis'; fi
 if named 'mcp-protocol-conformance'; then run_slot 'mcp-protocol-conformance'; elif selected 'mcp-protocol-conformance'; then printf '%s | install | skipped\n' 'mcp-protocol-conformance'; fi
+if named 'transfer-cli-gitleaks'; then run_slot 'transfer-cli-gitleaks'; fi
+if named 'transfer-cli-grype'; then run_slot 'transfer-cli-grype'; fi
+if named 'transfer-cli-ntfy'; then run_slot 'transfer-cli-ntfy'; fi
+if named 'transfer-cli-qdrant'; then run_slot 'transfer-cli-qdrant'; fi
+if named 'transfer-cli-tvly'; then run_slot 'transfer-cli-tvly'; fi
+if named 'transfer-cli-vllm'; then run_slot 'transfer-cli-vllm'; fi
+if named 'transfer-cli-agent-browser'; then printf '%s | install | not-needed\n' 'transfer-cli-agent-browser'; fi
+if named 'transfer-cli-agent-relay'; then printf '%s | install | not-needed\n' 'transfer-cli-agent-relay'; fi
+if named 'transfer-cli-amtool'; then printf '%s | install | not-needed\n' 'transfer-cli-amtool'; fi
+if named 'transfer-cli-claude.bak-20260929-max-default'; then printf '%s | install | not-needed\n' 'transfer-cli-claude.bak-20260929-max-default'; fi
+if named 'transfer-cli-claude.bak-20260929-max-default-v1'; then printf '%s | install | not-needed\n' 'transfer-cli-claude.bak-20260929-max-default-v1'; fi
+if named 'transfer-cli-codex-omniroute'; then printf '%s | install | not-needed\n' 'transfer-cli-codex-omniroute'; fi
+if named 'transfer-cli-context-mode'; then printf '%s | install | not-needed\n' 'transfer-cli-context-mode'; fi
+if named 'transfer-cli-dotnet'; then printf '%s | install | not-needed\n' 'transfer-cli-dotnet'; fi
+if named 'transfer-cli-ecosystem-bounded-run'; then printf '%s | install | not-needed\n' 'transfer-cli-ecosystem-bounded-run'; fi
+if named 'transfer-cli-gitleaks-guarded'; then printf '%s | install | not-needed\n' 'transfer-cli-gitleaks-guarded'; fi
+if named 'transfer-cli-hindsight'; then printf '%s | install | not-needed\n' 'transfer-cli-hindsight'; fi
+if named 'transfer-cli-huggingface-cli'; then printf '%s | install | not-needed\n' 'transfer-cli-huggingface-cli'; fi
+if named 'transfer-cli-kernel_keyring.py'; then printf '%s | install | not-needed\n' 'transfer-cli-kernel_keyring.py'; fi
+if named 'transfer-cli-llama-cli'; then printf '%s | install | not-needed\n' 'transfer-cli-llama-cli'; fi
+if named 'transfer-cli-llama-server'; then printf '%s | install | not-needed\n' 'transfer-cli-llama-server'; fi
+if named 'transfer-cli-mcp-inspector'; then printf '%s | install | not-needed\n' 'transfer-cli-mcp-inspector'; fi
+if named 'transfer-cli-pdfinfo'; then printf '%s | install | not-needed\n' 'transfer-cli-pdfinfo'; fi
+if named 'transfer-cli-pdftotext'; then printf '%s | install | not-needed\n' 'transfer-cli-pdftotext'; fi
+if named 'transfer-cli-promtool'; then printf '%s | install | not-needed\n' 'transfer-cli-promtool'; fi
+if named 'transfer-cli-socraticode'; then printf '%s | install | not-needed\n' 'transfer-cli-socraticode'; fi
+if named 'transfer-cli-tiny-agents'; then printf '%s | install | not-needed\n' 'transfer-cli-tiny-agents'; fi
+if named 'transfer-cli-tvly-keyring'; then printf '%s | install | not-needed\n' 'transfer-cli-tvly-keyring'; fi
+if named 'transfer-cli-pkgconf'; then run_slot 'transfer-cli-pkgconf'; fi
+if named 'transfer-cli-pkg-config'; then run_slot 'transfer-cli-pkg-config'; fi
+if named 'transfer-cli-x86_64-linux-gnu-pkgconf'; then run_slot 'transfer-cli-x86_64-linux-gnu-pkgconf'; fi
+if named 'transfer-cli-x86_64-linux-gnu-pkg-config'; then run_slot 'transfer-cli-x86_64-linux-gnu-pkg-config'; fi
+if named 'transfer-cli-apt-extracttemplates'; then printf '%s | install | not-needed\n' 'transfer-cli-apt-extracttemplates'; fi
+if named 'transfer-cli-apt-ftparchive'; then printf '%s | install | not-needed\n' 'transfer-cli-apt-ftparchive'; fi
+if named 'transfer-cli-apt-sortpkgs'; then printf '%s | install | not-needed\n' 'transfer-cli-apt-sortpkgs'; fi
+if named 'transfer-cli-cpan5.38-x86_64-linux-gnu'; then printf '%s | install | not-needed\n' 'transfer-cli-cpan5.38-x86_64-linux-gnu'; fi
+if named 'transfer-cli-cpp-13'; then printf '%s | install | not-needed\n' 'transfer-cli-cpp-13'; fi
+if named 'transfer-cli-gxx-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gxx-13'; fi
+if named 'transfer-cli-gcc-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcc-13'; fi
+if named 'transfer-cli-gcc-ar-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcc-ar-13'; fi
+if named 'transfer-cli-gcc-nm-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcc-nm-13'; fi
+if named 'transfer-cli-gcc-ranlib-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcc-ranlib-13'; fi
+if named 'transfer-cli-gcov-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcov-13'; fi
+if named 'transfer-cli-gcov-dump-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcov-dump-13'; fi
+if named 'transfer-cli-gcov-tool-13'; then printf '%s | install | not-needed\n' 'transfer-cli-gcov-tool-13'; fi
+if named 'transfer-cli-gdk-pixbuf-csource'; then printf '%s | install | not-needed\n' 'transfer-cli-gdk-pixbuf-csource'; fi
+if named 'transfer-cli-gdk-pixbuf-pixdata'; then printf '%s | install | not-needed\n' 'transfer-cli-gdk-pixbuf-pixdata'; fi
+if named 'transfer-cli-gdk-pixbuf-thumbnailer'; then printf '%s | install | not-needed\n' 'transfer-cli-gdk-pixbuf-thumbnailer'; fi
+if named 'transfer-cli-lto-dump-13'; then printf '%s | install | not-needed\n' 'transfer-cli-lto-dump-13'; fi
+if named 'transfer-cli-pdb3.12'; then printf '%s | install | not-needed\n' 'transfer-cli-pdb3.12'; fi
+if named 'transfer-cli-perl5.38-x86_64-linux-gnu'; then printf '%s | install | not-needed\n' 'transfer-cli-perl5.38-x86_64-linux-gnu'; fi
+if named 'transfer-cli-pkcon'; then printf '%s | install | not-needed\n' 'transfer-cli-pkcon'; fi
+if named 'transfer-cli-pkmon'; then printf '%s | install | not-needed\n' 'transfer-cli-pkmon'; fi
+if named 'transfer-cli-pydoc3.12'; then printf '%s | install | not-needed\n' 'transfer-cli-pydoc3.12'; fi
+if named 'transfer-cli-pygettext3.12'; then printf '%s | install | not-needed\n' 'transfer-cli-pygettext3.12'; fi
+if named 'transfer-cli-session-migration'; then printf '%s | install | not-needed\n' 'transfer-cli-session-migration'; fi
+if named 'transfer-cli-slirp4netns'; then printf '%s | install | not-needed\n' 'transfer-cli-slirp4netns'; fi
+if named 'transfer-cli-uuidd'; then printf '%s | install | not-needed\n' 'transfer-cli-uuidd'; fi
+if named 'transfer-cli-uuidgen'; then printf '%s | install | not-needed\n' 'transfer-cli-uuidgen'; fi
+if named 'transfer-cli-uuidparse'; then printf '%s | install | not-needed\n' 'transfer-cli-uuidparse'; fi
+if named 'transfer-cli-x86_64-linux-gnu-cpp-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-cpp-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gxx-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gxx-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcc-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcc-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcc-ar-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcc-ar-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcc-nm-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcc-nm-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcc-ranlib-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcc-ranlib-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcov-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcov-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcov-dump-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcov-dump-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-gcov-tool-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-gcov-tool-13'; fi
+if named 'transfer-cli-x86_64-linux-gnu-lto-dump-13'; then printf '%s | install | not-needed\n' 'transfer-cli-x86_64-linux-gnu-lto-dump-13'; fi
+if named 'transfer-cli-native-stack-sign-in'; then printf '%s | install | not-needed\n' 'transfer-cli-native-stack-sign-in'; fi
+if named 'transfer-cli-nativestack'; then printf '%s | install | not-needed\n' 'transfer-cli-nativestack'; fi
 exit "$failed"

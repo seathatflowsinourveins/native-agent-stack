@@ -4,6 +4,1628 @@
   "revised_at_utc": "2026-10-04T23:58:00Z",
   "base": "Ubuntu 26.04.1 WSL 2",
   "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination. Wave 3 (2026-10-04), 80 foundation rows: on the owner's decision of that day (amendment 4 of the manifest's decision rule), ten owner rows are added in token-efficiency (command-output, output-compression, code-index, code-graph, repo-packing, structured-data, doc-conversion, api-docs, trace-viewer, token-lane-carriers), ccusage and session-analytics install their owner defaults, context-supply installs as an owner default without the interim gate, and code-search installs both arms of its confirmatory; none of these commands has run anywhere. Fix-wave/wave-4 repair in this PR (2026-10-04): promptfoo follows the written manifest; repaired installation/prerequisites, isolated client probes and ownership migration. Destination commands remain UNRUN; local regression and artifact checks are recorded separately.",
+  "transfer_clis": [
+    {
+      "slot": "transfer-cli-gitleaks",
+      "cli": "gitleaks",
+      "owner": "Gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "release": "8.30.1",
+      "installed": true,
+      "route": "mise",
+      "version_pinned": true,
+      "mise_tool": "aqua:gitleaks/gitleaks",
+      "prerequisite_tools": [
+        "mise"
+      ],
+      "origin": {
+        "kind": "approved-prerequisite",
+        "source": "P1-GIT handoff and co-op A8,2026-10-06"
+      },
+      "commands": [
+        "mise use -g aqua:gitleaks/gitleaks@8.30.1"
+      ],
+      "install_source": {
+        "url": "https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md",
+        "pin": "v2026.10.1"
+      },
+      "upstream_source": {
+        "url": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md",
+        "pin": "v8.30.1"
+      },
+      "acceptance": {
+        "post_install": {
+        "command": "export MISE_AUTO_INSTALL=0\ntest \"$(gitleaks version)\" = 8.30.1\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nprintf '%s\\n' 'This native CLI fixture contains no credentials.' > \"$cli_work/README.txt\"\ngitleaks dir \"$cli_work\" --no-banner --redact\npython3 - \"$cli_work/planted.txt\" <<'PY'\nfrom pathlib import Path\nimport secrets, string, sys\n# Generated test value: never a usable credential, never printed.\nvalue = \"ghp_\" + \"\".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(36))\nPath(sys.argv[1]).write_text(\"generated_nonsecret_control=\" + value + \"\\n\")\nPY\nrc=0\nif gitleaks dir \"$cli_work\" --no-banner --redact --report-format json --report-path \"$cli_work/findings.json\" >\"$cli_work/control.log\" 2>&1; then\n  exit 1\nelse\n  rc=$?\nfi\ntest \"$rc\" = 1\npython3 - \"$cli_work/findings.json\" <<'PY'\nfrom pathlib import Path\nimport json, sys\nfindings = json.loads(Path(sys.argv[1]).read_text())\nassert any(row.get(\"RuleID\") == \"github-pat\" for row in findings), \"native finding control missing\"\nPY",
+          "kind": "smoke",
+          "source": {
+            "url": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md",
+            "pin": "v8.30.1"
+          }
+        }
+      },
+      "notes": "Named-only Phase1 transfer prerequisite for the existing Git hook. Gitleaks default rules are not replaced by Betterleaks; no foundation owner changes. Self-test scans an owned nonsecret fixture and requires native github-pat detection of a generated nonsecret control; no provider/broker use."
+    },
+    {
+      "slot": "transfer-cli-grype",
+      "cli": "grype",
+      "owner": "Grype",
+      "repository": "https://github.com/anchore/grype",
+      "release": "0.119.0",
+      "installed": true,
+      "route": "mise",
+      "version_pinned": true,
+      "mise_tool": "aqua:anchore/grype",
+      "prerequisite_tools": [
+        "mise"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target command inventory2026-10-06"
+      },
+      "commands": [
+        "mise use -g aqua:anchore/grype@0.119.0"
+      ],
+      "install_source": {
+        "url": "https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md",
+        "pin": "v2026.10.1"
+      },
+      "upstream_source": {
+        "url": "https://github.com/jdx/mise/blob/v2026.10.1/registry/grype.toml",
+        "pin": "v2026.10.1"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "export MISE_AUTO_INSTALL=0\ngrype --version 2>&1 | grep -E '(^|[[:space:]])0[.]119[.]0([[:space:],]|$)'\ngrype --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\ngrype --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\"",
+          "source": {
+            "url": "https://github.com/jdx/mise/blob/v2026.10.1/registry/grype.toml",
+            "pin": "v2026.10.1"
+          }
+        }
+      },
+      "notes": "Named-only transfer of an existing selected component; version/help/invalid-option checks only; no vulnerability DB update or CVE-detection claim. Native CLI self-test remains unrun by this repository-only PR."
+    },
+    {
+      "slot": "transfer-cli-ntfy",
+      "cli": "ntfy",
+      "owner": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "release": "2.28.0",
+      "installed": true,
+      "route": "mise",
+      "version_pinned": true,
+      "mise_tool": "aqua:binwiederhier/ntfy",
+      "prerequisite_tools": [
+        "mise"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target command inventory2026-10-06"
+      },
+      "commands": [
+        "mise use -g aqua:binwiederhier/ntfy@2.28.0"
+      ],
+      "install_source": {
+        "url": "https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md",
+        "pin": "v2026.10.1"
+      },
+      "upstream_source": {
+        "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/cmd/app.go",
+        "pin": "v2.28.0"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "export MISE_AUTO_INSTALL=0\nntfy --version 2>&1 | grep -E '(^|[[:space:]])2[.]28[.]0([[:space:],]|$)'\nntfy --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\nntfy --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\"",
+          "source": {
+            "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/cmd/app.go",
+            "pin": "v2.28.0"
+          }
+        }
+      },
+      "notes": "Named-only transfer of an existing selected component; CLI only; service/subscriber/delivery migration remains with observability owner. Native CLI self-test remains unrun by this repository-only PR."
+    },
+    {
+      "slot": "transfer-cli-qdrant",
+      "cli": "qdrant",
+      "owner": "Qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "release": "1.19.1",
+      "installed": true,
+      "route": "mise",
+      "version_pinned": true,
+      "mise_tool": "aqua:qdrant/qdrant",
+      "prerequisite_tools": [
+        "mise"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target command inventory2026-10-06"
+      },
+      "commands": [
+        "mise use -g aqua:qdrant/qdrant@1.19.1"
+      ],
+      "install_source": {
+        "url": "https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md",
+        "pin": "v2026.10.1"
+      },
+      "upstream_source": {
+        "url": "https://github.com/qdrant/qdrant/blob/v1.19.1/src/main.rs",
+        "pin": "v1.19.1"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "export MISE_AUTO_INSTALL=0\nqdrant --version 2>&1 | grep -E '(^|[[:space:]])1[.]19[.]1([[:space:],]|$)'\nqdrant --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\nqdrant --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\"",
+          "source": {
+            "url": "https://github.com/qdrant/qdrant/blob/v1.19.1/src/main.rs",
+            "pin": "v1.19.1"
+          }
+        }
+      },
+      "notes": "Named-only transfer of an existing selected component; CLI only; no store creation, server start or collection/query acceptance. Native CLI self-test remains unrun by this repository-only PR."
+    },
+    {
+      "slot": "transfer-cli-tvly",
+      "cli": "tvly",
+      "owner": "Tavily CLI",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "release": "0.1.8",
+      "installed": true,
+      "route": "uv-tool",
+      "version_pinned": true,
+      "uv_package": "tavily-cli",
+      "prerequisite_tools": [
+        "uv"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target command inventory2026-10-06"
+      },
+      "commands": [
+        "uv tool install --python 3.13.16 tavily-cli==0.1.8"
+      ],
+      "install_source": {
+        "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/tools.md",
+        "pin": "0.12.22"
+      },
+      "upstream_source": {
+        "url": "https://pypi.org/project/tavily-cli/0.1.8/",
+        "reviewed_on": "2026-10-06"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "export MISE_AUTO_INSTALL=0\ntvly --version 2>&1 | grep -E '(^|[[:space:]])0[.]1[.]8([[:space:],]|$)'\ntvly --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\ntvly --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\"",
+          "source": {
+            "url": "https://pypi.org/project/tavily-cli/0.1.8/",
+            "reviewed_on": "2026-10-06"
+          }
+        }
+      },
+      "notes": "Named-only transfer of an existing selected component; offline CLI parsing only; never invoke bare REPL, auth/status or provider commands; published sdist SHA3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08. Native CLI self-test remains unrun by this repository-only PR."
+    },
+    {
+      "slot": "transfer-cli-vllm",
+      "cli": "vllm",
+      "owner": "vLLM",
+      "repository": "https://github.com/vllm-project/vllm",
+      "release": "0.30.0",
+      "installed": true,
+      "route": "uv-tool",
+      "version_pinned": true,
+      "uv_package": "vllm",
+      "prerequisite_tools": [
+        "uv"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target command inventory2026-10-06"
+      },
+      "commands": [
+        "uv tool install --python 3.13.16 vllm==0.30.0"
+      ],
+      "install_source": {
+        "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/tools.md",
+        "pin": "0.12.22"
+      },
+      "upstream_source": {
+        "url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/vllm/entrypoints/cli/main.py",
+        "pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "export MISE_AUTO_INSTALL=0\nvllm --version 2>&1 | grep -E '(^|[[:space:]])0[.]30[.]0([[:space:],]|$)'\nvllm --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\nvllm --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\"",
+          "source": {
+            "url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/vllm/entrypoints/cli/main.py",
+            "pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607"
+          }
+        }
+      },
+      "notes": "Named-only transfer of an existing selected component; CLI only; supported Python3.13 pin, no serve/model pull/GPU inference or model-task parity claim. Native CLI self-test remains unrun by this repository-only PR."
+    },
+    {
+      "slot": "transfer-cli-agent-browser",
+      "cli": "agent-browser",
+      "owner": "Selected browser route",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Destination browser owner is Chrome DevTools MCP1.10.1; agent-browser remains a portable catalog candidate, but adds no assigned Phase1 consumer.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-agent-relay",
+      "cli": "agent-relay",
+      "owner": "Selected native messaging",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Destination transport is hcom0.7.27 plus native Claude cross-session messaging; do not copy the older13.0.0 relay launcher.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-amtool",
+      "cli": "amtool",
+      "owner": "Existing Alertmanager bundle",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Already installed in the selected Alertmanager0.34.1 bundle and called by owner acceptance; version/help each0. PATH alias is absent; no duplicate install or new alias.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-claude.bak-20260929-max-default",
+      "cli": "claude.bak-20260929-max-default",
+      "owner": "Inactive launcher backup",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Historical backup artifact, not the active Claude launcher; preserve active launcher ownership without restoring a backup executable.",
+      "decision_source": {
+        "path": "docs/decisions/2026-09-29-max-default-effort.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-claude.bak-20260929-max-default-v1",
+      "cli": "claude.bak-20260929-max-default-v1",
+      "owner": "Inactive launcher backup",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Historical backup artifact, not the active Claude launcher; preserve active launcher ownership without restoring a backup executable.",
+      "decision_source": {
+        "path": "docs/decisions/2026-09-29-max-default-effort.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-codex-omniroute",
+      "cli": "codex-omniroute",
+      "owner": "Native Codex profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "The documented native codex -p omniroute interface supplies this launch route; no duplicate legacy wrapper.",
+      "decision_source": {
+        "path": "recipes/README.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-context-mode",
+      "cli": "context-mode",
+      "owner": "Existing scoped context-mode",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Owned context-mode1.0.169 prefix already contains bin/context-mode; package exposes context-mode, not a ctx alias. Global PATH publication is absent; no second package install.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-dotnet",
+      "cli": "dotnet",
+      "owner": "Selected Nautilus runtime",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Selected historical destination is NautilusTrader/Python; retained LEAN is comparison history, with no new .NET consumer in this task. Apt10.0.112 would not reproduce historical SDK10.0.401.",
+      "decision_source": {
+        "path": "catalogs/us-equities/runtime-target.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-ecosystem-bounded-run",
+      "cli": "ecosystem-bounded-run",
+      "owner": "P1-GIT owned containment pair",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Required repository-sourced containment wrapper remains in the paired P1-GIT host apply (#767); no independent upstream-package transfer slot or claim that it is obsolete.",
+      "decision_source": {
+        "path": "adoption/tools/README.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gitleaks-guarded",
+      "cli": "gitleaks-guarded",
+      "owner": "P1-GIT owned containment pair",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Required repository-sourced Gitleaks wrapper remains in the paired P1-GIT host apply (#767), using the separately pinned native Gitleaks prerequisite; no duplicate wrapper installer here.",
+      "decision_source": {
+        "path": "adoption/tools/README.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-hindsight",
+      "cli": "hindsight",
+      "owner": "Destination memory owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "D3r4 leaves Hindsight/StackMeasure isolated; ai-memory2.5.2 remains the destination memory owner. Historical-data transfer gaps remain separate.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-huggingface-cli",
+      "cli": "huggingface-cli",
+      "owner": "Maintained HF executable",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Current huggingface_hub2.1.1 exposes hf; installed hf version/help each0. Do not restore the previous command name.",
+      "decision_source": {
+        "path": "manifests/stack.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-kernel_keyring.py",
+      "cli": "kernel_keyring.py",
+      "owner": "Credential custody helper",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "No global alias transfer: repository helper is retained, keyring is a per-boot spare, and credential values/stores are outside CLI transfer. Use current documented file-store/native custody.",
+      "decision_source": {
+        "path": "docs/secret-storage.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-llama-cli",
+      "cli": "llama-cli",
+      "owner": "Selected local-model owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Ollama owns the selected destination local-model-server route; this alternative CLI has no assigned Phase1 consumer. Existing model-contract/comparison gaps remain with the model owner.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-llama-server",
+      "cli": "llama-server",
+      "owner": "Selected local-model owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Ollama owns the selected destination local-model-server route; no competing server install/start here. Retain legacy llama service/model-contract gaps with the model owner.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-mcp-inspector",
+      "cli": "mcp-inspector",
+      "owner": "Existing on-demand Inspector",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Existing pinned on-demand npx @modelcontextprotocol/inspector@2.9.0 --web route installs no persistent wrapper; no global alias required.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pdfinfo",
+      "cli": "pdfinfo",
+      "owner": "MinerU document owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "A9B: no assigned2604consumer; MinerU owns parsing. Historical Poppler26.09.0 differs from apt26.01.0; retain a separate Poppler26.09.0 migration gap with the foundation automation owner.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pdftotext",
+      "cli": "pdftotext",
+      "owner": "MinerU document owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "A9B: no assigned2604consumer; MinerU owns parsing. Historical Poppler26.09.0 differs from apt26.01.0; retain a separate Poppler26.09.0 migration gap with the foundation automation owner.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-promtool",
+      "cli": "promtool",
+      "owner": "Existing Prometheus bundle",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Already installed in the selected Prometheus3.15.0 bundle and called by owner acceptance; version/help each0. PATH alias is absent; no duplicate install or new alias.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-socraticode",
+      "cli": "socraticode",
+      "owner": "Existing scoped SocratiCode",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Selected1.15.0 package intentionally has no linked command; clients invoke its owned dist/index.js. Backend/embedding qualification remains with code-search owner.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-tiny-agents",
+      "cli": "tiny-agents",
+      "owner": "Selected native worker",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Still an optional HF executable, not removed upstream. Destination worker is OpenHands SDK1.50.1; no additional runner consumer assigned.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-tvly-keyring",
+      "cli": "tvly-keyring",
+      "owner": "Credential custody helper",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; read-only legacy/target inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "No global alias transfer: retained repository helper/keyring spare remains separate; selected tvly uses documented credential_run.py file-store custody, never copied authentication state.",
+      "decision_source": {
+        "path": "docs/secret-storage.md",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pkgconf",
+      "cli": "pkgconf",
+      "owner": "pkgconf native aliases",
+      "repository": "https://github.com/pkgconf/pkgconf",
+      "release": "2.5.1-4",
+      "installed": true,
+      "route": "apt",
+      "version_pinned": true,
+      "apt_package": "pkgconf",
+      "additional_apt_packages": {
+        "libpkgconf7": "2.5.1-4",
+        "pkgconf-bin": "2.5.1-4"
+      },
+      "prerequisite_tools": [
+        "apt-get"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; all69legacy-only packages' bin/sbin filename audit2026-10-06"
+      },
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4"
+      ],
+      "install_source": {
+        "url": "https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html",
+        "reviewed_on": "2026-10-06"
+      },
+      "upstream_source": {
+        "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+        "pin": "pkgconf-2.5.1"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "source": {
+            "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+            "pin": "pkgconf-2.5.1"
+          },
+          "command": "export MISE_AUTO_INSTALL=0\ntest \"$(dpkg-query -W -f='${Version}' pkgconf-bin)\" = 2.5.1-4\ntest \"$(pkgconf --version)\" = 2.5.1\npkgconf --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\npkgconf --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined|invalid option' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\""
+        }
+      },
+      "notes": "Native Ubuntu26.04/resolute pkgconf2.5.1-4 supplies all four aliases; one canonical named installation covers them, with each alias retaining its own named acceptance. Pins include companion binary and library packages. CLI parsing only, not compile/link correctness or upstream-suite acceptance; host native self-test UNRUN.",
+      "package_source": {
+        "url": "https://packages.ubuntu.com/resolute/amd64/pkgconf-bin/filelist",
+        "reviewed_on": "2026-10-06"
+      }
+    },
+    {
+      "slot": "transfer-cli-pkg-config",
+      "cli": "pkg-config",
+      "owner": "pkgconf native aliases",
+      "repository": "https://github.com/pkgconf/pkgconf",
+      "release": "2.5.1-4",
+      "installed": true,
+      "route": "apt",
+      "version_pinned": true,
+      "apt_package": "pkgconf",
+      "additional_apt_packages": {
+        "libpkgconf7": "2.5.1-4",
+        "pkgconf-bin": "2.5.1-4"
+      },
+      "prerequisite_tools": [
+        "apt-get"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; all69legacy-only packages' bin/sbin filename audit2026-10-06"
+      },
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4"
+      ],
+      "install_source": {
+        "url": "https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html",
+        "reviewed_on": "2026-10-06"
+      },
+      "upstream_source": {
+        "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+        "pin": "pkgconf-2.5.1"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "source": {
+            "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+            "pin": "pkgconf-2.5.1"
+          },
+          "command": "export MISE_AUTO_INSTALL=0\ntest \"$(dpkg-query -W -f='${Version}' pkgconf-bin)\" = 2.5.1-4\ntest \"$(pkg-config --version)\" = 2.5.1\npkg-config --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\npkg-config --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined|invalid option' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\""
+        }
+      },
+      "notes": "Native Ubuntu26.04/resolute pkgconf2.5.1-4 supplies all four aliases; one canonical named installation covers them, with each alias retaining its own named acceptance. Pins include companion binary and library packages. CLI parsing only, not compile/link correctness or upstream-suite acceptance; host native self-test UNRUN.",
+      "package_source": {
+        "url": "https://packages.ubuntu.com/resolute/amd64/pkgconf/filelist",
+        "reviewed_on": "2026-10-06"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-pkgconf",
+      "cli": "x86_64-linux-gnu-pkgconf",
+      "owner": "pkgconf native aliases",
+      "repository": "https://github.com/pkgconf/pkgconf",
+      "release": "2.5.1-4",
+      "installed": true,
+      "route": "apt",
+      "version_pinned": true,
+      "apt_package": "pkgconf",
+      "additional_apt_packages": {
+        "libpkgconf7": "2.5.1-4",
+        "pkgconf-bin": "2.5.1-4"
+      },
+      "prerequisite_tools": [
+        "apt-get"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; all69legacy-only packages' bin/sbin filename audit2026-10-06"
+      },
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4"
+      ],
+      "install_source": {
+        "url": "https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html",
+        "reviewed_on": "2026-10-06"
+      },
+      "upstream_source": {
+        "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+        "pin": "pkgconf-2.5.1"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "source": {
+            "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+            "pin": "pkgconf-2.5.1"
+          },
+          "command": "export MISE_AUTO_INSTALL=0\ntest \"$(dpkg-query -W -f='${Version}' pkgconf-bin)\" = 2.5.1-4\ntest \"$(x86_64-linux-gnu-pkgconf --version)\" = 2.5.1\nx86_64-linux-gnu-pkgconf --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\nx86_64-linux-gnu-pkgconf --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined|invalid option' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\""
+        }
+      },
+      "notes": "Native Ubuntu26.04/resolute pkgconf2.5.1-4 supplies all four aliases; one canonical named installation covers them, with each alias retaining its own named acceptance. Pins include companion binary and library packages. CLI parsing only, not compile/link correctness or upstream-suite acceptance; host native self-test UNRUN.",
+      "package_source": {
+        "url": "https://packages.ubuntu.com/resolute/amd64/pkgconf/filelist",
+        "reviewed_on": "2026-10-06"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-pkg-config",
+      "cli": "x86_64-linux-gnu-pkg-config",
+      "owner": "pkgconf native aliases",
+      "repository": "https://github.com/pkgconf/pkgconf",
+      "release": "2.5.1-4",
+      "installed": true,
+      "route": "apt",
+      "version_pinned": true,
+      "apt_package": "pkgconf",
+      "additional_apt_packages": {
+        "libpkgconf7": "2.5.1-4",
+        "pkgconf-bin": "2.5.1-4"
+      },
+      "prerequisite_tools": [
+        "apt-get"
+      ],
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json; all69legacy-only packages' bin/sbin filename audit2026-10-06"
+      },
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends pkgconf=2.5.1-4 libpkgconf7=2.5.1-4 pkgconf-bin=2.5.1-4"
+      ],
+      "install_source": {
+        "url": "https://manpages.ubuntu.com/manpages/resolute/man8/apt-get.8.html",
+        "reviewed_on": "2026-10-06"
+      },
+      "upstream_source": {
+        "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+        "pin": "pkgconf-2.5.1"
+      },
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "source": {
+            "url": "https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/cli/main.c",
+            "pin": "pkgconf-2.5.1"
+          },
+          "command": "export MISE_AUTO_INSTALL=0\ntest \"$(dpkg-query -W -f='${Version}' pkgconf-bin)\" = 2.5.1-4\ntest \"$(x86_64-linux-gnu-pkg-config --version)\" = 2.5.1\nx86_64-linux-gnu-pkg-config --help >/dev/null\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nrc=0\nx86_64-linux-gnu-pkg-config --ns-transfer-invalid-option >\"$cli_work/control.log\" 2>&1 || rc=$?\ntest \"$rc\" -ne 0\ngrep -F -- 'ns-transfer-invalid-option' \"$cli_work/control.log\" >/dev/null\ngrep -Ei 'unknown|unexpected|unrecognized|no such|not defined|invalid option' \"$cli_work/control.log\" >/dev/null\nprintf 'native CLI invalid-option control exit=%s\\n' \"$rc\""
+        }
+      },
+      "notes": "Native Ubuntu26.04/resolute pkgconf2.5.1-4 supplies all four aliases; one canonical named installation covers them, with each alias retaining its own named acceptance. Pins include companion binary and library packages. CLI parsing only, not compile/link correctness or upstream-suite acceptance; host native self-test UNRUN.",
+      "package_source": {
+        "url": "https://packages.ubuntu.com/resolute/amd64/pkgconf/filelist",
+        "reviewed_on": "2026-10-06"
+      }
+    },
+    {
+      "slot": "transfer-cli-apt-extracttemplates",
+      "cli": "apt-extracttemplates",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Distribution archive/debconf helper; no assigned consumer for archive publishing or package-index preprocessing. Selected host steps use apt-get directly.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-apt-ftparchive",
+      "cli": "apt-ftparchive",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Distribution archive/debconf helper; no assigned consumer for archive publishing or package-index preprocessing. Selected host steps use apt-get directly.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-apt-sortpkgs",
+      "cli": "apt-sortpkgs",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Distribution archive/debconf helper; no assigned consumer for archive publishing or package-index preprocessing. Selected host steps use apt-get directly.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-cpan5.38-x86_64-linux-gnu",
+      "cli": "cpan5.38-x86_64-linux-gnu",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy distribution Perl5.38 alias; no assigned consumer. Do not downgrade the target distribution or claim exact historical SDK reproduction.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-cpp-13",
+      "cli": "cpp-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gxx-13",
+      "cli": "g++-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcc-13",
+      "cli": "gcc-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcc-ar-13",
+      "cli": "gcc-ar-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcc-nm-13",
+      "cli": "gcc-nm-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcc-ranlib-13",
+      "cli": "gcc-ranlib-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcov-13",
+      "cli": "gcov-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcov-dump-13",
+      "cli": "gcov-dump-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gcov-tool-13",
+      "cli": "gcov-tool-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gdk-pixbuf-csource",
+      "cli": "gdk-pixbuf-csource",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Legacy GTK image serialization/C-source/thumbnail helper; no assigned desktop or GTK-build consumer in the selected destination profile.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gdk-pixbuf-pixdata",
+      "cli": "gdk-pixbuf-pixdata",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Legacy GTK image serialization/C-source/thumbnail helper; no assigned desktop or GTK-build consumer in the selected destination profile.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-gdk-pixbuf-thumbnailer",
+      "cli": "gdk-pixbuf-thumbnailer",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Legacy GTK image serialization/C-source/thumbnail helper; no assigned desktop or GTK-build consumer in the selected destination profile.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-lto-dump-13",
+      "cli": "lto-dump-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pdb3.12",
+      "cli": "pdb3.12",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific distribution Python3.12 support helper; no assigned global CLI consumer. Managed Python/Nautilus runtimes retain their own pins; no historical interpreter equivalence is claimed.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-perl5.38-x86_64-linux-gnu",
+      "cli": "perl5.38-x86_64-linux-gnu",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy distribution Perl5.38 alias; no assigned consumer. Do not downgrade the target distribution or claim exact historical SDK reproduction.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pkcon",
+      "cli": "pkcon",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "PackageKit D-Bus administration/monitoring helper; no assigned consumer, while selected deployment uses apt directly.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pkmon",
+      "cli": "pkmon",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "PackageKit D-Bus administration/monitoring helper; no assigned consumer, while selected deployment uses apt directly.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pydoc3.12",
+      "cli": "pydoc3.12",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific distribution Python3.12 support helper; no assigned global CLI consumer. Managed Python/Nautilus runtimes retain their own pins; no historical interpreter equivalence is claimed.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-pygettext3.12",
+      "cli": "pygettext3.12",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific distribution Python3.12 support helper; no assigned global CLI consumer. Managed Python/Nautilus runtimes retain their own pins; no historical interpreter equivalence is claimed.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-session-migration",
+      "cli": "session-migration",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Legacy Ubuntu desktop/session-settings migration program, not the co-op's session relay; no assigned CLI consumer in the selected WSL/server profile.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-slirp4netns",
+      "cli": "slirp4netns",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Current rootless Docker selects gvisor-tap-vsock (read-only rootlesskit argv observation); this optional alternative is unnecessary and could alter automatic driver selection at restart. This is not new network acceptance.",
+      "decision_source": {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-uuidd",
+      "cli": "uuidd",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Service program from uuid-runtime, not a requested generic user CLI; no assigned destination daemon consumer. No service start/configuration or deletion is authorized here.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-uuidgen",
+      "cli": "uuidgen",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Standalone UUID generation/inspection utility has no assigned CLI consumer; current programmatic use follows Python UUID support. No daemon migration is implied.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-uuidparse",
+      "cli": "uuidparse",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Standalone UUID generation/inspection utility has no assigned CLI consumer; current programmatic use follows Python UUID support. No daemon migration is implied.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-cpp-13",
+      "cli": "x86_64-linux-gnu-cpp-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gxx-13",
+      "cli": "x86_64-linux-gnu-g++-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcc-13",
+      "cli": "x86_64-linux-gnu-gcc-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcc-ar-13",
+      "cli": "x86_64-linux-gnu-gcc-ar-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcc-nm-13",
+      "cli": "x86_64-linux-gnu-gcc-nm-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcc-ranlib-13",
+      "cli": "x86_64-linux-gnu-gcc-ranlib-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcov-13",
+      "cli": "x86_64-linux-gnu-gcov-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcov-dump-13",
+      "cli": "x86_64-linux-gnu-gcov-dump-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-gcov-tool-13",
+      "cli": "x86_64-linux-gnu-gcov-tool-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-x86_64-linux-gnu-lto-dump-13",
+      "cli": "x86_64-linux-gnu-lto-dump-13",
+      "owner": "Destination base profile",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;69legacy-only packages' bin/sbin audit2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "Version-specific legacy GCC13/compiler-inspection alias; no assigned retained consumer. Target distribution/toolchain choices remain unchanged; historical compiler reproduction is a separate gap if a consumer appears.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      }
+    },
+    {
+      "slot": "transfer-cli-native-stack-sign-in",
+      "cli": "native-stack-sign-in",
+      "owner": "Legacy wrapper purpose owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;read-only legacy bin inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "A10A: no assigned2604consumer or maintained wrapper locator in the scoped source audit. Purpose/consumer remains OPEN for legacy owner native-stack-migration-completion before R5 retirement. NativeStack source bins stay intact for retirement salvage. Documented native-client/adoption entry points are used only within their verified scope; no capability equivalence is claimed.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      },
+      "retained_gap": {
+        "owner": "native-stack-migration-completion",
+        "condition": "confirm wrapper purpose and consumer before R5 retirement",
+        "status": "open"
+      }
+    },
+    {
+      "slot": "transfer-cli-nativestack",
+      "cli": "nativestack",
+      "owner": "Legacy wrapper purpose owner",
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "acceptance": {},
+      "origin": {
+        "kind": "missing-cli",
+        "source": "transfer-inventory.json;read-only legacy bin inventory2026-10-06"
+      },
+      "not_needed_on": "2026-10-06",
+      "reason": "A10A: no assigned2604consumer or maintained wrapper locator in the scoped source audit. Purpose/consumer remains OPEN for legacy owner native-stack-migration-completion before R5 retirement. NativeStack source bins stay intact for retirement salvage. Documented native-client/adoption entry points are used only within their verified scope; no capability equivalence is claimed.",
+      "decision_source": {
+        "path": "adoption/manifest.json",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60"
+      },
+      "retained_gap": {
+        "owner": "native-stack-migration-completion",
+        "condition": "confirm wrapper purpose and consumer before R5 retirement",
+        "status": "open"
+      }
+    }
+  ],
   "owners": [
     {
       "layer": "native-clients",

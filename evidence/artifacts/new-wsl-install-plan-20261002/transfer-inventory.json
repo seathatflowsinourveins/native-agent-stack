@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "observed_on": "2026-10-06",
+  "north_star_action": "Transfer reproducible CLI/repository prerequisites to NativeStack2604 for research and historical simulation.",
+  "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "approved_plan_sha256": "775119dc6840552def19142a10e2730b489b6365c346e6f9fb6f5db5f2572ba2",
+  "missing_cli_names": [
+    "agent-browser",
+    "agent-relay",
+    "amtool",
+    "apt-extracttemplates",
+    "apt-ftparchive",
+    "apt-sortpkgs",
+    "claude.bak-20260929-max-default",
+    "claude.bak-20260929-max-default-v1",
+    "codex-omniroute",
+    "context-mode",
+    "cpan5.38-x86_64-linux-gnu",
+    "cpp-13",
+    "dotnet",
+    "ecosystem-bounded-run",
+    "g++-13",
+    "gcc-13",
+    "gcc-ar-13",
+    "gcc-nm-13",
+    "gcc-ranlib-13",
+    "gcov-13",
+    "gcov-dump-13",
+    "gcov-tool-13",
+    "gdk-pixbuf-csource",
+    "gdk-pixbuf-pixdata",
+    "gdk-pixbuf-thumbnailer",
+    "gitleaks",
+    "gitleaks-guarded",
+    "grype",
+    "hindsight",
+    "huggingface-cli",
+    "kernel_keyring.py",
+    "llama-cli",
+    "llama-server",
+    "lto-dump-13",
+    "mcp-inspector",
+    "native-stack-sign-in",
+    "nativestack",
+    "ntfy",
+    "pdb3.12",
+    "pdfinfo",
+    "pdftotext",
+    "perl5.38-x86_64-linux-gnu",
+    "pkcon",
+    "pkg-config",
+    "pkgconf",
+    "pkmon",
+    "promtool",
+    "pydoc3.12",
+    "pygettext3.12",
+    "qdrant",
+    "session-migration",
+    "slirp4netns",
+    "socraticode",
+    "tiny-agents",
+    "tvly",
+    "tvly-keyring",
+    "uuidd",
+    "uuidgen",
+    "uuidparse",
+    "vllm",
+    "x86_64-linux-gnu-cpp-13",
+    "x86_64-linux-gnu-g++-13",
+    "x86_64-linux-gnu-gcc-13",
+    "x86_64-linux-gnu-gcc-ar-13",
+    "x86_64-linux-gnu-gcc-nm-13",
+    "x86_64-linux-gnu-gcc-ranlib-13",
+    "x86_64-linux-gnu-gcov-13",
+    "x86_64-linux-gnu-gcov-dump-13",
+    "x86_64-linux-gnu-gcov-tool-13",
+    "x86_64-linux-gnu-lto-dump-13",
+    "x86_64-linux-gnu-pkg-config",
+    "x86_64-linux-gnu-pkgconf"
+  ],
+  "scopes": {
+    "legacy_bin_unique_filenames": 80,
+    "missing_legacy_bin_names": 30,
+    "legacy_dpkg_packages": 596,
+    "target_dpkg_packages": 635,
+    "legacy_only_package_names": 69,
+    "legacy_only_packages_bin_sbin_names": 43,
+    "package_names_present_on_target": [
+      "python3.12"
+    ],
+    "missing_package_program_names": 42,
+    "total_missing_names": 72,
+    "named_install_rows": 10,
+    "distinct_native_installs": 7,
+    "dated_exclusions": 62
+  },
+  "observations": [
+    {
+      "command": "mise ls --json",
+      "host": "target",
+      "exit_code": 0,
+      "output_sha256": "79c75181ea784285a9caacc91f6d9bf3be04ab503d4ff08003f35e7ac93ce0d2",
+      "scope": "16tool keys; sanitized metadata only"
+    },
+    {
+      "command": "uv tool list",
+      "host": "target",
+      "exit_code": 0,
+      "output_sha256": "8419e030b7e14bfb0385226fb1663da697d96b285ae22381cfcd2821be7f8565",
+      "scope": "Tool/version/bin names, not sign-in state"
+    },
+    {
+      "command": "list filenames in ${TARGET_HOME}/.local/bin",
+      "host": "target",
+      "exit_code": 0,
+      "output_sha256": "50a3e5d3f75b2351738d48703dc8e4290b8f3f5f586e61860dcf9e826d967fb9"
+    },
+    {
+      "command": "dpkg-query -W -f='${binary:Package}\\t${Version}\\t${Architecture}\\n'",
+      "host": "target",
+      "exit_code": 0,
+      "output_sha256": "6348971b0258dfbe1ae3f25fdcae4e381aab243ec9a41a0ca8223034a1b07d4e"
+    },
+    {
+      "command": "wsl.exe -d NativeStack --cd / --exec bash -c 'rtk proxy nice -n19 mise ls --json'",
+      "host": "legacy",
+      "exit_code": 127,
+      "started_utc": "2026-10-06T04:25:28Z",
+      "scope": "Non-login PATH lackedRTK; no successful mise query"
+    },
+    {
+      "command": "process-only PATH includes ${SOURCE_HOME}/.local/share/codex-ecosystem/bin; command-v mise conditional",
+      "host": "legacy",
+      "exit_code": 0,
+      "diagnostic": "MISE_NOT_FOUND_IN_READ_PATH",
+      "scope": "Mise not found in bounded read paths; empty placeholder is not a native mise result"
+    },
+    {
+      "command": "uv tool list with corrected process-only PATH",
+      "host": "legacy",
+      "exit_code": 0,
+      "output_sha256": "2b2697e4367f67018d9d257e75df567296ae7764eb8bbe4baec3b2af2bdf7846",
+      "scope": "harbor0.23.0 and tavily-cli0.1.8"
+    },
+    {
+      "command": "find ${SOURCE_HOME}/.local/bin and ${SOURCE_HOME}/.local/share/codex-ecosystem/bin -mindepth1 -maxdepth1 -printf filenames",
+      "host": "legacy",
+      "exit_code": 0,
+      "output_sha256": "94f1cdf198de06e3a5478dce134f0f611d989723a3cdccce13a312d2b0a8a795",
+      "scope": "80unique names; no wrapper execution or credential-store read"
+    },
+    {
+      "command": "dpkg-query -W package/version/architecture/section/priority metadata",
+      "host": "legacy",
+      "exit_code": 0,
+      "output_sha256": "8dcb9934983541bed5640e8476a59e25ec29fdb90a8c84c2e999cd2ffae6932c",
+      "started_utc": "2026-10-06T04:27:42Z",
+      "ended_utc": "2026-10-06T04:27:43Z"
+    },
+    {
+      "command": "wsl.exe -d NativeStack --cd / --exec /usr/bin/dpkg-query -L <all69legacy-only-package-names>",
+      "host": "legacy",
+      "exit_code": 0,
+      "started_utc": "2026-10-06T05:00:24Z",
+      "ended_utc": "2026-10-06T05:00:24Z",
+      "scope": "bin/sbin filename extraction, excluding internal libraries/config and no program execution"
+    }
+  ],
+  "supersession_ledger": {
+    "rows": 481,
+    "tool_or_cli_rows": 0,
+    "sha256": "5470cd659bd44c9d285c9b0fd36313d05c542ea3d37914924cb738c05d8efc16",
+    "limitation": "No CLI roster in task-filtered ledger/base/supplement; read-only legacy inventory supplies actual names."
+  },
+  "capability_reuse": [
+    {
+      "cli": "amtool",
+      "owner": "Alertmanager0.34.1",
+      "native_version_exit_code": 0,
+      "native_help_exit_code": 0,
+      "scope": "Exists in owner bundle, absent global PATH; no new install/alias"
+    },
+    {
+      "cli": "promtool",
+      "owner": "Prometheus3.15.0",
+      "native_version_exit_code": 0,
+      "native_help_exit_code": 0,
+      "scope": "Exists in owner bundle, absent global PATH; no new install/alias"
+    },
+    {
+      "cli": "context-mode",
+      "owner": "context-mode1.0.169",
+      "scope": "Existing owned prefix/bin/context-mode; no globalalias; no ctx entrypoint claimed"
+    },
+    {
+      "cli": "huggingface-cli",
+      "owner": "hf2.1.1",
+      "native_version_exit_code": 0,
+      "native_help_exit_code": 0,
+      "scope": "Current official entrypoint hf; prior name not restored"
+    },
+    {
+      "cli": "slirp4netns",
+      "owner": "current rootless Docker",
+      "observed_driver": "gvisor-tap-vsock",
+      "scope": "Read-only /proc whitelist; no new network or restart qualification"
+    }
+  ],
+  "retained_gaps": [
+    {
+      "id": "poppler-2604",
+      "owner": "foundation automation",
+      "status": "open",
+      "condition": "Poppler26.09.0 migration only if a retained consumer appears; A9B excludes pdfinfo/pdftotext now",
+      "future_route_lead": "Supported mise conda:poppler@26.09.0; feedstock13d784d77510e73d6066a75a79cd8e6040a6a261 matches upstream archive SHA. Source-reviewed, unrun; no apt26.01.0 downgrade."
+    },
+    {
+      "id": "legacy-wrapper-purpose",
+      "owner": "native-stack-migration-completion",
+      "status": "open",
+      "condition": "Confirm native-stack-sign-in/nativestack purpose and consumer before R5; A10A. Old bins intact for retirement salvage; no capability-equivalence claim."
+    },
+    {
+      "id": "service-model-qualification",
+      "owner": "existing observability/code-search/model owners",
+      "status": "open",
+      "condition": "CLI restoration does not qualify ntfy delivery, Qdrant collections/query, vLLM models or llama alternatives."
+    },
+    {
+      "id": "containment-wrapper-apply",
+      "owner": "P1-GIT",
+      "status": "separate host step",
+      "condition": "Paired repository ecosystem-bounded-run/gitleaks-guarded host apply in #767 remains required; no duplicate wrapper install here."
+    }
+  ],
+  "limitations": [
+    "This roster counts72missing filenames, not72distinct products:30legacy user-bin names plus42package-supplied program names, including two inactive launcher backups, versioned compiler/language helpers and uuidd service program.",
+    "69package-name differences include libraries/ABI/release splits and are not69CLI tools. All69were inspected for bin/sbin paths; internal keyboxd/library files remain package/service scope.",
+    "Observed PATH absence differs from absent installed capability; owner-bundle/scoped-prefix reuse is explicit.",
+    "Exact pins and native CLI/self-test commands are repository plans; NO host install, service/config change, fresh provider/model execution or platform READY promotion occurred.",
+    "Native CLI parsing checks and synthetic Gitleaks fixture controls are separate from upstream test suites, service/API/model acceptance and strategy readiness.",
+    "Source inventory ran only after the04:25Zcold hold and used read-only interop; private source outputs stay in the owned runtime directory."
+  ]
+}
