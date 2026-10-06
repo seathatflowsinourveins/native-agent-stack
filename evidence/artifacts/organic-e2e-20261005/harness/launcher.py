@@ -499,13 +499,22 @@ def stream_completed(client: str, stream_path: Path) -> bool:
     return False
 
 
+def result_before_t(policy: dict, outcome: dict) -> bool:
+    """The result event reached the stream before T. Claude Code in print mode holds its result event while a background
+    task (a Workflow run) is still going and writes it when the process is terminated: smoke-20261006c's claude-native
+    result reported duration_ms 575920 but arrived at 900.7 s, after the timeout's SIGTERM, so arrival time decides."""
+    ttr = outcome.get("time_to_result_s")
+    return ttr is not None and ttr < policy["t_seconds"]
+
+
 def trial_reason(client: str, policy: dict, outcome: dict, completed: bool) -> tuple[str | None, bool]:
     """(censoring reason or None, post_result_terminated). Under complete-at-result a Claude trial whose result event
     arrived before T and before any kill counts as complete, however the process then ended (grace, T, a window kill);
-    a nested client always censors."""
+    a result that arrived only at or after T (written on the timeout's SIGTERM) censors as timeout_after_result; a nested
+    client always censors."""
     rc, kill = outcome["rc"], outcome["kill_reason"]
     if (client == "claude" and policy["policy"] == "complete-at-result" and outcome["result_at"]
-            and outcome["result_before_kill"] and kill != "nested_client"):
+            and outcome["result_before_kill"] and result_before_t(policy, outcome) and kill != "nested_client"):
         terminated = bool(kill) or rc in (124, 137, -9, 143, -15)
         return None, terminated
     if kill:

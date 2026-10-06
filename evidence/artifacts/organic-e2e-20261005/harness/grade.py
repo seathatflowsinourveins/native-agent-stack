@@ -1442,10 +1442,25 @@ def ledger_by_trial(root: Path) -> dict:
     return ledger
 
 
+def effective_exit(exit_row: dict) -> dict:
+    """The exit row with the completion rule re-checked: under complete-at-result a Claude result counts only if it
+    reached the stream before T (launcher.result_before_t). A launcher frozen before that rule marked a result written
+    on the timeout's SIGTERM as complete (smoke-20261006c claude-native: result at 900.7 s, rc 124); the grader censors
+    such a trial as timeout_after_result and records that it overrode the launcher."""
+    if exit_row.get("completion_policy") == "complete-at-result" and not exit_row.get("censored") \
+            and exit_row.get("time_to_result_s") is not None and exit_row.get("t_seconds") \
+            and exit_row["time_to_result_s"] >= exit_row["t_seconds"]:
+        return {**exit_row, "censored": True, "reason": "timeout_after_result", "grader_override": "result at or after T"}
+    return exit_row
+
+
 def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_tools: dict) -> tuple[dict, dict | None]:
     """(table record, graded) for one trial; graded is None for a trial that never launched."""
     rows = trial["rows"]
-    exit_row = rows.get("exit", {})
+    exit_row = effective_exit(rows.get("exit", {}))
+    if exit_row is not rows.get("exit"):
+        rows = {**rows, "exit": exit_row}
+        trial = {**trial, "rows": rows}
     launched = "launched" in rows
     record = {"trial_id": tid, "cell": trial.get("cell"), "client": trial.get("client"), "arm": trial.get("arm"),
               "task": trial.get("task"), "instance": trial.get("instance"), "lane": trial.get("lane"), "ref": trial.get("ref"),
@@ -1453,7 +1468,8 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
               "repeatIndex": trial.get("repeatIndex"), "rc": exit_row.get("rc"), "censored": exit_row.get("censored"),
               "reason": exit_row.get("reason"), "duration_s": exit_row.get("duration_s"), "launched": launched,
               "time_to_result_s": exit_row.get("time_to_result_s"), "post_result_s": exit_row.get("post_result_s"),
-              "post_result_terminated": exit_row.get("post_result_terminated"), "terminated_by": exit_row.get("terminated_by")}
+              "post_result_terminated": exit_row.get("post_result_terminated"), "terminated_by": exit_row.get("terminated_by"),
+              "grader_override": exit_row.get("grader_override")}
     if not launched:
         return record, None
     task = tasks.get((trial.get("task"), trial.get("instance")), {})
