@@ -815,3 +815,18 @@ constant changes here. The top-rule/lanes pin named above moves from
 `568ee365aeef3455fc901e648eb72d28cc3b49c39f1bfba7f5e39beed20479a8` to
 `82e23b68466ed8b96566a229582f0c99fa1456a393e635f18cc5e65f601f4d09`: the pinned
 segment runs to the RTK marker, so it includes the `session-lanes` lines.
+
+## Addendum (2026-10-06): local-time review repair
+
+The 2026-10-05 addendum's figures precede the local-time record's review
+repair, which grew its sentence from 227 to 327 bytes. Against main, the
+portable Claude block now gains 330 bytes and the Codex `session-lanes` block
+328. `startup_files` measures Claude 23,896 and Codex 19,660 startup bytes,
+under the unchanged 24,458/20,103 constants (562/443 bytes of headroom); the
+compact Codex source is 7,635 bytes. For these inputs the post-gate projection
+becomes 23,216/18,980-byte scopes and 24,377/19,929-byte ceilings. No constant
+changes here. The top-rule/lanes pin moves from
+`82e23b68466ed8b96566a229582f0c99fa1456a393e635f18cc5e65f601f4d09` to
+`d21bb3bc0a2e68fb362af1d085da3761a08cc5ccec18ebd7ed16dd83d80bb3cd`. The
+[local-time record](2026-10-05-user-facing-local-time.md)'s 2026-10-06
+addendum holds the measurement table and the checks.

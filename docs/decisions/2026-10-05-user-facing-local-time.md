@@ -127,6 +127,8 @@ UTC timeline across hosts and clients.
 These are measured with `PortableTopRuleTests.startup_files`, which uses the renderer's committed carriers. Base is main
 `ecfa1127`. After the rebase onto it, both columns were measured again in code (the before column from main's startup
 files, extracted to a scratch directory), and every value equals the first measurement, made on main `e8c1edec`.
+This table and the sentence size below precede the review repair (`0df3f0dc`), which added 100 bytes to the
+sentence; the 2026-10-06 addendum at the end of this record gives the measurements after it.
 
 | File or scope | Before | After |
 | --- | ---: | ---: |
@@ -152,7 +154,7 @@ sentence is 227 bytes. The budget record has a dated addendum pointing here.
   `session-lanes` lines included. It was re-derived with the module's `template_segments()` as
   `82e23b68466ed8b96566a229582f0c99fa1456a393e635f18cc5e65f601f4d09`, and the budget record's addendum names the new
   value beside the old one. The size comments there and in `tools/adoption/new_wsl_client_config.py` now give 7,535
-  and 8,601 bytes.
+  and 8,601 bytes. These values precede the review repair; the 2026-10-06 addendum gives the current pin and sizes.
 - **The cloud-init check.** `tests/test_wsl_new_distro_recipe.py` requires `[time]` and `useWindowsTimezone=true` in
   the render, and reads the appended `/etc/wsl.conf` text by section: `[time]` holds only that key and comes before
   `[user]`, which holds only the default user. Its new mutants are a lost section, `false`, the key moved under
@@ -234,7 +236,7 @@ rebase, at base `ecfa1127`, on NativeStack2604 (2026-10-05 and 2026-10-06 UTC). 
 
 Rows whose result starts "round 3" ran again on that final tree. The others ran on the round-2 tree, `608c5266`. The
 third round changed no template, carrier, user-data or startup file. Only this record's prose changed after the last
-checks.
+checks. Every row precedes the review repair (`0df3f0dc`); the 2026-10-06 addendum lists the checks run after it.
 
 | Command | Exit | Result |
 | --- | ---: | --- |
@@ -312,3 +314,59 @@ checks.
   `timezone` appears only in `tools.web_search` (`location = { country, region, city, timezone }`).
 - **cloud-init 26.1** (installed `26.1-0ubuntu3~26.04.1`): `cloud-init schema -c` on the rendered user-data, P2's
   check.
+
+## Addendum (2026-10-06): measurements after the review repair
+
+The review repair (`0df3f0dc`) gave the sentence the records half that Decision 1 quotes, in both templates and both
+F9 carriers. The sentence grew from 227 to 327 bytes, and each of those four files by 100 bytes. The Startup bytes
+table, the sentence size, the pin and size comments under "Pins amended in the same change" and every Checks row above
+precede that repair; they stay as the record of the earlier tree. The repair left `TOP_RULE_SHA256` and those comments
+stale (a review finding of 2026-10-06), and this addendum's change repairs them.
+
+These values were measured on 2026-10-06 UTC on NativeStack2604 with `PortableTopRuleTests.startup_files` on the
+repaired tree. The two earlier columns were computed again with the same file set, reading the startup files and
+carriers from `ecfa1127` and from `a10ad2c0`, the branch head before the repair; both reproduce the table above. No
+startup file other than the two carriers changed between `ecfa1127` and the repaired tree.
+
+| File or scope | Main `ecfa1127` | Before the repair, `a10ad2c0` | After the repair |
+| --- | ---: | ---: | ---: |
+| `examples/claude-native/CLAUDE.md` and its carrier | 11,575 | 11,805 | 11,905 (+330 against main) |
+| Claude rendered user block | 11,841 | 12,071 | 12,171 |
+| `adoption/templates/codex.AGENTS.template.md` (local check: under 8,192) | 7,307 | 7,535 | 7,635 (+328) |
+| Codex rendered carrier | 8,373 | 8,601 | 8,701 |
+| Claude startup scope (fixed ceiling 24,458) | 23,566 | 23,796; headroom 662 | 23,896; headroom 562 |
+| Codex startup scope (fixed ceiling 20,103) | 19,332 | 19,560; headroom 543 | 19,660; headroom 443 |
+| Claude post-gate projection (scope − 680; ceiling = ×1.05, rounded up) | 22,886; 24,031 | 23,116; 24,272 | 23,216; 24,377 |
+| Codex post-gate projection | 18,652; 19,585 | 18,880; 19,824 | 18,980; 19,929 |
+
+- **The constants.** They stay at 24,458 and 20,103; nothing is re-baselined. When the routing host gate passes,
+  lowering both constants to the measured post-gate scopes plus 5% gives 24,377 and 19,929 for these inputs, replacing
+  24,272 and 19,824 above. The budget record has a matching dated addendum.
+- **The pin.** `TOP_RULE_SHA256` moves from `82e23b68466ed8b96566a229582f0c99fa1456a393e635f18cc5e65f601f4d09` to
+  `d21bb3bc0a2e68fb362af1d085da3761a08cc5ccec18ebd7ed16dd83d80bb3cd`. It was re-derived with the module's
+  `template_segments()`, whose top-rule segment, ending at the RTK marker, is now 6,360 bytes, and it equals the value
+  the review computed.
+- **The size comments.** Those in `tests/test_codex_worker_lane.py` and `tools/adoption/new_wsl_client_config.py` now
+  give 7,635 and 8,701 bytes.
+- **One wording.** The sentence is byte-identical in both templates and both F9 carriers. The repair changed all four
+  together with `StandingRuleSurfacesTests.LOCAL_TIME`, which checks that wording once on each, so no surface besides
+  the pin and these records needed a change.
+- **Erratum.** "No decision index" above says this record, like the context-budget record, is not registered in
+  `manifests/evidence.json`. This branch lists both in its `files[]` (main does not), so their edits here are
+  re-registered, with the test and the renderer, in the branch's last commit.
+
+These checks ran on 2026-10-06 UTC on NativeStack2604. The tests ran before this table was written; `validate.py`, the
+manifest order check and `git diff --check` ran again after it.
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source`, before the pin repair (`563eedab`) | 1 | the segment hashed to `d21bb3bc…` against the pinned `82e23b68…` (the review's finding, reproduced) |
+| The same test, after it | 0 | 1 test |
+| `python3 -B -m unittest` on 13 modules (the first 13 below), before the pin repair | 1 | 1,297 tests; the only failure is the test above |
+| `python3 -B -m unittest`, one run per module, after the repair: `test_codex_worker_lane`, `test_install_claude_profile`, `test_managed_block`, `test_new_wsl_client_config`, `test_codex_agents`, `test_codex_roles`, `test_scaffold_repo`, `test_bootstrap_full_profile`, `test_wsl_new_distro_recipe`, `test_new_wsl_handbook`, `test_landscape_sweep_harness`, `test_runtime_worker_openhands_push_gate`, `test_runtime_worker_openhands_resolver`, `test_catalog_freshness_runtime`, `test_freeze_snapshot`, `test_new_wsl_definitive_defaults`, `test_upstream_surface_watch` | 0 each | 1,754 tests, 26 skipped: every module that names the two templates or carriers, or reads the test, the renderer or these two records |
+| `python3 -B tools/adoption/new_wsl_client_config.py --check` | 0 | check passed, with the same two warnings about slot `mcp-inspector` |
+| `python3 -B tools/adoption/new_wsl_client_config.py --render --host nativestack2604 --out <scratch>` | 1 | stopped before rendering: this worktree has no host value file (`adoption/hosts/nativestack2604.json` is not tracked); the block sizes above come from `startup_files`' own `managed_block` merge of the committed carriers |
+| `python3 -B scripts/build_new_wsl_handbook.py --check` | 0 | current outputs (MD `4480fe88…`, JSON `0bf0583e…`); none of the four changed files is a handbook source |
+| `python3 scripts/validate.py` | 0 | 10,322 hashed files, 212 receipts |
+| `python3 scripts/evidence_manifest.py --check` | 0 | passed |
+| `git diff --check` | 0 | clean |

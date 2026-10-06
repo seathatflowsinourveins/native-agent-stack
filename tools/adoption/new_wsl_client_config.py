@@ -206,8 +206,8 @@ HEADING = re.compile(r"^(#{1,6})\s")
 SENTENCE_BREAK = re.compile(r"(?<=[.!?])(\s+)(?=[A-Z`\[(<\"'*_])")
 SENTENCE_END = re.compile(r"[.!?][\"')\]`*_]*$")
 # Wrap width of the verbatim rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md.
-# The rendered Codex carrier is 8,601 bytes; the local 8,192-byte test covers only
-# adoption/templates/codex.AGENTS.template.md's compact source (7,535 bytes).
+# The rendered Codex carrier is 8,701 bytes; the local 8,192-byte test covers only
+# adoption/templates/codex.AGENTS.template.md's compact source (7,635 bytes).
 # A run of lines this short with a sentence running into the next line is one
 # wrapped paragraph; longer lines are one statement each.
 WRAP_WIDTH = 80
