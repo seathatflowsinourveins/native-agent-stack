@@ -111,6 +111,19 @@ def descendants(root_pid: int) -> list[tuple[int, int, str, list[str]]]:
 
 
 SESSION_SUBCOMMANDS = {"exec", "e", "app-server", "review", "resume", "mcp-server", "proto", "fork"}
+# Claude Code's native binary is multi-call: run under argv[0] bfs, ugrep or rg it is the embedded find, grep or
+# ripgrep that its Bash, Glob and Grep tools use (observed on 2.1.290: `exec -a bfs <binary> DIR -type f` lists files,
+# `exec -a ugrep <binary> --version` prints ugrep 7.8.4, `exec -a rg <binary> --version` prints ripgrep 14.1.1). The
+# smoke-20261005f claude-native trial was killed as nested when the model ran `find / -xdev -type f ...`: the bfs
+# process's `-type` passed the short-flag test below.
+_VERSION_NAME = re.compile(r"\d+\.\d+\.\d+")
+
+
+def _claude_like_argv0(argv: list[str], claude_bin: str) -> bool:
+    """argv[0] names the client itself (`claude` from PATH, the versions file the launcher runs, or that file by any
+    version name), never an embedded tool name such as bfs, ugrep or rg."""
+    name = os.path.basename(argv[0]) if argv else ""
+    return name in ("claude", os.path.basename(claude_bin)) or bool(_VERSION_NAME.fullmatch(name))
 
 
 def _claude_session_argv(argv: list[str]) -> bool:
@@ -124,12 +137,23 @@ def _claude_session_argv(argv: list[str]) -> bool:
     return False
 
 
+def _is_claude_exe(exe: str, claude_bin: str) -> bool:
+    """The trial's Claude binary or another version beside it (the native installer updates in place, so a nested
+    `claude -p` started after an update runs a newer file in the same versions directory)."""
+    return exe == claude_bin or (os.path.dirname(exe) == os.path.dirname(claude_bin) and bool(_VERSION_NAME.fullmatch(os.path.basename(exe))))
+
+
+def _is_codex_exe(exe: str, codex_bin: str) -> bool:
+    return exe == codex_bin or os.path.basename(exe) == "codex"
+
+
 def nested_clients(root_pid: int, claude_bin: str, codex_bin: str) -> tuple[list[dict], list[str]]:
     """Client sessions below the trial's own client. The trial client is the shallowest claude or codex process; a
-    deeper claude process in print mode, or a deeper codex process running a session subcommand, is nested. Codex's
-    sandbox helper re-executes its own binary without a session subcommand and is not nested."""
+    deeper claude process whose argv[0] names the client and that runs in print mode, or a deeper codex process running
+    a session subcommand, is nested. The Claude binary run as an embedded tool (argv[0] bfs, ugrep, rg) and Codex's
+    sandbox helper (its own binary without a session subcommand) are not nested."""
     procs = descendants(root_pid)
-    clients = [p for p in procs if p[2] in (claude_bin, codex_bin)]
+    clients = [p for p in procs if _is_claude_exe(p[2], claude_bin) or _is_codex_exe(p[2], codex_bin)]
     seen_exes = sorted({os.path.basename(p[2]) for p in procs})
     if not clients:
         return [], seen_exes
@@ -139,8 +163,8 @@ def nested_clients(root_pid: int, claude_bin: str, codex_bin: str) -> tuple[list
     for pid, depth, exe, argv in clients:
         if top and pid == top[0][0]:
             continue
-        if exe == claude_bin:
-            if _claude_session_argv(argv):
+        if _is_claude_exe(exe, claude_bin):
+            if _claude_like_argv0(argv, claude_bin) and _claude_session_argv(argv):
                 nested.append({"pid": pid, "binary": "claude", "argv0": os.path.basename(argv[0]) if argv else ""})
         else:
             first = next((a for a in argv[1:] if not a.startswith("-")), "")
@@ -296,13 +320,18 @@ def claude_sdk_line(cfg: dict, trial_id: str, fixture: Path, prompt_file: Path, 
 
 def codex_sdk_line(cfg: dict, trial_id: str, fixture: Path, clone: Path, prompt_file: Path, sandbox: str, effort: str,
                    lane: str, t_seconds: int) -> str:
+    """CL7. The omniroute profile reaches the SDK as its config object (prepare.codex_profile_layer: the SDK cannot pass
+    --profile, and codex 0.160.0 refuses `profile = ...` through --config)."""
     q = shlex.quote
+    layer = (cfg.get("codex_profile_layer") or {}).get("file")
+    if not layer:
+        raise Censored("codex_profile_layer_missing")
     return (f"cd {q(str(fixture))} && timeout --signal=TERM --kill-after={KILL_AFTER} {t_seconds} "
             f"{q(cfg['binaries'].get('node_neutral') or cfg['binaries']['node'])} {q(_neutral_bin(cfg, 'run.mjs', str(HERE / 'sdk_codex.mjs')))} "
             f"--trial-id {trial_id} --cwd {q(str(fixture))} --prompt-file {q(str(prompt_file))} --codex-home {q(str(clone))} "
             f"--codex-path {q(cfg['binaries']['codex']['path'])} --sdk-dir {q(_neutral_bin(cfg, 'sdk', cfg['binaries']['codex_sdk_dir']))} "
             f"--sandbox {q(sandbox)} --effort {effort} --otel {q(otel_attributes(trial_id, lane))} "
-            f"--gh-config-dir {q(cfg['gh_config_dir'])}")
+            f"--gh-config-dir {q(cfg['gh_config_dir'])} --profile-config {q(layer)}")
 
 
 # ---------------------------------------------------------------------------------------------------------------------

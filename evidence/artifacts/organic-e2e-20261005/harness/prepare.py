@@ -138,6 +138,31 @@ def yaml_quote(text: str) -> str:
     return json.dumps(text, ensure_ascii=False)
 
 
+# Keys every Codex launch sets itself (CL3's -m and -c model_reasoning_effort; CL7's model and modelReasoningEffort;
+# CL7b's model and model_reasoning_effort), so the profile layer below leaves them out.
+PROFILE_KEYS_SET_BY_LAUNCH = ("model", "model_reasoning_effort")
+
+
+def codex_profile_layer(profile: str = "omniroute") -> dict:
+    """The omniroute profile as --config overrides for the cells whose client cannot pass --profile (CL7, CL7b).
+
+    codex-cli 0.160.0 selects a profile only with `-p/--profile <name>`, which layers $CODEX_HOME/<name>.config.toml over
+    config.toml (`codex exec --help`); `profile = "omniroute"` given through --config is refused ("legacy `profile =
+    \"omniroute\"` config is no longer supported; use `--profile omniroute` with `omniroute.config.toml` instead",
+    smoke-20261005f CL7 and CL7b). @openai/codex-sdk 0.160.0 builds `codex exec` with --config, --model, --sandbox and
+    --cd only (dist/index.js CodexExec.run), and promptfoo 0.123.1's openai:codex-app-server passes cli_config as -c
+    pairs (codex-app-server-B9-ncut6.js buildAppServerArgs); `codex app-server --help` lists no --profile. So those two
+    cells carry the profile file's own keys, minus the keys each launch sets, at the --config layer, which sits above the
+    profile layer CL3 gets from -p: every key resolves to the same value. The profile file is the host's, the same
+    bytes as each clone's copy (clone gate copies_match_host)."""
+    import tomllib
+    path = CODEX_HOME_REAL / f"{profile}.config.toml"
+    data = tomllib.loads(path.read_text(encoding="utf-8"))
+    layer = {k: v for k, v in data.items() if k not in PROFILE_KEYS_SET_BY_LAUNCH}
+    return {"profile": profile, "source": str(path).replace(str(HOME), "~"), "sha256": sha256_file(path),
+            "omitted": [k for k in PROFILE_KEYS_SET_BY_LAUNCH if k in data], "config": layer}
+
+
 def promptfoo_config(work: Path, code: str, tests: list[dict]) -> str:
     """One exec: provider (the cell's neutral shim) and the cell's tests. A test carries only its opaque ref and the
     task text: promptfoo passes the whole test case to the launcher's argv (finding 10)."""
@@ -153,9 +178,12 @@ def promptfoo_config(work: Path, code: str, tests: list[dict]) -> str:
 
 
 def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, clone: Path, gh_dir: Path,
-                      path_value: str, t_seconds: int = T_SECONDS) -> str:
-    """CL7b: promptfoo's own openai:codex-app-server provider, one provider entry (and config) per trial."""
+                      path_value: str, t_seconds: int = T_SECONDS, profile_layer: dict | None = None) -> str:
+    """CL7b: promptfoo's own openai:codex-app-server provider, one provider entry (and config) per trial. cli_config is
+    the omniroute profile layer (codex_profile_layer: app-server takes no --profile) plus the CL3 overrides, written as
+    one YAML flow mapping (JSON) that promptfoo flattens into -c key=value pairs."""
     otel = f"ecosystem.task.id={trial_id},ecosystem.lane={test['lane']},service.instance.id={trial_id}"
+    cli_config = {**((profile_layer or {}).get("config") or {}), "service_tier": "default", "otel": {"environment": trial_id}}
     cfg = [f"description: {yaml_quote(code)}",
            "prompts:", "  - '{{task_text}}'", "providers:",
            "  - id: openai:codex-app-server", f"    label: {yaml_quote(code)}", "    config:",
@@ -163,8 +191,7 @@ def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, c
            f"      working_dir: {yaml_quote(str(fixture_dir))}", "      skip_git_repo_check: true", "      ephemeral: false",
            "      reuse_server: false", "      approval_policy: never", f"      sandbox_mode: {yaml_quote(test['sandbox'])}",
            "      network_access_enabled: false", "      model: gpt-6.1-sol", "      model_reasoning_effort: max",
-           f"      turn_timeout_ms: {t_seconds * 1000}", "      cli_config:", "        profile: omniroute",
-           "        service_tier: default", "        otel:", f"          environment: {yaml_quote(trial_id)}",
+           f"      turn_timeout_ms: {t_seconds * 1000}", f"      cli_config: {json.dumps(cli_config, sort_keys=True)}",
            "      cli_env:", f"        CODEX_HOME: {yaml_quote(str(clone))}", "        OMNIROUTE_API_KEY: local-loopback",
            f"        GH_CONFIG_DIR: {yaml_quote(str(gh_dir))}",
            f"        OTEL_RESOURCE_ATTRIBUTES: {yaml_quote(otel)}", f"        PATH: {yaml_quote(path_value)}",
@@ -339,6 +366,11 @@ def main(argv=None) -> int:
     os.symlink(bins["node_real"], work / "bin" / "n")
     bins["python_neutral"], bins["node_neutral"] = str(work / "bin" / "py"), str(work / "bin" / "n")
     path_value = login_path()
+    # The omniroute profile as --config overrides for CL7 and CL7b (their clients cannot pass --profile), frozen here;
+    # bin/c.json is what the CL7 launcher reads (a neutral name: its path reaches the launcher's argv).
+    profile_layer = codex_profile_layer()
+    profile_layer["file"] = str(work / "bin" / "c.json")
+    profile_layer["file_sha256"] = write_json(work / "bin" / "c.json", profile_layer["config"], 0o600)
     # Suite, amendments, lexicon.
     loaded = suite.load_suite(Path(args.suite))
     items, amend_log = suite.amend(loaded["items"])
@@ -490,7 +522,8 @@ def main(argv=None) -> int:
                 fixture_dir = fixture.extract_fixture(Path(fx["tar"]["path"]), fx["tar"]["sha256"])
                 clone = work / "clones" / trial_id
                 clone_record = arms.build_clone(clone, spec["arm"], GH_EMPTY, rules_text)
-                text = app_server_config(code, trial_id, test, fixture_dir, clone, GH_EMPTY, path_value, args.claude_t_seconds)
+                text = app_server_config(code, trial_id, test, fixture_dir, clone, GH_EMPTY, path_value, args.claude_t_seconds,
+                                         profile_layer)
                 neutral = work / "p" / f"{code}-t{index}.yaml"
                 neutral.write_text(text, encoding="utf-8")
                 record["trials"].append({"trial_id": trial_id, "ref": test["ref"], "test_key": test["test_key"],
@@ -563,6 +596,7 @@ def main(argv=None) -> int:
         "claude_settings": claude_settings, "claude_settings_sha256": {a: sha256_json(s) for a, s in claude_settings.items()},
         "credential_denies_source_sha256": credential["source_sha256"],
         "codex_rules_sha256": sha256_bytes(rules_text.encode()), "codex_rules_check": rules_check,
+        "codex_profile_layer": profile_layer,
         "clone_samples": clone_samples, "gh_config_dir": str(GH_EMPTY), "gh_readonly_account": None,
         "s7_baseline": str(root / "s7" / "baseline.json"), "probe_required": probe_required,
         "baseline_hash_prefixes": {k: (baseline["files"].get(k) or "")[:16] for k in PROBE_HASHES} | {

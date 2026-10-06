@@ -1,6 +1,9 @@
 // CL7: one Codex SDK (@openai/codex-sdk 0.160.0) thread, written from the SDK README's runStreamed() example.
 // Run by launcher.py under the CL3 timeout. Every streamed event is written to stdout as one JSON line, the same event
 // shapes as `codex exec --json` (thread.started, item.*, turn.*), so one grader reads CL3 and CL7.
+// The omniroute profile comes in as the SDK's config object (--profile-config, written at stage 1 by
+// prepare.codex_profile_layer): the SDK builds `codex exec` without --profile, and codex 0.160.0 refuses
+// `profile = "omniroute"` through --config, so the profile file's keys go in as --config overrides instead.
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { join } from "node:path";
@@ -26,7 +29,8 @@ const env = {
 const codex = new sdk.Codex({
   codexPathOverride: arg("codex-path"),
   env,
-  configOverrides: ['profile="omniroute"', 'service_tier="default"', `otel.environment="${trialId}"`],
+  config: JSON.parse(readFileSync(arg("profile-config"), "utf8")),
+  configOverrides: ['service_tier="default"', `otel.environment="${trialId}"`],
 });
 const thread = codex.startThread({
   workingDirectory: arg("cwd"),
