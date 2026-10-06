@@ -44,6 +44,26 @@ codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort="max" -c web_se
   -o <owned dir>/review.md "<prompt naming review.diff and the cited sources>" < /dev/null
 ```
 
+**Measurement fixtures (Codex 0.160.0 source review).** A fresh exec thread sends
+`cwd`. The app-server can persist trusted project state when all of these hold:
+the request supplies `cwd`, the active project has no trust level, the
+configuration is not projectless, and the effective permission profile passes
+the project-trust check. `Disabled` and `External` profiles pass that check; a
+`Managed` profile must permit writing that directory. The trust setter applies
+a blocking configuration edit. Sources: `openai/codex` at
+`a956835d020762cb2b570053af06f643a11c0ecc`,
+[`thread_processor.rs` L1350-1378](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/request_processors/thread_processor.rs#L1350-L1378),
+[`config/mod.rs` L2412-2424](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L2412-L2424),
+and [`exec/src/lib.rs` L1369-1382](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/lib.rs#L1369-L1382).
+
+Use an owned non-git directory with `--skip-git-repo-check` for measurement
+fixtures. That flag bypasses only exec's Git-presence guard
+([`exec/src/lib.rs` L975-982](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/lib.rs#L975-L982));
+neither the flag nor a non-git directory establishes the app-server's
+`is_projectless()` result. Do not manually alter native trust settings to make
+a fixture pass; record any configuration effects separately from its returned result.
+These source-reviewed conditions do not qualify a new fixture run.
+
 - Keep Claude's reasoning and model family names out of the prompt; ask for one line
   per finding with severity, file and line, issue and fix.
 - One review round and one repair round: fix each finding that the source supports,
@@ -60,6 +80,17 @@ codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort="max" -c web_se
   `gpt-6-sol` and `gpt-6-luna`, and sends `ultra` as upstream wire `max`.
   The clean tag still caps `gpt-6.1-sol` at `xhigh`; its deployed `max` support
   belongs to the #15167 carry ([foundation stack](../docs/foundation-stack.md)).
+
+**Classify gateway failures from the semantic error.** At OmniRoute source pin
+`c1e30b7676975feb298b49eff6ff58923c04b89e`, the terminal-status classifier checks
+quota conditions first, then recognized nonterminal error classes, including
+`MODEL_NOT_FOUND`, before the banned and authentication-expiry paths. Other
+`401` errors can reach `expired`, subject to recoverable cookie-authentication
+and bounded ambiguous-authentication checks. Read the resolved model and
+classified provider error together with the returned status, and preserve the
+failed attempt. These are source-reviewed classifier conditions, not live
+provider acceptance. Source: `diegosouzapw/OmniRoute` at that pin,
+[`authTerminalStatus.ts` L49-115](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/sse/services/authTerminalStatus.ts#L49-L115).
 
 ## Lane B: live-session coordination
 
