@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "id": "windows-terminal-2604-fragment-20261006",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "claude-code",
+    "codex"
+  ],
+  "claim": "A portable 16-profile NativeStack2604 Terminal fragment carries explicit Microsoft-derived profile identities and the maintained bell/truecolor policy; source/fixture checks pass, while host deployment and session continuity remain pending.",
+  "limitations": [
+    "Repository/source checks only: no Windows Terminal deployment, UI, sound-playback or session-continuity acceptance was performed.",
+    "Source transformations remove private bindings; owner-supplied command-center, co-op and account-pool launchers are deployment prerequisites, not accepted implementations.",
+    "Librarium cwd and clone/vault binding are DEFERRED to P1-CLI; its profile remains hidden. Librarium course is a distinct project.",
+    "Operations and Local Chat depend on the installed nativestack CLI; four lane launcher/prompt files must be staged by their owner. No prompt body is authored here.",
+    "The old independent HTTP omniroute-fw on 20129 has no established 2604 equivalent. Its references are DEFERRED to Phase 3; WebSocket 21129 is not a replacement.",
+    "The broader 174-test regression retained one installed-client currency failure: Claude2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
+    "Independent review and operator host apply/read-back remain pending. The bounded same-lane completeness critic is a source-review lead, not independent acceptance."
+  ],
+  "evidence_class": "source_review",
+  "source_date": "2026-10-06",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "decision": "docs/decisions/2026-10-06-windows-terminal-2604-fragment.md",
+  "host_apply_contract": "windows/README.md",
+  "sources": [
+    {
+      "repository": "microsoft/terminal",
+      "pin": "dc8ae365847d41f62d1ebca93815bb00959bc12f",
+      "tag": "v1.25.2733.0",
+      "released_utc": "2026-10-02T20:27:27Z",
+      "paths": [
+        "src/cascadia/TerminalSettingsModel/Profile.cpp:307-318",
+        "doc/cascadia/profiles.schema.json"
+      ],
+      "url": "https://github.com/microsoft/terminal/releases/tag/v1.25.2733.0"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/terminal/json-fragment-extensions",
+      "updated": "2025-11-12",
+      "checked": "2026-10-06"
+    },
+    {
+      "repository": "seathatflowsinourveins/nativestack-practice",
+      "pin": "a7b8018524575cabbd979e6f2e1c84ee6e94700f",
+      "files": [
+        {
+          "path": "checks/check-terminal-profiles.py",
+          "sha256": "7e85df7edc535f19c835f2dfd2d1dae7ba690a57748722e3adbf2dfbad258db2"
+        },
+        {
+          "path": "checks/check-terminal-profiles-controls.py",
+          "sha256": "59e51c6af5a3c809992a0ac8928d7dca412ad4b9f2d0e0d9df8cbd9dfe0a834f"
+        },
+        {
+          "path": "windows/nativestack.json",
+          "sha256": "8bec3beee63c5ae45767d60328ada45ea6b26221cc06e8f1323a51e2c6fdd54c"
+        },
+        {
+          "path": "ops-entry.sh",
+          "sha256": "05cfc1bfc7eea9ec34ac60c53f644ece166e81b9f0b09b3e4da70ad039a62aac"
+        }
+      ]
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "paths": [
+        "docs/decisions/2026-09-28-terminal-experience.md:57-64,292",
+        "docs/acceptance-evidence-policy.md:26",
+        "scripts/validate.py:26-32",
+        "tests/test_windows_terminal_defaults.py:49-59,129-141"
+      ]
+    }
+  ],
+  "operator_sources": {
+    "approved_plan_sha256": "775119dc6840552def19142a10e2730b489b6365c346e6f9fb6f5db5f2572ba2",
+    "approved_plan_section": "Phase1, step5, lines88-96",
+    "portable_locators": [
+      {
+        "path": "%LOCALAPPDATA%/Microsoft/Windows Terminal/Fragments/NativeStack/NativeStack2604.json",
+        "sha256": "c6e49ee61a40e6dcee2eaa3fc31980e0eeb1da588f6b70f972d24a2add27716c",
+        "profile_count": 9
+      },
+      {
+        "path": "%LOCALAPPDATA%/Microsoft/Windows Terminal/Fragments/NativeStack/lanes.json",
+        "sha256": "b1601f40c6d3035358c8e2071d58ba17f486b3773b13b60716dbd30e01c5283c",
+        "profile_count": 4
+      }
+    ],
+    "rulings": [
+      "ns2604-coop A19,2026-10-06T03:44:12Z",
+      "ns2604-coop A20,2026-10-06T03:44:12Z",
+      "command-center port-role correction,2026-10-06T03:32:37Z"
+    ]
+  },
+  "transformations": [
+    "Keep the NativeStack fragment folder and all nine existing 2604 profile names; add the documented explicit GUID identities.",
+    "Use default WSL user and portable home-relative project paths; omit private fixed session identifiers and authentication assignments without recording their values.",
+    "Ordinary client resumes use native pickers; three special roles delegate to owner-supplied private launchers.",
+    "Add source-defined Operations and Local Chat; carry a hidden Librarium profile with its cwd contract deferred.",
+    "Carry four source-defined lane profiles in a separate commit, repointing distribution/name/project paths to2604; retain the original launcher/prompt basenames. Prompt bodies and any 20129 HTTP replacement are not supplied.",
+    "Preserve AI audible+taskbar bells/quiet sound, Claude COLORTERM=truecolor, static taskbar bells and application-driven AI titles."
+  ],
+  "checks": [
+    {
+      "command": "nice -n 19 python3 -B checks/check-terminal-profiles.py",
+      "exit_code": 0,
+      "stdout": "PASS 16 profiles: AI clients let titles through, ring audible+taskbar with a quiet sound and pass none of the barred options; static shells stay silent; every Claude profile sets COLORTERM through the profile environment key",
+      "evidence_class": "local_integration",
+      "scope": "Declarations in16profiles; no host deployment or actual bell/session execution."
+    },
+    {
+      "command": "nice -n 19 python3 -B -m unittest tests.test_terminal_fragment tests.test_validate tests.test_native_token_ci",
+      "exit_code": 0,
+      "returned_summary": "Ran132tests; OK",
+      "evidence_class": "synthetic",
+      "scope": "Local fixture controls, including empty/malformed identifiers, media/colour/title/bell defects, cold file-spec import and private-content rejection. No upstream suite."
+    },
+    {
+      "command": "nice -n 19 python3 -B -m unittest tests.test_terminal_fragment tests.test_validate tests.test_native_token_ci tests.test_windows_terminal_defaults",
+      "exit_code": 1,
+      "returned_summary": "Ran174tests; FAILED(failures=1),173passed",
+      "evidence_class": "local_integration",
+      "failed_test": "tests.test_windows_terminal_defaults.OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision",
+      "failure": "auth_storage_failure absent from pinned unchanged DECISIONS for installed Claude2.1.291",
+      "owner_followup": "grand-catalog Q21; notification owner decision pending"
+    }
+  ],
+  "port_observations": {
+    "observed_utc": "2026-10-06T03:28:03Z",
+    "evidence_class": "native_proven",
+    "scope": "Read-only socket/listener observation; no inference of route acceptance or Terminal deployment. Responses read only through their first status line, then socket closed.",
+    "listeners_same_process": [
+      21128,
+      21129,
+      21131
+    ],
+    "http": {
+      "port": 21128,
+      "returned_status_line": "HTTP/1.1 307 Temporary Redirect"
+    },
+    "websocket": {
+      "port": 21129,
+      "returned_status_line": "HTTP/1.1 101 Switching Protocols"
+    },
+    "embedded_proxy_port": 21131,
+    "old_fw_http_port": 20129,
+    "fw_equivalent_on_2604": "not_established"
+  },
+  "review": {
+    "independent_review": "pending",
+    "operator_apply": "pending",
+    "operator_readback": "pending"
+  },
+  "artifacts": [
+    {
+      "path": "windows/nativestack2604.json",
+      "sha256": "eadcf2da6bdb68c573892a5c89a033fa595867e9d8e0872bfb4f60c16942f1d6",
+      "bytes": 8522
+    },
+    {
+      "path": "windows/ops-entry.sh",
+      "sha256": "05cfc1bfc7eea9ec34ac60c53f644ece166e81b9f0b09b3e4da70ad039a62aac",
+      "bytes": 278
+    },
+    {
+      "path": "checks/check-terminal-profiles.py",
+      "sha256": "235d2f8e49e82813434373bb337c34a0200bf115d0ab0ebc6c93b5607721ab8b",
+      "bytes": 13480
+    },
+    {
+      "path": "scripts/terminal_profile_ids.py",
+      "sha256": "d637316cfa5ebdb99df624d04789026875b4deb9528dc69a8b069b7bc406337a",
+      "bytes": 764
+    },
+    {
+      "path": "tests/test_terminal_fragment.py",
+      "sha256": "7f0ab1897114de35bed78698ac3c69c809959684e4d46d5a128fc64ec36ad6c9",
+      "bytes": 9337
+    }
+  ]
+}
