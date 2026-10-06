@@ -4466,6 +4466,25 @@
       ],
       "evidence_class": "source_review",
       "path": "evidence/receipts/nautilus-rc6-candidate-addendum-20261006.json"
+    },
+    {
+      "id": "nautilus-rc6-spy-first-replication-20261006",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "NativeStack2604 FIRST rc6 candidate replication of SPYone_zero returned replay0/comparator0, complete136PASS/0FAIL/0SKIPPED, copied-method preregistration_qualifying true, fees0.00, nativeendcash90734.08 and equal normalized economic records.",
+      "limitations": [
+        "One frozen SPYone_zero case through a locally maintained harness: rc6 candidate replication, not the original rc5 result or an unchanged upstream test suite.",
+        "136total checks include the106execution-check subset; never add the two counts. Source review, actual native execution and local fixture tests are separate evidence.",
+        "Opus accepted the source before execution; independent observation/review of this execution publication is still pending. No catalog readiness aggregate is derived.",
+        "AAPLbaseline and fee_slippage_stress remain blocked/unrun. No provider, broker/live order, credential, C1-C4 risk-cap or destination-pin action occurred;5f owns those.",
+        "Native receipt prose retains historicalv2names as an accepted limitation. actual_executed_files and exact sanitized vectors identify the rc6 files that ran; rawprimary outputs are byte-preserved.",
+        "Exactly one replay and one comparison occurred after both approved records; two internal engine runs are the unchanged determinism method. No smoke/dryrun/test invocation or retry; no retry qualifies.",
+        "Full seven-file attempt identity appended to candidate history, original/knownrc5prefix preserved; no predicate, economic data, strategy, oracle or tolerance retuned."
+      ],
+      "evidence_class": "local_integration",
+      "path": "evidence/receipts/nautilus-rc6-spy-first-replication-20261006.json"
     }
   ],
   "files": [
@@ -14387,8 +14406,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-rc6.json",
-      "sha256": "e533643c720014264c6d04e30c1ca6e413819e3bef6321c365ea1ee206e4e7d4",
-      "bytes": 18474
+      "sha256": "47f4f6dcac4ce5ec88ce1b21ce33beae762adf1ca8fb213b119320525df19ecb",
+      "bytes": 20675
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
@@ -17172,8 +17191,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-nautilus-rc6-runtime-candidate.md",
-      "sha256": "b7dcc94a2ced63f1d4826c4ff387e03e9bef36ecde187e076cfa93029980d1b7",
-      "bytes": 7257
+      "sha256": "90b3624bf4ac0eab037ed2ec1aaca6049df26940121a7dbde8177d808f0c0b00",
+      "bytes": 8034
     },
     {
       "path": "docs/direct-results.md",
@@ -38627,8 +38646,8 @@
     },
     {
       "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/README.md",
-      "sha256": "b7ddd6c4aeed2295f3cec29f4fe7f8d9c68b43578a18f1acab9cbe57fb3a5e6a",
-      "bytes": 2569
+      "sha256": "cbe617aab6542559ec8a2ff914e2143d7f3998f38f31b7668b0080c774e03e03",
+      "bytes": 3262
     },
     {
       "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/attempts.json",
@@ -38654,6 +38673,26 @@
       "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/source-snapshot.json",
       "sha256": "cfe2dd64966d3a1b170d03cef3ade1b5ea0057ae74ee43da726db779d1001804",
       "bytes": 15301
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/comparison-stdout.txt",
+      "sha256": "e922dee279bb4c06ebb2f3d0c628d434e05a9beb01e0934dc5813e1b31b5671e",
+      "bytes": 25663
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/native-receipt.json",
+      "sha256": "8c69253179321805f3942873a81e4f22dee4299f74198fd57b417c91a409fe68",
+      "bytes": 62335
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/native-verdict.json",
+      "sha256": "abfaf529667ed4417ed346455f0ccb703490720c0108a0587b173c0191881036",
+      "bytes": 50180
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/spy-first-20261006/replay-stdout.txt",
+      "sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9",
+      "bytes": 317
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/README.md",
@@ -52734,6 +52773,11 @@
       "path": "evidence/receipts/nautilus-rc6-runtime-2604-20261006.json",
       "sha256": "e52164748462cd8dc92390d98d345125033f6bb66013b6054cb491c3aed43dd5",
       "bytes": 4780
+    },
+    {
+      "path": "evidence/receipts/nautilus-rc6-spy-first-replication-20261006.json",
+      "sha256": "3dd553953aee0dadcac49b2a0d1a91a22d3fc9b4ffecbf4703a88bb4cf5f4bb6",
+      "bytes": 14637
     },
     {
       "path": "evidence/receipts/nextjs-1638-qualification-20261001.json",
