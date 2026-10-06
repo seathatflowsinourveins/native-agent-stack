@@ -18,7 +18,8 @@ families. UDP 323 belongs to the older distribution on WSL's shared network;
 an old PHC0 answer must not mask a missing native observer. Reports name the
 actual `chrony_port` and use `chrony_phc0_answers`/`chrony_refs`. The installed
 chronyc 4.8 `-p PORT` option selects that target ([upstream manual](https://chrony-project.org/doc/4.8/chronyc.html)).
-This does not change the administrator script or persistence-only timer.
+This does not change the administrator script or persistence-only mode. The
+candidate boot oneshot runs both checks with `--seconds 60`.
 
 D0 fails if startup is delayed or not numeric 2, W32Time is not RUNNING, any
 STOP/unknown trigger exists, a required read is malformed, Minutes is not 1 or
