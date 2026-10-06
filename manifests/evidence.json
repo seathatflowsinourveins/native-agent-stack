@@ -39508,13 +39508,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "a271b95eb1f0ef3eaf401bee7fb122af91f7fa1dd1284c8bba5589cd176c6be5",
-      "bytes": 80138
+      "sha256": "bb80452932356be92d1a8dd1602cb73b639ec2f8571e946acec597f59c5a03c0",
+      "bytes": 80549
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "2776270a5115e2e21c882dfb222f7013995f19bc173dadd1fc661faa52ffc519",
-      "bytes": 173775
+      "sha256": "8e7b693f24dcd5fea3e3dd1885d28fd8dfda0bc6e2e6235465bdb4fbc7307eb8",
+      "bytes": 178157
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39693,8 +39693,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
-      "sha256": "346664158f2a14aa55142a1f588e5bee8663cfb5bd2a5b2727be7472d423ac90",
-      "bytes": 13308
+      "sha256": "4f406d9e209a9157f446f5eed8930dcb41fc99fc747c87d4a8d65b97ca0e2a14",
+      "bytes": 13953
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
@@ -39753,18 +39753,18 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "e3634e563adfc9f5427d499b1635f7a9954ba2492537c63ee45fc795ee20d492",
-      "bytes": 31106
+      "sha256": "591fd37a537332bf7543b1abadfd1573eba83a11c1f459b60f37bc5e78981af0",
+      "bytes": 40628
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
-      "sha256": "08c7c32c67136a3082ba9d378738761961c3d8684c9556b5395f7b20091ff26b",
-      "bytes": 49546
+      "sha256": "ee4c89945db875959252f8005ccbd998a4cf8d29cb26f34146b95d74932ec562",
+      "bytes": 50406
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.yaml",
-      "sha256": "b26ec870690dfe64b0bdbd3cf758f9c0f1bf75f6b007466dfa96b8aaff01b16b",
-      "bytes": 14452
+      "sha256": "52cd431da1af5e7b5d52de93115b1a1aa413bc0951a8803e64fe8383f8f5ed3e",
+      "bytes": 15280
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml",
