@@ -4877,8 +4877,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "585b88f2c381f966ffd42803a6c17d9630a8ff285369c386242d41638c86258f",
-      "bytes": 11805
+      "sha256": "2f1d38a12e5714c6178e33f7ade258cf7b5751f174afd059c37d2947ae6261ed",
+      "bytes": 11905
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -4887,8 +4887,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "c5961b3ff4625d51e5ccc6c2ebc6329c5d0f5d7274b86a7c2f23f7e7c7d0357d",
-      "bytes": 8601
+      "sha256": "26474ab5025772b05ed8bf5ba393d49da61e902f003ad427bf7b245c56b91d51",
+      "bytes": 8701
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "3d6164455a92300664d8b62870f2078a8163397aa8973131d037d7e474638026",
-      "bytes": 95459
+      "sha256": "65318f13f0fa3b92edd8566191ea8077988ff0909ac37594eb0ea08118512e58",
+      "bytes": 98099
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "2d62d6c73dbbfeb2c6d7632da0f76e77686ef0f422c6b7a845ce2065e8b6e52b",
-      "bytes": 7535
+      "sha256": "16dc351855e8c8cb27a0d0258636a91dee1db92b6f57adc7f541b764b327e140",
+      "bytes": 7635
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -5077,13 +5077,13 @@
     },
     {
       "path": "adoption/templates/wsl/first-boot-checklist.md",
-      "sha256": "12170643cc9fdf8ba4503762fd61147f902bb85c94f0f73b7be0522b31fd1014",
-      "bytes": 15597
+      "sha256": "523dd2ed0fe38dfab70061056cdabbf6a2df23257958ced6646fe0a624163c0f",
+      "bytes": 15681
     },
     {
       "path": "adoption/templates/wsl/stage1-receipt.example.json",
-      "sha256": "20c5ef6d34a9de45473be73e2bdf2114eb45c7d8e9389f15c754445d0cb8e398",
-      "bytes": 61751
+      "sha256": "b8e35b2791d47c57f69f086cba55ff15558c951ef6a3c3d50fc64aa4d60728a2",
+      "bytes": 63208
     },
     {
       "path": "adoption/tools/README.md",
@@ -17018,8 +17018,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-      "sha256": "753f01a78f820933eb8e2fe3be7f9cd7582710e0907c815e3274537be797ab83",
-      "bytes": 150728
+      "sha256": "8df3f18af352be4f1dd1a2a2dc5a4d718804582b8a6281e6d461dddd73e2647c",
+      "bytes": 151947
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
@@ -17273,8 +17273,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-user-facing-local-time.md",
-      "sha256": "d906951e9dcf27bad23e2f599fa9a74aeb2796ab9cd6d5315072ecce69d21427",
-      "bytes": 27979
+      "sha256": "4f85e48639c929983409d441a655c82d269c4cf6e6ffaf518861c49dc7227eab",
+      "bytes": 29182
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
@@ -17543,12 +17543,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "70cf495c8d914442db92d938c987fcba39a99382ad28463fb0641c4fa96bc96a",
+      "sha256": "0bf0583e75e866736c106157e14162f85b954522e7e55d65bba584d3b2d02af9",
       "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "50585de8165cddcc4e0b115fb2eb6e066796ca66ef6fefc3e1f16d0095c89fb3",
+      "sha256": "4480fe88eeed33c961c3457b7947fcd870721690d491e27d80ccff8fc921a7d6",
       "bytes": 362513
     },
     {
@@ -39683,8 +39683,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "ef808e29ee3fe8914d4757504897cd892e0996b09fc8a6cf96279db0d0e96fcc",
-      "bytes": 12984
+      "sha256": "9fb0af56bf21e3fc2c5d8d7932ab23f9daa8b97d15751e85e8e134a7bdaa19b6",
+      "bytes": 13886
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -53183,8 +53183,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "585b88f2c381f966ffd42803a6c17d9630a8ff285369c386242d41638c86258f",
-      "bytes": 11805
+      "sha256": "2f1d38a12e5714c6178e33f7ade258cf7b5751f174afd059c37d2947ae6261ed",
+      "bytes": 11905
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -54858,8 +54858,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "1649fe42c58014d3b5b00290fd2f4723bef248489f92aae425cbdab29fab5f66",
-      "bytes": 132431
+      "sha256": "c4b2815e0e51086aeeb9da24a88bba918b81812bf33c433f473e3619bdfdec80",
+      "bytes": 132552
     },
     {
       "path": "tests/test_install_skills.py",
@@ -55438,8 +55438,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "14c09b86ffb9db8f3c565da498c8035edec7e223079881c9ab51e1a94f632ee3",
-      "bytes": 233146
+      "sha256": "3604c05b04921fbc6c4493a1678885386f1ef3f05a7995592b9d04157ce5fa72",
+      "bytes": 237414
     },
     {
       "path": "tests/test_wsl_restore.py",

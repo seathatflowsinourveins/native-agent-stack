@@ -6,8 +6,8 @@
   "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "50585de8165cddcc4e0b115fb2eb6e066796ca66ef6fefc3e1f16d0095c89fb3",
-    "docs/new-wsl-handbook.json": "70cf495c8d914442db92d938c987fcba39a99382ad28463fb0641c4fa96bc96a"
+    "docs/new-wsl-handbook.md": "4480fe88eeed33c961c3457b7947fcd870721690d491e27d80ccff8fc921a7d6",
+    "docs/new-wsl-handbook.json": "0bf0583e75e866736c106157e14162f85b954522e7e55d65bba584d3b2d02af9"
   },
   "inventory": {
     "layers": 37,
@@ -260,6 +260,20 @@
         "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "input_parent": "a10ad2c019b54ccd83abdd0a831aeca536e846d6",
+      "cause": "PR758 Codex P2 repair: record the exact Windows GeoName mapping input, upsert the path-B time key and propagate parser failure, and scope UTC commit records to message text. The guide digest changed; the maintained generator refreshed both provenance outputs.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "50585de8165cddcc4e0b115fb2eb6e066796ca66ef6fefc3e1f16d0095c89fb3",
+        "docs/new-wsl-handbook.json": "70cf495c8d914442db92d938c987fcba39a99382ad28463fb0641c4fa96bc96a"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "evidence_class": "local_integration",
+      "windows_geoname_api_execution_or_first_boot": false
     }
   ]
 }
