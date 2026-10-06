@@ -12,6 +12,7 @@ import re
 import tomllib
 import unittest
 from pathlib import Path
+from scripts import skills_status
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "adoption" / "skills" / "manifest.json"
@@ -56,12 +57,11 @@ class ManifestShapeTests(unittest.TestCase):
         self.assertTrue(cli["version"])
         self.assertEqual(cli["env"].get("DISABLE_TELEMETRY"), "1")
 
-    def test_trial_block_has_the_review_window_and_char_cap(self):
+    def test_trial_block_has_the_review_window_without_a_manifest_listing_cap(self):
         trial = self.manifest["trial"]
-        for key in ("started", "window_days", "review_after", "on_description_char_cap"):
+        for key in ("started", "window_days", "review_after"):
             self.assertIn(key, trial, key)
-        self.assertIsInstance(trial["on_description_char_cap"], int)
-        self.assertGreater(trial["on_description_char_cap"], 0)
+        self.assertNotIn("on_description_char_cap", trial)
 
 
 class SkillEntryTests(unittest.TestCase):
@@ -87,14 +87,30 @@ class SkillEntryTests(unittest.TestCase):
     def test_url_is_built_from_source_ref_and_path(self):
         for skill in self.skills:
             with self.subTest(skill=skill["name"]):
-                expected = f"https://github.com/{skill['source']}/tree/{skill['ref']}/{skill['path']}"
+                form = "blob" if skill.get("source_type") == "native_generated" else "tree"
+                expected = f"https://github.com/{skill['source']}/{form}/{skill['ref']}/{skill['path']}"
                 self.assertEqual(skill["url"], expected)
 
     def test_ref_and_tree_sha_are_40_hex(self):
         for skill in self.skills:
             with self.subTest(skill=skill["name"]):
                 self.assertRegex(skill["ref"], HEX40, f"ref {skill['ref']!r}")
-                self.assertRegex(skill["tree_sha"], HEX40, f"tree_sha {skill['tree_sha']!r}")
+                if skill.get("source_type") == "native_generated":
+                    self.assertIsNone(skill["tree_sha"])
+                    self.assertTrue(skills_status.native_generated(skill))
+                else:
+                    self.assertRegex(skill["tree_sha"], HEX40, f"tree_sha {skill['tree_sha']!r}")
+
+    def test_hf_generated_and_mirror_identities_are_distinct(self):
+        skill = next(s for s in self.skills if s["name"] == "hf-cli")
+        self.assertEqual(skill["generator"]["version"], "2.1.1")
+        self.assertEqual(skill["skill_md_bytes"] + 1, skill["mirror"]["skill_md_bytes"])
+        self.assertNotEqual(skill["skill_md_sha256"], skill["mirror"]["skill_md_sha256"])
+        for key, value in (("name", "unrelated"), ("source", "other/repo"), ("ref", "HEAD"),
+                           ("tree_sha", "a" * 40), ("generator", {}), ("mirror", {})):
+            with self.subTest(key=key):
+                mutant = dict(skill, **{key: value})
+                self.assertFalse(skills_status.native_generated(mutant))
 
     def test_skill_md_sha256_is_64_hex(self):
         for skill in self.skills:
@@ -169,10 +185,8 @@ class BudgetTests(unittest.TestCase):
         expected = sum(skill["description_chars"] for skill in self.skills if skill["claude_listing"] == "on")
         self.assertEqual(self.budget["claude_on_description_chars"], expected)
 
-    def test_claude_on_description_chars_stays_within_the_trial_cap(self):
-        cap = self.manifest["trial"]["on_description_char_cap"]
-        self.assertEqual(self.budget["claude_on_cap"], cap)
-        self.assertLessEqual(self.budget["claude_on_description_chars"], cap)
+    def test_manifest_sums_are_not_a_live_client_listing_gate(self):
+        self.assertNotIn("claude_on_cap", self.budget)
 
     def test_codex_enabled_description_chars_is_the_sum_over_codex_enabled_skills(self):
         expected = sum(skill["description_chars"] for skill in self.skills if skill["codex_enabled"])
@@ -320,7 +334,10 @@ class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
     def test_skill_overrides_equals_name_to_claude_listing(self):
         expected = {skill["name"]: skill["claude_listing"] for skill in self.manifest["skills"]}
         expected.update({entry["skills"]: "off" for entry in self.manifest["excluded"] if "retired" in entry})
-        self.assertEqual(self.template.get("skillOverrides"), expected)
+        overrides = self.template.get("skillOverrides", {})
+        # Native Claude's missing override is on; full host status still checks any host's retained off value.
+        self.assertEqual({name: overrides.get(name, "on") for name in expected}, expected)
+        self.assertFalse(set(overrides) - set(expected))
 
 
 class NativePracticePinConsistencyTests(unittest.TestCase):

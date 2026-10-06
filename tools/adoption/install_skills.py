@@ -114,6 +114,7 @@ With --only, a name that the manifest marks pruned is reported as pruned, not un
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import functools
 import hashlib
 import json
@@ -126,6 +127,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
+sys.path.insert(0, str(ROOT))
+from scripts import skills_status as skill_state
 
 # A manifest entry may reuse an adoption skill by naming that manifest instead of copying the
 # entry (blueprints/runtime-workers/skills/manifest.json); the same-named adoption skill is the
@@ -135,6 +138,7 @@ DEFAULT_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
 REUSE_REF = "adoption/skills/manifest.json"
 REUSE_PIN_KEYS = ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256")
 REUSE_GATE_KEYS = ("codex_enabled", "claude_listing")
+PROVENANCE_KEYS = ("source", "url", "path", "ref", "tree_sha", "skill_md_sha256")
 
 # A manifest with "scope": "project" is only installed into a project (--project-dir).
 PROJECT_SCOPE = "project"
@@ -174,6 +178,215 @@ class InstallError(ValueError):
     """A skill could not be safely installed, verified or checked."""
 
 
+def git_commit(source: str, ref: str = "HEAD") -> str:
+    """Resolve a public GitHub commit before recording; never fill in a guessed ref.
+
+    The commit endpoint and Trees oracle are the same upstream identity path used by
+    vercel-labs/skills@7407f389 src/skill-lock.ts:168-171.
+    """
+    if not re.fullmatch(r"[\w.-]+/[\w.-]+", source) or not re.fullmatch(r"[\w./-]+", ref):
+        raise InstallError("unverified source or ref")
+    try:
+        done = subprocess.run(["gh", "api", f"repos/{source}/commits/{ref}"],
+                              capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                              timeout=VERSION_CHECK_TIMEOUT, check=False)
+        value = json.loads(done.stdout) if done.returncode == 0 else {}
+        commit = value.get("sha")
+    except (OSError, subprocess.SubprocessError, ValueError, AttributeError):
+        raise InstallError("public source commit could not be verified") from None
+    if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit):
+        raise InstallError("public source commit could not be verified")
+    return commit
+
+
+def skill_metadata(folder: Path, name: str) -> dict:
+    """Installed public metadata, using the manifest's PyYAML description-count contract."""
+    path = folder / "SKILL.md"
+    data = skill_state.read_frontmatter(path, (folder.parent,))
+    description = data.get("description")
+    if data.get("name") != name or not isinstance(description, str):
+        raise InstallError("installed frontmatter name/description could not be verified")
+    disabled = data.get("disable-model-invocation", False)
+    disabled = disabled in (True, 1) or (isinstance(disabled, str) and disabled.lower() in ("true", "yes", "on", "1"))
+    implicit = skill_state.implicit_policy(folder / "agents" / "openai.yaml", (folder.parent,))
+    raw = skill_state.metadata_bytes(path, (folder.parent,))
+    return {"skill_md_sha256": hashlib.sha256(raw).hexdigest(), "skill_md_bytes": len(raw),
+            "description_chars": len(description.strip()), "upstream_disable_model_invocation": disabled,
+            "upstream_allow_implicit_invocation": implicit}
+
+
+def refresh_budget(manifest: dict) -> None:
+    """Static manifest totals remain metadata; the live native catalogs own the budget gate."""
+    budget = manifest.get("budget")
+    if not isinstance(budget, dict):
+        return
+    skills = manifest["skills"]
+    budget["claude_on_description_chars"] = sum(s["description_chars"] for s in skills if s["claude_listing"] == "on")
+    budget["codex_enabled_description_chars"] = sum(s["description_chars"] for s in skills if s["codex_enabled"])
+    budget["codex_catalog_description_chars"] = sum(s["description_chars"] for s in skill_state.codex_catalog_skills(skills))
+
+
+def record_skills(manifest: dict, home: Path, only: list[str] | None = None) -> tuple[dict, dict]:
+    """Tier B reconciliation: record installed identity only after an unchanged upstream tree matches it.
+
+    Missing source identity is reported, not invented. This never installs, updates, changes settings,
+    writes a host lock, or runs a model. Failed/unknown rows leave their earlier manifest entry intact.
+    """
+    entries = load_lock(home).get("skills", {})
+    if not isinstance(entries, dict):
+        entries = {}
+    existing = {s["name"]: s for s in manifest["skills"]}
+    folders = skill_state.installed_metadata(home, os.environ)
+    names = list(dict.fromkeys(only or sorted({item["name"] for item in folders} | set(entries))))
+    results = {}
+    for name in names:
+        if not skill_state.NAME_RE.fullmatch(name):
+            results["invalid_name"] = "unverified"
+            continue
+        old = existing.get(name)
+        if old and old.get("source_type") == "native_generated":
+            folder = canonical_skill_dir(home, name)
+            path = folder / "SKILL.md"
+            try:
+                results[name] = "recorded" if skill_state.native_generated(old) and path.is_file() and sha256_of(path) == old["skill_md_sha256"] else "unverified"
+            except (InstallError, OSError, ValueError, RuntimeError, NotImplementedError):
+                results[name] = "unverified"
+            continue
+        entry = entries.get(name, {})
+        entry = entry if isinstance(entry, dict) else {}
+        source = entry.get("source", old.get("source") if old else None)
+        skill_path = entry.get("skillPath", old.get("path") if old else None)
+        try:
+            if not isinstance(source, str) or not re.fullmatch(r"[\w.-]+/[\w.-]+", source):
+                raise InstallError("source identity unknown")
+            if not isinstance(skill_path, str):
+                raise InstallError("source skill path unknown")
+            skill_path = skill_path.removesuffix("/SKILL.md")
+            if "\\" in skill_path or any(part in ("", ".", "..") for part in skill_path.split("/")):
+                raise InstallError("source skill path unverified")
+            folder = installed_skill_dir(old, home) if old else canonical_skill_dir(home, name)
+            if not folder.is_dir():
+                folder = claude_skills_dir(home) / name
+            metadata = skill_metadata(folder, name)
+            tree = skill_state.git_tree_sha(folder, skill_state.RUNTIME_ARTIFACT_DIRS)
+            lock_tree = entry.get("skillFolderHash")
+            if lock_tree and lock_tree != tree:
+                raise InstallError("installed content differs from public lock tree")
+            ref = git_commit(source)
+            if pinned_source_trees(source, ref).get(skill_path) != tree:
+                # A previously recorded immutable pin remains a valid identity when HEAD has already moved.
+                ref = old.get("ref") if old else None
+                if not isinstance(ref, str) or not skill_state.SHA1_RE.fullmatch(ref) or pinned_source_trees(source, ref).get(skill_path) != tree:
+                    raise InstallError("installed tree has no verified source commit")
+            row = dict(old) if old else {"name": name, "status": "trial", "license": "Unknown", "official": False,
+                                        "gap": "Recorded existing installation; task fit and audits remain unknown."}
+            row.update({"source": source, "ref": ref, "path": skill_path, "tree_sha": tree,
+                        "url": f"https://github.com/{source}/tree/{ref}/{skill_path}", **metadata})
+            identity_changed = old is None or any(old.get(key) != row.get(key) for key in PROVENANCE_KEYS)
+            if old and identity_changed:
+                row["prior_pins"] = [*old.get("prior_pins", []),
+                                     {key: old.get(key) for key in (*PROVENANCE_KEYS, "official", "license", "audits")}]
+            if old is None or old.get("source") != source:
+                # Identical bytes from a fork are not evidence that the fork is the earlier official origin.
+                row["official"] = False
+            row["claude_listing"] = "user-invocable-only" if metadata["upstream_disable_model_invocation"] else row.get("claude_listing", "on")
+            row.setdefault("codex_enabled", True)
+            if name in skill_state.TOOL_COUPLED_SKILLS:
+                row.setdefault("pin_policy", {"kind": "tool-coupled", "advisory": True})
+            if old is None and folder.parent == claude_skills_dir(home):
+                row.update({"agents": ["claude-code"], "copy": True, "codex_enabled": False})
+            if identity_changed:
+                row["license"] = "Unknown"
+                row["audits"] = {"gen_agent_trust_hub": "Unknown", "socket": "Unknown", "snyk": "Unknown",
+                                 "url": f"https://skills.sh/{source}/{name}", "checked_at": datetime.now(timezone.utc).date().isoformat()}
+            existing[name] = row
+            results[name] = "recorded"
+        except (InstallError, OSError, ValueError, TypeError, ImportError):
+            results[name] = "unverified"
+    manifest["skills"] = list(existing.values())
+    refresh_budget(manifest)
+    return manifest, results
+
+
+def retire_skill(manifest: dict, home: Path, name: str, skills_bin: str, dry_run: bool) -> str:
+    """Native remove, then observed read-back, then retained last pin. No locally authored remover.
+
+    vercel-labs/skills@7407f389 src/remove.ts:209,293-340; a surviving universal-agent
+    canonical entry is a retained removal limit, even when the CLI returns zero.
+    """
+    if not skill_state.NAME_RE.fullmatch(name):
+        return "unknown"
+    matches = [s for s in manifest["skills"] if s.get("name") == name]
+    if len(matches) != 1:
+        return "unknown"
+    skill = matches[0]
+    if skill.get("source_type") == "native_generated":
+        return "unsupported-native-remove"
+    if dry_run:
+        return "planned"
+    done = run_skills_bin(skills_bin, ["remove", name, "-g", "-y", "-a", *SKILL_AGENTS], home, REMOVE_TIMEOUT)
+    if done.returncode:
+        return "remove-failed"
+    codex_root = skill_state.codex_config_path(home, os.environ).parent / "skills"
+    if (canonical_skill_dir(home, name).exists() or canonical_skill_dir(home, name).is_symlink()
+            or (claude_skills_dir(home) / name).exists() or (claude_skills_dir(home) / name).is_symlink()
+            or (codex_root / name).exists() or (codex_root / name).is_symlink()
+            or lock_retains(home, name)):
+        return "remove-retained"
+    manifest["skills"] = [s for s in manifest["skills"] if s["name"] != name]
+    manifest.setdefault("excluded", []).append({"skills": name, "source": skill["source"],
+        "retired": datetime.now(timezone.utc).date().isoformat(), "last_pin": dict(skill),
+        "reason": "Retired through the native Skills CLI; last_pin retains the complete source for a re-add.",
+        "overturn": "A later task decision re-adds the unchanged upstream last_pin through its native installer."})
+    refresh_budget(manifest)
+    return "retired"
+
+
+def generated_skill(skill: dict, home: Path, binary: str, dry_run: bool, check_only: bool, force: bool) -> str:
+    """Hugging Face's supported locally generated install; no Skills CLI tree URL or fabricated lock.
+
+    huggingface_hub@bd4a7603 cli/skills.py:308,323-327,442-470. print(preview) adds
+    one output delimiter; installation writes build_skill_md's exact bytes. HF 2.1.1 ships no remove in this contract.
+    """
+    if not skill_state.native_generated(skill):
+        return "unsupported-native-generated"
+    folder = canonical_skill_dir(home, skill["name"])
+    md = folder / "SKILL.md"
+    alias = claude_skills_dir(home) / skill["name"] / "SKILL.md"
+    matches = md.is_file() and sha256_of(md) == skill["skill_md_sha256"]
+    alias_roots = (folder.parent, alias.parent.parent)
+    alias_matches = alias.is_file() and sha256_of(alias, alias_roots) == skill["skill_md_sha256"]
+    if matches and alias_matches and (folder / ".hf-skill-manifest.json").is_file():
+        return "ok"
+    if check_only:
+        return "missing-or-drifted"
+    if folder.exists() and not matches and not force:
+        return "local-modified"
+    if dry_run:
+        return "planned"
+    environment = {**os.environ, "HOME": str(home), "PYTHONDONTWRITEBYTECODE": "1"}
+    try:
+        version = subprocess.run([binary, "version", "--format", "json"], capture_output=True,
+                                 text=True, stdin=subprocess.DEVNULL, env=environment, timeout=VERSION_CHECK_TIMEOUT)
+        value = json.loads(version.stdout) if version.returncode == 0 else {}
+        if not isinstance(value, dict) or value.get("version") != skill["generator"]["version"]:
+            return "unverified-generator-version"
+        preview = subprocess.run([binary, "skills", "preview"], capture_output=True, stdin=subprocess.DEVNULL,
+                                 env=environment, timeout=VERSION_CHECK_TIMEOUT)
+        raw = preview.stdout.removesuffix(b"\n")
+        if preview.returncode or hashlib.sha256(raw).hexdigest() != skill["skill_md_sha256"]:
+            return "unverified-generated-bytes"
+        command = [binary, "skills", "add", "--global", *(["--force"] if force else [])]
+        done = subprocess.run(command, capture_output=True, stdin=subprocess.DEVNULL, env=environment, timeout=ADD_TIMEOUT)
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return "unverified-generator"
+    if (done.returncode or not md.is_file() or sha256_of(md) != skill["skill_md_sha256"]
+            or not alias.is_file() or sha256_of(alias, alias_roots) != skill["skill_md_sha256"]
+            or not (folder / ".hf-skill-manifest.json").is_file()):
+        return "install-failed"
+    return "installed"
+
+
 def load_manifest(path: Path, root: Path = ROOT) -> dict:
     """Read a manifest and resolve each `reuse_ref` entry against root's adoption manifest.
 
@@ -199,6 +412,8 @@ def load_manifest(path: Path, root: Path = ROOT) -> dict:
         if ref != REUSE_REF or len(matches) != 1:
             raise InstallError(f"{skill.get('name')}: reuse_ref {ref!r} names no single {REUSE_REF} skill of that name")
         old = matches[0]
+        if old.get("source_type") == "native_generated":
+            raise InstallError("native-generated entries are not supported by the runtime-worker/project installer")
         drifted = [key for key in REUSE_PIN_KEYS if skill.get(key) != old.get(key)]
         if drifted:
             raise InstallError(f"{skill.get('name')}: reuse_ref differs from the adoption pin in {drifted}")
@@ -209,8 +424,11 @@ def load_manifest(path: Path, root: Path = ROOT) -> dict:
     return manifest
 
 
-def sha256_of(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def sha256_of(path: Path, roots=None) -> str:
+    try:
+        return hashlib.sha256(skill_state.metadata_bytes(path, roots or (path.parent.parent,))).hexdigest()
+    except (OSError, ValueError, RuntimeError, NotImplementedError):
+        raise InstallError("public skill metadata target could not be verified") from None
 
 
 def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) -> Path:
@@ -407,7 +625,7 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
         if project_dir is not None:
             if agent == "claude-code":
                 target_md = project_dir / ".claude" / "skills" / name / "SKILL.md"
-                if not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]:
+                if not target_md.is_file() or sha256_of(target_md, (project_dir / ".agents/skills", project_dir / ".claude/skills")) != skill["skill_md_sha256"]:
                     return "install"
             identity_matches = (
                 entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
@@ -633,6 +851,12 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Report planned actions without add/remove; project source lookups still run")
     parser.add_argument("--check-only", action="store_true",
                          help="Read-only installed pin check; exit 1 for any missing/drifted skill or misplaced copy")
+    recording = parser.add_mutually_exclusive_group()
+    recording.add_argument("--record", action="store_true",
+                           help="Reconcile verified installed source identities into the owned manifest; no install or host-lock writes")
+    recording.add_argument("--retire", action="append", metavar="NAME",
+                           help="Run the native global remove, observe removal, then retain last_pin in excluded[]")
+    parser.add_argument("--hf-bin", default="hf", help="Native HF executable for vendor-generated hf-cli entries")
     parser.add_argument("--only", action="append", metavar="NAME",
                          help="Process only this manifest skill name; repeatable")
     parser.add_argument("--force", action="store_true",
@@ -681,6 +905,39 @@ def main(argv: list[str] | None = None) -> int:
     if scope not in (None, PROJECT_SCOPE):
         print(f"install-skills failed: unknown manifest scope {scope!r}", file=sys.stderr)
         return 1
+
+    generated = [s for s in all_skills if isinstance(s, dict) and s.get("source_type") == "native_generated"]
+    if generated and (project_dir is not None or manifest.get("kind") != "skills_trial_manifest"):
+        print("install-skills failed: native-generated entries support only the global adoption manifest", file=sys.stderr)
+        return 1
+    if any(not skill_state.native_generated(s) for s in generated):
+        print("install-skills failed: unverified vendor-generated provenance", file=sys.stderr)
+        return 1
+
+    if args.record or args.retire:
+        if args.check_only or args.print_codex_config or args.force or project_dir is not None:
+            parser.error("--record/--retire cannot be combined with check/config/force or project installation")
+        try:
+            before = json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
+            if args.record:
+                manifest, results = record_skills(manifest, Path(args.home), args.only)
+                ok = all(status == "recorded" for status in results.values())
+            else:
+                verify_skills_bin(args.skills_bin, manifest["cli"], Path(args.home))
+                results = {name: retire_skill(manifest, Path(args.home), name, args.skills_bin, args.dry_run)
+                           for name in dict.fromkeys(args.retire)}
+                ok = all(status in ("retired", "planned") for status in results.values())
+            after = json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
+            if not args.dry_run and after != before:
+                temporary = manifest_path.with_name(manifest_path.name + ".record-tmp")
+                temporary.write_text(after, encoding="utf-8")
+                temporary.replace(manifest_path)
+        except (InstallError, OSError, ValueError, TypeError, ImportError):
+            print("install-skills failed: reconciliation or native removal could not be verified", file=sys.stderr)
+            return 1
+        print(json.dumps({"mode": "record" if args.record else "retire", "dry_run": args.dry_run,
+                          "ok": ok, "skills": results}, sort_keys=True))
+        return 0 if ok else 1
 
     if args.print_codex_config:
         if scope == PROJECT_SCOPE and project_dir is None:
@@ -755,7 +1012,8 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     try:
-        verify_skills_bin(args.skills_bin, manifest["cli"], home)
+        if not skills or any(s.get("source_type") != "native_generated" for s in skills):
+            verify_skills_bin(args.skills_bin, manifest["cli"], home)
     except InstallError as error:
         print(f"install-skills failed: {error}", file=sys.stderr)
         return 1
@@ -788,6 +1046,9 @@ def main(argv: list[str] | None = None) -> int:
     results: dict[str, str] = {}
     try:
         for skill in skills:
+            if skill.get("source_type") == "native_generated":
+                results[skill["name"]] = generated_skill(skill, home, args.hf_bin, args.dry_run, args.check_only, args.force)
+                continue
             results[skill["name"]] = process_skill(skill, home, args.skills_bin, args.dry_run,
                                                     args.force, args.json, project_dir, args.agent or "universal",
                                                     args.check_only)

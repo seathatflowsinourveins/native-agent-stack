@@ -26,7 +26,6 @@
     "started": "2026-09-25",
     "window_days": 30,
     "review_after": "2026-10-25",
-    "on_description_char_cap": 10500,
     "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
@@ -670,13 +669,60 @@
         "claude-code"
       ],
       "copy": true
+    },
+    {
+      "name": "hf-cli",
+      "source_type": "native_generated",
+      "source": "huggingface/huggingface_hub",
+      "url": "https://github.com/huggingface/huggingface_hub/blob/bd4a76030582d118e28dc9ad6c7a5911ea76176b/src/huggingface_hub/cli/skills.py",
+      "ref": "bd4a76030582d118e28dc9ad6c7a5911ea76176b",
+      "path": "src/huggingface_hub/cli/skills.py",
+      "tree_sha": null,
+      "skill_md_sha256": "5fa67d3f5b5e071d026c13a029544220f077d9651ed96f5e4ed546981e2c19c5",
+      "skill_md_bytes": 33972,
+      "description_chars": 1008,
+      "upstream_disable_model_invocation": false,
+      "license": "Apache-2.0",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Unknown",
+        "socket": "Unknown",
+        "snyk": "Unknown",
+        "url": "https://skills.sh/huggingface/skills/hf-cli",
+        "checked_at": "2026-10-06"
+      },
+      "status": "kept",
+      "gap": "Record the vendor-generated skill already installed by the command center. Task: model-hub. Generator and mirror bytes are distinct provenance; no new host installation or paired quality claim.",
+      "task": "model-hub",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-06",
+      "pin_policy": {"kind": "tool-coupled", "binary": "hf", "release_tag": "v2.1.1", "advisory": true},
+      "generator": {
+        "package": "huggingface_hub",
+        "version": "2.1.1",
+        "release_tag": "v2.1.1",
+        "install": ["hf", "skills", "add", "--global"],
+        "update": ["hf", "skills", "update", "hf-cli", "--global"],
+        "preview": ["hf", "skills", "preview"],
+        "managed_marker": ".hf-skill-manifest.json",
+        "managed_marker_format": "empty-presence-marker"
+      },
+      "mirror": {
+        "source": "huggingface/skills",
+        "ref": "ca0325bb20b2d0a1b2efa893670c4c72f79e707b",
+        "path": "skills/hf-cli",
+        "tree_sha": "6f293e30d665bc0447a46af7831e386f3ab84bdb",
+        "skill_md_sha256": "91dddd0303b2a3c5b6a38aa240d29cb2c93b118c98a6aafe46461df8f7a163bb",
+        "skill_md_bytes": 33973,
+        "relationship": "mirror bytes equal generated installed bytes plus one final LF; never an installed-tree identity"
+      }
     }
   ],
   "budget": {
-    "claude_on_description_chars": 9484,
-    "claude_on_cap": 10500,
-    "codex_enabled_description_chars": 9165,
-    "codex_catalog_description_chars": 9165,
+    "claude_on_description_chars": 10492,
+    "codex_enabled_description_chars": 10173,
+    "codex_catalog_description_chars": 10173,
     "codex_configured_budget_tokens": 6000,
     "codex_fallback_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",

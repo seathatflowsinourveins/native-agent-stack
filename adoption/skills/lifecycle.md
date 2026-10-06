@@ -86,15 +86,25 @@ that the measurement rejects leaves through a dated record as under
 [Retire and remove](#retire-and-remove). `agent-browser` is held for the
 browser-tool measurement (since 2026-10-03).
 
-Verify each pin from a blobless clone of its source repository
-(`git clone --filter=blob:none --no-checkout <repository>`, then
-`git rev-parse <ref>:<path>` and `git show <ref>:<path>/SKILL.md`), not with
-per-file API calls. A newer repository commit alone does not establish a better
-workflow: retain an unchanged skill tree at its existing pin, and re-pin only
-after reviewing a change to the skill's own tree (`git rev-parse origin/HEAD:<path>`
-differs from `tree_sha`). A registry listing's installed flag may cover only its
-own directory; it does not inspect every native skill root. Plugins and built-in
-skills also consume context, outside this manifest's description budget.
+The accepted October 6 round-two lifecycle supersedes the historical unchanged-ref
+preference: guidance follows upstream HEAD and every verified move retains its prior
+canonical identity. `install_skills.py --record` resolves the public commit and binds
+its skill-directory tree to the actual installed tree. When HEAD no longer matches,
+an earlier immutable ref is a fallback only after its own source tree matches the
+installed content. A newer ref is recorded identity, not evidence of improved fit.
+Compare source, URL, path, ref, tree and SKILL.md digest together: identical bytes at
+a fork do not inherit the earlier origin, license or audit evidence. Unverified rows
+preserve the earlier entry and remain unresolved; no ref is guessed. See the
+[recording and live-budget decision](../../docs/decisions/2026-10-06-skill-recording-and-live-catalog-budgets.md).
+
+Tool-coupled skills follow their binary release. The status check compares retained
+binary-release metadata and reports an advisory upstream restore/update proposal;
+missing release evidence is unknown. It adds no deny rule or automatic host restore.
+Vendor-generated HF records the pinned generator and exact emitted SKILL.md bytes
+with `tree_sha: null`; its mirror stays separate comparison provenance. That
+exception does not authorize null trees for other sources or project/worker installs.
+A registry listing's installed flag may cover only its own directory. Plugins and
+built-in skills also consume the actual client catalog budget.
 
 ## Install and inspect
 
@@ -109,6 +119,27 @@ python3 tools/adoption/install_skills.py --skills-bin "$SKILLS_BIN" --check-only
 python3 scripts/skills_status.py --skills-bin "$SKILLS_BIN" --json
 "$SKILLS_BIN" list -g --json
 ```
+
+Installation may use the selected upstream's supported route; Tier A observes the
+public lock, folders and plugin caches, and Tier B reconciles verified identities in
+an owned worktree. The October 6 configuration changes have their own review and
+host-apply authorization; these commands do not apply client settings or hooks:
+
+```sh
+python3 tools/adoption/install_skills.py --record --dry-run --json
+python3 tools/adoption/install_skills.py --record --json
+python3 scripts/skills_status.py --metadata-only --ledger <state>/skills/ledger.jsonl --json
+```
+
+The metadata-only status reads bounded regular files with required no-follow and
+nonblocking descriptor flags. It preserves canonical Claude directory aliases into
+the explicit shared roots; unknown external targets, final-file symlinks and FIFOs
+are not read or hashed. Missing or stale ledger coverage is reported. Neither status
+nor the recorder starts a fresh model session. Full budget evidence uses explicitly
+retained native listing/catalog inputs; absent inputs are unknown, not passed.
+Coverage matches the current canonical `state_key` and SKILL.md digest, so a visit to
+another native profile cannot replace or remove the first profile's identity.
+Legacy ledger rows without that supported binding stay unbound rather than proving coverage.
 
 The existing installer checks the CLI pin, calls upstream `skills add` with each
 immutable tree URL and only the selected clients, then verifies or rolls back a
@@ -302,11 +333,17 @@ manifest skills, so remove a retired skill's installed folder instead. Remove it
 runtime-worker `reuse_ref` entry and coverage selections while retaining dated
 evidence.
 
-For removal, the host batch runs upstream `"$SKILLS_BIN" remove NAME -g -y` from a
-shell outside a Claude session, since the settings template denies the CLI's
-remove commands in a session (see [Install and inspect](#install-and-inspect)).
-Then inspect the canonical folder, lock and client links. Omit `-g` in an owned
-disposable project.
+For an approved global retirement, use `install_skills.py --retire NAME --skills-bin
+"$SKILLS_BIN" --json`. It invokes upstream `skills remove NAME -g -y -a claude-code
+codex`, then confirms absence from the canonical folder, Claude alias, global lock
+and native legacy `$CODEX_HOME/skills/NAME` root before changing the manifest. It
+does not inspect or delete unrelated bundled `.system/NAME`. A zero native exit with
+any retained global copy is reported as a limit and leaves the selected entry intact.
+`--dry-run` makes a proposal only; `excluded[].last_pin` keeps the full prior source.
+The HF generated form's removal is explicitly unsupported by this adapter rather
+than replaced with a custom file remover. Project retirement remains a separate
+owned native operation. Configuration and hook activation changes require their
+own reviewed host-apply step; these commands do not apply that configuration.
 Removing a shared selected skill affects its client aliases; update its selection
 before claiming the host still matches the manifest. Retain useful evidence and
 delete only the owned temporary installation. Rollback and cleanup are operations
