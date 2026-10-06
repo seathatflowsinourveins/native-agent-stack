@@ -6822,6 +6822,131 @@
       "bytes": 2816
     },
     {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/component-pins.json",
+      "sha256": "c05ab7b1c899f5b854314d73e918ec82563fde3a6065f7ea0b364723bf9f4e8a",
+      "bytes": 10388
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-memory-aa.json",
+      "sha256": "7438275a9bca4eec93f76daa8e9bf858c6fb8dd82bb7656e699c94041895b665",
+      "bytes": 10597
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-memory-full.json",
+      "sha256": "ce72f72489f7f33e32bc6a3b6ff8f0fbcc3cb275693a9724cd1b867d7c3bf156",
+      "bytes": 10596
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-aa.json",
+      "sha256": "b9541f3c2c00a4754aa9178bd06867bb3d7b243989e9fba6e15b8f513403f0f5",
+      "bytes": 11112
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-full.json",
+      "sha256": "191e0ea70ac345e82468e8afed0a6ac91831a73b65d45e5d76583a142b00cd7f",
+      "bytes": 11111
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-ast-grep.json",
+      "sha256": "0b11552563f50626d25cbe53b9f7c589e4e44b7019f1d6ccf9587f218ddf35d2",
+      "bytes": 11136
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-codebase-memory-mcp.json",
+      "sha256": "14e7245f6f783586873ab6f6e0e1b5271b4309723adcafa04857e69408c21e05",
+      "bytes": 11158
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-context-hub.json",
+      "sha256": "3856c568a7746abfa27303bbc6e3c4d4d31c8d86303366ced710f058abbe52f4",
+      "bytes": 11142
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-context-mode.json",
+      "sha256": "1f244b1ee5df92a251eec24d9a574b37b0bbafd84a1bcf87f42dbefe60edf885",
+      "bytes": 11144
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-headroom.json",
+      "sha256": "6cf0d1e3875aa1e32dc625515c7c20e5479c7801027914d80c45831b8635e08f",
+      "bytes": 11136
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-jcodemunch-mcp.json",
+      "sha256": "60b11d75b3fd86e3a10920bb7d103905a74e931c3f3fecc56fd0b1d880f0ad8f",
+      "bytes": 11148
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-markitdown.json",
+      "sha256": "64f656ad938439db41928f79bf20876e932452c0f0119feed329dcebbf9e261f",
+      "bytes": 11140
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-qmd.json",
+      "sha256": "fd776ee36b354b09baefdec2379b4ccb1634a63545a1e3eaafada2a676c11f6c",
+      "bytes": 11126
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-repomix.json",
+      "sha256": "020404e41d858a949a3fd9cc1c8714f04c9e3a29286c22f02442369886632ba1",
+      "bytes": 11134
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-rtk.json",
+      "sha256": "101150754384dd1ba6e2c9371f3442a7a208d7095648f4e82e825e8f74248ae8",
+      "bytes": 11126
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-semble.json",
+      "sha256": "c33b936c8c0a401fc341d4f41ddbfec3333d67e00185faf9730edb5ab57bb424",
+      "bytes": 11132
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-serena.json",
+      "sha256": "c02eac22fce0a12132b958b5cce789d20d80cd10cd9aaf31a960bcd5871d7da7",
+      "bytes": 11132
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-socraticode.json",
+      "sha256": "32d73ad2f3f5a92f8b10afb12668741938a6a77982ea0474d6541d052e7dac20",
+      "bytes": 11142
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-token-lane-carriers.json",
+      "sha256": "38367b16784e96a481667f96f049f6ea343e23a38604997827287a2ccd99c7ac",
+      "bytes": 11158
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-toon.json",
+      "sha256": "1adaafe7221e78d3ab136755b0cf8ffc24b5c49c9292892a4fac71a3b78bbed4",
+      "bytes": 11128
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/inputs.json",
+      "sha256": "b43fd2d59a528d37c62bf2528c66c75a0c078be88e063786ae42334ad7660a81",
+      "bytes": 3995
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/organic-census.json",
+      "sha256": "c16bacc3e2682abbe67970809f2a37746bfce5be2c4935ff497c80bab43242f5",
+      "bytes": 1687
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/preregistration.md",
+      "sha256": "a63ef4e212eb695adc715bbdba46b9de30a45550a8369fbd4997ac615bdf04a0",
+      "bytes": 14948
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/source-review.json",
+      "sha256": "1904a8f56e969fb31aef8ecbb5cb279fe46a975e3a2045c57c9604a7c4f33ac1",
+      "bytes": 5265
+    },
+    {
+      "path": "blueprints/convergence-practice/token-memory-ablation-20261006/tasks.json",
+      "sha256": "2f97a74c1165784ce61650cd7b429714d7e258a50a5f7d6c610ff329b1f298ac",
+      "bytes": 4272
+    },
+    {
       "path": "blueprints/convergence-practice/validation.json",
       "sha256": "2781bc66707fad526ae0798546cc4b6738f03964d6e4702dabd94f9f4172cf9d",
       "bytes": 2009
@@ -17270,6 +17395,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-token-memory-ablation-preregistration.md",
+      "sha256": "231a26faf7a8f10519aab6d2025aa85ff1b448bb77a6113143cf873770bf3c1c",
+      "bytes": 3970
     },
     {
       "path": "docs/direct-results.md",
@@ -56028,6 +56158,25 @@
     }
   ],
   "convergence_records": [
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-full.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-aa.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-rtk.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-context-mode.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-headroom.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-jcodemunch-mcp.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-qmd.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-serena.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-socraticode.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-semble.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-repomix.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-toon.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-ast-grep.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-codebase-memory-mcp.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-context-hub.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-markitdown.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-token-minus-token-lane-carriers.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-memory-full.json",
+    "blueprints/convergence-practice/token-memory-ablation-20261006/experiment-memory-aa.json",
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
