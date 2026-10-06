@@ -1504,7 +1504,16 @@ class NewWslHandbookTests(unittest.TestCase):
             "native facilities do not cover"))
         returned = [slot for slot in rows
                     if slot["record"]["measurement"] and slot["record"]["measurement"]["returned"]]
-        self.assertTrue(returned)
+        self.assertEqual(returned, [])
+        current = [slot for slot in rows if slot["record"].get("current_ruling")]
+        self.assertEqual({slot["record"]["slot_id"] for slot in current},
+                         {"local-model-server", "local-generation-model", "embedding-model"})
+        for slot in current:
+            record = slot["record"]
+            self.assertIs(record["historical_settlement"]["measurement"]["returned"], True)
+            self.assertIsNone(record["measurement"])
+            self.assertEqual(record["current_ruling"]["evidence_class"], "source_review")
+            self.assertEqual(slot["installed"], record["slot_id"] == "embedding-model")
         for slot in returned:
             record = slot["record"]
             installs = bool(record["default"]) and not record["installs_nothing_extra"]

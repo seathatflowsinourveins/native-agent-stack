@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_provenance",
+  "date": "2026-10-06",
+  "evidence_class": "local_integration_checks",
+  "claim": "Actual returned repository checks for the documentary local-model correction; retained failures are not native model acceptance.",
+  "source_manifest_base_commit": "67c6b6f94b456a3a7b5d28bb1fa34625a808d316",
+  "source_ruling_receipt": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+  "execution_policy": {
+    "nice": 19,
+    "ionice_class": 3,
+    "final_check_bytecode_policy": "PYTHONDONTWRITEBYTECODE=1; initial generated pyc scratch was removed after its retained privacy-test error.",
+    "new_model_runs": 0
+  },
+  "checks": [
+    {
+      "scope": "test_new_wsl_definitive_defaults.py",
+      "attempt_log": "definitive-defaults-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "e39af52c5d4149065af7e72adddcd5dce15fb695b79eb3bd13c2e043eeb106ae",
+      "returned_summary": [
+        "ERROR: test_no_host_path_or_user_name_in_the_artifact (test_new_wsl_definitive_defaults.Manifest.test_no_host_path_or_user_name_in_the_artifact)",
+        "FAIL: test_the_unchanged_copy_passes (test_new_wsl_definitive_defaults.InterimPlanChecks.test_the_unchanged_copy_passes)",
+        "FAILED: 7 problem(s)",
+        "Ran 87 tests in 4.939s",
+        "FAILED (failures=1, errors=1, skipped=3)"
+      ]
+    },
+    {
+      "scope": "test_new_wsl_definitive_defaults.py",
+      "attempt_log": "definitive-defaults-second.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "e57d62bb9e9f7163a1847867ddedfc0717d38ae144b18d5a206525357e2ddb0e",
+      "returned_summary": [
+        "FAIL: test_the_unchanged_copy_passes (test_new_wsl_definitive_defaults.InterimPlanChecks.test_the_unchanged_copy_passes)",
+        "FAILED: 7 problem(s)",
+        "Ran 87 tests in 4.977s",
+        "FAILED (failures=1, skipped=3)"
+      ]
+    },
+    {
+      "scope": "test_new_wsl_handbook.py",
+      "attempt_log": "handbook-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "f2026f5f720dc3826eb2bafa5d31d9c6cc449cd38f57f85c5403a7bc364fc940",
+      "returned_summary": [
+        "FAIL: test_a_split_row_is_shown_as_not_installed_with_the_manifests_reason (test_new_wsl_handbook.NewWslHandbookTests.test_a_split_row_is_shown_as_not_installed_with_the_manifests_reason)",
+        "FAIL: test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them (test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them)",
+        "Ran 87 tests in 38.101s",
+        "FAILED (failures=2)"
+      ]
+    },
+    {
+      "scope": "test_new_wsl_handbook.py",
+      "attempt_log": "handbook-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "3243119aa217291f16acb3ff2dcea95678e07ad00960665836fd115890160ea4",
+      "returned_summary": [
+        "Ran 87 tests in 37.419s",
+        "OK"
+      ]
+    },
+    {
+      "scope": "test_architecture_pin_source.py",
+      "attempt_log": "architecture-pin-source-first.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "2883683acc18ad75a5bc59a202565af534679f56218db3d1a66368e72cb40c45",
+      "returned_summary": [
+        "Ran 4 tests in 0.175s",
+        "OK"
+      ]
+    },
+    {
+      "scope": "test_install_claude_profile.py",
+      "attempt_log": "install-claude-profile-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "95136b4007206857a92d4bc3a3f464b5a63795691d0be405c84ab93310d89f35",
+      "returned_summary": [
+        "FAIL: test_each_entry_matches_the_codex_user_template (test_install_claude_profile.McpCodexParityTests.test_each_entry_matches_the_codex_user_template)",
+        "FAIL: test_the_parity_check_rejects_each_kind_of_drift (test_install_claude_profile.McpCodexParityTests.test_the_parity_check_rejects_each_kind_of_drift) (mutant='command')",
+        "FAIL: test_the_parity_check_rejects_each_kind_of_drift (test_install_claude_profile.McpCodexParityTests.test_the_parity_check_rejects_each_kind_of_drift) (mutant='argument')",
+        "FAIL: test_the_parity_check_rejects_each_kind_of_drift (test_install_claude_profile.McpCodexParityTests.test_the_parity_check_rejects_each_kind_of_drift) (mutant='env name missing')",
+        "FAIL: test_the_parity_check_rejects_each_kind_of_drift (test_install_claude_profile.McpCodexParityTests.test_the_parity_check_rejects_each_kind_of_drift) (mutant='env name added')",
+        "FAIL: test_the_parity_check_rejects_each_kind_of_drift (test_install_claude_profile.McpCodexParityTests.test_the_parity_check_rejects_each_kind_of_drift) (mutant='url')",
+        "Ran 106 tests in 1.344s",
+        "FAILED (failures=6, skipped=1)"
+      ]
+    },
+    {
+      "scope": "test_install_claude_profile.py",
+      "attempt_log": "install-claude-profile-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "ddfcd9a09c9f595a103786937b909e7b2a4b3f50db5abb854bcaee04b55e2cf3",
+      "returned_summary": [
+        "Ran 106 tests in 1.350s",
+        "OK (skipped=1)"
+      ]
+    },
+    {
+      "scope": "test_render_config.py",
+      "attempt_log": "render-config-first.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "4612d8cebd506cc06c2810f721fd2f1dcec74a807c9966f328beb57c48c598db",
+      "returned_summary": [
+        "Ran 36 tests in 1.710s",
+        "OK"
+      ]
+    },
+    {
+      "scope": "test_new_wsl_client_config.py",
+      "attempt_log": "new-wsl-client-config-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "862c4ece923697fe2554b94c585070d638a5d4435812590d22e0a9c861e44d0d",
+      "returned_summary": [
+        "FAIL: test_the_rule_selects_the_rows_the_plan_installs_and_the_two_on_demand_rows (test_new_wsl_client_config.ManifestRuleTests.test_the_rule_selects_the_rows_the_plan_installs_and_the_two_on_demand_rows)",
+        "FAIL: test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file (test_new_wsl_client_config.PlanConfigurationTests.test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file)",
+        "FAILED: 7 problem(s)",
+        "FAIL: test_the_counts_that_the_record_states_are_the_ones_check_prints (test_new_wsl_client_config.RecordTests.test_the_counts_that_the_record_states_are_the_ones_check_prints)",
+        "Ran 205 tests in 78.142s",
+        "FAILED (failures=3)"
+      ]
+    },
+    {
+      "scope": "RecordTests.test_the_counts_that_the_record_states_are_the_ones_check_prints",
+      "attempt_log": "client-count-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "0ab6b8adedbb1d4bf47b81d731a2ce832d9644c02a7b2356e8a7612e00107019",
+      "returned_summary": [
+        "Ran 1 test in 0.278s",
+        "OK"
+      ]
+    },
+    {
+      "scope": "test_adoption_docs_consistency.py",
+      "attempt_log": "adoption-docs-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "fc66264c6ef5c0507e030d1bdd74885d784a5fab8d88f9c78a2ef45b23288189",
+      "returned_summary": [
+        "FAIL: test_pages_mentioning_a_changed_install_input_say_so (test_adoption_docs_consistency.UnreleasedStepMarkerTests.test_pages_mentioning_a_changed_install_input_say_so)",
+        "Ran 39 tests in 18.188s",
+        "FAILED (failures=1, skipped=1)"
+      ]
+    },
+    {
+      "scope": "test_adoption_docs_consistency.py",
+      "attempt_log": "adoption-docs-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "84d9c62c4946205b2cc1ee8aa1bbe75e5e8c882e69ce5d7b2074ff980c607f70",
+      "returned_summary": [
+        "Ran 39 tests in 18.480s",
+        "OK (skipped=1)"
+      ]
+    },
+    {
+      "scope": "scripts/build_ecosystem.py --write",
+      "attempt_log": "ecosystem-write-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "ea0adf22cd6b35b178286fd8ff5103307b66aa31fa8065c7bb024a001940624b",
+      "returned_summary": [
+        "Explorer validation failed: freshness selected version differs from current manifest"
+      ]
+    },
+    {
+      "scope": "scripts/build_ecosystem.py --write",
+      "attempt_log": "ecosystem-write-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "831d98d498d9f6121acd15bdf6f07eda14c44ef9e36f70b5ceaac0cbdf0d4bd1",
+      "returned_summary": []
+    },
+    {
+      "scope": "scripts/build_new_wsl_handbook.py --check",
+      "attempt_log": "handbook-check-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "d8a5caf87ba146590c3aca270674cd3e94d4f7e9d606733b2e0c5d0c2fa0afa0",
+      "returned_summary": []
+    },
+    {
+      "scope": "test_local_model_rulings.py",
+      "attempt_log": "source-rulings-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "d094b1bd2c8318c96097f80c50da282add5b2972970a77046de8db6c8935f6ca",
+      "returned_summary": [
+        "Ran 4 tests in 0.002s",
+        "OK"
+      ]
+    },
+    {
+      "scope": "test_new_wsl_client_config.py",
+      "attempt_log": "new-wsl-client-config-second.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "f6e38af19f1d0deda120628b56773011c99a314818c5f70b5e85176aa49554e7",
+      "returned_summary": [
+        "FAIL: test_the_rule_selects_the_rows_the_plan_installs_and_the_two_on_demand_rows (test_new_wsl_client_config.ManifestRuleTests.test_the_rule_selects_the_rows_the_plan_installs_and_the_two_on_demand_rows)",
+        "FAIL: test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file (test_new_wsl_client_config.PlanConfigurationTests.test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file)",
+        "FAILED: 7 problem(s)",
+        "Ran 205 tests in 80.098s",
+        "FAILED (failures=2)"
+      ]
+    },
+    {
+      "scope": "scripts/validate.py",
+      "attempt_log": "validate-first.log",
+      "exit_code": 1,
+      "stdout_stderr_sha256": "7c7ad63eeb9dc23aaccf2e300cf0e9d3f980c719340ae7a4ff94de9ad0ea6f52",
+      "returned_summary": [
+        "Publication validation failed:",
+        "receipt ns2604-local-models-rulings-20261006: payload id differs from manifest",
+        "receipt ns2604-local-models-rulings-20261006: payload kind differs from manifest",
+        "receipt ns2604-local-models-rulings-20261006: payload component_ids differs from manifest",
+        "receipt ns2604-local-models-rulings-20261006: payload claim differs from manifest",
+        "receipt ns2604-local-models-rulings-20261006: payload limitations differs from manifest",
+        "receipt ns2604-vllm-freshness-source-20261006: payload id differs from manifest",
+        "receipt ns2604-vllm-freshness-source-20261006: payload component_ids differs from manifest",
+        "receipt ns2604-vllm-freshness-source-20261006: payload claim differs from manifest",
+        "receipt ns2604-vllm-freshness-source-20261006: payload limitations differs from manifest",
+        "receipt ns2604-local-models-local-checks-20261006: payload id differs from manifest",
+        "receipt ns2604-local-models-local-checks-20261006: payload component_ids differs from manifest",
+        "receipt ns2604-local-models-local-checks-20261006: payload claim differs from manifest",
+        "receipt ns2604-local-models-local-checks-20261006: payload limitations differs from manifest"
+      ]
+    },
+    {
+      "scope": "assemble_manifest.py",
+      "attempt_log": "assembler-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "94313f4e1e1e58bb8af339144e4cb011f5a68e12a09a860f53f2ebaf1881851b",
+      "returned_summary": []
+    },
+    {
+      "scope": "render_tables.py --write",
+      "attempt_log": "tables-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "4faa8027e251efd0d1dcf4936639730a9b2344a73f994dc3d2e31a011ba5393c",
+      "returned_summary": []
+    },
+    {
+      "scope": "build_new_wsl_handbook.py --write",
+      "attempt_log": "handbook-write-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "2739095a4179b87ae0640fcc1c8db2fde1c9775edbe294397d77ce1458198733",
+      "returned_summary": []
+    },
+    {
+      "scope": "scripts/validate.py",
+      "attempt_log": "validate-second.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "c55696ad676f00835d8dbc0c30e070d3bdd408e35d752b61fe82df689205b787",
+      "returned_summary": [
+        "{\"components\": 69, \"hashed_files\": 10363, \"profiles\": 4, \"receipts\": 217, \"status\": \"passed\"}"
+      ]
+    },
+    {
+      "scope": "test_new_wsl_handbook.py",
+      "attempt_log": "handbook-third.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "ea0c8ef694b804f7800842d0d0a5efea5d213c80a6916ff573fb0d0dac89311f",
+      "returned_summary": [
+        "Ran 87 tests in 37.137s",
+        "OK"
+      ]
+    },
+    {
+      "scope": "render_tables.py --check",
+      "attempt_log": "tables-check-final.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "93fdeb8afa33cc95292fbafef21bb93b2a11dffa9064c493e21fe5cbfc846604",
+      "returned_summary": [
+        "the record's tables are current"
+      ]
+    },
+    {
+      "scope": "scripts/build_new_wsl_handbook.py --check",
+      "attempt_log": "handbook-check-final.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "6a9cfe9527e9fa6126fa9383ee334f788d444035c629a4934475e5a01130c70b",
+      "returned_summary": [
+        "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"09e511413a4dabf7572e123f19946511eb9fb3ddd7c15770ab2aaea208b128af\", \"docs/new-wsl-handbook.md\": \"56541a271b75b1148566e1257effb4d74c367eb170411f09138aec7a02487e83\"}, \"status\": \"passed\"}"
+      ]
+    },
+    {
+      "scope": "scripts/build_ecosystem.py --check",
+      "attempt_log": "ecosystem-check-final.log",
+      "exit_code": 0,
+      "stdout_stderr_sha256": "b1c5157edaa1aa98a9b7b38876afd8bb232b2b17805295bd88684e57c8e0500d",
+      "returned_summary": [
+        "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.80.0\", \"row\": \"foundation/workers\", \"stack_pin\": \"0.79.0\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.80.0\", \"row\": \"foundation/isolation\", \"stack_pin\": \"0.79.0\"}, {\"component_id\": \"sandbox-runtime\", \"edition_pin\": \"0.0.78\", \"row\": \"foundation/isolation\", \"stack_pin\": \"0.0.77\"}, {\"component_id\": \"rtk\", \"edition_pin\": \"0.50.0\", \"row\": \"foundation/token-efficiency\", \"stack_pin\": \"0.51.0\"}, {\"component_id\": \"syft\", \"edition_pin\": \"1.54.0\", \"row\": \"foundation/ci-supply-chain\", \"stack_pin\": \"1.52.0\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"foundation/observation-inference\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"mcporter\", \"edition_pin\": \"0.14.1\", \"row\": \"foundation/mcp-surfaces\", \"stack_pin\": \"0.14.2\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.80.0\", \"row\": \"foundation/git-github-automation\", \"stack_pin\": \"0.79.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"rtk\", \"edition_pin\": \"0.50.0\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.51.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.160.0\"}], \"bytes\": 15380583, \"input_sha256\": \"41862ee32f6937b4e378d39329b6cff98ee5e51a6bfba4811768f76f553309b6\", \"output_sha256\": \"d8a3c37a85f0c0c527125e38422790ec48bede35a200a634a9c57c56e142f2ec\", \"status\": \"passed\"}"
+      ]
+    }
+  ],
+  "open_failures": [
+    {
+      "scope": "install-plan coupling",
+      "tests": [
+        "InterimPlanChecks.test_the_unchanged_copy_passes",
+        "ManifestRuleTests.test_the_rule_selects_the_rows_the_plan_installs_and_the_two_on_demand_rows",
+        "PlanConfigurationTests.test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file"
+      ],
+      "status": "owner_authored_atomic_correction_pending",
+      "description": "New manifest defaults and old plan rows disagree in seven checks. No plan or plan-owned assertion is changed or waived here."
+    }
+  ],
+  "limitations": [
+    "The unit cases include synthetic clients and controls; they do not qualify an upstream model or demonstrate organic use.",
+    "Actual failed attempts and their output hashes remain distinct from passing repairs.",
+    "No readiness aggregate is derived; no host configuration is applied.",
+    "Final full validator and generated-output checks passed at this source checkpoint. The unchanged install-plan coupling remains a failed local integration check pending its owner-authored atomic correction."
+  ],
+  "id": "ns2604-local-models-local-checks-20261006",
+  "component_ids": [
+    "vllm",
+    "qmd",
+    "ai-memory",
+    "socraticode"
+  ],
+  "retained_repaired_failures": [
+    {
+      "scope": "first registry/payload metadata check",
+      "exit_code": 1,
+      "condition": "The documentary payloads lacked the registry metadata envelope or disagreed with it.",
+      "correction": "Add payload id/kind/component_ids/claim as required by the existing validator; derive registry metadata from each payload, preserving the source-review limitations."
+    }
+  ]
+}

@@ -268,6 +268,11 @@ Windows Terminal re-saves `settings.json` in its own layout, written from its se
   `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper, and
   jcodemunch is no longer registered at user scope (a per-project opt-in in
   `adoption/bootstrap.md` step 4a).
+  `adoption/mcp/claude-user.json` also changed after `v2026.10.05.1`:
+  the [retrieval-first model ruling](../../docs/decisions/2026-10-06-retrieval-first-local-models.md)
+  selects the 8B/4096 shared embedding registration and QMD's lexical index
+  with CPU execution. This source-template projection does not establish
+  installation or a completed collection-namespace/two-client cutover.
 - With `networkingMode=mirrored`, a wildcard (`*` or `0.0.0.0`) listener can be
   reached from the local network
   ([mirrored mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking))

@@ -599,6 +599,12 @@ GitHub-hosted macOS runner; see
    (changed 2026-10-04), so a host registered from the tag keeps that entry and
    the installer reports it as already registered.
 
+   `adoption/mcp/claude-user.json` also changed after `v2026.10.05.1`:
+   the [retrieval-first model ruling](../docs/decisions/2026-10-06-retrieval-first-local-models.md)
+   selects the 8B/4096 shared embedding registration and QMD's lexical index
+   with CPU execution. This template change does not apply or accept a host's
+   model, collection namespace or two-client cutover.
+
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude
    marketplace source takes a branch or tag and never a commit

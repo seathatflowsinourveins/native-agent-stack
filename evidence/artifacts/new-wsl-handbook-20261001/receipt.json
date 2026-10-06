@@ -180,6 +180,15 @@
       "returned_output": "Ran 97 tests in 34.301s\n\nFAILED (failures=1)",
       "evidence_class": "local_integration",
       "correction": "Refresh the existing receipt generator/output hashes from actual files, retain the failed check and rerun the native suite."
+    },
+    {
+      "condition": "Initial current-ruling handbook suite found stale receipt output hashes and an assertion requiring a current returned measurement after those three rows were retired/source-projected.",
+      "native_exit_code": 1,
+      "tests": 87,
+      "failures": 2,
+      "returned_output": "Ran 87 tests in38.101s; FAILED(failures=2).",
+      "evidence_class": "local_integration",
+      "correction": "Refresh hashes from actual generated outputs and separately assert current source choices plus historical returned rows."
     }
   ],
   "derived_catalog_correction": {
@@ -611,6 +620,27 @@
         "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
       },
       "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "nice -n 19 ionice -c3 python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Local-model source rulings: retain historical returned settlements while current choices are source review or retired.",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "not_model_execution": true
+    },
+    {
+      "date": "2026-10-06",
+      "round": "local-model-receipt-contract-repair",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Documentary receipts now expose the existing registry metadata contract; their corrected source hashes flow through the maintained settlement producer.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "e0b9f34464a0a9ba791236659606b6c5631b9c0e28346dce44668b6c6bc2882b",
+        "docs/new-wsl-handbook.json": "ce93a4d6d436eec83d0cf7797a09a01e5967a81f17eb818a20c684ff93a358a2"
+      },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]

@@ -77,6 +77,11 @@ release, the note is history and the step is in your checkout (`test -e
    `serena-context` wrapper that nothing installs, and main's runs
    `${ECO_ROOT}/bin/serena`; the tag also registers `jcodemunch` at user
    scope, which main leaves to each project.
+   `adoption/mcp/claude-user.json` also changed after `v2026.10.05.1`:
+   the [retrieval-first model ruling](../../docs/decisions/2026-10-06-retrieval-first-local-models.md)
+   selects the 8B/4096 shared embedding registration and QMD's lexical index
+   with CPU execution. These are inactive source defaults; this decision
+   provides no new macOS model installation or acceptance evidence.
    `adoption/templates/claude.settings.template.json` changed after `v2026.09.25.2`: its eight
    ai-memory hook commands name `tools/ai-memory-2.4.1`, where the tag's name `tools/ai-memory-2.3.2`.
    Since 2026-09-27 they run `${AI_MEMORY_BIN}`, rendered from this platform's pin (see

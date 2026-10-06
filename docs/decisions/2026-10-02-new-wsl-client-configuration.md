@@ -1035,6 +1035,8 @@ The user's [September 30 LLM-native invocation directive](2026-09-30-skills-llm-
 
 After the refresh onto main 9e9553277, which carries wave 5's four browser-registration pieces: Today: 398 pieces, 358 wired (207 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces. The check prints `authorization: 16`, and 24 pieces are not wired. Earlier dated tables and counts remain historical.
 
+The 2026-10-06 [retrieval-first model ruling](2026-10-06-retrieval-first-local-models.md) adds the Codex QMD `QMD_FORCE_CPU` environment declaration. Today: 399 pieces, 359 wired (207 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces. These are local configuration-map counts: the extra scalar is classified by `adoption/new-wsl/client-config-map.json` as `slot:tobi-qmd`; they are neither a host apply nor native model acceptance. The preceding dated count remains historical.
+
 | Piece | Wiring | Why it is not wired |
 | --- | --- | --- |
 | `claude/settings/permission/deny/Agent(codex:codex-rescue)` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |

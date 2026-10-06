@@ -6,6 +6,6 @@
   "CODE_INDEX_PATH": "/home/example/.code-index",
   "OTEL_ENDPOINT": "127.0.0.1:14318",
   "AI_MEMORY_URL": "127.0.0.1:49374",
-  "QDRANT_URL": "127.0.0.1:16333",
-  "EMBED_URL": "127.0.0.1:8231"
+  "QDRANT_URL": "127.0.0.1:21633",
+  "EMBED_URL": "127.0.0.1:28231"
 }

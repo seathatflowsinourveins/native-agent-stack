@@ -2561,39 +2561,39 @@
       "component_id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
       "selected_repository_url": "https://github.com/vllm-project/vllm",
-      "selected_version": "0.30.0",
-      "selected_source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "selected_version": "0.31.0",
+      "selected_source_pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
       "checks": [
         {
           "endpoint": "repos/vllm-project/vllm",
           "exit_code": 0,
-          "started_at": "2026-09-25T16:12:44.330894+00:00",
-          "ended_at": "2026-09-25T16:12:44.711487+00:00",
-          "stdout_sha256": "e56bc5a32692b13e8044063bcee56cd5ac75bc43853e5858ef8efb9eb32d5d5b",
+          "started_at": "2026-10-06T22:41:06.335821+00:00",
+          "ended_at": "2026-10-06T22:41:06.809778+00:00",
+          "stdout_sha256": "4f7ea8d82c7d5fa92e0b6c77c7cb02d72c6f22f72e1b888552ac8945d38d4c05",
           "status": "ok"
         },
         {
           "endpoint": "repos/vllm-project/vllm/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T16:12:44.711618+00:00",
-          "ended_at": "2026-09-25T16:12:45.016575+00:00",
-          "stdout_sha256": "367f651bccc6b1c1da875f3728804965561e7bffbfbcd2942cfce9d35357d793",
+          "started_at": "2026-10-06T22:41:06.809889+00:00",
+          "ended_at": "2026-10-06T22:41:07.137444+00:00",
+          "stdout_sha256": "e04f246495bc16261482ca857b76108ddac11e35e9df7d6e1ef8dd65d692f977",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vllm-project/vllm/commits/ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+          "endpoint": "repos/vllm-project/vllm/commits/db9527a46873454610df6dbedf79a36d6bf1a7f6",
           "exit_code": 0,
-          "started_at": "2026-09-25T16:12:45.016818+00:00",
-          "ended_at": "2026-09-25T16:12:45.318262+00:00",
-          "stdout_sha256": "2d3c5a3b9d60b7dd995316fe0cf543c9a27201c4aea94119b4e0a49b6051a4b9",
+          "started_at": "2026-10-06T22:41:07.137689+00:00",
+          "ended_at": "2026-10-06T22:41:07.474758+00:00",
+          "stdout_sha256": "c03eac7f1d6ef6745b7ff3f3e032e4090d051915bcbb0cec0360e4dfca59a8b5",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vllm-project/vllm/commits/v0.30.0",
+          "endpoint": "repos/vllm-project/vllm/commits/v0.31.0",
           "exit_code": 0,
-          "started_at": "2026-09-25T16:12:45.318345+00:00",
-          "ended_at": "2026-09-25T16:12:45.633026+00:00",
-          "stdout_sha256": "2d3c5a3b9d60b7dd995316fe0cf543c9a27201c4aea94119b4e0a49b6051a4b9",
+          "started_at": "2026-10-06T22:41:07.474856+00:00",
+          "ended_at": "2026-10-06T22:41:07.798891+00:00",
+          "stdout_sha256": "c03eac7f1d6ef6745b7ff3f3e032e4090d051915bcbb0cec0360e4dfca59a8b5",
           "status": "ok"
         }
       ],
@@ -2601,33 +2601,34 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-25T16:12:29Z",
+      "pushed_at": "2026-10-06T22:02:04Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.30.0",
-        "published_at": "2026-09-22T05:20:54Z",
-        "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
+        "tag_name": "v0.31.0",
+        "published_at": "2026-10-05T06:44:55Z",
+        "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
-        "sha": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
-        "html_url": "https://github.com/vllm-project/vllm/commit/ced6857afa0ea7b2e3f0846a62e1394e90f15607",
-        "committed_at": "2026-09-21T22:32:49Z"
+        "ref": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+        "sha": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+        "html_url": "https://github.com/vllm-project/vllm/commit/db9527a46873454610df6dbedf79a36d6bf1a7f6",
+        "committed_at": "2026-10-02T22:18:12Z"
       },
       "latest_release_source": {
-        "ref": "v0.30.0",
-        "sha": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
-        "html_url": "https://github.com/vllm-project/vllm/commit/ced6857afa0ea7b2e3f0846a62e1394e90f15607",
-        "committed_at": "2026-09-21T22:32:49Z"
+        "ref": "v0.31.0",
+        "sha": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+        "html_url": "https://github.com/vllm-project/vllm/commit/db9527a46873454610df6dbedf79a36d6bf1a7f6",
+        "committed_at": "2026-10-02T22:18:12Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/vllm-project/vllm",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "checked_at": "2026-10-06T22:41:07.798891+00:00"
     },
     {
       "component_id": "worktrunk",

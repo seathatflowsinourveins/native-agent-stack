@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "kind": "documentary_local_model_rulings",
+  "kind": "upstream_provenance",
   "date": "2026-10-06",
   "host_scope": "NativeStack2604",
   "source_commit": "0d5e6506434fab598dee861c749a22e628beb75a",
@@ -268,5 +268,18 @@
     "Coupled source/install-plan test ownership and PR order awaits Q27.",
     "Namespace deployment/read-back is CC-owned; no generic renderer binding is invented.",
     "Independent execution acceptance, local source verification, organic-use observation and gates remain their separate owner records."
-  ]
+  ],
+  "id": "ns2604-local-models-rulings-20261006",
+  "component_ids": [
+    "vllm",
+    "qmd",
+    "ai-memory",
+    "socraticode",
+    "jcodemunch-mcp",
+    "codebase-memory-mcp",
+    "headroom",
+    "huggingface-hub-native"
+  ],
+  "provenance_type": "documentary_local_model_rulings",
+  "claim": "Dated source-review record of the command center local-model choices. Ten roles, consumer-limited exceptions, retirement, pins and pending application gates; no new model run, native acceptance or readiness aggregate."
 }
