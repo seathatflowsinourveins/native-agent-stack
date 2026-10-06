@@ -4477,6 +4477,25 @@
         "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
       ],
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json"
+    },
+    {
+      "id": "windows-terminal-2604-fragment-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "A portable 16-profile NativeStack2604 Terminal fragment carries explicit Microsoft-derived profile identities and the maintained bell/truecolor policy; source/fixture checks pass, while host deployment and session continuity remain pending.",
+      "limitations": [
+        "Repository/source checks only: no Windows Terminal deployment, UI, sound-playback or session-continuity acceptance was performed.",
+        "Source transformations remove private bindings; owner-supplied command-center, co-op and account-pool launchers are deployment prerequisites, not accepted implementations.",
+        "Librarium cwd and clone/vault binding are DEFERRED to P1-CLI; its profile remains hidden. Librarium course is a distinct project.",
+        "Operations and Local Chat depend on the installed nativestack CLI; four lane launcher/prompt files must be staged by their owner. No prompt body is authored here.",
+        "The old independent HTTP omniroute-fw on 20129 has no established 2604 equivalent. Its references are DEFERRED to Phase 3; WebSocket 21129 is not a replacement.",
+        "The broader 174-test regression retained one installed-client currency failure: Claude2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
+        "Independent review and operator host apply/read-back remain pending. The bounded same-lane completeness critic is a source-review lead, not independent acceptance."
+      ],
+      "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json"
     }
   ],
   "files": [
@@ -16747,6 +16766,11 @@
       "bytes": 3031
     },
     {
+      "path": "checks/check-terminal-profiles.py",
+      "sha256": "235d2f8e49e82813434373bb337c34a0200bf115d0ab0ebc6c93b5607721ab8b",
+      "bytes": 13480
+    },
+    {
       "path": "docs/acceptance-evidence-policy.md",
       "sha256": "38ddfb80673ae86cad110a65a9cc938bb974d65a34bb9638b7a0f96d3e2ef508",
       "bytes": 5820
@@ -17328,8 +17352,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
-      "sha256": "2859b9a07848be5666856121e1bd350e0c08389826718e96334354dd0ac9ecc7",
-      "bytes": 22114
+      "sha256": "88b7af359232314987c5763a78941e27990a89144ccfed450b63c909bf897146",
+      "bytes": 22547
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -17355,6 +17379,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-windows-terminal-2604-fragment.md",
+      "sha256": "8833753bf6a55d606b1d753d7b64998dbb87ea89322ea56895b7d7c0df737311",
+      "bytes": 5189
     },
     {
       "path": "docs/direct-results.md",
@@ -53222,6 +53251,11 @@
       "bytes": 1939
     },
     {
+      "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json",
+      "sha256": "bb6f84b451982accbbbc2a527560084e17924781b53a8d5c7330ef81c59da56b",
+      "bytes": 8721
+    },
+    {
       "path": "evidence/receipts/worktrunk-list.json",
       "sha256": "ba277663d33930ff5e65623525a86686c2b108fb0346bc4593c43b01570ebb6c",
       "bytes": 547
@@ -54227,6 +54261,11 @@
       "bytes": 42439
     },
     {
+      "path": "scripts/terminal_profile_ids.py",
+      "sha256": "d637316cfa5ebdb99df624d04789026875b4deb9528dc69a8b069b7bc406337a",
+      "bytes": 764
+    },
+    {
       "path": "scripts/trading_gates.py",
       "sha256": "9781ed54be63cef127a9bb2e99f9e0b24d0aea09b048cde5402f8a151bcde70f",
       "bytes": 34570
@@ -54238,8 +54277,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
-      "bytes": 26751
+      "sha256": "6a744e566543378c1d15af5244eaf7f389c5c57bb3cae5a085c3e64478e71192",
+      "bytes": 29106
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -55437,6 +55476,11 @@
       "bytes": 6838
     },
     {
+      "path": "tests/test_terminal_fragment.py",
+      "sha256": "7f0ab1897114de35bed78698ac3c69c809959684e4d46d5a128fc64ec36ad6c9",
+      "bytes": 9337
+    },
+    {
       "path": "tests/test_token_e2e_grader.py",
       "sha256": "42708be8476b880f4288f8cfc44622123ea18e8ae8198ca0c98a379460932cd3",
       "bytes": 524375
@@ -56175,6 +56219,21 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "57c98b9b1389315a06de47f59d6d4708e00f44959e02a717f14e0c500365b8b4",
       "bytes": 64712
+    },
+    {
+      "path": "windows/README.md",
+      "sha256": "b0583bf0706b4edebb051eec561d3b52d185296eb89ac9f83df69594c6ba5c4a",
+      "bytes": 8517
+    },
+    {
+      "path": "windows/nativestack2604.json",
+      "sha256": "eadcf2da6bdb68c573892a5c89a033fa595867e9d8e0872bfb4f60c16942f1d6",
+      "bytes": 8522
+    },
+    {
+      "path": "windows/ops-entry.sh",
+      "sha256": "05cfc1bfc7eea9ec34ac60c53f644ece166e81b9f0b09b3e4da70ad039a62aac",
+      "bytes": 278
     }
   ],
   "convergence_records": [
