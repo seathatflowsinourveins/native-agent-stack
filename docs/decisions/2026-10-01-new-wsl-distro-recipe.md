@@ -703,6 +703,7 @@ workstation distribution (Evidence classes).
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf` | `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]`, `default=<WSL_USER>`, each once |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value` | the IANA zone that CLDR's `windowsZones` mapping gives for `tzutil /g`'s zone and the Windows region, for example `America/New_York`; recorded; a mismatch stops the run for review without the failed-proof export and unregister |
 | W5 | powershell | `tzutil /g` | the Windows time zone ID, for example `Eastern Standard Time`; recorded |
+| W5 | powershell | `if (-not ('WslRegionProof.Native' -as [type])) { Add-Type -Namespace WslRegionProof -Name Native -MemberDefinition '[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling=true, SetLastError=true)] public static extern int GetUserDefaultGeoName(System.Text.StringBuilder geoName, int geoNameCount);' -ErrorAction Stop }; $wslRegionBuffer = [System.Text.StringBuilder]::new(16); if ([WslRegionProof.Native]::GetUserDefaultGeoName($wslRegionBuffer, $wslRegionBuffer.Capacity) -eq 0) { throw [System.ComponentModel.Win32Exception]::new([System.Runtime.InteropServices.Marshal]::GetLastWin32Error()) }; $wslRegionBuffer.ToString()` | exact ISO alpha-2 or UN M.49 GeoName under the Windows account launching WSL, recorded separately as `windows_region`; native API failure stops W5 |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled` | the marker exists |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'` | `(ALL) NOPASSWD: ALL` |
 | W5 | powershell | `wsl.exe --list --verbose` | the starred line equals W1's |
@@ -752,7 +753,7 @@ workstation distribution (Evidence classes).
 | W6 | sh | `chmod 0440 /etc/sudoers.d/90-wsl-default-user` | mode 0440 |
 | W6 | sh | `visudo -cf /etc/sudoers.d/90-wsl-default-user` | `parsed OK` |
 | W6 | sh | `grep -q '^\[user\]' /etc/wsl.conf \|\| printf '\n[user]\ndefault=%s\n' '<WSL_USER>' >> /etc/wsl.conf` | one `[user]` section naming the user |
-| W6 | sh | `grep -q '^\[time\]' /etc/wsl.conf \|\| printf '\n[time]\nuseWindowsTimezone=true\n' >> /etc/wsl.conf` | a `[time]` section exists (the guard reads only the header); W5's repeated read-back confirms `useWindowsTimezone=true` |
+| W6 | sh | `python3 -c 'import configparser, io; from pathlib import Path; p = Path("/etc/wsl.conf"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else ""); c.has_section("time") or c.add_section("time"); c.set("time", "useWindowsTimezone", "true"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' \|\| exit "$?"` | updates false/missing key or adds [time]; preserves other values; setter failure exits before the marker; W5 read-back/relaunch proves resulting zone |
 | W6 | sh | `touch /etc/cloud/cloud-init.disabled` | the marker exists |
 | W6 | powershell | `wsl.exe --terminate '<Name>'` | exit 0 |
 | W6 | powershell | `wsl.exe --list --running` | `<Name>` absent |

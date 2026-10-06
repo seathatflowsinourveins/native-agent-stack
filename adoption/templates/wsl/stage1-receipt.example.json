@@ -93,6 +93,7 @@
     "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>",
     "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>",
     "cloud_init_version": "<W5: selected image cloud-init --version and its exit>",
+    "windows_region": "<W5: exact GetUserDefaultGeoName ISO alpha-2 or UN M.49 result, under the Windows account launching WSL; repeat alongside both zone outputs on path B>",
     "cgroup_isolation": "<W5, after launch before F1, while both run: common active system unit, process ids with no 0 entry read natively from the running distribution, and active new user@<uid>.service; the paired five-value record is paired_isolation; any failed W5 proof uses the guarded w5_failure_export/removal>",
     "systemd_user_session_warning": "<W5: warning text and stop if wsl: Failed to start the systemd user session appears, even with launch exit 0; absent otherwise>",
     "getty_mask": {
@@ -780,6 +781,12 @@
     },
     {
       "step": "W5",
+      "cmd": "if (-not ('WslRegionProof.Native' -as [type])) { Add-Type -Namespace WslRegionProof -Name Native -MemberDefinition '[System.Runtime.InteropServices.DllImport(\"kernel32.dll\", CharSet=System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling=true, SetLastError=true)] public static extern int GetUserDefaultGeoName(System.Text.StringBuilder geoName, int geoNameCount);' -ErrorAction Stop }; $wslRegionBuffer = [System.Text.StringBuilder]::new(16); if ([WslRegionProof.Native]::GetUserDefaultGeoName($wslRegionBuffer, $wslRegionBuffer.Capacity) -eq 0) { throw [System.ComponentModel.Win32Exception]::new([System.Runtime.InteropServices.Marshal]::GetLastWin32Error()) }; $wslRegionBuffer.ToString()",
+      "exit": "<PowerShell success status; an API exception stops W5>",
+      "output_excerpt": "<W5: exact GetUserDefaultGeoName value, ISO alpha-2 or UN M.49, under the Windows account launching WSL>"
+    },
+    {
+      "step": "W5",
       "cmd": "wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
@@ -1074,7 +1081,7 @@
     },
     {
       "step": "W6",
-      "cmd": "grep -q '^\\[time\\]' /etc/wsl.conf || printf '\\n[time]\\nuseWindowsTimezone=true\\n' >> /etc/wsl.conf",
+      "cmd": "python3 -c 'import configparser, io; from pathlib import Path; p = Path(\"/etc/wsl.conf\"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else \"\"); c.has_section(\"time\") or c.add_section(\"time\"); c.set(\"time\", \"useWindowsTimezone\", \"true\"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' || exit \"$?\"",
       "exit": "<path B only: exit code; null on path A>",
       "output_excerpt": "<path B only: sanitized output; null on path A>"
     },

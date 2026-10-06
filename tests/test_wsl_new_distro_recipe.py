@@ -103,8 +103,13 @@ Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is
 from __future__ import annotations
 
 import json
+import configparser
 import re
+import shlex
 import string
+import subprocess
+import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -1169,6 +1174,15 @@ def time_zone_pair_errors(recipe: str, record: str, checklist: str, receipt: dic
     listed = [(entry.get("step"), entry.get("cmd")) for entry in receipt.get("steps", []) if isinstance(entry, dict)]
     if listed.count(("W5", ZONE_DISTRIBUTION)) != 1 or listed.count(("W5", ZONE_WINDOWS)) != 1:
         errors.append("the receipt example does not record each zone command once under W5")
+    region_commands = [c for c in commands if "GetUserDefaultGeoName" in c and "$wslRegionBuffer.ToString()" in c]
+    if len(region_commands) != 1:
+        errors.append("W5 lacks the exact Windows GeoName API readback")
+    elif rows.count(region_commands[0]) != 1 or listed.count(("W5", region_commands[0])) != 1:
+        errors.append("the Windows GeoName readback is not recorded in both the command table and receipt")
+    if not is_placeholder(field(receipt, "first_launch", "windows_region"), "<W5"):
+        errors.append("the receipt has no exact Windows-region field")
+    if "GetUserDefaultGeoName" not in line:
+        errors.append("the W5 checklist lacks the Windows GeoName mapping input")
     return errors
 
 
@@ -2033,6 +2047,52 @@ class TimeZonePairTests(FollowUpCase):
 
     def test_w5_reads_the_distribution_zone_beside_the_windows_zone(self):
         self.assertEqual(time_zone_pair_errors(*self.inputs()), [])
+
+    def test_missing_region_input_or_record_is_rejected(self):
+        recipe, record, checklist, receipt = self.inputs()
+        cmd = next(c for shell, c in step_commands(recipe, "W5") if "GetUserDefaultGeoName" in c)
+        self.assertTrue(time_zone_pair_errors(recipe.replace(cmd + "\n", ""), record, checklist, receipt))
+        self.assertTrue(time_zone_pair_errors(recipe, record, checklist, dict(receipt, first_launch={
+            k: v for k, v in receipt["first_launch"].items() if k != "windows_region"})))
+        self.assertTrue(time_zone_pair_errors(recipe, record, checklist, dict(receipt, steps=[
+            e for e in receipt["steps"] if e.get("cmd") != cmd])))
+
+    def test_path_b_sets_actual_time_key_and_preserves_other_section_values(self):
+        command = next(c for shell, c in step_commands(read(RECIPE), "W6")
+                       if shell == "sh" and c.startswith("python3 -c ") and "useWindowsTimezone" in c)
+        source = shlex.split(command)[2]
+        prefix = "[boot]\nsystemd=true\n[user]\ndefault=example\n[automount]\noptions=metadata,uid=1000%literal\n"
+        for time_section in ("", "[time]\nuseWindowsTimezone=false\n", "[time]\n"):
+            with self.subTest(initial=time_section), tempfile.TemporaryDirectory() as d:
+                path = Path(d) / "wsl.conf"
+                path.write_text(prefix + time_section, encoding="utf-8")
+                # Only redirect the documented file path; execute the actual upstream-API recipe.
+                fixture_source = source.replace('Path("/etc/wsl.conf")', "Path(" + repr(str(path)) + ")")
+                self.assertNotEqual(source, fixture_source)
+                for repeat in range(2):
+                    result = subprocess.run([sys.executable, "-c", fixture_source], capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    parsed = configparser.ConfigParser(interpolation=None)
+                    parsed.read(path)
+                    self.assertTrue(parsed.getboolean("time", "useWindowsTimezone"))
+                    self.assertEqual(parsed.get("boot", "systemd"), "true")
+                    self.assertEqual(parsed.get("user", "default"), "example")
+                    self.assertEqual(parsed.get("automount", "options"), "metadata,uid=1000%literal")
+                    self.assertEqual(path.read_text().count("useWindowsTimezone=true"), 1)
+
+    def test_path_b_parse_failure_stops_before_the_completion_marker(self):
+        command = next(c for shell, c in step_commands(read(RECIPE), "W6")
+                       if shell == "sh" and c.startswith("python3 -c ") and "useWindowsTimezone" in c)
+        for original in ("not an INI file\n", "[time]\nuseWindowsTimezone=false\n[time]\n",
+                         "[time]\nuseWindowsTimezone=false\nuseWindowsTimezone=true\n"):
+            with self.subTest(original=original), tempfile.TemporaryDirectory() as d:
+                path, marker = Path(d) / "wsl.conf", Path(d) / "cloud-init.disabled"
+                path.write_text(original, encoding="utf-8")
+                script = command.replace("/etc/wsl.conf", str(path)) + "\ntouch " + shlex.quote(str(marker)) + "\n"
+                result = subprocess.run(["bash", "-s"], input=script, capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(path.read_text(), original)
+                self.assertFalse(marker.exists())
 
     def test_the_check_rejects_a_lost_command_an_early_pair_a_lost_mapping_and_lost_records(self):
         recipe, record, checklist, receipt = self.inputs()

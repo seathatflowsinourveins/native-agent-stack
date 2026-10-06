@@ -1785,8 +1785,9 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     # blocks and in the carriers F9 renders from them, once each. It is not a standing clause of the repository
     # AGENTS.md, so SHARED does not hold it.
     LOCAL_TIME = ("When you tell the user a time, give it first in the host's local time zone (read it with "
-                  "`timedatectl` or `date`), with UTC beside it, for example \"4:00 PM EDT (20:00Z)\"; keep UTC in "
-                  "ledger rows, receipts, evidence and commits.")
+                  "`timedatectl` or `date`), with UTC beside it, for example \"4:00 PM EDT (20:00Z)\". Write timestamps in "
+                  "ledger rows, receipts, evidence and commit messages in UTC (RFC 3339 with `Z`); "
+                  "Git author/committer metadata retains its native format.")
     LOCAL_TIME_SURFACES = ("examples/claude-native/CLAUDE.md", "adoption/templates/codex.AGENTS.template.md",
                            "adoption/new-wsl/claude-user-instructions.md", "adoption/new-wsl/codex-user-instructions.md")
 

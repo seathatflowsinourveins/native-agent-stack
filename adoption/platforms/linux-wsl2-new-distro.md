@@ -562,6 +562,7 @@ wsl.exe -d '<Name>' -u root --exec cloud-init schema --system
 wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf
 wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value
 tzutil /g
+if (-not ('WslRegionProof.Native' -as [type])) { Add-Type -Namespace WslRegionProof -Name Native -MemberDefinition '[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling=true, SetLastError=true)] public static extern int GetUserDefaultGeoName(System.Text.StringBuilder geoName, int geoNameCount);' -ErrorAction Stop }; $wslRegionBuffer = [System.Text.StringBuilder]::new(16); if ([WslRegionProof.Native]::GetUserDefaultGeoName($wslRegionBuffer, $wslRegionBuffer.Capacity) -eq 0) { throw [System.ComponentModel.Win32Exception]::new([System.Runtime.InteropServices.Marshal]::GetLastWin32Error()) }; $wslRegionBuffer.ToString()
 wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled
 wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'
 wsl.exe --list --verbose
@@ -636,7 +637,15 @@ Proof (path A, cloud-init provisioned the instance):
   ships and, while `useWindowsTimezone` was true when the instance started, links `/etc/localtime` to it at each
   instance start and again in a running instance when Windows' time zone changes (microsoft/WSL `91f161fa`, tag 3.0.1:
   `src/windows/common/helpers.cpp:358-413`, `src/linux/init/timezone.cpp:22-110`; the decision record cites both
-  paths). Record both outputs. On either path, a mismatch is recorded with both outputs and stops the run for review,
+  paths). The region command calls the same `GetUserDefaultGeoName` API under the Windows account that launches
+  `<Name>`; record its exact ISO 3166-1 alpha-2 or numeric UN M.49 result separately from both zone outputs, as
+  `windows_region`. A culture name or `Get-WinHomeLocation`'s numeric GeoID is not this mapping input. API failure
+  throws and stops W5 rather than substituting a region. This small PowerShell bridge follows Microsoft's
+  [native-API Add-Type pattern](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/5b129a73fbe761fc12516c5f9776700daa0aa8a4/reference/5.1/Microsoft.PowerShell.Utility/Add-Type.md#L200)
+  and [GetUserDefaultGeoName contract](https://github.com/MicrosoftDocs/sdk-api/blob/7b93b54da4b144f042bef2ed25aa902d58916dc4/sdk-api-src/content/winnls/nf-winnls-getuserdefaultgeoname.md#L54).
+  The CLDR pin is a reference mapping; Windows' shipped ICU data version is not established here. These sequential
+  reads must be repeated if the zone or region changes during the proof. On either path, a mismatch is recorded with
+  both outputs and stops the run for review,
   without the failed-proof recovery below: WSL leaves `/etc/localtime` unchanged when the Windows-to-IANA mapping is
   empty (`Windows to Linux timezone mapping was not possible.`, `timezone.cpp:54-58`) or the image lacks the zone's
   file (`... not found. Is the tzdata package installed?`, `:66-70`). The remedy is to check the Windows region and
@@ -801,11 +810,18 @@ printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-defaul
 chmod 0440 /etc/sudoers.d/90-wsl-default-user
 visudo -cf /etc/sudoers.d/90-wsl-default-user
 grep -q '^\[user\]' /etc/wsl.conf || printf '\n[user]\ndefault=%s\n' '<WSL_USER>' >> /etc/wsl.conf
-grep -q '^\[time\]' /etc/wsl.conf || printf '\n[time]\nuseWindowsTimezone=true\n' >> /etc/wsl.conf
+python3 -c 'import configparser, io; from pathlib import Path; p = Path("/etc/wsl.conf"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else ""); c.has_section("time") or c.add_section("time"); c.set("time", "useWindowsTimezone", "true"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' || exit "$?"
 touch /etc/cloud/cloud-init.disabled
 ```
 
-The last line writes the marker the official first-run command writes after cloud-init. `/etc/wsl.conf` takes effect at
+The Python command updates the actual key when `[time]` already exists, including `false` or a missing key, and adds
+the section only when absent. It uses the maintained standard-library
+[ConfigParser read/set/write API](https://github.com/python/cpython/blob/v3.13.16/Doc/library/configparser.rst),
+preserves other section values and key case, and writes compact `key=value` text. Its INI serialization normalizes
+formatting and drops comments; malformed or duplicate-section input fails before writing and exits the root block
+before the completion marker. This is a provisioning
+step, not a host command to run during a paper session. The last line writes the marker the official first-run
+command writes after cloud-init. `/etc/wsl.conf` takes effect at
 the next start, so terminate the new distribution only and wait until it is no longer running:
 
 ```powershell

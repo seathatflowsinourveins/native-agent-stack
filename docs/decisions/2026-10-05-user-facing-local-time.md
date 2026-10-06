@@ -28,8 +28,8 @@ UTC timeline across hosts and clients.
 1. **One instruction sentence at user level, in both clients, with one wording:**
 
    > When you tell the user a time, give it first in the host's local time zone (read it with `timedatectl` or
-   > `date`), with UTC beside it, for example "4:00 PM EDT (20:00Z)"; keep UTC in ledger rows, receipts, evidence and
-   > commits.
+   > `date`), with UTC beside it, for example "4:00 PM EDT (20:00Z)". Write timestamps in ledger rows, receipts, evidence
+   > and commit messages in UTC (RFC 3339 with `Z`); Git author/committer metadata retains its native format.
 
    - **Claude.** [`examples/claude-native/CLAUDE.md`](../../examples/claude-native/CLAUDE.md) carries it as a Core rule
      bullet after the concise-handoff bullet, the existing rule about reporting to the user.
@@ -42,7 +42,8 @@ UTC timeline across hosts and clients.
      [three-surface record](2026-09-30-rule-text-every-layer.md) requires all three surfaces only for the standing
      clauses that `StandingRuleSurfacesTests.SHARED` lists; its one-wording rule still holds here, on both client
      templates and both carriers, and a new test in that class checks it. The sentence is a display rule (how an agent
-     words a time it tells the user) plus a records rule (UTC in ledger rows, receipts, evidence and commits). The user
+      words a time it tells the user) plus a records rule (UTC timestamps in ledger rows, receipts, evidence and commit
+      messages; Git metadata keeps its native format). The user
      keeps both at user level, the level both clients document for a person's standing working agreements:
      - Claude's memory documentation lists `~/.claude/CLAUDE.md` as "Personal preferences for all projects".
      - The Codex guide puts persistent defaults in the Codex home "so every repository inherits your working
@@ -54,7 +55,9 @@ UTC timeline across hosts and clients.
 2. **The recipe writes WSL's time-zone default explicitly.**
    - **Path A.** The cloud-init user-data appends `[time]` with `useWindowsTimezone=true` to `/etc/wsl.conf`, before
      `[user]`.
-   - **Path B.** W6 appends the same key when `/etc/wsl.conf` has no `[time]` section.
+   - **Path B.** W6 uses Python's maintained ConfigParser read/set/write API to set the actual key to `true`, updating
+     an existing `false` value or missing key and adding `[time]` only if absent. It preserves other section values and
+     key case, with INI formatting/comments normalized on serialization.
    - **Read-back.** W5 reads the key back, and the first-boot checklist and the recipe record's command table follow.
    - **The source.** Microsoft documents the key as a boolean that defaults to `true`: "Setting this key will make WSL use
      and sync to the timezone set in Windows." The WSL 3.0.1 source holds the same default (Sources).
@@ -79,7 +82,12 @@ UTC timeline across hosts and clients.
      first run.
    - **Claude Code's UI clock.** Claude Code's own UI times follow the system zone by default (below), so they show the
      Windows zone while the distribution follows it.
-3. **Records stay UTC.** Ledger rows, receipts, evidence and commits keep UTC, written as RFC 3339 date-times with `Z`.
+3. **Recorded timestamps stay UTC.** Timestamps written in ledger rows, receipts, evidence and commit messages use
+   RFC 3339 date-times with `Z`. This implementation scope does not alter Git author/committer dates: Git stores those
+   as Unix seconds plus a numeric UTC offset, and preserves original authorship when reusing commits. It is not a
+   claim that a Git commit object stores RFC 3339 text. See Git 2.53.0's
+   [date formats](https://github.com/git/git/blob/v2.53.0/Documentation/date-formats.adoc#L4) and
+   [authorship reuse](https://github.com/git/git/blob/v2.53.0/Documentation/git-commit.adoc#L81).
 
 ## Alternatives considered
 
@@ -199,9 +207,11 @@ sentence is 227 bytes. The budget record has a dated addendum pointing here.
   the text between the managed markers and keeps every byte outside them (`tools/adoption/managed_block.py:106-113`),
   so the user's own dated rule after the end markers stays, and the rule loads twice on NativeStack2604 until the user
   decides. Whether to remove the user's copy is the user's call; this change does not touch it.
-- **Open for the user.** Whether "commits" in the records half covers git's own author and committer dates, which these
-  hosts write with the local numeric offset (for example `-0400`), is the user's decision. This record does not
-  decide it.
+- **Commit scope clarified in the review repair.** The managed records sentence covers timestamps written in commit
+  messages/text. Native Git author/committer metadata keeps its Unix-time-plus-offset format (for example `-0400`);
+  this patch supplies no metadata override or history rewrite. A future requirement to normalize metadata offsets
+  needs a separate user decision and a mechanism that preserves original author instants. This narrows the
+  implementation's previously ambiguous term; it is not a new assertion of the user's intent about metadata.
 - **The experiment's frozen inputs.** The WSL image experiment
   (`blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json`) froze four files that this change
   edits. Their recorded bytes moved to `evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/` with
