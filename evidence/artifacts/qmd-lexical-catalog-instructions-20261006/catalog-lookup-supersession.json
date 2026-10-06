@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "evidence_class": "structural-validation",
+  "decision": "docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md",
+  "source": {
+    "command_center_item": "task-ns2604-coop-20261006T224125Z",
+    "ruling": "local-models-rulings-wf_96bbdf83-4f5.json",
+    "ruling_locator": "syn.apply[7].step",
+    "ruling_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a"
+  },
+  "supersedes": {
+    "file": "tests/fixtures/harness-context-moves/04.txt",
+    "contract": "tests/fixtures/harness-context-moves/contracts.json",
+    "bytes": 499,
+    "sha256": "63371ccabaa9fd58734c55a114f7c4cfd4ad30c12126d513429b70a94c1e9b73",
+    "retained_unchanged": true
+  },
+  "replacement": {
+    "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/catalog-lookup.txt",
+    "to": "docs/token-session-handbook.md",
+    "heading": "## Catalog lookup",
+    "bytes": 708,
+    "sha256": "12baacd98b8f20f8ce22a9d35c2897ee8c4fbcd482b6f52bc143ea51a4a93301"
+  },
+  "limits": [
+    "The replacement is a source-backed current instruction, not an executed catalog cutover.",
+    "The original passage and its frozen contract remain historical evidence and are not rewritten."
+  ]
+}

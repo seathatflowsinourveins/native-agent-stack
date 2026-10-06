@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "unit": "qmd-lexical-catalog-instructions",
+  "lane": "foundation",
+  "base": "f0d1c6d04e4e2ee309151b3a8800a05803f4877a",
+  "decision": "docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md",
+  "evidence_class": [
+    "source-review",
+    "local-integration-check",
+    "structural-validation"
+  ],
+  "sources": [
+    {
+      "repository": "tobi/qmd",
+      "pin": "v2.8.3",
+      "path": "src/mcp/server.ts",
+      "lines": "294-296,321-335,412-413",
+      "claim": "Typed lexical searches with reranking disabled, named collections and bounded document retrieval."
+    },
+    {
+      "repository": "giancarloerra/SocratiCode",
+      "pin": "v1.15.0",
+      "path": "src/index.ts",
+      "lines": "138-146",
+      "claim": "Semantic codebase_search accepts an optional absolute projectPath; the local rule makes it explicit."
+    },
+    {
+      "repository": "giancarloerra/SocratiCode",
+      "pin": "v1.15.0",
+      "path": "README.md",
+      "lines": "1325",
+      "claim": "Markdown is a supported indexing extension."
+    },
+    {
+      "command_center_item": "task-ns2604-coop-20261006T224125Z",
+      "ruling": "local-models-rulings-wf_96bbdf83-4f5.json",
+      "locator": "syn.apply[7].step",
+      "sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "claim": "The user assigns keyword retrieval to QMD and meaning-based catalog retrieval to codebase_search; no qmd embed or qmd pull."
+    }
+  ],
+  "readback": {
+    "native_renderer": "tools/adoption/managed_block.py:169-181,184-197",
+    "native_f4_extractor": "tools/adoption/codex_roles.py:286-290",
+    "codex_user_instructions_match_render": true,
+    "all_ten_role_copies_retain_base_f4": true,
+    "rtk_exception_count": 7,
+    "role_models_effort_and_non_instruction_keys_preserved": true,
+    "verifier_and_three_worker_roles_byte_identical_to_base": true,
+    "historical_client_configuration_record_unchanged_and_matches": true,
+    "compact_template_bytes": 7758,
+    "rendered_template_bytes": 8824,
+    "top_rule_sha256": "45d8c0bf1c1168c7d3d8128b0c6502b7bbbd736adba1b3811808879edc1ad95c",
+    "catalog_passage_supersession": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/catalog-lookup-supersession.json"
+  },
+  "retained_failed_attempts": [
+    {
+      "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_codex_agents tests.test_codex_roles tests.test_managed_block tests.test_install_claude_profile tests.test_new_wsl_client_config.RecordTests",
+      "exit_code": 1,
+      "tests": 210,
+      "failures": 5,
+      "errors": 1,
+      "skips": 1,
+      "cause": "Three stale hook digests caused four failures and one error; the frozen04.txt relocation assertion caused the remaining failure.",
+      "correction": "Refresh hook checksums; add a new linked supersession snapshot and verify both historical and replacement bytes without rewriting historical evidence."
+    },
+    {
+      "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_codex_worker_lane",
+      "exit_code": 1,
+      "tests": 123,
+      "failures": 2,
+      "skips": 12,
+      "cause": "The changed top-rule text needed its new independent digest and the literal configured qmd server marker.",
+      "correction": "Retain the server marker and refresh the digest and descriptive byte counts; preserve all assertions."
+    }
+  ],
+  "qualification": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_codex_agents tests.test_codex_roles tests.test_managed_block tests.test_install_claude_profile tests.test_new_wsl_client_config.RecordTests tests.test_codex_worker_lane",
+    "umask": "022",
+    "exit_code": 0,
+    "tests": 333,
+    "skips": 13,
+    "class": "local-integration-check",
+    "raw_logs": "Retained privately under the lane's durable coordination directory; no private paths or raw output are published."
+  },
+  "host_changes": false,
+  "limits": [
+    "No model inference, QMD operation, embedding, index build, download, installation or configuration apply occurred.",
+    "Instruction text does not grant a tool to a role that lacks it; the coordinator supplies a missing retrieval prerequisite.",
+    "These checks prove repository consistency, not native retrieval quality, first-turn MCP availability, organic use or token savings.",
+    "The configuration owner applies and reads back the client cutover after the instruction PR and its base land.",
+    "Historical receipts, decisions,04.txt and its frozen relocation contract are unchanged."
+  ]
+}
