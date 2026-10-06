@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "jcodemunch-1108327-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "jcodemunch-mcp"
+  ],
+  "claim": "The recorded version command printed \"jcodemunch-mcp 1.108.327\" (exit 0); the recorded get_session_stats smoke returned \"visible_tools\":6, \"catalog_tools\":94, \"schema_tokens_visible\":1050 and \"schema_tokens_catalog\":27880 (exit 0).",
+  "limitations": [
+    "Only get_session_stats and schema listing ran at 1.108.327; index_folder, search_symbols and get_symbol_source were not repeated.",
+    "The recorded integrity_source says \"The Sigstore signature and certificate chain were NOT verified\".",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "1.108.319",
+    "version": "1.108.327",
+    "source": {
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "tag": "v1.108.327",
+      "commit": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+      "published_at": "2026-10-02T18:21:53Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "PyPI wheel (bdist_wheel, py3-none-any, 1734964 bytes); PyPI lists one wheel and one sdist for 1.108.327; downloaded to <qualification-root>/jcodemunch-mcp/jcodemunch_mcp-1.108.327-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/5f/0a/7027d053796993db79ccf341b6f4a5e00be3b8cb23eb81f7aef525dd8a08/jcodemunch_mcp-1.108.327-py3-none-any.whl",
+      "sha256": "9e2f639456e740a9497f4f238d095c9b995d54074edf01d9c61cf3517afcf88a",
+      "integrity_checked": true,
+      "integrity_source": "Local sha256sum of the download equals four published values: (1) PyPI JSON API https://pypi.org/pypi/jcodemunch-mcp/1.108.327/json urls[].digests.sha256; (2) PyPI Simple API JSON https://pypi.org/simple/jcodemunch-mcp/ files[].hashes.sha256; (3) GitHub release asset digest sha256:9e2f...f88a (gh api repos/jgravelle/jcodemunch-mcp/releases/tags/v1.108.327, assets[].digest); (4) the PEP 740 publish-attestation statement subject digest at https://pypi.org/integrity/jcodemunch-mcp/1.108.327/jcodemunch_mcp-1.108.327-py3-none-any.whl/provenance (publisher GitHub jgravelle/jcodemunch-mcp, workflow release.yml, environment pypi). Size 1734964 equals the PyPI size; a re-hash after the install was identical. The Sigstore signature and certificate chain were NOT verified (no verifier was run)."
+    },
+    "install_recorded": {
+      "command": "env HOME=<qualification-root>/jcodemunch-mcp/home UV_CACHE_DIR=<qualification-root>/jcodemunch-mcp/uv-cache UV_PYTHON_DOWNLOADS=never UV_TOOL_DIR=<qualification-root>/jcodemunch-mcp/prefix/python-tools UV_TOOL_BIN_DIR=<qualification-root>/jcodemunch-mcp/prefix/bin uv --no-config --directory <qualification-root>/jcodemunch-mcp tool install --python 3.13 --default-index https://pypi.org/simple <qualification-root>/jcodemunch-mcp/jcodemunch_mcp-1.108.327-py3-none-any.whl",
+      "exit": 0,
+      "prefix": "<qualification-root>/jcodemunch-mcp/prefix"
+    },
+    "version_recorded": {
+      "command": "env HOME=<qualification-root>/jcodemunch-mcp/home <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --version",
+      "exit": 0,
+      "output": "jcodemunch-mcp 1.108.327"
+    },
+    "smoke_recorded": {
+      "ran": true,
+      "command": "env HOME=<qualification-root>/jcodemunch-mcp/home mcporter call --stdio <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --env CODE_INDEX_PATH=<qualification-root>/jcodemunch-mcp/code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --cwd <qualification-root>/jcodemunch-mcp --name jcodemunch --server jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+      "exit": 0,
+      "output_excerpt": "{\"session_tokens_saved\":0,\"session_calls\":0,\"total_tokens_saved\":0,\"total_tokens_saved_basis\":{\"generation\":2,\"first_generation\":2,\"mixed_basis\":false},\"processes\":{\"live\":1,\"others\":0},\"tool_surface\":{\"surface\":\"counter\",\"profile\":\"full\",\"visible_tools\":6,\"catalog_tools\":94,\"schema_tokens_visible\":1050,\"schema_tokens_catalog\":27880,\"schema_tokens_avoided\":26830,\"heaviest_tools\":{\"order\":260,\"route\":229,\"announce_model\":161,\"jcodemunch_guide\":147,\"menu\":128,\"set_tool_tier\":125}}} (mcporter 0.14.1; <scratch>/code-index/last_seen_version = 1.108.327; no scratch-prefix process remained: pgrep -af '[c]urrency-wave/jcodemunch-mcp' exit 1)"
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.263923+00:00",
+          "ended_at": "2026-10-03T05:50:26.552288+00:00",
+          "stdout_sha256": "23c0e08651dc4c28954690f0b7388ff807791f7ae15371fe1db2ee53b85235c8",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.552568+00:00",
+          "ended_at": "2026-10-03T05:50:26.804972+00:00",
+          "stdout_sha256": "b9189cd5b951b56a22995a6d1579ff471021364848956e7d548bff0bce16b9fd",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.805286+00:00",
+          "ended_at": "2026-10-03T05:50:27.105086+00:00",
+          "stdout_sha256": "58f7af21d83244862c88609a8ecadba60bfb001f3cebbe788c371fe6a51a17bf",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/v1.108.327",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.105452+00:00",
+          "ended_at": "2026-10-03T05:50:27.407841+00:00",
+          "stdout_sha256": "58f7af21d83244862c88609a8ecadba60bfb001f3cebbe788c371fe6a51a17bf",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v1.108.327",
+        "published_at": "2026-10-02T18:21:53Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "committed_at": "2026-10-02T18:09:09Z"
+      },
+      "latest_release_source": {
+        "ref": "v1.108.327",
+        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "committed_at": "2026-10-02T18:09:09Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_checks_ref": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "9e2f639456e740a9497f4f238d095c9b995d54074edf01d9c61cf3517afcf88a",
+      "bytes": 1734964,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

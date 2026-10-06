@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "id": "mcporter-0142-qualification-20261003",
+  "kind": "compatibility_attempt",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "mcporter"
+  ],
+  "claim": "mcporter 0.14.2 remains an unaccepted compatibility attempt: version and an ad-hoc stdio canary passed, but npm ls --all returned ELSPROBLEMS (bundled core 2.2.0 beside resolved server 2.3.0). The persistent daemon and serve roles used by foundation-cpu and token-efficiency were not qualified. The selected Linux pin remains 0.14.1; the independently held macOS pin remains 0.13.13.",
+  "limitations": [
+    "The original documented host-config smoke is \"NOT RUN\"; the ad-hoc stdio canary is evidence for the hold only and does not establish daemon or serve acceptance.",
+    "No daemon restart/recovery, mixed-version daemon, OAuth, Windows retry, serve operation or upstream test suite was exercised.",
+    "The judge records npm ls --all ELSPROBLEMS from bundled core 2.2.0 beside resolved server 2.3.0; the canary covers client stdio calls, not serve.",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "0.14.1",
+    "version": "0.14.2",
+    "source": {
+      "repository": "https://github.com/openclaw/mcporter",
+      "tag": "v0.14.2",
+      "commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+      "published_at": "2026-10-01T18:24:07Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
+      "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+      "integrity_checked": true,
+      "integrity_source": "Checked against four published sources, all matched. (1) npm registry version metadata https://registry.npmjs.org/mcporter/0.14.2: dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== equals `openssl dgst -sha512 -binary | base64` of the downloaded tarball, and dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd equals sha1sum. (2) GitHub release v0.14.2 asset digest sha256:f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b for mcporter-0.14.2.tgz equals the local sha256sum; the release checksums.txt line matches (sha256sum -c: OK, exit 0); the release asset is byte-identical to the npm tarball (cmp exit 0); size 3585823 bytes. (3) npm SLSA provenance attestation (https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.2): subject sha512 dda8e32b...8725 equals the tarball sha512 hex, workflow .github/workflows/release.yml at refs/tags/v0.14.2, gitCommit aa0f55f9bffcde9d2070c86145f37d4dd3525f6c; the release provenance.json asset also names commit aa0f55f9 and the tgz sha256. (4) `npm audit signatures` exit 0: audited 40 packages, 40 verified registry signatures, 12 verified attestations."
+    },
+    "install_recorded": {
+      "command": "S=<qualification-root>/mcporter; env -i HOME=$S/<scratch-home> PATH=<host-prefix>/bin:/usr/bin:/bin npm install --global --prefix $S/prefix --cache $S/npm-cache --userconfig $S/<scratch-home>/.npmrc --globalconfig $S/<scratch-home>/.npmrc-global --no-audit --no-fund --no-update-notifier $S/mcporter-0.14.2.tgz   (installs from the verified local tarball, the same file-based route manifests/evidence.json:3164 records for 0.14.1; spec form is `npm install --global --prefix <dir> mcporter@0.14.2` per recipes/README.md:100; it was run via `rtk proxy` with output `added 28 packages in 8s`)",
+      "exit": 0,
+      "prefix": "<qualification-root>/mcporter/prefix"
+    },
+    "version_recorded": {
+      "command": "S=<qualification-root>/mcporter; env -i HOME=$S/<scratch-home> PATH=<host-prefix>/bin:/usr/bin:/bin $S/prefix/bin/mcporter --version   (the row's version_probe is `mcporter --version`, adoption/pins-linux-x86_64.json:137-142)",
+      "exit": 0,
+      "output": "0.14.2"
+    },
+    "smoke_recorded": {
+      "command": "mcporter --config \"${MCPORTER_CONFIG}\" list socraticode --brief --no-oauth",
+      "exit": -1,
+      "output_excerpt": "NOT RUN; exit -1 is a placeholder because no process ran. The row's documented smoke command (manifests/stack.json (component id mcporter, JSON pointer /commands)) needs the host MCPORTER_CONFIG ($STACK_HOME/config/mcporter.json, recipes/README.md:29), which the task forbids touching, and a live `socraticode` MCP server; prior evidence records that a mcporter call started a daemon (manifests/evidence.json:3164), which the task forbids. Extra offline checks (not the smoke): `mcporter --help` exit 0, 57 lines, showing `--log-level <debug|info|warn|error>  Adjust CLI logging (defaults to warn)`; importing dist/serve.js exit 0.",
+      "ran": false
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/openclaw/mcporter",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.642381+00:00",
+          "ended_at": "2026-10-03T05:50:27.993166+00:00",
+          "stdout_sha256": "99540d98c8f7c763f29d150f85aa20c4d907a8ba1e893de4a6feffda56012988",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openclaw/mcporter/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.993405+00:00",
+          "ended_at": "2026-10-03T05:50:28.250033+00:00",
+          "stdout_sha256": "0f03fb3adf27eec7af988468fb21576aa6aba61ed00e7deab129f6e82c24c68e",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openclaw/mcporter/commits/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.250309+00:00",
+          "ended_at": "2026-10-03T05:50:28.570581+00:00",
+          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openclaw/mcporter/commits/v0.14.2",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.571161+00:00",
+          "ended_at": "2026-10-03T05:50:28.896720+00:00",
+          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.14.2",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_checks_ref": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+      "bytes": 3585823,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    },
+    "command_sanitization": "Restored from the hashed W1-moves.json packet. Qualification and host prefixes remain distinct; scratch HOME path segments use <scratch-home>, retaining all child paths including separate npm user/global config files and XDG directories.",
+    "adoption_status": "held_not_selected",
+    "overturn_condition": "A consistent resolved dependency tree (npm ls --all succeeds) and qualified persistent daemon/serve role, including use, restart and recovery, in an isolated prefix.",
+    "r642b_timed_command_refs": [
+      "evidence/artifacts/currency-wave-w1-20261003/native-checks.json#/commands/mcporter-call-r642b-timed"
+    ],
+    "r642b_dependency_tree_check": {
+      "command": "npm ls --global --prefix <qualification-root>/mcporter/prefix --all --json",
+      "environment": {
+        "HOME": "<repair-scratch>/home",
+        "NPM_CONFIG_CACHE": "<repair-scratch>/npm-cache",
+        "NPM_CONFIG_USERCONFIG": "<repair-scratch>/npm-user.ini",
+        "NPM_CONFIG_GLOBALCONFIG": "<repair-scratch>/npm-global.ini",
+        "NPM_CONFIG_OFFLINE": "true"
+      },
+      "exit_code": 1,
+      "started_at_utc": "2026-10-03T08:16:49Z",
+      "ended_at_utc": "2026-10-03T08:16:50Z",
+      "returned_json_problems": [
+        "invalid: @modelcontextprotocol/core@2.2.0 <qualification-root>/mcporter/prefix/lib/node_modules/mcporter/node_modules/@modelcontextprotocol/core"
+      ],
+      "returned_stderr": "npm error code ELSPROBLEMS\nnpm error invalid: @modelcontextprotocol/core@2.2.0 <qualification-root>/mcporter/prefix/lib/node_modules/mcporter/node_modules/@modelcontextprotocol/core\nnpm error A complete log of this run can be found in: <repair-scratch>/npm-cache/_logs/2026-10-03T08_16_49_590Z-debug-0.log\n",
+      "stdout_sha256_original": "f1d26e61afa60d2757ae7a42f2df0f699df87a0b7e1ff0b7c0d2d861ed12a2ee",
+      "retained_stdout_fields": [
+        "problems"
+      ],
+      "scope": "Read-only native inspection of the W1 scratch install. This fresh ELSPROBLEMS output corroborates the hold; no dependency resolution or host installation was changed."
+    }
+  }
+}

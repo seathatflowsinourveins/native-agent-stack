@@ -90,9 +90,9 @@ FROZEN_LOCKS = {
     # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
     "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
         "config": FROZEN_CONFIG,
-        "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q"],
+        "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q", "GHSA-wq5f-xc86-pv6w"],
         "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
-        "evidence": "evidence/receipts/osv-frozen-macos-source-map-js-20261005.json",
+        "evidence": "evidence/receipts/sharp-0355-qualification-20261006.json",
     },
 }
 

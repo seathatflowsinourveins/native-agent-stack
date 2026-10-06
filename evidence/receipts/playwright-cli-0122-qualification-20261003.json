@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "playwright-cli-0122-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "playwright-cli"
+  ],
+  "claim": "The recorded version command printed \"0.1.22\" (exit 0); the help smoke printed \"Usage: playwright-cli <command> [args] [options]\" and \"--version                   print version\" (exit 0).",
+  "limitations": [
+    "The recorded help smoke is installation/help evidence; no browser E2E or upstream npm test ran at 0.1.22. Bundled Playwright remains 1.64.0-alpha-1790635538000.",
+    "The recorded smoke notes an anonymous update-check GET and cli-update-check.json under the overridden HOME.",
+    "The recorded integrity_source says \"Registry signatures and attestation were not cryptographically verified\".",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+    "version": "0.1.22; Playwright 1.64.0-alpha-1790635538000",
+    "source": {
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "tag": "v0.1.22",
+      "commit": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+      "published_at": "2026-09-28T23:23:13Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "npm_tarball",
+      "url": "https://registry.npmjs.org/@playwright/cli/-/cli-0.1.22.tgz",
+      "sha256": "bb4840be17006e2b7ba856224dc3062f6571d5f647352476f95c5e77ff5d679a",
+      "integrity_checked": true,
+      "integrity_source": "npm registry version manifest https://registry.npmjs.org/%40playwright%2Fcli/0.1.22: dist.integrity sha512-6WMkQNM4VEzqMkdr/l60X9Cr7i+tI/arK87IWz2K7pB6j8I2ZJ8KN+1JfhJDLnK+SXnab6Op8xGt4adcGLsyfA== and dist.shasum 8f4bb69e84084f1fabcb4ba08f491f7e16894a06 both equal the local tarball digests (35464 bytes; 16 files = dist.fileCount). Local sha512 hex also equals the npm provenance attestation subject digest (https://registry.npmjs.org/-/npm/v1/attestations/@playwright%2fcli@0.1.22). The sha256 is a local rehash because npm publishes no sha256, the same basis as the 0.1.21 pin (adoption/new-wsl-profile.json:1010 integrity_observation downloaded_and_rehashed). Registry signatures and attestation were not cryptographically verified (npm audit signatures not run)."
+    },
+    "install_recorded": {
+      "command": "npm install --prefix <qualification-root>/playwright-cli/prefix --cache <qualification-root>/playwright-cli/npm-cache --userconfig /dev/null --no-audit --no-fund <qualification-root>/playwright-cli/cli-0.1.22.tgz",
+      "exit": 0,
+      "prefix": "<qualification-root>/playwright-cli/prefix"
+    },
+    "version_recorded": {
+      "command": "cd <qualification-root>/playwright-cli && HOME=<qualification-root>/playwright-cli/home <qualification-root>/playwright-cli/prefix/node_modules/.bin/playwright-cli --version",
+      "exit": 0,
+      "output": "0.1.22"
+    },
+    "smoke_recorded": {
+      "command": "cd <qualification-root>/playwright-cli && HOME=<qualification-root>/playwright-cli/home <qualification-root>/playwright-cli/prefix/node_modules/.bin/playwright-cli --help",
+      "exit": 0,
+      "ran": true,
+      "output_excerpt": "playwright-cli - run playwright mcp commands from terminal\n\nAgent skill: prefix/node_modules/playwright-core/lib/tools/skills/playwright-cli/SKILL.md\n\nUsage: playwright-cli <command> [args] [options]\nUsage: playwright-cli -s=<session> <command> [args] [options]\n\nCore:\n  open [url]                  open the browser\n  attach [name]               attach to a running playwright browser\n  ...(elided; groups Navigation, Keyboard, Mouse, Save as, Tabs, Storage, Emulation, Network, DevTools, WebMCP, Install, Browser sessions)...\nGlobal options:\n  --help [command]            print help\n  --json                      output response as JSON\n  --raw                       output only the result value, without status and code\n  --version                   print version\n[caveat, see notes item 5: the wrapper also did an anonymous update-check GET to registry.npmjs.org and wrote cli-update-check.json under the overridden HOME]"
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/microsoft/playwright-cli",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.264446+00:00",
+          "ended_at": "2026-10-03T05:50:26.717410+00:00",
+          "stdout_sha256": "8c6f21427cb3061d2ffc77ebfc71bdb48d29bf3515685cda75095a9a154d13c7",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/microsoft/playwright-cli/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.717640+00:00",
+          "ended_at": "2026-10-03T05:50:26.989657+00:00",
+          "stdout_sha256": "c33eb616038124751bfa29d1f54150323a86286afb4af42758ec5da356ec8e0b",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/microsoft/playwright-cli/commits/b85c7a736bb473bf55b584e54a09ffa698d6d871",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.989873+00:00",
+          "ended_at": "2026-10-03T05:50:27.302466+00:00",
+          "stdout_sha256": "8cc4e442825d47fc09f93f03448b81645efaa13090851c4226e07aff72a1f864",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/microsoft/playwright-cli/commits/v0.1.22",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.302725+00:00",
+          "ended_at": "2026-10-03T05:50:27.642073+00:00",
+          "stdout_sha256": "8cc4e442825d47fc09f93f03448b81645efaa13090851c4226e07aff72a1f864",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v0.1.22",
+        "published_at": "2026-09-28T23:23:13Z",
+        "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "html_url": "https://github.com/microsoft/playwright-cli/commit/b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "committed_at": "2026-09-28T23:22:31Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.1.22",
+        "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "html_url": "https://github.com/microsoft/playwright-cli/commit/b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "committed_at": "2026-09-28T23:22:31Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "bb4840be17006e2b7ba856224dc3062f6571d5f647352476f95c5e77ff5d679a",
+      "bytes": 35464,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

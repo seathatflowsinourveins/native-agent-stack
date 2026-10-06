@@ -285,13 +285,12 @@ mcporter() {
 agent-messaging() {
   # hcom@v0.7.27; cross-client transport only.
   copy_config 'hcom-client-config.py' || return "$?"
-  copy_config 'hcom-deny.rules' || return "$?"
   # Source: https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27
   run_command 'fetch_verified https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98 "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
   # Source: https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh
   run_command 'HCOM_INSTALL_DIR="$HOME/.local/bin" HCOM_NO_MODIFY_PATH=1 sh "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
-  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465
-  run_command 'python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --apply' || return "$?"
+  # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/config.rs#L126
+  run_command 'python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --apply' || return "$?"
 }
 
 sandbox-runtime-srt() {
@@ -528,10 +527,10 @@ output-compression() {
 }
 
 code-index() {
-  # jcodemunch-mcp 1.108.319 | uv-tool | planned
+  # jcodemunch-mcp 1.108.327 | uv-tool | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91 (uv tool install jcodemunch-mcp); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L523 (the pin, --python 3.13 and the ecosystem root)
-  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.319' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91 (uv tool install jcodemunch-mcp); https://github.com/seathatflowsinourveins/native-agent-stack/blob/f640b53094ed4de5a526cda44d6341de9598df30/recipes/README.md#L554-L560 (--python 3.13, the selected pin, UV_TOOL_DIR/UV_TOOL_BIN_DIR under the ecosystem root, and --version); manifests/stack.json (jcodemunch-mcp 1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (recorded W1 qualification and limitations; this plan row remains UNRUN)
+  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.327' || return "$?"
 }
 
 code-graph() {
@@ -1019,7 +1018,7 @@ if $list; then
   printf '%s\n' 'statusline | claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned'
   printf '%s\n' 'command-output | RTK 0.51.0 | release-binary | planned'
   printf '%s\n' 'output-compression | Headroom 0.37.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned'
-  printf '%s\n' 'code-index | jcodemunch-mcp 1.108.319 | uv-tool | planned'
+  printf '%s\n' 'code-index | jcodemunch-mcp 1.108.327 | uv-tool | planned'
   printf '%s\n' 'code-graph | codebase-memory-mcp 0.11.0 | release-binary | planned'
   printf '%s\n' 'repo-packing | Repomix 1.18.1 | none | planned'
   printf '%s\n' 'structured-data | TOON 4.1.1 (@toon-format/cli) | none | planned'

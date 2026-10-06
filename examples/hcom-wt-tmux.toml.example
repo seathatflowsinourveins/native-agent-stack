@@ -1,0 +1,4 @@
+[terminal.presets.wt-tmux]
+open = ['/bin/sh', '-c', 'cd /mnt/c/Windows/System32 && exec "$0" "$@"', '/mnt/c/Users/<WINDOWS_USER>/AppData/Local/Microsoft/WindowsApps/wt.exe', '-w', '0', 'new-tab', '-p', 'NativeStack2604 - Codex', '--title', '{pane_title}', '--tabColor', '#0E7C86', 'wsl.exe', '-d', 'NativeStack2604', '-u', '<WSL_USER>', '--cd', '{cwd}', '--exec', '/usr/bin/tmux', '-L', 'hcom', '-f', '/home/<WSL_USER>/.config/tmux/hcom-lanes.conf', 'new-session', '-s', 'hcom-{process_id}', '-e', 'OTEL_RESOURCE_ATTRIBUTES=service.instance.id=hcom-{process_id},ecosystem.lane={instance_name}', '/bin/bash', '{script}']
+close = ['/usr/bin/tmux', '-L', 'hcom', 'kill-pane', '-t', '{pane_id}']
+pane_id_env = 'TMUX_PANE'

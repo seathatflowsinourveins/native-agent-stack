@@ -29,6 +29,7 @@ not live Claude execution, deployment acceptance or unchanged upstream tests.
 from __future__ import annotations
 
 import json
+import os
 import re
 import socket
 import subprocess
@@ -44,7 +45,11 @@ ROOT = Path(__file__).resolve().parents[1]
 COLLECTOR = ROOT / "observability/collector/collector.yaml"
 LOKI_CONFIG = ROOT / "observability/backends/templates/ecosystem-loki.yml.example"
 TOOLS = Path.home() / ".local/share/codex-ecosystem/tools"
-OTELCOL = TOOLS / "otelcol-0.161.0/otelcol-contrib"
+OTELCOL_VERSION = next(component["version"] for component in
+                       json.loads((ROOT / "manifests/stack.json").read_text())["components"]
+                       if component["id"] == "opentelemetry-collector-contrib")
+OTELCOL = Path(os.environ.get("OTELCOL_TEST_BIN", str(TOOLS /
+               f"otelcol-{OTELCOL_VERSION}/otelcol-contrib")))
 LOKI = TOOLS / "ecosystem-loki-3.7.8/loki-linux-amd64"
 
 try:
@@ -156,7 +161,7 @@ def otlp_attributes(values):
 
 
 @unittest.skipUnless(yaml and OTELCOL.exists() and LOKI.exists(),
-                     "requires PyYAML, otelcol-contrib 0.161.0 and Loki 3.7.8 at documented paths")
+                     f"requires PyYAML, otelcol-contrib {OTELCOL_VERSION} and Loki 3.7.8; set OTELCOL_TEST_BIN for a scratch install")
 class NativeRunCorrelationTests(unittest.TestCase):
     """Synthetic OTLP -> native Collector -> native Loki, on isolated loopback ports."""
 

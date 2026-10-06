@@ -226,8 +226,24 @@ remove repeated REST polling; no blanket handshake quota exemption is assumed.
 The [market-data stream](https://docs.alpaca.markets/us/docs/streaming-market-data)
 normally allows one connection per endpoint, and slow consumers can be dropped.
 The pinned SDK already reconnects with jittered exponential backoff, closes
-half-open sockets and optionally detects muted stock streams; this adapter sets
-that watchdog and adds explicit ACK health. A small handshake protocol guard
+half-open sockets and optionally detects muted stock streams. This adapter adds
+explicit ACK health, and sets that mute watchdog (`data_timeout`, at the quote
+timeout) only for a regular-session run. A run that allows extended hours keeps
+the SDK default, which is off. The SDK documents that a legitimately quiet
+subscription would otherwise reconnect periodically. Each such close freezes
+health as `quotes_disconnected`, and the runners stop on any freeze reason other
+than stale quotes. Thin sessions produced that reconnect in trial
+`20260923-post-extended-hours`, which then stopped, and in Account 2's
+2026-10-06 recovery. The cost is that an extended-hours run, its
+regular-session part included, no longer reconnects a connected-but-mute
+socket, which ping/pong cannot detect. A persistently mute transport stays
+frozen on `quote_stale`, with no entry and no quote-priced exit, until a new
+transport is built. Recovery builds one only for residual positions or
+unresolved orders, and an accepted overnight hold skips it. Run receipts
+record the transport's terminal `stream_health`: frozen, reasons, fresh quotes
+and the selected `data_timeout_seconds`, where null is the SDK default. That
+view does not tell legitimate quiet from a mute socket. Freshness gating is
+unchanged: the `quote_stale` watchdog and the order-time quote age still apply. A small handshake protocol guard
 rejects WebSocket redirects before credentials can be sent to another endpoint.
 REST disables retries after construction (the pinned constructor ignores zero),
 environment proxies and redirects, with finite connect/read timeouts.
