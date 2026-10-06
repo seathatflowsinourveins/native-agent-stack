@@ -4088,29 +4088,62 @@ sys.exit(42 if fail else 0)
             self.assertEqual(child.stdout.strip(), str(allowed))
 
     def test_owned_old_agentsview_links_migrate_but_foreign_aliases_are_retained(self):
-        for foreign in (False, True):
-            with self.subTest(foreign=foreign), tempfile.TemporaryDirectory() as directory:
+        cases = (
+            ("old binary", "0.43.0", "agentsview", False),
+            ("old launcher", "0.43.0", "launcher", False),
+            ("current binary", "0.44.0", "agentsview", False),
+            ("current launcher", "0.44.0", "launcher", False),
+            ("foreign symlink", None, None, False),
+            ("regular aliases", None, None, True),
+        )
+        row = self.row("session-analytics")
+        self.assertEqual(row["release"], "v0.44.0")
+        self.assertIn("agentsview_0.44.0_linux_amd64.tar.gz", row["commands"][0])
+        self.assertIn("037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+                      row["commands"][0])
+        for name, version, executable, regular in cases:
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 eco = root / "eco"
-                owned = eco / "tools/agentsview-0.43.0"
-                owned.mkdir(parents=True)
-                (owned / "agentsview").write_text("binary fixture")
-                target = root / "foreign" if foreign else owned / "agentsview"
-                target.write_text("foreign fixture" if foreign else "binary fixture")
+                current = eco / "tools/agentsview-0.44.0"
+                foreign = version is None
+                target = root / "foreign" if foreign else eco / f"tools/agentsview-{version}" / executable
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("retained fixture")
                 aliases = (eco / "bin/agentsview", root / ".local/bin/agentsview")
                 for alias in aliases:
                     alias.parent.mkdir(parents=True, exist_ok=True)
-                    alias.symlink_to(target)
-                archive = eco / "downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz"
+                    if regular:
+                        alias.write_text("regular fixture")
+                    else:
+                        alias.symlink_to(target)
+                package = root / "release"
+                package.mkdir()
+                (package / "agentsview").write_text("current archive fixture")
+                (package / "agentsview").chmod(0o755)
+                archive = eco / "downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz"
                 archive.parent.mkdir(parents=True)
-                (owned / "agentsview").chmod(0o755)
-                subprocess.run(["tar", "-czf", str(archive), "-C", str(owned), "agentsview"], check=True)
-                result = subprocess.run(["bash", "-euo", "pipefail", "-c", self.row("session-analytics")["commands"][1]],
-                                        env={**os.environ, "HOME": str(root), "ECO_ROOT": str(eco), "plan_dir": str(PLAN)},
+                subprocess.run(["tar", "-czf", str(archive), "-C", str(package), "agentsview"], check=True)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", row["commands"][1]],
+                                        env={"PATH": os.environ["PATH"], "TMPDIR": str(root),
+                                             "HOME": str(root), "ECO_ROOT": str(eco), "plan_dir": str(PLAN)},
                                         capture_output=True, text=True, timeout=20)
                 self.assertEqual(result.returncode, 1 if foreign else 0, result.stderr)
                 for alias in aliases:
-                    self.assertEqual(alias.resolve(), target if foreign else owned / "launcher")
+                    if regular:
+                        self.assertFalse(alias.is_symlink())
+                        self.assertEqual(alias.read_text(), "regular fixture")
+                    else:
+                        self.assertEqual(alias.resolve(), target if foreign else current / "launcher")
+                if foreign:
+                    self.assertEqual(target.read_text(), "retained fixture")
+                    self.assertFalse((current / "agentsview").exists(), "Foreign refusal extracted the archive")
+                else:
+                    self.assertEqual((current / "agentsview").read_text(), "current archive fixture")
+                    self.assertEqual((current / "launcher").read_bytes(),
+                                     (PLAN / "config/agentsview.sh").read_bytes())
+                    if version == "0.43.0":
+                        self.assertEqual(target.read_text(), "retained fixture")
 
 
     def test_inspector_probe_rejects_env_drift_and_port_collision_and_cleans_up(self):

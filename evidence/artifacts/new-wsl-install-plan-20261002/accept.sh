@@ -880,15 +880,15 @@ session-analytics() {
   # G5 plan repair 2026-10-04; upstream operations with local artifact assertions.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/cli.go#L870
+      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/cli.go#L831
       check session-analytics smoke 'a="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
 v="$("$a" --version)"
-[[ "$v" == "agentsview v0.43.0 "* ]]
-cmp -s "$plan_dir/config/agentsview.sh" "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/agentsview-0.43.0/launcher"
+[[ "$v" == "agentsview v0.44.0 "* ]]
+cmp -s "$plan_dir/config/agentsview.sh" "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/agentsview-0.44.0/launcher"
 [[ "$(readlink -f "$HOME/.local/bin/agentsview")" == "$(readlink -f "$a")" ]]'
       ;;
     service_health)
-      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md#L40
+      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/README.md#L53
       check session-analytics smoke 'a="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
 umask 077
 state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/session-analytics"
@@ -906,7 +906,7 @@ for agent in claude codex; do
 done'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/session_get.go#L21
+      # Kind: smoke; Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/session_get.go#L21
       check session-analytics smoke 'a="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
 : "${AGENTSVIEW_ACCEPT_CLAUDE_ID:?Supply the canonical ID of the fresh Claude session}"
 : "${AGENTSVIEW_ACCEPT_CODEX_ID:?Supply the canonical ID of the fresh Codex session}"

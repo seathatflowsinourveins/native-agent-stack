@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "kind": "agentsview_release_and_native_probe",
+  "date_utc": "2026-10-06",
+  "observed_utc": "2026-10-06T15:59:13Z",
+  "evidence_classes": [
+    "source_review",
+    "local_integration",
+    "native_proven"
+  ],
+  "scope": "B2/CCitemtask-ns2604-coop-20261006T151719Z: exact stable release/native counters; no builds, local parser, client configuration or model calls.",
+  "release": {
+    "repository": "kenn-io/agentsview",
+    "tag": "v0.44.0",
+    "annotated_tag": "24ac704b3468386dbddc333853f81bc1cdb3a1b9",
+    "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+    "published_utc": "2026-09-21T13:56:12Z",
+    "stable": true,
+    "url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+    "verified_before_install": "gh api --cache120s owner/ref/tag/release queries; each rc0"
+  },
+  "integrity": {
+    "archive": "agentsview_0.44.0_linux_amd64.tar.gz",
+    "sha256": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "checksum_list_sha256": "83e253573ccb014c88f437264f934d69f022e42b315d4ef79df9463543567043",
+    "checksum_exit": 0,
+    "signature_sidecar_published": true,
+    "signature_verification": "not performed; only the two SHA256 comparisons were verified"
+  },
+  "supported_install": {
+    "source": "kenn-io/agentsview@413a87f7:scripts/install.sh:142-160",
+    "reason_for_direct_archive": "The tagged installer selects latest and default system/user bin roots (35-41,121), with no pin/private-prefix selector; reuse its native verification/extraction/placement steps.",
+    "prefix": "private durable state prefix",
+    "argv": [
+      [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--retry",
+        "3",
+        "https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz",
+        "--output",
+        "<private-prefix>/downloads/agentsview_0.44.0_linux_amd64.tar.gz"
+      ],
+      [
+        "sha256sum",
+        "--check",
+        "--ignore-missing",
+        "SHA256SUMS"
+      ],
+      [
+        "tar",
+        "-xzf",
+        "<archive>",
+        "-C",
+        "<private-prefix>/extracted"
+      ],
+      [
+        "mv",
+        "<private-prefix>/extracted/agentsview",
+        "<private-prefix>/bin/agentsview"
+      ],
+      [
+        "chmod",
+        "755",
+        "<private-prefix>/bin/agentsview"
+      ],
+      [
+        "<private-prefix>/bin/agentsview",
+        "--version"
+      ]
+    ],
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "version": "agentsview v0.44.0 (commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, built 2026-09-21T12:48:49Z)"
+  },
+  "archive_scope": {
+    "data_dir": "existing owned new-wsl-native-stack/agentsview archive",
+    "env": {
+      "AGENTSVIEW_TELEMETRY_ENABLED": "0",
+      "AGENTSVIEW_DISABLE_UPDATE_CHECK": "1",
+      "AGENTSVIEW_ARCHIVE_CONTENT": "usage"
+    },
+    "client_config_changed": false,
+    "default_alias_version_after_probe": "0.44.0; both guarded aliases now target tools/agentsview-0.44.0/launcher."
+  },
+  "migration": {
+    "trigger": "Requested native session tool-calls command in default daemon mode",
+    "native_autostart": true,
+    "manual_db_changes": false,
+    "daemon_version": "v0.44.0",
+    "daemon_host": "127.0.0.1",
+    "port": 21808,
+    "observed_status_exit": 0,
+    "full_resync_sessions": 2435,
+    "full_resync_messages": 117464,
+    "progress_elapsed_seconds_at_close": 70,
+    "limit": "Automatic upstream startup migrated/resynced the existing owned archive; initial failures retained. No claim of a byte-identical frozen A/B dataset."
+  },
+  "baseline": {
+    "version": "0.43.0",
+    "pin": "9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+    "receipt_sha256": "84d47e4c0f924b1ed278aca17dd0c700cbae39f8e59dfcbc89a82ba4af56e985",
+    "usage_exit": 1,
+    "usage_stdout_bytes": 0,
+    "error": "usage rollup build kept losing dedup classification races",
+    "candidate_sessions": 2343,
+    "tool_calls_count_from_supplied_baseline": 47,
+    "tool_name_from_supplied_baseline": "subagent"
+  },
+  "probes": [
+    {
+      "stage": "pre_migration_daily",
+      "argv": [
+        "agentsview",
+        "usage",
+        "daily",
+        "--all",
+        "--agent",
+        "claude",
+        "--offline",
+        "--no-sync",
+        "--json"
+      ],
+      "env": {
+        "AGENTSVIEW_NO_DAEMON": "1"
+      },
+      "nice": 19,
+      "exit_code": 1,
+      "stdout_bytes": 0,
+      "error": "schema missing session_project_assignments.session_id; writable daemon startup upgrade required",
+      "log": "usage-daily.err"
+    },
+    {
+      "stage": "no_daemon_tool_calls_control",
+      "argv": [
+        "agentsview",
+        "session",
+        "tool-calls",
+        "<private-memory-h2h-session>",
+        "--json"
+      ],
+      "env": {
+        "AGENTSVIEW_NO_DAEMON": "1"
+      },
+      "nice": 19,
+      "exit_code": 1,
+      "stdout_bytes": 0,
+      "error": "daemon autostart is disabled; direct SQLite reads are not supported for this command",
+      "log": "tool-calls.err"
+    },
+    {
+      "stage": "requested_tool_calls_default_mode",
+      "argv": [
+        "agentsview",
+        "session",
+        "tool-calls",
+        "<private-memory-h2h-session>",
+        "--json"
+      ],
+      "nice": 19,
+      "exit_code": 0,
+      "reported_count": 47,
+      "row_count": 47,
+      "name_counts": {
+        "subagent": 47
+      },
+      "category_counts": {
+        "Task": 47
+      },
+      "code_mode_nested_names_exposed": false,
+      "log": "tool-calls-default.json",
+      "privacy": "input_json exists in native output; no values or raw conversations are copied into this receipt."
+    },
+    {
+      "stage": "post_migration_requested_daily",
+      "argv": [
+        "agentsview",
+        "usage",
+        "daily",
+        "--all",
+        "--agent",
+        "claude",
+        "--offline",
+        "--no-sync",
+        "--json"
+      ],
+      "env": {
+        "AGENTSVIEW_NO_DAEMON": "1"
+      },
+      "nice": 19,
+      "exit_code": 0,
+      "stdout_bytes": 29379,
+      "stdout_sha256": "5600f30c2e6c2f2cf4e03fdce5d4e978d4650042424870f77a47fb3bc7a3e282",
+      "schema_version": 6,
+      "top_keys": [
+        "schema_version",
+        "pricing",
+        "projects",
+        "daily",
+        "totals",
+        "sessionCounts"
+      ],
+      "candidate_sessions_reported": 2438,
+      "database_daily_rows_built_reported": 2492,
+      "elapsed_usage_rollup_seconds_reported": 2.575,
+      "log": "usage-daily-after-migration.json"
+    }
+  ],
+  "session_locator": {
+    "source": "durable co-op lanes/threads.json pointer /memory-h2h",
+    "source_sha256": "613df8a0f969870d8eef810f3ea612a9362f9795f8fce02986792f2be0a3bd52",
+    "native_lookup_success": true,
+    "session_id_sha256": "5a41403d044755db92eac3f9cb754db9d75601a0a60bc109213882d14b9efe8e"
+  },
+  "outcome": {
+    "daily_usage_passes": true,
+    "code_mode_attribution_observed": false,
+    "scope": "The requested reported set remains47 subagent/Task calls; no nested tools.<name> entries are exposed. This is the actual session result, not a global parser-completeness proof.",
+    "shared_alias_apply": "Finished under urgent CCitem155742Z explicit exception: canonical0.44 installed, both aliases guarded, old0.43 retained, onlyagentsview.service restarted."
+  },
+  "sources": [
+    {
+      "repository": "kenn-io/agentsview",
+      "pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "path": "scripts/install.sh",
+      "lines": "35-41,121,142-160"
+    },
+    {
+      "repository": "kenn-io/agentsview",
+      "pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "path": "internal/config/config.go",
+      "lines": "2048-2058,2136-2146"
+    },
+    {
+      "repository": "kenn-io/agentsview",
+      "pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "path": "internal/service/service.go",
+      "lines": "440"
+    },
+    {
+      "repository": "kenn-io/agentsview",
+      "pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "path": "internal/service/direct.go",
+      "lines": "377"
+    },
+    {
+      "repository": "kenn-io/agentsview",
+      "pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "path": "internal/parser/codex.go",
+      "lines": "627"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "2de892b0443efc98c70d553277556cd9c1d5d655",
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.sh",
+      "contract": "Reuse the existing owned archive launcher environment and symlink adoption protocol while updating only the binary pin."
+    }
+  ],
+  "limitations": [
+    "Native CLI/host integration, not unchanged upstream suites.",
+    "Initial failed controls stay distinct from the post-migration passing daily result.",
+    "Costs are upstream pricing estimates; no provider billing, native-profile quality, or nested-execution savings claim.",
+    "No raw messages, input_json, credentials or client configuration in public evidence."
+  ],
+  "urgent_finish": {
+    "source_item": "task-ns2604-coop-20261006T155742Z",
+    "before": {
+      "observed_utc": "2026-10-06T16:03:30Z",
+      "service_active_state": "activating",
+      "service_sub_state": "auto-restart",
+      "n_restarts": 158,
+      "alias_version": "0.43.0"
+    },
+    "correction": "The requested default query migrated the archive before the managed service/aliases were upgraded. This avoidable version mismatch was repaired; no false healthy claim is made from the earlier ad-hoc server.",
+    "install_argv": [
+      "tar -xzf <verified0.44archive> -C <ownedECO_ROOT>/tools/agentsview-0.44.0",
+      "install -m0755 <plan>/config/agentsview.sh <ownedECO_ROOT>/tools/agentsview-0.44.0/launcher",
+      "ln -sfn <owned0.44launcher> <ownedECO_ROOT>/bin/agentsview",
+      "ln -sfn <owned0.44launcher> $HOME/.local/bin/agentsview"
+    ],
+    "install_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "observed_install_complete_utc": "2026-10-06T16:03:30Z",
+    "old_private_pid_stop": {
+      "pid": 2983447,
+      "argv": [
+        "/usr/bin/kill",
+        "--signal",
+        "TERM",
+        "2983447"
+      ],
+      "exit_code": 1,
+      "returned": "No such process",
+      "observed_utc": "2026-10-06T16:04:52Z",
+      "limit": "Already exited when checked; this lane does not claim a successful signal/stop."
+    },
+    "service_restart": {
+      "argv": [
+        "systemctl",
+        "--user",
+        "restart",
+        "agentsview.service"
+      ],
+      "exit_code": 0,
+      "observed_utc": "2026-10-06T16:04:52Z",
+      "native_ExecMainStartTimestamp_utc": "2026-10-06T16:04:51Z"
+    },
+    "readbacks": [
+      {
+        "observed_utc": "2026-10-06T16:04:52Z",
+        "ActiveState": "active",
+        "SubState": "running",
+        "MainPID": 138884,
+        "NRestarts": 0
+      },
+      {
+        "observed_utc": "2026-10-06T16:07:47Z",
+        "ActiveState": "active",
+        "SubState": "running",
+        "MainPID": 138884,
+        "NRestarts": 0,
+        "listener_count": 1,
+        "listener": "127.0.0.1:21808",
+        "listener_pid": 138884
+      },
+      {
+        "observed_utc": "2026-10-06T16:12:40Z",
+        "ActiveState": "active",
+        "SubState": "running",
+        "MainPID": 138884,
+        "NRestarts": 0,
+        "listener_count": 1,
+        "listener_pid": 138884
+      },
+      {
+        "observed_utc": "2026-10-06T16:28:14Z",
+        "ActiveState": "active",
+        "SubState": "running",
+        "MainPID": 138884,
+        "NRestarts": 0
+      }
+    ],
+    "counter_steady": true,
+    "mcp_status": {
+      "argv": [
+        "agentsview",
+        "mcp",
+        "status"
+      ],
+      "exit_code": 0,
+      "returned": "No HTTP MCP listeners are running.",
+      "scope": "HTTP listener status only; CC's stdio user-scope registration is unchanged, no HTTP listener started."
+    },
+    "timing_limit": "Filesystem ctimes are observed mutation-time proxies, not fabricated shell start timestamps; batch observations and native unit start time are retained.",
+    "no_manager_reexec": true,
+    "no_os_restart": true,
+    "client_configuration_changed": false,
+    "filesystem_change_time_utc": {
+      "canonical_binary": "2026-10-06T16:03:29.114798Z",
+      "canonical_launcher": "2026-10-06T16:03:29.586830Z",
+      "ecosystem_alias": "2026-10-06T16:03:30.022860Z",
+      "user_alias": "2026-10-06T16:03:30.266876Z"
+    }
+  },
+  "rollback": {
+    "old_binary_retained": true,
+    "pre_migration_copy_exists": true,
+    "copy_source": "orch-records-work/session-analytics-copy-20261006T1512Z",
+    "main_database": "sessions.db",
+    "main_database_bytes": 245940224,
+    "main_pragma_user_version": 108,
+    "metadata_check": "SQLite mode=ro&immutable=1; no user/session data queried; WAL not opened or changed.",
+    "wal_and_shm_present": true,
+    "current_data_version_from_CC_observation": 113,
+    "required": "Stop the managed0.44 service, restore a consistent pre-migration archive including its WAL/state as its custodian directs, then switch to the preserved0.43 install. Merely changing binaries cannot read113 with108.",
+    "restore_performed": false,
+    "snapshot_consistency_or_restore_qualification": "not performed; preserved copy existence/version observed only",
+    "backup_deleted": false
+  },
+  "native_comparison": {
+    "rollout_sha256": "6aac8ed7599ee3b6e83b4cfc65f750db6c35afa0d4df857818f236a1cf5a5a49",
+    "bytes": 22910503,
+    "jsonl_records": 10273,
+    "scope": "event_msg/payload.type=item_completed",
+    "completed_records": 3103,
+    "distinct_item_ids": 3103,
+    "CommandExecution": 733,
+    "McpToolCall": 369,
+    "MCP_by_server": {
+      "ai-memory": 24,
+      "context-mode": 345
+    },
+    "line_locators": [
+      {
+        "line": 18,
+        "json_pointers": [
+          "/type",
+          "/payload/type",
+          "/payload/item/type"
+        ],
+        "kind": "CommandExecution"
+      },
+      {
+        "line": 32,
+        "json_pointers": [
+          "/type",
+          "/payload/type",
+          "/payload/item/type",
+          "/payload/item/server",
+          "/payload/item/tool"
+        ],
+        "kind": "McpToolCall",
+        "server": "context-mode",
+        "tool": "ctx_batch_execute"
+      }
+    ],
+    "separate_overlapping_response_scope": {
+      "custom_tool_call_exec": 604,
+      "function_call": 208
+    },
+    "window_utc": [
+      "2026-10-05T04:05:07.944Z",
+      "2026-10-06T15:50:35.570Z"
+    ],
+    "limit": "Do not sum overlapping response and completed-item scopes. ID uniqueness checked; success/organic-only use or individual wrapper-to-inner join not established. No arguments/code/message content inspected or copied.",
+    "conclusion": "Native Codex metadata exposes MCP/command executions while AgentsView's requested set remains47Task/subagent rows; monitoring lacks their attribution.",
+    "session_id_sha256": "5a41403d044755db92eac3f9cb754db9d75601a0a60bc109213882d14b9efe8e"
+  },
+  "managed_probes": [
+    {
+      "log": "managed-usage.json",
+      "exit_code": 0,
+      "stdout_bytes": 29626,
+      "sha256": "eb4ab649e64a80e925da9de74e07b6ec03f9d77f3c71554611c03e710d44e1ef"
+    },
+    {
+      "log": "managed-tool-calls.json",
+      "exit_code": 0,
+      "stdout_bytes": 8289,
+      "sha256": "7e48eac5f2622735151d6d58b4a5e1c450418c634b431cdf64ffa7ccd07ff53a"
+    }
+  ],
+  "local_checks": {
+    "check_plan_exit": 0,
+    "rows": 84,
+    "commands": 191,
+    "acceptance_entries": 112,
+    "focused_migration_test_exit": 0,
+    "tests": 1,
+    "subcases": 6,
+    "test_log": "migration-test.log",
+    "scope": "Synthetic alias/foreign-file protections; no host install fromtests."
+  },
+  "privacy_validation": {
+    "first_exit_code": 1,
+    "error": "possible local session identifier in candidate public receipt",
+    "correction": "Exact identifier retained only in protected native argv/source records; public receipt uses a SHA256 locator and placeholder.",
+    "published": false
+  }
+}

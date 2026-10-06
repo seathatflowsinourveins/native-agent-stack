@@ -1137,3 +1137,36 @@ SkillSpector native follow-up: [report.py:1334](https://github.com/NVIDIA/skills
 ## Hcom owner supersession (2026-10-06)
 
 The user03:03:10Z decision, command-center item033237Z section3 and co-op A50 supersede the earlier custom quiet/deny adoption. The row keeps the published [v0.7.27 installer](https://github.com/aannoo/hcom/releases/tag/v0.7.27), its checksum and native messaging parameterization at2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b. No historical helper/rules are copied or applied; no posture check or deny-only acceptance remains. Explicit historical assets follow the existing checker consumer/history pattern. Their prior tests and records remain historical evidence, not current policy. Revised native CLI post-install0 is local integration. Managed Windows Terminal orchestration and its acceptance remain unqualified until the command-center recipe; no new model run or active client configuration change occurred.
+
+## B2 AgentsView v0.44.0 source preparation (2026-10-06)
+
+- Official [kenn-io/agentsview v0.44.0 release](https://github.com/kenn-io/agentsview/releases/tag/v0.44.0),
+  published 2026-09-21T13:56:12Z, stable/non-draft. Native gh api --cache 120s
+  metadata peels tag 24ac704b3468386dbddc333853f81bc1cdb3a1b9 to commit
+  413a87f7bfbd67b2815b1119ac51abc1efbeeaba.
+- Published [Linux amd64 archive](https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz)
+  SHA256: 037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3.
+  SHA256SUMS, signature, provenance and SPDX are separate release assets;
+  publication metadata is distinct from an actual download/hash observation.
+- At kenn-io/agentsview@413a87f7bfbd67b2815b1119ac51abc1efbeeaba,
+  [scripts/install.sh:142](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142)
+  verifies checksum before extraction/placement at 151-160. Standard directories
+  are selected at 35-41 and latest at 121; no version/private-prefix selector
+  exists. The plan retains owned placement glue and the explicit release archive.
+- The same pin's [internal/config/config.go:2051](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051),
+  2136 and 2139 support data directory, disabled updates and archive-content
+  policy. [cmd/agentsview/cli.go:831](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/cli.go#L831)
+  supplies native version output; session_get.go:21 retains the existing interface.
+- Counter sources at that pin:
+  [internal/db/usage.go:1802](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/db/usage.go#L1802)
+  and 1879 define daily token/cache/cost totals.
+  [internal/service/direct.go:377](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/service/direct.go#L377)
+  and service.go:440 flatten named-session recorded calls and define count/name/category.
+  internal/parser/codex.go:627 preserves native names; taxonomy.go:172 maps generic
+  exec to Bash and 318-325 maps unmatched names to Other. These are not a
+  dedicated code-mode/savings counter. cmd/agentsview/session_usage.go:37-50
+  distinguishes descendant-inclusive usage, --own-only and archived --no-sync.
+- Tagged docs/changelog.md:6 still labels 0.43.0 latest/Unreleased; published
+  v0.44.0 release notes govern. Earlier G5 v0.43.0 records remain historical.
+  Local migration fixtures are integration evidence; native host observations,
+  whole-host acceptance and measured code-mode improvement remain separate.

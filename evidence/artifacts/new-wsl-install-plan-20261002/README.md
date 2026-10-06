@@ -712,3 +712,23 @@ MCP conformance preserves all upstream tests and contains their server trees in 
 ## Hcom posture supersession (2026-10-06)
 
 The user withdrew the custom quiet/deny posture. The row retains the verified vendor installer and native messaging smoke; old helper/rules remain historical fixtures and are never installed or accepted. The deny-only after-sign-in stage is withdrawn and unqualified until the command center supplies the managed Windows Terminal recipe. This source update changes no active host configuration.
+
+## AgentsView operational pin supersession (2026-10-06)
+
+The session-analytics artifact now selects published v0.44.0 at
+413a87f7bfbd67b2815b1119ac51abc1efbeeaba. The frozen catalog's v0.43.0 owner
+label and earlier G5 receipts preserve historical selection/execution; current
+download, launcher and version gates select v0.44.0. Only symlinks to known
+owned v0.43.0 or v0.44.0 binary/launcher paths may migrate. Foreign symlinks and
+regular aliases remain refused before extraction. Existing data, usage-only
+retention, telemetry/update settings and functional/fresh-session gates remain.
+
+Daily usage reports archived token/cache counts and pricing estimates. Native
+session tool-calls lists named-session outer calls; Task-only calls establish no
+code-mode attribution or savings. Session usage includes descendants unless
+--own-only is selected. Sources and counter boundaries are in SOURCES.md.
+
+This local source preparation serves research and historical-simulation usage
+accounting. It changes no host alias, data, daemon or client configuration.
+Co-op alone applies at the #723 boundary. Historical receipts do not qualify
+this upgrade; current native observations are separately recorded.
