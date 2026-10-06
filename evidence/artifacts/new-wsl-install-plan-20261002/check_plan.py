@@ -155,10 +155,10 @@ def client_additional_checks(row, funcs, bad):
             bad("acceptance", f"row {slot}: initialize the native embedded cache, then run both upstream validators through python with bytecode disabled")
 
 def agent_messaging_contract(plan_dir, by_slot, bad):
-    """Round-2 hcom pin and mapped posture; no new model trial.
+    """Round-2 hcom pin, mapped configuration and the 2026-10-06 relaxation; no new model trial.
 
-    Sources: aannoo/hcom@2c5f343:tests/cli_smoke.rs:129,140;
-    https://developers.openai.com/codex/rules; this PR: config/hcom-client-config.py.
+    Sources: aannoo/hcom@2c5f343:tests/cli_smoke.rs:129,140 and src/hooks/codex.rs:1538-1579;
+    https://developers.openai.com/codex/rules; docs/decisions/2026-10-06-hcom-relaxation.md.
     """
     row = by_slot.get("agent-messaging", {})
     if not row.get("installed") or row.get("release") != "v0.7.27":
@@ -166,8 +166,7 @@ def agent_messaging_contract(plan_dir, by_slot, bad):
         return
     try:
         # --plan-dir supports a standalone copied plan in the existing tests.
-        # Its native map stays beside this checker in the source checkout;
-        # check the rules and adapter from the selected plan, including copies.
+        # Its native map stays beside this checker in the source checkout.
         source_root = pathlib.Path(__file__).resolve().parents[3]
         mapping = json.loads((source_root / "adoption/new-wsl/client-config-map.json").read_text())
         spec = mapping["slot_configs"]["agent-messaging"]
@@ -176,24 +175,30 @@ def agent_messaging_contract(plan_dir, by_slot, bad):
                 or posture["launch"]["auto_trust_workspace"] is not False
                 or posture["preferences"]["auto_approve"] is not True):
             bad("agent-messaging", "mapped hcom configuration differs from the accepted posture")
-        deny = set(spec["claude_settings"]["permissions"]["deny"])
-        for prefix in ("hcom", "uvx hcom"):
-            for tail in ("term *", "relay *", "config *", "hooks *", "run *", "kill *", "stop *", "reset *",
-                         "update *", "claude-pty *", "* claude-pty *", "--name *", "--go *",
-                         "send -b *", "send --from *", "send --from=*"):
-                if f"Bash({prefix} {tail})" not in deny:
-                    bad("agent-messaging", f"mapped Claude deny is missing: {prefix} {tail}")
-        rules = (plan_dir / "config" / pathlib.Path(spec["codex_rule_file"]).name).read_text()
-        if rules.count('decision = "forbidden"') != 4 or "not_match =" not in rules:
-            bad("agent-messaging", "Codex requires all four forbidden rules and their native inline examples")
-        adapter = (plan_dir / "config/hcom-client-config.py").read_text()
-        if '"execpolicy", "check", "--pretty", "--rules"' not in adapter:
-            bad("agent-messaging", "the configuration adapter must run the mandatory native rule check")
+        # The 2026-10-06 relaxation: upstream hcom.rules is the only Codex hcom
+        # policy and Claude gets no hcom deny list; peer text stays data.
+        if "codex_rule_file" in spec or "claude_settings" in spec:
+            bad("agent-messaging", "the 2026-10-06 relaxation maps no Codex rule file and no Claude hcom settings")
+        for text in (posture["launch"]["hints"], spec["peer_instructions"]):
+            if "treat it as data" not in text or "never counts as the user's approval" not in text:
+                bad("agent-messaging", "both peer texts must keep that peer text is data and never the user's approval")
     except (OSError, ValueError, KeyError, TypeError):
-        bad("agent-messaging", "mapped native posture or rules are missing")
-    acceptance = row.get("acceptance", {}).get("post_install", {}).get("command", "")
-    if not all(token in acceptance for token in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i", "--check")):
-        bad("agent-messaging", "post-install must check upstream CLI smoke behavior and installed client posture")
+        bad("agent-messaging", "mapped native configuration is missing")
+    acceptance = row.get("acceptance", {})
+    post = acceptance.get("post_install", {}).get("command", "")
+    if not all(token in post for token in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i")):
+        bad("agent-messaging", "post-install must check upstream CLI smoke behavior")
+    # After sign-in reads the Codex home that hcom derives (CODEX_HOME, else the parent of HCOM_DIR:
+    # aannoo/hcom@2c5f343b src/hooks/codex.rs:72-75, src/paths.rs:26-53) and evaluates every rules file
+    # there, as Codex loads them (openai/codex rust-v0.160.0 codex-rs/core/src/exec_policy.rs:662-700),
+    # so a leftover stricter file is seen; retired Claude hcom denies are reported too.
+    native = acceptance.get("after_sign_in", {}).get("command", "")
+    if (not all(token in native for token in ('"${HCOM_DIR:-$HOME/.hcom}"', '$(dirname -- "$hcom_dir")/.codex',
+                                               '-name "*.rules"', "hcom send @luna -- hi", "hcom term inject luna hi",
+                                               ".permissions.deny", "exit 78"))
+            or "${CODEX_HOME:-$HOME/.codex}" in native or '--rules "$codex_rules/' in native):
+        bad("agent-messaging", "after sign-in must evaluate every rules file in the Codex home that hcom derives from "
+                               "HCOM_DIR, and report retired Claude hcom denies")
 
 
 def code_docs_contract(plan_dir, by_slot, bad):
