@@ -214,9 +214,12 @@ def main(argv=None) -> int:
             outcomes.append({"command": command, "dry_run": True})
             continue
         if trial:
+            # CL7b has no launcher, so its launched row carries the gateway build (CL9, G11) the launcher records for
+            # the other Codex cells.
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
                                                  "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
                                                  "test_key": trial["test_key"], "phase": "launched", "at": started,
+                                                 "gateway_build": row.get("gateway_build"),
                                                  "launched_by": "block.py (CL7b: promptfoo's own provider, no launcher)"})
         with open(log, "wb") as handle:
             proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)

@@ -183,7 +183,11 @@ def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, c
     the omniroute profile layer (codex_profile_layer: app-server takes no --profile) plus the CL3 overrides, written as
     one YAML flow mapping (JSON) that promptfoo flattens into -c key=value pairs."""
     otel = f"ecosystem.task.id={trial_id},ecosystem.lane={test['lane']},service.instance.id={trial_id}"
-    cli_config = {**((profile_layer or {}).get("config") or {}), "service_tier": "default", "otel": {"environment": trial_id}}
+    # model_reasoning_effort here as well as in the provider's turn settings: CL3 sets it with -c, which is the thread
+    # default codex.conversation_starts reports (devcheck-cl7-20261006a: without it the app-server thread started at the
+    # host config's ultra while each turn asked for max).
+    cli_config = {**((profile_layer or {}).get("config") or {}), "model_reasoning_effort": "max", "service_tier": "default",
+                  "otel": {"environment": trial_id}}
     cfg = [f"description: {yaml_quote(code)}",
            "prompts:", "  - '{{task_text}}'", "providers:",
            "  - id: openai:codex-app-server", f"    label: {yaml_quote(code)}", "    config:",

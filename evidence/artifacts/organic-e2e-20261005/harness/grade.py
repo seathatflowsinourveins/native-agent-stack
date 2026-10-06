@@ -1183,7 +1183,8 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
               "gateway_forwarded_exposed": bool(exposed),
               "gateway_service_tier": sorted({str(c.get("received_service_tier")) for c in calls}),
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
-              "gateway_calls": len(calls), "gateway_build": ledger_rows.get("pre-launch", {}).get("gateway_build")}
+              "gateway_calls": len(calls), "gateway_build": ledger_rows.get("pre-launch", {}).get("gateway_build")
+              or ledger_rows.get("launched", {}).get("gateway_build")}
     all_items = list(stream["items"]) + [it for r in child_rollouts for it in r["items"].values()]
     return {"stream": {"thread_id": stream["thread_id"], "items": len(stream["items"]), "errors": stream["errors"],
                        "turn_failed": len(stream["turn_failed"]), "usage": stream["usage"], "source": stream_source},
