@@ -103,5 +103,25 @@
     "whitespace": {"command": "rtk git diff --check", "exit": 0}
   },
   "owner_procedure": "evidence/artifacts/pointer-environment-transfer-20261006/README.md",
+  "paper_constraint_update": {
+    "directive": "co-op 2026-10-06T05:04:26Z, task-ns2604-coop-20261006T050351Z",
+    "class": "source_review",
+    "prohibited_windows_utc": [["2026-10-06T10:35:00Z", "2026-10-06T13:45:00Z"], ["2026-10-06T19:50:00Z", "2026-10-07T00:10:00Z"]],
+    "paper_env_file_2_legacy_export_edit_not_before": "2026-10-07T00:10:00Z",
+    "manager_restart_or_reexec_in_windows": false,
+    "heavy_phase_in_windows": false,
+    "never_kill_running_case": true,
+    "native_generator_lifecycle": "Startup and configuration reload; daemon-reload reruns environment generators. Re-exec is not the only trigger at the selected pin.",
+    "lifecycle_sources": ["systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/environment.d.xml:42-46", "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.environment-generator.xml:54-58,71-73", "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:src/core/manager.c:2022,3633"],
+    "pending_owner_consumption_proof": "Fresh systemd-run --user child: all8 pointers nonempty, RTK=1 and credential_status --require-pointers; six host-readable paths plus rootless daemon/readonly password mount identity, then docker exec --user 1000:1000 password readability in the intended gateway container; before Dagu restart or future-unit reliance, reported by co-op to 5f for the 10-07 switch.",
+    "rootless_consumer_sources": ["native-agent-stack@e0c260caa1e5a9c3246e3365f5af41fd46b158d8:docs/secret-storage.md:645-679", "native-agent-stack@e0c260caa1e5a9c3246e3365f5af41fd46b158d8:blueprints/us-equities/runtime-2604/ibkr-gateway-recreate-durable.sh:26,29,60-65,98-105", "https://docs.docker.com/reference/cli/docker/container/exec/ (read 2026-10-06)", "https://docs.docker.com/reference/cli/docker/inspect/ (read 2026-10-06)", "https://docs.docker.com/engine/security/rootless/ (read 2026-10-06)"],
+    "retained_proof_correction": "The first draft tested host-user -r for both IBKR password stores; critic identified intentional subordinate-owner custody. Corrected to native consumer-context proof without permissions/ownership changes or credential reads.",
+    "host_proof_run_by_lane": false,
+    "final_independent_review": {"class": "source_review", "verdict": "approved for publication, no remaining material findings", "tests_run_by_reviewer": false, "host_manager_or_docker_calls_by_reviewer": false, "next_acceptance_sweep": ["real consuming-unit proof before the 10-07 switch", "Dagu worker context", "fresh native Claude/Codex sessions", "rollback rehearsal"]},
+    "script_qualification": {"class": "synthetic", "bash_n_blocks": 4, "syntax_exits": [0, 0, 0, 0], "frozen_time_boundary_cases": 8, "boundary_expected_exits": [0, 1, 1, 0, 0, 1, 1, 0], "all_boundary_results_matched": true, "initial_and_readback_proof_names": 8, "host_readable_names": 6, "readonly_mount_identity_checks": 2, "password_readability_checks_as_container_uid_1000": 2, "proof_function_calls": 3, "cleanup_cutoff_guard": true, "rollback_per_path_cutoff_guard": true, "unit_argv_capture_exit": 0, "unit_sh_syntax_exit": 0, "container_argv_capture_exit": 0, "container_sh_syntax_exit": 0, "container_file_variables_deferred": true, "limits": "Native shell parsing with synthetic CLI argument sinks, no systemd-run or Docker call."},
+    "implementation_code_changed": false,
+    "prior_289_test_result_reused": true,
+    "limits": "Documentation and controlled shell syntax/time-boundary qualification only. No manager reload/re-exec, Dagu restart, real store readability or real paper-unit execution performed."
+  },
   "conditions": {"generation_key": "only if its service moves", "fw_lane_store": "only if Phase 3 selects an actual 20129 lane", "paper_units": "future 2026-10-07 units direct --env-file; 2026-10-06 unchanged"}
 }

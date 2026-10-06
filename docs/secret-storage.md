@@ -296,6 +296,17 @@ without opening or resolving the pointed-to store or printing either path. Optio
 informational; it does not remove that pointer from the eight-name contract. The separately owned IBKR store/security
 rows must land before the host `--require-pointers` gate can pass; this environment change does not duplicate those rows.
 
+For the frozen 2026-10-06 paper units, keep the `PAPER_ENV_FILE_2` export in `~/.bashrc` unchanged until
+2026-10-07T00:10Z: they still launch through `/bin/bash -ic`. The owner performs the guarded by-name cleanup as a
+separate phase after that cutoff. Before future units rely on environment.d, a new user-manager child must prove every
+pointer is nonempty and its store is readable in its intended consumer context, with no value output; the co-op reports
+the result to the paper owner. The two IBKR passwords retain their rootless-container ownership: their readability is
+proved as that container's uid 1000, with readonly-mount identity checked, rather than weakening custody for a host-shell check.
+systemd v259.5 reruns environment generators on manager startup and `daemon-reload`
+([native lifecycle](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.environment-generator.xml#L54-L73)).
+The [owner procedure](../evidence/artifacts/pointer-environment-transfer-20261006/README.md) schedules apply and
+manager-affecting rollback outside 10:35Z-13:45Z and 19:50Z-2026-10-07T00:10Z, with no manager restart or killed case.
+
 For this transfer, `grafana-admin` names the existing `new-wsl-native-stack/grafana.env` store; this is an inventory
 correction, not a rerun of the generic `observability/backends/configure.py` producer. The host generation key is
 regenerated through its own service only if that service moves. The separate `omniroute-fw-lane.env` store remains
