@@ -261,6 +261,13 @@ not a boundary.
   hosts (`adoption/manifest.json` `authentication_transfer:
   native_login_on_target_only`).
 
+If a credential store is supplied through a mount, check its visibility in the
+consuming process's mount namespace. The process's `/proc/<pid>/mountinfo` view
+is the relevant observation; a mount seen by another process or a general claim
+about Administrator or WSL state does not establish that view. Keep restart
+visibility unqualified until it is observed from the consumer after that restart.
+See [Linux mount_namespaces(7), DESCRIPTION](https://man7.org/linux/man-pages/man7/mount_namespaces.7.html#DESCRIPTION).
+
 ## Adding or rotating a key without pasting it anywhere
 
 Never paste a key into a chat, an issue, a prompt or a command line. Run:
@@ -1345,6 +1352,17 @@ do not acquire an exception. POST provider-limits performs a live quota-cache
 synchronization; it is deliberately authorized with no body on 20128 and 21128. Preview
 is 20129-only. Body absence is explicit: even an empty string, object or body-file
 option is body-present; no file is opened to decide this.
+
+At the cited OmniRoute pin, `GET /api/usage/provider-limits` reads cached data
+through `getSanitizedCachedProviderLimitsMap()`, while `POST` calls
+`syncAllProviderLimits({ source: "manual" })`. Retain the returned
+`lastAutoSyncAt` and `intervalMinutes` as synchronization metadata with the
+cached observation; record an explicit live synchronization separately. The
+cached helper rewrites selected quota keys; its sanitization name does not
+certify that every returned field is safe to publish. Review the exact route
+and helper before publishing value-free observations
+([diegosouzapw/OmniRoute@c1e30b76, route.ts:13–38](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/api/usage/provider-limits/route.ts#L13-L38),
+[providerLimits.ts:668–720](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L668-L720)).
 
 Method and query evidence are associated with each request. Curl's last explicit
 `-X` controls its wire method; otherwise data/form means POST, upload PUT and
