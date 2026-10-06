@@ -4527,8 +4527,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "6ac40e443963ca0bc93d75e440c697268682bd11810ea6203794d063a4d6be76",
-      "bytes": 15075
+      "sha256": "84616d333406934b7576c70430014099f872766d3b84a0a69a997845909a02d6",
+      "bytes": 15495
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -46212,6 +46212,11 @@
       "bytes": 6747
     },
     {
+      "path": "evidence/artifacts/skills-held-routing-20261006/dependency-inventory-correction.json",
+      "sha256": "0acf1f14035a310cab84afcf10f3de26eb00455c1ed066f3d7e43b9d4675a7c9",
+      "bytes": 3334
+    },
+    {
       "path": "evidence/artifacts/skills-held-routing-20261006/source-review.json",
       "sha256": "237e6087e8d4715defa63333474a51ab2d6773854c8395eb4b7f8145e7d25ee9",
       "bytes": 10420
@@ -55263,8 +55268,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "e89585ef067044a90eb0685a38116816271400f07a4c11bcf25cb3cef486d947",
-      "bytes": 75144
+      "sha256": "6362e39148bb4c9c9bde1165abb17c9e0b5b04435f11e901a48118ab2bbad7ed",
+      "bytes": 75426
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",
