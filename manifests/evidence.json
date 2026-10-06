@@ -17443,8 +17443,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
-      "sha256": "f9846e697c24c2f1f8176860c6aa7f435d9fc1a76fce33c660f6702d4ef4a06a",
-      "bytes": 9124
+      "sha256": "4123f2e22192d43fe0226b0e49ce5d625a0ffe1c6e0dbba3b65515d871b3f8b7",
+      "bytes": 11333
     },
     {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
@@ -40928,8 +40928,8 @@
     },
     {
       "path": "evidence/artifacts/ns2604-pin-decision-20261006/selection.json",
-      "sha256": "a044f48dc2d6a1501a48d62ff003f26e9b7168c5a07d9cce6bd4deff2282b05c",
-      "bytes": 4877
+      "sha256": "ba388865d8507e849ebf4a9fdcc3feeacce592b6d7538a684f92913ca03d2801",
+      "bytes": 5042
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
