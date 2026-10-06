@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import install_claude_profile as icp  # noqa: E402
 import managed_block  # noqa: E402
+import workflow_variants as variants  # noqa: E402
 
 # The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
 # repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
@@ -928,7 +929,6 @@ class AgentsInstallTests(unittest.TestCase):
             home = Path(tmp)
             results = icp.install_agents(home, dry_run=False)
             self.assertEqual(len(results), len(list(icp.AGENTS_SRC_DIR.glob("*.md"))))
-            self.assertEqual(len(results), 11)
             dest_dir = home / ".claude" / "agents"
             installed = sorted(p.name for p in dest_dir.glob("*.md"))
             expected = sorted(p.name for p in icp.AGENTS_SRC_DIR.glob("*.md"))
@@ -1214,17 +1214,17 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
         return {cells[0]: cells[1].strip("`") for cells in cls.table_rows(text, cls.ROLE_HEADER)}
 
     def test_every_preload_is_listing_eligible_and_targeted_roles_have_exact_skills(self):
-        # Sources: the pinned table's Listing column and the upstream sub-agents
-        # preload rules. Plugin skills are not table rows: only their namespace shape
+        # Sources: the current lifecycle store and upstream sub-agent preload
+        # rules. Dated decision tables are historical. Plugin skills are not rows: only their namespace shape
         # is checked here; this is not a native plugin-preload probe.
         try:
             import yaml
         except ImportError:
             self.skipTest("PyYAML is not installed")
-        columns = [cell.strip() for cell in self.SKILLS_HEADER.strip("|").split("|")]
-        rows = self.table_rows(self.SKILLS_DOC.read_text(encoding="utf-8"), self.SKILLS_HEADER)
-        self.assertTrue(rows, "pinned skills table is missing")
-        listing = {row[columns.index("Name")]: row[columns.index("Listing")] for row in rows}
+        rows = json.loads((ROOT / "adoption/skills/manifest.json").read_text(encoding="utf-8"))["skills"]
+        self.assertTrue(rows, "canonical skill store is missing")
+        listing = {row["name"]: row.get("claude_listing") for row in rows
+                   if row.get("status") in {"kept", "trial"}}
         preloads = {}
         for path in sorted(icp.AGENTS_SRC_DIR.glob("*.md")):
             with self.subTest(agent=path.name):
@@ -1286,6 +1286,150 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                          {"scout": "source-scout"})
 
 
+class PreloadVariantTests(unittest.TestCase):
+    """Native frontmatter variants preserve the sealed roles, not evidence of organic use.
+
+    Sources: official sub-agents docs, Preload skills; the 2026-10-06 addendum
+    in docs/decisions/2026-09-26-stack-agents-role-dispatch.md. Assertions
+    inspect the original body and parsed frontmatter independently of the renderer.
+    """
+
+    PRELOADS = {
+        "isolated-builder-ci-pr": ["context-mode:context-mode", "gh-fix-ci"],
+        "isolated-builder-agent-docs": ["context-mode:context-mode", "writing-for-agents"],
+        "isolated-builder-hosting": ["context-mode:context-mode", "dagu"],
+        "isolated-builder-broker-adapter": ["context-mode:context-mode", "alpaca-broker-money-precision",
+                                            "alpaca-broker-rate-limits-resilience"],
+        "stack-researcher-data-quant": ["EdgarTools"],
+        "isolated-builder-skills": ["context-mode:context-mode"],
+        "security-reviewer-skills": ["security-best-practices", "variant-analysis"],
+    }
+
+    @classmethod
+    def manifest(cls):
+        return {"rows": [{"id": name, "lanes": {"ultracode_stage": {
+            "agentType": name, "base": "agents:" + base,
+            "description": "Route the bounded " + name + " task in its owned worktree.",
+            "preload": cls.PRELOADS[name], "skill_grant": name == "isolated-builder-skills",
+        }}} for name, base in variants.VARIANTS.items()]}
+
+    @staticmethod
+    def parts(raw):
+        return raw.split(b"---\n", 2)[1:]
+
+    def test_renderer_preserves_every_body_byte_and_only_allowed_frontmatter_fields(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML is not installed")
+        manifest = self.manifest()
+        rendered = variants.render_variants(ROOT, manifest)
+        self.assertEqual(len(rendered), 3 * len(self.PRELOADS))
+        for name, base in variants.VARIANTS.items():
+            original = (icp.AGENTS_SRC_DIR / f"{base}.md").read_bytes()
+            base_front, base_body = self.parts(original)
+            base_fields = yaml.safe_load(base_front)
+            expected_stage = next(row["lanes"]["ultracode_stage"] for row in manifest["rows"]
+                                  if row["id"] == name)
+            for directory in variants.AGENT_DIRS:
+                with self.subTest(agent=name, directory=directory):
+                    front, body = self.parts(rendered[f"{directory}/{name}.md"])
+                    self.assertEqual(body, base_body)
+                    fields = yaml.safe_load(front)
+                    allowed = {"name", "description", "skills", "tools"}
+                    if name == "isolated-builder-skills":
+                        self.assertIn("Skill", fields["tools"].split(", "))
+                    else:
+                        self.assertNotIn("Skill", fields["tools"].split(", "))
+                    self.assertEqual({key: value for key, value in fields.items() if key not in allowed},
+                                     {key: value for key, value in base_fields.items() if key not in allowed})
+                    self.assertEqual(fields["name"], name)
+                    self.assertEqual(fields["skills"], self.PRELOADS[name])
+                    self.assertEqual(fields["description"], expected_stage["description"])
+                    self.assertNotEqual(fields["description"], base_fields["description"])
+
+    def test_shipped_variant_bodies_match_their_held_base_and_native_preload_names(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML is not installed")
+        for name, base in variants.VARIANTS.items():
+            with self.subTest(agent=name):
+                base_front, base_body = self.parts((icp.AGENTS_SRC_DIR / f"{base}.md").read_bytes())
+                role = icp.AGENTS_SRC_DIR / f"{name}.md"
+                if not role.is_file():
+                    role = ROOT / variants.PENDING_DIRS[0] / f"{name}.md"
+                    self.assertFalse((ROOT / ".claude/agents" / f"{name}.md").exists())
+                    self.assertEqual(role.read_bytes(), (ROOT / variants.PENDING_DIRS[1] / f"{name}.md").read_bytes())
+                front, body = self.parts(role.read_bytes())
+                self.assertEqual(body, base_body)
+                original, actual = yaml.safe_load(base_front), yaml.safe_load(front)
+                changed = {key for key in original.keys() | actual.keys() if original.get(key) != actual.get(key)}
+                allowed = {"name", "description", "skills", "tools"}
+                if name == "isolated-builder-skills":
+                    self.assertIn("Skill", actual["tools"].split(", "))
+                self.assertLessEqual(changed, allowed)
+                self.assertEqual(actual["skills"], self.PRELOADS[name])
+                self.assertNotEqual(actual["description"], original["description"])
+
+    def test_client_wiring_hold_preserves_every_base_tool_grant(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML is not installed")
+        for name, base in variants.VARIANTS.items():
+            with self.subTest(agent=name):
+                role = icp.AGENTS_SRC_DIR / f"{name}.md"
+                if not role.is_file():
+                    role = ROOT / variants.PENDING_DIRS[0] / f"{name}.md"
+                front = yaml.safe_load(self.parts(role.read_bytes())[0])
+                original = yaml.safe_load(self.parts((icp.AGENTS_SRC_DIR / f"{base}.md").read_bytes())[0])
+                tools, base_tools = set(front["tools"].split(", ")), set(original["tools"].split(", "))
+                expected = base_tools | ({"Skill"} if name == "isolated-builder-skills" else set())
+                self.assertEqual(tools, expected)
+                if name != "isolated-builder-skills":
+                    self.assertEqual(front["tools"], original["tools"])
+
+    def test_inert_route_can_render_its_passive_plan_without_becoming_deliverable(self):
+        manifest = self.manifest()
+        stages = [row["lanes"]["ultracode_stage"] for row in manifest["rows"]]
+        for row, stage in zip(manifest["rows"], stages):
+            row["lanes"]["ultracode_stage"] = "inert"
+            row["measure"] = {"planned_ultracode_stage": stage}
+        outputs = variants.render_variants(ROOT, manifest)
+        self.assertEqual(len(outputs), 2 * len(self.PRELOADS))
+        self.assertFalse(any(path.startswith((".claude/agents/", "adoption/agents/claude/")) for path in outputs))
+        self.assertTrue(all(row["lanes"]["ultracode_stage"] == "inert" for row in manifest["rows"]))
+
+    def test_renderer_refuses_an_unapproved_skill_grant(self):
+        manifest = self.manifest()
+        manifest["rows"][0]["lanes"]["ultracode_stage"]["skill_grant"] = True
+        with self.assertRaisesRegex(ValueError, "only isolated-builder-skills"):
+            variants.render_variants(ROOT, manifest)
+
+    def test_renderer_refuses_an_unknown_base_and_conflicting_native_names(self):
+        manifest = self.manifest()
+        manifest["rows"][0]["lanes"]["ultracode_stage"]["base"] = "agents:../../other"
+        with self.assertRaisesRegex(ValueError, "base must be agents:isolated-builder"):
+            variants.render_variants(ROOT, manifest)
+        manifest = self.manifest()
+        clone = json.loads(json.dumps(manifest["rows"][0]))
+        clone["lanes"]["ultracode_stage"]["description"] = "A conflicting role definition."
+        manifest["rows"].append(clone)
+        with self.assertRaisesRegex(ValueError, "conflicting definitions"):
+            variants.render_variants(ROOT, manifest)
+
+    def test_renderer_refuses_empty_routing_description_and_duplicate_preloads(self):
+        manifest = self.manifest()
+        manifest["rows"][0]["lanes"]["ultracode_stage"]["description"] = ""
+        with self.assertRaisesRegex(ValueError, "task-specific description"):
+            variants.render_variants(ROOT, manifest)
+        manifest = self.manifest()
+        manifest["rows"][0]["lanes"]["ultracode_stage"]["preload"] = ["gh-fix-ci", "gh-fix-ci"]
+        with self.assertRaisesRegex(ValueError, "duplicate preload"):
+            variants.render_variants(ROOT, manifest)
+
+
 class AgentEvidenceSentenceTests(unittest.TestCase):
     """Each shipped body that no other record binds carries the one sentence its role's abilities allow
     (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30). HELD lists the bodies whose bytes
@@ -1317,10 +1461,21 @@ class AgentEvidenceSentenceTests(unittest.TestCase):
     # tools/sota-convergence/lane-provenance.json binds these two blind lane roles by hash.
     LANE_BOUND = frozenset({"blind-lane-reviewer", "blind-adjudicator"})
 
-    HELD = E2E_PINNED | E2E_FROZEN | LANE_BOUND
+    # Each native variant inherits an unchanged E2E-pinned body; the distinct
+    # frontmatter has no authority to amend its source's body sentence.
+    VARIANTS = variants.VARIANTS
+    HELD_BASES = E2E_PINNED | E2E_FROZEN | LANE_BOUND
+    HELD = HELD_BASES
+    for variant_name, base_name in VARIANTS.items():
+        if base_name in HELD_BASES:
+            HELD = HELD | {variant_name}
 
     # The sentence each unheld body carries once.
-    SENTENCE = {"landscape-sweep-worker": UPSTREAM, "security-reviewer": CITE, "semantic-evidence-reviewer": CITE}
+    BASE_SENTENCE = {"landscape-sweep-worker": UPSTREAM, "security-reviewer": CITE, "semantic-evidence-reviewer": CITE}
+    SENTENCE = BASE_SENTENCE.copy()
+    for variant_name, base_name in VARIANTS.items():
+        if base_name in BASE_SENTENCE:
+            SENTENCE[variant_name] = BASE_SENTENCE[base_name]
 
     def names(self):
         return sorted(path.stem for path in icp.AGENTS_SRC_DIR.glob("*.md"))
@@ -1330,9 +1485,10 @@ class AgentEvidenceSentenceTests(unittest.TestCase):
 
     def test_each_body_is_held_or_carries_its_roles_sentence_once(self):
         names = self.names()
-        self.assertLessEqual(self.HELD, set(names))
+        self.assertLessEqual(self.HELD_BASES, set(names))
         # A new role has to be classified: held for its owner's amendment, or given the sentence it can act on.
-        self.assertEqual(set(names) - self.HELD, set(self.SENTENCE))
+        self.assertEqual(set(names) - self.HELD, set(self.BASE_SENTENCE) |
+                         {name for name in self.SENTENCE if name in names})
         for name in names:
             body = self.body(name)
             with self.subTest(agent=name):
@@ -1353,6 +1509,13 @@ class AgentEvidenceSentenceTests(unittest.TestCase):
             with self.subTest(agent=name):
                 for sentence in (self.UPSTREAM, self.CITE, self.EVIDENCE):
                     self.assertNotIn(sentence, self.body(name))
+
+    def test_variants_inherit_their_bases_body_classification(self):
+        self.assertLessEqual(set(self.VARIANTS.values()), self.HELD_BASES | set(self.BASE_SENTENCE))
+        for name, base in self.VARIANTS.items():
+            with self.subTest(agent=name):
+                if name in self.names():
+                    self.assertEqual(self.body(name), self.body(base))
 
 
 class McpMatchTests(unittest.TestCase):

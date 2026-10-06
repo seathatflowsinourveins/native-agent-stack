@@ -482,7 +482,27 @@ class Validator:
 
 
 def validate(root: Path) -> dict[str, int]:
-    return Validator(root).validate()
+    summary = Validator(root).validate()
+    workflow_path = root / "adoption/workflow/manifest.json"
+    if workflow_path.is_file():
+        # Native formats and strict existing-store references are verified by the
+        # routing module; this is declared consistency, not delivery evidence.
+        import sys
+        module_dir = root / "tools/adoption"
+        sys.path.insert(0, str(module_dir))
+        try:
+            from workflow_manifest import WorkflowError, load_json, validate_manifest
+            from render_workflow import check_rendered
+            manifest = load_json(workflow_path)
+            validate_manifest(root, manifest)
+            errors = check_rendered(root, manifest)
+            if errors:
+                raise WorkflowError("\n".join(errors))
+        except (ValueError, OSError, ImportError) as error:
+            raise InvalidPublication(f"Workflow routing validation failed: {error}") from error
+        finally:
+            sys.path.pop(0)
+    return summary
 
 
 def main() -> int:
