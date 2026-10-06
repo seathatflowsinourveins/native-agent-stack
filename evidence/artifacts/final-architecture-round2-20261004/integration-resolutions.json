@@ -1683,7 +1683,76 @@
         "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts#L1084"
       ],
       "alternative_not_selected": "Option (a) would restore the historical max aliases. The pinned suffix parser only strips max/ultra aliases whose base model is in the explicit sets; gpt-6.1-sol is not named there. Retaining the supported unsuffixed route with an honest dated amendment is preferable to assuming alias compatibility from the old label.",
-      "unmeasured": "This amendment does not qualify a new model run, unchanged report quality/latency or delivered wire effort. Those require the destination's native acceptance; the tests bind source and configuration only."
+      "unmeasured": "This amendment does not qualify a new model run, unchanged report quality/latency or delivered wire effort. Those require the destination's native acceptance; the tests bind source and configuration only.",
+      "superseded_by": "repair_round_4.research_configuration_amendment_2026_10_06"
+    },
+    "research_configuration_amendment_2026_10_06": {
+      "date_utc": "2026-10-06",
+      "kind": "effort_alias_amendment",
+      "amends": "repair_round_4.research_configuration_amendment",
+      "measurement_performed": false,
+      "configuration_path": "tools/research/gpt-researcher.config.json",
+      "previous_configuration_sha256": "4c4d077808a03f4937b129fc349b65ebf0841a75df2456f37eb3db6a51e3bf97",
+      "configuration_sha256": "8edd67475f0e7f80057a5dbefadfee3af558ceceba7ab4d48a5d4145157ab50b",
+      "ruling": "The command center's item task-ns2604-coop-20261006T043449Z, section 4 (2026-10-06): FAST keeps the -high suffix, as docs/decisions/2026-10-04-round2-plan-g4-config.md:66 and docs/decisions/2026-10-05-round2-adoption-repair.md:53 record, and the effort each request sends must agree with its alias, so that no request asks for xhigh on a -high alias.",
+      "finding": "Gateway call_logs rows of GPT Researcher's FAST role (requested_model codex/gpt-6.1-sol-high) recorded reasoning_effort_requested xhigh and reasoning_effort_upstream high: the 2026-10-05 configuration's LLM_KWARGS.reasoning_effort reached all three roles, and the gateway lets a model suffix outrank a body effort.",
+      "changes": {
+        "SMART_LLM": {
+          "previous_value": "openai:cx/gpt-6.1-sol",
+          "value": "openai:cx/gpt-6.1-sol-xhigh",
+          "reason": "xhigh moves from the shared body parameter onto the alias, which the running gateway's suffix parser recognizes and which outranks any body effort."
+        },
+        "STRATEGIC_LLM": {
+          "previous_value": "openai:cx/gpt-6.1-sol",
+          "value": "openai:cx/gpt-6.1-sol-xhigh",
+          "reason": "The same change for strategic calls."
+        },
+        "LLM_KWARGS.reasoning_effort": {
+          "previous_value": "xhigh",
+          "removed": true,
+          "reason": "GPT Researcher v3.7.0 has one LLM_KWARGS for all three roles and no per-role kwargs, so any body effort there contradicts at least one alias."
+        }
+      },
+      "unchanged": {
+        "FAST_LLM": "openai:cx/gpt-6.1-sol-high"
+      },
+      "per_role_mechanism": "None at assafelovic/gpt-researcher@0957c301 (v3.7.0): config/variables/base.py L35 and L46 declare one LLM_KWARGS and one REASONING_EFFORT; config.py L97 reads REASONING_EFFORT from the environment only, and L225-231 accept high, medium or low; utils/llm.py L86-87 send it only for SUPPORT_REASONING_EFFORT_MODELS (llm_provider/generic/base.py L77-90, which lists no gpt-6.1 model), and L103-104 merge LLM_KWARGS into every call; config.py L205-222 split provider:model only.",
+      "gateway_sources": [
+        "The running 21128 build omniroute-3.8.51-5f4b3d577-affinity-pr15167 (the composition in docs/decisions/2026-10-05-omniroute-gateway-composition.md L9-34): open-sse/executors/codex.ts L1401-1408 split the alias suffix, and L1428-1433 resolve the effort as forced, then the model suffix, then reasoning.effort, then reasoning_effort.",
+        "Same build: open-sse/executors/codex/reasoningSuffix.ts L1-9 (effort order with xhigh) and L54-58 (hyphen suffixes none through xhigh).",
+        "Same build: src/lib/usage/callLogs.ts L649-668 and src/lib/db/migrations/188_call_logs_reasoning_encrypted.sql L13-14: reasoning_effort_requested is the client body's effort verbatim (NULL when absent), and reasoning_effort_upstream is the effort the gateway sent."
+      ],
+      "before": "In the 24 hours before the observed run (2026-10-05T04:45:27Z to 2026-10-06T04:45:27Z), call_logs held 12 rows whose requested and upstream efforts differed: all of them GPT Researcher sessions (session_tag gptr-*) on codex/gpt-6.1-sol-high, requested xhigh, upstream high.",
+      "observation": {
+        "kind": "one native host run through the patched wrapper; not a quality or latency measurement",
+        "run": "20261006T044527Z-3989681",
+        "session_tag": "gptr-20261006T044527Z-3989681",
+        "window_utc": "2026-10-06T04:45:27Z/2026-10-06T04:51:31Z",
+        "query": "NTP leap smear guidance 2026",
+        "wrapper_sha256": "fbf0f46a42f1489193a0b190b284944b65ce0cecd975e85eb370a8bfccd23311",
+        "wrapper_exit": 0,
+        "sources_count": 12,
+        "method": "The gateway's call_logs table, opened with sqlite3 mode=ro and filtered by session_tag.",
+        "rows": [
+          {
+            "requested_model": "codex/gpt-6.1-sol-xhigh",
+            "count": 3,
+            "status": 200,
+            "reasoning_effort_requested": null,
+            "reasoning_effort_upstream": "xhigh"
+          },
+          {
+            "requested_model": "codex/gpt-6.1-sol-high",
+            "count": 1,
+            "status": 200,
+            "reasoning_effort_requested": null,
+            "reasoning_effort_upstream": "high"
+          }
+        ],
+        "result": "On every row the upstream effort equals the alias suffix, and no row carries a body effort; no row reached /v1/embeddings."
+      },
+      "dependency": "A gateway without OmniRoute PR 15167 answers HTTP 400 for cx/gpt-6.1-sol-xhigh (docs/decisions/2026-10-05-omniroute-gateway-composition.md L49-51). Rolling 21128 back to such a build needs the 2026-10-05 configuration back as well.",
+      "unmeasured": "No report quality or latency claim. The observation covers routing and effort agreement in one run only."
     },
     "local_reproduction": {
       "rg_on_path": false,

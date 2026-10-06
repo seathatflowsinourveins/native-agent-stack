@@ -89,6 +89,11 @@ class Round2RepairIntegrationTests(unittest.TestCase):
         rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/chat/completions",
                  "model": "gpt-6.1-sol", "requestedModel": "cx/gpt-6.1-sol"}]
         self.assertEqual(gate.observed_routes(rows), {"cx/gpt-6.1-sol"})
+        # GPT Researcher's routes since 2026-10-06: the effort rides on each alias.
+        research = [dict(rows[0], model="gpt-6.1-sol-high", requestedModel="cx/gpt-6.1-sol-high"),
+                    dict(rows[0], model="gpt-6.1-sol-xhigh", requestedModel="cx/gpt-6.1-sol-xhigh")]
+        self.assertEqual(gate.observed_routes(research), {"cx/gpt-6.1-sol-high", "cx/gpt-6.1-sol-xhigh"})
+        self.assertEqual({gate.ROUTES[route] for route in gate.observed_routes(research)}, {"high", "xhigh"})
         for field, value in (("status", 503), ("path", "/v1/embeddings"),
                              ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max")):
             with self.subTest(field=field), self.assertRaises(ValueError):

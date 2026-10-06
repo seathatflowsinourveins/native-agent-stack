@@ -63,6 +63,12 @@ older than the run start end pagination; prepended in-memory rows do not.
 [default summary fields](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/callLogs.ts#L472),
 [pipeline-capture default](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/db/migrations/014_unified_log_artifacts.sql#L7).
 
+Amended 2026-10-06: GPT Researcher's smart and strategic roles now use
+`cx/gpt-6.1-sol-xhigh` and send no body effort. FAST's `-high` alias therefore no
+longer receives the shared xhigh request that the gateway downgraded to high.
+DeerFlow keeps plain `cx/gpt-6.1-sol` at xhigh. Record:
+`repair_round_4.research_configuration_amendment_2026_10_06` in the integration ledger.
+
 Source review found a second effort path: DeerFlow v2.1.0 defaults
 `supports_reasoning_effort` to false and removes the configured effort in that
 case. The configuration now enables that supported flag, and effective

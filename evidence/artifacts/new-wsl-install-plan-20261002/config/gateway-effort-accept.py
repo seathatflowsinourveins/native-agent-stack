@@ -27,7 +27,9 @@ import urllib.request
 
 
 BASE = "http://127.0.0.1:21128/api/usage/call-logs"
-ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high"}
+# DeerFlow keeps the plain route at xhigh. GPT Researcher (amended 2026-10-06) puts each role's effort on its alias:
+# fast -high, smart and strategic -xhigh (integration-resolutions.json, research_configuration_amendment_2026_10_06).
+ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high", "cx/gpt-6.1-sol-xhigh": "xhigh"}
 MODELS = {route.split("/", 1)[1] for route in ROUTES}
 
 

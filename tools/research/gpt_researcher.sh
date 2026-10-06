@@ -8,7 +8,12 @@
 # (2026-10-03; evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.gpt-runtimes, changes 2-5):
 # - tools/research/gpt-researcher.config.json preserves session 80's measured profile without its key, with the
 #   dated compatibility amendments in integration-resolutions.json:repair_round_4.research_configuration_amendment
-#   (unsuffixed smart/strategic aliases and explicit xhigh follow #637; this is not a new measurement).
+#   (2026-10-05) and research_configuration_amendment_2026_10_06; neither is a new measurement. Since 2026-10-06
+#   each role's effort rides on its alias suffix alone: fast cx/gpt-6.1-sol-high, smart and strategic
+#   cx/gpt-6.1-sol-xhigh, and no LLM_KWARGS.reasoning_effort. GPT Researcher has one LLM_KWARGS for all three roles
+#   (config/variables/base.py L35 at 0957c301; utils/llm.py L103-104), and the gateway lets a suffix outrank a body
+#   effort (OmniRoute 3.8.51 open-sse/executors/codex.ts L1428-1433), so a shared xhigh went upstream as high on the
+#   fast alias.
 #   Each run gets its own copy, in its own directory, with base_url set to the gateway below and one
 #   x-omniroute-session-id value, the join key of the gateway's call log
 #   (OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/handlers/chatCore.ts:1087-1090,1133).
@@ -113,15 +118,27 @@ if config.retrievers != ["duckduckgo"]:
     problems.append(f"retrievers {config.retrievers!r}, not ['duckduckgo']")
 if getattr(config, "context_filter", None) != "keyword":
     problems.append(f"context filter {getattr(config, 'context_filter', None)!r}, not 'keyword'")
-wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol"),
-          "strategic": ("openai", "cx/gpt-6.1-sol")}
+wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol-xhigh"),
+          "strategic": ("openai", "cx/gpt-6.1-sol-xhigh")}
 for role, pair in wanted.items():
     found = (getattr(config, f"{role}_llm_provider", None), getattr(config, f"{role}_llm_model", None))
     if found != pair:
         problems.append(f"{role} model {found!r}, not {pair!r}")
 kwargs = getattr(config, "llm_kwargs", None) or {}
-if kwargs.get("reasoning_effort") != "xhigh":
-    problems.append("gateway research reasoning_effort must be xhigh on OmniRoute 3.8.51")
+
+
+def keys(value):
+    """Every key at any depth: model_kwargs or extra_body would carry an effort into the request body as well."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from keys(item)
+
+
+efforts = sorted({key for key in keys(kwargs) if key in ("reasoning_effort", "reasoning")})
+if efforts:
+    problems.append(f"LLM_KWARGS sets {', '.join(efforts)}, which every role would send; each role's alias suffix "
+                    "carries its effort")
 base_url = kwargs.get("base_url")
 if not base_url == os.environ.get("OPENAI_BASE_URL") == gateway:
     problems.append(f"base_url {base_url!r} and OPENAI_BASE_URL {os.environ.get('OPENAI_BASE_URL')!r} are not {gateway!r}")

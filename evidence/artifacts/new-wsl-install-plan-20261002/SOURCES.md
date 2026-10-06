@@ -577,6 +577,12 @@ do not include `gpt-6.1-sol` in that set. The
 is xhigh. Keep the unsuffixed smart/strategic route and explicit xhigh request
 from #637's record; an alias label supplies no delivered-effort evidence.
 
+Amended 2026-10-06 (`repair_round_4.research_configuration_amendment_2026_10_06`):
+GPT Researcher has one `LLM_KWARGS` for all three roles, so the explicit xhigh
+request also reached FAST's `-high` alias, where the running gateway's suffix
+outranked it. Smart and strategic now use `cx/gpt-6.1-sol-xhigh`, FAST keeps
+`cx/gpt-6.1-sol-high`, and no body effort is sent.
+
 The per-run correlation header remains `x-omniroute-session-id`, as the pinned
 [chat handler reads](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts#L1084)
 before assigning `call_logs.session_tag`. Chrome Signed-By and Claude MCP

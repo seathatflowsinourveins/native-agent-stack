@@ -134,37 +134,52 @@ class ResearchEntry(unittest.TestCase):
         self.env["PATH"] = f"{timer_bin}{os.pathsep}{self.env['PATH']}"
         return timer_bin / "timeout", record
 
-    def test_the_committed_configuration_matches_the_measured_profile_and_dated_amendment_without_a_key(self):
-        # The retained ruling binds the baseline to session 80. The 2026-10-05
-        # amendment binds these exact config bytes to #637's source compatibility
-        # corrections; it makes no new model-run or delivered-effort claim.
-        amendment = json.loads(AMENDMENT_RECORD.read_text())["repair_round_4"]["research_configuration_amendment"]
-        self.assertEqual(amendment["date_utc"], "2026-10-05")
-        self.assertFalse(amendment["measurement_performed"])
-        self.assertEqual(amendment["configuration_sha256"], hashlib.sha256(CONFIG.read_bytes()).hexdigest())
-        self.assertEqual(amendment["measured_record"]["path"], str(MEASURED_RECORD.relative_to(ROOT)))
-        self.assertEqual(amendment["measured_record"]["sha256"], hashlib.sha256(MEASURED_RECORD.read_bytes()).hexdigest())
+    def test_the_committed_configuration_matches_the_measured_profile_and_dated_amendments_without_a_key(self):
+        # The retained ruling binds the baseline to session 80. The 2026-10-05 amendment bound #637's source
+        # compatibility corrections; the 2026-10-06 amendment binds these exact config bytes and moves each role's
+        # effort onto its own alias. Neither makes a new model-run, quality or delivered-effort claim.
+        record = json.loads(AMENDMENT_RECORD.read_text())["repair_round_4"]
+        first = record["research_configuration_amendment"]
+        latest = record["research_configuration_amendment_2026_10_06"]
+        self.assertEqual((first["date_utc"], latest["date_utc"]), ("2026-10-05", "2026-10-06"))
+        self.assertEqual(first["superseded_by"], "repair_round_4.research_configuration_amendment_2026_10_06")
+        self.assertEqual(latest["amends"], "repair_round_4.research_configuration_amendment")
+        self.assertEqual(latest["previous_configuration_sha256"], first["configuration_sha256"])
+        self.assertFalse(first["measurement_performed"] or latest["measurement_performed"])
+        self.assertEqual(latest["configuration_sha256"], hashlib.sha256(CONFIG.read_bytes()).hexdigest())
+        self.assertEqual(first["measured_record"]["path"], str(MEASURED_RECORD.relative_to(ROOT)))
+        self.assertEqual(first["measured_record"]["sha256"], hashlib.sha256(MEASURED_RECORD.read_bytes()).hexdigest())
         ruling = json.loads(MEASURED_RECORD.read_text())["layers"]["gpt-runtimes"]["ruling"]
         self.assertIn("session 80's config.json", ruling["changes"]["2"])
         self.assertIn("cx/gpt-6.1-sol-high and cx/gpt-6.1-sol-max", ruling["decided_default"])
         config = json.loads(CONFIG.read_text())
-        for field, value in amendment["preserved_measured_values"].items():
+
+        def value(field):
             found = config
             for part in field.split("."):
                 found = found[part]
-            self.assertEqual(found, value, field)
-        for field, change in amendment["compatibility_amendments"].items():
-            found = config
-            for part in field.split("."):
-                found = found[part]
-            self.assertEqual(found, change["value"], field)
+            return found
+
+        for field, expected in first["preserved_measured_values"].items():
+            self.assertEqual(value(field), expected, field)
+        for field, change in first["compatibility_amendments"].items():
+            if field not in latest["changes"]:  # a field the 2026-10-06 amendment changed is checked below
+                self.assertEqual(value(field), change["value"], field)
+        for field, change in latest["changes"].items():
+            self.assertEqual(change["previous_value"], first["compatibility_amendments"][field]["value"], field)
+            if change.get("removed"):
+                self.assertRaises(KeyError, value, field)
+            else:
+                self.assertEqual(value(field), change["value"], field)
+        for field, expected in latest["unchanged"].items():
+            self.assertEqual(value(field), expected, field)
         self.assertNotIn("api_key", config["LLM_KWARGS"])
         self.assertEqual(config["LLM_KWARGS"]["base_url"], GATEWAY)
         self.assertEqual(config["LLM_KWARGS"]["max_tokens"], 12000)
         self.assertEqual((config["RETRIEVER"], config["CONTEXT_FILTER"]), ("duckduckgo", "keyword"))
         self.assertEqual((config["FAST_LLM"], config["SMART_LLM"], config["STRATEGIC_LLM"]),
-                         ("openai:cx/gpt-6.1-sol-high", "openai:cx/gpt-6.1-sol", "openai:cx/gpt-6.1-sol"))
-        self.assertEqual(config["LLM_KWARGS"]["reasoning_effort"], "xhigh")
+                         ("openai:cx/gpt-6.1-sol-high", "openai:cx/gpt-6.1-sol-xhigh", "openai:cx/gpt-6.1-sol-xhigh"))
+        self.assertNotIn("reasoning_effort", config["LLM_KWARGS"])
         self.assertEqual((config["MAX_SCRAPER_WORKERS"], config["SCRAPER_RATE_LIMIT_DELAY"], config["BROWSE_CHUNK_MAX_LENGTH"],
                           config["TOTAL_WORDS"]), (4, 0.5, 4096, 1500))
 
@@ -181,10 +196,17 @@ class ResearchEntry(unittest.TestCase):
 
     def test_the_preflight_fails_closed_and_the_research_never_starts(self):
         base = json.loads(CONFIG.read_text())
+        kwargs = base["LLM_KWARGS"]
         cases = {
             "retrievers": dict(base, RETRIEVER="tavily"),
             "context filter": dict(base, CONTEXT_FILTER="embeddings"),
             "fast model": dict(base, FAST_LLM="openai:gpt-4o-mini"),
+            # The 2026-10-05 spelling: a plain smart route, and one body effort that every role, fast included, sends.
+            "smart model": dict(base, SMART_LLM="openai:cx/gpt-6.1-sol"),
+            "strategic model": dict(base, STRATEGIC_LLM="openai:cx/gpt-6.1-sol-high"),
+            "LLM_KWARGS sets reasoning_effort": dict(base, LLM_KWARGS=dict(kwargs, reasoning_effort="xhigh")),
+            "LLM_KWARGS sets reasoning,": dict(base, LLM_KWARGS=dict(kwargs, model_kwargs={"reasoning": {"effort": "high"},
+                                                                                         "reasoning_effort": "high"})),
         }
         for problem, config in cases.items():
             with self.subTest(problem=problem):
