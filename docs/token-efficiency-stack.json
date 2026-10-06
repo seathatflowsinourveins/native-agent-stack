@@ -7222,11 +7222,10 @@
         "install": [],
         "use": [
           "grafana --version",
-          "curl --fail --silent http://127.0.0.1:13000/api/health",
-          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:13000/api/health"
+          "curl --fail --silent --show-error --output \"$GRAFANA_HEALTH_FILE\" http://127.0.0.1:13000/api/health"
         ],
         "statistics": [],
-        "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
+        "command_kind": "Read-only upstream validation and health commands. Before the health check, set GRAFANA_HEALTH_FILE to an owned real file; require curl's exit status and inspect that file (docs/token-session-handbook.md, quiet-download routing). The retained 2026-09-20 observation below was taken with the earlier stdout forms. No installer or service mutation is run by this row."
       },
       "returned_result_summary": "2026-09-20 14:17 UTC: /api/health returned HTTP 200 with database 'ok', version '13.2.2', and the retained commit identity. The native user service was active in the follow-up. This current health check does not constitute a new visual dashboard acceptance or a token-savings measurement.",
       "session_statistics": {

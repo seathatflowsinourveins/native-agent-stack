@@ -1206,7 +1206,7 @@
       "role": "Local native observation dashboard",
       "commands": [
         "grafana --version",
-        "curl --fail --silent http://127.0.0.1:13000/api/health"
+        "curl --fail --silent --show-error --output \"$GRAFANA_HEALTH_FILE\" http://127.0.0.1:13000/api/health"
       ],
       "evidence_ids": [
         "native-observability",
