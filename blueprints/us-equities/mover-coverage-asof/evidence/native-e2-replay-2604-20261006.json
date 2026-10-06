@@ -101,6 +101,6 @@
     "strategy_evidence": false,
     "broker_or_paper_evidence": false
   },
-  "publication_review": "Outputs accepted by the trading-custody cross-family read; public first-pass, command-center ACK and owner landing remain pending.",
-  "meta_format_observation": "A-classify's older meta format recorded EXIT_CODE=0 while the outer tool reported1. D2 governs by native exit0; later commands explicitly record NATIVE_EXIT_CODE and SANITIZER_EXIT_CODE. The discrepancy is retained, not erased."
+  "publication_review": "Outputs accepted by the trading-custody cross-family read; public first-pass, command-center acknowledgment and owner landing remain pending.",
+  "meta_format_observation": "Exact-arm classify's older meta format recorded EXIT_CODE=0 while the outer tool reported1. D2 governs by native exit0; later commands explicitly record NATIVE_EXIT_CODE and SANITIZER_EXIT_CODE. The discrepancy is retained, not erased."
 }
