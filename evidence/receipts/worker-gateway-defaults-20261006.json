@@ -7,17 +7,19 @@
     "omniroute"
   ],
   "checked_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
-  "claim": "Both actual worker argument/configuration paths select canonical gateway.endpoint or21128fallback without an explicit --base-url; default selection avoids legacy20128. Explicit override behavior is preserved.",
+  "claim": "At initial reviewed head 1942acb12, both actual worker argument/configuration paths selected canonical gateway.endpoint or the 21128 fallback without an explicit --base-url; default selection avoided legacy 20128. Explicit override behavior was preserved. Later P3 corrections and their actual rechecks are recorded separately below.",
   "source_refs": [
     "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json:9",
     "native-agent-stack@84c79f7f92f61972a46aa470a4f299017bc82768:evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs:8-14",
     "native-agent-stack@84c79f7f92f61972a46aa470a4f299017bc82768:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh:2596-2600",
     "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:sdk/python",
-    "langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py"
+    "langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py",
+    "https://docs.python.org/3.13/library/pathlib.html#pathlib.PurePath.parents",
+    "https://docs.python.org/3.13/library/pathlib.html#operators"
   ],
   "evidence_classes": {
     "configuration_tests": "local_integration with synthetic SDK/provider import fixtures",
-    "native_sdk_checks": "local_integration with real0.160.0SDK/bundledCLI and synthetic catalog/observer",
+    "native_sdk_checks": "local_integration with real 0.160.0 SDK/bundled CLI and synthetic catalog/observer",
     "upstream_tests": "Not run; repository cases are not unchanged upstream tests",
     "provider_or_gateway_acceptance": "Not run",
     "cross_distribution_namespace": "Command-center reported observation; no new host/interop measurement by this lane"
@@ -36,13 +38,42 @@
       "gateway_http_requests": 0
     }
   ],
-  "review_correction": "Initial helper accepted malformed URL candidates such as missingport; source critic found it, defaults now follow existing Codex gateway_url contract and expanded cases passed. Initial4-case pass did not cover those added conditions.",
+  "review_correction": "Initial helper accepted malformed URL candidates such as a missing port; the source critic found it, the default reader adopted the existing Codex gateway_url contract, and expanded cases passed before initial publication. The earlier four-case pass did not cover those added conditions. Neither initial run qualified 20129 rejection or shallow-copy imports.",
+  "p3_correction": {
+    "reviewed_head": "1942acb128f001164607892fceb907901f891030",
+    "evidence_classes": {
+      "source_review": "Main's canonical topology, pinned open draft proposal and Python pathlib contracts.",
+      "configuration_tests": "Local integration with inert synthetic SDK/provider imports.",
+      "native_sdk_checks": "Local integration with real pinned SDK/CLI and synthetic metadata observer, without inference or gateway HTTP."
+    },
+    "changes": [
+      "Reject both NativeStack ports, 20128 and 20129, as implicit defaults; preserve explicit CLI overrides.",
+      "Resolve the checkout topology path inside the reader and catch shallow-copy IndexError; add a synthetic module-import fixture.",
+      "Attribute the canonical field to main; identify the supporting reader as an open draft #723 source proposal.",
+      "Mark the explicit 21128 flags as interim until PR #773 lands, name out-of-scope stale defaults, and restore prose spacing and decision attribution."
+    ],
+    "acceptance_status": "Root configuration and bounded native SDK checks passed on 2026-10-06. The bounded writer performed source edits/review only. Integrity validation is recorded in the PR and lane status after registration.",
+    "configuration_test_result": {
+      "command": "nice -n 19 python3 -m unittest -v tests.test_gateway_worker_defaults; external TMPDIR",
+      "exit_code": 0,
+      "output": "test_configured_endpoint_and_explicit_cli_override (tests.test_gateway_worker_defaults.GatewayWorkerDefaultTests.test_configured_endpoint_and_explicit_cli_override) ... ok\ntest_missing_topology_falls_back_to_2604 (tests.test_gateway_worker_defaults.GatewayWorkerDefaultTests.test_missing_topology_falls_back_to_2604) ... ok\ntest_no_base_url_uses_canonical_topology (tests.test_gateway_worker_defaults.GatewayWorkerDefaultTests.test_no_base_url_uses_canonical_topology) ... ok\ntest_shallow_worker_copies_import_and_fall_back (tests.test_gateway_worker_defaults.GatewayWorkerDefaultTests.test_shallow_worker_copies_import_and_fall_back) ... ok\ntest_stale_legacy_or_malformed_topology_never_defaults_to_nativestack (tests.test_gateway_worker_defaults.GatewayWorkerDefaultTests.test_stale_legacy_or_malformed_topology_never_defaults_to_nativestack) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.045s\n\nOK\n"
+    },
+    "native_sdk_check_result": {
+      "command": "nice -n 19 uv run --locked --no-build --python <Python3.13.16> --script examples/omniroute-codex-sdk/test_worker.py NativeTransportTests.test_gateway_runtime_config_keeps_native_catalog_matching NativeTransportTests.test_preflight_discovers_native_mcp_skill_and_roles_without_inference; task-private UV_CACHE_DIR and external TMPDIR",
+      "exit_code": 0,
+      "output": "Downloading openai-codex-cli-bin (133.0MiB)\nDownloading pydantic-core (2.0MiB)\n Downloaded pydantic-core\n Downloaded openai-codex-cli-bin\nInstalled 8 packages in 18ms\ntest_gateway_runtime_config_keeps_native_catalog_matching (__main__.NativeTransportTests.test_gateway_runtime_config_keeps_native_catalog_matching) ... ok\ntest_preflight_discovers_native_mcp_skill_and_roles_without_inference (__main__.NativeTransportTests.test_preflight_discovers_native_mcp_skill_and_roles_without_inference) ... <python-runtime>/lib/python3.13/concurrent/futures/thread.py:59: ResourceWarning: unclosed file <_io.TextIOWrapper name=<fd> encoding='utf-8'>\n  result = self.fn(*self.args, **self.kwargs)\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n<python-runtime>/lib/python3.13/concurrent/futures/thread.py:59: ResourceWarning: unclosed file <_io.TextIOWrapper name=<fd> encoding='utf-8'>\n  result = self.fn(*self.args, **self.kwargs)\nResourceWarning: Enable tracemalloc to get the object allocation traceback\nok\n\n----------------------------------------------------------------------\nRan 2 tests in 1.036s\n\nOK\n",
+      "model_inference_submitted": false,
+      "gateway_http_requests": 0
+    }
+  },
   "limitations": [
     "New configuration tests stub third-party constructors; they do not accept SDK/provider execution.",
-    "Native cases use realSDK/CLI metadata with synthetic observer/catalog fixtures, not live-provider/model acceptance.",
+    "Native cases use real SDK/CLI metadata with synthetic observer/catalog fixtures, not live-provider/model acceptance.",
     "Two unclosed-file ResourceWarnings in native passing run retained; not a claim of complete resource closure.",
     "No gateway/config/client/host state is changed by the lane; installed/client configuration copies are not read.",
-    "No bounded model job or live gateway request is launched; source policy for2604jobs passes explicit21128."
+    "No bounded model job or live gateway request was launched; the interim policy for 2604 jobs passes explicit 21128 until PR #773 lands.",
+    "Supporting reader sources at 84c79f7f are from open draft #723; main's canonical topology field is the direct data source.",
+    "The two initial observations above predate the P3 source corrections; fresh results are recorded separately under p3_correction, including two retained ResourceWarnings."
   ],
   "sanitization": "Actual returned outputs retained; private Python runtime prefix and native file-descriptor identifiers replaced with placeholders.",
   "recorded_at_utc": "2026-10-06T04:52:04Z"

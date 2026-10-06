@@ -105,7 +105,7 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
 
     def test_no_base_url_uses_canonical_topology(self):
         expected = json.loads(TOPOLOGY.read_text())["gateway"]["endpoint"]
-        self.assertNotEqual(urlsplit(expected).port, 20128)
+        self.assertNotIn(urlsplit(expected).port, {20128, 20129})
         for name in self.workers:
             with self.subTest(worker=name):
                 self.assertEqual(self.selected_url(name, TOPOLOGY), expected)
@@ -124,14 +124,16 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
             for name in self.workers:
                 with self.subTest(worker=name):
                     self.assertEqual(self.selected_url(name, topology), "http://127.0.0.1:21188/v1")
-                    for explicit in ("http://127.0.0.1:24444/v1", "http://127.0.0.1:20128/v1"):
+                    for explicit in ("http://127.0.0.1:24444/v1", "http://127.0.0.1:20128/v1",
+                                     "http://127.0.0.1:20129/v1"):
                         self.assertEqual(self.selected_url(name, topology, explicit), explicit)
 
-    def test_stale_legacy_or_malformed_topology_never_defaults_to_20128(self):
+    def test_stale_legacy_or_malformed_topology_never_defaults_to_nativestack(self):
         with tempfile.TemporaryDirectory() as directory:
             topology = Path(directory) / "topology.json"
             malformed_urls = (
                 "http://127.0.0.1:20128/v1",
+                "http://127.0.0.1:20129/v1",
                 "http://127.0.0.1/v1",
                 "https://127.0.0.1:21188/v1",
                 "http://remote.example.invalid:21188/v1",
@@ -145,6 +147,31 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
                 for name in self.workers:
                     with self.subTest(worker=name, topology=text):
                         self.assertEqual(self.selected_url(name, topology), FALLBACK)
+
+    def test_shallow_worker_copies_import_and_fall_back(self):
+        strict = os.environ.get("LANGGRAPH_STRICT_MSGPACK")
+        try:
+            for name, original in self.workers.copy().items():
+                with self.subTest(worker=name):
+                    module = ModuleType("gateway_default_shallow_" + name)
+                    module.__file__ = "/worker.py"
+                    source = Path(original.__file__).read_text(encoding="utf-8")
+                    imports = imports_without_providers()
+                    imports[module.__name__] = module
+                    with patch.dict(sys.modules, imports):
+                        exec(compile(source, module.__file__, "exec"), module.__dict__)
+                    with patch.dict(self.workers, {name: module}):
+                        self.assertEqual(self.selected_url(name, module.GATEWAY_TOPOLOGY), FALLBACK)
+                        self.assertEqual(
+                            self.selected_url(name, module.GATEWAY_TOPOLOGY,
+                                              "http://127.0.0.1:24444/v1"),
+                            "http://127.0.0.1:24444/v1",
+                        )
+        finally:
+            if strict is None:
+                os.environ.pop("LANGGRAPH_STRICT_MSGPACK", None)
+            else:
+                os.environ["LANGGRAPH_STRICT_MSGPACK"] = strict
 
 
 if __name__ == "__main__":

@@ -27,8 +27,9 @@ provider execution or promote this candidate to a default.
   seconds and zero retries. The caller supplies an existing credential through
   an environment-variable name; the recipe does not copy native client sign-ins.
   WSL distributions share networking; implicit defaults avoid NativeStack's
-  port 20128. Bounded jobs on NativeStack2604 explicitly pass
-  `--base-url http://127.0.0.1:21128/v1`.
+  ports 20128 and 20129. Until PR #773 lands, bounded jobs on NativeStack2604
+  explicitly pass `--base-url http://127.0.0.1:21128/v1`; after landing, omit
+  that interim flag to use the canonical default.
 - SQLite checkpoint package **3.1.1**, [matched release source `b2926a0f`](https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite).
   The published wheel SHA-256 is
   `8505c54c94a658080525d7e6780fdd4e0c078ff2566b30d399c02cc9f9af1c63`;

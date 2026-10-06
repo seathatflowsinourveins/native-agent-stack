@@ -24,24 +24,24 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 
 BASE_URL = "http://127.0.0.1:21128/v1"
 GATEWAY_TOPOLOGY = (
-    Path(__file__).resolve().parents[2]
-    / "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json"
+    Path("evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json")
 )
 MODEL = "cx/gpt-6.1-sol-max"
 
 
 def default_gateway_base_url():
-    # Same gateway.endpoint field as #723's native Promptfoo config (84c79f7f).
+    # Canonical field: native-agent-stack@ecfa11276, plan topology JSON:9.
     try:
-        endpoint = json.loads(GATEWAY_TOPOLOGY.read_text(encoding="utf-8"))["gateway"]["endpoint"]
+        topology = Path(__file__).resolve().parents[2] / GATEWAY_TOPOLOGY
+        endpoint = json.loads(topology.read_text(encoding="utf-8"))["gateway"]["endpoint"]
         if isinstance(endpoint, str):
             parsed = urlsplit(endpoint)
-            # WSL distributions share networking; 20128 belongs to NativeStack.
+            # WSL distributions share networking; both ports belong to NativeStack.
             # Match the existing Codex worker gateway_url contract for defaults.
             if (
                 parsed.scheme == "http"
                 and parsed.hostname in {"127.0.0.1", "localhost", "::1"}
-                and parsed.port not in {None, 20128}
+                and parsed.port not in {None, 20128, 20129}
                 and parsed.username is None
                 and parsed.password is None
                 and not parsed.query
@@ -49,7 +49,7 @@ def default_gateway_base_url():
                 and parsed.path.rstrip("/") == "/v1"
             ):
                 return endpoint.rstrip("/")
-    except (OSError, ValueError, KeyError, TypeError):
+    except (OSError, ValueError, KeyError, TypeError, IndexError):
         pass
     return BASE_URL
 

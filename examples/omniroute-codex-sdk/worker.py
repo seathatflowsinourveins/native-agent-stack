@@ -41,8 +41,7 @@ PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:21128/v1"
 GATEWAY_TOPOLOGY = (
-    Path(__file__).resolve().parents[2]
-    / "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json"
+    Path("evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json")
 )
 # OmniRoute 0585aba5589d5a1f49243a13a8db249558e7c9e3:
 # open-sse/executors/codex/reasoningSuffix.ts: suffix tokens for a lexical
@@ -55,14 +54,15 @@ _CLEANUP_TASKS: set[asyncio.Task] = set()
 
 
 def default_gateway_base_url() -> str:
-    # Same gateway.endpoint field as #723's native Promptfoo config (84c79f7f).
+    # Canonical field: native-agent-stack@ecfa11276, plan topology JSON:9.
     try:
-        endpoint = json.loads(GATEWAY_TOPOLOGY.read_text(encoding="utf-8"))["gateway"]["endpoint"]
+        topology = Path(__file__).resolve().parents[2] / GATEWAY_TOPOLOGY
+        endpoint = json.loads(topology.read_text(encoding="utf-8"))["gateway"]["endpoint"]
         if isinstance(endpoint, str):
-            # WSL distributions share networking; 20128 belongs to NativeStack.
-            if urlsplit(endpoint).port != 20128:
+            # WSL distributions share networking; both ports belong to NativeStack.
+            if urlsplit(endpoint).port not in {20128, 20129}:
                 return gateway_url(endpoint)
-    except (OSError, ValueError, KeyError, TypeError, argparse.ArgumentTypeError):
+    except (OSError, ValueError, KeyError, TypeError, IndexError, argparse.ArgumentTypeError):
         pass
     return DEFAULT_BASE_URL
 
