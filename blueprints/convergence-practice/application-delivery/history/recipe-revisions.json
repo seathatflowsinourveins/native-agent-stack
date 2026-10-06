@@ -260,7 +260,7 @@
       "amendment_date": "2026-10-06",
       "amendment_receipt": "evidence/receipts/pr765-bindings-amendment-20261006.json",
       "pre_amendment_record": {
-        "revision": "67c6594d2c252bdd253626dc54789c70e54c4a28",
+        "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
         "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
         "retained_path": "../../../evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment.json.source.txt"
       }
@@ -268,7 +268,7 @@
     {
       "record": "experiment-macos-20260924.json",
       "original": {
-        "revision": "67c6594d2c252bdd253626dc54789c70e54c4a28",
+        "revision": "67666d6e3b790131a9b4a86f6e6b933e26fe305d",
         "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
         "retained_path": "../../../evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment-macos-20260924.json.source.txt"
       },

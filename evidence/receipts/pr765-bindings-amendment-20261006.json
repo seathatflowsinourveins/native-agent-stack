@@ -8,8 +8,8 @@
   "sources": [
     "native-agent-stack@c96c2555c2d84683d9e519623354c814aeb6a584:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:121-139",
     "native-agent-stack@798ac445307e2cd8eba6e74d7722ac0e16da02c7:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:99-137",
-    "native-agent-stack@67c6594d2c252bdd253626dc54789c70e54c4a28:blueprints/convergence-practice/application-delivery/test_portability.py:101-131",
-    "native-agent-stack@67c6594d2c252bdd253626dc54789c70e54c4a28:scripts/validate_convergence.py:60-71,203-243"
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/convergence-practice/application-delivery/test_portability.py:101-131",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:scripts/validate_convergence.py:60-71,203-243"
   ],
   "preserved": {
     "uv_lock_original_sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
