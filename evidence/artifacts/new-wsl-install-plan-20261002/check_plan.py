@@ -188,10 +188,17 @@ def agent_messaging_contract(plan_dir, by_slot, bad):
     post = acceptance.get("post_install", {}).get("command", "")
     if not all(token in post for token in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i")):
         bad("agent-messaging", "post-install must check upstream CLI smoke behavior")
+    # After sign-in reads the Codex home that hcom derives (CODEX_HOME, else the parent of HCOM_DIR:
+    # aannoo/hcom@2c5f343b src/hooks/codex.rs:72-75, src/paths.rs:26-53) and evaluates every rules file
+    # there, as Codex loads them (openai/codex rust-v0.160.0 codex-rs/core/src/exec_policy.rs:662-700),
+    # so a leftover stricter file is seen; retired Claude hcom denies are reported too.
     native = acceptance.get("after_sign_in", {}).get("command", "")
-    if (not all(token in native for token in ('--rules "$codex_rules/hcom.rules"', "exit 78", '.decision == "allow"'))
-            or "hcom-deny" in native):
-        bad("agent-messaging", "after sign-in must check upstream hcom.rules alone with the native checker")
+    if (not all(token in native for token in ('"${HCOM_DIR:-$HOME/.hcom}"', '$(dirname -- "$hcom_dir")/.codex',
+                                               '-name "*.rules"', "hcom send @luna -- hi", "hcom term inject luna hi",
+                                               ".permissions.deny", "exit 78"))
+            or "${CODEX_HOME:-$HOME/.codex}" in native or '--rules "$codex_rules/' in native):
+        bad("agent-messaging", "after sign-in must evaluate every rules file in the Codex home that hcom derives from "
+                               "HCOM_DIR, and report retired Claude hcom denies")
 
 
 def code_docs_contract(plan_dir, by_slot, bad):

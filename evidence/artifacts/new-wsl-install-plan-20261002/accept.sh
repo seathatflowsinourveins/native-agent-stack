@@ -326,13 +326,34 @@ jq -s -e --arg sender "$sender" '"'"'length == 1 and .[0].from == $sender and .[
       ;;
     after_sign_in)
       # Kind: native integration; Source: https://developers.openai.com/codex/rules
-      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1538
-      check agent-messaging 'native integration' 'codex_rules="${CODEX_HOME:-$HOME/.codex}/rules"
-if [[ ! -f "$codex_rules/hcom.rules" ]]; then
+      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L72 (Codex home: CODEX_HOME, else the parent of HCOM_DIR, src/paths.rs#L26)
+      # Source: https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/exec_policy.rs#L662 (every *.rules file of the layer is loaded)
+      check agent-messaging 'native integration' 'hcom_dir="${HCOM_DIR:-$HOME/.hcom}"
+case "$hcom_dir" in "~"*) hcom_dir="$HOME${hcom_dir#"~"}" ;; esac
+case "$hcom_dir" in /*) ;; *) hcom_dir="$PWD/$hcom_dir" ;; esac
+codex_home="${CODEX_HOME:-$(dirname -- "$hcom_dir")/.codex}"
+case "$codex_home" in /*) ;; *) codex_home="$PWD/$codex_home" ;; esac
+codex_rules="$codex_home/rules"
+claude_settings="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
+if [[ -f "$claude_settings" ]]; then
+  retired="$(jq "[.permissions.deny[]? | strings | select(test(\"^Bash[(](uvx )?hcom ((term|relay|config|hooks|run|kill|stop|reset|update|claude-pty)( [*])?|[*] claude-pty [*]|--name [*]|--go [*]|send -b [*]|send --from [*]|send --from=[*])[)]$\"))] | length" "$claude_settings")"
+  if [[ "$retired" != 0 ]]; then
+    printf "needs_user: %s retired 2026-10-04 hcom deny entries remain in the Claude settings.\n" "$retired" >&2
+    exit 78
+  fi
+fi
+if [[ ! -f "$codex_rules/hcom.rules" || -L "$codex_rules/hcom.rules" ]]; then
   printf "needs_user: launch hcom codex once so that upstream writes its hcom.rules.\n" >&2
   exit 78
 fi
-codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" -- hcom send @luna -- hi | jq -e '"'"'.decision == "allow"'"'"' >/dev/null'
+rules=()
+while IFS= read -r -d "" file; do rules+=(--rules "$file"); done < <(find "$codex_rules" -maxdepth 1 -type f -name "*.rules" -print0 | sort -z)
+send="$(codex execpolicy check --pretty "${rules[@]}" -- hcom send @luna -- hi | jq -r ".decision // \"none\"")"
+term="$(codex execpolicy check --pretty "${rules[@]}" -- hcom term inject luna hi | jq -r ".decision // \"none\"")"
+if [[ "$send" != allow || "$term" != allow ]]; then
+  printf "needs_user: the Codex rules in this home give %s for hcom send and %s for hcom term, so a stricter rules file (such as the retired hcom-deny.rules) remains beside upstream hcom.rules.\n" "$send" "$term" >&2
+  exit 78
+fi'
       ;;
     *) skipped agent-messaging ;;
   esac

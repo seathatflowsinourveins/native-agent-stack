@@ -89,6 +89,76 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                     self.assertIn("never counts as the user's approval", text)
                     self.assertNotIn("Agents may not use", text)
 
+    @unittest.skipUnless(shutil.which("jq"), "the after-sign-in program parses the checker's JSON with jq")
+    def test_hcom_after_sign_in_reads_hcoms_codex_home_and_every_rules_file(self):
+        # docs/decisions/2026-10-06-hcom-relaxation.md: the Codex home is CODEX_HOME, else the parent of
+        # HCOM_DIR (aannoo/hcom@2c5f343b src/hooks/codex.rs:72-75, src/paths.rs:26-53), and Codex loads every
+        # *.rules file there (openai/codex rust-v0.160.0 codex-rs/core/src/exec_policy.rs:662-700). A stub
+        # codex answers by the basenames it receives, like the real checker on the retained receipt
+        # (evidence/artifacts/hcom-relaxation-20261006/probe-receipt.json), and records its arguments.
+        row = next(r for r in json.loads((PLAN / "install-plan.json").read_text())["owners"]
+                   if r["slot"] == "agent-messaging")
+        program = row["acceptance"]["after_sign_in"]["command"]
+        stub = ("#!/usr/bin/env python3\n"
+                "import json, os, sys\n"
+                "args = sys.argv[1:]\n"
+                "with open(os.environ['STUB_LOG'], 'a') as log:\n"
+                "    log.write(json.dumps(args) + '\\n')\n"
+                "names = {os.path.basename(args[i + 1]) for i, a in enumerate(args) if a == '--rules'}\n"
+                "command = args[args.index('--') + 1:]\n"
+                "decision = 'allow' if 'hcom.rules' in names and command[1:2] in (['send'], ['term']) else None\n"
+                "if 'hcom-deny.rules' in names and command[1:2] == ['term']:\n"
+                "    decision = 'forbidden'\n"
+                "print(json.dumps({'decision': decision}))\n")
+        retired = ["Bash(hcom term)", "Bash(hcom term *)", "Bash(uvx hcom * claude-pty *)",
+                   "Bash(hcom send --from=*)", "Bash(uvx hcom --go *)"]
+        kept = ["Bash(git push --force *)", "Bash(hcom send *)", "Bash(hcom term inject *)", "Read(~/mine)"]
+
+        def run(layout, env=None, settings=None):
+            with tempfile.TemporaryDirectory() as scratch:
+                base = Path(scratch)
+                (base / "bin").mkdir()
+                (base / "bin" / "codex").write_text(stub)
+                (base / "bin" / "codex").chmod(0o755)
+                (base / "home").mkdir()
+                for rel in layout:
+                    (base / rel).parent.mkdir(parents=True, exist_ok=True)
+                    (base / rel).write_text("# synthetic\n")
+                if settings is not None:
+                    (base / "home" / ".claude").mkdir()
+                    (base / "home" / ".claude" / "settings.json").write_text(
+                        json.dumps({"permissions": {"deny": settings}}))
+                full_env = {"PATH": f"{base / 'bin'}:{os.environ['PATH']}", "HOME": str(base / "home"),
+                            "STUB_LOG": str(base / "calls.jsonl")}
+                full_env.update({k: str(base / v) for k, v in (env or {}).items()})
+                done = subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=full_env, cwd=base,
+                                      capture_output=True, text=True)
+                calls = [json.loads(line) for line in (base / "calls.jsonl").read_text().splitlines()] \
+                    if (base / "calls.jsonl").exists() else []
+                rules = sorted({str(Path(c[i + 1]).relative_to(base)) for c in calls
+                                for i, a in enumerate(c) if a == "--rules"})
+                return done.returncode, done.stderr, rules
+
+        rc, err, rules = run([])
+        self.assertEqual((rc, rules), (78, []))
+        self.assertIn("launch hcom codex once", err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"])
+        self.assertEqual((rc, rules), (0, ["home/.codex/rules/hcom.rules"]), err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules", "home/.codex/rules/hcom-deny.rules"])
+        self.assertEqual((rc, rules), (78, ["home/.codex/rules/hcom-deny.rules", "home/.codex/rules/hcom.rules"]))
+        self.assertIn("allow for hcom send and forbidden for hcom term", err)
+        rc, err, rules = run(["state/.codex/rules/hcom.rules"], env={"HCOM_DIR": "state/hub"})
+        self.assertEqual((rc, rules), (0, ["state/.codex/rules/hcom.rules"]), err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"], env={"HCOM_DIR": "state/hub"})
+        self.assertEqual((rc, rules), (78, []))
+        rc, err, rules = run(["explicit/rules/hcom.rules"], env={"HCOM_DIR": "state/hub", "CODEX_HOME": "explicit"})
+        self.assertEqual((rc, rules), (0, ["explicit/rules/hcom.rules"]), err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"], settings=kept + retired)
+        self.assertEqual((rc, rules), (78, []))
+        self.assertIn(f"{len(retired)} retired 2026-10-04 hcom deny entries", err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"], settings=kept)
+        self.assertEqual(rc, 0, err)
+
     def test_gateway_default_metadata_is_observed_without_pipeline_capture(self):
         gate = self.source_module("gateway-effort-accept.py")
         rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/chat/completions",

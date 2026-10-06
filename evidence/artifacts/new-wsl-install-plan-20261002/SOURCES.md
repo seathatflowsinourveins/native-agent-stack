@@ -819,8 +819,16 @@ The accepted OS-sandbox boundary and prefix limitations remain explicit in the
   (build_codex_rules :1538-1563; written to `<codex home>/rules/hcom.rules` at
   :1566-1579), with the command list at
   https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46
-  (:46-72). The after-sign-in check evaluates that file alone with
-  https://developers.openai.com/codex/rules (`codex execpolicy check --rules`).
+  (:46-72).
+- **After-sign-in check, revised after the read at 3b6ea9d1e:**
+  - **Codex home.** It derives the Codex home as hcom does: `CODEX_HOME`, else the parent of `HCOM_DIR`.
+    https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L72 (:72-75);
+    https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/paths.rs#L26 (:26-53).
+  - **Effective policy.** It passes every `*.rules` file there to `codex execpolicy check --rules`
+    (https://developers.openai.com/codex/rules), the set Codex loads:
+    https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/exec_policy.rs#L662 (:662-700, :1121-1170).
+  - **Leftovers.** A stricter leftover file, or a retired Claude hcom deny entry, reports needs_user.
+  - **Retained probe.** `../hcom-relaxation-20261006/probe-receipt.json` (synthetic; codex-cli 0.160.1, whose exec-policy code equals rust-v0.160.0).
 - **Current release:** v0.7.27 at `2c5f343b` is still aannoo/hcom's latest
   release (`gh api repos/aannoo/hcom/releases/latest`, read 2026-10-06). Its
   plain-Claude hook guard is unchanged:

@@ -487,8 +487,13 @@ the user's own inputs. Existing conflicting hcom configuration is retained with
 retained. The installer needs no sudo. Post-install acceptance checks the
 installed binary's status/list/send/listen behavior in a disposable HCOM_DIR; it
 is separate from upstream repository-quality CI. After the first `hcom codex`
-launch, the after-sign-in check evaluates upstream `hcom.rules` with the native
-`codex execpolicy check`.
+launch, the after-sign-in check takes the Codex home the way hcom does
+(`CODEX_HOME`, else the parent of `HCOM_DIR`). It then evaluates every `*.rules`
+file there, as Codex loads them, with the native `codex execpolicy check`.
+`hcom send` and `hcom term` must both be allowed. A stricter leftover file, such
+as the retired `hcom-deny.rules`, reports `needs_user`, and so do the retired
+Claude hcom deny entries. The retained probe is in
+`../hcom-relaxation-20261006/probe-receipt.json`.
 
 Claude <-> Claude stays on native messaging. Codex transport sessions use
 upstream `hcom codex`; this row creates no Claude hcom launch wrapper or global

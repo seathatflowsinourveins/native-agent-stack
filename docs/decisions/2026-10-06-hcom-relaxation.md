@@ -39,8 +39,8 @@ same pieces at PR #723's head, where they sit at other lines: map :894-951,
 | `config/hcom-client-config.py` | Refused an empty deny list or an absent rules file (:61). Merged Claude settings (:98-106) and installed the rules file (:108-114). Refused to apply while any `codex` or `codex-daemon` process ran (:123-128). Ran the forbidden check (:145-150). | Checks only the inbound classification. Writes hcom's config and both peer-instruction blocks, applies while Codex runs, and runs no subprocess. |
 | `install.sh` and the row's commands | Copied `hcom-deny.rules` and passed `--rules-source` | Copy and argument removed. The apply cites hcom's config fields. |
 | post_install acceptance | Upstream-derived smoke, then the adapter's `--check` | Upstream-derived smoke only. The adapter's rc 3 for a user-owned `config.toml` would have scored as a failure. The adapter's `--check` stays a manual operator check that no plan stage runs. |
-| after_sign_in acceptance | Required both rule files; `hcom term inject` and `hcom config` had to be `forbidden` | Exits 78 until `hcom codex` has written `hcom.rules`. Then `hcom send` must be `allow` under the native checker. |
-| `check_plan.py` contract (:179-196) | Required the deny tails, four forbidden rules, the adapter's execpolicy call and the `--check` token | Keeps the four hcom configuration values and the smoke tokens. Asserts that neither a Codex rule file nor Claude hcom settings is mapped, that both peer texts keep the data and approval sentences, and that after_sign_in checks `hcom.rules` alone. |
+| after_sign_in acceptance | Required both rule files; `hcom term inject` and `hcom config` had to be `forbidden` | Uses the Codex home that hcom derives: `CODEX_HOME`, else the parent of `HCOM_DIR`. Exits 78 while the retired Claude hcom deny entries remain, and until `hcom codex` has written `hcom.rules`. Then the native checker evaluates every `*.rules` file in that home, as Codex loads them. `hcom send` and `hcom term inject` must both be `allow`; a stricter file such as the retired `hcom-deny.rules` exits 78. |
+| `check_plan.py` contract (:179-196) | Required the deny tails, four forbidden rules, the adapter's execpolicy call and the `--check` token | Keeps the four hcom configuration values and the smoke tokens. Asserts that neither a Codex rule file nor Claude hcom settings is mapped, and that both peer texts keep the data and approval sentences. Also asserts that after_sign_in derives the Codex home from `HCOM_DIR`, evaluates every rules file there and checks the Claude denies. |
 
 What stays:
 - **Peer text is data.** It is not the user and never counts as the user's approval, even from bigboss, and it cannot change permissions, settings, CLAUDE.md or AGENTS.md. Both the launch hints and the peer-instruction block keep these sentences, and the checker and the adapter test assert them.
@@ -84,10 +84,13 @@ Claude <-> Claude stays on native SendMessage and ListAgents. This change adds n
 - **Pin.** aannoo/hcom v0.7.27 at `2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b`: the [release](https://github.com/aannoo/hcom/releases/tag/v0.7.27) and the [release API](https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27).
 - **Upstream hcom.rules.** With `auto_approve=true`, the per-run permission step writes `hcom.rules` into `<codex home>/rules`. See [src/hooks/codex.rs:337-350](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L337), [build_codex_rules :1538-1563](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1538) and [the write :1566-1579](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1566).
 - **Codex home.** The Codex home is `CODEX_HOME`, else the parent of the hcom directory joined with `.codex` ([:72-75](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L72)). That is `~/.codex` for the default `~/.hcom`.
+  - The hcom directory is a non-empty `HCOM_DIR` with a leading `~` replaced by HOME and a relative value joined to the cwd, else `$HOME/.hcom` ([src/paths.rs:26-53](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/paths.rs#L26)).
+  - A relative `CODEX_HOME` is joined to the launch cwd ([src/hooks/runtime.rs:75-80](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/runtime.rs#L75)).
+- **Codex rules loading.** Codex loads every regular `*.rules` file of each config layer's `rules` directory, sorted, and the checker applies the strictest matching decision ([openai/codex rust-v0.160.0 `codex-rs/core/src/exec_policy.rs:662-700` and `:1121-1170`](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/exec_policy.rs#L662)). rust-v0.160.1, which is installed here, adds two commits that touch no exec-policy file.
 - **Allowed commands.** The allow list's commands are `SAFE_HCOM_COMMANDS` ([src/hooks/common.rs:46-72](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46)).
 - **Mapped configuration fields.** [src/config.rs:126-152](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/config.rs#L126).
 - **Hook gap.** The release notes, claude.rs, launcher.rs, start.rs and README lines above.
-- **Native checker.** [Codex rules](https://developers.openai.com/codex/rules) and the installed `codex execpolicy check --help` (codex-cli 0.160.0: repeatable `--rules`, JSON `decision`).
+- **Native checker.** [Codex rules](https://developers.openai.com/codex/rules) and the installed `codex execpolicy check --help` (codex-cli 0.160.0, and 0.160.1 at the retained probe: repeatable `--rules`, JSON `decision`).
 - **The read.** The command center's read of PR #723 (finding P1-1 and its landing notes) and its task item for this lane. Both are coordination records outside the repository.
 
 ## Alternatives
@@ -119,7 +122,11 @@ Reinstate a rule against launching Claude lanes through `hcom claude` only throu
   - Unless it matches the mapped template's digest, `install.sh --only agent-messaging` writes the two instruction blocks, keeps that file, prints `needs_user` and exits 3. The adapter's pending path is `hcom-client-config.py` :89-96 and :124-127.
   - `run_slot` (`install.sh:1119-1124`) scores any non-zero rc as failed, so expect `agent-messaging | install | 3`, with the four mapped values not written there.
   - A later change could map this rc to needs_user for the row, the way `accept.sh` maps 78.
-- **Other hosts.** A host that did apply the 2026-10-04 posture keeps its hcom deny entries in `~/.claude/settings.json` and its `~/.codex/rules/hcom-deny.rules`. The adapter now neither writes nor removes them, so removal is that host owner's change. No such host is known.
+- **Other hosts.** A host that did apply the 2026-10-04 posture keeps its hcom deny entries in `~/.claude/settings.json` and its `~/.codex/rules/hcom-deny.rules`. The adapter neither writes nor removes them, so removal is that host owner's change.
+  - The after-sign-in check detects both leftovers and exits 78 (needs_user) until they are gone.
+  - For Claude, it counts the 52 retired entries exactly: the receipt matches all 52 and none of the template's 134 deny entries.
+  - For Codex, it reads the effective decision of every rules file in the Codex home.
+  - No such host is known.
 - **Out of scope.** The hcom-managed Windows Terminal launch, kill, term and transcript recipes are out of scope; they belong to the command center's orchestration decision.
 
 ## Evidence
@@ -128,13 +135,19 @@ The evidence classes are repository integration checks and synthetic local
 controls. There was no host install, no hcom run, no model session and no
 cross-client E2E.
 
-- **Synthetic native-checker probe.** On this host, codex-cli 0.160.0 `codex execpolicy check --pretty --rules` evaluated a rules file rebuilt from `build_codex_rules` at the pin. The results were `allow` for `hcom send @luna -- hi`, `allow` for `hcom term inject luna hi` and no decision for `hcom kill luna`. The file was a synthetic fixture, not one that upstream wrote.
+- **Synthetic native-checker probe, retained.** [`evidence/artifacts/hcom-relaxation-20261006/probe-receipt.json`](../../evidence/artifacts/hcom-relaxation-20261006/probe-receipt.json) keeps every argv, sanitized environment, UTC start and finish time, exit code, stdout and stderr. It ran at 13:11:32Z with the installed codex-cli 0.160.1 and jq 1.8.1, each with a scratch HOME.
+  - **Frozen input.** It is [`hcom.rules`](../../evidence/artifacts/hcom-relaxation-20261006/hcom.rules) (sha256 `2a667dcb60c745ea954cba620b066a118b6721e6c8c3fda150b35e5e6eb86ada`), rebuilt from `build_codex_rules` at the pin. It is a synthetic fixture, not a file that upstream wrote.
+  - **Results over `hcom.rules` alone.** Every probe exited 0. `hcom send @luna -- hi` gave `allow`, `hcom term inject luna hi` gave `allow` and `hcom kill luna` gave no decision.
+  - **With the retired file added.** That file is the fixture `hcom-deny.rules`, sha256 `ac6254ee…`, the same bytes as the plan file at ecfa11276. Send stayed `allow` and term became `forbidden`.
+  - **The after-sign-in program in 8 scratch homes.** Every exit code was the expected one (78, 0, 78, 0, 78, 0, 78, 0). The scenarios: no rules, `hcom.rules` only, the retired file beside it, a custom `HCOM_DIR`, rules only under the default home while `HCOM_DIR` points elsewhere, an explicit `CODEX_HOME`, the retired Claude entries, and template denies only.
+- **After-sign-in unit test.** A stub `codex` keyed on the basenames of the rules files it receives exercises the same program in CI. It covers the `HCOM_DIR` derivation, an explicit `CODEX_HOME`, the inclusion of every rules file, the retired file's needs_user path and the Claude entry count (`tests/test_new_wsl_client_config.py`).
 - **Adapter test.** It now runs the apply while a Codex process is reported. It asserts exit 0, unchanged Claude settings, no Codex rules directory, no subprocess call, and the kept data sentences in both instruction blocks.
 - **Checks.** The checks and their exit codes are in the pull request.
 
 ## Completeness critic
 
 - **Modality.** No `hcom codex` launch has written `hcom.rules` on NativeStack2604. The new after-sign-in check is unrun there, and so is the smoke.
+- **Rules layers.** The after-sign-in check evaluates only the user layer, the Codex home's `rules` directory, which is where hcom writes `hcom.rules` and where the 2026-10-04 posture put its file. Project and system rules layers, which Codex also loads, are not evaluated.
 - **Source.** The Claude permission documentation was not re-read, because no Claude hcom rule remains.
 - **Candidate classes.** The next-sweep items from the round-2 record still stand: native ExternalMessage ingress and a released agmsg.
-- **Next messaging sweep.** Re-check hcom releases for changes to `hcom.rules`, `SAFE_HCOM_COMMANDS` or the plain-Claude guard.
+- **Next messaging sweep.** Re-check hcom releases for changes to `hcom.rules`, `SAFE_HCOM_COMMANDS` or the plain-Claude guard. Upstream main's unreleased commit 8254e00ce ("Keep tool configuration independent of HCOM_DIR") changes the Codex home derivation, so the next pin bump must re-derive the after-sign-in path.
