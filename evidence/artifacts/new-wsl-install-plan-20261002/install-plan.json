@@ -775,8 +775,7 @@
       "route": "native-installer",
       "commands": [
         "fetch_verified https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98 \"$tool_root/hcom-0.7.27/hcom-installer.sh\"",
-        "HCOM_INSTALL_DIR=\"$HOME/.local/bin\" HCOM_NO_MODIFY_PATH=1 sh \"$tool_root/hcom-0.7.27/hcom-installer.sh\"",
-        "python3 \"$config_root/hcom-client-config.py\" --repo-root \"$repo_root\" --rules-source \"$config_root/hcom-deny.rules\" --apply"
+        "HCOM_INSTALL_DIR=\"$HOME/.local/bin\" HCOM_NO_MODIFY_PATH=1 sh \"$tool_root/hcom-0.7.27/hcom-installer.sh\""
       ],
       "needs": {
         "sudo": false,
@@ -793,39 +792,20 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "smoke=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$smoke\"' EXIT\nmkdir -p -- \"$smoke/home\"\nhcom_binary=\"$(command -v hcom)\"\nisolated=(env -i HOME=\"$smoke/home\" PATH=\"$PATH\" HCOM_DIR=\"$smoke\")\n\"${isolated[@]}\" \"$hcom_binary\" status --json > \"$smoke/status.json\"\njq -e --arg expected \"$smoke\" '.hcom_dir == $expected and .instances.total == 0' \"$smoke/status.json\" >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" list --json | jq -e 'type == \"array\" and length == 0' >/dev/null\nidentity_rc=0\n\"${isolated[@]}\" \"$hcom_binary\" send @nobody -- hi > \"$smoke/no-identity.out\" 2> \"$smoke/no-identity.err\" || identity_rc=$?\n[[ \"$identity_rc\" -ne 0 ]]\nrg -Fq \"identity not found\" \"$smoke/no-identity.err\"\n\"${isolated[@]}\" \"$hcom_binary\" start > \"$smoke/sender.txt\"\n\"${isolated[@]}\" \"$hcom_binary\" start > \"$smoke/recipient.txt\"\nsender=\"$(sed -n '/^[[:space:]]*\\[hcom:/{s/^[[:space:]]*\\[hcom:\\([^]]*\\).*/\\1/;p;q;}' \"$smoke/sender.txt\")\"\nrecipient=\"$(sed -n '/^[[:space:]]*\\[hcom:/{s/^[[:space:]]*\\[hcom:\\([^]]*\\).*/\\1/;p;q;}' \"$smoke/recipient.txt\")\"\n[[ \"$sender\" =~ ^[a-z0-9_]+$ && \"$recipient\" =~ ^[a-z0-9_]+$ && \"$sender\" != \"$recipient\" ]]\n\"${isolated[@]}\" \"$hcom_binary\" send \"@$recipient\" --name \"$sender\" -- \"hello there\"\n\"${isolated[@]}\" \"$hcom_binary\" events --last 10 > \"$smoke/events.jsonl\"\njq -s -e --arg sender \"$sender\" '[.[] | select(.type == \"message\")] | length == 1 and .[0].instance == $sender and .[0].data.from == $sender and .[0].data.text == \"hello there\"' \"$smoke/events.jsonl\" >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" list --json | jq -e --arg sender \"$sender\" --arg recipient \"$recipient\" 'any(.[]; .name == $recipient and .unread_count == 1) and any(.[]; .name == $sender and .unread_count == 0)' >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" listen --name \"$recipient\" --timeout 1 --json > \"$smoke/delivered.jsonl\"\njq -s -e --arg sender \"$sender\" 'length == 1 and .[0].from == $sender and .[0].text == \"hello there\" and .[0].reply_id == (.[0].event_id | tostring)' \"$smoke/delivered.jsonl\" >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" list --json | jq -e --arg recipient \"$recipient\" 'any(.[]; .name == $recipient and .unread_count == 0)' >/dev/null\npython3 \"$config_root/hcom-client-config.py\" --repo-root \"$repo_root\" --rules-source \"$config_root/hcom-deny.rules\" --check",
+          "command": "smoke=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$smoke\"' EXIT\nmkdir -p -- \"$smoke/home\"\nhcom_binary=\"$(command -v hcom)\"\nisolated=(env -i HOME=\"$smoke/home\" PATH=\"$PATH\" HCOM_DIR=\"$smoke\")\n\"${isolated[@]}\" \"$hcom_binary\" status --json > \"$smoke/status.json\"\njq -e --arg expected \"$smoke\" '.hcom_dir == $expected and .instances.total == 0' \"$smoke/status.json\" >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" list --json | jq -e 'type == \"array\" and length == 0' >/dev/null\nidentity_rc=0\n\"${isolated[@]}\" \"$hcom_binary\" send @nobody -- hi > \"$smoke/no-identity.out\" 2> \"$smoke/no-identity.err\" || identity_rc=$?\n[[ \"$identity_rc\" -ne 0 ]]\nrg -Fq \"identity not found\" \"$smoke/no-identity.err\"\n\"${isolated[@]}\" \"$hcom_binary\" start > \"$smoke/sender.txt\"\n\"${isolated[@]}\" \"$hcom_binary\" start > \"$smoke/recipient.txt\"\nsender=\"$(sed -n '/^[[:space:]]*\\[hcom:/{s/^[[:space:]]*\\[hcom:\\([^]]*\\).*/\\1/;p;q;}' \"$smoke/sender.txt\")\"\nrecipient=\"$(sed -n '/^[[:space:]]*\\[hcom:/{s/^[[:space:]]*\\[hcom:\\([^]]*\\).*/\\1/;p;q;}' \"$smoke/recipient.txt\")\"\n[[ \"$sender\" =~ ^[a-z0-9_]+$ && \"$recipient\" =~ ^[a-z0-9_]+$ && \"$sender\" != \"$recipient\" ]]\n\"${isolated[@]}\" \"$hcom_binary\" send \"@$recipient\" --name \"$sender\" -- \"hello there\"\n\"${isolated[@]}\" \"$hcom_binary\" events --last 10 > \"$smoke/events.jsonl\"\njq -s -e --arg sender \"$sender\" '[.[] | select(.type == \"message\")] | length == 1 and .[0].instance == $sender and .[0].data.from == $sender and .[0].data.text == \"hello there\"' \"$smoke/events.jsonl\" >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" list --json | jq -e --arg sender \"$sender\" --arg recipient \"$recipient\" 'any(.[]; .name == $recipient and .unread_count == 1) and any(.[]; .name == $sender and .unread_count == 0)' >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" listen --name \"$recipient\" --timeout 1 --json > \"$smoke/delivered.jsonl\"\njq -s -e --arg sender \"$sender\" 'length == 1 and .[0].from == $sender and .[0].text == \"hello there\" and .[0].reply_id == (.[0].event_id | tostring)' \"$smoke/delivered.jsonl\" >/dev/null\n\"${isolated[@]}\" \"$hcom_binary\" list --json | jq -e --arg recipient \"$recipient\" 'any(.[]; .name == $recipient and .unread_count == 0)' >/dev/null",
           "kind": "upstream smoke + native integration",
           "source": {
             "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129",
             "line": 129
           }
-        },
-        "after_sign_in": {
-          "kind": "native integration",
-          "command": "codex_rules=\"${CODEX_HOME:-$HOME/.codex}/rules\"\nif [[ ! -f \"$codex_rules/hcom.rules\" ]]; then\n  printf \"needs_user: launch hcom codex once before checking its upstream allow rules together with the posture denies.\\n\" >&2\n  exit 78\nfi\ncodex execpolicy check --pretty --rules \"$codex_rules/hcom.rules\" --rules \"$codex_rules/hcom-deny.rules\" -- hcom term inject luna hi | jq -e '.decision == \"forbidden\"' >/dev/null\ncodex execpolicy check --pretty --rules \"$codex_rules/hcom.rules\" --rules \"$codex_rules/hcom-deny.rules\" -- hcom config | jq -e '.decision == \"forbidden\"' >/dev/null",
-          "source": {
-            "url": "https://developers.openai.com/codex/rules",
-            "lines": "native repeated --rules and strictest decision"
-          },
-          "needs_user": "Launch hcom codex once, then evaluate its native allow file and the mapped deny file together.",
-          "requires_sign_in": false
         }
       },
       "config_paths": [
         "$tool_root/hcom-0.7.27/hcom-installer.sh",
         "$HOME/.local/bin/hcom",
-        "${XDG_CONFIG_HOME:-$HOME/.config}/hcom/hcom-receipt.json",
-        "${HCOM_DIR:-$HOME/.hcom}/config.toml",
-        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json",
-        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/CLAUDE.md",
-        "${CODEX_HOME:-$HOME/.codex}/rules/hcom-deny.rules",
-        "${CODEX_HOME:-$HOME/.codex}/AGENTS.md",
-        "$plan_dir/config/hcom-client-config.py",
-        "$plan_dir/config/hcom-deny.rules",
-        "$config_root/hcom-client-config.py",
-        "$config_root/hcom-deny.rules"
+        "${HCOM_DIR:-$HOME/.hcom}/config.toml"
       ],
-      "notes": "Round-2 wave5 owner default (2026-10-04), not a local trial. UNRUN on NativeStack2604. hcom owns Claude Code <-> Codex transport only; Claude <-> Claude uses native SendMessage/ListAgents and crossSessionInbound=accept, and Codex-internal work keeps multi_agent/queue. Install the pinned upstream checksum-verifying installer; do not add an hcom Claude launcher or global hooks. Codex uses upstream hcom codex for terminal delivery. Plain Claude uses hcom start/listen; automatic idle Claude receive is not established by this posture, because 0.7.27 per-run Claude hooks require HCOM_PROCESS_ID. Preserve auto_approve=true, relay.enabled=false, auto_trust_workspace=false and title_mode=off. The map owns both clients' deny/peer-hint configuration; the bounded adapter reuses new_wsl_client_config.py's native merge/block/write helpers. Qualify the separate hcom-deny.rules with codex execpolicy check; leave hcom.rules upstream-owned. Prefix denies have the posture's stated reordered/equals-joined/numbered-launch/script limits, including executable wrappers; they are not an OS security boundary. The user's OS-sandbox decision is outside this row. Upstream tag CI is repository-quality evidence; the temporary-directory status/list commands parameterize its CLI smoke assertions, and client-file/rule checks are local integration acceptance. No new model run, cross-client E2E or upstream suite execution is claimed. Repair 2026-10-05: crossSessionInbound is written only by new_wsl_client_config.py --apply --with-authorization-settings; the adapter never writes it and accepts an absent or different user choice. Post-install also parameterizes upstream no-identity refusal and send/listen/unread tests with a clean inherited identity environment. After the first hcom codex launch, acceptance checks hcom.rules and hcom-deny.rules together for terminal injection and config. The supplied rtk 0.51.0 measurements show no rewriting of the denied hcom/uvx commands, hence no hook bypass. hcom-deny.rules remains unchanged. J-713 2026-10-05: hcom deliberately repeats its base identity marker before/after bootstrap (aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/commands/start.rs:840-848); follow its tests/support/mod.rs:949-959 first-marker parser on each existing regular-file capture, then native ^[a-z0-9_]+$ validation (src/identity.rs:14-15,37-39). Preserve send/listen/unread/no-identity gates; no name suffix stripping or invented first-letter/length rule. The co-op install failure is the distinct live-Codex quiet interlock; preserve it for co-op quiet apply. Local regression fixtures are not an unchanged upstream suite or cross-client model acceptance. J-713 correction (2026-10-06): select the first native [hcom:name] marker, trim leading whitespace and validate [a-z0-9_]+. hcom 2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/commands/start.rs:840, tests/support/mod.rs:949, src/identity.rs:14 define the repeated marker and first-line grammar. Messaging gates stay unchanged. The isolated native post-install exits 1 at the final unmapped config.toml gate; quiet install/posture apply remains co-op-owned after landing.",
+      "notes": "2026-10-06 supersession: the user selected seamless LLM-native hcom operation and relaxed the 2026-10-04 custom deny/quiet posture at03:03:10Z; command-center item task-ns2604-coop-20261006T033237Z section3 and co-op A50 confirm the narrow removal. Install the unchanged checksum-verified upstreamv0.7.27 installer; retain native send/listen/events/unread/no-identity CLI smoke and first-marker parsing from aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/commands/start.rs:840, tests/support/mod.rs:949, src/identity.rs:14. Custom posture helper and deny rules are historical artifacts, never copied/applied/accepted. The generic client writer does not consume the historical slot_configs extension. No custom deny list or quiet posture goes onto Claude settings or Codex rules. The deny-only after_sign_in gate is withdrawn, not passed; the command center will supply the managed Windows Terminal launch/kill/term/transcript recipe. Do not anticipate it. This source change neither edits active host client configuration nor claims new cross-client model acceptance.",
       "source_commit": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b",
       "checksums": [
         {
@@ -864,7 +844,11 @@
           "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465"
         }
       ],
-      "needs_user": "Use the clients' own native sign-ins; trust each Codex lane folder once yourself (hcom never answers trust prompts). Close Codex before configuration apply and restart it to load the rules. Existing conflicting hcom configuration, deny file or Claude inbound choice is retained and reported as needs_user. Plain-Claude idle automatic receive remains an upstream capability gap; no hcom Claude wrapper or OS-sandbox change is introduced."
+      "needs_user": "Native sign-ins and workspace trust remain native; hcom does not answer trust prompts. Managed Windows Terminal orchestration/acceptance await the command-center recipe. No custom deny list or quiet posture is prescribed.",
+      "historical_config_assets": [
+        "hcom-client-config.py",
+        "hcom-deny.rules"
+      ]
     },
     {
       "layer": "isolation",

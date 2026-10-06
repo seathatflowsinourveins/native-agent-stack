@@ -1,6 +1,6 @@
 # New WSL install plan
 
-Current structural inventory (2026-10-05): 84 rows, 192 install commands and 113 acceptance entries (including two additional checks). The source includes 66 configuration assets. D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+Current structural inventory (2026-10-05): 84 rows, 191 install commands and 112 acceptance entries (including two additional checks). The source includes 66 configuration assets. D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
@@ -481,6 +481,11 @@ evidence-registry digests and the upstream-freshness snapshot following the srt 
 
 ## Round 2: agent messaging (2026-10-04)
 
+This is the historical adoption recipe. The user's2026-10-06 no-deny ruling
+supersedes its custom posture/apply instructions; do not execute them.
+See [Hcom posture supersession](#hcom-posture-supersession-2026-10-06) for the
+current unchanged vendor installer, native smoke and pending orchestration boundary.
+
 The `agent-messaging` row installs adopted hcom 0.7.27 with its upstream
 checksum-verifying installer. It applies the accepted posture from the slot's
 extension of `adoption/new-wsl/client-config-map.json`, using the scoped
@@ -703,3 +708,7 @@ D-ollama-2 local integration:321touched tests passed with3existing skips; native
 Inspect, Scout and Harbor resolve in independent uv environments. Scout retains its historical manifest owner identity, requires the Harbor Trajectory import before its unchanged tests, and uses its own interpreter and guarded alias. The hcom smoke selects the first native identity marker. SkillSpector receives a validated model from checked-out canonical topology, reads the native issues field and requires actual successful model-call counters even when the safe report skips inapplicable meta-analysis. DeerFlow metadata follows the landed Sol-max composition; the keyless provider remains unchanged.
 
 MCP conformance preserves all upstream tests and contains their server trees in unprivileged user/PID/network namespaces with only loopback up, because several examples provide no host binding setting. The acceptance-only helper retains raw test stdout and fails on remaining owned processes or listeners; EXIT/INT/TERM cleanup revalidates process ownership. The external on-demand target remains unqualified until its owner supplies an in-namespace native SDK startup command or fixture. Missing target 78 means needs_user, not a protocol pass. See [the decision](../../../docs/decisions/2026-10-06-native-plan-gate1-repairs.md), [sources](SOURCES.md) and the separate gate-1 receipt. Local integration does not constitute full host or provider acceptance.
+
+## Hcom posture supersession (2026-10-06)
+
+The user withdrew the custom quiet/deny posture. The row retains the verified vendor installer and native messaging smoke; old helper/rules remain historical fixtures and are never installed or accepted. The deny-only after-sign-in stage is withdrawn and unqualified until the command center supplies the managed Windows Terminal recipe. This source update changes no active host configuration.

@@ -312,14 +312,10 @@ mcporter() {
 
 agent-messaging() {
   # hcom@v0.7.27; cross-client transport only.
-  copy_config 'hcom-client-config.py' || return "$?"
-  copy_config 'hcom-deny.rules' || return "$?"
   # Source: https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27
   run_command 'fetch_verified https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98 "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
   # Source: https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh
   run_command 'HCOM_INSTALL_DIR="$HOME/.local/bin" HCOM_NO_MODIFY_PATH=1 sh "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
-  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465
-  run_command 'python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --apply' || return "$?"
 }
 
 sandbox-runtime-srt() {

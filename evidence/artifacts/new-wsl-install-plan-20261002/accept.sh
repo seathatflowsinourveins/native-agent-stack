@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Current integration: 111 primary acceptance stages and two additional checks (113 total), from the merged 84-row plan.
+# Current integration: 110 primary acceptance stages and two additional checks (112 total), from the merged 84-row plan.
 # Historical 64-row revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill and credential-custody install nothing and have nothing to check; the fix-wave adds native review checks.
 # On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement; like their installation, their checks run only with --only, and as plan rows they have not run anywhere.
@@ -302,7 +302,6 @@ agent-messaging() {
   case "$stage" in
     post_install)
       # Kind: upstream smoke + native integration; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
-      # Source: https://developers.openai.com/codex/rules
       check agent-messaging 'upstream smoke + native integration' 'smoke="$(mktemp -d)"
 trap '"'"'rm -rf -- "$smoke"'"'"' EXIT
 mkdir -p -- "$smoke/home"
@@ -326,19 +325,7 @@ jq -s -e --arg sender "$sender" '"'"'[.[] | select(.type == "message")] | length
 "${isolated[@]}" "$hcom_binary" list --json | jq -e --arg sender "$sender" --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 1) and any(.[]; .name == $sender and .unread_count == 0)'"'"' >/dev/null
 "${isolated[@]}" "$hcom_binary" listen --name "$recipient" --timeout 1 --json > "$smoke/delivered.jsonl"
 jq -s -e --arg sender "$sender" '"'"'length == 1 and .[0].from == $sender and .[0].text == "hello there" and .[0].reply_id == (.[0].event_id | tostring)'"'"' "$smoke/delivered.jsonl" >/dev/null
-"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 0)'"'"' >/dev/null
-python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --check'
-      ;;
-    after_sign_in)
-      # Kind: native integration; Source: https://developers.openai.com/codex/rules
-      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1566
-      check agent-messaging 'native integration' 'codex_rules="${CODEX_HOME:-$HOME/.codex}/rules"
-if [[ ! -f "$codex_rules/hcom.rules" ]]; then
-  printf "needs_user: launch hcom codex once before checking its upstream allow rules together with the posture denies.\n" >&2
-  exit 78
-fi
-codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom term inject luna hi | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null
-codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom config | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null'
+"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 0)'"'"' >/dev/null'
       ;;
     *) skipped agent-messaging ;;
   esac

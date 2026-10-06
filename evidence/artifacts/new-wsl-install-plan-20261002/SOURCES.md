@@ -786,6 +786,9 @@ For a future upgrade of any existing owned installation, stop its owned unit and
   https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/.github/workflows/ci.yml#L121.
   This builder ran no hcom install, model session, messaging E2E or new local trial.
 - **Configuration glue:** this PR, tools/adoption/new_wsl_client_config.py:549,577,1623,2289;
+  Historical only: the2026-10-06 owner supersession below removes this adapter
+  from installation and acceptance. These references preserve prior provenance;
+  they prescribe no current client posture or host apply.
   tools/adoption/apply_claude_settings.py:191; tools/adoption/managed_block.py:104.
   `config/hcom-client-config.py` reads the slot's map extension because the shared
   mapper enumerates existing template pieces only. It reuses those merge/block
@@ -1130,3 +1133,7 @@ The [dated decision](../../../docs/decisions/2026-10-06-native-plan-gate1-repair
 The initial uncontained 524-test pass leaked 18 processes and three wildcard listeners, so its lifecycle failed. The first contained run failed on a 161-byte IPC path. The corrected native plan post-install passes 44 upstream files/524 unchanged tests, with independent zero owned namespace/group processes and run listeners. These upstream results are distinct from LOCAL INTEGRATION environment/alias/namespace fixtures and from full host/provider acceptance. All attempts remain. External on-demand after targets are unqualified; missing target 78 is needs_user, never protocol acceptance. A45 requires an owner-supplied in-namespace native SDK startup command or fixture; no host-network fallback or outside bridge.
 
 SkillSpector native follow-up: [report.py:1334](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1334) emits issues. [meta_analyzer.py:616](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/meta_analyzer.py#L616) skips zero findings; [report.py:1173](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1173) says this is not failure. [native counters:1124,1240](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1124) distinguish actual successful semantic calls from static-only or degraded output. The actual whole stage exits0 after the canonical plan-path, native-field and safe-completion fixes; all three intermediate native1 attempts remain.
+
+## Hcom owner supersession (2026-10-06)
+
+The user03:03:10Z decision, command-center item033237Z section3 and co-op A50 supersede the earlier custom quiet/deny adoption. The row keeps the published [v0.7.27 installer](https://github.com/aannoo/hcom/releases/tag/v0.7.27), its checksum and native messaging parameterization at2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b. No historical helper/rules are copied or applied; no posture check or deny-only acceptance remains. Explicit historical assets follow the existing checker consumer/history pattern. Their prior tests and records remain historical evidence, not current policy. Revised native CLI post-install0 is local integration. Managed Windows Terminal orchestration and its acceptance remain unqualified until the command-center recipe; no new model run or active client configuration change occurred.

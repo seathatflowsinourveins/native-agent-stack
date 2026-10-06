@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-06T04:12:18.317206Z",
+  "scope": "Bounded custom hcom quiet/deny posture removal; native installer/smoke preserved",
+  "previous_head": "84c79f7f92f61972a46aa470a4f299017bc82768",
+  "owner_ruling": {
+    "user_decision_at_utc": "2026-10-06T03:03:10Z",
+    "command_center_item": "task-ns2604-coop-20261006T033237Z section3",
+    "co_op_answer": "A50: narrow removal, no future Windows Terminal recipe"
+  },
+  "sources": [
+    {
+      "repository": "aannoo/hcom",
+      "pin": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b",
+      "release": "v0.7.27",
+      "path": "tests/cli_smoke.rs",
+      "line": 129
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "84c79f7f92f61972a46aa470a4f299017bc82768",
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "purpose": "Existing explicit consumer/history pattern"
+    }
+  ],
+  "native_vendor_commands_byte_equal": true,
+  "smoke_only_change": "Removed final custom posture --check; actual messaging predicates unchanged",
+  "historical_assets": [
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-client-config.py",
+      "bytes": 8007,
+      "sha256": "c88799c0771939029814173c9d7899acc23f41f05330418006b4101fd74ff340",
+      "byte_equal_to_previous_head": true,
+      "installed": false
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-deny.rules",
+      "bytes": 2939,
+      "sha256": "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa",
+      "byte_equal_to_previous_head": true,
+      "installed": false
+    }
+  ],
+  "withdrawn_stage": {
+    "stage": "after_sign_in",
+    "qualified": false,
+    "reason": "Deny-only gate removed; native orchestration recipe owner-pending. Missing stage reports skipped, never native success."
+  },
+  "attempts": [
+    {
+      "log_alias": "j723-hcom-drop-red.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Historical-assets regression failed before removal",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-red.log",
+        "bytes": 828,
+        "sha256": "50e990c2d756b6f499614534d4c0bf44eabfa9cb4f78430e73aedab97240a6be"
+      }
+    },
+    {
+      "log_alias": "j723-hcom-drop-check-plan.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Attempted null after-stage shape was invalid; stage key was removed instead, without changing validator semantics",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-check-plan.log",
+        "bytes": 494,
+        "sha256": "4eb51ed08aaab02caa8b82a4347a27194e63fca14f5e945c67c10fb8edfa8a62"
+      }
+    },
+    {
+      "log_alias": "j723-hcom-drop-check-plan-fixed.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "84rows/191commands/112acceptance entries; mirrored scripts match",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-check-plan-fixed.log",
+        "bytes": 202,
+        "sha256": "83c7a7fd919244fa284b76f3cc62ad9e25cc52f6cf3567f72f7b18889751a797"
+      }
+    },
+    {
+      "log_alias": "j723-hcom-drop-controls-final.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Authored fixture missed importlib; corrected and retained",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-controls-final.log",
+        "bytes": 849,
+        "sha256": "1b311ac8ffec90f170ba6d06632ef1965e3942bed864246d17eb6de7809b139b"
+      }
+    },
+    {
+      "log_alias": "j723-hcom-drop-controls-fixed.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Three focused methods including four policy reintroduction controls",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-controls-fixed.log",
+        "bytes": 101,
+        "sha256": "a51deb963dc74776d322d29298792906eebf3afc14c51425b9a4a7aa079a6974"
+      }
+    },
+    {
+      "log_alias": "j723-hcom-drop-native-post.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Actual native messaging smoke after removing only obsolete final posture check; no model or new orchestration",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-native-post.log",
+        "bytes": 35,
+        "sha256": "c7b1a29510644c2222e1a9164bab77332849a1e2a6db6632ac89adfffc026750"
+      }
+    },
+    {
+      "log_alias": "j723-hcom-drop-touched-tests.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "446 touched tests passed with3 existing skips/140.338s",
+      "retained_private_output": {
+        "artifact": "lane-cache/j723-hcom-drop-touched-tests.log",
+        "bytes": 85303,
+        "sha256": "64d4249c7c5d01870051fbb288ca1bbea96070edb732b8ee7f5c277105313111"
+      }
+    }
+  ],
+  "critic": {
+    "evidence_class": "source_review",
+    "operative_blockers": [],
+    "resolved": "Present-tense legacy adoption paragraphs marked historical/superseded; helper/map fixtures remain reference data only."
+  },
+  "preparatory_failure": "Patch generation first failed when finding an old dictionary in a mutated list; corrected index capture, no repository mutation by that failed generation.",
+  "limits": [
+    "No new managed Windows Terminal launch/kill/term/transcript recipe",
+    "No active client settings/rules edited or host configuration apply",
+    "No fresh model/provider or cross-client qualification",
+    "Earlier native1 missing-posture result remains in historical receipt",
+    "P1 timer work is separate; NativeStack source read remains time-gated"
+  ],
+  "local_checks": {
+    "touched_tests": {
+      "exit_code": 0,
+      "tests": 446,
+      "skips": 3,
+      "seconds": 140.338
+    },
+    "check_plan": {
+      "exit_code": 0,
+      "rows": 84,
+      "install_commands": 191,
+      "acceptance_entries": 112
+    },
+    "validator": "Recorded after registration in status/PR body, not self-certified"
+  }
+}

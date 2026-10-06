@@ -2540,6 +2540,51 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(tuple(result.stdout.splitlines()), expected)
 
+    def test_hcom_superseded_posture_is_historical_and_never_adopted(self):
+        row = self.row("agent-messaging")
+        history = {"hcom-client-config.py", "hcom-deny.rules"}
+        self.assertEqual(set(row["historical_config_assets"]), history)
+        self.assertEqual(len(row["commands"]), 2)
+        self.assertIn("fetch_verified", row["commands"][0])
+        self.assertIn("HCOM_NO_MODIFY_PATH=1", row["commands"][1])
+        self.assertNotIn("after_sign_in", row["acceptance"])
+        post = row["acceptance"]["post_install"]["command"]
+        for marker in ("send @nobody -- hi", "listen --name", "events --last 10", "--name"):
+            self.assertIn(marker, post)
+        executable = "\n".join(row["commands"] + [post])
+        for asset in history:
+            self.assertNotIn(asset, executable)
+            self.assertTrue((PLAN / "config" / asset).is_file())
+        install = (PLAN / "install.sh").read_text()
+        function = install.split("agent-messaging() {", 1)[1].split("\n}", 1)[0]
+        self.assertNotIn("copy_config", function)
+        self.assertNotIn("--apply", function)
+        self.assertNotIn("--check", post)
+
+    def test_hcom_contract_rejects_reintroducing_superseded_posture(self):
+        import copy
+        import importlib.util
+        path = PLAN / "check_plan.py"
+        spec = importlib.util.spec_from_file_location("hcom_drop_check_plan", path)
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        cases = ("apply", "post-check", "deny-stage", "undeclared-history")
+        for case in cases:
+            with self.subTest(case=case):
+                row = copy.deepcopy(self.row("agent-messaging"))
+                if case == "apply":
+                    row["commands"].append('python3 "$config_root/hcom-client-config.py" --apply')
+                elif case == "post-check":
+                    row["acceptance"]["post_install"]["command"] += '\npython3 "$config_root/hcom-client-config.py" --check'
+                elif case == "deny-stage":
+                    row["acceptance"]["after_sign_in"] = {"command": "codex execpolicy check --rules hcom-deny.rules"}
+                else:
+                    row["historical_config_assets"] = []
+                errors = []
+                checker.agent_messaging_contract(PLAN, {"agent-messaging": row},
+                                                  lambda *message: errors.append(message))
+                self.assertTrue(errors, "Superseded posture was admitted: " + case)
+
     def test_skillspector_scans_bind_the_native_topology_model_and_keep_report_gates(self):
         # Local integration fixture for the native SKILLSPECTOR_MODEL carrier.
         # No Codex sign-in, scan provider, credential store or model is contacted.

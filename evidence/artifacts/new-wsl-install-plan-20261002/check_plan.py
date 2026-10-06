@@ -156,45 +156,36 @@ def client_additional_checks(row, funcs, bad):
             bad("acceptance", f"row {slot}: initialize the native embedded cache, then run both upstream validators through python with bytecode disabled")
 
 def agent_messaging_contract(plan_dir, by_slot, bad):
-    """Round-2 hcom pin and mapped posture; no new model trial.
+    """Pinned transport; custom quiet/deny posture superseded by the2026-10-06 user ruling.
 
-    Sources: aannoo/hcom@2c5f343:tests/cli_smoke.rs:129,140;
-    https://developers.openai.com/codex/rules; this PR: config/hcom-client-config.py.
+    Source: aannoo/hcom@2c5f343 tests/cli_smoke.rs:129,140;
+    item task-ns2604-coop-20261006T033237Z section3 and co-op A50.
     """
     row = by_slot.get("agent-messaging", {})
     if not row.get("installed") or row.get("release") != "v0.7.27":
-        bad("agent-messaging", "round 2 adopts the pinned hcom 0.7.27 transport")
+        bad("agent-messaging", "retain the pinned hcom0.7.27 transport")
         return
-    try:
-        # --plan-dir supports a standalone copied plan in the existing tests.
-        # Its native map stays beside this checker in the source checkout;
-        # check the rules and adapter from the selected plan, including copies.
-        source_root = pathlib.Path(__file__).resolve().parents[3]
-        mapping = json.loads((source_root / "adoption/new-wsl/client-config-map.json").read_text())
-        spec = mapping["slot_configs"]["agent-messaging"]
-        posture = spec["hcom_config"]
-        if (posture["terminal"]["title_mode"] != "off" or posture["relay"]["enabled"] is not False
-                or posture["launch"]["auto_trust_workspace"] is not False
-                or posture["preferences"]["auto_approve"] is not True):
-            bad("agent-messaging", "mapped hcom configuration differs from the accepted posture")
-        deny = set(spec["claude_settings"]["permissions"]["deny"])
-        for prefix in ("hcom", "uvx hcom"):
-            for tail in ("term *", "relay *", "config *", "hooks *", "run *", "kill *", "stop *", "reset *",
-                         "update *", "claude-pty *", "* claude-pty *", "--name *", "--go *",
-                         "send -b *", "send --from *", "send --from=*"):
-                if f"Bash({prefix} {tail})" not in deny:
-                    bad("agent-messaging", f"mapped Claude deny is missing: {prefix} {tail}")
-        rules = (plan_dir / "config" / pathlib.Path(spec["codex_rule_file"]).name).read_text()
-        if rules.count('decision = "forbidden"') != 4 or "not_match =" not in rules:
-            bad("agent-messaging", "Codex requires all four forbidden rules and their native inline examples")
-        adapter = (plan_dir / "config/hcom-client-config.py").read_text()
-        if '"execpolicy", "check", "--pretty", "--rules"' not in adapter:
-            bad("agent-messaging", "the configuration adapter must run the mandatory native rule check")
-    except (OSError, ValueError, KeyError, TypeError):
-        bad("agent-messaging", "mapped native posture or rules are missing")
-    acceptance = row.get("acceptance", {}).get("post_install", {}).get("command", "")
-    if not all(token in acceptance for token in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i", "--check")):
-        bad("agent-messaging", "post-install must check upstream CLI smoke behavior and installed client posture")
+    expected_commands = [
+    "fetch_verified https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98 \"$tool_root/hcom-0.7.27/hcom-installer.sh\"",
+    "HCOM_INSTALL_DIR=\"$HOME/.local/bin\" HCOM_NO_MODIFY_PATH=1 sh \"$tool_root/hcom-0.7.27/hcom-installer.sh\""
+]
+    if row.get("commands") != expected_commands:
+        bad("agent-messaging", "retain verified native installer without custom posture apply")
+    history = {"hcom-client-config.py", "hcom-deny.rules"}
+    if set(row.get("historical_config_assets", [])) != history:
+        bad("agent-messaging", "superseded posture assets must be explicit historical references")
+    for name in history:
+        if not (plan_dir / "config" / name).is_file():
+            bad("agent-messaging", "historical posture source is missing: " + name)
+    executable = list(row.get("commands", []))
+    executable.extend(e["command"] for e in row.get("acceptance", {}).values() if e)
+    if any(name in cmd for cmd in executable for name in history):
+        bad("agent-messaging", "historical posture must never be installed or accepted")
+    if row.get("acceptance", {}).get("after_sign_in") is not None:
+        bad("agent-messaging", "deny-only acceptance withdrawn pending native orchestration recipe")
+    post = row.get("acceptance", {}).get("post_install", {}).get("command", "")
+    if not all(t in post for t in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i")):
+        bad("agent-messaging", "preserve native CLI messaging smoke")
 
 
 def code_docs_contract(plan_dir, by_slot, bad):
@@ -259,7 +250,7 @@ def browser_contract(by_slot, install_funcs, bad):
         bad("playwright-cli", "the wave-5 Chrome DevTools MCP 1.10.1 owner must install by default at its release commit")
     commands = row.get("commands", [])
     # The destination map is the sole registration writer (round-2 G2 handoff).
-    # Like hcom's posture check, read the source map even for --plan-dir copies.
+    # Read the source map even for --plan-dir copies.
     source_root = pathlib.Path(__file__).resolve().parents[3]
     args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
     try:
@@ -670,7 +661,11 @@ def main():
         }
         if historical_gateway_configs & copied:
             bad("gpt-gateway", "selected prebuilt release must not install historical canary assets")
-    for name in sorted(config - copied - historical_gateway_configs):
+    # User ruling2026-10-06: retain old hcom posture as uninstalled historical fixtures.
+    historical_hcom_configs = {"hcom-client-config.py", "hcom-deny.rules"}
+    if historical_hcom_configs & copied:
+        bad("agent-messaging", "superseded posture assets must never be copied")
+    for name in sorted(config - copied - historical_gateway_configs - historical_hcom_configs):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
