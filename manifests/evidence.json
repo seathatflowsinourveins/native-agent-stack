@@ -16432,6 +16432,11 @@
       "bytes": 21449
     },
     {
+      "path": "catalogs/landscape/skills-lifecycle.json",
+      "sha256": "590dc54e09a3a40da31ac73a5d265bcd348326304feb0ab52c0f6db634a3403f",
+      "bytes": 25471
+    },
+    {
       "path": "catalogs/landscape/upstream-snapshot.json",
       "sha256": "85a1715168203fef8f201672d3f284ff3021797c0576a974ef05ed4b6af7446c",
       "bytes": 258289
@@ -17442,9 +17447,19 @@
       "bytes": 19235
     },
     {
+      "path": "docs/decisions/2026-10-06-saved-workflow-install-plan.md",
+      "sha256": "ce95a4325eb17080a8273c5205aa764a0860dfd534a43248b70912a54c8ecf8b",
+      "bytes": 6738
+    },
+    {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
+    },
+    {
+      "path": "docs/decisions/2026-10-06-skills-hygiene-and-discovery.md",
+      "sha256": "a57585f9a53ca5ae50ec775fe00a36fd1bcc2b7191817b6cc69f16ee0f42b161",
+      "bytes": 7482
     },
     {
       "path": "docs/direct-results.md",
@@ -46282,6 +46297,11 @@
       "bytes": 6747
     },
     {
+      "path": "evidence/artifacts/skills-hygiene-20261006/mineru-registration.json",
+      "sha256": "0103bfe93461a3376daa6d44f85523858e1e7ecd93ad5fda4dd5f030812b179f",
+      "bytes": 2312
+    },
+    {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
       "sha256": "13dc826b75e8160c11b31a2d7afef22754b6f5660fe6db9a1af721dff9cd3fd0",
       "bytes": 12541
@@ -55140,6 +55160,11 @@
       "path": "tests/test_landscape_sweep_harness.py",
       "sha256": "472f0c0fbae4fc006345df7b1ba7150d2d72643a6838a48076ca2f482d9113e3",
       "bytes": 377687
+    },
+    {
+      "path": "tests/test_landscape_sweep_skills.py",
+      "sha256": "82fcb50e61d9714a33fd9988482c0ef6a51cbc7f76f81d18bb38306eb96e05e8",
+      "bytes": 184258
     },
     {
       "path": "tests/test_lane_packets.py",
