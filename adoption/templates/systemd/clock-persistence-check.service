@@ -1,0 +1,23 @@
+# CLOCK-R2 candidate. Install only after the command-center ACK.
+# Source: systemd 259, systemd.service(5) Type=oneshot/RemainAfterExit,
+# systemd.unit(5) OnFailure/WantedBy; runtime checks use read-only native APIs.
+# https://github.com/systemd/systemd/tree/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man
+[Unit]
+Description=Read back WSL clock-agent and Windows Time persistence after distro boot
+OnFailure=paper-alert@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.local/lib/native-agent-stack/clock-r2/d0-check.py --seconds 60
+TimeoutStartSec=240
+RemainAfterExit=yes
+Nice=19
+IOSchedulingClass=idle
+UMask=0077
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=clock-persistence-check
+
+[Install]
+WantedBy=default.target
