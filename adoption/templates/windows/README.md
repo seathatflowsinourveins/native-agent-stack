@@ -13,6 +13,13 @@ immediately with the administrator remediation. `--persistence-only` reads
 Windows without a census; `--agent-only 60` retains the original census behavior.
 The script accepts the original positional duration as well as `--seconds`.
 
+The NativeStack2604 census queries its observer on UDP **3323** for both loopback
+families. UDP 323 belongs to the older distribution on WSL's shared network;
+an old PHC0 answer must not mask a missing native observer. Reports name the
+actual `chrony_port` and use `chrony_phc0_answers`/`chrony_refs`. The installed
+chronyc 4.8 `-p PORT` option selects that target ([upstream manual](https://chrony-project.org/doc/4.8/chronyc.html)).
+This does not change the administrator script or persistence-only timer.
+
 D0 fails if startup is delayed or not numeric 2, W32Time is not RUNNING, any
 STOP/unknown trigger exists, a required read is malformed, Minutes is not 1 or
 MaxTimes is not 7. START triggers, including the unidentified type-7 start path,

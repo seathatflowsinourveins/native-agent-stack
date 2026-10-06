@@ -21,6 +21,7 @@ import sys
 import time
 
 POWERSHELL = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+CHRONY_PORT = 3323  # NativeStack2604 observer; 323 is the old distro's on shared WSL loopback.
 REMEDIATION = (
     "The user re-applies CLOCK-R2 fixes 1 and 2 as Windows administrator: "
     "sc.exe config w32time start= auto; ResolvePeerBackoffMinutes=1, leaving MaxTimes=7. "
@@ -164,7 +165,7 @@ def sample_timex() -> dict:
 def read_agent_reference() -> str:
     for address in ("::1", "127.0.0.1"):
         try:
-            result = subprocess.run(["chronyc", "-h", address, "-p", "323", "-n", "tracking"],
+            result = subprocess.run(["chronyc", "-h", address, "-p", str(CHRONY_PORT), "-n", "tracking"],
                                     capture_output=True, text=True, timeout=5, check=False)
         except (OSError, subprocess.TimeoutExpired):
             continue
@@ -198,8 +199,9 @@ def agent_census(seconds: int) -> dict:
     phc0 = sum(ref.startswith("50484330") for ref in refs)
     alive = len(gaps) >= 3 and all(6.5 <= gap <= 9.5 for gap in gaps) and phc0 >= 1
     return {"seconds": seconds, "maxerror_resets": len(resets), "reset_gaps_s": gaps,
-            "pll_status_samples": pll, "port323_phc0_answers": f"{phc0}/10",
-            "port323_refs": sorted(set(refs)), "agent_alive": alive}
+            "pll_status_samples": pll, "chrony_port": CHRONY_PORT,
+            "chrony_phc0_answers": f"{phc0}/10", "chrony_refs": sorted(set(refs)),
+            "agent_alive": alive}
 
 
 def main(seconds: int = 60, mode: str = "both", powershell: str = POWERSHELL) -> int:
