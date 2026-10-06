@@ -4762,8 +4762,8 @@
     },
     {
       "path": "adoption/git-hook-acceptance.md",
-      "sha256": "bcc32517fd829c6e319f382409775a11071eed6e5eaa38d6f12f55427c15d992",
-      "bytes": 6544
+      "sha256": "445e5ca63f39bcf539ceaded17dad8ff071c7d13f822a44c5c299092eb0561f1",
+      "bytes": 7770
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -17103,8 +17103,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-git-hook-scanner-pin.md",
-      "sha256": "531ce888805d6b3e92b642055d045d2221eb2616005ea1e33816b3592ff6f882",
-      "bytes": 4581
+      "sha256": "26af1e2b3a2ec146f38a6af0b5f3480f3cf33e542f8c98e42bfb157296f008bc",
+      "bytes": 5821
     },
     {
       "path": "docs/direct-results.md",
@@ -52703,8 +52703,8 @@
     },
     {
       "path": "evidence/receipts/p1-git-hook-acceptance-20261006.json",
-      "sha256": "5195a10f1c1aa7b8c219d73bc6285630941b159ed4260fecd96bbf1552db2b22",
-      "bytes": 9483
+      "sha256": "37350cb04b8cbd6eb6df12623da9059223e7dd0fded9156c55d7d9b16b6a2ff5",
+      "bytes": 12304
     },
     {
       "path": "evidence/receipts/pit-availability.json",
