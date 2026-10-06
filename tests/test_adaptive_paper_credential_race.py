@@ -1171,6 +1171,30 @@ MUTATIONS = {
 }
 
 
+class MutationDriverInterpreterTests(unittest.TestCase):
+    """Exercise interpreter selection at the named-test subprocess boundary."""
+
+    def test_default_uses_current_python_even_when_adaptive_python_exists(self):
+        with patch.object(os, "environ", {}), \
+                patch.object(driver, "PY") as named_python, \
+                patch.object(driver.subprocess, "run") as run:
+            named_python.exists.return_value = True
+            driver.run_test_ids(Path("fixture-checkout"), ["fixture.NamedTest"], timeout=7)
+        run.assert_called_once()
+        self.assertEqual(run.call_args.args[0][0], sys.executable)
+        named_python.exists.assert_not_called()
+
+    def test_explicit_opt_in_uses_named_adaptive_python(self):
+        named_python = Path("/fixture/adaptive-paper-20260921/bin/python")
+        with patch.object(os, "environ", {"NATIVE_STACK_CREDENTIAL_MUTATION_USE_ADAPTIVE_PAPER": "1"}), \
+                patch.object(driver, "PY", named_python), \
+                patch.object(driver.subprocess, "run") as run:
+            driver.run_test_ids(Path("fixture-checkout"), ["fixture.NamedTest"], timeout=7)
+        run.assert_called_once_with(
+            [str(named_python), "-W", "ignore::ResourceWarning", "-m", "unittest", "-v", "fixture.NamedTest"],
+            cwd=Path("fixture-checkout"), capture_output=True, text=True, timeout=7)
+
+
 class MutationDriverSelfTests(unittest.TestCase):
     """Fix-round-4 item 2: the driver itself must not report a false kill.
     An empty mutation (no change at all) and a mutation that only breaks

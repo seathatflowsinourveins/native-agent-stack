@@ -41,7 +41,17 @@ quiet. A55 confirms it does not block #772. Carry the failing gate
 tests/test_windows_terminal_defaults.py:166-176, its DECISIONS table at
 evidence/artifacts/notification-types-20260929/notification_types_scan.py:20,
 observed Claude Code 2.1.291, and the exact returned assertion in the CI receipt.
-The full retry keeps that gate intact. The qualified full retry is pending
+The CC subsequently ruled RING in item151719Z; CURRENCY owns its dated table
+row. Cite that actual row when provided; do not manufacture a row or change
+client configuration here. The full retry keeps the native gate intact.
+
+Item153309Z also assigns the credential mutation driver's interpreter fix.
+Use sys.executable by default and expose the old named adaptive-paper runtime
+only through documented NATIVE_STACK_CREDENTIAL_MUTATION_USE_ADAPTIVE_PAPER=1.
+This follows [CPython3.13.16 subprocess guidance:383-387](https://github.com/python/cpython/blob/v3.13.16/Doc/library/subprocess.rst#L383).
+Two subprocess-boundary tests failed before the repair and pass after it.
+Every preexisting mutation/verdict function and test class remains byte-identical;
+assertion strength is unchanged. The qualified full retry is pending
 GO-RELAUNCH under command-center item
 task-ns2604-coop-20261006T143738Z. No full-pass or publication claim is made from
 this checkpoint.

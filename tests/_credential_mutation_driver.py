@@ -9,6 +9,11 @@ that copy, and runs the actually-named test(s) against the mutated copy in a
 subprocess (`python -m unittest -v <test-id> ...`), the same shape as
 `scratchpad/rev-mrcred/claude/driver.py`'s independently-authored driver.
 
+Named tests use the current interpreter (`sys.executable`) by default. To
+explicitly select the named adaptive-paper runtime, set
+`NATIVE_STACK_CREDENTIAL_MUTATION_USE_ADAPTIVE_PAPER=1`. An unavailable
+explicitly selected runtime fails normally; it never selects a fallback.
+
 Fix-round-4 correction (both reviewers, MEDIUM): an earlier version of this
 driver counted *any* non-zero subprocess exit as a kill. That over-counts:
 an ImportError, a SyntaxError, or a mistyped test id all make `unittest`
@@ -44,6 +49,7 @@ completely unchanged code. This version:
 """
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import subprocess
@@ -61,11 +67,11 @@ ADAPTIVE_PAPER = "blueprints/us-equities/adaptive-paper"
 # unrelated ImportError before the named test ever executes, which the
 # old, cruder kill rule would have miscounted as a kill.
 ORDER_CONTRACT = "blueprints/us-equities/order-contract"
-# The pinned adaptive-paper runtime, named the same way tests/test_promotion_gate.py
+# The explicit opt-in adaptive-paper runtime, named the same way tests/test_promotion_gate.py
 # and tests/test_observability_backends_alerts.py already locate their own pinned
 # tool runtimes (relative to Path.home(), never a literal host path).
 PY = Path.home() / ".local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python"
-_FALLBACK_PY = sys.executable
+ADAPTIVE_PAPER_PYTHON_ENV = "NATIVE_STACK_CREDENTIAL_MUTATION_USE_ADAPTIVE_PAPER"
 
 # A shared test helper several `tests/test_adaptive_paper_*.py` files import
 # unconditionally at module scope.
@@ -77,7 +83,10 @@ _RESULT_LINE = re.compile(r"^\S+ \((?P<dotted>[\w.]+)\) \.\.\. (?P<status>ok|FAI
 
 
 def _python():
-    return str(PY) if PY.exists() else _FALLBACK_PY
+    # CPython@v3.13.16 Doc/library/subprocess.rst:383-387 recommends sys.executable.
+    if os.environ.get(ADAPTIVE_PAPER_PYTHON_ENV) == "1":
+        return str(PY)
+    return sys.executable
 
 
 def _prepare_copy(root: Path) -> None:

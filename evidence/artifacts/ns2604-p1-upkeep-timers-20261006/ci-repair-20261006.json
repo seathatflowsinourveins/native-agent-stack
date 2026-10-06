@@ -76,6 +76,13 @@
       "path": "adoption/templates/systemd/upkeep-transfer.md",
       "lines": "494",
       "contract": "Reuse the maintained keyed native-show parsing in the test's observation path."
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "v3.13.16",
+      "path": "Doc/library/subprocess.rst",
+      "lines": "383-387",
+      "url": "https://github.com/python/cpython/blob/v3.13.16/Doc/library/subprocess.rst#L383"
     }
   ],
   "commands": [
@@ -257,7 +264,7 @@
     "returned_unknown_type": "auth_storage_failure",
     "result": "failure",
     "owner": "command center/notification decision owner",
-    "action": "Carry the exact gate/table/version/failure in #772; owner decides separately. Run the full retry without excluding or weakening the gate.",
+    "action": "RING ruling accepted; table owner CURRENCY, source citation pending their dated row. This lane changes no table/client config. Full retry retains native gate; gap is nonblocking per A55.",
     "gate_path": "tests/test_windows_terminal_defaults.py:166-176",
     "decision_table_path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py:20",
     "observed_client_version": "2.1.291 (Claude Code)",
@@ -266,7 +273,9 @@
     "version_observed_utc": "2026-10-06T15:12:17Z",
     "exact_returned_output": "AssertionError: Lists differ: ['auth_storage_failure'] != []\n\nFirst list contains 1 additional elements.\nFirst extra element 0:\n'auth_storage_failure'\n\n- ['auth_storage_failure']\n+ [] : a type this client knows has no decision in DECISIONS",
     "blocks_pr772": false,
-    "owner_ruling": "Co-op A55,2026-10-06T15:10:53Z: carry explicitly; CC owns ring-or-quiet and table owner; does not block #772."
+    "owner_ruling": "CCitem151719Z: auth_storage_failure=RING; CURRENCY owns and adds dated DECISIONS row. #772 cites its actual row when supplied, without inventing one.",
+    "decision_pending": false,
+    "currency_row_citation_pending": true
   },
   "park": {
     "source_item": "task-ns2604-coop-20261006T143738Z",
@@ -282,5 +291,42 @@
       "option": 1,
       "scope": "Prerequisites, fixture preludes, CI umask, named properties and regenerable scratch converge; notification is an explicitly recorded, nonblocking owner item; full retry waits GO."
     }
-  ]
+  ],
+  "driver_fix": {
+    "source_item": "task-ns2604-coop-20261006T153309Z",
+    "files": [
+      "tests/_credential_mutation_driver.py",
+      "tests/test_adaptive_paper_credential_race.py"
+    ],
+    "default": "sys.executable, no installed adaptive-paper runtime probe",
+    "explicit_opt_in": "NATIVE_STACK_CREDENTIAL_MUTATION_USE_ADAPTIVE_PAPER=1 selects the existing named adaptive-paper PY path; unavailable explicit runtime is not silently replaced.",
+    "documented_in": "driver module docstring",
+    "source": {
+      "repository": "python/cpython",
+      "pin": "v3.13.16",
+      "path": "Doc/library/subprocess.rst",
+      "lines": "383-387",
+      "url": "https://github.com/python/cpython/blob/v3.13.16/Doc/library/subprocess.rst#L383"
+    },
+    "controls": {
+      "before_fix_exit": 1,
+      "before_fix_failures": 2,
+      "after_fix_exit": 0,
+      "tests": 2,
+      "log": "driver-fix-focused.log",
+      "boundary": "named-test subprocess argv default/opt-in"
+    },
+    "preservation": {
+      "all_existing_driver_functions_except_selector_byte_identical": true,
+      "all_preexisting_test_classes_byte_identical": true,
+      "assertion_strength_changed": false,
+      "mutation_verdict_logic_changed": false
+    },
+    "evidence_classes": [
+      "source",
+      "synthetic",
+      "local_integration"
+    ],
+    "full_qualified_retry": "NOT STARTED; awaits tools-waveGO and paper window"
+  }
 }
