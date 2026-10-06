@@ -1,0 +1,36 @@
+[2026-10-06T00:43:13Z] uv 0.12.22 (x86_64-unknown-linux-gnu)
+base archive and lock hashes:
+2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8  <scratch-relock>/sdk-fcc102a.tar.gz
+e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1  <scratch-relock>/u3/base.lock
+[2026-10-06T00:43:14Z] control uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2
+lock exit: 0
+check exit: 0
+export exit: 0
+Resolved 412 packages in 449ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+Updated litellm v1.93.0 -> v1.93.2
+Updated pyjwt v2.13.0 -> v2.15.0
+Updated pypdf v6.14.2 -> v6.19.0
+Updated soupsieve v2.8.4 -> v2.9.2
+Updated urllib3 v2.7.0 -> v2.8.0
+e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1  <scratch-relock>/u3/control/requirements.lock.repro
+[2026-10-06T00:43:16Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1
+lock exit: 0
+check exit: 0
+export exit: 0
+Resolved 412 packages in 305ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+Updated fsspec v2025.9.0 -> v2026.6.0
+Updated litellm v1.93.0 -> v1.93.2
+Updated multidict v6.7.0 -> v6.9.1
+Updated pyjwt v2.13.0 -> v2.15.0
+Updated pypdf v6.14.2 -> v6.19.0
+Updated soupsieve v2.8.4 -> v2.9.2
+Updated urllib3 v2.7.0 -> v2.8.0
+2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401  <scratch-relock>/u3/new/requirements.lock.repro
+control reproduces the committed lock byte for byte
+[2026-10-06T00:43:17Z] new paired lock generated; inspect every pin delta before adoption

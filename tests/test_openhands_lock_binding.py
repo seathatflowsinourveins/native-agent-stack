@@ -1,4 +1,5 @@
-"""Bindings around the OpenHands recipe lock that nothing tested before the litellm relock of 2026-09-30 (a cross-family review of that change showed both gaps by mutation).
+"""Bindings around the OpenHands recipe lock, retained for the fsspec relock of
+2026-10-05 from the litellm relock of 2026-09-30 (review exposed both gaps by mutation).
 
 1. pins.json records the sha256 of requirements.lock and of build-requirements.lock, and the recipe's host.py preflight refuses to run when they differ (host.py:324-327); no test compared
    them, so a relock could leave a stale digest that only a real run would notice.
