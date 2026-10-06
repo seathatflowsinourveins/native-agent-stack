@@ -1538,7 +1538,9 @@ class McpCodexParityTests(unittest.TestCase):
         self.assertEqual(entry.get("env", {}), {})
 
     def test_qmd_serves_the_named_catalog_index(self):
-        self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog", "mcp"])
+        self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog-lex", "mcp"])
+        self.assertEqual(self.claude()["qmd"]["env"]["QMD_FORCE_CPU"], "1")
+        self.assertNotIn("INDEX_PATH", self.claude()["qmd"]["env"])
         self.assertIn("docs/token-session-handbook.md#catalog-lookup", (ROOT / "AGENTS.md").read_text(encoding="utf-8"))
         self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "docs/token-session-handbook.md").read_text(encoding="utf-8"))
 

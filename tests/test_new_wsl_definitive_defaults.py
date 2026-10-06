@@ -140,6 +140,7 @@ class Manifest(unittest.TestCase):
     def as_decided(self, row):
         """The row as the rounds or an earlier batch decided it: an owner default (amendment 4) puts back the fields it
         replaced and the interim it dropped, and an interim the owner amended gets its replaced values back."""
+        row = row.get("historical_settlement", row)
         kept = row.get("overturned")
         if not kept:
             return row
@@ -220,6 +221,7 @@ class Manifest(unittest.TestCase):
         added_jobs = {d["slot_id"]: d["job"] for d in self.convergence["added_slots"]}
         owners = {}
         for row in self.rows:
+            row = row.get("historical_settlement", row)
             sid = row["slot_id"]
             with self.subTest(slot=sid):
                 self.assertTrue(row.get("job"), sid)
@@ -424,6 +426,7 @@ class Manifest(unittest.TestCase):
 
     def test_resolved_rows_keep_their_first_round_record(self):
         for row in self.rows:
+            row = row.get("historical_settlement", row)
             resolution = row["resolution"]
             if resolution["outcome"] not in RESOLVED:
                 continue
@@ -441,6 +444,7 @@ class Manifest(unittest.TestCase):
         self.assertEqual(sorted(stated), ["agent-structural-diff"])
         settled = {settlement["slot_id"]: settlement["label"] for settlement in self.settlements}
         for row in self.rows:
+            row = row.get("historical_settlement", row)
             resolution = row["resolution"]
             if resolution["outcome"] not in RESOLVED:
                 continue
@@ -617,12 +621,13 @@ class Manifest(unittest.TestCase):
         # (rows that the convergence decisions added and split).
         settled = {"local-model-server", "local-generation-model", "embedding-model"}
         self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, settled)
-        self.assertEqual({row["slot_id"] for row in self.rows if row["measurement"] and row["measurement"]["returned"]},
+        historical_rows = [row.get("historical_settlement", row) for row in self.rows]
+        self.assertEqual({row["slot_id"] for row in historical_rows if row["measurement"] and row["measurement"]["returned"]},
                          settled)
         for settlement in self.settlements:
             rows = [row for row in self.rows if row["slot_id"] == settlement["slot_id"]]
             self.assertEqual(len(rows), 1, settlement["slot_id"])
-            row = rows[0]
+            row = rows[0].get("historical_settlement", rows[0])
             self.assertFalse(row["definitive"], row["slot_id"])
             self.assertEqual(row["state"], "measurement")
             self.assertEqual(row["default"], settlement["default"]["name"])
@@ -642,6 +647,29 @@ class Manifest(unittest.TestCase):
                 self.assertEqual(sha(path), receipt["sha256"], receipt["path"])
             self.assertEqual(settlement["limits"], load(ROOT / settlement["receipts"][-1]["path"])["limitations"])
 
+    def test_current_model_rulings_preserve_history_and_are_source_choices(self):
+        current = {row["slot_id"]: row for row in self.rows if row.get("current_ruling")}
+        self.assertEqual(set(current), {"local-model-server", "local-generation-model", "embedding-model"})
+        for sid, row in current.items():
+            self.assertEqual(row["state"], "resolved", sid)
+            self.assertIsNone(row["measurement"], sid)
+            self.assertFalse(row["definitive"], sid)
+            self.assertEqual(row["current_ruling"]["evidence_class"], "source_review", sid)
+            self.assertIs(row["historical_settlement"]["measurement"]["returned"], True)
+            for receipt in row["current_ruling"]["receipts"]:
+                self.assertEqual(sha(ROOT / receipt["path"]), receipt["sha256"])
+                self.assertEqual(load(ROOT / receipt["path"])["native_runs_by_this_pr"], 0)
+        for sid in ("local-model-server", "local-generation-model"):
+            self.assertTrue(current[sid]["installs_nothing_extra"])
+            self.assertEqual(current[sid]["repository"], "")
+            self.assertEqual(current[sid]["resolution"]["outcome"], "not_installed")
+        embed = current["embedding-model"]
+        self.assertIn("nvidia/Nemotron-3-Embed-8B-BF16", embed["default"])
+        self.assertEqual(embed["resolution"]["outcome"], "kept")
+        self.assertEqual(embed["current_ruling"]["dimensions"], 4096)
+        self.assertEqual(embed["current_ruling"]["query_prefix"], "query: ")
+        self.assertEqual(embed["current_ruling"]["document_prefix"], "passage: ")
+
     def test_settled_split_tables_preserve_the_blind_picks(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
         slots = {slot["slot_id"]: slot for layer in self.foundation["layers"] for slot in layer["slots"]}
@@ -654,12 +682,13 @@ class Manifest(unittest.TestCase):
                 self.assertIn(settlement["slot_id"], added)
                 line = next(line for line in lines if re.match(r"\| [^|]+ \| " + re.escape(settlement["slot_id"]) + r" \|", line))
                 cells = [cell.strip() for cell in line.split("|")[1:-1]]
-                self.assertEqual(cells[3:], [settlement["default"]["name"], "measurement", "settled by the preregistered measurement"])
+                ruling = settlement["current_ruling"]
+                self.assertEqual(cells[3:], [ruling["default"]["name"], "resolved", ruling["label"]])
                 continue
             if slot.get("split"):
                 line = next(line for line in lines if line.startswith(f"| {slot['slot_id']} |"))
                 cells = [cell.strip() for cell in line.split("|")[1:-1]]
-                self.assertEqual(cells[1], settlement["default"]["name"])
+                self.assertEqual(cells[1], settlement["current_ruling"]["default"]["name"])
                 self.assertEqual(cells[2], settlement["label"])
                 for pick in slot["split_between"]:
                     self.assertIn(pick["name"], cells[3 if pick["family"] == "claude" else 4])
@@ -831,16 +860,18 @@ class Manifest(unittest.TestCase):
         self.assertEqual(counts["layers"], 37)
         # 56 after the layer consensus, 57 with its wave-2 statusline row, 59 with the two local-model slots settled by their
         # measurement (2026-10-03), 72 with wave 3, 73 with Promptfoo, then six wave-5 installs.
-        self.assertEqual(counts["installed"], 79)
+        # The 2026-10-06 source ruling retires two installation choices; this is
+        # a catalog projection count, not a native E2E readiness count.
+        self.assertEqual(counts["installed"], 77)
         # Three interims under amendment 3; the context-supply owner default replaced one of them.
         self.assertEqual(counts["interim"], 2)
         self.assertEqual(counts["by_row_kind"]["consensus"], 6)
         self.assertEqual(counts["by_row_kind"]["owner_decision"], 14)
         # 23, the ten wave-3 owner rows, context-supply, the four wave-5 owner rows and the two wave-5 owner defaults (agent-messaging, playwright-cli) = 40.
-        self.assertEqual(counts["by_state"]["resolved"], 40)
+        self.assertEqual(counts["by_state"]["resolved"], 43)
         self.assertEqual(counts["by_state"]["definitive"], 30)
         self.assertEqual(counts["definitive"], 30)
-        self.assertEqual(counts["by_state"]["measurement"], 6)
+        self.assertEqual(counts["by_state"]["measurement"], 3)
         self.assertEqual(counts["by_state"]["split"], 3)
 
     def test_consensus_rows_are_the_records_rows_with_its_states(self):

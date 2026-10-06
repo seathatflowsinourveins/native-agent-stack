@@ -23,6 +23,8 @@ def cell(row):
 
 
 def basis(row, combined):
+    if row.get("current_ruling"):
+        return row["label"]
     # A row added by the direct consensus or by the owner's decision (amendment 4), and a row the owner gave a default, give
     # their own basis: the label says what kind of result it is and is not.
     if row["row_kind"] in ("consensus", "owner_decision") or (row.get("overturned") or {}).get("fields"):
@@ -102,15 +104,20 @@ def render():
                 row = rows[slot["slot_id"]]
                 # The family columns are the manifest's current status; the blind round's own basis stays in the third column.
                 statuses = {family: row[family] for family in ("claude", "gpt")}
-                if slot.get("split") and row["measurement"] and row["measurement"]["returned"]:
+                historical = row.get("historical_settlement", row)
+                if slot.get("split") and historical["measurement"] and historical["measurement"]["returned"]:
                     for pick in slot["split_between"]:
-                        statuses[pick["family"]] += f" on {pick['name']} in the blind round"
+                        if row.get("current_ruling"):
+                            statuses[pick["family"]] += (f"; historical verdict {historical[pick['family']]}"
+                                                         f" on {pick['name']} in the blind round")
+                        else:
+                            statuses[pick["family"]] += f" on {pick['name']} in the blind round"
                 # An owner default (amendment 4) replaced the row's decided fields; the blind round's basis is in the ones it kept.
                 decided = (row.get("overturned") or {}).get("fields") or row
                 blind_basis = decided["resolution"].get("first_round_record", decided)["label"]
                 lines.append(f"| {slot['slot_id']} | {row['default']} | {blind_basis} | {statuses['claude']} | {statuses['gpt']} | "
                              f"{'yes' if row['definitive'] else 'no'} | {row['job']} | {row.get('state') or 'open'} | {basis(row, combined)} |")
-                if slot.get("split_note") and not (row["measurement"] and row["measurement"]["returned"]):
+                if slot.get("split_note") and not row.get("current_ruling") and not (row["measurement"] and row["measurement"]["returned"]):
                     lines.append(f"| | | {slot['split_note']} | | | | | | |")
     interims = [row for row in man["slots"] if row.get("interim")]
     if interims:

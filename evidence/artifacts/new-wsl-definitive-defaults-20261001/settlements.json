@@ -32,7 +32,31 @@
    "OLLAMA_NO_CLOUD=1 and loopback binding were set; outbound traffic was not captured.",
    "The load average was recorded only in this run; the first gate did not record it, so tokens per second are not comparable across the two gates."
   ],
-  "overturn_condition": "A llama.cpp release that passes the same gate, or a throughput comparison once both arms pass, can overturn this settlement."
+  "overturn_condition": "A llama.cpp release that passes the same gate, or a throughput comparison once both arms pass, can overturn this settlement.",
+  "current_ruling": {
+   "date_utc": "2026-10-06",
+   "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+   "evidence_class": "source_review",
+   "default": {
+    "name": "Not installed: retired; no general local-generation consumer",
+    "repository": ""
+   },
+   "state": "resolved",
+   "installs_nothing_extra": true,
+   "label": "2026-10-06 owner retirement: no general local-generation consumer; historical returned measurement retained",
+   "resolution": {
+    "outcome": "not_installed",
+    "by": "command-center dated local-model ruling",
+    "reason": "The generation/server role is retired until a consumer is named.",
+    "covered_by": "not needed"
+   },
+   "receipts": [
+    {
+     "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+     "sha256": "96c5abffd014bb96ab41579c890b6aa201db975ab539544bd6308a658203016c"
+    }
+   ]
+  }
  },
  {
   "slot_id": "local-generation-model",
@@ -68,7 +92,31 @@
    "Raw model outputs (the Inspect logs, the client run records, the server logs) stay private and are listed by sha256 in files.json; the published per-case validity files carry case ids, verdicts, reasons and timings, and the decision statistic reproduces from them.",
    "The Swift file's licence is the publisher's own (Swift Open License v1.0, with the original Qwen parts under Apache-2.0); the Modelfile's LICENSE block is the library model's Apache-2.0 text. Recorded, not judged."
   ],
-  "overturn_condition": "A newer local generation model or runtime that passes the function gate, fits entirely on the GPU beside the embedder at 64,000 tokens and has a higher first-pass valid tool-call share on the same cases with an interval above zero; or the destination distribution's acceptance failing for this system (the model not created from the pinned file, or not answering through the server)."
+  "overturn_condition": "A newer local generation model or runtime that passes the function gate, fits entirely on the GPU beside the embedder at 64,000 tokens and has a higher first-pass valid tool-call share on the same cases with an interval above zero; or the destination distribution's acceptance failing for this system (the model not created from the pinned file, or not answering through the server).",
+  "current_ruling": {
+   "date_utc": "2026-10-06",
+   "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+   "evidence_class": "source_review",
+   "default": {
+    "name": "Not installed: retired; no general local-generation consumer",
+    "repository": ""
+   },
+   "state": "resolved",
+   "installs_nothing_extra": true,
+   "label": "2026-10-06 owner retirement: no general local-generation consumer; historical returned measurement retained",
+   "resolution": {
+    "outcome": "not_installed",
+    "by": "command-center dated local-model ruling",
+    "reason": "The generation/server role is retired until a consumer is named.",
+    "covered_by": "not needed"
+   },
+   "receipts": [
+    {
+     "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+     "sha256": "96c5abffd014bb96ab41579c890b6aa201db975ab539544bd6308a658203016c"
+    }
+   ]
+  }
  },
  {
   "slot_id": "embedding-model",
@@ -103,6 +151,33 @@
    "The 31 MB prediction files and the run records stay private and are listed by sha256 in files.json; the published per-query nDCG@10 files reproduce the decision statistic.",
    "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
   ],
-  "overturn_condition": "A single-server embedding model with a higher nDCG@10 on the same task whose difference has an interval above zero, or a second-server model that beats this one by an interval above zero; a measured gain of an external reranker once a retrieval owner that can call one is installed; or the destination distribution's acceptance failing for this system."
+  "overturn_condition": "A single-server embedding model with a higher nDCG@10 on the same task whose difference has an interval above zero, or a second-server model that beats this one by an interval above zero; a measured gain of an external reranker once a retrieval owner that can call one is installed; or the destination distribution's acceptance failing for this system.",
+  "current_ruling": {
+   "date_utc": "2026-10-06",
+   "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+   "evidence_class": "source_review",
+   "default": {
+    "name": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text endpoint, 4096 dimensions, query: / passage: prefixes)",
+    "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16"
+   },
+   "state": "resolved",
+   "installs_nothing_extra": false,
+   "label": "2026-10-06 current source choice: shared Nemotron 8B; application and independent execution acceptance are separate",
+   "resolution": {
+    "outcome": "kept",
+    "by": "command-center dated local-model ruling",
+    "reason": "Select the already shared text-embedding role; this publication performs no model run or migration."
+   },
+   "receipts": [
+    {
+     "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+     "sha256": "96c5abffd014bb96ab41579c890b6aa201db975ab539544bd6308a658203016c"
+    }
+   ],
+   "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+   "dimensions": 4096,
+   "query_prefix": "query: ",
+   "document_prefix": "passage: "
+  }
  }
 ]

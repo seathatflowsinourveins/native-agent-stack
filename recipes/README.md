@@ -25,7 +25,7 @@ Set these in the current shell, replacing the project path with this clone's abs
 ```sh
 STACK_HOME="$HOME/.local/share/native-agent-stack"
 PROJECT_ROOT=/absolute/path/to/native-agent-stack
-MODEL_DIRECTORY="$STACK_HOME/models/nemotron-3-embed-1b-c0c9fea"
+MODEL_DIRECTORY="$STACK_HOME/models/nemotron-3-embed-8b-d1f2f25"
 MCPORTER_CONFIG="$STACK_HOME/config/mcporter.json"
 QDRANT_CONFIG="$STACK_HOME/config/qdrant.yaml"
 QMD_INDEX=native-stack-docs
@@ -309,32 +309,32 @@ The expected source symbol is `greeting`. A language-server setup error is a mis
 
 ## Local semantic code search
 
-Use [qdrant.yaml.example](../examples/qdrant.yaml.example) and the service templates only after replacing absolute paths and creating their state directories. They bind to loopback, disable Qdrant telemetry and gRPC, and keep storage outside binary prefixes. The service port is **16333**, the embedding endpoint **8231**. Loopback limits exposure; it is not authorization against another local user. Add Qdrant's supported API-key protection if that is part of the host's threat model, and keep that key private.
+Use [qdrant.yaml.example](../examples/qdrant.yaml.example) and the service templates only after replacing absolute paths and creating their state directories. They bind to loopback, disable Qdrant telemetry and gRPC, and keep storage outside binary prefixes. The NativeStack2604 service port is **21633**, the embedding endpoint **28231**. Loopback limits exposure; it is not authorization against another local user. Add Qdrant's supported API-key protection if that is part of the host's threat model, and keep that key private.
 
-The model is [NVIDIA Nemotron-3-Embed-1B-BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), released July 16, 2026, under OpenMDW-1.1. Pin the revision and retain model license/config files:
+The NativeStack2604 choice is [NVIDIA Nemotron-3-Embed-8B-BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md), released July 16, 2026, under OpenMDW-1.1. The [dated decision](../docs/decisions/2026-10-06-retrieval-first-local-models.md) separates this selection from owner application/acceptance. Pin the revision and retain model license/config files:
 
 ```sh
-hf download nvidia/Nemotron-3-Embed-1B-BF16 \
-  --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 \
-  --local-dir "$MODEL_DIRECTORY" --max-workers 2 --json
+hf download nvidia/Nemotron-3-Embed-8B-BF16 \
+  --revision d1f2f25730bbd775b99b29185134bc86653bf2d1 \
+  --local-dir "$MODEL_DIRECTORY" --max-workers 2
 
 qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
 # In a second terminal, or via the reviewed user unit:
-"$STACK_HOME/tools/vllm-0.30.0/bin/vllm" serve "$MODEL_DIRECTORY" \
-  --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 \
-  --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 \
-  --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests
+"$STACK_HOME/tools/vllm-0.31.0/bin/vllm" serve "$MODEL_DIRECTORY" \
+  --served-model-name nvidia/Nemotron-3-Embed-8B-BF16 \
+  --host 127.0.0.1 --port 28231 --max-model-len 8192 --max-num-seqs 4 \
+  --gpu-memory-utilization 0.62 --enforce-eager --no-enable-log-requests
 ```
 
-This is a roughly 2.3 GB pinned model download, not a metadata-only check. vLLM selects its native pooling/embedding implementation without `trust_remote_code`. Queries use `query: ` and documents `passage: `, including the trailing spaces. SocratiCode's supported `lmstudio` provider is the generic OpenAI-compatible local adapter pointing to vLLM here; LM Studio itself is not installed. These settings do not change Claude/Codex generation models.
+This is a full 8B pinned weight download; the recipe is prospective and is not executed by this source PR. The shared model uses MEAN pooling and 4096-dimensional normalized embeddings. Queries use `query: ` and documents `passage: `, including the trailing spaces. SocratiCode's supported `lmstudio` provider is the OpenAI-compatible adapter to vLLM here. The current host's Qdrant endpoint is 21633; use the CC's existing collection namespace only through its deployment/read-back contract. Model serving and both-client smoke gates remain the owners' work. These settings do not change Claude/Codex generation models.
 
 The [MCPorter example](../examples/mcporter.json.example) pins one project working directory, sets `imports: []`, and retains the SocratiCode connection so its upstream watcher stays alive. Edit only the corresponding absolute paths, then save a local copy at `$MCPORTER_CONFIG`; its SocratiCode path names the linux-x86_64 pin, `socraticode-1.15.0`, so on macos-arm64 it becomes `socraticode-1.14.0`. The MCPorter daemon is shared per OS user; do not restart it without checking for other users' connections/active calls.
 
 ```sh
-curl --fail --silent --show-error http://127.0.0.1:16333/healthz
-curl --fail --silent --show-error http://127.0.0.1:8231/v1/embeddings \
+curl --fail --silent --show-error http://127.0.0.1:21633/healthz
+curl --fail --silent --show-error http://127.0.0.1:28231/v1/embeddings \
   -H 'Content-Type: application/json' \
-  -d '{"model":"nvidia/Nemotron-3-Embed-1B-BF16","input":["query: how are native tools scoped to one project?"]}' \
+  -d '{"model":"nvidia/Nemotron-3-Embed-8B-BF16","input":["query: how are native tools scoped to one project?"]}' \
   -o "$STACK_HOME/output/embedding.json"
 
 mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_health --args '{}' --output text --no-oauth

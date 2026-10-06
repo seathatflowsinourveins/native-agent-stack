@@ -1,10 +1,10 @@
-# Inactive native Qdrant config. Replace absolute placeholders before use.
+# Inactive NativeStack2604 Qdrant example. Replace absolute placeholders before use.
 storage:
   storage_path: /ABSOLUTE/STACK_HOME/state/qdrant/storage
   snapshots_path: /ABSOLUTE/STACK_HOME/state/qdrant/snapshots
 service:
   host: 127.0.0.1
-  http_port: 16333
+  http_port: 21633
   grpc_port: null
   enable_cors: false
 cluster:

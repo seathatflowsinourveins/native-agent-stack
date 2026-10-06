@@ -15,6 +15,7 @@ default replaces, and an interim it drops or amends, are kept on the row under `
 
 Usage: assemble_manifest.py [--check]
 """
+import copy
 import hashlib
 import json
 import re
@@ -825,9 +826,47 @@ def assemble_rows():
     return foundation, trading, rows, layers, convergence
 
 
+def apply_current_rulings(rows):
+    """Project dated source choices while retaining the old returned measurements.
+
+    The historical settlement remains the input to the rounds/consensus above.
+    Current model retirements need the existing resolved outcomes, rather than
+    settle()'s returned-measurement claim. Source: this repository at 0d5e6506,
+    settle():97-101; docs/decisions/2026-10-06-retrieval-first-local-models.md.
+    """
+    for settlement in json.loads(SETTLEMENTS.read_text(encoding="utf-8")):
+        ruling = settlement.get("current_ruling")
+        if ruling is None:
+            continue
+        sid = settlement["slot_id"]
+        matches = [row for row in rows if row["slot_id"] == sid]
+        if len(matches) != 1:
+            raise ValueError(f"current ruling {sid}: requires exactly one historical row")
+        if ruling["state"] != "resolved" or ruling["evidence_class"] != "source_review":
+            raise ValueError(f"current ruling {sid}: requires a resolved source-review choice")
+        if ruling["resolution"]["outcome"] not in ("not_installed", "kept"):
+            raise ValueError(f"current ruling {sid}: unsupported current-choice outcome")
+        verify_receipts(sid, ruling)
+        row = matches[0]
+        historical = copy.deepcopy(row)
+        resolution = copy.deepcopy(ruling["resolution"])
+        resolution["first_round_record"] = copy.deepcopy(
+            historical["resolution"].get("first_round_record", {"label": historical["label"]}))
+        row.update({"state": "resolved", "default": ruling["default"]["name"],
+                    "repository": ruling["default"]["repository"],
+                    "installs_nothing_extra": ruling["installs_nothing_extra"],
+                    "definitive": False, "label": ruling["label"],
+                    "claude": "current source ruling; no new blind-family verdict recorded here",
+                    "gpt": "current source ruling; no new blind-family verdict recorded here",
+                    "resolution": resolution, "measurement": None,
+                    "historical_settlement": historical,
+                    "current_ruling": copy.deepcopy(ruling)})
+
+
 def build():
     foundation, trading, rows, layers, convergence = assemble_rows()
     consensus = apply_consensus(rows, layers)
+    apply_current_rulings(rows)
     by_kind, by_state = {}, {}
     for r in rows:
         by_kind[r["row_kind"]] = by_kind.get(r["row_kind"], 0) + 1

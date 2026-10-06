@@ -2401,7 +2401,7 @@
               "fidelity_status": "refuted: wrong-document retrieval. The retrieved catalogs/us-equities/engines-strategies.md does not answer the release re-pin question (evidence/artifacts/token-e2e-codex-20260926/receipt.json, corrections_to_296). The token counts stand; they are not evidence of a successful retrieval."
             }
           ],
-          "shortfall_cause": "The -84.3% comparison is retracted: PR #343 found it retrieved the wrong document. BM25 retrieval works; semantic search needs `qmd embed`, not run on this host."
+          "shortfall_cause": "Historical 2026-09-26 scope: The -84.3% comparison is retracted: PR #343 found it retrieved the wrong document. BM25 retrieval works; semantic search needs `qmd embed`, not run on this host. Current NativeStack2604 disposition (docs/decisions/2026-10-06-retrieval-first-local-models.md): qmd embedding is retired; lexical retrieval keeps query expansion and rerank, while semantic catalog Markdown search uses SocratiCode's shared Nemotron8B index. The two-client cutover gates remain owner work; no qmd embed/pull is selected."
         },
         "invoke_rates": {
           "evidence_class": "local integration (transcript counts over the dated window; a command can count for several tools; Codex sessions without the context-mode block are excluded negative controls)",

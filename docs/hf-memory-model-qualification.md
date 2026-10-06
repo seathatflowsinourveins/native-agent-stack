@@ -1,31 +1,35 @@
-# Current Hugging Face models for memory and retrieval
+# Memory and retrieval models: current selection and historical qualification
 
 Reviewed September 21, 2026 using native `hf` 1.32.0, revision-pinned model
 cards, the running embedding service and upstream examples. Model release dates,
 published benchmark scores and local runtime acceptance are different evidence.
 
-The current code-RAG model is **NVIDIA Nemotron-3-Embed-1B-BF16**, from the
-July 16, 2026 family. It is a current, capable retrieval model, not a demonstrated
-universal winner. Shared ai-memory uses **MiniLM as a supported compact baseline**;
-it must not be labeled the latest SOTA model.
+For NativeStack2604, the [2026-10-06 retrieval-first decision](decisions/2026-10-06-retrieval-first-local-models.md)
+selects **NVIDIA Nemotron-3-Embed-8B-BF16**, revision
+`d1f2f25730bbd775b99b29185134bc86653bf2d1`, for shared text embedding at
+4096 dimensions. Its exact query/document prefixes and consumer/application
+boundaries are recorded there. The 1B and MiniLM checks below are historical
+qualification, preserved at their original scope; this source update runs no
+model and does not repeat those checks for the 8B.
 
 ## Which model is selected, and why
 
 | Model | Role on this PC | Evidence and limitation |
 | --- | --- | --- |
-| [Nemotron 3 Embed 1B BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) | Active SocratiCode embedder, 2,048 dimensions | All 15 upstream repository files matched the selected revision. The native model-card example and existing OpenAI-compatible route returned the expected first-ranked documents for all four examples. |
-| [Nemotron 3 Embed 8B BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16) | Quality candidate, not installed | NVIDIA reports RTEB 78.46 versus 72.38 for 1B on the same 16-task table. BF16 weights alone need about 14.81 GiB; no local quality/latency or serving qualification establishes it as a better default on this shared GPU. |
-| [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) | Active ai-memory local provider, 384 dimensions | All three files required by the upstream loader matched HF checksums. This is an older compatibility baseline with symmetric encoding. |
+| [Nemotron 3 Embed 1B BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) | Historical SocratiCode qualification, 2,048 dimensions; superseded on NativeStack2604 | All 15 upstream repository files matched the selected revision. The native model-card example and existing OpenAI-compatible route returned the expected first-ranked documents for all four examples. |
+| [Nemotron 3 Embed 8B BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md) | Selected shared NativeStack2604 text embedder, 4096 dimensions | Dated CC choice and retained owner observations are separate from this document's source review; the 2026-10-06 receipt records pending migration/independent-acceptance boundaries. No new model-quality run occurred here. |
+| [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) | Historical ai-memory baseline, 384 dimensions; deletion owner-gated | All three files required by the upstream loader matched HF checksums. This is an older compatibility baseline with symmetric encoding. |
 | [EmbeddingGemma](https://huggingface.co/google/embeddinggemma-300m) | Unadopted compact candidate | Requires distinct retrieval prompts and gated model/config access. Its published MTEB scores use different benchmark scopes and cannot be compared directly with NVIDIA's RTEB table. |
 
-The local GPU is an RTX 5090 Laptop with 24,463 MiB total memory. Capacity alone
+The historical 2026-09-21 GPU was an RTX 5090 Laptop with 24,463 MiB total memory. Capacity alone
 does not prove that a larger model meets latency, context or concurrent-work
-requirements. The running 1B service uses **4,096 tokens**, although its model
+requirements. The recorded 1B service used **4,096 tokens**, although its model
 card supports 32,768. Do not advertise the model-card limit as the live limit.
 
-NVIDIA's pinned card explicitly recommends **vLLM 0.25.0** for BF16 `/v2/embed`.
-That strengthens the existing WSL compatibility decision; a newer runtime version
-alone is not a reason to replace this documented native combination.
+The historical 1B card explicitly recommended **vLLM 0.25.0** for BF16 `/v2/embed`.
+That recommendation belongs to the recorded qualification. The NativeStack2604
+8B serving choice and its owner application gates are recorded in the later
+decision; this document does not replay the old combination on the new model.
 
 ## Actual upstream commands and returned results
 

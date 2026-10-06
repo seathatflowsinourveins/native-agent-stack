@@ -611,7 +611,7 @@
           "component_id": "markitdown",
           "repository": "https://github.com/microsoft/markitdown",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:581",
+          "pin_source": "manifests/stack.json:582",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "markitdown fixtures/greeting.html -o \"$STACK_HOME/output/greeting.md\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.1.8 (2026-09-21)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/microsoft/markitdown/releases"}
@@ -695,11 +695,11 @@
         {
           "component_id": "vllm",
           "repository": "https://github.com/vllm-project/vllm",
-          "pin": "0.30.0",
-          "pin_source": "manifests/stack.json:1041",
-          "install": {"command": "uv venv --python 3.13 \"$STACK_HOME/tools/vllm-0.30.0\"; uv pip install --python \"$STACK_HOME/tools/vllm-0.30.0/bin/python\" vllm==0.30.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "curl --fail --silent --show-error http://127.0.0.1:8231/v1/embeddings with the recipe's request body (the new host file moves the port)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.30.0 (2026-09-22)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/vllm-project/vllm/releases"}
+          "pin": "0.31.0",
+          "pin_source": "manifests/stack.json:1038",
+          "install": {"command": "uv venv --python 3.13 \"$STACK_HOME/tools/vllm-0.31.0\"; uv pip install --python \"$STACK_HOME/tools/vllm-0.31.0/bin/python\" vllm==0.31.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
+          "acceptance": {"command": "Current source choice only; no serving operation repeated. Historical 1B/0.30 proof remains in evidence/receipts/vllm-030-switch-20260925.json.", "evidence_class": "source_review", "source_path": "evidence/receipts/ns2604-local-models-rulings-20261006.json"},
+          "upstream_currency": {"latest_release": "v0.31.0 (2026-10-05); CC pin record 2026-10-06", "checked_at": "2026-10-06T21:25Z", "pin_is_latest": "yes", "url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0"}
         },
         {
           "component_id": "huggingface-hub-native",
@@ -711,13 +711,13 @@
           "upstream_currency": {"latest_release": "v2.0.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/huggingface/huggingface_hub/releases"}
         },
         {
-          "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
-          "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
-          "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
-          "pin_source": "manifests/stack.json:2099",
-          "install": {"command": "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
-          "acceptance": {"command": "an embeddings request to the vLLM service with the recipe's request body; the receipt records identical embeddings and identical top-10 code-index results after the switch to vLLM 0.30.0", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
-          "upstream_currency": {"latest_release": "model revision c0c9fea9 (last modified 2026-08-27) is the current head of the model repository", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"}
+          "name": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text embedding)",
+          "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+          "pin": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+          "pin_source": "manifests/stack.json:2096",
+          "install": {"command": "hf download nvidia/Nemotron-3-Embed-8B-BF16 --revision d1f2f25730bbd775b99b29185134bc86653bf2d1 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
+          "acceptance": {"command": "Source-review selection of the shared 8B/4096 role; no model request run by this PR. Prior 1B native proof retains its original vllm-030-switch-20260925 receipt.", "evidence_class": "source_review", "source_path": "evidence/receipts/ns2604-local-models-rulings-20261006.json"},
+          "upstream_currency": {"latest_release": "HF metadata HEAD d1f2f257, last modified 2026-08-28; card release 2026-07-16", "checked_at": "2026-10-06T21:25Z", "pin_is_latest": "yes", "url": "https://huggingface.co/api/models/nvidia/Nemotron-3-Embed-8B-BF16"}
         }
       ],
       "verdict": "selection_of_record_open",
@@ -1625,7 +1625,7 @@
           "component_id": "mcp-inspector",
           "repository": "https://github.com/modelcontextprotocol/inspector",
           "pin": "2.8.0",
-          "pin_source": "manifests/stack.json:606",
+          "pin_source": "manifests/stack.json:607",
           "install": {
             "command": "npm install --global --prefix \"$STACK_HOME/tools/mcp-inspector-2.8.0\" @modelcontextprotocol/inspector@2.8.0",
             "kind": "repo_recipe",

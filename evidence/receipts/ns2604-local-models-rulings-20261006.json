@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "kind": "documentary_local_model_rulings",
+  "date": "2026-10-06",
+  "host_scope": "NativeStack2604",
+  "source_commit": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+  "evidence_class": "source_review",
+  "native_runs_by_this_pr": 0,
+  "independent_execution_review": "not supplied by this documentary publication",
+  "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+  "limitations": [
+    "These labels are the command center's final choices, not upstream test verdicts or aggregate readiness.",
+    "CURRENT means selected for the stated role; NEW and GATED do not imply activation.",
+    "Host cutover/deletion, independent acceptance and organic-use observations remain the assigned owners' separate records.",
+    "RTEB private-13 means and GGUF-versus-BF16 score comparisons are derived/sibling evidence; do not label them official scores for the deployed artifact.",
+    "Trading catalog changes are handed off; fixwave-defects owns install-plan finding2."
+  ],
+  "roles": [
+    {
+      "id": "shared-text-embedder",
+      "label": "CURRENT",
+      "models": [
+        {
+          "id": "nvidia/Nemotron-3-Embed-8B-BF16",
+          "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+          "dimensions": 4096,
+          "source_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md"
+        }
+      ],
+      "date": "2026-07-16",
+      "scope": "Shared vLLM text embedding for ai-memory and SocratiCode; query: and passage: prefixes include their trailing spaces.",
+      "apply": "Codex endpoint migration was reported by the CC; Claude migration/read-back is pending its window. This publication does not rerun acceptance.",
+      "triggers": [
+        "An open text model's published LMEB result or complete RTEB evidence exceeds the current owner comparison and fits the supported 24 GB serving route; the private-13 mean remains derived.",
+        "NVIDIA changes weights or publishes a successor/official quant; consumer modality or serving behavior changes; another GPU tenant is requested."
+      ]
+    },
+    {
+      "id": "qmd-reranker",
+      "label": "NAMED_EXCEPTION",
+      "models": [
+        {
+          "id": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+          "revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
+          "file": "qwen3-reranker-0.6b-q8_0.gguf",
+          "sha256": "22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48",
+          "source_url": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/README.md"
+        }
+      ],
+      "date": "2025-10-03",
+      "scope": "QMD's supported in-process ranking default only. This is distinct from the excluded external-reranker-model slot.",
+      "apply": "Kept model; copying to a pinned local URI and CPU-forced lexical registration are owner-gated future steps.",
+      "triggers": [
+        "A QMD release supports remote reranking or changes its default/backend; a vendor publishes a stock-loadable ranking GGUF with stronger comparable upstream evidence."
+      ]
+    },
+    {
+      "id": "qmd-embedding",
+      "label": "RETIRED",
+      "models": [],
+      "date": null,
+      "scope": "No new QMD embedder, download or vector build is selected. Semantic catalog Markdown search uses SocratiCode's existing shared index.",
+      "apply": "The existing 0.6B index/file remains interim until both-client cutover checks pass, and remains a named-exception fallback if an executed semantic smoke fails.",
+      "fallback": {
+        "id": "Qwen/Qwen3-Embedding-0.6B-GGUF",
+        "revision": "370f27d7550e0def9b39c1f16d3fbaa13aa67728",
+        "file": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+        "sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439"
+      },
+      "triggers": [
+        "A QMD release adds configurable-prefix remote embeddings or bundles EmbeddingGemma2 support; an executed either-client semantic smoke fails; zero organic QMD use reopens the whole lane."
+      ]
+    },
+    {
+      "id": "qmd-expansion",
+      "label": "CURRENT",
+      "models": [
+        {
+          "id": "tobil/qmd-query-expansion-1.7B-gguf",
+          "revision": "7816de0b72572c6c860ca1eddf97ba9e7fb8cc65",
+          "file": "qmd-query-expansion-1.7B-q4_k_m.gguf",
+          "sha256": "000dfb1c06efa6a049e9f64ba921c3740e2454f62abab6fa10e77bd30bb2bcc0",
+          "source_url": "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/README.md"
+        }
+      ],
+      "date": "2026-01-25",
+      "scope": "QMD's upstream query-expansion default, on CPU and for lexical expansion; not a general generation selection.",
+      "apply": "Existing model kept; pin-copy and lexical registration remain owner steps.",
+      "triggers": [
+        "Upstream changes its default or publishes a superior loadable GGUF in the same comparison; zero organic QMD use reopens the lane."
+      ]
+    },
+    {
+      "id": "semble-code-embedding",
+      "label": "CURRENT",
+      "models": [
+        {
+          "id": "minishlab/potion-code-16M-v2",
+          "revision": "e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b",
+          "sha256": "75cf7a6c2171b230ad19b1e7d8e0b1aee86da5a02af8e7cacedd9921d227623c",
+          "source_url": "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/README.md"
+        }
+      ],
+      "date": "2026-07-04",
+      "scope": "Semble's CPU Model2Vec loader only.",
+      "apply": "Existing choice kept; server process revision follows its actual relaunch.",
+      "triggers": [
+        "minishlab publishes a newer code model or Semble adds another supported loader."
+      ]
+    },
+    {
+      "id": "jcodemunch-semantic-embedding",
+      "label": "NEW",
+      "models": [
+        {
+          "id": "ibm-granite/granite-embedding-311m-multilingual-r2",
+          "revision": "44399559930365213510b1ee2eb15ded83374f0e",
+          "dimensions": 768,
+          "sha256": "dcb6431bfa6e817fe100a2b0521360cec3383963b03fa966b685de18ca310d31",
+          "source_url": "https://huggingface.co/ibm-granite/granite-embedding-311m-multilingual-r2/blob/44399559930365213510b1ee2eb15ded83374f0e/README.md"
+        }
+      ],
+      "date": "2026-04-29",
+      "scope": "CPU sentence-transformers semantic extra, no custom remote code or query/passage prompts. Never the unpinned local-embed download path.",
+      "apply": "Load/embed proof, exact pin and two-client activation remain owner-gated; no semantic acceptance is claimed here.",
+      "fallback": {
+        "id": "ibm-granite/granite-embedding-97m-multilingual-r2",
+        "revision": "835ad14087e140460703cf0fae09f97d469d65c2",
+        "condition": "Only a failed load/embed smoke activates this fallback."
+      },
+      "triggers": [
+        "IBM publishes a successor, another compatible zero-prompt model has stronger comparable upstream code evidence, prefixes become supported, or upstream L-121 closes."
+      ]
+    },
+    {
+      "id": "local-generation",
+      "label": "RETIRED",
+      "models": [],
+      "date": null,
+      "scope": "No resident or on-demand general local generation model while no named consumer needs one; QMD expansion is a separate role.",
+      "apply": "No download or installation selected. Host Swift/Ollama deletion belongs to the CC after the required source merge/holder gates.",
+      "triggers": [
+        "A consumer is named; its owner then selects from current official upstream evidence and checks the exclusive GPU window."
+      ]
+    },
+    {
+      "id": "document-parsing",
+      "label": "CURRENT",
+      "models": [
+        {
+          "id": "jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF",
+          "revision": "9185688a0495e1577d521a757c7c0b62dd38ca48",
+          "source_url": "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/blob/9185688a0495e1577d521a757c7c0b62dd38ca48/README.md"
+        },
+        {
+          "id": "opendatalab/MinerU-4_models_onnx",
+          "revision": "358310b4f64b95f9fefc372ad899356e4111f376",
+          "source_url": "https://huggingface.co/opendatalab/MinerU-4_models_onnx/blob/358310b4f64b95f9fefc372ad899356e4111f376/README.md"
+        }
+      ],
+      "date": "2026-05-21",
+      "scope": "MinerU's official registry path: CPU GGUF/mmproj and ONNX small models. A separate docling side project is a scoped exception.",
+      "apply": "Existing bytes retained; local-source wiring and upstream verify/parse are assigned to fixwave-defects. BF16 leaderboard quality is not a measured GGUF score.",
+      "triggers": [
+        "OmniDocBench/PureDocBench evidence, MinerU registry/model, usable GPU capacity or native checks change; missing vendor classes belong to the assigned next owner re-drive."
+      ]
+    },
+    {
+      "id": "headroom-kompress",
+      "label": "GATED",
+      "models": [
+        {
+          "id": "chopratejas/kompress-v2-base",
+          "revision": "b1563631b35bfdcee37587ad530147497d820d4c",
+          "source_url": "https://huggingface.co/chopratejas/kompress-v2-base/blob/b1563631b35bfdcee37587ad530147497d820d4c/README.md"
+        },
+        {
+          "id": "answerdotai/ModernBERT-base",
+          "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "exception": "Pinned stale tokenizer matched to the ONNX export.",
+          "source_url": "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/README.md"
+        }
+      ],
+      "date": "2026-05-30",
+      "scope": "Headroom remains MCP-only. The compressor's model/tokenizer are not newly fetched or activated.",
+      "apply": "The token owner controls an extra change and first rereads all other loaders at the installed release.",
+      "triggers": [
+        "The token lane chooses proxy/all or the vendor publishes a newer compatible export."
+      ]
+    },
+    {
+      "id": "bundled-models",
+      "label": "NAMED_EXCEPTION",
+      "models": [
+        {
+          "id": "magika/standard_v3_3",
+          "revision": "shipped with Magika 1.0.3 and 0.6.3",
+          "reported_model_date": "2025-04-11",
+          "source_url": "https://github.com/google/magika"
+        },
+        {
+          "id": "nomic-embed-code static vectors",
+          "revision": "codebase-memory-mcp v0.11.0 / 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "reported_model_date": "2025-03-24",
+          "source_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+        },
+        {
+          "id": "CMU PocketSphinx en-US language model",
+          "revision": "SpeechRecognition 3.16.1 bundled data",
+          "reported_model_date": null,
+          "date_scope": "Bundled language-model release date not established; package metadata version verified.",
+          "source_url": "https://github.com/Uberi/speech_recognition/blob/3.16.1/speech_recognition/recognizers/pocketsphinx.py"
+        }
+      ],
+      "date": null,
+      "scope": "Keep maintainer-shipped package/compiled assets. Codebase Memory semantic pass remains opt-in/off; PocketSphinx recognition use was not observed.",
+      "apply": "PocketSphinx presence and cache duplicate were reported by the critic. A metadata-only local read confirmed SpeechRecognition 3.16.1; neither a recognizer run nor extra installation occurred.",
+      "triggers": [
+        "A maintainer changes the bundled asset, the consuming package/feature is removed or enabled, or a named model consumer appears; the owning lane re-drives the exception before changing package contents."
+      ]
+    }
+  ],
+  "retired_prior_choices": [
+    {
+      "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "status": "RETIRED on NativeStack2604",
+      "historical_scope": "Earlier host/native receipts preserved; no 1B endpoint availability claimed."
+    },
+    {
+      "id": "unsloth/Qwen3.8-27B-GGUF",
+      "status": "historical old-host generation; no NativeStack2604 selection"
+    },
+    {
+      "id": "sentence-transformers/all-MiniLM-L6-v2",
+      "status": "superseded NativeStack2604 ai-memory baseline",
+      "deletion": "CC Gate3 ruling and holder check still gate deletion."
+    }
+  ],
+  "sources": [
+    {
+      "repository": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "pin": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+      "path": "README.md",
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md"
+    },
+    {
+      "repository": "tobi/qmd",
+      "pin": "v2.8.3",
+      "path": "src/llm.ts",
+      "url": "https://github.com/tobi/qmd/blob/v2.8.3/src/llm.ts"
+    },
+    {
+      "repository": "Uberi/speech_recognition",
+      "pin": "3.16.1",
+      "path": "speech_recognition/recognizers/pocketsphinx.py",
+      "url": "https://github.com/Uberi/speech_recognition/blob/3.16.1/speech_recognition/recognizers/pocketsphinx.py"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "path": "docs/acceptance-evidence-policy.md:26-33"
+    }
+  ],
+  "open_owner_followups": [
+    "Critic7/8 vendor-trigger and card coverage re-drive belongs to lm-qmd/fixwave-defects; no new candidate is selected here.",
+    "Coupled source/install-plan test ownership and PR order awaits Q27.",
+    "Namespace deployment/read-back is CC-owned; no generic renderer binding is invented.",
+    "Independent execution acceptance, local source verification, organic-use observation and gates remain their separate owner records."
+  ]
+}
