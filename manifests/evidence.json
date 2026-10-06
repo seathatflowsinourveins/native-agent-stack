@@ -4477,6 +4477,37 @@
         "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
       ],
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json"
+    },
+    {
+      "id": "ns2604-difftastic-client-smokes-20261006",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "difftastic"
+      ],
+      "claim": "One actual pinned Difftastic JavaScript structural smoke per consuming native client, Codex and Claude. Both returned the expected syntactic-change output; this named smoke is not organic use or an upstream test-suite acceptance.",
+      "limitations": [
+        "These are prompted local integration smokes on NativeStack2604, not independently reviewed adoption or aggregate readiness.",
+        "No organic trials/uses/OIR/selection-rate counters are derived; the named-tool turns are ineligible for organic use.",
+        "The Claude client process returned0 and its one native Bash tool result completed without error; its native stream/transcript does not expose a numeric shell-exit field, so command_exit_code remains null rather than taking the model's reported value.",
+        "No source, fixture, service, client configuration, runtime or credential value was changed."
+      ],
+      "path": "evidence/receipts/ns2604-difftastic-client-smokes-20261006.json"
+    },
+    {
+      "id": "ns2604-finalized-catalog-structure-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Source-only finalized-catalog publication scaffold and scoped declaration guard; pending synthesis selects no repository, unknown census remains null, and prior research overlap stays allowed. Actual repository checks retained; no native adoption or readiness aggregate.",
+      "limitations": [
+        "The slot plan is a proposed taxonomy; final repository/default/census and complete evidence references await the command center synthesis.",
+        "Synthetic and structural checks prove declarations and compatibility only, not external evidence truth.",
+        "The source completeness critic is a same-family lead, not independent cross-family acceptance.",
+        "Organic observations and four facts/fit/family scopes are separate pending owner records; named smokes supply none."
+      ],
+      "path": "evidence/receipts/ns2604-finalized-catalog-structure-20261006.json"
     }
   ],
   "files": [
@@ -16307,9 +16338,14 @@
       "bytes": 140288
     },
     {
+      "path": "catalogs/foundation/finalized-sota-catalog.json",
+      "sha256": "b8ba24173d82a59626ffc31b1604429a2be49c055a2367c926d2b6d4e56c12a4",
+      "bytes": 25577
+    },
+    {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
-      "bytes": 29964
+      "sha256": "10e1350945f25311d4edb192665ad7db3a679873e2858f2b1ab6fc7a9f532b5d",
+      "bytes": 30045
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -17445,6 +17481,11 @@
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
+    },
+    {
+      "path": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
+      "sha256": "773a824cc313c6db1aeabc1a064de2bbf930af913ab23a1bce56fdb9b880b5ad",
+      "bytes": 9097
     },
     {
       "path": "docs/direct-results.md",
@@ -53057,9 +53098,19 @@
       "bytes": 24695
     },
     {
+      "path": "evidence/receipts/ns2604-difftastic-client-smokes-20261006.json",
+      "sha256": "38086f027c63404bdd8175034ef8f4b9085b91c6710a87e587d35a1698bc31be",
+      "bytes": 3770
+    },
+    {
       "path": "evidence/receipts/ns2604-e2e-20261004.json",
       "sha256": "4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705",
       "bytes": 22000
+    },
+    {
+      "path": "evidence/receipts/ns2604-finalized-catalog-structure-20261006.json",
+      "sha256": "4171f7cdff94c04d3e89a438ac1430b21fb53e95d63af1aea165638c0b58b52d",
+      "bytes": 5675
     },
     {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
@@ -54363,8 +54414,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
-      "bytes": 26751
+      "sha256": "8af1a053f662509dac2d674158037ab0dbde9ae852dbab23ef0b5323ed2d96c6",
+      "bytes": 28553
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -54378,8 +54429,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "8b21236a96c73a01d56de5a692e49a968bc79f8470ee476eac02f0a3c12cd4d2",
-      "bytes": 15403
+      "sha256": "f09bad50fcfccc599168cca7701a4ed9376e929abd7c47b5dcb6d788c0e1809b",
+      "bytes": 20734
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -54975,6 +55026,11 @@
       "path": "tests/test_extreme_gainer_audit.py",
       "sha256": "bfdf6e71700f259bdec3df2381328d07d0eb5c85622bf8a6d09a613de1cc75a4",
       "bytes": 15815
+    },
+    {
+      "path": "tests/test_finalized_foundation_catalog.py",
+      "sha256": "ea215039157c2523b5ab5df4cf029ad08be6c935e1e20e7050f7c4e571948e2c",
+      "bytes": 15696
     },
     {
       "path": "tests/test_financial_data.py",
