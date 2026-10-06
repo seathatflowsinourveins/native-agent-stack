@@ -4432,6 +4432,22 @@
         "artifact_path": "evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json"
       },
       "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+    },
+    {
+      "id": "nautilus-rc6-runtime-2604-20261006",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "In an owned isolated HOME on NativeStack2604, ns2604-coop executed the rc6 candidate recipe: installation exit0 and24offline checksPASS at lock853ad0a1. The four runtime inputs were identical before/after. This is the recorded operation scope; independent review, J2reruns and the destination pin decision remain pending.",
+      "limitations": [
+        "Candidate qualification is provisional until independent review; the canonical runtime-target remainsrc5.",
+        "The unchanged vendor quickstart establishes only its synthetic native workflow; import/version, isolation, adapted examples and integrity checks retain their individual classes. No upstream full test suite was run locally.",
+        "The failed64attempt remains retained, caused by absent WSLdistribution metadata in Codextools; the passing attempt used the co-op verified native route without changing a guard.",
+        "Three J2case reruns remain not-run with missing retained inputs, launcher/mount disposition and candidate version/fee metadata binding pending. Native24checks do not close economic parity.",
+        "No credentials, broker connection or actual orders were used; 5f owns the engine-cap C1\u2013C4run, review gates and runtime pin decision."
+      ],
+      "path": "evidence/receipts/nautilus-rc6-runtime-2604-20261006.json"
     }
   ],
   "files": [
@@ -15578,12 +15594,12 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
+      "sha256": "792ceee9276f3d58e65b40b70dc335997c8783ba7be2b69d0448c6ce5b8c9491",
       "bytes": 13161
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "1ee8707a248d2c988f468ac721a85b22103d0f2c4a95076e2e2b5ca86c4d0b92",
+      "sha256": "7720762cdd62deb3738fc4298b24ef0ac0252edf9236875c4e3d335f96d44e6e",
       "bytes": 19205
     },
     {
@@ -15593,13 +15609,13 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
-      "sha256": "30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958",
+      "sha256": "721c3a9e40cb2a1f5220d302fd4fad4bae9dbf83983f15bc80e4c713fbe482da",
       "bytes": 496
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
-      "bytes": 303829
+      "sha256": "853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4",
+      "bytes": 304124
     },
     {
       "path": "blueprints/us-equities/security-identity/README.md",
@@ -17095,6 +17111,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-06-nautilus-rc6-runtime-candidate.md",
+      "sha256": "74e4b4dc6db36951223c014322144baf8635679d38d220b23baa8c73e5b75d1a",
+      "bytes": 5184
     },
     {
       "path": "docs/direct-results.md",
@@ -38547,6 +38568,31 @@
       "bytes": 817
     },
     {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/README.md",
+      "sha256": "e35f072aa44a243193bf698896cf3c33bb22a892a4fbe822af7a7d15d4dd10d5",
+      "bytes": 1704
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/attempts.json",
+      "sha256": "6f6fae054c9dc114f13448eab5d4c80fca3a640d7dd97cca64f30bffa785b79d",
+      "bytes": 14684
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/changed-lines.json",
+      "sha256": "cb81cc558e515dfeda1372ec1b47f425ac6acbedef4b089b3e381c3b2c0535d2",
+      "bytes": 7755
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/lock-comparison.json",
+      "sha256": "84d55e6ae34fc2920ad6e7946ec835bb1ec5bb993c3c59382447fdcf6c34b2f7",
+      "bytes": 3122
+    },
+    {
+      "path": "evidence/artifacts/nautilus-rc6-qualification-20261005/source-snapshot.json",
+      "sha256": "cfe2dd64966d3a1b170d03cef3ade1b5ea0057ae74ee43da726db779d1001804",
+      "bytes": 15301
+    },
+    {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/README.md",
       "sha256": "02b9dcd15080141851f8b18f0b6340279e2c43a032df8f3dd7b8f1560c3fcdb3",
       "bytes": 2323
@@ -52615,6 +52661,11 @@
       "path": "evidence/receipts/nautilus-equity-replay-20260921.json",
       "sha256": "880f79d64adb7536180059a96989dd91abc679c1afa3828c7f612da15152248d",
       "bytes": 867
+    },
+    {
+      "path": "evidence/receipts/nautilus-rc6-runtime-2604-20261006.json",
+      "sha256": "e52164748462cd8dc92390d98d345125033f6bb66013b6054cb491c3aed43dd5",
+      "bytes": 4780
     },
     {
       "path": "evidence/receipts/nextjs-1638-qualification-20261001.json",
