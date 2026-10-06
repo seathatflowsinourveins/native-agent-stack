@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "worktrunk-0800-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "worktrunk"
+  ],
+  "claim": "The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"\u25cb Showing 1 worktree\" (exit 0).",
+  "limitations": [
+    "The recorded wt list smoke uses \"a one-commit synthetic scratch repo\"; it does not qualify create/remove, dirty-refusal, copy-ignored, shell integration or upstream cargo test at 0.80.0.",
+    "The host installation and rollback launcher were not switched.",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "0.79.0",
+    "version": "0.80.0",
+    "source": {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "tag": "v0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "published_at": "2026-09-27T21:18:46Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "github-release-asset",
+      "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "integrity_checked": true,
+      "integrity_source": "Published per-asset checksum https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256 (sha256sum -c: OK, exit 0). Cross-checked: aggregate release asset sha256.sum (sha256sum -c --ignore-missing: OK, exit 0); GitHub API asset digest sha256:532ce3ed... from releases/tags/v0.80.0; gh release verify v0.80.0 and gh release verify-asset on the archive (GitHub release attestation, both exit 0); adoption/new-wsl-profile.json:815 records the same value."
+    },
+    "install_recorded": {
+      "command": "tar -xJf <qualification-root>/worktrunk/worktrunk-x86_64-unknown-linux-musl.tar.xz -C <qualification-root>/worktrunk/prefix",
+      "exit": 0,
+      "prefix": "<qualification-root>/worktrunk/prefix"
+    },
+    "version_recorded": {
+      "command": "<qualification-root>/worktrunk/prefix/worktrunk-x86_64-unknown-linux-musl/wt --version",
+      "exit": 0,
+      "output": "wt v0.80.0"
+    },
+    "smoke_recorded": {
+      "command": "wt list (the row's documented command, manifests/stack.json (component id worktrunk, JSON pointer /commands)). Binary: <prefix>/worktrunk-x86_64-unknown-linux-musl/wt. cwd: <qualification-root>/worktrunk/smoke/repo, a one-commit synthetic scratch repo (not 0c/base). Run as env -i with HOME, XDG_*, WORKTRUNK_CONFIG_PATH and WORKTRUNK_SYSTEM_CONFIG_PATH in the scratch dir, GIT_CONFIG_GLOBAL=/dev/null, GIT_CONFIG_NOSYSTEM=1, stdin /dev/null.",
+      "exit": 0,
+      "output_excerpt": "  Branch  Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path  Commit    Age  Message\n@ main        ^                                             .     54a02d5    1w  synthetic fixture\n\n\u25cb Showing 1 worktree",
+      "ran": true
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/max-sixty/worktrunk",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.551710+00:00",
+          "ended_at": "2026-10-03T05:50:27.850863+00:00",
+          "stdout_sha256": "caf913d3aaf6e621b46ce4b59f1fa53be35032d7f304f94453ae82d4f22d57b7",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/max-sixty/worktrunk/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.851194+00:00",
+          "ended_at": "2026-10-03T05:50:28.131482+00:00",
+          "stdout_sha256": "c65bee197fd1e89af27be32310e1683af8bf1bebdd7fd6da43f495dad4606d05",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/max-sixty/worktrunk/commits/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.131899+00:00",
+          "ended_at": "2026-10-03T05:50:28.413949+00:00",
+          "stdout_sha256": "f6463368e4353d375593a0e6cf478df0577658046a300234276f27b758d6026c",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/max-sixty/worktrunk/commits/v0.80.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.414318+00:00",
+          "ended_at": "2026-10-03T05:50:28.691238+00:00",
+          "stdout_sha256": "f6463368e4353d375593a0e6cf478df0577658046a300234276f27b758d6026c",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "target_commitish": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "committed_at": "2026-09-27T20:55:48Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.80.0",
+        "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "committed_at": "2026-09-27T20:55:48Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "bytes": 8173256,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

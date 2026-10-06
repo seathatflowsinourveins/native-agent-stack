@@ -279,6 +279,8 @@ and the real run waits until the failure is understood. The rehearsal's private 
 outlive `--unregister`. After the required comparison records, run the page again from P1 for the default real
 `<Name>`, or the qualified rollback, without R1.
 
+`pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its `orx` entry (0.2.7 to 0.2.15); the Node 24.21.0 pin used here is unchanged.
+
 ## Pre-checks in the workstation distribution
 
 P1 to P3 run as `sh` in the workstation's distribution, before W1, so before anything is downloaded on Windows or
@@ -943,6 +945,8 @@ dpkg-query -W -f='${Package} ${Version}\n' jq libatomic1 uidmap
 
 Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages. The historical
 24.04.5 image lacked them; do not assume the selected 26.04.1 image has the same package gaps.
+
+`pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its `orx` entry (0.2.7 to 0.2.15); the Node 24.21.0 pin used here is unchanged.
 
 ### F5. Subordinate ids
 

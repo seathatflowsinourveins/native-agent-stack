@@ -857,7 +857,7 @@
     "layer_id": "token-efficiency",
     "slot_id": "code-index",
     "row_kind": "owner_decision",
-    "default": "jcodemunch-mcp 1.108.319",
+    "default": "jcodemunch-mcp 1.108.327",
     "repository": "https://github.com/jgravelle/jcodemunch-mcp",
     "installs_nothing_extra": false,
     "definitive": false,
@@ -873,8 +873,8 @@
      "by": "the owner's decision of 2026-10-04",
      "batch": "wave3",
      "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
-     "pin": "PyPI jcodemunch-mcp==1.108.319, source 8f7b34abe16fb459e0bf1c04747d584216dfe32e (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
-     "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.319 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+     "pin": "PyPI jcodemunch-mcp==1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
+     "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
      "usage_rules": [
       "registered per project, never at user scope (docs/token-session-handbook.md:108)",
       "index only the selected code; sharing, AI summaries, watchers, cross-repository defaults and external context providers off (manifests/stack.json, jcodemunch-mcp command_scope)"
@@ -888,7 +888,9 @@
       "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
       "docs/token-efficiency-stack.json (rows[component_id=jcodemunch-mcp].upstream_commands)",
       "docs/token-session-handbook.md (uv tool specifications, line 334)",
-      "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319"
+      "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+      "manifests/stack.json (components[id=jcodemunch-mcp])",
+      "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
      ]
     }
    },

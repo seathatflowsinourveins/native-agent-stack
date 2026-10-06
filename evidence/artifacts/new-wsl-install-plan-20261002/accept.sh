@@ -781,12 +781,12 @@ output-compression() {
   esac
 }
 code-index() {
-  # jcodemunch-mcp 1.108.319 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
+  # jcodemunch-mcp 1.108.327 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113 (jcodemunch-mcp --version); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L525 (its output at the pin)
-      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.319" ]]'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113 (jcodemunch-mcp --version); manifests/stack.json (jcodemunch-mcp 1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (recorded W1 qualification and limitations; this plan row remains UNRUN)
+      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.327" ]]'
       ;;
     *) skipped code-index ;;
   esac

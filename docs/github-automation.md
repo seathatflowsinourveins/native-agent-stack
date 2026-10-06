@@ -432,7 +432,7 @@ not currently visible anywhere the job's own output is read.
 download/verify/install steps for the exact same `nautilus_trader==2.0.0rc5`
 wheel set into an isolated venv (no bwrap sandbox -- this job only needs an
 installed environment to scan, not to execute the engine), generates an SPDX
-and a CycloneDX SBOM with syft 1.52.0, scans both with grype (see pin below),
+and a CycloneDX SBOM with syft 1.54.0, scans both with grype (see pin below),
 and writes `summary.json` (versions, `grype db status`, package count,
 findings by severity). Since 2026-09-22 it runs grype with `--config .grype.yaml
 --fail-on high`, so a High or Critical match fails the job; the job is
@@ -474,9 +474,9 @@ repos/seathatflowsinourveins/native-agent-stack/rules/branches/main`
 returns a `required_status_checks` rule listing `validate`, `token-report`
 and `secret-scan` under ruleset id 23739774.
 
-`supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
-SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
-read from `https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt`)
+`supply-chain.yml`'s `sbom-vuln` job uses syft 1.54.0 (linux_amd64 tarball
+SHA-256 `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`,
+read from `https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt`)
 and grype 0.119.0 (linux_amd64 tarball SHA-256
 `3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`, read from
 `https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`).
@@ -748,10 +748,10 @@ release notes carry the `gh attestation verify` and `gh release verify-asset`
 commands. No hosted tag run of this job exists yet.
 
 The job now produces two attested artifacts per run, not one. After the
-existing archive-and-hash step, a SHA-256-checked download of syft 1.52.0
-(`syft_1.52.0_linux_amd64.tar.gz`, verified against the upstream
-`syft_1.52.0_checksums.txt` and pinned in-workflow to
-`caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`) scans the
+existing archive-and-hash step, a SHA-256-checked download of syft 1.54.0
+(`syft_1.54.0_linux_amd64.tar.gz`, verified against the upstream
+`syft_1.54.0_checksums.txt` and pinned in-workflow to
+`54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`) scans the
 checked-out tree and writes
 `native-agent-stack-${GITHUB_SHA}.spdx.json`. A second `actions/attest` step
 (same pinned action SHA as the archive's) attests that SBOM with

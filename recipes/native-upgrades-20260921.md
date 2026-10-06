@@ -13,6 +13,20 @@ model, hook and service settings were not changed by these upgrades.
 | OpenResearch | [0.2.7](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7), 24e404ecbe19cb9184ea8177e8e9f90d4f3205b0 | Three-paper discovery, complete selected paper retrieval, seven unchanged Markdown tests |
 | Worktrunk | [0.79.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0), 5ba6f148e8505c20794f2d8bc706aa4f26335c95 | Disposable worktree create/list/remove and source-backed child-directory comparison |
 
+**Current pins, 2026-10-03:** OpenResearch is now
+[0.2.15](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.15), commit
+`ee36ef0333ca3c533eace915f1bec322a1efde1c`, and Worktrunk is
+[0.80.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0), commit
+`b49ca7eea9b03145791a5b94eccaf9c59412ed37`.
+Use the current [installation rows](README.md#component-catalog-install-and-check) and
+[Linux artifact pins](../adoption/pins-linux-x86_64.json); the
+[W1 decision](../docs/decisions/2026-10-03-currency-wave-w1.md) links their
+qualification receipts and rollback boundary. OpenResearch's new receipt
+establishes version and integrity only; its live discovery/paper smoke was not
+run. Worktrunk's new receipt covers `wt list`; create/remove and dirty-refusal
+were not repeated. The September 21 table and outputs below remain dated
+acceptance and rollback references.
+
 ## Installation
 
 Choose an explicit user-owned `NATIVE_TOOLS` prefix. Preserve lockfiles and

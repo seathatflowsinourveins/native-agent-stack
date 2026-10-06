@@ -2122,6 +2122,78 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertGreater(len(hashed), 3)
         self.assertEqual(sorted(hashed - tracked), [])
 
+    def repository_page_data(self):
+        """Observe the real repository through the explorer's native render command."""
+        target = self.root / "repository-explorer.html"
+        result = subprocess.run(
+            [sys.executable, str(GENERATOR), "--root", str(ROOT), "--render-to", str(target)],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(Page(target.read_text(encoding="utf-8")).data)
+
+    def test_repository_architecture_links_cite_the_owners_current_pin_fields(self):
+        """A drifted edition still links the owner's current version, or the model revision."""
+        data = self.repository_page_data()
+        scope = data["architecture"]["edition"]["scope"]
+        self.assertIn("Historical citation refresh (2026-10-04)", scope)
+        self.assertIn("Citation rebinding (2026-10-05, PR #642 fix round 3)", scope)
+        self.assertIn("manifests/stack.json at PR #642 commit 5c4f53f05", scope)
+        stack = json.loads((ROOT / "manifests/stack.json").read_text(encoding="utf-8"))
+        components = {row["id"]: row for row in stack["components"]}
+        models = {row["id"]: row for row in stack["models"]}
+        lines = (ROOT / "manifests/stack.json").read_text(encoding="utf-8").splitlines()
+        checked = set()
+        errors = []
+        for row in data["architecture"]["rows"]:
+            for winner in row["winners"]:
+                source = winner["pin_source"]
+                match = re.fullmatch(r"manifests/stack.json:([1-9][0-9]*)", source["locator"])
+                if match is None:
+                    continue
+                checked.add(source["locator"])
+                index = int(match[1]) - 1
+                identifier = winner["component_id"]
+                if identifier is None:
+                    identifier = winner["repository"].removeprefix("https://huggingface.co/")
+                    field, expected = "revision", models[identifier]["revision"]
+                else:
+                    field, expected = "version", components[identifier]["version"]
+                owner_line = next(line for line in reversed(lines[:index])
+                                  if re.match(r'\s{6}"id":', line))
+                owner = json.loads("{" + owner_line.strip().rstrip(",") + "}")["id"]
+                expected_line = f'"{field}": {json.dumps(expected)},'
+                if owner != identifier or lines[index].strip() != expected_line:
+                    errors.append(f"{identifier}: {source['locator']} cites {lines[index].strip()}")
+                self.assertTrue(source["url"].endswith(f"/manifests/stack.json#L{index + 1}"))
+        self.assertTrue(checked)
+        self.assertEqual(sorted(set(errors)), [])
+
+    def test_repository_collector_statuses_name_their_historical_pin(self):
+        """Moved token rows attribute observations and lifecycle statuses to their historical pins."""
+        data = self.repository_page_data()
+        rows = {row["component_id"]: row for row in data["efficiency"]["topic"]["rows"]}
+        stack = json.loads((ROOT / "manifests/stack.json").read_text(encoding="utf-8"))
+        selected_pins = {item["id"]: item["version"] for item in stack["components"]}
+        for identifier, historical_pin, install_fact in (
+                ("opentelemetry-collector-contrib", "0.161.0", "install: observed_installed"),
+                ("jcodemunch-mcp", "1.108.319", "install: accepted_within_scope")):
+            row = rows[identifier]
+            selected = selected_pins[identifier]
+            self.assertEqual(row["version"], selected)
+            for field, historical_fact in (("returned_result_summary", "2026-09-20"),
+                                           ("lifecycle_summary", install_fact)):
+                with self.subTest(component=identifier, field=field):
+                    text = row[field]
+                    self.assertIn(historical_pin, text)
+                    self.assertLess(text.index(historical_pin), text.index(historical_fact))
+                    self.assertIn("historical", text[:text.index(historical_fact)].lower())
+                    self.assertIn(f"Selected {selected}; qualified on scratch/synthetic validation only", text)
+                    if identifier == "opentelemetry-collector-contrib":
+                        self.assertIn("host acceptance pending", text)
+                    else:
+                        self.assertIn("evidence/receipts/jcodemunch-1108327-qualification-20261003.json", text)
+                        self.assertIn("no host switch or full lifecycle recertification occurred", text)
+
     def test_the_repository_architecture_record_keeps_the_acceptance_invariant(self):
         """The record states the rule every winner's acceptance class follows and the dated review that corrected
         the edition. The build cannot read prose, so this test keeps a later edit from dropping either silently."""

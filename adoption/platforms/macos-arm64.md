@@ -213,6 +213,8 @@ mechanism the Linux script does not have — a built-in skip list, currently
 empty, so a future undocumented gap still trips the exit-3 refusal instead of
 silently reusing a stale skip; `--plan` is also macOS-only.
 
+`adoption/pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its Linux `orx` entry (0.2.7 to 0.2.15), which this page does not use.
+
 ### darwin-arm64 pinned release archives
 
 These components are installed from upstream `darwin-arm64` (or `darwin-arm64`-equivalent)
@@ -462,6 +464,8 @@ no `build/bin` path in this asset), so the bootstrap installs the whole
 directory into `tools/llama-cpp-b11057` and places a wrapper script at
 `bin/llama-server` that exports `DYLD_LIBRARY_PATH` before exec'ing the real
 binary, instead of a bare symlink.
+
+`adoption/pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its Linux `orx` entry (0.2.7 to 0.2.15), which this page does not use.
 
 ### Codex notifications on macOS
 

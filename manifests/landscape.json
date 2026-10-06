@@ -355,10 +355,10 @@
   "additional_supply_chain_candidates": [
     {
       "repo": "anchore/syft",
-      "version": "v1.52.0",
-      "published_at": "2026-09-17T14:38:17Z",
-      "source_commit": "02ba369d13b4248395b20a504eca94b0cab564d8",
-      "url": "https://github.com/anchore/syft/releases/tag/v1.52.0"
+      "version": "v1.54.0",
+      "published_at": "2026-10-01T20:54:29Z",
+      "source_commit": "cc326e45a6213360266dda4b30cc68095946d676",
+      "url": "https://github.com/anchore/syft/releases/tag/v1.54.0"
     },
     {
       "repo": "google/osv-scanner",

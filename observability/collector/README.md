@@ -1,15 +1,17 @@
 # Native Collector profile
 
-Pinned distribution: `otelcol-contrib` **0.161.0**, Linux amd64, from the official
-[release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0).
-Archive SHA256: `778c689efa681ff6e4722ce9f66b9b7f57c3ba009ab2e2b43dc2e0315862c731`.
-The downloaded publisher `.sha256` file matched before extraction.
+Pinned distribution: `otelcol-contrib` **0.162.0**, Linux amd64, from the official
+[release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0).
+Archive SHA256: `fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3`.
+The downloaded publisher `.sha256` file matched before extraction. The [2026-10-03 scratch qualification](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json) ran `--version` and `validate`. The [R642 native checks](../../evidence/artifacts/currency-wave-w1-20261003/review-repair-checks.json) also exercise the current logs, metrics and SDK fixtures on 0.162.0 with zero native skips; earlier dated runtime observations retain their 0.161.0 scope. No host service was switched.
+
+Selected 0.162.0; qualified on scratch/synthetic validation only ([receipt:11-15](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json#L11-L15)); host acceptance pending. The R642 log/metric/SDK fixtures are synthetic integration checks. NativeStack2604 retains a release hold for the failed release-tag build-and-test ([record](../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md#L117)); scratch validation does not close that hold.
 
 These are upstream installation commands for a new explicit installation path.
 Do not overwrite an existing installation or customized configuration.
 
 ```bash
-version=0.161.0
+version=0.162.0
 asset="otelcol-contrib_${version}_linux_amd64.tar.gz"
 release="https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v${version}"
 mkdir -p "$PRIVATE_DOWNLOAD_DIR" "$COLLECTOR_INSTALL_DIR"
@@ -34,7 +36,7 @@ export ECOSYSTEM_OBSERVABILITY_DATA="$STACK_DATA_ROOT"
 For persistent hosting, install the [user-service example](ecosystem-otelcol.service.example)
 with explicit absolute paths substituted for `@COLLECTOR_INSTALL_DIR@`,
 `@CONFIG_ROOT@`, and `@DATA_ROOT@`, then use native `systemctl --user enable --now`.
-The active acceptance service uses this layout and `UMask=0077`.
+The historical 0.161.0 acceptance service used this layout and `UMask=0077`; the selected 0.162.0 host acceptance remains pending.
 
 Ports: OTLP HTTP14318, OTLP gRPC14317, readiness14333, native metrics18889,
 Collector self-metrics18888. Every listener is loopback. Logs go to native Loki
@@ -114,7 +116,7 @@ missing telemetry remains unknown.
 
 Validation: `python3 -m unittest tests.test_observability_run_correlation -v`.
 The always-on allowlist regression fails if either required field is dropped.
-With PyYAML and the documented Collector **0.161.0** and Loki **3.7.8** binaries,
+With PyYAML and the current Collector **0.162.0** and Loki **3.7.8** binaries,
 the native test sends synthetic OTLP records through the committed logs
 processors and exporters to isolated loopback services. It checks workflow arm
 token sums, matching resource/event copies of the run key, whole-run prefix and
@@ -126,6 +128,15 @@ Those native checks skip when their optional dependencies are absent. A skip is
 not a pass: run them with an interpreter that has PyYAML and confirm zero skips.
 This is **local integration with synthetic fixtures**; it is not a new provider
 run, an unchanged upstream test suite or proof of deployment on the active host.
+
+**Current selector, 2026-10-03:** the native Collector tests read the
+`opentelemetry-collector-contrib` version from `manifests/stack.json`. Their
+default executable is
+`$HOME/.local/share/codex-ecosystem/tools/otelcol-<version>/otelcol-contrib`.
+For an isolated candidate installation, set `OTELCOL_TEST_BIN` to its absolute
+executable path and confirm `--version` before running the same tests. This
+overrides only the test process; it does not replace a host service. Dated
+0.161.0 source reviews and receipts below keep their original scope.
 
 **Dated clarification, 2026-09-27:** base `ec27a300` already kept the resource
 run key and `workflow.run_id` (added in #366, `a464d288`, after #364 merged at

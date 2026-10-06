@@ -1871,13 +1871,13 @@
     {
       "layer": "token-efficiency",
       "slot": "code-index",
-      "owner": "jcodemunch-mcp 1.108.319",
+      "owner": "jcodemunch-mcp 1.108.327",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "release": "v1.108.319",
+      "release": "v1.108.327",
       "installed": true,
       "route": "uv-tool",
       "commands": [
-        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319"
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.327"
       ],
       "needs": {
         "sudo": false,
@@ -1889,16 +1889,16 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
         "line": 91
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.319\" ]]",
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.327\" ]]",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113",
+            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113",
             "line": 113
           }
         }
@@ -1907,7 +1907,7 @@
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools/jcodemunch-mcp",
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The pin is manifests/stack.json's at f77a35eb (source 8f7b34abe16fb459e0bf1c04747d584216dfe32e), installed where the project template runs ${ECO_ROOT}/bin/jcodemunch-mcp (recipes/README.md, Focused jCodeMunch retrieval); no artifact digest is recorded for it, so uv's index hashes are the only artifact check. It is registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md, which overturns the per-project rule of 2026-09-25 for this distribution), as the pinned README documents (claude mcp add -s user jcodemunch jcodemunch-mcp), with JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The pin is manifests/stack.json's W1 1.108.327 selection (source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d; evidence/receipts/jcodemunch-1108327-qualification-20261003.json; https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327), installed where the project template runs ${ECO_ROOT}/bin/jcodemunch-mcp (recipes/README.md, Focused jCodeMunch retrieval); this plan records source identity without an artifact digest, so uv checks its index hashes; the W1 receipt records the qualified wheel digest and its limitations. It is registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md, which overturns the per-project rule of 2026-09-25 for this distribution), as the pinned README documents (claude mcp add -s user jcodemunch jcodemunch-mcp), with JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
     },
     {
       "layer": "token-efficiency",
@@ -2257,7 +2257,7 @@
         "$config_root/otel.yaml",
         "$config_root/observability_config.py"
       ],
-      "notes": "G4 source-backed plan repair, UNRUN on a distribution: release v0.162.0 remains the selected checksum-verified tar installation. Installation creates the owned observability/otelcol/queue, collector and sdk-receipts directories; both the service and acceptance use NS2604_OBSERVABILITY_DATA (default ${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability). Pristine configurations adopt the existing repository native privacy, metrics, Loki and SDK-receipt pipelines in this PR, adapted to the plan ports. Existing operator pipelines are retained; only the exact /otelcol/queue directory is migrated, with native validation before replacement. file_storage create_directory and directory_permissions=0700 cover a clean install. The measured destination runs ns2604-otelcol-contrib.service, not ecosystem-*; this plan starts no service. The client configuration map already wires both native clients to HTTP21318; acceptance of a fresh destination session remains host work.",
+      "notes": "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). G4 source-backed plan repair, UNRUN on a distribution: release v0.162.0 remains the selected checksum-verified tar installation. Installation creates the owned observability/otelcol/queue, collector and sdk-receipts directories; both the service and acceptance use NS2604_OBSERVABILITY_DATA (default ${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability). Pristine configurations adopt the existing repository native privacy, metrics, Loki and SDK-receipt pipelines in this PR, adapted to the plan ports. Existing operator pipelines are retained; only the exact /otelcol/queue directory is migrated, with native validation before replacement. file_storage create_directory and directory_permissions=0700 cover a clean install. The measured destination runs ns2604-otelcol-contrib.service, not ecosystem-*; this plan starts no service. The client configuration map already wires both native clients to HTTP21318; acceptance of a fresh destination session remains host work.",
       "release_asset": {
         "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
         "sha256": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3"
@@ -2456,7 +2456,7 @@
         "$config_root/grafana-token-layer.json",
         "$config_root/observability_config.py"
       ],
-      "notes": "G4 source-backed plan repair, UNRUN on a distribution: verified OSS 13.2.3 tar route remains available with --only grafana. The canonical selection still marks this row split/measurement-only; this bounded job cannot edit owners.json or the definitive manifest. Finalization must explicitly install this slot (and Loki) before service acceptance; the coordinator owns reconciliation of that selection. Native file provisioning installs the token-layer dashboard and the three datasource definitions. All six affected hourly Claude queries retain [1h] and use targets[].interval=1m. Anonymous Viewer is loopback only. Post-install archive/JSON checks are repository integration checks; running native HTTP datasource/query operations provide functional acceptance. Alertmanager acceptance uses the frontend plugin testDatasource /api/v2/status proxy operation, not its unavailable backend health endpoint. After sign-in the existing native SDK worker produces a new sanitized receipt and all six affected Claude plus three SDK-receipt queries must return observed values. No synthetic receipt substitutes for that workload. Counter first-sample undercount remains a separate Prometheus service-start prerequisite; never sum overlapping native counters or cumulative snapshots.",
+      "notes": "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head. G4 source-backed plan repair, UNRUN on a distribution: verified OSS 13.2.3 tar route remains available with --only grafana. The canonical selection still marks this row split/measurement-only; this bounded job cannot edit owners.json or the definitive manifest. Finalization must explicitly install this slot (and Loki) before service acceptance; the coordinator owns reconciliation of that selection. Native file provisioning installs the token-layer dashboard and the three datasource definitions. All six affected hourly Claude queries retain [1h] and use targets[].interval=1m. Anonymous Viewer is loopback only. Post-install archive/JSON checks are repository integration checks; running native HTTP datasource/query operations provide functional acceptance. Alertmanager acceptance uses the frontend plugin testDatasource /api/v2/status proxy operation, not its unavailable backend health endpoint. After sign-in the existing native SDK worker produces a new sanitized receipt and all six affected Claude plus three SDK-receipt queries must return observed values. No synthetic receipt substitutes for that workload. Counter first-sample undercount remains a separate Prometheus service-start prerequisite; never sum overlapping native counters or cumulative snapshots.",
       "release_asset": {
         "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
         "sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235"
