@@ -132,8 +132,19 @@ class CatalogTests(unittest.TestCase):
 
     def test_every_pinned_skill_serves_exactly_one_task(self):
         served = [name for task in self.catalog["tasks"] for name in task["installed"]]
-        self.assertEqual(sorted(served), sorted(skill["name"] for skill in self.manifest["skills"]))
+        # Selected-but-held sources remain covered as gaps, not installed incumbents
+        # (adoption/skills/lifecycle.md:77-86; C13 reconciliation).
+        active = [skill["name"] for skill in self.manifest["skills"] if skill.get("status") != "held"]
+        self.assertEqual(sorted(served), sorted(active))
         self.assertEqual(len(served), len(set(served)))
+        pinned = {skill["name"]: skill for skill in self.manifest["skills"]}
+        for skill in self.manifest["skills"]:
+            if skill.get("status") == "held":
+                with self.subTest(held=skill["name"]):
+                    gaps = [task["layer_id"] for task in self.catalog["tasks"]
+                            if any(skill["name"] in build_args.skill_mentions(gap, pinned)
+                                   for gap in task["open_gaps"])]
+                    self.assertEqual(len(gaps), 1, gaps)
 
     def test_open_gaps_state_the_pinned_codex_and_claude_flags(self):
         # Each layer input carries the installed skills' codex_enabled and claude_listing from the manifest beside the

@@ -13,7 +13,8 @@
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
     "alpacahq-alpaca-skills and vercel-labs-agent-skills serve no task: the paper-trading skills have the model submit orders, which deterministic code owns here, and the React/Vercel skills have no code here (the manifest's excluded reasons).",
     "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit.",
-    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill."
+    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill.",
+    "C13 reconciliation on 2026-10-06: selected-but-held agent-browser is not an installed browser incumbent. The browser task has an empty installed list and its explicit browser-tool gate in open_gaps; its central pin, eligibility and conservative budget contribution remain unchanged."
   ],
   "sources": [
     {"source_id": "addyosmani-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/addyosmani/agent-skills", "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6"},
@@ -168,9 +169,9 @@
       "layer_id": "skills-browser",
       "lifecycle_task": "browser",
       "requirement": "Browser acceptance through the pinned agent-browser CLI (adoption/pins-*.json), with a skill that documents its commands for the pinned CLI version.",
-      "installed": ["agent-browser"],
+      "installed": [],
       "source_ids": ["vercel-labs-agent-browser", "microsoft-playwright-cli", "openai-skills", "anthropics-skills", "addyosmani-agent-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [],
+      "open_gaps": ["agent-browser is selected but held in adoption/skills/manifest.json for the browser-tool measurement; it is not an installed incumbent. Preserve its source pin and held gate until the owning measurement and lifecycle adoption decide it."],
       "overturn_when": "agent-browser fails a browser acceptance task that a candidate passes, measured with a skill-creator paired benchmark (or a promptfoo config) on frozen browser acceptance tasks against the pinned CLI, in Claude Code and in Codex; or the pinned agent-browser CLI stops shipping the skill."
     },
     {
