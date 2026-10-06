@@ -6,8 +6,8 @@
   "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
-    "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+    "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
+    "docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda"
   },
   "inventory": {
     "layers": 37,
@@ -249,6 +249,18 @@
         "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #752 added one-time service-tier migration prose to the hashed distro guide without regenerating the handbook. Validate run 37401702955 failed its existing freshness test at head d2f6d8c. Regenerated through the unchanged native builder; both output deltas are only the distro-guide provenance digest.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+        "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "repair_evidence": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json"
     }
   ]
 }

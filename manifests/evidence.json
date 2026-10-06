@@ -17363,12 +17363,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e",
+      "sha256": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda",
       "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+      "sha256": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
       "bytes": 362513
     },
     {
@@ -18665,6 +18665,11 @@
       "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
       "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
       "bytes": 14536
+    },
+    {
+      "path": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json",
+      "sha256": "76dff0d9fcac36c10cf9a86e6a63915794aca4b6465f5ea83e69554a75a38464",
+      "bytes": 6940
     },
     {
       "path": "evidence/artifacts/codex-service-tier-migration-20261005/receipt.json",
@@ -39508,8 +39513,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749",
-      "bytes": 12145
+      "sha256": "37815008b4e7078e11880d28542a9ecd89c7606a292b1b4a64e28ba5bebebbed",
+      "bytes": 13039
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
