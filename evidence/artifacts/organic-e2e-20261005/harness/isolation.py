@@ -164,6 +164,31 @@ WSL_INTEROP_DIR = Path("/run/WSL")
 RUNTIME_PASS_THROUGH: tuple[tuple[str, str], ...] = ()
 BROKER_SOCKETS = (RUNTIME_DIR / "systemd" / "private", RUNTIME_DIR / "bus", RUNTIME_DIR / "docker.sock",
                   RUNTIME_DIR / "openssh_agent")
+# The answer-channel closure (CC item task-ns2604-coop-20261006T164313Z, section 3 (c); a separate, droppable commit).
+# The home folder is a temporary overlay (bwrap --overlay-src HOME --tmp-overlay HOME): a trial reads it, but nothing it
+# writes there outlives it, except through the explicit binds below. Each store that holds other sessions' or other
+# trials' content is an empty tmpfs in the namespace.
+CLOSURE_DECISION = "task-ns2604-coop-20261006T164313Z"
+CLOSED_STORES = (("ai-memory's store and hook spool (every scope's database, pages and spooled events)",
+                  HOME / ".local" / "share" / "ai-memory"),
+                 ("agentsview's archive of every session on the host", HOME / ".agentsview"),
+                 ("codebase-memory's project indexes", HOME / ".cache" / "codebase-memory-mcp"),
+                 ("jcodemunch's index", HOME / ".code-index"),
+                 ("Serena's logs", HOME / ".serena" / "logs"),
+                 ("Claude's plans", HOME / ".claude" / "plans"),
+                 ("Claude's tasks", HOME / ".claude" / "tasks"),
+                 ("Claude's paste cache", HOME / ".claude" / "paste-cache"),
+                 ("Codex's own state: history, session index, logs, memories, goals and queue", CODEX_HOME_REAL))
+# Files, each replaced by an empty private file the trial may write.
+CLOSED_FILES = (("Claude's prompt history", "claude-history.jsonl", HOME / ".claude" / "history.jsonl"),)
+# What a client provably needs from the closed Codex folder: the entries a trial's clone links to (arms.SYMLINK), each
+# as a temporary overlay so nothing is written back: packages (the codex binary), skills, plugins, cache and
+# context-mode. The clone's sessions and context-mode stores are the trial's private folders (PRIVATE_STORES).
+CODEX_BIND_BACK = ("packages", "skills", "plugins", "cache", "context-mode")
+# Written back to the host on purpose, each with its reason.
+PERSISTENT_BINDS = ((HOME / ".claude" / ".credentials.json",
+                     "Claude Code's OAuth refresh rotates the stored token: a refresh kept only in the overlay would "
+                     "leave the host's login with a spent token"),)
 # Round 6 (CC item task-ns2604-coop-20261006T155742Z, section 2): (A) the gateway's response cache stays on, with a
 # reading before and after each trial; (B) each trial gets a network namespace of its own with explicit forwards only.
 ROUND6_DECISION = "task-ns2604-coop-20261006T155742Z"
@@ -322,6 +347,9 @@ def listed_locations(cfg: dict, run_root, trial_id: str, client: str, fixture, c
     rows += [(f"the shared {STORE_LABELS[label]}" if label == "codex-sessions" else f"other sessions' {STORE_LABELS[label]}",
               target, target, "private") for label, target in PRIVATE_STORES]
     rows += [(f"the host's {path} (other trials' scratch files)", path, path, "tmpfs") for path in PRIVATE_TMP]
+    rows += [("the home folder's writes (they would outlive the trial)", HOME, HOME, "overlay")]
+    rows += [(label, store, store, "tmpfs") for label, store in CLOSED_STORES]
+    rows += [(label, target, target, "private file") for label, _, target in CLOSED_FILES if target.is_file()]
     rows.append(("the host's runtime folder: the user manager's, the session bus's and Docker's sockets (host "
                  "execution brokers)", RUNTIME_DIR, RUNTIME_DIR, "tmpfs"))
     if WSL_INTEROP_DIR.is_dir():
@@ -376,7 +404,10 @@ def plan(cfg: dict, run_root, trial_id: str, client: str, fixture, *, clone=None
     run_root, fixture = Path(run_root), Path(fixture)
     work, private = trial_dir(cfg, run_root), private_dir(cfg, run_root, trial_id)
     ops: list[list] = [["ro-bind", "/", "/"], ["dev-bind", "/dev", "/dev"], ["proc", None, "/proc"]]
-    ops += [["bind-try", str(path), str(path)] for path in WRITABLE]
+    # CLOSURE_DECISION: the home folder as a temporary overlay; nothing a trial writes there outlives it, except through
+    # the explicit binds below.
+    ops += [["overlay", str(path), str(path)] for path in WRITABLE]
+    ops += [["bind-try", str(path), str(path)] for path, _ in PERSISTENT_BINDS]
     # P2-2: a private runtime folder (a tmpfs op's source field carries its mode) and no WSL interop sockets.
     ops.append(["tmpfs", "0700", str(RUNTIME_DIR)])
     ops += [["bind", str(src), str(src)] for src, _ in RUNTIME_PASS_THROUGH]
@@ -405,9 +436,16 @@ def plan(cfg: dict, run_root, trial_id: str, client: str, fixture, *, clone=None
     own_project = CLAUDE_PROJECTS / claude_slug(fixture) if client == "claude" else None
     ops.append(["tmpfs", None, str(CLAUDE_PROJECTS)])
     # --bind-try: Claude Code's transcript cleanup may remove a project folder between this plan and the spawn.
-    ops += [["bind-try", str(CLAUDE_PROJECTS / name), str(CLAUDE_PROJECTS / name)] for name in kept]
+    ops += [["ro-bind-try", str(CLAUDE_PROJECTS / name), str(CLAUDE_PROJECTS / name)] for name in kept]
     if own_project:
         ops.append(["bind", str(own_project), str(own_project)])
+    # CLOSURE_DECISION: each closed store an empty tmpfs; the Codex entries a clone links to come back as overlays.
+    for _, store in CLOSED_STORES:
+        ops.append(["tmpfs", None, str(store)])
+        if store == CODEX_HOME_REAL:
+            ops += [["overlay", str(store / name), str(store / name)] for name in CODEX_BIND_BACK
+                    if (store / name).is_dir()]
+    ops += [["bind", str(private / name), str(target)] for _, name, target in CLOSED_FILES if target.is_file()]
     ops += [["bind", str(private / label), str(target)] for label, target in PRIVATE_STORES]
     blocked = []
     for path in _declared(cfg):
@@ -442,6 +480,8 @@ def prepare_dirs(plan_: dict) -> None:
     for folder in (plan_["private"] / "net", plan_["private"] / "net" / plan_["client"]):
         if folder.is_dir():
             os.chmod(folder, 0o700)
+    for _, name, _ in CLOSED_FILES:
+        (plan_["private"] / name).touch()
     scope = plan_["ai_memory_scope"]
     (plan_["private"] / "ai-memory.toml").write_text(f'workspace = "{scope["workspace"]}"\nproject = "{scope["project"]}"\n')
     if plan_["blocked"]:
@@ -457,6 +497,8 @@ def options(plan_: dict, info_fd: int | None = None) -> list[str]:
             out += ["--proc", dest]
         elif op == "tmpfs":
             out += (["--perms", src] if src else []) + ["--tmpfs", dest]
+        elif op == "overlay":
+            out += ["--overlay-src", src, "--tmp-overlay", dest]
         else:
             out += [f"--{op}", src, dest]
     out += ["--unshare-pid", "--unshare-ipc", "--die-with-parent", "--chdir", str(plan_["fixture"])]
@@ -751,7 +793,10 @@ def permitted_binds(cfg: dict, run_root, trial_id: str, client: str, fixture) ->
                ("ro-bind", str(private / "ai-memory.toml"), str(NEUTRAL_ROOT / ".ai-memory.toml")),
                ("ro-bind", str(work / "bin"), str(work / "bin")),
                ("bind", str(private / "last"), str(work / "last"))}
-    triples |= {("bind-try", str(path), str(path)) for path in WRITABLE}
+    triples |= {("overlay", str(path), str(path)) for path in WRITABLE}
+    triples |= {("bind-try", str(path), str(path)) for path, _ in PERSISTENT_BINDS}
+    triples |= {("overlay", str(CODEX_HOME_REAL / name), str(CODEX_HOME_REAL / name)) for name in CODEX_BIND_BACK}
+    triples |= {("bind", str(private / name), str(target)) for _, name, target in CLOSED_FILES}
     triples |= {("bind", str(src), str(src)) for src, _ in RUNTIME_PASS_THROUGH}
     triples.add(("ro-bind", str(private / "net" / client), str(NET_DIR_INSIDE)))
     triples |= {("ro-bind", str(path), str(path))
@@ -769,7 +814,7 @@ def permitted_binds(cfg: dict, run_root, trial_id: str, client: str, fixture) ->
 
 def kept_project_bind(op: str, src, dest, own_project) -> bool:
     """A Claude project outside the experiment, bound back onto itself (plan()'s --bind-try)."""
-    if op != "bind-try" or not src or src != dest or dest == own_project:
+    if op != "ro-bind-try" or not src or src != dest or dest == own_project:
         return False
     return Path(dest).parent == CLAUDE_PROJECTS and not experiment_project(Path(dest).name)
 
@@ -816,6 +861,13 @@ def check(cfg: dict, run_root, trial_id: str, client: str, rows: dict) -> dict:
         if need["mount"] == "inaccessible" and ("ro-bind", str(Path(private) / "blocked"), cover) not in ops \
                 and not any(op == "tmpfs" and dest == cover for op, _, dest in ops):
             failures.append(f"no inaccessible bind over {need['covered_by']}")
+        # CLOSURE_DECISION: the home folder's overlay, and the private file over each closed file.
+        if need["mount"] == "overlay" and ("overlay", cover, cover) not in ops:
+            failures.append(f"no temporary overlay over {need['covered_by']} ({need['location']})")
+        if need["mount"] == "private file":
+            names = [name for _, name, target in CLOSED_FILES if str(target) == cover]
+            if not names or ("bind", str(Path(private) / names[0]), cover) not in ops:
+                failures.append(f"no private file over {need['covered_by']} ({need['location']})")
     # ROUND4_READ_DECISION (P2-1): every bind is an exact (operation, source, destination) triple of the plan.
     own_project = str(CLAUDE_PROJECTS / claude_slug(fixture)) if fixture and client == "claude" else None
     permitted = permitted_binds(cfg, run_root, trial_id, client, fixture) if fixture else set()
@@ -958,7 +1010,32 @@ def _probe_targets(cfg: dict, run_root: Path | None, skip: list[Path]) -> list[t
                ("another trial's Claude transcript", transcript)]
     targets += [(f"the shared {STORE_LABELS[label]}" if label == "codex-sessions" else f"other sessions' {STORE_LABELS[label]}",
                  _first_file(target, 5)) for label, target in PRIVATE_STORES]
+    # CLOSURE_DECISION: a real file in each closed store; for Codex's folder, each of its state files by name (the
+    # entries a clone links to come back as overlays, so its first file could be one of those).
+    for label, store in CLOSED_STORES:
+        if store == CODEX_HOME_REAL:
+            targets += [(f"{label}: {name}", store / name) for name in CODEX_STATE_PROBES]
+            targets.append((f"{label}: log", _first_file(store / "log", 2)))
+        else:
+            targets.append((label, _first_file(store, 4)))
     return [(label, Path(path)) for label, path in targets if path and Path(path).is_file()]
+
+
+CODEX_STATE_PROBES = ("history.jsonl", "session_index.jsonl", "logs_2.sqlite", "memories_1.sqlite", "goals_1.sqlite",
+                      "queue_1.sqlite", "auth.json")
+
+
+def closed_file_probes(plan_: dict) -> dict:
+    """CLOSURE_DECISION: each closed file reads empty in the namespace (its private file) while the host's is not."""
+    out = {}
+    for label, _, target in CLOSED_FILES:
+        if not target.is_file():
+            continue
+        result, _ = run_wrapped(plan_, ["sh", "-c", 'wc -c < "$1"', "size", str(target)], timeout=60)
+        inside = result.stdout.strip()
+        out[label] = {"outside_bytes": target.stat().st_size, "inside_bytes": int(inside) if inside.isdigit() else None,
+                      "ok": inside == "0"}
+    return out
 
 
 def _verdicts(out: str, paths: list, rc: int, err: str) -> dict[str, str]:
@@ -1072,17 +1149,24 @@ def selftest(cfg: dict | None = None, run_root=None, clients: bool = False) -> d
                                          "inside": verdict, "hidden": verdict in ("ENOENT", "EACCES")})
             own = [fixture / "own.txt", prompt, work / "bin" / "c.json"] + \
                 ([settings] if client == "claude" else [clone / "config.toml"])
-            native = [p for p in (HOME / ".claude" / "settings.json", CODEX_HOME_REAL / "config.toml") if p.is_file()]
+            # The native home's client configuration (Codex's own folder is closed; a trial's clone carries its copy).
+            native = [p for p in (HOME / ".claude" / "settings.json", HOME / ".claude" / "CLAUDE.md") if p.is_file()]
             kept_file = next((f for n in plan_["kept_projects"] for f in [_first_file(CLAUDE_PROJECTS / n, 2)] if f), None)
             readable, _ = cat_inside(plan_, own + native + ([kept_file] if kept_file else []))
             report["own"][client] = {tilde(p): readable.get(str(p)) for p in own}
             report["native"][client] = {public_text(tilde(p)): readable.get(str(p))
                                         for p in native + ([kept_file] if kept_file else [])}
             marker = f"selftest-{token}-{client}.txt"
+            created += [HOME / marker, HOME / ".claude" / marker] + [CLAUDE_PROJECTS / n / marker for n in plan_["kept_projects"][:1]]
             write, _ = run_wrapped(plan_, ["sh", "-c", f'echo x > "{CODEX_SESSIONS}/{marker}" && '
                                                        f'echo x > "{work}/last/{marker}" && '
                                                        f'echo x > "/tmp/{marker}" && echo x > "/var/tmp/{marker}" && '
-                                                       f'echo x > "/dev/shm/{marker}" && echo x > "/tmp/claude-{UID}/{marker}"'])
+                                                       f'echo x > "/dev/shm/{marker}" && echo x > "/tmp/claude-{UID}/{marker}" && '
+                                                       f'echo x > "{HOME}/{marker}" && echo x > "{HOME}/.claude/{marker}"'])
+            # CLOSURE_DECISION: a project outside the experiment is bound back read-only.
+            kept_dir = next((CLAUDE_PROJECTS / n for n in plan_["kept_projects"] if (CLAUDE_PROJECTS / n).is_dir()), None)
+            kept_write = run_wrapped(plan_, ["sh", "-c", f'echo x > "{kept_dir}/{marker}"'])[0] if kept_dir else None
+            report.setdefault("closed_files", {})[client] = closed_file_probes(plan_)
             pid1, _ = run_wrapped(plan_, ["sh", "-c", 'tr "\\0" " " < /proc/1/cmdline'])
             argv1 = pid1.stdout.strip()
             report["writes"][client] = {
@@ -1092,6 +1176,8 @@ def selftest(cfg: dict | None = None, run_root=None, clients: bool = False) -> d
                 "last_write_in_private_folder": (plan_["private"] / "last" / marker).exists(),
                 "tmp_shm_writes_stay_in_the_namespace": not any((folder / marker).exists() for folder in PRIVATE_TMP),
                 "claude_tmp_write_in_private_folder": (plan_["private"] / "claude-tmp" / marker).exists(),
+                "home_writes_stay_in_the_namespace": not (HOME / marker).exists() and not (HOME / ".claude" / marker).exists(),
+                "kept_project_not_writable": kept_dir is None or (kept_write.returncode != 0 and not (kept_dir / marker).exists()),
                 "pid1_argv": argv1[:160],
                 "pid1_argv_shows_no_option_or_hidden_path": bool(argv1) and "--tmpfs" not in argv1
                 and all(str(root) not in argv1 for root in HIDDEN_ROOTS)}
@@ -1141,12 +1227,14 @@ def selftest(cfg: dict | None = None, run_root=None, clients: bool = False) -> d
         and all(w["rc"] == 0 and w["sessions_write_in_private_folder"] and w["sessions_write_not_in_native_folder"]
                 and w["last_write_in_private_folder"] and w["pid1_argv_shows_no_option_or_hidden_path"]
                 and w["tmp_shm_writes_stay_in_the_namespace"] and w["claude_tmp_write_in_private_folder"]
+                and w["home_writes_stay_in_the_namespace"] and w["kept_project_not_writable"]
                 for w in report["writes"].values()) \
         and all(m["ok"] for m in (report.get("ai_memory") or {}).values()) and len(report.get("ai_memory") or {}) == 2 \
         and all(n["namespace"] and n["namespace"] != n["host_namespace"] for n in report["namespaces"].values()) \
         and all(n["ipc_namespace"] and n["ipc_namespace"] != n["host_ipc_namespace"] for n in report["namespaces"].values()) \
         and bool((report.get("host_brokers") or {}).get("ok")) \
         and bool((report.get("network") or {}).get("ok")) \
+        and all(f["ok"] for c in (report.get("closed_files") or {}).values() for f in c.values()) \
         and all(n.get("net_namespace") and n["net_namespace"] != n.get("host_net_namespace")
                 for n in report["namespaces"].values()) \
         and all(c.get("ok") for c in report["clients"].values())

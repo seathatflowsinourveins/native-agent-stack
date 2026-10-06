@@ -412,13 +412,13 @@ class G13Check(unittest.TestCase):
         """P2-1, ordering: the home's own bind is permitted, but after the covers it would put the host's view back."""
         isolation, cfg, trial_id, rows = self._rows()
         rec = rows["launched"]["isolation"]
-        home = [op for op in rec["ops"] if op == ["bind-try", "~", "~"]]
+        home = [op for op in rec["ops"] if op[1:] == ["~", "~"]]
         self.assertEqual(len(home), 1)
-        rec["ops"] = [op for op in rec["ops"] if op != ["bind-try", "~", "~"]] + home
+        rec["ops"] = [op for op in rec["ops"] if op[1:] != ["~", "~"]] + home
         self._reseal(isolation, rows)
         result = self._check(isolation, cfg, trial_id, rows)
         self.assertFalse(result["ok"])
-        self.assertTrue(any(f.startswith("bind-try ~ after the cover") for f in result["failures"]), result["failures"])
+        self.assertTrue(any(f.startswith(f"{home[0][0]} ~ after the cover") for f in result["failures"]), result["failures"])
 
     def test_the_hosts_runtime_folder_bound_in_fails(self):
         """P2-2: the round-4 plan bound the host's runtime folder (its brokers' sockets) into the namespace."""
@@ -1286,6 +1286,128 @@ class NetworkNamespace(unittest.TestCase):
                                       for _, port in self.listeners])
             for label, result in out.items():
                 self.assertEqual(result["rc"], 7, (client, label, result))
+
+
+@unittest.skipUnless(HOST_READY, "needs /usr/bin/bwrap and the experiment's roots on this host")
+class ChannelClosure(unittest.TestCase):
+    """The answer-channel closure (CC item task-ns2604-coop-20261006T164313Z, section 3 (c)): one negative test per
+    closed channel. Each reads, inside a trial's namespace, a real file the host holds in that channel, and requires
+    it gone (ENOENT), or empty for a closed file. The same read outside is the control; a channel with no file on this
+    host is skipped. Home writes must not outlive the trial, and a project outside the experiment is read-only."""
+
+    @classmethod
+    def setUpClass(cls):
+        import isolation
+        cls.isolation = isolation
+        isolation_, cfg, plan, trial_id, fixture, work = _synthetic_plan("claude")
+        fixture.mkdir(parents=True)
+        for path in (plan["prompt"], plan["settings"]):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("{}\n")
+        isolation.prepare_dirs(plan)
+        cls.plan, cls.paths = plan, [fixture, work, plan["own_project"]]
+
+    @classmethod
+    def tearDownClass(cls):
+        import shutil
+        for path in cls.paths:
+            if path:
+                shutil.rmtree(path, ignore_errors=True)
+
+    def closed(self, store: Path, depth: int = 4, names=()):
+        files = [store / n for n in names if (store / n).is_file()] or \
+            [f for f in [self.isolation._first_file(store, depth)] if f]
+        if not files:
+            self.skipTest(f"nothing in {store} on this host")
+        outside = self.isolation.cat_outside(files)
+        inside, _ = self.isolation.cat_inside(self.plan, files)
+        for path in files:
+            self.assertEqual(outside[str(path)], "READABLE", path)
+            self.assertEqual(inside[str(path)], "ENOENT", path)
+
+    def test_ai_memory_store_is_closed(self):
+        store = HOME_ / ".local" / "share" / "ai-memory"
+        self.closed(store, names=("db/memory.sqlite", "db/memory.sqlite-wal"))
+        self.closed(store / "wiki", 3)
+
+    def test_agentsview_archive_is_closed(self):
+        self.closed(HOME_ / ".agentsview", names=("sessions.db", "sessions.db-wal"))
+
+    def test_codebase_memory_indexes_are_closed(self):
+        self.closed(HOME_ / ".cache" / "codebase-memory-mcp", 2)
+
+    def test_jcodemunch_index_is_closed(self):
+        self.closed(HOME_ / ".code-index", 3)
+
+    def test_serena_logs_are_closed(self):
+        self.closed(HOME_ / ".serena" / "logs", 3)
+
+    def test_claude_plans_tasks_and_paste_cache_are_closed(self):
+        found = 0
+        for name in ("plans", "tasks", "paste-cache"):
+            store = HOME_ / ".claude" / name
+            if self.isolation._first_file(store, 4):
+                self.closed(store)
+                found += 1
+        if not found:
+            self.skipTest("no Claude plans, tasks or paste cache on this host")
+
+    def test_claude_history_reads_empty(self):
+        history = HOME_ / ".claude" / "history.jsonl"
+        if not history.is_file() or not history.stat().st_size:
+            self.skipTest("no Claude history on this host")
+        probes = self.isolation.closed_file_probes(self.plan)
+        self.assertEqual(probes["Claude's prompt history"]["inside_bytes"], 0, probes)
+
+    def test_codex_state_is_closed(self):
+        self.closed(self.isolation.CODEX_HOME_REAL, names=self.isolation.CODEX_STATE_PROBES)
+        self.closed(self.isolation.CODEX_HOME_REAL / "log", 2)
+
+    def test_home_writes_do_not_persist(self):
+        marker = f"ut-{uuid.uuid4().hex[:8]}"
+        targets = [HOME_ / marker, HOME_ / ".claude" / marker, HOME_ / ".local" / "share" / marker]
+        try:
+            result, _ = self.isolation.run_wrapped(self.plan, ["sh", "-c", " && ".join(
+                f'echo x > "{t}" && cat "{t}" >/dev/null' for t in targets)])
+            leaked = [str(t) for t in targets if t.exists()]
+        finally:
+            for target in targets:
+                target.unlink(missing_ok=True)
+        self.assertEqual(result.returncode, 0, result.stderr)   # writable inside...
+        self.assertEqual(leaked, [])                              # ...and gone with the trial
+
+    def test_a_project_outside_the_experiment_is_read_only(self):
+        kept = next((self.isolation.CLAUDE_PROJECTS / n for n in self.plan["kept_projects"]
+                     if (self.isolation.CLAUDE_PROJECTS / n).is_dir()), None)
+        if not kept:
+            self.skipTest("no project outside the experiment on this host")
+        marker = kept / f"ut-{uuid.uuid4().hex[:8]}"
+        try:
+            result, _ = self.isolation.run_wrapped(self.plan, ["sh", "-c", f'echo x > "{marker}"'])
+            leaked = marker.exists()
+        finally:
+            marker.unlink(missing_ok=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(leaked)
+
+    def test_g13_requires_every_closure(self):
+        """A receipt without the home overlay, a closed store's tmpfs or the private history file fails G13."""
+        isolation = self.isolation
+        for drop in ("overlay", isolation.HOME / ".agentsview", isolation.CODEX_HOME_REAL,
+                     HOME_ / ".local" / "share" / "ai-memory", HOME_ / ".claude" / "history.jsonl"):
+            check = G13Check()
+            iso, cfg, trial_id, rows = check._rows()
+            rec = rows["launched"]["isolation"]
+            if drop == "overlay":
+                rec["ops"] = [op for op in rec["ops"] if op[0] != "overlay" or op[2] != "~"]
+            else:
+                rec["ops"] = [op for op in rec["ops"] if op[2] != iso.tilde(drop)]
+            check._reseal(iso, rows)
+            result = check._check(iso, cfg, trial_id, rows)
+            self.assertFalse(result["ok"], drop)
+
+
+HOME_ = Path.home()
 
 
 def shutil_which(name):

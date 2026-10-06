@@ -157,6 +157,24 @@ Inside the namespace, socat listens on each forward's usual loopback port (`isol
 
   Validity and G13 share one predicate (`grade.ai_memory_invalidates`).
 
+### The answer-channel closure (item 164313Z, section 3 (c); a separate, droppable commit)
+
+The round-6 completeness check found stores outside the hidden roots that hold other sessions' or other trials' content, all readable from a trial, and found the home folder writable, so a trial could leave content for a later one.
+- **The home folder is a temporary overlay** (`--overlay-src ~ --tmp-overlay ~`, bubblewrap 0.11.1). A trial reads it and may write it, but nothing it writes there outlives it.
+- **What still reaches the host** goes only through explicit binds:
+  - the trial's own fixture, clone, -o file and transcripts (its own Claude project), and its private stores;
+  - Claude Code's credentials file, which is written back because an OAuth refresh rotates the stored token. A refresh kept only in the overlay would leave the host's login with a spent token.
+- **Projects outside the experiment** are now bound back read-only.
+- **Closed stores, each an empty tmpfs in the namespace** (`isolation.CLOSED_STORES`):
+  - ai-memory's store and hook spool (`~/.local/share/ai-memory`): every scope's database, pages and spooled events. A trial's hooks spool into the empty folder, and its events still reach the server through the ai-memory forward.
+  - agentsview's archive of every session on the host (`~/.agentsview`).
+  - codebase-memory's project indexes, jcodemunch's index and Serena's logs.
+  - Claude's plans, tasks and paste cache.
+  - Codex's own folder: its history, session index, logs, and memories, goals and queue databases (and its login). The entries a trial's clone links to come back as temporary overlays: packages (the codex binary), skills, plugins, cache and context-mode. The clone's sessions and context-mode stores stay the trial's private folders.
+- **Closed file:** Claude's prompt history is an empty private file in the namespace.
+- **G13** lists every closure, so a receipt without the overlay, a closed store's tmpfs or the private history file fails.
+- **A negative test per channel** (`test_isolation.ChannelClosure`): a real file the host holds in each channel is gone in the namespace (ENOENT), or empty for the history. Home writes do not outlive the trial. A project outside the experiment cannot be written.
+
 ## Round 5 (CC 14:38Z, 14:42Z and 15:17Z)
 
 ### The gateway's response cache: not confirmed off
@@ -648,6 +666,13 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **The answer-channel closure commit:** the focused module passes 87 of 87 tests, client starts included.
+  - **Red run.** On the round-6 commit without it, exactly its 11 closure tests are red (9 fail, 2 error), and the other 76 pass.
+  - **Stage-1 self-test** with the overlay and the closed stores:
+    - 79 probes hidden, all with ENOENT, 30 of them in the closed stores;
+    - Claude's history reads 0 bytes inside;
+    - home writes stay in the namespace, and a kept project is not writable;
+    - 18 of 18 network expectations are met, and all 7 client checks pass.
 - **Round 6** (the Gate 0 amendment, the network namespace and the GPT read of a513616d): the focused module passes 76 of 76 tests, client starts included.
   - **Red run.** The same tests on the round-5 head a513616d: 4 fail and 16 error, one of them the network class's set-up, whose 4 tests do not run.
   - **Stage-1 self-test** (`isolation.py selftest --clients`, no model call):
