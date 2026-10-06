@@ -1,0 +1,43 @@
+# Controls for scripts/drain-prototype.sh.txt (version 4, 2026-10-06): each run is the real script with one condition broken. Raw output filtered to the script's own decision lines (the exit code is the script's), home directory written $HOME.
+# (1) EXPECT_TREE = 40 zeros: the baseline and negative-control stages run, the patched tree id differs, the script stops with exit 3 before the P, A2 and B2 stages.
+# (2) a patch whose test-file hunk was changed by one token while its index line was left alone: the extracted test's blob id differs from the index line, the script stops with exit 3 before the negative controls.
+# (3) a DRAIN_DIR that holds no patch: the preflight stops with exit 2 and creates no work directory (the before and after counts of omniroute-drain-validate-* directories are equal).
+# A completed run creates one work directory of its own (about 5 GB with the clone and node_modules; the controls of (1) leave one too); a work directory is deleted only by the operator, by its literal path.
+
+## (1) EXPECT_TREE = 40 zeros: must stop with exit 3 at the patched-tree check, before the P, A2 and B2 stages
+00:09:55Z A-baseline expectation met: tests=1746 pass=1745 fail=1
+00:09:55Z extract the new test file from the patch exit=0
+00:09:55Z new test file blob d2f94e21222b273e81368f011035b99add6de3e5 matches the patch's index line (d2f94e212)
+00:09:56Z N-new-test-unpatched exit=1 tests=6 suites=0 pass=3 fail=3 cancelled=0 skipped=0 todo=0
+00:09:56Z N-new-test-unpatched expectation met: tests=6 pass=3 fail=3
+00:09:56Z apply the first version's streamHandler.ts hunk exit=0
+00:09:58Z N2-new-test-first-version exit=1 tests=6 suites=0 pass=4 fail=2 cancelled=0 skipped=0 todo=0
+00:09:58Z N2-new-test-first-version expectation met: tests=6 pass=4 fail=2
+00:09:58Z restore streamHandler.ts exit=0
+00:09:58Z apply patch under test exit=0
+00:09:58Z commit patch under test exit=0
+00:09:58Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 DIFFERS from the expected tree 0000000000000000000000000000000000000000: stopping before the patched test stages
+script exit=3
+omniroute-drain-validate-* work directories before: 4, after: 5
+
+## (2) a patch whose test-file hunk was changed by one token while its index line was left alone: must stop with exit 3 at the blob check, before the negative controls
+00:09:58Z clone exit=0
+00:09:58Z fetch pr15167 exit=0
+00:10:03Z checkout tag exit=0
+00:11:21Z npm ci exit=0
+00:11:21Z apply affinity patch exit=0
+00:11:21Z apply pr15167 diff exit=0
+00:11:21Z commit composition exit=0
+00:11:21Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+00:12:37Z A-baseline exit=1 tests=1746 suites=43 pass=1745 fail=1 cancelled=0 skipped=0 todo=0
+00:12:37Z A-baseline expectation met: tests=1746 pass=1745 fail=1
+00:12:37Z extract the new test file from the patch exit=0
+00:12:37Z new test file blob a28d6976edea8d0b7afa5a5867bb8e101017cff3 does not match the patch's index line (d2f94e212): stopping
+script exit=3
+omniroute-drain-validate-* work directories before: 5, after: 6
+
+## (3) a DRAIN_DIR that holds no patch: must stop with exit 2 before anything is created
+missing input file: $HOME/.cache/omniroute-empty-fixture-uSu9NB/drain-after-terminal.patch
+script exit=2
+omniroute-drain-validate-* work directories before: 6, after: 6
+

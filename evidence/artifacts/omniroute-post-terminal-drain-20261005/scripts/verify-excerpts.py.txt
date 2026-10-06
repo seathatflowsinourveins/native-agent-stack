@@ -1,0 +1,70 @@
+import os
+import subprocess
+
+M = os.path.expanduser("~/.cache/omniroute-upstream-mirror-20261005.git")
+M2 = os.path.expanduser("~/.cache/omniroute-upstream-newer-20261005.git")
+PR = "0585aba5589d5a1f49243a13a8db249558e7c9e3"
+TAG = "c1e30b7676975feb298b49eff6ff58923c04b89e"
+NEW = "23a11484862b3bb589a55e85b00e4ac53ffeb234"
+S = "open-sse/utils/streamHandler.ts"
+RANGES = [
+    (S, [(326, 362), (383, 394), (842, 852), (660, 690), (704, 717)]),
+    ("open-sse/utils/stream.ts", [(1340, 1356), (2510, 2512), (2872, 2873), (2993, 2996), (3160, 3161), (3214, 3216)]),
+    ("open-sse/utils/streamFailureBoundary.ts", [(36, 72)]),
+    ("open-sse/utils/streamFailureFinalization.ts", [(56, 82), (160, 190)]),
+    ("open-sse/handlers/chatCore.ts", [(3085, 3115), (6025, 6026), (6088, 6089), (6112, 6113), (6174, 6175), (6281, 6291)]),
+    ("open-sse/handlers/chatCore/attemptLogging.ts", [(397, 397), (565, 565)]),
+    ("bin/cli/runtime/processSupervisor.mjs", [(22, 22), (77, 92), (99, 128), (186, 191), (207, 228)]),
+    ("bin/cli/commands/serve.mjs", [(600, 604)]),
+]
+
+
+def lines(gitdir, ref, path):
+    out = subprocess.run(["git", f"--git-dir={gitdir}", "show", f"{ref}:{path}"], capture_output=True, text=True)
+    return out.stdout.split("\n") if out.returncode == 0 else None
+
+
+import sys
+
+detail = []
+tail = ["## release/v3.8.52 head 23a114848 (fetched 2026-10-05): the cited files, per file (blob ids at the tag / PR 15167's head / release/v3.8.52, and where each excerpt sits at release/v3.8.52)"]
+tot = {"tag_equal": 0, "tag_total": 0}
+
+
+def blob(gitdir, ref, path):
+    out = subprocess.run(["git", f"--git-dir={gitdir}", "rev-parse", f"{ref}:{path}"], capture_output=True, text=True)
+    return out.stdout.strip()[:12]
+
+
+for path, ranges in RANGES:
+    pr = lines(M, PR, path)
+    tag = lines(M, TAG, path)
+    new = lines(M2, NEW, path)
+    results = []
+    for a, b in ranges:
+        block = pr[a - 1:b]
+        same_tag = tag[a - 1:b] == block
+        found = None
+        if new:
+            n = len(block)
+            for i in range(0, len(new) - n + 1):
+                if new[i:i + n] == block:
+                    found = i + 1
+                    break
+        tot["tag_total"] += 1
+        tot["tag_equal"] += 1 if same_tag else 0
+        detail.append(f"{path} L{a}-{b}: identical at the tag: {same_tag} | at release/v3.8.52: " + (f"verbatim at L{found}" if found else "not verbatim"))
+        results.append((a, b, found))
+    bt, bp, bn = blob(M, TAG, path), blob(M, PR, path), blob(M2, NEW, path)
+    ident = "identical" if bt == bp == bn else "differs"
+    parts = []
+    for a, b, found in results:
+        parts.append(f"L{a}-{b} " + ("verbatim at the same lines" if found == a else (f"verbatim at L{found}" if found else "NOT verbatim: changed there")))
+    note = "; every cited range is verbatim at the same lines" if all(f == a for a, b, f in results) else "; " + ", ".join(parts)
+    if path.endswith("/stream.ts"):
+        note += " (the file differs only by timing registration, createStreamTiming/registerStreamTiming, 5 lines, checked 2026-10-05)"
+    tail.append(f"{path}: {bt} / {bp} / {bn}: {ident}{note}")
+detail.append(str(tot))
+print("\n".join(detail))
+open(sys.argv[1], "w", encoding="utf-8").write("\n".join(tail) + "\n")
+open(sys.argv[2], "w", encoding="utf-8").write("# Per-excerpt check of checks/source-lines.txt (scripts/verify-excerpts.py.txt, 2026-10-05): each cited range of the eight files at 0585aba55 compared with the v3.8.51 tag and located in release/v3.8.52 23a114848\n" + "\n".join(detail) + "\n")

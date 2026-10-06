@@ -1,0 +1,43 @@
+# The post-terminal client-disconnect drain: prototype results from a scratch tree built from public refs (2026-10-05, node 24.21.0; nothing deployed)
+# composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch commit adds the drain in streamHandler.ts cancel() and the test file stream-terminal-seen-client-disconnect.test.ts
+# test runner: upstream's flags (tsx loader, setupPolyfill, isolateDataDir) with --test --test-force-exit --test-concurrency=4; the stream set is every tests/unit/*stream*, *sse* file plus the Codex tool-handoff and empty-stream tests
+# script: scripts/drain-prototype.sh.txt. The block below is its progress log, byte for byte.
+
+20:16:41Z clone exit=0
+20:16:41Z fetch pr15167 exit=0
+20:16:45Z checkout tag exit=0
+20:17:46Z npm ci exit=0
+20:17:46Z apply affinity patch exit=0
+20:17:46Z apply pr15167 diff exit=0
+20:17:46Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f (expected f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f)
+20:17:46Z stream-related test files: 236
+20:18:56Z A-baseline exit=1 tests=1733 pass=1732 fail=1
+20:18:57Z N-new-test-unpatched exit=1 tests=4 pass=3 fail=1
+20:18:57Z patch applied exit=0
+20:18:57Z commit exit=0 tree=f89d3f3f366a7c41b19468bf3fd7fd284669669e
+20:18:58Z P-new-test-patched exit=0 tests=4 pass=4 fail=0
+20:20:01Z A2-stream-tests-patched exit=1 tests=1737 pass=1736 fail=1
+20:20:32Z B2-calllog-usage-chat-pipeline exit=0 tests=126 pass=126 fail=0
+20:20:32Z format-patch exit=0 sha256=d8eab39308cc9142426ae6f44513a09bb58c7c4cc773f00c912c26c0da09ac5e bytes=8544
+20:20:32Z DONE
+
+## A: baseline, the stream-related test files on the unpatched composition (236 files)
+1 of 1,733 fails, and it fails identically after the patch (A2 below); it does not concern streams:
+✖ repository provider asset manifest covers the audited 141-file snapshot (106.841426ms)
+
+## N: the new test file on the unpatched composition (negative control: only the first test must fail)
+✖ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (96.768226ms)
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.688661ms)
+✔ the drain is bounded: an upstream that never ends is cancelled when the grace period expires (123.278015ms)
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (27.402923ms)
+
+## P: the new test file on the patched tree
+✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (92.229506ms)
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (33.510292ms)
+✔ the drain is bounded: an upstream that never ends is cancelled when the grace period expires (121.827879ms)
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (25.535041ms)
+
+## A2: the same 236 stream-related files plus the new test file on the patched tree: the same single, unrelated failure
+✖ repository provider asset manifest covers the audited 141-file snapshot (108.204806ms)
+
+## B2: call-log, artifact-worker, usage-history and chat-pipeline integration tests on the patched tree: 126 of 126 pass (no failing line)

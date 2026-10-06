@@ -1,0 +1,17 @@
+# Stage logs of the validation and handler-e2e runs (2026-10-06): what each log is, its size, its sha256 and where it is kept.
+# Every log is kept gzipped in the first host's private artifact directory (0700, with the tarball: <artifact directory>/test-logs/<name>.gz); a log up to 64 KiB is also committed here as plain text.
+# The three large logs (about 1.5 MB of runner output) stay in the private directory only, because this repository's publication check reads UTF-8 text and the runner's output is not compact evidence;
+# their stage summaries are in checks/drain-prototype-results.txt and the failing test's output is checks/failing-test-output-A.txt.
+# retained = the text kept and committed: the home directory written $HOME and UUID-shaped strings shortened to their first 8 hex digits and an ellipsis. raw = the runner's output before that.
+# The raw logs were scratch files of the runs (deleted with the scratch trees at handover); the retained gzip is what a reviewer can verify against `retained_sha256` after `gunzip`.
+
+| log | bytes (retained) | lines | raw_sha256 | retained_sha256 | committed copy |
+| --- | --- | --- | --- | --- | --- |
+| `validation-A-baseline.log` | 608133 | 9577 | `c6feb7f00dcce6ce626634f1465c44cf76c02ec53b77e35503f6c960b480e2a6` | `433be94a7977cfc07d3c23e687f6808045b6a5931b5cb3b3c927cbb7d1b821ab` | private only |
+| `validation-A2-stream-tests-patched.log` | 610718 | 9611 | `f817c5ef94da38f83703506a46afa0f67980944d605302a9009a48411e808821` | `70466d642ffb78e17146e14017f4323431a41cf8e5ec0d1b08074c517dce0962` | private only |
+| `validation-B2-calllog-usage-chat-pipeline.log` | 275608 | 4995 | `dc4d7adae7850cb64362d7e03a7a1bef1952c5dcdd27862df918e6f4df3d4982` | `9e6cef6a8dd097384b8955d32c282b1c47602460febc9aef675935bbf07fbda1` | private only |
+| `validation-N-new-test-unpatched.log` | 4920 | 94 | `505e357d6ae895f76a049c3bbded01847785d72f872f0f530107a81773cc2032` | `84df3da89a9fe2d313857179115d6a0cf2ffda775a00b26d5d324dbd949efd54` | `checks/logs/validation-N-new-test-unpatched.log` |
+| `validation-N2-new-test-first-version.log` | 4230 | 78 | `f8a0d130517038139ecdb71a5d1f54ec28c18e53c82facd2b9dd637cc1ad8667` | `55227ed13b0f32a80b6c18fc727c78c647a386d642d9e33c617acec31b4492f8` | `checks/logs/validation-N2-new-test-first-version.log` |
+| `validation-P-new-test-patched.log` | 2681 | 42 | `1efba6ee2b86a752e0e67480a5933e5c397fb61fa4a633a92ce8765c7e4e54f0` | `1efba6ee2b86a752e0e67480a5933e5c397fb61fa4a633a92ce8765c7e4e54f0` | `checks/logs/validation-P-new-test-patched.log` |
+| `handler-e2e-P-e2e-patched.log` | 28813 | 509 | `edb61b3a4a3e0255ae57540e3c8d9fa72ca1a5944a49c40f2dd722bb37e5940d` | `eff3f7cf8d095a7c71fc1ad5e0b009dc8d82393108dfe40bbf59a57eda63b6e4` | `checks/logs/handler-e2e-P-e2e-patched.log` |
+| `handler-e2e-U-e2e-unpatched.log` | 32034 | 576 | `05ee9a1ee32afbc54204fdf492b4216ec950142f804b72483260cca7a9485a99` | `d8ddfabd0379b06baf6678330db8d2ee476e07f276b8c0df5f200b734486e737` | `checks/logs/handler-e2e-U-e2e-unpatched.log` |

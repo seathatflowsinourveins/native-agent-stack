@@ -1,0 +1,20 @@
+#!/bin/bash
+# Install the drain-patched tarball (patch v2, patched tree b7c6869001ce, built 2026-10-05) into its own prefix next to the live ones; no live unit is touched.
+# The tarball is the one the upstream release scripts built from that tree (see the build record in the evidence folder); its sha256 is checked first.
+set -u
+A=$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005
+TGZ=$A/omniroute-3.8.51-drain-b7c68690.tgz
+NAME=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690
+TOOLS=$HOME/.local/share/codex-ecosystem/tools
+P=$TOOLS/$NAME
+LIVE=$TOOLS/omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
+OUT=$HOME/.cache/omniroute-drain-install-out; mkdir -p "$OUT"
+export PATH="$TOOLS/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+[ -e "$P" ] && { echo "$P exists; refusing to overwrite"; exit 2; }
+( cd "$A" && grep -F " omniroute-3.8.51-drain-b7c68690.tgz" SHA256SUMS | sha256sum -c - ) || { echo "tarball sha256 mismatch or missing in SHA256SUMS"; exit 3; }
+nice -n 19 npm install -g --prefix "$P" --no-audit --no-fund "$TGZ" > "$OUT/install.log" 2>&1; rc=$?
+echo "$(date -u +%H:%M:%SZ) npm install exit=$rc"
+cp -a "$LIVE/shim" "$P/shim"; echo "shim sha256: $(sha256sum "$P/shim/lsof" | cut -c1-64)"
+echo "BUILD_SHA $(cat "$P/lib/node_modules/omniroute/dist/BUILD_SHA" 2>/dev/null)"
+du -sb "$P" | cut -f1 | sed 's/^/bytes: /'
+exit $rc

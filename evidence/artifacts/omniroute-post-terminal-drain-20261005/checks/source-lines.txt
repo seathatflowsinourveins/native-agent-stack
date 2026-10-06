@@ -1,4 +1,5 @@
-# Upstream OmniRoute at 0585aba5589d5a1f49243a13a8db249558e7c9e3 (the composition's tree): the lines that cause and bound the dropped call_logs and usage_history rows, and the other routes to onStreamComplete (verbatim, line-numbered; read from a bare mirror of diegosouzapw/OmniRoute)
+# Upstream OmniRoute, read at 0585aba5589d5a1f49243a13a8db249558e7c9e3 (PR 15167's head): the lines that cause and bound the dropped call_logs and usage_history rows, and the other routes to onStreamComplete (verbatim, line-numbered; read from a bare mirror of diegosouzapw/OmniRoute).
+# All 28 excerpt ranges are identical at the v3.8.51 tag c1e30b7676975feb298b49eff6ff58923c04b89e, and neither PR 15167's diff nor the affinity patch touches these eight files, so they are also the composition's content (checks/source-lines-check.txt, scripts/verify-excerpts.py.txt).
 
 
 ## open-sse/utils/streamHandler.ts L326-362: the stream controller's handleDisconnect (a client that has the terminal event goes to handleComplete and never reaches onDisconnect) and handleComplete
@@ -404,7 +405,12 @@
 603:   if (recentLog.length) {
 604:     console.error("--- Recent server output ---");
 
-## release/v3.8.52 head 23a114848 (fetched 2026-10-05): the same files
-open-sse/utils/streamHandler.ts tarball-tree cef58650b1a5 release/v3.8.52 cef58650b1a5
-open-sse/utils/stream.ts tarball-tree d563cf7e6990 release/v3.8.52 76a4b2772c31
-(stream.ts differs only by timing registration: createStreamTiming/registerStreamTiming, 5 lines; flush and cancel are unchanged)
+## release/v3.8.52 head 23a114848 (fetched 2026-10-05): the cited files, per file (blob ids at the tag / PR 15167's head / release/v3.8.52, and where each excerpt sits at release/v3.8.52)
+open-sse/utils/streamHandler.ts: cef58650b1a5 / cef58650b1a5 / cef58650b1a5: identical; every cited range is verbatim at the same lines
+open-sse/utils/stream.ts: d563cf7e6990 / d563cf7e6990 / 76a4b2772c31: differs; every cited range is verbatim at the same lines (the file differs only by timing registration, createStreamTiming/registerStreamTiming, 5 lines, checked 2026-10-05)
+open-sse/utils/streamFailureBoundary.ts: bb3da7c850fa / bb3da7c850fa / bb3da7c850fa: identical; every cited range is verbatim at the same lines
+open-sse/utils/streamFailureFinalization.ts: 9d511a8bef0d / 9d511a8bef0d / 2f771215e5dd: differs; L56-82 verbatim at L58, L160-190 NOT verbatim: changed there
+open-sse/handlers/chatCore.ts: 3f48d582eeb2 / 80e9a6964f81 / e618526b9d2f: differs; L3085-3115 verbatim at the same lines, L6025-6026 verbatim at the same lines, L6088-6089 verbatim at L6089, L6112-6113 verbatim at L6113, L6174-6175 verbatim at L6175, L6281-6291 verbatim at L6283
+open-sse/handlers/chatCore/attemptLogging.ts: f07d0507eb1c / f07d0507eb1c / f07d0507eb1c: identical; every cited range is verbatim at the same lines
+bin/cli/runtime/processSupervisor.mjs: e8205c39d57b / e8205c39d57b / e8205c39d57b: identical; every cited range is verbatim at the same lines
+bin/cli/commands/serve.mjs: a6e8f3c363c4 / a6e8f3c363c4 / 8be09c1a808f: differs; every cited range is verbatim at the same lines

@@ -1,0 +1,8 @@
+# Same-day control for the live acceptance (2026-10-05, ~21:46-21:48Z): omniroute-live-acceptance-20261005.py eof early:0 early:0 against NativeStack's 20128 BEFORE the drain patch (build cf6748d04, PR 15167 head f5d8e150b)
+# attribution by the response's X-Correlation-Id and response id; the totals show other lanes' traffic in the same window
+mode=eof http=200 saw_completed=True closed_early=False stream_s=68.8 corr=yes response_id=yes -> call_logs rows for this request=1; usage_history rows with its token counts (or small-token rows in the window when there is no call_logs row)=1; all rows in the window: call_logs=2 usage_history=2; rows in the 120 s before: call_logs=1 usage_history=1
+   call_logs: ('2026-10-05T21:46:50.870Z', '/v1/responses', 200, 'gpt-6-astra', 22, 26, 'ready')
+   usage_history: ('2026-10-05T21:46:50.868Z', 'gpt-6-astra', '200', 22, 26)
+mode=early:0 http=200 saw_completed=True closed_early=True stream_s=2.3 corr=yes response_id=yes -> call_logs rows for this request=0; usage_history rows with its token counts (or small-token rows in the window when there is no call_logs row)=0; all rows in the window: call_logs=0 usage_history=0; rows in the 120 s before: call_logs=3 usage_history=3
+mode=early:0 http=200 saw_completed=True closed_early=True stream_s=4.0 corr=yes response_id=yes -> call_logs rows for this request=0; usage_history rows with its token counts (or small-token rows in the window when there is no call_logs row)=0; all rows in the window: call_logs=0 usage_history=0; rows in the 120 s before: call_logs=2 usage_history=2
+control exit=0

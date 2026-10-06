@@ -3,7 +3,7 @@
 # SMOKE_SCRIPT selects the smoke script, DUMMY_PORT the port of the dummy (the old script hard-codes 29999).
 # Expected for the fixed script: the smoke does not pass (health_ok=no, listener_owned_by_child=no, exit 1) and it does not kill the unrelated process.
 set -u
-SMOKE=${SMOKE_SCRIPT:?set SMOKE_SCRIPT to the smoke script to test (scripts/smoke.sh.txt or scripts/smoke-superseded.sh.txt)}
+SMOKE=${SMOKE_SCRIPT:?set SMOKE_SCRIPT to the smoke script to test (scripts/smoke.sh.txt)}
 PORT=${DUMMY_PORT:-$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')}
 python3 - "$PORT" <<'PYEOF' &
 import http.server, sys

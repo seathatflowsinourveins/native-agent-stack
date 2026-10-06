@@ -1,0 +1,56 @@
+#!/bin/bash
+# Boot smoke of an OmniRoute install prefix on a FREE port with an EMPTY scratch data dir (no credentials, no live unit touched).
+# The child runs in its own process group (set -m). Success needs a health reply while the child is alive AND a listener on the port that belongs to that group,
+# so another OmniRoute instance on any port can neither make this smoke pass nor be killed by it (cleanup signals only the owned process group, never a name match).
+# usage: omniroute-smoke-20261005.sh <prefix directory name under tools/>   e.g. omniroute-3.8.51-npm
+set -u
+set -m
+NAME="${1:?prefix name}"
+TOOLS="$HOME/.local/share/codex-ecosystem/tools"
+PREFIX="$TOOLS/$NAME"
+[ -x "$PREFIX/bin/omniroute" ] || { echo "no executable $PREFIX/bin/omniroute" >&2; exit 2; }
+S="$(mktemp -d "$HOME/.cache/omniroute-smoke-XXXXXX")" || exit 2
+# SMOKE_PORT forces a port (only for the control that occupies it with a dummy health server); the default is a free port chosen now
+PORT=${SMOKE_PORT:-$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')} || exit 2
+export PATH="$PREFIX/shim:$TOOLS/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+export DATA_DIR="$S/data"
+export HOST=127.0.0.1
+export HOSTNAME=127.0.0.1
+export OMNIROUTE_MEMORY_MB=4096
+export CLI_ALLOW_CONFIG_WRITES=false
+export TMPDIR="$S/tmp"
+mkdir -p "$DATA_DIR" "$TMPDIR"
+cd "$S" || exit 2
+"$PREFIX/bin/omniroute" serve --port "$PORT" --no-open --no-tray > "$S/serve.log" 2>&1 &
+PID=$!
+PGID=$(ps -o pgid= -p "$PID" | tr -d ' ')
+[ "$PGID" = "$PID" ] || { echo "the child is not its own process group leader (pid $PID, pgid $PGID): refusing to continue" >&2; exit 2; }
+owned_listener() {
+  local p
+  for p in $(ss -ltnpH "sport = :$PORT" 2>/dev/null | grep -o 'pid=[0-9]*' | cut -d= -f2 | sort -u); do
+    if [ "$(ps -o pgid= -p "$p" 2>/dev/null | tr -d ' ')" = "$PGID" ]; then echo yes; return; fi
+  done
+  echo no
+}
+ok=no
+owned=no
+for _ in $(seq 1 60); do
+  sleep 2
+  kill -0 "$PID" 2>/dev/null || break
+  if body=$(curl -s -m 3 "http://127.0.0.1:$PORT/api/health"); then
+    case "$body" in
+      *ok*|*healthy*)
+        owned=$(owned_listener)
+        if [ "$owned" = yes ]; then ok=yes; break; fi
+        ;;
+    esac
+  fi
+done
+echo "prefix=$NAME port=$PORT health_ok=$ok listener_owned_by_child=$owned body=${body:-none} child_alive=$(kill -0 "$PID" 2>/dev/null && echo yes || echo no)"
+echo "--- first log lines:"
+head -c 1500 "$S/serve.log" | head -14
+kill -- "-$PGID" 2>/dev/null; sleep 2; kill -9 -- "-$PGID" 2>/dev/null
+sleep 1
+echo "processes left in the owned group: $(ps -o pid= -g "$PGID" 2>/dev/null | wc -l)"
+echo "scratch dir: $S (remove with rm -rf after reading)"
+[ "$ok" = yes ]

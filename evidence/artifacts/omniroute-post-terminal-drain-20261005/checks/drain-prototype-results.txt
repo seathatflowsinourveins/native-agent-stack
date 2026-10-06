@@ -1,62 +1,61 @@
-# The post-terminal client-disconnect drain: validation results from a scratch tree built from public refs (2026-10-05, node 24.21.0; nothing deployed)
+# The post-terminal client-disconnect drain: validation results from a scratch tree built from public refs (2026-10-05/06, node 24.21.0; nothing deployed)
 # composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch under test is patches/drain-after-terminal.patch (sha256 74c0f449...), applied to C it gives tree b7c68690...
-# test runner: upstream's flags (tsx loader, setupPolyfill, isolateDataDir) with --test --test-force-exit --test-concurrency=4; the stream set is every tests/unit/*stream*, *sse* file, the Codex tool-handoff and empty-stream files, and every unit test file that mentions streamHandler (239 files)
-# script: scripts/drain-prototype.sh.txt. The block below is its progress log, byte for byte except that the home directory is written $HOME.
+# test runner: upstream's flags (tsx loader, setupPolyfill, isolateDataDir) with --test --test-force-exit --test-concurrency=4; the stream set is every tests/unit/*stream*, *sse* file, the Codex tool-handoff and empty-stream files, and every unit test file that mentions streamHandler (239 files, listed in checks/test-file-list.txt)
+# script: scripts/drain-prototype.sh.txt. The unit test file is extracted from the patch and its git blob id is checked against the patch's own index line; every stage's expectation (counts and failing test names) is enforced by the script. The block below is its progress log, byte for byte except that the home directory is written $HOME.
 
-22:02:54Z clone exit=0
-22:02:54Z fetch pr15167 exit=0
-22:02:58Z checkout tag exit=0
-22:04:09Z npm ci exit=0
-22:04:09Z apply affinity patch exit=0
-22:04:09Z apply pr15167 diff exit=0
-22:04:09Z commit composition exit=0
-22:04:09Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
-22:04:10Z stream-related test files: 239
-22:05:21Z A-baseline exit=1 tests=1746 pass=1745 fail=1
-22:05:21Z copy the new test file exit=0
-22:05:23Z N-new-test-unpatched exit=1 tests=6 pass=3 fail=3
-22:05:23Z apply the first version's streamHandler.ts hunk exit=0
-22:05:24Z N2-new-test-first-version exit=1 tests=6 pass=4 fail=2
-22:05:24Z restore streamHandler.ts exit=0
-22:05:24Z apply patch under test exit=0
-22:05:24Z commit patch under test exit=0
-22:05:24Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
-22:05:26Z P-new-test-patched exit=0 tests=6 pass=6 fail=0
-22:06:30Z A2-stream-tests-patched exit=1 tests=1752 pass=1751 fail=1
-22:07:02Z B2-calllog-usage-chat-pipeline exit=0 tests=126 pass=126 fail=0
-22:07:02Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-validate-89TzHw (remove it with rm -rf after reading)
+23:55:48Z clone exit=0
+23:55:48Z fetch pr15167 exit=0
+23:55:52Z checkout tag exit=0
+23:57:00Z npm ci exit=0
+23:57:00Z apply affinity patch exit=0
+23:57:00Z apply pr15167 diff exit=0
+23:57:00Z commit composition exit=0
+23:57:00Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+23:57:00Z stream-related test files: 239
+23:58:14Z A-baseline exit=1 tests=1746 suites=43 pass=1745 fail=1 cancelled=0 skipped=0 todo=0
+23:58:14Z A-baseline expectation met: tests=1746 pass=1745 fail=1
+23:58:14Z A-baseline failing tests are as expected: 1 name(s)
+23:58:14Z extract the new test file from the patch exit=0
+23:58:14Z new test file blob d2f94e21222b273e81368f011035b99add6de3e5 matches the patch's index line (d2f94e212)
+23:58:15Z N-new-test-unpatched exit=1 tests=6 suites=0 pass=3 fail=3 cancelled=0 skipped=0 todo=0
+23:58:15Z N-new-test-unpatched expectation met: tests=6 pass=3 fail=3
+23:58:15Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+23:58:15Z apply the first version's streamHandler.ts hunk exit=0
+23:58:17Z N2-new-test-first-version exit=1 tests=6 suites=0 pass=4 fail=2 cancelled=0 skipped=0 todo=0
+23:58:17Z N2-new-test-first-version expectation met: tests=6 pass=4 fail=2
+23:58:17Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+23:58:17Z restore streamHandler.ts exit=0
+23:58:17Z apply patch under test exit=0
+23:58:17Z commit patch under test exit=0
+23:58:17Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+23:58:18Z P-new-test-patched exit=0 tests=6 suites=0 pass=6 fail=0 cancelled=0 skipped=0 todo=0
+23:58:18Z P-new-test-patched expectation met: tests=6 pass=6 fail=0
+23:58:18Z P-new-test-patched failing tests are as expected: 0 name(s)
+23:59:25Z A2-stream-tests-patched exit=1 tests=1752 suites=43 pass=1751 fail=1 cancelled=0 skipped=0 todo=0
+23:59:25Z A2-stream-tests-patched expectation met: tests=1752 pass=1751 fail=1
+23:59:25Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+23:59:59Z B2-calllog-usage-chat-pipeline exit=0 tests=126 suites=9 pass=126 fail=0 cancelled=0 skipped=0 todo=0
+23:59:59Z B2-calllog-usage-chat-pipeline expectation met: tests=126 pass=126 fail=0
+23:59:59Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+23:59:59Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-validate-X7OSps (remove it with rm -rf after reading)
 
-## A: baseline, the 239 stream-related test files on the unpatched composition
-1 of 1,746 fails, and it fails identically after the patch (A2 below); it does not concern streams:
-✖ repository provider asset manifest covers the audited 141-file snapshot (103.006594ms)
+## Runner summaries of every stage (all counters; the stage logs, their sizes and sha256 are in checks/logs/MANIFEST.txt: the small ones are committed there, the three large ones are kept in the private artifact directory)
+| stage | exit | tests | suites | pass | fail | cancelled | skipped | todo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A-baseline | 1 | 1746 | 43 | 1745 | 1 | 0 | 0 | 0 |
+| N-new-test-unpatched | 1 | 6 | 0 | 3 | 3 | 0 | 0 | 0 |
+| N2-new-test-first-version | 1 | 6 | 0 | 4 | 2 | 0 | 0 | 0 |
+| P-new-test-patched | 0 | 6 | 0 | 6 | 0 | 0 | 0 | 0 |
+| A2-stream-tests-patched | 1 | 1752 | 43 | 1751 | 1 | 0 | 0 | 0 |
+| B2-calllog-usage-chat-pipeline | 0 | 126 | 9 | 126 | 0 | 0 | 0 | 0 |
 
-## N: the new test file (6 tests) on the unpatched composition (negative control: 3 fail)
-✖ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (96.767424ms)
-✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (43.43667ms)
-✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (123.577876ms)
-✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.766993ms)
-✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (74.53763ms)
-✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (124.266384ms)
-assertion messages of the failures: flush() never runs, so the drain must clear the pending request | the completed response must be drained, not aborted | the grace period must end the drain
+## Failing tests by stage (names; the output of the one failing upstream test is checks/failing-test-output-A.txt)
+A-baseline: repository provider asset manifest covers the audited 141-file snapshot
+N-new-test-unpatched: a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run | a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared | the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared
+N2-new-test-first-version: a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared | the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared
+P-new-test-patched: none
+A2-stream-tests-patched: repository provider asset manifest covers the audited 141-file snapshot
+B2-calllog-usage-chat-pipeline: none
 
-## N2: the new test file with only the streamHandler.ts hunk of the first version of the patch (negative control for the two defects the cross-family read found: 2 fail)
-✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (93.180924ms)
-✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.047569ms)
-✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (124.154765ms)
-✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.613879ms)
-✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.754793ms)
-✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.045657ms)
-assertion messages of the failures: flush() never runs, so the drain must clear the pending request | the grace period must end the drain
-
-## P: the new test file on the patched tree (6 of 6 pass)
-✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (93.807873ms)
-✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.219335ms)
-✔ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (123.45587ms)
-✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.670343ms)
-✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.552885ms)
-✔ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.481441ms)
-
-## A2: the same 239 files plus the new test file on the patched tree: the same single, unrelated failure
-✖ repository provider asset manifest covers the audited 141-file snapshot (96.4234ms)
-
-## B2: call-log, artifact-worker, usage-history and chat-pipeline integration tests on the patched tree: 126 of 126 pass (no failing line)
+The unit test file's six tests: N fails three (the main test, the bounded drain with the pending request cleared, the tool handoff with its terminal event already delivered); N2 fails the last two (the two defects of the superseded first version); P passes all six.
+Test 5 ("a completed tool handoff ... is drained too") and the two guards (grace period 0; a disconnect before the terminal event) pass on every tree: they are regression guards, not evidence of the fix.

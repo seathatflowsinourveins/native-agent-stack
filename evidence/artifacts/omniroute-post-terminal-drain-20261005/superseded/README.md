@@ -1,0 +1,26 @@
+# Superseded and failed attempts behind this evidence (kept, not deleted: docs/acceptance-evidence-policy.md, "Preserve the returned result")
+
+Each file is the exact text that existed, extracted from the branch history of PR #757 (the commit is named) or reconstructed with a verified hash; `$HOME` replaces the home directory. A superseded script is not a claim about the current evidence.
+
+| File | What it is | Why it was superseded | Where it ran or lived |
+| --- | --- | --- | --- |
+| `first-version-drain-prototype-results.txt` | results of the first version of the patch (4 tests; 236 stream-related files: 1,733 tests, 1,737 after) | the patch had two defects found by a GPT-6.1 read: no drain timer for a completed tool handoff whose terminal event was already delivered; an expired drain left the pending entry | commit `998c9c246` |
+| `drain-prototype-v1-first-version.sh.txt` | the validation script of the first version (built the patch by a python replacement) | the validation now applies the patch file and checks tree ids | commit `998c9c246` |
+| `drain-prototype-v2-unchecked-fixture-copy.sh.txt` | validation script with the tree-id check but a fixture copy outside `step()` | a missing fixture let the negative controls run on and fail for the wrong reason (review r4, P2) | commit `5cc493dc4` |
+| `drain-prototype-v3-standalone-test-copy.sh.txt` | validation script that copied a standalone test file the evidence did not hold | the rerun was not self-contained; nothing tied the copy to the patch's blob (command center RC5) | commit `7e5e2f6c2` |
+| `drain-prototype-v2-tree-check-control.txt`, `drain-prototype-v3-missing-fixture-control.txt` | the controls of validation script versions 2 and 3 (a wrong expected tree; a DRAIN_DIR without a fixture) | their scripts are superseded; `../checks/drain-prototype-controls.txt` holds the controls of version 4 (wrong tree, a tampered patch, a DRAIN_DIR without the patch) | commits `5cc493dc4` and `51dd3fe21` |
+| `smoke-v1-fixed-port.sh.txt` | the first boot smoke (fixed port 29999, health read before the child, name-matching `pkill`) | it passed on an unrelated healthy instance and could signal one (its false pass is in `smoke-v3-pgid-column-not-loopback-results.txt`, run 1) | first push of the PR |
+| `smoke-v2-ps-g-selector.sh.txt`, `smoke-v2-ps-g-selector-results.txt` | the smoke whose "processes left in the owned group" used `ps -g` (a session selector): its recorded 0 proved nothing | `checks/smoke-group-selector-control.txt` reproduces the defect | commit `51dd3fe21` (run at 22:02Z) |
+| `smoke-v3-pgid-column-not-loopback.sh.txt`, `smoke-v3-pgid-column-not-loopback-results.txt` | the smoke with the PGID-column count, whose scratch server listened on all interfaces with no API key (HOST and HOSTNAME are ignored on Linux) | command center RC12 | commit `7e5e2f6c2` (run at 22:23Z) |
+| `build-drain-v1-as-ran.sh.txt` | the build script that produced the recorded tarball (every gate's exit code is in `checks/build-results.txt`) | it did not propagate failing gates to its exit status and built in a fixed, reused tree without a clean-tree check (RC6); the recorded run is unaffected | commit `7e5e2f6c2` (ran at 21:12-21:25Z) |
+| `install-drain-v1-sha256sums-beside-the-tarball.sh.txt` | the install script that verified the tarball only against a SHA256SUMS beside it | the pinned sha256, BUILD_SHA and shim hash were not enforced (RC13) | commit `7e5e2f6c2` (ran at 21:29Z) |
+| `stream-close-repro-v1-timestamp-only.py.txt`, `native-exec-compare-v1-timestamp-only.py.txt` | the scripts of the pre-patch reproduction (`checks/pre-patch-repro-20128.txt`) | they select rows by timestamp only and read 8 s after the client finished, inside the 10 s grace period: the pre-patch 0-row results stay valid negatives, but they cannot be an acceptance check (RC3) | first push of the PR |
+| `live-acceptance-attempt1-usage-window-too-wide.py.txt`, `live-acceptance-baseline-attempt1-output.txt` | the first frozen acceptance script and its baseline run at 23:43Z | its second read widened the usage window to the read time, so later requests with identical token counts looked like late rows (`LATE ... changed=True` for two chat modes); the script's sha256 was `4b830e08...` (reconstructed from the fix and verified) | this round |
+
+Paths inside the retained outputs are the paths of the commit they come from: `scripts/smoke-superseded.sh.txt` in the smoke outputs is `smoke-v1-fixed-port.sh.txt` here, and `scripts/stream-close-repro.py.txt` and `scripts/native-exec-compare.py.txt` are the two `*-v1-timestamp-only.py.txt` files here.
+
+## Not retained
+
+- The outputs of two `codex exec` attempts on 20128 that reached a 240 s timeout before the script read the store (a single `cx/gpt-6.1-sol` request at effort xhigh; an astra request that needed a tool call): only a note survives. The frozen acceptance protocol runs the tool-call shape only as an observed, non-gating step.
+- The output of a raw run of about 117 s that an earlier note cited: not kept; the record now cites only retained runs.
+- The script version that produced `../checks/live-acceptance-control-unpatched-v2-script.txt` (an intermediate version of the acceptance script, 21:46Z); its output is kept, its text is not, and its sha256 was not recorded.

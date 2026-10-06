@@ -1,0 +1,30 @@
+# Per-excerpt check of checks/source-lines.txt (scripts/verify-excerpts.py.txt, 2026-10-05): each cited range of the eight files at 0585aba55 compared with the v3.8.51 tag and located in release/v3.8.52 23a114848
+open-sse/utils/streamHandler.ts L326-362: identical at the tag: True | at release/v3.8.52: verbatim at L326
+open-sse/utils/streamHandler.ts L383-394: identical at the tag: True | at release/v3.8.52: verbatim at L383
+open-sse/utils/streamHandler.ts L842-852: identical at the tag: True | at release/v3.8.52: verbatim at L842
+open-sse/utils/streamHandler.ts L660-690: identical at the tag: True | at release/v3.8.52: verbatim at L660
+open-sse/utils/streamHandler.ts L704-717: identical at the tag: True | at release/v3.8.52: verbatim at L704
+open-sse/utils/stream.ts L1340-1356: identical at the tag: True | at release/v3.8.52: verbatim at L1340
+open-sse/utils/stream.ts L2510-2512: identical at the tag: True | at release/v3.8.52: verbatim at L2510
+open-sse/utils/stream.ts L2872-2873: identical at the tag: True | at release/v3.8.52: verbatim at L2872
+open-sse/utils/stream.ts L2993-2996: identical at the tag: True | at release/v3.8.52: verbatim at L2993
+open-sse/utils/stream.ts L3160-3161: identical at the tag: True | at release/v3.8.52: verbatim at L3160
+open-sse/utils/stream.ts L3214-3216: identical at the tag: True | at release/v3.8.52: verbatim at L3214
+open-sse/utils/streamFailureBoundary.ts L36-72: identical at the tag: True | at release/v3.8.52: verbatim at L36
+open-sse/utils/streamFailureFinalization.ts L56-82: identical at the tag: True | at release/v3.8.52: verbatim at L58
+open-sse/utils/streamFailureFinalization.ts L160-190: identical at the tag: True | at release/v3.8.52: not verbatim
+open-sse/handlers/chatCore.ts L3085-3115: identical at the tag: True | at release/v3.8.52: verbatim at L3085
+open-sse/handlers/chatCore.ts L6025-6026: identical at the tag: True | at release/v3.8.52: verbatim at L6025
+open-sse/handlers/chatCore.ts L6088-6089: identical at the tag: True | at release/v3.8.52: verbatim at L6089
+open-sse/handlers/chatCore.ts L6112-6113: identical at the tag: True | at release/v3.8.52: verbatim at L6113
+open-sse/handlers/chatCore.ts L6174-6175: identical at the tag: True | at release/v3.8.52: verbatim at L6175
+open-sse/handlers/chatCore.ts L6281-6291: identical at the tag: True | at release/v3.8.52: verbatim at L6283
+open-sse/handlers/chatCore/attemptLogging.ts L397-397: identical at the tag: True | at release/v3.8.52: verbatim at L397
+open-sse/handlers/chatCore/attemptLogging.ts L565-565: identical at the tag: True | at release/v3.8.52: verbatim at L565
+bin/cli/runtime/processSupervisor.mjs L22-22: identical at the tag: True | at release/v3.8.52: verbatim at L22
+bin/cli/runtime/processSupervisor.mjs L77-92: identical at the tag: True | at release/v3.8.52: verbatim at L77
+bin/cli/runtime/processSupervisor.mjs L99-128: identical at the tag: True | at release/v3.8.52: verbatim at L99
+bin/cli/runtime/processSupervisor.mjs L186-191: identical at the tag: True | at release/v3.8.52: verbatim at L186
+bin/cli/runtime/processSupervisor.mjs L207-228: identical at the tag: True | at release/v3.8.52: verbatim at L207
+bin/cli/commands/serve.mjs L600-604: identical at the tag: True | at release/v3.8.52: verbatim at L600
+{'tag_equal': 28, 'tag_total': 28}

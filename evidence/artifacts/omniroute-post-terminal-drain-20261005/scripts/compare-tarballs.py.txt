@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Compare two npm tarballs entry by entry (content sha256 per file), for the reproducibility check of the drain build.
+
+usage: compare-tarballs.py <recorded tarball> <rebuilt tarball> [max listed entries per category]
+Prints the sha256 and size of both tarballs, the entry counts, the number of entries with identical content, and (capped) the entries that differ or exist on one side only.
+Reads the tarballs only; writes nothing.
+"""
+import hashlib
+import sys
+import tarfile
+
+
+def digest(path):
+    entries, h = {}, hashlib.sha256()
+    size = 0
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(1 << 20)
+            if not chunk:
+                break
+            h.update(chunk)
+            size += len(chunk)
+    with tarfile.open(path, "r:gz") as tf:
+        for m in tf:
+            if m.isfile():
+                entries[m.name] = hashlib.sha256(tf.extractfile(m).read()).hexdigest()
+            else:
+                entries[m.name] = "<" + m.type.decode("ascii", "replace") + ">"
+    return h.hexdigest(), size, entries
+
+
+a_path, b_path = sys.argv[1], sys.argv[2]
+cap = int(sys.argv[3]) if len(sys.argv) > 3 else 40
+a_sha, a_size, a = digest(a_path)
+b_sha, b_size, b = digest(b_path)
+print(f"recorded tarball: sha256 {a_sha} size {a_size} entries {len(a)}")
+print(f"rebuilt  tarball: sha256 {b_sha} size {b_size} entries {len(b)}")
+same = [n for n in a if n in b and a[n] == b[n]]
+diff = sorted(n for n in a if n in b and a[n] != b[n])
+only_a = sorted(n for n in a if n not in b)
+only_b = sorted(n for n in b if n not in a)
+print(f"entries with identical content: {len(same)}; different content: {len(diff)}; only in the recorded tarball: {len(only_a)}; only in the rebuilt tarball: {len(only_b)}")
+import re
+
+# Next.js writes one page_client-reference-manifest.js per page (hundreds of near-identical files): they are counted, not listed
+# (the repository's publication check also reads a page directory named "home" as a home path).
+MANIFEST = re.compile(r"(?:^|/)page_client-reference-manifest\.js$")
+for label, names in (("different content", diff), ("only in the recorded tarball", only_a), ("only in the rebuilt tarball", only_b)):
+    counted = [n for n in names if MANIFEST.search(n)]
+    listed = [n for n in names if not MANIFEST.search(n)]
+    extra = f"; {len(counted)} page_client-reference-manifest.js entries counted, not listed" if counted else ""
+    print(f"-- {label}: {len(names)}{extra} (first {min(cap, len(listed))} of the {len(listed)} listed)")
+    for n in listed[:cap]:
+        print("   ", n)

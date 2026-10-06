@@ -1,0 +1,19 @@
+# Controls for the exit-code logic of scripts/build-drain.sh.txt (version 2, 2026-10-06 ~23:50Z): gate() and compare_dry_run() are sourced (BUILD_DRAIN_SOURCE_ONLY=1) and exercised with failing and passing inputs. Raw output, home directory written $HOME.
+# (1) a failing gate stops the script with exit 3; (2) a passing gate continues; (3) the first build's recorded dry-run metadata equals the kept tarball; (4) a one-byte-corrupted tarball and (5) altered metadata both fail the comparison.
+
+## (1) gate() with a failing command must stop the script with exit 3 and log the failing gate
+23:50:53Z failing-gate exit=1 seconds=0
+subshell exit=3
+## (2) gate() with a passing command logs it and continues
+23:50:53Z passing-gate exit=0 seconds=0
+reached after the passing gate
+subshell exit=0
+## (3) compare_dry_run: the first build's recorded dry-run metadata against the kept tarball (same bytes: must succeed)
+dry-run shasum 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | kept sha1 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | integrity equal: True | size 137825952 137825952 | entries 26762 | equal: True
+exit=0
+## (4) compare_dry_run against a one-byte-corrupted copy of the tarball (must fail)
+dry-run shasum 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | kept sha1 078d30810bc6e280b27f982076bc37ca16acaede | integrity equal: False | size 137825952 137825952 | entries 26762 | equal: False
+exit=1
+## (5) compare_dry_run with dry-run metadata whose integrity was altered (must fail)
+dry-run shasum 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | kept sha1 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | integrity equal: False | size 137825952 137825952 | entries 26762 | equal: False
+exit=1
