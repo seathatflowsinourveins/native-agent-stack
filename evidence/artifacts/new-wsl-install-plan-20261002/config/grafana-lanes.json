@@ -867,11 +867,11 @@
         "w": 24,
         "h": 9
       },
-      "description": "Only the model-free health route is probed. Gateway settings and database routes are excluded.",
+      "description": "Only the model-free health route is probed. Native http_url label observed on existing targets. Gateway settings and database routes are excluded.",
       "targets": [
         {
           "refId": "A",
-          "expr": "httpcheck_status{httpcheck_target=\"http://127.0.0.1:21128/api/health\"}",
+          "expr": "httpcheck_status{http_url=\"http://127.0.0.1:21128/api/health\",http_status_class=\"2xx\"}",
           "queryType": "instant",
           "legendFormat": "Value",
           "datasource": {
