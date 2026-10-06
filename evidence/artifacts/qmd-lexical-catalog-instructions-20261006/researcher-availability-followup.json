@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "unit": "qmd-researcher-availability-followup",
+  "lane": "foundation",
+  "base": "2a7191c74aeedd47a7ec075d8869e37c2aa0b8ab",
+  "evidence_class": [
+    "source-review",
+    "local-integration-check",
+    "structural-validation"
+  ],
+  "prior_receipts": [
+    {
+      "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/receipt.json",
+      "sha256": "acdffe5707ba8f652f5d08a4e432d714afb5c302815131a3756c158753860c73",
+      "retained_unchanged": true
+    },
+    {
+      "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/citation-followup.json",
+      "sha256": "7be0ec4b9a2b0fd490e2d856d3550db0d6dbffd4eb0bb165fa705d2c6c7ebc0a",
+      "retained_unchanged": true
+    }
+  ],
+  "source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "pin": "2a7191c74aeedd47a7ec075d8869e37c2aa0b8ab",
+    "path": "docs/token-session-handbook.md",
+    "line": 262,
+    "claim": "The Claude researcher has no SocratiCode grant; instruction text cannot add that grant."
+  },
+  "repair": {
+    "carriers": [
+      "adoption/hooks/claude/token-lanes-block.researcher.md:8",
+      "docs/token-session-handbook.md:262"
+    ],
+    "availability_note": "This researcher has no SocratiCode grant: perform QMD keyword retrieval directly and hand meaning-based catalog requests to the coordinator for codebase_search.",
+    "exact_owner_rule_preserved": true,
+    "grants_and_bootstrap_tool_names_unchanged": true,
+    "codex_role_files_and_fields_unchanged": true,
+    "historical_client_configuration_record_unchanged_and_matches": true,
+    "readme_otel_environment_still_line_192": true
+  },
+  "qualification": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_install_claude_profile tests.test_managed_block",
+    "umask": "022",
+    "exit_code": 0,
+    "tests": 149,
+    "skips": 1,
+    "duration_seconds": 1.421,
+    "raw_log": "Retained privately as researcher-availability.qualified.log in the lane's durable QMD instruction directory."
+  },
+  "host_changes": false,
+  "limits": [
+    "This clarifies the existing Claude researcher grant boundary and changes no registration, tool grant or host state.",
+    "The original 333-test and citation-followup 114-test results remain scoped to their recorded sources and are not rewritten or represented as fresh runs.",
+    "These local checks establish carrier consistency, not a live catalog retrieval, organic use or token saving."
+  ]
+}
