@@ -6,8 +6,8 @@
   "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
-    "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+    "docs/new-wsl-handbook.md": "540a1ca5668a86aca1ae572ff0d095c0e1494e3a8afbfb8ce20ababbf911e789",
+    "docs/new-wsl-handbook.json": "e8f775cb7607b4b116afba7a2b21c29e589e29cd8b96dd1d263c09aaf40ea88d"
   },
   "inventory": {
     "layers": 37,
@@ -247,6 +247,16 @@
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
         "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "The IBKR paper gateway passwordless-login branch (base ecfa11276) marks adoption/platforms/linux-wsl2-new-distro.md F11 with the guard pin's change after v2026.10.05.1; only that source page's recorded digest changed; regenerated from the branch's tree.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+        "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }

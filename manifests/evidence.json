@@ -4752,13 +4752,13 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9ea67939f6e5443576cdc2aad3ff997cc554aca3292e877afbe0c000d7d9e6ae",
-      "bytes": 65967
+      "sha256": "21ab5b170ec4227c1593676ddb1366deb7ee315f014f48e86fc0fa47765b4925",
+      "bytes": 66370
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "6e1e50f3ad647859915eefa64835ff4c43767bf8abec104b5d30f47895cef097",
-      "bytes": 24095
+      "sha256": "7547a5e74994eb86be0a641ea69edbe8eb115862da627704a7b270af79b8a052",
+      "bytes": 28963
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -4767,7 +4767,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "032b710787fb62ffffd532758eea07c6ead6f9e064396f7d3f2802b192901ae3",
+      "sha256": "fa032e8f44bf753c9e8a21c20ef69b9183fefd737dc060363faa31deabe242a5",
       "bytes": 1137
     },
     {
@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe",
-      "bytes": 92982
+      "sha256": "374296594b35e756372cbae6438795b2a55efbf938ad180d209871b79f5dff87",
+      "bytes": 93084
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -15743,13 +15743,18 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "9fc77cb8e74405aa38e396fc29dd06f35659bb591e2dab1dcb6001c8119bf1df",
-      "bytes": 26246
+      "sha256": "09f0d8a2fb23464afc0028e4c36b6596238ffc44d410cdbeea302174eaae8bf6",
+      "bytes": 28439
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
       "sha256": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
       "bytes": 13161
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/ibkr-gateway-recreate-durable.sh",
+      "sha256": "12def2b5a7460392699151d3577f57146f373867788e04a4b1e74d3996938ca5",
+      "bytes": 8369
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
@@ -16198,7 +16203,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7a11c341ad0c194ae42e4bcd8fc0fc61c3765bb871e97fec31bef03f3c933594",
+      "sha256": "ac5ca376bd8fe605e47f18b30e8940f24ad285c7bd318ceccd96f8f569512521",
       "bytes": 155287
     },
     {
@@ -17272,6 +17277,11 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-ibkr-paper-passwordless-login.md",
+      "sha256": "27d3c0b1788e43383d89b6520523ac49aa34876ef9f8a6a62d2bf39bbd47f284",
+      "bytes": 14949
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -17533,12 +17543,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e",
+      "sha256": "e8f775cb7607b4b116afba7a2b21c29e589e29cd8b96dd1d263c09aaf40ea88d",
       "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+      "sha256": "540a1ca5668a86aca1ae572ff0d095c0e1494e3a8afbfb8ce20ababbf911e789",
       "bytes": 362513
     },
     {
@@ -17573,8 +17583,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "61039915b9fe31c5931f3cffbd60bdc686fa3433a495ce91dd56501bb67b0ef7",
-      "bytes": 184073
+      "sha256": "182bc7e4ea6f39619e8705b9973091d2596620a2ddc765a5721e32bec7d0bc41",
+      "bytes": 193992
     },
     {
       "path": "docs/stack.md",
@@ -39673,8 +39683,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749",
-      "bytes": 12145
+      "sha256": "6b9713778577ec0801188d2eb45a51ee08d61accafa924347e48c0fff7691fb7",
+      "bytes": 12841
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -53978,8 +53988,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "0d997b483438ff1b728f97de08c4beb020110b440c293f4c3d3adc872c665b54",
-      "bytes": 34277
+      "sha256": "cdf4fe897f35c5b758aa6fcfefba0da1d5e9664f8f279498dab77e0a4d4b2849",
+      "bytes": 39704
     },
     {
       "path": "scripts/currency_due.py",
@@ -54013,8 +54023,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
-      "bytes": 296975
+      "sha256": "8241db823b046ddad2eeac0ad17dcd3de3819979bfd0b2978c9392c24879e0d7",
+      "bytes": 297389
     },
     {
       "path": "scripts/host_receipts.py",
@@ -54643,18 +54653,18 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "d65c6551a7070b225179ac73316998081857c0f1e256a8e6f39ded12cd587757",
-      "bytes": 128507
+      "sha256": "1529e5593617402c5e19aa01f119575b27697d2b2e4da2fb7da9ff70708ae8d9",
+      "bytes": 128565
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "3840065b72c62fe51278b513baee5a01eeff623eb7a3f814e55e3f345c282bf4",
-      "bytes": 53736
+      "sha256": "c2c4556adc1b4a42ac0a4bcb40049ad9da1d5f40a8f2001b27113c057b1ce4b1",
+      "bytes": 67506
     },
     {
       "path": "tests/test_credential_tools.py",
-      "sha256": "93aee1682d47a0ac54d1d39ef4d566ac141bbc12434ab9983d99b942156ccc99",
-      "bytes": 34946
+      "sha256": "daf1ad996c16399a9982d553aae6df0b2171b767229d78d36f64e6476ed3f6a7",
+      "bytes": 35239
     },
     {
       "path": "tests/test_currency_due.py",
@@ -54805,6 +54815,11 @@
       "path": "tests/test_ibkr_acceptance.py",
       "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
       "bytes": 15483
+    },
+    {
+      "path": "tests/test_ibkr_gateway_recreate.py",
+      "sha256": "425797e4f6e34aa1cc871b154a58781f58f0a31036100d4fada2e086a62b785d",
+      "bytes": 12525
     },
     {
       "path": "tests/test_ibkr_native_paper.py",
@@ -55203,8 +55218,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "36edfe372be11f424e36576c1533111514662958063f429aec7a7284cc81b958",
-      "bytes": 391697
+      "sha256": "a9d213bfad501ca6bafc967ca4da89b4f9ac4b18965f47c0a6af9364f1dfef6c",
+      "bytes": 393455
     },
     {
       "path": "tests/test_security_identity.py",

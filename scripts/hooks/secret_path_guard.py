@@ -235,6 +235,9 @@ SECRET_NAMES = (
     "CODEX_API_KEY", "OPENROUTER_API_KEY", "MISTRAL_API_KEY", "QDRANT_API_KEY",
     "PREFECT_API_KEY", "MC_API_KEY", "MSB_API_KEY", "PAPERCLIP_API_KEY",
     "TWS_USERNAME", "TWS_PASSWORD", "TWS_ACCOUNT", "IBKR_ACCOUNT_ID",
+    # The IBKR paper gateway's stored user ID (2026-10-06): the name the gnzsnz/ib-gateway image reads, which exists only inside the
+    # gateway container; on the host it stays unset like the other TWS_* names.
+    "TWS_USERID",
     "TAVILY_API_KEY",
     # The variable of the `canary-e2e` inventory entry (a disposable synthetic proof key: class test_canary, status test_only), listed
     # ahead of that entry so the inventory tie test holds when it lands; it is refused like every other name.
@@ -258,9 +261,11 @@ SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
 SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
 # Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), with an optional numeric suffix: a
 # further paper account's pointer is PAPER_ENV_FILE_2. Without the suffix group the word boundary after PAPER_ENV_FILE failed
-# before `_2`, so a reader, a redirect or a `source` on "$PAPER_ENV_FILE_2" passed while the account-1 forms were blocked.
+# before `_2`, so a reader, a redirect or a `source` on "$PAPER_ENV_FILE_2" passed while the account-1 forms were blocked. The three
+# IBKR_PAPER_* pointers (2026-10-06) name the IBKR paper gateway's stored login and VNC password files.
 POINTER_VARIABLE = re.compile(
-    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)(?:_[0-9]+)?\b")
+    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH"
+    r"|IBKR_PAPER_LOGIN_ENV|IBKR_PAPER_TWS_FILE|IBKR_PAPER_VNC_FILE)(?:_[0-9]+)?\b")
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")

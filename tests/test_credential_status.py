@@ -22,6 +22,11 @@ from scripts import credential_status as cs
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/credential_status.py"
+# The IBKR paper gateway's three stored files (2026-10-06), and the two that the recreate script hands to the container user
+# inside the rootless Docker user namespace, whose owner may therefore be the mapped one.
+IBKR_FILES = {"ibkr-gateway": "ibkr-paper-login.env", "ibkr-gateway-tws-password": "ibkr-paper-tws.password",
+              "ibkr-gateway-vnc-password": "ibkr-paper-vnc.password"}
+ROOTLESS_IDS = ("ibkr-gateway-tws-password", "ibkr-gateway-vnc-password")
 
 
 def git(cwd, *args):
@@ -497,6 +502,238 @@ class CredentialStatusTests(unittest.TestCase):
         self.write_alpaca()
         entry = self.entry(self.report(uid=os.getuid() + 1))
         self.assertIn("foreign_owner", entry["findings"])
+
+    def write_ibkr(self, mode=0o600):
+        """The three IBKR files, holding fake sentinels and owned by this test's uid."""
+        paths = {}
+        for identifier, name in IBKR_FILES.items():
+            path = self.store / name
+            path.unlink(missing_ok=True)
+            path.write_text(f"TWS_USERID={self.fake_a}\n" if name.endswith(".env") else self.fake_b)
+            path.chmod(mode)
+            paths[identifier] = path
+        return paths
+
+    def subuid_file(self, text):
+        path = self.home.parent / "subuid"
+        path.write_text(text)
+        return path
+
+    def mapped_owner(self):
+        """(checker uid, subordinate-uid fixture) under which this test's own uid, the files' real owner, is the host uid
+        that container uid 1000 maps to: the checker runs as another uid whose first range starts 999 below it. A test
+        cannot chown a file to another uid, so the checker's uid moves instead."""
+        owner = os.getuid()
+        if owner < 999:
+            self.skipTest("a subordinate range 999 below the file owner needs an owner uid of 999 or more")
+        checker = owner + 1
+        return checker, self.subuid_file(f"# rootless Docker ranges\n{checker}:{owner - 999}:65536\n")
+
+    def test_real_inventory_declares_the_rootless_owner_for_the_two_ibkr_password_files_only(self):
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        declared = {i: e["store"]["rootless_container_uid"] for i, e in rows.items()
+                    if "rootless_container_uid" in e["store"]}
+        self.assertEqual(declared, dict.fromkeys(ROOTLESS_IDS, 1000))
+        for identifier, name in IBKR_FILES.items():
+            with self.subTest(id=identifier):
+                row = rows[identifier]
+                rule = {"rootless_container_uid": 1000} if identifier in ROOTLESS_IDS else {}
+                self.assertEqual(row["store"], {"kind": "private_file", "path_template": f"{cs.STORE_ROOT}/{name}", **rule})
+                self.assertEqual((row["lane"], row["status"]), ("us-equities-paper", "optional"))
+                self.assertEqual(row["variables"] + row["optional_variables"], [])
+        self.assertEqual([rows[i]["pointer_variables"] for i in IBKR_FILES],
+                         [["IBKR_PAPER_LOGIN_ENV"], ["IBKR_PAPER_TWS_FILE"], ["IBKR_PAPER_VNC_FILE"]])
+        self.assertIn("TWS_USERID", self.inventory["must_not_be_set"])
+
+    def test_inventory_allows_rootless_container_uid_only_on_a_private_file_store(self):
+        def errors(kind, value):
+            inventory = copy.deepcopy(self.inventory)
+            row = next(e for e in inventory["entries"] if e["id"] == "ibkr-gateway-tws-password")
+            row["store"]["kind"], row["store"]["rootless_container_uid"] = kind, value
+            return [e for e in cs.inventory_errors(inventory, ROOT) if "rootless_container_uid" in e]
+
+        self.assertEqual(errors("private_file", 1000), [])
+        for kind in ("private_env_file", "native_store"):
+            with self.subTest(kind=kind):
+                self.assertTrue(errors(kind, 1000))
+        for value in (0, -1, True, "1000", 1000.0, None):
+            with self.subTest(value=value):
+                self.assertTrue(errors("private_file", value))
+
+    def test_rootless_host_uid_lays_out_subuid_ranges_as_rootlesskit_does(self):
+        # rootlesskit v3.1.0: container uid 0 is the user and the user's ranges follow from container uid 1, in file order
+        # (pkg/parent/parent.go:401-432); a line names the user by uid or name, and any line without three fields fails the
+        # whole file (pkg/parent/idtools/idtools.go:48-83, the static source).
+        uid = 3_999_999  # no passwd entry, so only a line naming the uid matches
+        cases = {
+            f"{uid}:100000:65536\n": 100999,
+            f"# comment\n\nsomeone:1:65536\n{uid}:200000:65536\n": 200999,
+            f"{uid}:300000:65536\n{uid}:400000:65536\n": 300999,
+            f"{uid}:300000:500\n{uid}:400000:65536\n": 400499,  # container uids 1-500 in the first range, 501 on in the next
+            f"{uid}:100000:999\n": None,  # the range ends at container uid 999
+            "": None,
+            "someone:100000:65536\n": None,
+            f"{uid}:100000\n": None,
+            f"{uid}:100000:65536\nnot a range\n": None,  # a malformed line anywhere fails the file, as in rootlesskit
+            f"{uid}:x:65536\n": None,
+            f"{uid}:-5:65536\n": None,
+            f"{uid}: 100000:65536\n": None,
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(cs.rootless_host_uid(1000, uid, self.subuid_file(text)), expected)
+        self.assertIsNone(cs.rootless_host_uid(1000, uid, None))
+        self.assertIsNone(cs.rootless_host_uid(1000, uid, self.home.parent / "absent"))
+        self.assertIsNone(cs.rootless_host_uid(0, uid, self.subuid_file(f"{uid}:100000:65536\n")))
+        import pwd
+        try:
+            name = pwd.getpwuid(os.getuid()).pw_name
+        except KeyError:
+            name = None
+        if name:  # a line may name the user instead of the uid
+            self.assertEqual(cs.rootless_host_uid(1000, os.getuid(), self.subuid_file(f"{name}:500000:65536\n")), 500999)
+
+    def test_mapped_owner_is_accepted_only_for_the_listed_files(self):
+        checker, subuid = self.mapped_owner()
+        self.write_alpaca()
+        self.write_ibkr()
+        report = self.report(uid=checker, subuid=subuid)
+        for identifier in ROOTLESS_IDS:
+            with self.subTest(id=identifier):
+                entry = self.entry(report, identifier)
+                self.assertEqual(entry["state"], "ok", entry["findings"])
+                self.assertEqual(entry["owner"], "rootless_container_user")
+        # The same owner anywhere else is foreign: the login file, which the docker CLI reads on the host, and Alpaca's.
+        for identifier in ("ibkr-gateway", "alpaca-paper"):
+            with self.subTest(id=identifier):
+                entry = self.entry(report, identifier)
+                self.assertEqual(entry["state"], "unsafe")
+                self.assertIn("foreign_owner", entry["findings"])
+                self.assertNotIn("owner", entry)
+        # A row loses the rule with its declaration.
+        inventory = copy.deepcopy(self.inventory)
+        row = next(e for e in inventory["entries"] if e["id"] == "ibkr-gateway-tws-password")
+        del row["store"]["rootless_container_uid"]
+        planted = cs.inspect(ROOT, inventory, self.env, uid=checker, subuid=subuid, proc_keys=self.proc_keys)
+        self.assertIn("foreign_owner", self.entry(planted, "ibkr-gateway-tws-password")["findings"])
+        # Owned by the user itself, as before the recreate script's chown, every IBKR row is ok as well.
+        report = self.report(subuid=subuid)
+        for identifier in IBKR_FILES:
+            self.assertEqual(self.entry(report, identifier)["state"], "ok", identifier)
+        self.assertEqual(self.entry(report, "ibkr-gateway-tws-password")["owner"], "user")
+        self.assertEqual(report["coverage"]["undeclared_store_files"], [])
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
+
+    def test_rootless_rows_reject_any_other_owner(self):
+        checker, _ = self.mapped_owner()
+        owner = os.getuid()
+        self.write_ibkr()
+        fixtures = {
+            "maps to another uid": f"{checker}:{owner - 998}:65536\n",
+            "another user's range": f"{checker + 1}:{owner - 999}:65536\n",
+            "range ends before 1000": f"{checker}:{owner - 999}:999\n",
+            "malformed file": f"{checker}:{owner - 999}:65536\nnot a range\n",
+            "empty file": "",
+        }
+        for label, text in fixtures.items():
+            with self.subTest(fixture=label):
+                report = self.report(uid=checker, subuid=self.subuid_file(text))
+                for identifier in ROOTLESS_IDS:
+                    entry = self.entry(report, identifier)
+                    self.assertEqual(entry["state"], "unsafe")
+                    self.assertIn("foreign_owner", entry["findings"])
+        for subuid in (None, self.home.parent / "absent"):
+            with self.subTest(subuid=str(subuid)):
+                report = self.report(uid=checker, subuid=subuid)
+                for identifier in ROOTLESS_IDS:
+                    self.assertIn("foreign_owner", self.entry(report, identifier)["findings"])
+
+    def test_rootless_rows_still_need_mode_0600(self):
+        checker, subuid = self.mapped_owner()
+        for mode in (0o640, 0o644, 0o400, 0o700):
+            with self.subTest(mode=oct(mode)):
+                self.write_ibkr(mode)
+                report = self.report(uid=checker, subuid=subuid)
+                for identifier in ROOTLESS_IDS:
+                    entry = self.entry(report, identifier)
+                    self.assertEqual(entry["state"], "unsafe")
+                    self.assertIn("mode_not_0600", entry["findings"])
+                    self.assertNotIn("foreign_owner", entry["findings"])  # the owner is accepted; the mode is not
+        self.write_ibkr(0o644)
+        result = self.run_cli("--subuid", str(subuid))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("mode_not_0600", result.stdout)
+
+    def test_rootless_rows_still_need_one_link(self):
+        checker, subuid = self.mapped_owner()
+        paths = self.write_ibkr()
+        for identifier in ROOTLESS_IDS:
+            os.link(paths[identifier], self.home / f"{identifier}.second-name")
+        for uid in (checker, os.getuid()):  # the mapped owner and the user alike
+            with self.subTest(owner="mapped" if uid == checker else "user"):
+                report = self.report(uid=uid, subuid=subuid)
+                for identifier in ROOTLESS_IDS:
+                    entry = self.entry(report, identifier)
+                    self.assertEqual(entry["state"], "unsafe")
+                    self.assertIn("hard_link", entry["findings"])
+                    self.assertNotIn("foreign_owner", entry["findings"])
+        result = self.run_cli("--json", "--subuid", str(subuid))
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(sorted(json.loads(result.stdout)["unsafe_stored"]), sorted(ROOTLESS_IDS))
+
+    def test_every_private_file_row_needs_one_link(self):
+        # The IBKR login env file stays the user's and declares no container owner, yet it holds the user ID: a second
+        # name for it is refused as well, as for every private_file store (the generated host key too). An env-file
+        # store keeps its own rules; credential_run.py refuses a hard link there when it injects.
+        paths = self.write_ibkr()
+        key = self.config / "nativestack" / "generation.key"
+        key.parent.mkdir(mode=0o700)
+        key.write_text(self.fake_a)
+        key.chmod(0o600)
+        report = self.report()
+        for identifier in IBKR_FILES:
+            self.assertEqual(self.entry(report, identifier)["state"], "ok", identifier)
+        self.assertEqual(self.entry(report, "nativestack-generation-key")["state"], "ok")
+        os.link(paths["ibkr-gateway"], self.home / "login.second-name")
+        os.link(key, self.home / "key.second-name")
+        alpaca = self.write_alpaca()
+        os.link(alpaca, self.home / "alpaca.second-name")
+        report = self.report()
+        for identifier in ("ibkr-gateway", "nativestack-generation-key"):
+            with self.subTest(id=identifier):
+                entry = self.entry(report, identifier)
+                self.assertEqual(entry["state"], "unsafe")
+                self.assertEqual(entry["findings"], ["hard_link"])
+        self.assertNotIn("hard_link", self.entry(report, "alpaca-paper")["findings"])
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
+
+    def test_rootless_rule_reads_only_the_subuid_file(self):
+        checker, subuid = self.mapped_owner()
+        self.write_ibkr()
+        opened = []
+        real_open, real_os_open = builtins.open, os.open
+
+        def watch_open(file, *args, **kwargs):
+            opened.append(str(file))
+            return real_open(file, *args, **kwargs)
+
+        def watch_os_open(file, *args, **kwargs):
+            opened.append(str(file))
+            return real_os_open(file, *args, **kwargs)
+
+        with patch("builtins.open", watch_open), patch("os.open", watch_os_open), \
+                patch.object(Path, "read_text", side_effect=AssertionError("read_text called")), \
+                patch.object(Path, "read_bytes", side_effect=AssertionError("read_bytes called")):
+            report = self.report(uid=checker, subuid=subuid)
+        self.assertEqual([self.entry(report, i)["state"] for i in ROOTLESS_IDS], ["ok", "ok"])
+        self.assertFalse([p for p in opened if str(self.store) in p])
+        self.assertIn(str(subuid), opened)
+        self.assertFalse(report["values_read"])
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
+        result = self.run_cli("--json", "--subuid", str(subuid))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual({e["id"]: e["state"] for e in json.loads(result.stdout)["entries"] if e["id"] in IBKR_FILES},
+                         dict.fromkeys(IBKR_FILES, "ok"))
 
     def test_symlink_is_refused_not_followed(self):
         target = self.home / "elsewhere.env"

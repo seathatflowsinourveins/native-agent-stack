@@ -1112,7 +1112,8 @@ second line therefore tests each printed path as a regular file (`test -f`) that
 ### F11. jCodeMunch for this clone
 
 Added after `v2026.09.26.2`. F9 no longer copies the SubagentStart carrier blocks of `adoption/hooks/claude/`
-(changed after `v2026.09.26.2`) into `~/.claude/hooks/`: the client-configuration tool leaves them out, and four of the
+(changed after `v2026.09.26.2`; its `SHA256SUMS` guard pin also changed after `v2026.10.05.1`, for the IBKR paper
+gateway's pointers) into `~/.claude/hooks/`: the client-configuration tool leaves them out, and four of the
 six name jCodeMunch tools, so no session on this distribution is told to use jCodeMunch. The user-scope MCP template leaves
 jCodeMunch out on purpose, because it registers per project
 ([2026-09-25 addendum](../../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)),

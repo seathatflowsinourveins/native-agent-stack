@@ -393,6 +393,16 @@ BLOCKED = {
     "set -o xtrace; source \"${PAPER_ENV_FILE_2}\"": "trace_while_sourcing",
     ". \"$PAPER_ENV_FILE_2\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
     "( . \"$PAPER_ENV_FILE_2\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
+    # The IBKR paper gateway's three pointers (2026-10-06) name its stored login and VNC password files: a reader on any of them is
+    # refused like the paper account pointers, and so is the stored user ID's variable name.
+    "cat \"$IBKR_PAPER_LOGIN_ENV\"": "credential_file_read",
+    "cat \"${IBKR_PAPER_TWS_FILE}\"": "credential_file_read",
+    "head -c 8 \"$IBKR_PAPER_VNC_FILE\"": "credential_file_read",
+    "while read -r l; do :; done < \"$IBKR_PAPER_LOGIN_ENV\"": "credential_file_read",
+    "cp \"$IBKR_PAPER_TWS_FILE\" /tmp/copy": "credential_file_read",
+    "set -x; . \"$IBKR_PAPER_LOGIN_ENV\"": "trace_while_sourcing",
+    ". \"$IBKR_PAPER_LOGIN_ENV\"; declare -p TWS_USERID": "environment_dump_after_source",
+    "printf '%s' \"$TWS_USERID\"": "secret_variable_reference",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -1035,6 +1045,12 @@ ALLOWED = [
     "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
     "wc -c \"$PAPER_ENV_FILE_2\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
+    # The IBKR paper gateway (2026-10-06): its pointers handed to docker as an --env-file or a read-only mount, a size, mode or link
+    # check, and the recreate script that does both.
+    "docker run -d --name x --env-file \"$IBKR_PAPER_LOGIN_ENV\" -v \"$IBKR_PAPER_TWS_FILE\":/run/secrets/tws_password:ro img",
+    "stat -c '%a %U %h' \"$IBKR_PAPER_TWS_FILE\"",
+    "wc -c \"$IBKR_PAPER_VNC_FILE\"",
+    "bash -i blueprints/us-equities/runtime-2604/ibkr-gateway-recreate-durable.sh",
     # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
     # loader as --env-file. It must keep passing for both accounts, so closing the numbered-pointer hole never blocks a unit.
     "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
@@ -1412,6 +1428,11 @@ EXPECTED_PASS_THROUGH = [
     # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
     # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
     "cat \"$PAPER_ENV_FILE_B\"",
+    # docker is not a modelled reader (2026-10-06): a container that mounts an IBKR_PAPER_* pointer's file and prints it, and a bare
+    # `docker inspect` of the IBKR paper gateway, whose Config.Env holds TWS_USERID, both pass. The decision record
+    # docs/decisions/2026-10-06-ibkr-paper-passwordless-login.md accepts this residual for the paper login.
+    "docker run --rm -v \"$IBKR_PAPER_TWS_FILE\":/s img cat /s",
+    "docker inspect native-trading-ibkr-paper-20261005",
     # An unquoted here-document expands `$(...)` in its body even between single quotes; the guard reads the body as command lines, where
     # single quotes hide it, as the base guard did.
     "cat <<EOF\nvalue: '$(printenv)' and \\$HOME\nEOF",

@@ -109,7 +109,10 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(list(target.iterdir()), [])
 
     def test_only_operator_supplied_stored_entries(self):
-        for entry in ("alpaca-live", "grafana-admin", "claude-native", "no-such-entry"):
+        # The IBKR paper gateway's three files (2026-10-06) are private_file stores in docker's formats; the writer's
+        # `export NAME=value` lines would break them, so it refuses all three.
+        for entry in ("alpaca-live", "grafana-admin", "claude-native", "no-such-entry",
+                      "ibkr-gateway", "ibkr-gateway-tws-password", "ibkr-gateway-vnc-password"):
             with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
                 store_mod.load_entry(entry, env=self.env)
         self.assertEqual(store_mod.load_entry("typesafe", env=self.env)["id"], "typesafe")

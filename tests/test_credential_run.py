@@ -40,7 +40,7 @@ INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", 
                   "claude-oauth-token", "canary-e2e"}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
-                      "github-actions")
+                      "ibkr-gateway-tws-password", "ibkr-gateway-vnc-password", "github-actions")
 MARK = b"[REDACTED:TAVILY_API_KEY]"
 PARTIAL = b"[REDACTED-PARTIAL:TAVILY_API_KEY]"
 STORE_LINE = re.compile(rb"export +[A-Za-z_]")

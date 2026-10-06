@@ -21,6 +21,16 @@ user keys described native-agent-stack:<name>, by the whole <name> (/proc/keys,
 which shows descriptions and payload lengths, never payloads; Linux only). Each
 nonempty list is a warning.
 
+A store whose inventory entry declares `rootless_container_uid` (only the IBKR
+paper gateway's two password files) holds a file handed to that uid inside a
+rootless Docker user namespace. Its owner may then also be the host uid the
+namespace maps that container uid to, derived at run time from this user's
+/etc/subuid ranges as rootlesskit lays them out. Such a file still needs mode
+0600. Every private_file store (these two, the IBKR login env file and the
+generated host keys) also needs exactly one link (`hard_link` otherwise,
+credential_run.py's reason for the same rule). Only /etc/subuid is read for
+the owner rule, never the credential file.
+
 Exit status is 1 when any credential file that exists is unsafe (whatever the
 entry's status, since a stored optional or paid key leaks just as badly), and 2
 for an invalid inventory. Missing entries and warnings are informational.
@@ -68,8 +78,18 @@ KEYRING_PREFIX = "native-agent-stack:"  # scripts/kernel_keyring.py PREFIX
 # removes it per consumer attempt): a missing file is informational like every missing row, and the pair goes together.
 STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native",
             "interactive_only", "ci_only", "test_only"}
-CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
+CLASSES = {"broker_api_key_pair", "broker_login", "contact_identity", "provider_api_key",
            "local_service_secret", "native_signin", "ci_secret", "test_canary"}
+# Subordinate uids of a rootless Docker user namespace (docs/decisions/2026-10-06-ibkr-paper-passwordless-login.md).
+# rootlesskit v3.1.0 (commit 62d2101f), the rootless dockerd's namespace parent, maps container uid 0 to the user and
+# lays this user's /etc/subuid ranges end to end, in file order, from container uid 1 (pkg/parent/parent.go:401-432).
+# A line names the user by uid or by name; blank and `#` lines are skipped; any other line without exactly three
+# `:` fields fails the whole file (pkg/parent/idtools/idtools.go:48-83). Container uid 1000, the gateway image's
+# user, therefore lands on the first range's start plus 999. This mirrors rootlesskit's static source only: its
+# default `auto` source asks getsubids first (pkg/parent/parent.go:375-381), so a host whose ranges come from an NSS
+# subid provider rather than /etc/subuid gets no mapped owner here and fails closed (foreign_owner).
+SUBUID = Path("/etc/subuid")
+SUBID_NUMBER = re.compile(r"[0-9]+")
 TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
                      "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
@@ -152,6 +172,15 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             if store["kind"] in MEMORY_KINDS and entry["status"] == "required":
                 errors.append(f"{label}: a required key cannot live only in the kernel keyring, which loses it "
                               "at every kernel restart; store it in a file")
+            if "rootless_container_uid" in store:
+                # A file handed to a container user (inspect_entry accepts the mapped owner). Only a private_file:
+                # credential_run.py injects and set_credential.py writes private_env_file stores, both as the user.
+                container_uid = store["rootless_container_uid"]
+                if store["kind"] != "private_file":
+                    errors.append(f"{label}: rootless_container_uid applies only to a private_file store")
+                if isinstance(container_uid, bool) or not isinstance(container_uid, int) or container_uid < 1:
+                    errors.append(f"{label}: rootless_container_uid must be a container uid of 1 or more "
+                                  "(container uid 0 is the user)")
         for key in ("variables", "optional_variables", "pointer_variables"):
             names = entry[key]
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
@@ -238,7 +267,47 @@ def native_store_overrides(entries, env) -> list[str]:
                    for name in entry["pointer_variables"] if name in env})
 
 
-def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
+def rootless_host_uid(container_uid: int, uid: int, subuid: Path | None) -> int | None:
+    """The host uid that a rootless Docker user namespace maps container_uid to, or None.
+
+    Reads this user's ranges from the subordinate-uid file (never a credential file) and lays them out as rootlesskit
+    v3.1.0 does (see SUBUID). Fails closed: no file, an unreadable or malformed one (rootlesskit refuses the whole
+    file), a range field that is not a plain number, or no range holding container_uid gives None, and the owner is
+    then foreign."""
+    if subuid is None or container_uid < 1:
+        return None
+    try:
+        import pwd  # POSIX only; a host without it can still match the user's line by uid
+        name = pwd.getpwuid(uid).pw_name
+    except (ImportError, KeyError, OverflowError):
+        name = None
+    try:
+        with open(subuid, encoding="utf-8") as handle:
+            text = handle.read()
+    except (OSError, UnicodeDecodeError):
+        return None
+    ranges = []  # the whole file is parsed first, as rootlesskit does, so a later malformed line still fails it
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        fields = line.split(":")
+        if len(fields) != 3:
+            return None
+        owner, start, length = fields
+        if owner == str(uid) or (name and owner == name):
+            if not (SUBID_NUMBER.fullmatch(start) and SUBID_NUMBER.fullmatch(length)):
+                return None
+            ranges.append((int(start), int(length)))
+    inner = 1  # container uid 0 is the user itself; the ranges follow from container uid 1
+    for start, length in ranges:
+        if container_uid < inner + length:
+            return start + container_uid - inner
+        inner += length
+    return None
+
+
+def inspect_entry(entry: dict, env, uid: int, now: float, subuid: Path | None = None) -> dict:
     store = entry["store"]
     names = entry["variables"] + entry["optional_variables"]
     report = {
@@ -285,7 +354,16 @@ def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
             findings.append("group_or_other_access")
     elif mode != 0o600:
         findings.append("mode_not_0600")
-    if info.st_uid != uid:
+    container_uid = store.get("rootless_container_uid")
+    if store["kind"] == "private_file" and info.st_nlink != 1:
+        findings.append("hard_link")  # a second name for the inode, which this check never sees
+    if info.st_uid == uid:
+        if container_uid is not None:
+            report["owner"] = "user"
+    elif container_uid is not None and info.st_uid == rootless_host_uid(container_uid, uid, subuid):
+        # Only an entry that declares the rule, and only the one uid its container user maps to.
+        report["owner"] = "rootless_container_user"
+    else:
         findings.append("foreign_owner")
     try:
         parent = os.lstat(path.parent)
@@ -541,12 +619,14 @@ def client_guards(env, root: Path = ROOT) -> dict:
 
 
 def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
-            with_client_guards=False, proc_keys: Path | None = None) -> dict:
-    """The report. proc_keys is the kernel's key list to scan (the CLI passes PROC_KEYS); None skips it."""
+            with_client_guards=False, proc_keys: Path | None = None, subuid: Path | None = SUBUID) -> dict:
+    """The report. proc_keys is the kernel's key list to scan (the CLI passes PROC_KEYS); None skips it. subuid is the
+    subordinate-uid file for a rootless container's file (default /etc/subuid, read only when such a file is not the
+    user's); None accepts no mapped owner."""
     env = os.environ if env is None else env
     uid = os.getuid() if uid is None else uid
     now = time.time() if now is None else now
-    entries = [inspect_entry(entry, env, uid, now) for entry in inventory["entries"]]
+    entries = [inspect_entry(entry, env, uid, now, subuid) for entry in inventory["entries"]]
     exported = sorted(n for n in inventory["must_not_be_set"] if n in env)
     tracked = tracked_sensitive_names(root)
     coverage = {"undeclared_store_files": undeclared_store_files(inventory["entries"], env),
@@ -585,6 +665,8 @@ def render_text(report: dict) -> str:
         extra = ""
         if "mode" in entry:
             extra = f" mode={entry['mode']} dir={entry.get('directory_mode', '?')} age={entry.get('age_days', '?')}d"
+            if "owner" in entry:
+                extra += f" owner={entry['owner']}"
         warn = f" warnings={','.join(entry['warnings'])}" if entry["warnings"] else ""
         exported = entry["variables_in_environment"]
         env_note = f" exported={','.join(exported)}" if exported else ""
@@ -631,6 +713,9 @@ def main(argv=None) -> int:
     parser.add_argument("--proc-keys", type=Path, default=PROC_KEYS,
                         help="the kernel's key list to scan for undeclared native-agent-stack keys, names only "
                              f"(default {PROC_KEYS}; the tests pass a fixture)")
+    parser.add_argument("--subuid", type=Path, default=SUBUID,
+                        help="the subordinate-uid file that maps a rootless container's file owner "
+                             f"(default {SUBUID}; the tests pass a fixture)")
     args = parser.parse_args(argv)
     inventory_path = args.inventory or args.root / INVENTORY
     try:
@@ -642,7 +727,8 @@ def main(argv=None) -> int:
     if errors:
         print("invalid inventory:\n" + "\n".join(errors), file=sys.stderr)
         return 2
-    report = inspect(args.root, inventory, with_client_guards=args.client_guards, proc_keys=args.proc_keys)
+    report = inspect(args.root, inventory, with_client_guards=args.client_guards, proc_keys=args.proc_keys,
+                     subuid=args.subuid)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_text(report))
     return 1 if report["unsafe_stored"] else 0
 

@@ -112,6 +112,43 @@ removes a stale completion marker and writes a replacement atomically only after
 both immutable images have been inspected. Acceptance requires that marker and
 both images. An incomplete install blocks all 24 checks in the current recipe.
 
+## IBKR paper gateway recreate script (2026-10-06)
+
+[`ibkr-gateway-recreate-durable.sh`](ibkr-gateway-recreate-durable.sh) is a
+separate host script for the IBKR paper gateway. It is not part of the offline
+research runtime above. By the user's decision of 2026-10-06, the paper
+gateway signs in by itself
+([decision record](../../../docs/decisions/2026-10-06-ibkr-paper-passwordless-login.md),
+[runbook](../../../docs/secret-storage.md#ibkr-paper-gateway-sign-in-2026-10-06)).
+The script recreates the digest-pinned gnzsnz/ib-gateway 10.51.1b container,
+the image of the [2026-10-05 IBKR acceptance receipt](../../../evidence/receipts/ibkr-readonly-acceptance-20261005.json),
+with the stored paper login and a nightly IBC auto-restart. One second-factor
+approval on the user's phone then lasts all week. It runs the paper account
+with orders enabled (`TRADING_MODE=paper`, `READ_ONLY_API=no`). The
+[IBKR paper-orders harness](../engine-nautilus/ibkr-paper-orders/README.md)
+needs Read-Only API off, which the user had set by hand in the running Gateway
+before; the read-only acceptance ran with `READ_ONLY_API=yes`.
+
+Run it from an interactive shell (`bash -i`), by the user or an agent, so
+that the three `IBKR_PAPER_*` path pointers are set. Only typing the stored
+values, once, at the user's private prompt is the user's own step. The script
+never reads or prints a credential value. Before any change, it refuses in
+each of these cases:
+- the record directory would sit inside a Git worktree;
+- the Docker daemon is not rootless;
+- `ss` is missing;
+- an API client is connected to 127.0.0.1:4002.
+
+It then hands the two password files to the container user inside the
+rootless user namespace and keeps the old container stopped for rollback. It
+prints the rollback command before it starts the new container, so a failed
+start still shows the way back. Its
+records are the full `docker inspect` output, which holds the user ID. It
+writes them `0600` under
+`${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/ibkr-gateway/`.
+[`tests/test_ibkr_gateway_recreate.py`](../../../tests/test_ibkr_gateway_recreate.py)
+runs the script against stub `docker`, `ss` and `sleep` commands only.
+
 ## Wheel census and shared sync
 
 The current lock has no nonvirtual package without any wheel. Removing DVC
