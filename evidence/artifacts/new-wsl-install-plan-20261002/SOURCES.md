@@ -986,3 +986,36 @@ in this builder.
   `needs_user` and no trial is invented. ATIF schema acceptance is separate from
   the native telemetry-contract assertions described in
   `config/harbor-worker-telemetry-contract.md`.
+
+## Phase 1 transfer-CLI sources (2026-10-06)
+
+- Existing maintained plan at ecfa112764c664d35377dd66b8cfcb67e5a94d60:
+  install.sh native run_command/--only dispatch, accept.sh native check, and
+  check_plan.py source/command equality. The supplemental namespace fills the
+  demonstrated strict-foundation-row gap without new default decisions.
+- Mise [v2026.10.1 use](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md),
+  [unuse](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/unuse.md) and
+  [uninstall](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/uninstall.md).
+  Pins use native mise use -g TOOL@VERSION. The separate pin TOML is checked
+  without running a task or granting trust.
+- Gitleaks [v8.30.1 release](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1)
+  and [README](https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md):
+  version, directory scan, --no-banner and full --redact. The generated nonsecret
+  planted-value check is a local integration control, bound to the upstream
+  [github-pat rule](https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml).
+  This compatibility pin was required by A8/P1-GIT;
+  it is not described as a newly released version.
+- UV [0.12.22 tools](https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/tools.md):
+  native pinned tool installation and isolated tool environments.
+- APT installed3.2.0; [apt-get manual](https://manpages.debian.org/apt/apt-get.8.en.html),
+  reviewed2026-10-06: explicit package=version install. Exact target-compatible
+  candidate versions must be observed from the 2604 package metadata; old
+  distribution package revisions are not copied blindly.
+- Source choice: mise tasks can run serial native commands, but config
+  environments overlay the base and post-dependencies run after failure.
+  [Task TOML](https://github.com/jdx/mise/blob/v2026.10.1/docs/tasks/toml-tasks.md),
+  [configuration environments](https://github.com/jdx/mise/blob/v2026.10.1/docs/configuration/environments.md),
+  [task configuration](https://github.com/jdx/mise/blob/v2026.10.1/docs/tasks/task-configuration.md).
+  Reusing this plan preserves its existing slot coverage and source checks with
+  fewer installation/trust semantics. Plain safe mise TOML does not universally
+  require a trust prompt; [trust docs](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/trust.md).

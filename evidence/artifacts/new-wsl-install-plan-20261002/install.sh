@@ -987,6 +987,14 @@ mcp-protocol-conformance() {
   run_command 'source_dir="$tool_root/mcp-conformance-source-0.2.0-alpha.11"; if [[ ! -d "$source_dir/.git" ]]; then git clone --filter=blob:none --no-checkout https://github.com/modelcontextprotocol/conformance.git "$source_dir"; fi; [[ "$(git -C "$source_dir" config --get remote.origin.url)" == https://github.com/modelcontextprotocol/conformance.git ]]; if [[ -f "$source_dir/.git/index" ]]; then git -C "$source_dir" diff --quiet; git -C "$source_dir" diff --cached --quiet; fi; git -C "$source_dir" fetch --depth 1 origin c321dd32035556e6769d3724a8ee97d87c3faaac; git -C "$source_dir" checkout --detach c321dd32035556e6769d3724a8ee97d87c3faaac; [[ "$(git -C "$source_dir" rev-parse HEAD)" == c321dd32035556e6769d3724a8ee97d87c3faaac ]]' || return "$?"
 }
 
+transfer-cli-gitleaks() {
+  # Phase1 transfer-only CLI; foundation owner/default is unchanged.
+  command -v mise >/dev/null || return 69
+  # Source: https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md
+  run_command 'mise use -g aqua:gitleaks/gitleaks@8.30.1'
+}
+
+
 if $list; then
   printf '%s\n' 'claude-code | Claude Code | native-installer | planned'
   printf '%s\n' 'codex | Codex | native-installer | planned'
@@ -1072,10 +1080,11 @@ if $list; then
   printf '%s\n' 'skill-vetting | SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook) | uv-tool | planned'
   printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.23.0 for ATIF import) | uv-tool-owner-extension | planned'
   printf '%s\n' 'mcp-protocol-conformance | MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08) | npx-on-demand | planned'
+  printf '%s\n' 'transfer-cli-gitleaks | Gitleaks | mise | planned-named-only'
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance|transfer-cli-gitleaks) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
@@ -1211,4 +1220,5 @@ if selected 'lm-program-optimization'; then run_slot 'lm-program-optimization'; 
 if selected 'skill-vetting'; then run_slot 'skill-vetting'; fi
 if selected 'trajectory-analysis'; then run_slot 'trajectory-analysis'; fi
 if named 'mcp-protocol-conformance'; then run_slot 'mcp-protocol-conformance'; elif selected 'mcp-protocol-conformance'; then printf '%s | install | skipped\n' 'mcp-protocol-conformance'; fi
+if named 'transfer-cli-gitleaks'; then run_slot 'transfer-cli-gitleaks'; fi
 exit "$failed"

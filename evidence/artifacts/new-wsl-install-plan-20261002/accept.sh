@@ -33,7 +33,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance|transfer-cli-gitleaks) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -2241,6 +2241,42 @@ fi'
   esac
 }
 
+transfer-cli-gitleaks() {
+  # Phase1 transfer-only CLI; explicit --only selection required.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md
+      check transfer-cli-gitleaks smoke 'test "$(gitleaks version)" = 8.30.1
+cli_work="$(mktemp -d)"
+trap '"'"'rm -rf -- "$cli_work"'"'"' EXIT
+printf '"'"'%s\n'"'"' '"'"'This native CLI fixture contains no credentials.'"'"' > "$cli_work/README.txt"
+gitleaks dir "$cli_work" --no-banner --redact
+python3 - "$cli_work/planted.txt" <<'"'"'PY'"'"'
+from pathlib import Path
+import secrets, string, sys
+# Generated test value: never a usable credential, never printed.
+value = "ghp_" + "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(36))
+Path(sys.argv[1]).write_text("generated_nonsecret_control=" + value + "\n")
+PY
+rc=0
+if gitleaks dir "$cli_work" --no-banner --redact --report-format json --report-path "$cli_work/findings.json" >"$cli_work/control.log" 2>&1; then
+  exit 1
+else
+  rc=$?
+fi
+test "$rc" = 1
+python3 - "$cli_work/findings.json" <<'"'"'PY'"'"'
+from pathlib import Path
+import json, sys
+findings = json.loads(Path(sys.argv[1]).read_text())
+assert any(row.get("RuleID") == "github-pat" for row in findings), "native finding control missing"
+PY'
+      ;;
+    *) skipped transfer-cli-gitleaks ;;
+  esac
+}
+
+
 if [[ -z "$only" || "$only" == claude-code ]]; then claude-code; fi
 if [[ -z "$only" || "$only" == codex ]]; then codex; fi
 if [[ -z "$only" || "$only" == claude-agent-sdk ]]; then claude-agent-sdk; fi
@@ -2314,4 +2350,5 @@ if [[ -z "$only" || "$only" == lm-program-optimization ]]; then lm-program-optim
 if [[ -z "$only" || "$only" == skill-vetting ]]; then skill-vetting; fi
 if [[ -z "$only" || "$only" == trajectory-analysis ]]; then trajectory-analysis; fi
 if [[ "$only" == mcp-protocol-conformance ]]; then mcp-protocol-conformance; elif [[ -z "$only" ]]; then skipped mcp-protocol-conformance; fi
+if [[ "$only" == transfer-cli-gitleaks ]]; then transfer-cli-gitleaks; fi
 exit "$failed"

@@ -1,0 +1,3 @@
+# Named-only Phase1 CLI transfer pins; the default mise.toml is unchanged.
+[tools]
+"aqua:gitleaks/gitleaks" = "8.30.1"

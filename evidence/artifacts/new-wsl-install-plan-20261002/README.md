@@ -624,3 +624,56 @@ upstream snapshot, evidence registry and shared gateway template remain under
 their owners. Source: this PR:tests/test_stack_lifecycle.py:21. Destination
 installation, upstream runtime tests, native model/browser acceptance and
 provider/GPU checks have not run in this integration job.
+
+## Phase 1 transfer-only CLIs (2026-10-06)
+
+The optional install-plan.json transfer_clis collection implements approved
+Phase 1 environment transfer. It is separate from owners: the 84 foundation rows,
+63 installed selections and existing default dispatch remain unchanged. The SAME
+check_plan.py validates both collections. Each transfer install is explicit-only:
+
+~~~sh
+nice -n 19 bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only transfer-cli-gitleaks
+nice -n 19 bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only transfer-cli-gitleaks --stage post_install
+~~~
+
+transfer-mise.toml is a checked pin inventory, not a replacement for mise.toml.
+A transfer function calls the native pinned manager after checking its declared
+manager prerequisites; it does not bootstrap a new foundation or select another
+catalog default. Default installation/acceptance dispatch does not call any
+transfer function. --list includes the named-only rows and dated not-needed rows.
+
+Allowed managers are mise, uv-tool and apt. The command declared in the row must
+match the actual native shell function and its source comment. Installed rows
+require an exact release, upstream pin/date, manager prerequisite and native
+post_install smoke/self-test. Not-needed rows run no function and record an ISO
+date and reason, with explicit not-needed/skipped output when named.
+
+The Gitleaks 8.30.1 row is the P1-GIT prerequisite accepted by co-op A8, not a new
+foundation secret-scanning default. Its native self-test checks the exact version,
+scans an owned nonsecret directory, then generates a never-usable planted value
+and requires the native finding exit and github-pat report signal with redaction.
+The existing Betterleaks owner/default is untouched; similar command flags do not
+establish equality of the two embedded rule sets.
+
+Repo and vault host apply/read-back/rollback are in
+[repository-transfer.md](../../../adoption/new-wsl/repository-transfer.md).
+This lane changes repository sources only. The co-op applies these instructions
+after the PR's own checks pass; no native host install or privileged mount is
+claimed by the metadata/contract tests.
+
+Transfer rollback is manager-native and scoped to the apply receipt. Retain each
+tool's prior requested version/presence through metadata-only manager queries
+before applying. For a newly introduced mise request use mise unuse --global
+TOOL@EXACT_REQUEST: its literal selector removes only that request, and native
+pruning preserves versions needed by another tracked config. If a prior request
+was changed, restore its saved request with mise use --global only while the
+current request still equals this apply's pin. For a newly introduced UV tool use
+uv tool uninstall PACKAGE; for an upgraded tool restore its saved exact version.
+For a newly installed apt package remove only that package, without autoremove or
+purge; for a prior package restore its captured exact version if available. Refuse
+a broad rollback when another operator has changed the selected request/package.
+
+These are planned host steps, not a completed platform or upstream-suite
+qualification. The focused contract tests reject unknown managers, missing pins,
+source/command drift, default-dispatch leakage and undated exclusions.

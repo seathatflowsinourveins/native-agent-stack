@@ -1605,7 +1605,9 @@ class InterimPlanChecks(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn("privileged prerequisite declaration differs", out)
 
-    def run_check(self, change_rows=None, change_install=None, change_manifest=None):
+    def run_check(self, change_rows=None, change_install=None, change_manifest=None,
+                  change_transfer=None, change_accept=None, change_transfer_mise=None,
+                  change_inventory=None):
         """(exit status, output) of check_plan.py over a scratch copy of the plan and the manifest."""
         with tempfile.TemporaryDirectory() as scratch:
             scratch = Path(scratch)
@@ -1625,6 +1627,22 @@ class InterimPlanChecks(unittest.TestCase):
             if change_install:
                 path = plan_dir / "install.sh"
                 path.write_text(change_install(path.read_text(encoding="utf-8")), encoding="utf-8")
+            if change_transfer:
+                path = plan_dir / "install-plan.json"
+                data = load(path)
+                change_transfer(data)
+                path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            if change_accept:
+                path = plan_dir / "accept.sh"
+                path.write_text(change_accept(path.read_text(encoding="utf-8")), encoding="utf-8")
+            if change_transfer_mise:
+                path = plan_dir / "transfer-mise.toml"
+                path.write_text(change_transfer_mise(path.read_text(encoding="utf-8")), encoding="utf-8")
+            if change_inventory:
+                path = plan_dir / "transfer-inventory.json"
+                data = load(path) if path.exists() else {"status": "complete", "missing_cli_names": []}
+                change_inventory(data)
+                path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
             result = subprocess.run([sys.executable, "-B", str(PLAN / "check_plan.py"), "--plan-dir", str(plan_dir),
                                      "--manifest", str(manifest)], capture_output=True, text=True, timeout=180)
         return result.returncode, result.stdout + result.stderr

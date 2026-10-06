@@ -4,6 +4,48 @@
   "revised_at_utc": "2026-10-04T23:58:00Z",
   "base": "Ubuntu 26.04.1 WSL 2",
   "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination. Wave 3 (2026-10-04), 80 foundation rows: on the owner's decision of that day (amendment 4 of the manifest's decision rule), ten owner rows are added in token-efficiency (command-output, output-compression, code-index, code-graph, repo-packing, structured-data, doc-conversion, api-docs, trace-viewer, token-lane-carriers), ccusage and session-analytics install their owner defaults, context-supply installs as an owner default without the interim gate, and code-search installs both arms of its confirmatory; none of these commands has run anywhere. Fix-wave/wave-4 repair in this PR (2026-10-04): promptfoo follows the written manifest; repaired installation/prerequisites, isolated client probes and ownership migration. Destination commands remain UNRUN; local regression and artifact checks are recorded separately.",
+  "transfer_clis": [
+    {
+      "slot": "transfer-cli-gitleaks",
+      "cli": "gitleaks",
+      "owner": "Gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "release": "8.30.1",
+      "installed": true,
+      "route": "mise",
+      "version_pinned": true,
+      "mise_tool": "aqua:gitleaks/gitleaks",
+      "prerequisite_tools": [
+        "mise"
+      ],
+      "origin": {
+        "kind": "approved-prerequisite",
+        "source": "P1-GIT handoff and co-op A8,2026-10-06"
+      },
+      "commands": [
+        "mise use -g aqua:gitleaks/gitleaks@8.30.1"
+      ],
+      "install_source": {
+        "url": "https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/use.md",
+        "pin": "v2026.10.1"
+      },
+      "upstream_source": {
+        "url": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md",
+        "pin": "v8.30.1"
+      },
+      "acceptance": {
+        "post_install": {
+        "command": "test \"$(gitleaks version)\" = 8.30.1\ncli_work=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$cli_work\"' EXIT\nprintf '%s\\n' 'This native CLI fixture contains no credentials.' > \"$cli_work/README.txt\"\ngitleaks dir \"$cli_work\" --no-banner --redact\npython3 - \"$cli_work/planted.txt\" <<'PY'\nfrom pathlib import Path\nimport secrets, string, sys\n# Generated test value: never a usable credential, never printed.\nvalue = \"ghp_\" + \"\".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(36))\nPath(sys.argv[1]).write_text(\"generated_nonsecret_control=\" + value + \"\\n\")\nPY\nrc=0\nif gitleaks dir \"$cli_work\" --no-banner --redact --report-format json --report-path \"$cli_work/findings.json\" >\"$cli_work/control.log\" 2>&1; then\n  exit 1\nelse\n  rc=$?\nfi\ntest \"$rc\" = 1\npython3 - \"$cli_work/findings.json\" <<'PY'\nfrom pathlib import Path\nimport json, sys\nfindings = json.loads(Path(sys.argv[1]).read_text())\nassert any(row.get(\"RuleID\") == \"github-pat\" for row in findings), \"native finding control missing\"\nPY",
+          "kind": "smoke",
+          "source": {
+            "url": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md",
+            "pin": "v8.30.1"
+          }
+        }
+      },
+      "notes": "Named-only Phase1 transfer prerequisite for the existing Git hook. Gitleaks default rules are not replaced by Betterleaks; no foundation owner changes. Self-test scans an owned nonsecret fixture and requires native github-pat detection of a generated nonsecret control; no provider/broker use."
+    }
+  ],
   "owners": [
     {
       "layer": "native-clients",
