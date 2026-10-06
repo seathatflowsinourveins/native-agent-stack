@@ -106,3 +106,41 @@ measurement remains D3r4's separate decision.
 Backups remain private until at least2026-10-13. The optional workspace-wide
 force-embed purge of227 superseded MiniLM rows is deferred to waveB; it was
 not part of this publication and must preserve recovery and scope boundaries.
+
+## Capture repair and pending config consistency
+
+After this acceptance the CC applied ai-memory2.5.2's own Claude hook
+installer with explicit `--capture-prompts`; its readback now includes
+UserPromptSubmit and preserves every unrelated hook. Fresh-marker
+Claude→Codex Gate3 subsequently passed at17:47–17:50Z through a fresh Claude
+source under the shared lock and a fresh native Codex receiver on the default
+tier. One prompt observation and one current-identity embedded page were
+present before the receiver ran. Native tool results showed recall_pass and
+association-based control_clean true; the expected hit had vector rank1.
+The strict no-canary-fact-text control remained false, so this does not assert
+that stronger condition. Only the assigned scratch scope was used; raw source,
+receiver and marker/fact evidence remain private. The immutable receipt above
+retains its acceptance-time PARTIAL result rather than being rewritten after
+that repair. This follow-up is actual native execution with a synthetic canary,
+separate from the29-target retrieval comparison and any upstream test.
+
+Passive native spool-status samples after the prompts decreased30→18→10
+pending, with oldest age11169→2660→708ms and zero reported retries. This
+shows drain progress, not an observed globally empty queue. Native status
+did not report acknowledgement counts; those remain unknown and are not
+manufactured from pending deltas. Prompt storage and receiver recall are
+independent evidence that this canary landed.
+
+The CC will separately apply this top-level consistency setting:
+
+```toml
+server_url = "http://127.0.0.1:29374"
+```
+
+It names the thin client's endpoint, not the server's bind address or
+embedding endpoint. It is pending because applying it changes the accepted
+config hash. The earlier49374 log lead was withdrawn: a generic startup
+log prints the configured client default before command-specific backfill
+URL selection; it did not prove requests went to the wrong listener.
+Sources: [config.rs:267/1655](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L267),
+[backfill endpoint override](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/backfill.rs#L156).

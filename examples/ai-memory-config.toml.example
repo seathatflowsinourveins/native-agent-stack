@@ -14,6 +14,9 @@ embedding_provider = "local"
 # embedding_dim = 4096
 # embedding_query_prefix = "query: "
 # embedding_document_prefix = "passage: "
+# For a deployment already bound on 29374, the CC separately applies:
+# server_url = "http://127.0.0.1:29374"
+# This client consistency line is pending; it is not part of the receipt hash.
 # Source: ai-memory@7580b74d config.rs:461-502 and embedding.rs:465-485;
 # model README at d1f2f25730bbd775b99b29185134bc86653bf2d1.
 backfill_on_start = false
