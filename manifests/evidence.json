@@ -4477,35 +4477,6 @@
         "Serena and MinerU are excluded from old-bar READY while condition-absent controls remain open. Difftastic, structural-search, inspect-ai, harbor and codex-sdk: fresh-session use not evidenced; installation-time checks retain original classes."
       ],
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json"
-    },
-    {
-      "id": "agent-browser-0382-qualification-20261003",
-      "kind": "compatibility_attempt",
-      "component_ids": [
-        "agent-browser"
-      ],
-      "claim": "W1-r2 records install exit 0, version output \"agent-browser 0.38.2\", and offline smoke output \"All four positive commands exit 0 on 0.38.2 (and 0.38.1)\"; \"skills list\" and \"skills get core\" are recorded as byte-identical to 0.38.1. W1b independently repeated --version and skills list (both exit 0) and rehashed the qualified tarball to 2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49.",
-      "limitations": [
-        "UNTESTED: live fixture workflow, `agent-browser install`, Chrome launch on WSL2, any model run; darwin, arm64, musl and win32 binaries are hash-checked only. This is a version check plus offline smoke on one host, not live acceptance.",
-        "NOT run: the live fixture workflow (open file://.../fixtures/greeting.html, snapshot -i -c --json, fill, click, get text '#status', close) and `agent-browser install` (Chrome download); that is the untested boundary.",
-        "W1b reuses recorded W1-r2 install and offline comparison evidence. The integration commands are additional native observations; they do not replay the installation or establish live browser or model acceptance."
-      ],
-      "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json"
-    },
-    {
-      "id": "grafana-1323-qualification-20261003",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "grafana"
-      ],
-      "claim": "W1-r2 records install exit 0 and native synthetic integration results: /api/health returned {\"database\":\"ok\",\"version\":\"13.2.3\",\"commit\":\"90ffed056f0884267356c12a0eeb72a022af53f1\"}; anonymous POST /api/datasources returned 403; the query output reports 36 targets, 36 http_ok, 36 result_ok, 36 frames and errors []. The upgrade record reports migration_log rows 719 before and after. W1b independently repeated --version (\"grafana version 13.2.3\", exit 0) and server --version (\"Version 13.2.3 (commit: 90ffed056f0884267356c12a0eeb72a022af53f1, branch: release-13.2.3#patched)\", exit 0), and rehashed the archive to 6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235.",
-      "limitations": [
-        "SMOKE EVIDENCE CLASS: locally authored synthetic integration checks run in a private user/net/pid namespace (unshare ... --mount-proc), not upstream acceptance and not check_persistence.py (which restarts host units and was deliberately not run). No real credentials (inline synthetic GF_SECURITY_* constants; the configure.py-generated scratch ecosystem-grafana.env files were never read or used), no live service reachable (the namespace has only its own loopback).",
-        "LIMITS: not tested: browser rendering (stat/table/Loki issues #132901, #132502 and #132879 are unverified here), real Prometheus/Loki data or production cardinality, Grafana-managed alerting, a restart onto the host's real database, Grafana's own upstream test suite.",
-        "W1b reuses the recorded W1-r2 synthetic integration outputs; it does not replay the namespace smoke or activate the host service. The tarball build commit and public tag commit are recorded separately.",
-        "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
-      ],
-      "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
     }
   ],
   "files": [
@@ -5011,8 +4982,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "b3b4b8f7ee5107dc486bc158c61afc9d6dbc55158cd08ef495e5dc6c3ab02702",
-      "bytes": 37402
+      "sha256": "804eba0e086670c75e6b2f3725734477914318987c99fb90195680188be337c9",
+      "bytes": 37335
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -10787,8 +10758,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "f66dc633de8f5325d7f7ebdb045c627080d9c050a7e847d78e9cd47ab5053268",
-      "bytes": 487321
+      "sha256": "b2e82b633fd1594a15d1726afe8d4b1d401440b265cfaf12d07c6d6752a71641",
+      "bytes": 486278
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -16382,7 +16353,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "d3948910a2ad5dcf099e8a55667a8003001074165f02453b35f70598d9844687",
+      "sha256": "d1f0f17e142e8bfca223006f72cb16fce65456609248a32b5cf7958ba9f54dd2",
       "bytes": 287704
     },
     {
@@ -16392,8 +16363,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "a266aedfaba600d1b959ddcaa0d428107cd0fe6b353ecbcb2dd37864bd1edeef",
-      "bytes": 266505
+      "sha256": "85a1715168203fef8f201672d3f284ff3021797c0576a974ef05ed4b6af7446c",
+      "bytes": 258289
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17156,11 +17127,6 @@
       "bytes": 21453
     },
     {
-      "path": "docs/decisions/2026-10-03-currency-wave-w1b.md",
-      "sha256": "36f5494a6e55a207ace59a3222cfa98a622530d8ef86c296d16cb45f2c2bb287",
-      "bytes": 16990
-    },
-    {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
       "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
       "bytes": 16588
@@ -17642,7 +17608,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "06e91d22d386bb08ba057e336d9aa486cca9ce062a5a1f3253fd2a2f166b1f60",
+      "sha256": "feacb3a295970f1269ea2004127e5dd11a4f43c9e2fb29166e501346205091af",
       "bytes": 18483
     },
     {
@@ -17752,8 +17718,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "beb1b775d8c69527ddd1ee02564efc7ddf26dbc7e40d1737355f5cc69e22547b",
-      "bytes": 592549
+      "sha256": "172d1d75458d9af2c24f1a1f63615fbaa34dc6abaf9428c58d6cacee3ec58b95",
+      "bytes": 592422
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -19419,96 +19385,6 @@
       "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
       "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
       "bytes": 14197
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
-      "sha256": "12a72072978b21d012eb337685b396bf3ddc225fe07dcc336fd5fe9c4d3253d9",
-      "bytes": 47321
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/github-metadata.json",
-      "sha256": "36731be8722018d77547c53638c45c8ab97bdca7f5b10fde2d7777f6cd8f434f",
-      "bytes": 3389
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/qualification-record.json",
-      "sha256": "fc21e1b1fdd90ca281f1631fe93222abe5f251ed85e17d95fb985387aa36c945",
-      "bytes": 22746
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.1.stdout.txt",
-      "sha256": "03c63627e990ceede97ae12d5938bc6fd37d7c6a30751e926d66dadd2bd8a852",
-      "bytes": 898
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.2.stdout.txt",
-      "sha256": "03c63627e990ceede97ae12d5938bc6fd37d7c6a30751e926d66dadd2bd8a852",
-      "bytes": 898
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/github-metadata.json",
-      "sha256": "7067d7dfbabafa73266aaa909fb6bd28d1d22d53a2ca843d2cd67304d0a2e176",
-      "bytes": 3271
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/installation.json",
-      "sha256": "8af667a097b2e64d78f77e186a78c27006d4b14a6984fd31cf67a84277708eb5",
-      "bytes": 708
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
-      "sha256": "febed953a2049eeea3345770e27d88a0375b29ba222956399792e70c9fce260c",
-      "bytes": 30509
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-fresh.stdout.txt",
-      "sha256": "d23e03bfd1e507d498eb853430a4d9c347c705512e439c9d8cda833decfb479e",
-      "bytes": 6851
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-queries.stdout.txt",
-      "sha256": "00655c36b580851bae97165c29ed099eeb0a7c40ffbf0ba51487428af6aad330",
-      "bytes": 12485
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-upgrade.stdout.txt",
-      "sha256": "e34d5f96a4b940a22e83be62df4ba43133b07c35310d8fa22575e22df08eab2e",
-      "bytes": 11612
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
-      "sha256": "5fb0e0f31cbcb1448d70c271b840cf252d6922069440a87b33ba6f387107d0e6",
-      "bytes": 6515
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/move-hold-judges.json",
-      "sha256": "f50e4ed112f596cf05206e6bdb5e3ee99c5fd892214a42634b2ae0093aba6ca2",
-      "bytes": 42160
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/repair-round-replies.md",
-      "sha256": "57c7ac53ea6c12d23c45f1feab5979814c60f7ecc622b03e1e46ce861579ff67",
-      "bytes": 17182
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/review-round-findings.json",
-      "sha256": "109fac651186384944dafd29e8cf084a7f1293dd785beee67fb413cd8b5bc51d",
-      "bytes": 12370
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt",
-      "sha256": "7379e23243ff91eda3a028f525c3b2506ea1b5d3af8494718d1bd7d086e3a146",
-      "bytes": 129476
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stdout.txt",
-      "sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
-      "bytes": 150
-    },
-    {
-      "path": "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json",
-      "sha256": "b163526176d933371fb64c3fd15adef9fb4851838bdf5fa1fd2ad3ef267ac5fc",
-      "bytes": 32284
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -52446,11 +52322,6 @@
       "bytes": 4676
     },
     {
-      "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json",
-      "sha256": "051bd9e94f82426529f6d1a779c4427535cdcfdf584d3909c47b19b5f46cb3a8",
-      "bytes": 4842
-    },
-    {
       "path": "evidence/receipts/agent-browser-lna-20260930.json",
       "sha256": "d26374a40b8b74fbe14dcf63c65257d3370a84831553740ef679ca9362aa8d1b",
       "bytes": 5305
@@ -52719,11 +52590,6 @@
       "path": "evidence/receipts/gpt-tokenizer-400-qualification-20260929.json",
       "sha256": "5c1c1e5e98882f76373825f057db81c50f1c7bc2ae0ca0be5f821cd039aa2bbf",
       "bytes": 21687
-    },
-    {
-      "path": "evidence/receipts/grafana-1323-qualification-20261003.json",
-      "sha256": "51acc9245a3a0f1e349cec54c94537cbaf3d1592770ab2d7a61eaf7b4b70944b",
-      "bytes": 6314
     },
     {
       "path": "evidence/receipts/guard-k3-verification-20260930.json",
@@ -53902,18 +53768,18 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "4a4b8a4e41978d5e0ce9887c2810d43659d218b89834f775574284c8b2f865e3",
-      "bytes": 103920
+      "sha256": "3ca8f36178c4e61c9f8241fd6eb045172a9e66c38da5f4943b4532fc42f94a72",
+      "bytes": 103027
     },
     {
       "path": "observability/README.md",
-      "sha256": "7d33686ba2414438561bac931043d931ffb982bd33d09ff8961cc85e1eb36d7f",
-      "bytes": 15740
+      "sha256": "7c7795560a7ef6541c91dfb8b0bf4e693f5dcdf9cfc75f262d8e4832057177e3",
+      "bytes": 15625
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "e75d16a8ff9e0d651f9e33474c47fb9982d83fe5ce7b6d65328988d9cc8b0f61",
-      "bytes": 25850
+      "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
+      "bytes": 25778
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -53942,7 +53808,7 @@
     },
     {
       "path": "observability/backends/pins.json",
-      "sha256": "feb9a5c580b76f3e4d0884d231bab0349c4bc7cbcd4a761e2371301c6a64bf49",
+      "sha256": "8a230843fdcfbe228ac4d8568739ff82d0b98ddc9ca7d0d4b1ba5f6fe6d4aefe",
       "bytes": 3040
     },
     {
@@ -54132,8 +53998,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "63bab52fea451f4dc941b8e02e5d0c0176d96899403cd03c063798b9374a9b20",
-      "bytes": 16711
+      "sha256": "0ced49d094ec8ab7737da7ef008216b053ee8c2622c82508966f854b326786f8",
+      "bytes": 16655
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -54187,7 +54053,7 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "8f5b695af1ed89ad27e4aaa011b7e5b251ffdc98a2d256dabce1a531f8e61ab8",
+      "sha256": "ad750498ace3022cdaab34bc6cafb42300379d9a9e0f9e76f00414916c9d8a96",
       "bytes": 128978
     },
     {
