@@ -1939,6 +1939,199 @@ class ApplyCase(unittest.TestCase):
         write_exe(self.home / ".local/share/mise/shims/qmd", "#!/bin/sh\necho qmd\n")
 
 
+class CodexOwnedMigrationTests(ApplyCase):
+    """Scratch profiles and a synthetic native config writer; no native account or provider is used."""
+
+    def setUp(self):
+        super().setUp()
+        self.installed_state()
+        self.config = self.home / ".codex/config.toml"
+        self.config.parent.mkdir()
+        self.migration_marker = self.config.parent / ".native-agent-stack-migrations/service-tier-fast-to-default-20261005.json"
+        self.edits = []
+        case = self
+
+        class SyntheticAppServer:
+            def __init__(self, codex, env, cwd):
+                case.assertEqual(Path(env["CODEX_HOME"]), case.config.parent)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *error):
+                return False
+
+            def user_layer(self):
+                return hashlib.sha256(case.config.read_bytes()).hexdigest(), tomllib.loads(case.config.read_text())
+
+            def batch_write(self, edits, expected_version):
+                version, data = self.user_layer()
+                case.assertEqual(version, expected_version)
+                case.edits.extend(edits)
+                for edit in edits:
+                    case.assertEqual(edit["key"], ["service_tier"])
+                    data["service_tier"] = edit["value"]
+                case.config.write_text(cfg.emit_toml(data, "# synthetic native writer\n"))
+                return {"status": "ok", "version": self.user_layer()[0]}
+
+        self.synthetic_server = SyntheticAppServer
+        patcher = mock.patch.object(cfg.lane, "AppServer", SyntheticAppServer)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def fast_config(self):
+        original = b"service_tier = 'fast'\nmodel = 'operator-model'\n[features]\ndaemon_auto_start = false\n"
+        self.config.write_bytes(original)
+        return original
+
+    def test_fresh_host_gets_default_and_a_marker_that_preserves_later_fast(self):
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        data = tomllib.loads(self.config.read_text())
+        self.assertEqual(data["service_tier"], "default")
+        self.assertTrue(self.migration_marker.is_file())
+        data["service_tier"] = "fast"  # A later native /fast choice.
+        self.config.write_text(cfg.emit_toml(data, ""))
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "fast")
+        self.assertEqual(self.edits, [])
+
+    def test_upgraded_fast_migrates_once_with_backup_and_native_version_guard(self):
+        before = self.fast_config()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "default")
+        self.assertTrue(self.migration_marker.is_file())
+        self.assertEqual(self.edits, [{"key": ["service_tier"], "value": "default"}])
+        self.assertIn("service_tier", out)
+        self.assertIn("migration", out)
+        self.assertEqual([p.read_bytes() for p in self.config.parent.glob("config.toml.bak.*")], [before])
+        once = tree(self.home)
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tree(self.home), once)
+        self.assertEqual(len(self.edits), 1)
+
+    def test_fast_with_marker_stays_as_a_conflict(self):
+        self.fast_config()
+        self.migration_marker.parent.mkdir()
+        self.migration_marker.write_text("completed\n")  # Presence alone; never parse marker values.
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "fast")
+        self.assertIn("service_tier", out)
+        self.assertIn("conflicts kept", out)
+        self.assertEqual(self.edits, [])
+
+    def test_dry_run_reports_migration_without_writes_or_native_calls(self):
+        self.fast_config()
+        before = tree(self.home)
+        code, out, err = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertIn("would migrate service_tier", out)
+        self.assertEqual(tree(self.home), before)
+        self.assertFalse(self.migration_marker.exists())
+        self.assertFalse(self.marker.exists())
+        self.assertEqual(self.edits, [])
+
+    def test_other_scalars_still_conflict_while_owned_fast_is_migrated(self):
+        self.fast_config()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        data = tomllib.loads(self.config.read_text())
+        self.assertEqual(data["model"], "operator-model")
+        self.assertEqual(data["service_tier"], "default")
+        self.assertIn("conflicts kept", out)
+
+    def test_already_default_adoption_stamps_completion_without_native_edit(self):
+        self.config.write_text("service_tier = 'default'\n[features]\ndaemon_auto_start = false\n")
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertTrue(self.migration_marker.is_file())
+        self.assertEqual(self.edits, [])
+
+    def test_marker_failure_restores_config_and_does_not_mark_migration_done(self):
+        before = self.fast_config()
+        native_write = cfg.lane.atomic_write
+
+        def fail_marker(path, *args, **kwargs):
+            if path == self.migration_marker:
+                raise OSError("synthetic marker write failure")
+            return native_write(path, *args, **kwargs)
+
+        with mock.patch.object(cfg.lane, "atomic_write", side_effect=fail_marker):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertFalse(self.migration_marker.exists())
+        self.assertIn("the file is back as it was", out)
+
+    def test_native_precheck_rejection_keeps_the_concurrent_choice(self):
+        self.fast_config()
+        native_read = self.synthetic_server.user_layer
+
+        def changed_before_read(server):
+            data = tomllib.loads(self.config.read_text())
+            data["service_tier"] = "flex"
+            self.config.write_text(cfg.emit_toml(data, ""))
+            return native_read(server)
+
+        with mock.patch.object(self.synthetic_server, "user_layer", changed_before_read):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "flex")
+        self.assertFalse(self.migration_marker.exists())
+        self.assertEqual(self.edits, [])
+
+    def test_native_version_rejection_keeps_concurrent_unowned_edits(self):
+        self.fast_config()
+
+        def reject_write(*args):
+            data = tomllib.loads(self.config.read_text())
+            data["operator_after_read"] = "keep"
+            self.config.write_text(cfg.emit_toml(data, ""))
+            raise cfg.lane.AppServerError("config/batchWrite", {"message": "synthetic version rejection", "code": 1})
+
+        with mock.patch.object(self.synthetic_server, "batch_write", side_effect=reject_write):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["operator_after_read"], "keep")
+        self.assertFalse(self.migration_marker.exists())
+
+    def test_fresh_marker_failure_is_failed_adoption_and_can_retry_at_default(self):
+        native_write = cfg.lane.atomic_write
+
+        def fail_marker(path, *args, **kwargs):
+            if path == self.migration_marker:
+                raise OSError("synthetic marker write failure")
+            return native_write(path, *args, **kwargs)
+
+        with mock.patch.object(cfg.lane, "atomic_write", side_effect=fail_marker):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "default")
+        self.assertFalse(self.migration_marker.exists())
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err)
+        self.assertTrue(self.migration_marker.is_file())
+
+    def test_native_written_version_must_match_readback_before_completion(self):
+        self.fast_config()
+        native_write = self.synthetic_server.batch_write
+
+        def wrong_version(server, edits, expected_version):
+            result = native_write(server, edits, expected_version)
+            result["version"] = "synthetic-intervening-version"
+            return result
+
+        with mock.patch.object(self.synthetic_server, "batch_write", wrong_version):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertFalse(self.migration_marker.exists())
+        self.assertIn("native migration version changed", out)
+
+
 class ApplyTests(ApplyCase):
     def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
         self.installed_state()
@@ -2024,7 +2217,7 @@ class ApplyTests(ApplyCase):
         self.assertEqual(stat.S_IMODE(codex.stat().st_mode), 0o700)
         self.assertEqual(stat.S_IMODE((codex / "config.toml").stat().st_mode), 0o600)
         # No role carrier (the map leaves them out), so no agents directory; the Codex block is the whole AGENTS.md.
-        self.assertEqual(sorted(p.name for p in codex.iterdir()), ["AGENTS.md", "config.toml", "omniroute.config.toml",
+        self.assertEqual(sorted(p.name for p in codex.iterdir()), [".native-agent-stack-migrations", "AGENTS.md", "config.toml", "omniroute.config.toml",
                                                                     "stack-worker.config.toml"])
         self.assertIn(f"{self.home}/.local/share/mise/shims", (codex / "config.toml").read_text())
         launcher = self.eco / "bin" / "claude"

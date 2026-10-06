@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "unit": "J-752",
+  "lane": "foundation",
+  "started_at": "2026-10-05T23:32:16Z",
+  "module_checks_completed_at": "2026-10-06T00:00:12Z",
+  "owner_pr": 752,
+  "owner_branch": "c5/followup-residuals-20261005",
+  "owner_head_before": "32e6b0bde15d82cfbcccb117af3a728c5e9eeb5d",
+  "rebase_target": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "decision": "docs/decisions/2026-10-05-codex-service-tier-migration.md",
+  "scope": {
+    "host_configuration_reads": false,
+    "host_configuration_writes": false,
+    "provider_sessions": 0,
+    "unchanged_upstream_test_execution": false,
+    "acceptance": "source review plus local integration with synthetic homes, clients and native RPC replies",
+    "heavy_steps": "one at a time, nice 19",
+    "scratch": "private owned cache outside every checkout and outside shared tmpfs"
+  },
+  "source_review": [
+    {
+      "source": "native-agent-stack@32e6b0bde15d82cfbcccb117af3a728c5e9eeb5d:tools/adoption/new_wsl_client_config.py:1626-1648,2272-2282",
+      "finding": "Existing scalar conflicts remain unchanged on upgrade, retaining the previous managed fast setting."
+    },
+    {
+      "source": "native-agent-stack@32e6b0bde15d82cfbcccb117af3a728c5e9eeb5d:docs/decisions/2026-10-04-new-wsl-changelog-parity.md#amendment-2026-10-05-normal-by-default-fast-on-demand",
+      "finding": "The user selected normal by default, fast on demand; the template requests explicit default."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/tui/src/config_update.rs:105-121,154-170",
+      "finding": "The maintained native scalar writer uses config/batchWrite for service-tier persistence."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/tui/src/chatwidget/service_tiers.rs:99-117",
+      "finding": "A later /fast choice persists to the same configuration key, requiring completion markers for successful adoption."
+    },
+    {
+      "source": "native-agent-stack@32e6b0bde15d82cfbcccb117af3a728c5e9eeb5d:tools/adoption/apply_codex_lane.py:514-560,1257-1273",
+      "finding": "Reuse the existing native AppServer wrapper, expected-version write, readback and outside-owned-key checks. No new scalar editor or RPC wrapper."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/config/src/fingerprint.rs:54-65",
+      "finding": "Native versions hash canonical configuration, not raw file bytes."
+    },
+    {
+      "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/app-server/src/config_manager_service.rs:426-438",
+      "finding": "The write returns the updated layer version; verify it against native readback before validating and hashing one disk snapshot."
+    }
+  ],
+  "executions": [
+    {
+      "phase": "red upgrade reproduction",
+      "evidence_class": "synthetic",
+      "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.CodexOwnedMigrationTests -q",
+      "exit_code": 1,
+      "tests": 5,
+      "failures": 4,
+      "duration_seconds": 4.164,
+      "observation": "Upgrade retained fast; fresh adoption lacked completion; dry-run did not report migration. Existing-marker control passed."
+    },
+    {
+      "phase": "initial bounded repair",
+      "evidence_class": "synthetic",
+      "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.CodexOwnedMigrationTests -q",
+      "exit_code": 0,
+      "tests": 5,
+      "duration_seconds": 5.487
+    },
+    {
+      "phase": "existing inventory expectation correction",
+      "evidence_class": "local_integration",
+      "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config -q",
+      "exit_code": 1,
+      "tests": 194,
+      "failures": 1,
+      "duration_seconds": 72.754,
+      "observation": "Existing exact file inventory omitted the new private owned marker directory; updated that expectation."
+    },
+    {
+      "phase": "rollback and concurrent-choice controls",
+      "evidence_class": "synthetic",
+      "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.CodexOwnedMigrationTests -q",
+      "exit_code": 0,
+      "tests": 10,
+      "duration_seconds": 10.900
+    },
+    {
+      "phase": "full module before final version-snapshot control",
+      "evidence_class": "local_integration",
+      "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config -q",
+      "exit_code": 0,
+      "tests": 197,
+      "duration_seconds": 78.086
+    },
+    {
+      "phase": "final module after main rebase and version-snapshot control",
+      "evidence_class": "local_integration",
+      "fixture_class": "synthetic",
+      "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config -q",
+      "exit_code": 0,
+      "tests": 198,
+      "duration_seconds": 78.495,
+      "returned_output": "Ran 198 tests in 78.495s\n\nOK"
+    },
+    {
+      "phase": "owner branch rebase",
+      "evidence_class": "local_integration",
+      "command": "git rebase origin/main",
+      "exit_code": 0,
+      "observation": "Two original owner commits rebased cleanly onto ecfa1127. Only the shared evidence registry overlapped main; no peer-owned path conflict. Immutable owned stash checkpoint reapplied without conflict."
+    },
+    {
+      "phase": "hot-file derived reports",
+      "evidence_class": "local_integration",
+      "commands": ["nice -n 19 python3 scripts/component_matrix.py --write", "nice -n 19 python3 scripts/new_host_grand_list.py --write"],
+      "exit_codes": [0, 0],
+      "observation": "32 component rows, zero flip-rule violations; 32 layers and 66 winners."
+    },
+    {
+      "phase": "repository integrity and scope",
+      "evidence_class": "local_integration",
+      "command": "nice -n 19 python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 10274, \"profiles\": 4, \"receipts\": 212, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    }
+  ],
+  "migration_contract": {
+    "path": ["service_tier"],
+    "previous": "fast",
+    "new": "default",
+    "marker": ".native-agent-stack-migrations/service-tier-fast-to-default-20261005.json",
+    "marker_policy": "create-only, mode 0600, presence-only; do not read or overwrite an existing marker",
+    "successful_completion": ["fresh default", "missing-key default addition", "already-default adoption", "fast-to-default migration"],
+    "later_fast_choice": "kept as a reported conflict once the marker exists",
+    "unowned_scalars": "always kept as conflicts",
+    "dry_run": "no home/config/backup/marker or native client mutation",
+    "native_precheck": "old value and expected raw snapshot hash must match before a native expected-version write",
+    "native_readback": "write version equals native layer version; changed and unowned keys verified; validate and hash one full disk snapshot",
+    "rollback": "restore only against the last verified write hash, preserving intervening edits; retain original backup",
+    "general_override": false
+  },
+  "independent_review": {
+    "evidence_class": "source_review",
+    "kind": "bounded read-only GPT source review and completeness critic",
+    "findings_closed": ["reuse supported native scalar writer", "preserve native no-write rejection", "guard rollback against intervening edits", "native version agreement and one disk-snapshot capture"],
+    "result": "approved within documented bounds",
+    "native_execution": false
+  },
+  "limits": [
+    "Source metadata, synthetic native RPC replies and local integrity checks are not real native writer or provider acceptance.",
+    "Config completion and marker creation are separate writes; crash recovery between them is not atomic.",
+    "Failed fresh marker creation leaves a failed adoption with default config. Retry at default completes it; a /fast choice before retry cannot be distinguished from unmarked legacy fast.",
+    "Canonical native versions cannot attribute formatting-only edits before disk snapshot capture to another writer.",
+    "Additional owned migration rules require a declared partial-marker recovery policy.",
+    "No host apply, credential handling, merge or readiness change performed by this lane."
+  ]
+}
