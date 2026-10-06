@@ -35,15 +35,18 @@ and the maintained keyed reader in upkeep-transfer.md:494 at6b19ae22. Eight focu
 regressions and three loader/native-containment preflight checks pass. No production
 policy or limit changes.
 
-The installed client's new auth_storage_failure Notification type still requires
-its notification owner's dated decision (Q55); this lane chooses neither ring nor
-quiet. A55 confirms it does not block #772. Carry the failing gate
-tests/test_windows_terminal_defaults.py:166-176, its DECISIONS table at
-evidence/artifacts/notification-types-20260929/notification_types_scan.py:20,
-observed Claude Code 2.1.291, and the exact returned assertion in the CI receipt.
-The CC subsequently ruled RING in item151719Z; CURRENCY owns its dated table
-row. Cite that actual row when provided; do not manufacture a row or change
-client configuration here. The full retry keeps the native gate intact.
+The failed full-discovery attempt retained the installed Claude Code 2.1.291
+auth_storage_failure assertion from the notification gate
+(tests/test_windows_terminal_defaults.py:166-176). The CC ruled **RING** in
+item151719Z; Currency supplied its
+[dated owner row at92963dabc0fb:11](https://github.com/seathatflowsinourveins/native-agent-stack/blob/92963dabc0fb56dc8669e3a87478e2ac57eecb68/docs/decisions/2026-10-06-auth-storage-failure-notification.md#L11)
+and the
+[executable DECISIONS entry at the same pin:23](https://github.com/seathatflowsinourveins/native-agent-stack/blob/92963dabc0fb56dc8669e3a87478e2ac57eecb68/evidence/artifacts/notification-types-20260929/notification_types_scan.py#L23).
+That row is in draft #790, outside this branch's captured main0d5e6506; it is
+source evidence, not an assertion that the native hook or this branch has adopted
+it. The original failed result and exact returned output remain in the CI receipt.
+A55 makes this owner item nonblocking for #772. This lane changes no Currency
+table or client configuration, and the full retry retains the native gate.
 
 Item153309Z also assigns the credential mutation driver's interpreter fix.
 Use sys.executable by default and expose the old named adaptive-paper runtime

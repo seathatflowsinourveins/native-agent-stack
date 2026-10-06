@@ -264,7 +264,7 @@
     "returned_unknown_type": "auth_storage_failure",
     "result": "failure",
     "owner": "command center/notification decision owner",
-    "action": "RING ruling accepted; table owner CURRENCY, source citation pending their dated row. This lane changes no table/client config. Full retry retains native gate; gap is nonblocking per A55.",
+    "action": "RING ruling and Currency dated row are supplied. Cite the owner source pin; no table/client configuration change here. The first failing result remains historical, and the full retry retains the native gate.",
     "gate_path": "tests/test_windows_terminal_defaults.py:166-176",
     "decision_table_path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py:20",
     "observed_client_version": "2.1.291 (Claude Code)",
@@ -275,7 +275,16 @@
     "blocks_pr772": false,
     "owner_ruling": "CCitem151719Z: auth_storage_failure=RING; CURRENCY owns and adds dated DECISIONS row. #772 cites its actual row when supplied, without inventing one.",
     "decision_pending": false,
-    "currency_row_citation_pending": true
+    "currency_row_citation_pending": false,
+    "currency_row_citation": {
+      "source_pin": "92963dabc0fb56dc8669e3a87478e2ac57eecb68",
+      "dated_row": "docs/decisions/2026-10-06-auth-storage-failure-notification.md:11",
+      "dated_row_sha256": "9e30b13eaee2bddc8285b90cf1acffcd6ce01f3698bdabd927e2b824a46c2e5a",
+      "executable_row": "evidence/artifacts/notification-types-20260929/notification_types_scan.py:23",
+      "executable_source_sha256": "b12ea18b67f64a13688d1468249c395058a528b8ba44239b472edba897bdf385",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/92963dabc0fb56dc8669e3a87478e2ac57eecb68/docs/decisions/2026-10-06-auth-storage-failure-notification.md#L11",
+      "status": "Draft #790 source, not present in captured main0d5e6506. Native hook application remains CC-owned; no new host acceptance claimed."
+    }
   },
   "park": {
     "source_item": "task-ns2604-coop-20261006T143738Z",
