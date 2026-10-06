@@ -21,7 +21,7 @@ import urllib.parse
 import urllib.request
 
 LOKI = "http://127.0.0.1:13100/loki/api/v1/push"
-# The approved2604 plan uses Loki21300; preserve the recorded original host.
+# The approved 2604 plan uses Loki 21300; preserve the recorded original host.
 # native-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:
 # evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json (loki).
 LOKI_ENDPOINTS = frozenset({LOKI, "http://127.0.0.1:21300/loki/api/v1/push"})

@@ -1,4 +1,4 @@
-# NativeStack source read2026-10-06: serviceSHA256da706cb9947ff96a2b503ca3074923bfc471f6c5b8b50f82ba7e669d06b6bd7e.
+# NativeStack source read 2026-10-06: service SHA256 da706cb9947ff96a2b503ca3074923bfc471f6c5b8b50f82ba7e669d06b6bd7e.
 # systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:
 # man/systemd.service.xml:209-219 (oneshot); man/systemd.exec.xml (privacy and Nice).
 [Unit]
@@ -9,5 +9,7 @@ Type=oneshot
 Nice=19
 UMask=0077
 NoNewPrivileges=true
+Environment=UV_CACHE_DIR=%h/.cache/uv
+Environment=UV_LOCK_TIMEOUT=10
 Environment="PATH=%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
 ExecStart=%h/.local/state/native-agent-stack/ops/disk-headroom-guard.sh

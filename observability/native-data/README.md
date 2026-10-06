@@ -230,10 +230,19 @@ and [unit specifiers](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d95
 
 Use the strict verification command above: the installed 259.5 default verifier
 can return 0 with warnings. After a synchronous manual start, record Result,
-ExecMainStatus and a fresh ExecMainStartTimestamp. Successful oneshots normally
+ExecMainStatus and the journal cursor/start-job boundary. systemd can unload an
+inactive oneshot and discard its live ExecMainStartTimestamp/InvocationID; neither
+field is a reliable finished-run freshness gate. Successful oneshots normally
 end inactive; `status` can return 3. Also retain the fresh snapshot generation,
 Loki publication status, unknown_count and stale_count. HTTP 204 and a successful
-service prove publication and execution, not complete native-tool health.
+service prove returned publication and execution, not complete native-tool health.
+The transfer additionally requires an independent query_range on Loki 21300 to
+return the exact generated snapshot marker, joined to the journal invocation
+and hash-bound local snapshot. The destination render gate enforces ai-memory
+29374 and optional Qdrant 21633, verifies Node 22+, selected paths and a clean
+approved persistent checkout. Use
+[config.ns2604.example.json](config.ns2604.example.json) for reviewed private
+bindings; the original example remains the old host's configuration.
 
 Capture prior unit bytes, enablement and activation before applying. Roll back
 only this transfer's changes and restore those recorded states, including any

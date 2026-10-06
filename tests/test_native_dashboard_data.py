@@ -356,7 +356,7 @@ class NativeDataTests(unittest.TestCase):
             M.validate_config(c)
 
     def test_loki_targets_are_exact_recorded_native_host_endpoints(self):
-        # Phase-1 transfer follows the destination plan's Loki21300 listener;
+        # Phase-1 transfer follows the destination plan's Loki 21300 listener;
         # retain the established NativeStack13100 endpoint and other guards.
         for endpoint in (
             "http://127.0.0.1:13100/loki/api/v1/push",

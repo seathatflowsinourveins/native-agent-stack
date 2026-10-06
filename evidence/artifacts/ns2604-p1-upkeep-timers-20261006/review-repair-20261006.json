@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "kind": "upkeep_timer_host_review_repairs",
+  "date_utc": "2026-10-06",
+  "reviewed_head": "2c43a27fbb14569b050817a37496ae84c926571a",
+  "evidence_classes": [
+    "source_review",
+    "synthetic",
+    "local_integration"
+  ],
+  "source_receipt": "receipt.json",
+  "reviews": {
+    "host_apply": "co-op2026-10-06T05:46:18Z apply_with_changes",
+    "command_center": "VERDICT-2c43a27fb.md ACK_AFTER, P2 cache-lock correction plus five P3s"
+  },
+  "guard_host_partial": {
+    "executor": "co-op sole host writer",
+    "applied_from_head": "2c43a27fbb14569b050817a37496ae84c926571a",
+    "start_utc": "2026-10-06T05:45:36Z",
+    "sample_free_gib": 634,
+    "real_prune": false,
+    "automated_old_green_gate_exit": 1,
+    "service_start_succeeded": true,
+    "manual_owner_judgment": "journal Starting/Finished, Result=success, ExecMainStatus=0, fresh CSV row",
+    "class": "native_proven",
+    "boundary": "Co-op returned/manual host observation, not a passing replay of the failed automated gate; native-data not applied."
+  },
+  "guard_restaging_required": {
+    "service": {
+      "old_sha256": "8a3435e3ffb41c1b2939931809b03b9d680e75142678b684d5e7666ef936d448",
+      "candidate": {
+        "sha256": "23a5f7433022f2fa3daf99f28e7160b9af6e97c9e7369cf0c37494c512d4b3a4",
+        "bytes": 654
+      },
+      "changes": [
+        "explicit UV_CACHE_DIR=%h/.cache/uv",
+        "explicit UV_LOCK_TIMEOUT=10",
+        "source spacing comments"
+      ]
+    },
+    "script": {
+      "old_sha256": "689218b891aae3f5306a6aec20fef74fe4f5d50f21f81608fecad91bc738857c",
+      "candidate": {
+        "sha256": "2d8b3e4129043bd30ae02538e598300243980874338a54b72932e146cf099009",
+        "bytes": 3008
+      },
+      "changes": [
+        "distinct lock-busy deferred failure",
+        "ps no-match none versus actual failure unavailable",
+        "source spacing comments"
+      ]
+    },
+    "timer_cadence_changed": false
+  },
+  "corrections": [
+    {
+      "claim": "fresh live ExecMainStartTimestamp proves inactive oneshot execution",
+      "correction": "Unit GC/unload discards live properties; gate on post-cursor successful native start job, invocation and changed fresh artifact. Preserve the failed old gate.",
+      "source": "systemd@b3d8fc43:man/systemd.unit.xml:558-586; src/core/job.c:812-821; unit.c:6834-6839"
+    },
+    {
+      "claim": "a config existing and any returned204 bind the destination",
+      "correction": "Render and pre-start gate exact Loki21300, ai-memory29374, optionalQdrant21633; independent21300 query_range must return the exact generation/marker, joined to snapshot hash and journal invocation.",
+      "source": "native-stack@ecfa11276:host.new-distro.json.template:8-9,config/loki.yaml:3-8; Loki@09e6ce2:docs/sources/reference/loki-http-api.md:462-540"
+    },
+    {
+      "claim": "source-unlimited oneshot describes uv prune lock waiting",
+      "correction": "uv safe prune waits on shared-cache users, defaults300s then fails; unit10s bounds onlylock acquisition and logs distinct cache-in-use failure, never --force.",
+      "source": "uv@70fe1196:cache.md:160-164; cache_prune.rs:31-43; locked_file.rs:17-28,41-47; env_vars.rs:1539-1543"
+    },
+    {
+      "claim": "volatile shell variables plus fragment backups are a fresh-shell rollback",
+      "correction": "Self-contained strict-shell entry validates private persisted identity/action manifest before any manager or deletion call. Backup bytes/modes/links, timer intents and apply/rollback phases prevent false success and retain operator edits."
+    },
+    {
+      "claim": "enable --no-reload avoids all reload-gate issues",
+      "correction": "It leaves global unit-file cache dirty. Use supported enable --now with immediate pending-other-unit/window gate before its implicit reload; record source limit about concurrent writers/unloaded files.",
+      "source": "systemd@b3d8fc43:man/systemctl.xml:883-889; manager.h:278-281; unit.c:3852-3853"
+    }
+  ],
+  "guard_deviations": {
+    "umask": "0077",
+    "no_new_privileges": true,
+    "path": "%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin",
+    "uv_cache_dir": "%h/.cache/uv",
+    "uv_lock_timeout_seconds": 10,
+    "total_startup_timeout": "source-unlimited;90s supported but genuine successful-prune duration not measured",
+    "lock_timeout_policy": "10s is below120s timer interval; not a total sampling/prune timing qualification",
+    "force": false
+  },
+  "native_data_prerequisites": {
+    "pinned_live_worktree": "native git worktree add --detach at exact reviewed40hex; no reset/main checkout change",
+    "configuration": "reviewed nonsecret destination example; manifest-backed creation of private config/state directories",
+    "node_minimum_major": 22,
+    "canonical_urls": {
+      "loki": "http://127.0.0.1:21300/loki/api/v1/push",
+      "ai_memory": "http://127.0.0.1:29374",
+      "qdrant_if_selected": "http://127.0.0.1:21633"
+    },
+    "paths": "existing selected token/native/project/data; owned nonsymlink private state; explicit report scopes"
+  },
+  "commands": [
+    {
+      "command": "nice -n19 python3 -B -m unittest tests.test_native_dashboard_data tests.test_new_wsl_upkeep_timers tests.test_disk_headroom_guard -v",
+      "exit_code": 0,
+      "interpreter": "PATH Python3.13.16",
+      "evidence_classes": [
+        "synthetic",
+        "local_integration"
+      ],
+      "log": "review-touched-publish.log",
+      "tests": 69
+    },
+    {
+      "command": "nice -n19 /usr/bin/python3 -B -m unittest tests.test_native_dashboard_data -v",
+      "exit_code": 0,
+      "interpreter": "service Python3.14.4",
+      "evidence_classes": [
+        "synthetic",
+        "local_integration"
+      ],
+      "tests": 44,
+      "log": "review-service-interpreter.log"
+    },
+    {
+      "command": "nice -n19 python3 -B check_plan.py",
+      "exit_code": 0,
+      "class": "local_integration",
+      "log": "review-check-plan.log"
+    },
+    {
+      "command": "bash -n guard; seven runbook shell blocks bash -n and embedded Python ast.parse",
+      "exit_code": 0,
+      "class": "local_integration",
+      "host_commands_executed": false
+    },
+    {
+      "command": "nice -n19 python3 -B scripts/validate.py",
+      "exit_code": 0,
+      "class": "local_integration",
+      "interpreter": "PATH Python3.13.16",
+      "log": "review-validate.log",
+      "output": {
+        "components": 69,
+        "hashed_files": 10284,
+        "profiles": 4,
+        "receipts": 212,
+        "status": "passed"
+      }
+    }
+  ],
+  "controls": {
+    "old_real_render_and_missing_manifest_false_pass": "two red controls1 retained, then corrected",
+    "endpoint_node_pin_path_controls": "small real isolated Git fixture; no network/host writer",
+    "restore_controls": [
+      "regular baseline bytes/mode",
+      "dangling symlink",
+      "created path removal",
+      "unrelated alias preserved",
+      "missing/corrupt manifest before manager",
+      "operator edit/deletion retained",
+      "early action-free manager untouched",
+      "partial apply/rollback absence recovered"
+    ],
+    "green_controls": [
+      "GC-empty live properties",
+      "failed job/stale artifact rejected without rerun",
+      "exact invocation join",
+      "wrong namespace/generation rejected",
+      "pause before second case at window boundary"
+    ],
+    "readback_controls": [
+      "both timers required",
+      "static not enabled",
+      "wrong cadence rejected",
+      "installed bytes mismatch rejected"
+    ],
+    "lock_branch": "stubbed only, genuine shared-cache prune not executed"
+  },
+  "logs": [
+    {
+      "name": "review-regressions-red.log",
+      "sha256": "1e168ff63e27baf9f5af6827d288419057212e4669a46ca5a5d00ad28670ff44",
+      "bytes": 2165,
+      "summary": [
+        "AssertionError: 0 == 0 : prior-distribution config was accepted",
+        "AssertionError: 0 == 0 : unset rollback was a false success",
+        "Ran 2 tests in 0.080s",
+        "FAILED (failures=2)"
+      ]
+    },
+    {
+      "name": "review-regressions-first-green.log",
+      "sha256": "23cb86ca71b03ad7866b6672b67468cdab1a4b5a317e5dfb8388bce7111e164c",
+      "bytes": 540,
+      "summary": [
+        "Ran 2 tests in 0.068s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-input-controls.log",
+      "sha256": "45e875a73584d73546c8d501b413476b617cbee52439406ed6e268dc36d50358",
+      "bytes": 1686,
+      "summary": [
+        "Ran 8 tests in 1.279s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-restore-controls.log",
+      "sha256": "be808c9a80577ef3307fbea0e37f80f6bbe88e34d8b6b491ad0438ac791211b2",
+      "bytes": 2376,
+      "summary": [
+        "Ran 11 tests in 2.186s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-green-controls.log",
+      "sha256": "af2a3cdb60c461e00c8a977d89e8b41c5ef17dd143b91ca996681677c997c724",
+      "bytes": 4303,
+      "summary": [
+        "AssertionError: Lists differ: ['disk-headroom-guard.service.green.json', [38 chars]son'] != ['ecosystem-native-data.service.green.json'[38 chars]son']",
+        "Ran 14 tests in 1.880s",
+        "FAILED (failures=1)"
+      ]
+    },
+    {
+      "name": "review-recovery-final.log",
+      "sha256": "5188a5f9df87a1cb0eaa50d1dc7805231c99647e23b4420123075ded1fd3feb2",
+      "bytes": 3381,
+      "summary": [
+        "Ran 16 tests in 1.376s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-readback-controls.log",
+      "sha256": "fb700ecca0bbf1474a22bcb8897279e8d93cedecbdb7103f7c551a1ee613283f",
+      "bytes": 3588,
+      "summary": [
+        "Ran 17 tests in 1.353s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-touched-publish.log",
+      "sha256": "48d83f72c1d18c3b60c16c56c0a6e1600cbd5e390cce4182256ccdb1fcab7890",
+      "bytes": 12626,
+      "summary": [
+        "Ran 69 tests in 2.942s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-service-interpreter.log",
+      "sha256": "39ee86e846b456c8696cff2d7138efbde2c4d3cae28e9c2b72d8a41d5e67bf19",
+      "bytes": 7751,
+      "summary": [
+        "Ran 44 tests in 0.351s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-uv-lock-controls.log",
+      "sha256": "b658db84d1eea7246ea536028daf286bbf5d714fd44330ea925786231a0daa4f",
+      "bytes": 4974,
+      "summary": [
+        "Ran 25 tests in 3.267s",
+        "OK"
+      ]
+    },
+    {
+      "name": "review-check-plan.log",
+      "sha256": "61ec367cab28434f26332620d8d0514429d79eb5f57efbf3baa6124c57e4e3e2",
+      "bytes": 202,
+      "summary": [
+        "OK: 84 rows: 63 installed (60 by the default run, 3 only when named), 2 measurement-only, 19 not installed; 185 commands and 113 acceptance entries agree with the scripts (2 additional checks included)"
+      ]
+    },
+    {
+      "name": "review-validate.log",
+      "sha256": "dae0e557bbeaeffdc8e682d64e8df05fbd6395869de87e42dc3a5df5f775fb23",
+      "bytes": 162,
+      "summary": [
+        "{\"components\": 69, \"hashed_files\": 10284, \"profiles\": 4, \"receipts\": 212, \"status\": \"passed\"}",
+        "Integrity and scope checks only; no live provider or GPU execution."
+      ]
+    }
+  ],
+  "sources": [
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.unit.xml:558-586,man/journalctl.xml:355-374,src/core/job.c:812-821",
+    "grafana/loki@09e6ce2ff1bdc19763a10265b870c86f51c98655:docs/sources/reference/loki-http-api.md:462-540",
+    "astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/cache.md:160-164,crates/uv/src/commands/cache_prune.rs:31-43,crates/uv-fs/src/locked_file.rs:17-28,41-47,crates/uv-static/src/env_vars.rs:66-69,1539-1543",
+    "tobi/qmd@v2.8.3:package.json:99-100",
+    "seathatflowsinourveins/native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:adoption/templates/wsl/host.new-distro.json.template:8-9"
+  ],
+  "host_acceptance": {
+    "native_data": "pending_coop_apply",
+    "revised_guard": "pending_coop_restaging",
+    "independent_live_loki_query": "not_run_by_lane",
+    "new_host_apply_by_lane": false,
+    "provider_or_model_execution": false
+  },
+  "privacy": {
+    "credentials_read_printed_copied": false,
+    "credential_files_read_copied": false,
+    "environment_files_read": false,
+    "raw_uv_error_printed_or_logged": false,
+    "process_arguments_omitted": true,
+    "raw_host_config_not_published": true,
+    "scratch_outside_tmp": true
+  },
+  "command_center_findings": {
+    "p2": "uv in-use wait/default300s/cadence correction recorded; native10s lock budget and distinct deferred line adopted; noforce",
+    "p3": [
+      "proxy/native exact captures",
+      "targeted prose/comment spacing repairs; exact URI/hash control",
+      "destination privateconfig creation/link",
+      "none versus actualpsfailure",
+      "mixedclasses + bothinterpreter versions"
+    ]
+  },
+  "historical_guard_receipt_correction": "Originalautomatedgreengate1 remainsfailure; defaultUVcache-lock300s wasdistinct fromunlimitedsystemd startup. Newunit lock10s only."
+}
