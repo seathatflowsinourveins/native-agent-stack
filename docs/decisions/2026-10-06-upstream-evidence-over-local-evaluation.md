@@ -89,6 +89,11 @@ The named skills and Grafana A/B campaigns above are superseded even where their
 configuration contains integration assertions; this is not a blanket deletion
 of wiring tests.
 
+The [B3 context-budget amendment](2026-10-05-harness-context-budget.md#amendment-2026-10-06-b3-read-back-scope)
+records a separate dated waiver of NativeStack's side of a two-host wiring
+read-back, the measured NativeStack2604 observation, and the SDK kit owner's
+deferred `codex-home-full` check. Its remaining wiring check retains that scope.
+
 S4 becomes one read-back after **one working day of normal lane work following
 both tools windows**. Read organic counters from native client records; give
 each slot without organic use, including services, timers and dashboards, one

@@ -464,6 +464,29 @@ feeds the next lifecycle-task sweep. Upstream closing a demonstrated glue gap
 removes that glue. No new security ceremony, service, model run or custom runner
 is added.
 
+#### Amendment 2026-10-06: B3 read-back scope
+
+**Decision.** NativeStack's part of the two-host read-back requirement above is
+waived until its retirement. NativeStack2604 has a recorded measured read-back
+pass; the owner's `/context` observation supplies the Skills row: **64 skills,
+7.8k tokens**. The bounded SDK jobs' `codex-home-full` read-back remains due at
+the first bounded SDK job after the night of 2026-10-06, owned by the SDK kit
+owner (the co-op). The remaining read-back requirement still governs replacement
+of the inline root routing; this amendment changes no client configuration.
+
+**Evidence and authority.** The measured observations are recorded in
+`coordination/session-d91d55ad-20261006/IMPROVEMENT-MANIFEST.md`, B3. The waiver
+and deferred SDK check follow `task-ns2604-coop-20261006T203515Z`, section 5, B3.
+These are retained observations and a dated ruling, rather than a new read-back
+performed by this amendment. The Skills figure describes the displayed context
+row and establishes no provider-token saving or comparative benchmark.
+
+**Alternative and overturn.** Re-rendering and checking the retiring host was
+the alternative to the waiver. A dated decision to retain it as an ongoing
+target would reopen its read-back requirement. Compare any continuing target's
+actual client blocks with the phrases and settings required above; an SDK
+read-back failure remains a wiring issue for the kit owner to resolve.
+
 ### PR #726 repair acceptance
 
 | Command | Exit | Actual returned result |
