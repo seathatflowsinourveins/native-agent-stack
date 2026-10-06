@@ -14042,56 +14042,6 @@
       "bytes": 47180
     },
     {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/README.md",
-      "sha256": "f1c06b44a8a0ef52e3851aeaa0b07fd25f24672209f109809eacea650ac11ef2",
-      "bytes": 36439
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.188e0078fc8f",
-      "sha256": "188e0078fc8f4a36ef54eb856bf2ef2660cad1ae280332dc86e405b7a230a0f5",
-      "bytes": 51113
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.5a061ff06f41",
-      "sha256": "5a061ff06f41fa1b5721f10fb01037ce790639f715481c2efdd98ea32700ee3b",
-      "bytes": 62212
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.67429251370f",
-      "sha256": "67429251370f1d397e53e69c5ff0b8b0ef7c2cb0e069687f0b087e6cca2ba013",
-      "bytes": 58848
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/receipt-20261005-passed.json",
-      "sha256": "757252a952b5b3481f9c51c89e76b2947e40bfdeba5187d0b17b5c2c8bfb43dd",
-      "bytes": 31250
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/receipt-20261005-run1-not-connected.json",
-      "sha256": "3275357f7673f50d41bda2686ed6712d2202b7b02180f9b8e5cb9120a9f977df",
-      "bytes": 6092
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/receipt-20261005-run2-failed.json",
-      "sha256": "2778c4d476c1f9a711590acd3b95155958b5af1b12d2d6d85b49b6ca9db430a9",
-      "bytes": 14712
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/plan.json",
-      "sha256": "24ffca56dfa7bd647bcf423dbc91ae3f605384a81a0ad9523cc024a36ac3ec72",
-      "bytes": 3390
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/run.py",
-      "sha256": "af6c817e73938bb446a9026e1713c3c35db7a519b7e5ff9162523a916f35a091",
-      "bytes": 79117
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/safety.py",
-      "sha256": "4165946e022deeb7725e63041c0f5c8a529a6490d46bf78d4b1bd131a1a90a1d",
-      "bytes": 5047
-    },
-    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
       "sha256": "e8c551a8082ebb5909ed00507d39a635b995e61d44546860710108040becb2f4",
       "bytes": 24080
@@ -16053,7 +16003,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "ebad29544bcd86c22b0fc4d76c2882156c3735b8d003b8b1259e4bf96ba22d8e",
+      "sha256": "8420f58ef2f613bab8da7a4486e907a9118b178d9d8e5eb8c70e4d84950c6c73",
       "bytes": 322942
     },
     {
@@ -16498,8 +16448,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "82077f9c635c5e50f36384de017e1844d3a65320fac06c4cac2dd26ca972d554",
-      "bytes": 26205
+      "sha256": "110b4c884323b0ead55981925bdb0645fedcff1ed02af375a5f12be0e3a2c617",
+      "bytes": 25545
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -17408,12 +17358,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "e30b11544f28a0a8682f930afef47a2af9c441591d25a8dbadbfb255921d8212",
+      "sha256": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e",
       "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "aa6515ab958fd48038e853e91ebf29e196da7d4d6736aa90240c12a8cf6dabd5",
+      "sha256": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
       "bytes": 362513
     },
     {
@@ -39548,8 +39498,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "1845593bc80d441b231b59ab2cbf567cc94ac8f3893797bf818c64e4c0d50a35",
-      "bytes": 12991
+      "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749",
+      "bytes": 12145
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -54650,11 +54600,6 @@
       "path": "tests/test_ibkr_paper_orders.py",
       "sha256": "787be818d3b4e5693597979da34fa09683697275de146520ccc438c3b897afc6",
       "bytes": 67010
-    },
-    {
-      "path": "tests/test_ibkr_paper_orders_rc5.py",
-      "sha256": "4a058d2fbb31c6d5007035ce49941a7ee67b0cd538c408a0c9a6804fd4736475",
-      "bytes": 90541
     },
     {
       "path": "tests/test_ingest_snapshot.py",
