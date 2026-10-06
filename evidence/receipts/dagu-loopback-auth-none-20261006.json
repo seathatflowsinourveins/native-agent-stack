@@ -325,6 +325,13 @@
       "retained_failure": "Registry was copied from a newer shared origin/main while the worktree still contained c1300c15 files; unrelated new-main files were missing or had mismatched hashes",
       "correction": "Rebase source commit onto immutable 1fa865066b4a9e82522170ca48759ffebc07ed0c, then derive registry from the same pinned main commit and re-register only owned files",
       "scope": "Publication synchronization failure, not Dagu operation or owner classification"
+    },
+    {
+      "command": "rtk proxy nice -n 19 python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_stdout": "{\"components\": 69, \"hashed_files\": 10322, \"profiles\": 4, \"receipts\": 213, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "evidence_class": "local_integration",
+      "scope": "Passing rebased publication integrity/scope check on pinned main 1fa865066b4a9e82522170ca48759ffebc07ed0c; not host, provider, paper or upstream acceptance"
     }
   ],
   "owner_classification_artifact": "evidence/artifacts/dagu-loopback-auth-none-20261006/owner-classification.json",
