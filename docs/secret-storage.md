@@ -264,8 +264,8 @@ not a boundary.
 If a credential store is supplied through a mount, check its visibility in the
 consuming process's mount namespace. The process's `/proc/<pid>/mountinfo` view
 is the relevant observation; a mount seen by another process or a general claim
-about Administrator or WSL state does not establish that view. Keep restart
-visibility unqualified until it is observed from the consumer after that restart.
+about Administrator or WSL state does not establish that view. Treat restart
+visibility as unverified until it is observed from the consumer after that restart.
 See [Linux mount_namespaces(7), DESCRIPTION](https://man7.org/linux/man-pages/man7/mount_namespaces.7.html#DESCRIPTION).
 
 ## Adding or rotating a key without pasting it anywhere
@@ -1355,14 +1355,25 @@ option is body-present; no file is opened to decide this.
 
 At the cited OmniRoute pin, `GET /api/usage/provider-limits` reads cached data
 through `getSanitizedCachedProviderLimitsMap()`, while `POST` calls
-`syncAllProviderLimits({ source: "manual" })`. Retain the returned
-`lastAutoSyncAt` and `intervalMinutes` as synchronization metadata with the
-cached observation; record an explicit live synchronization separately. The
-cached helper rewrites selected quota keys; its sanitization name does not
-certify that every returned field is safe to publish. Review the exact route
-and helper before publishing value-free observations
+`syncAllProviderLimits({ source: "manual" })`. The cached reader rewrites only
+Antigravity/agy quota keys; its sanitization name does not certify that every
+returned field is safe to publish. Review the exact route and helper before
+publishing value-free observations
 ([diegosouzapw/OmniRoute@c1e30b76, route.ts:13–38](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/api/usage/provider-limits/route.ts#L13-L38),
-[providerLimits.ts:668–720](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L668-L720)).
+[cached reader, providerLimits.ts:686–724](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L686-L724),
+[quota sanitizer, providerLimits.ts:160–169](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L160-L169)).
+
+`lastAutoSyncAt` records only the last scheduled bulk sync. Retain it and
+`intervalMinutes` as scheduler metadata. A manual POST, per-connection refresh
+or post-usage refresh can update the cache without advancing that bulk-sync
+stamp. Date each cached entry by its own `fetchedAt` and retain its recorded
+`source`; an error-only refresh can preserve a prior entry and its metadata
+([timestamp getter, providerLimits.ts:668–676](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L668-L676),
+[bulk-sync writer, providerLimits.ts:1028–1034](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L1028-L1034),
+[post-usage refresh, providerLimits.ts:117–133](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimits.ts#L117-L133),
+[per-connection refresh, route.ts:14–23](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/api/usage/%5BconnectionId%5D/route.ts#L14-L23),
+[entry fields, providerLimitsCache.ts:22–38](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimitsCache.ts#L22-L38),
+[prior-entry preservation, providerLimitsCache.ts:40–49](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/providerLimitsCache.ts#L40-L49)).
 
 Method and query evidence are associated with each request. Curl's last explicit
 `-X` controls its wire method; otherwise data/form means POST, upload PUT and
