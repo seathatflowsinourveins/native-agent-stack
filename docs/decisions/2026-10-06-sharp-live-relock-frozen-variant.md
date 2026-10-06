@@ -40,3 +40,20 @@ Recipe/source scope: native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a
 blueprints/convergence-practice/application-delivery/Makefile:3-5,27-32,
 README.md:170-180; tests/test_frozen_macos_variant_no_use.py:1-47.
 Actual output and scope: evidence/receipts/sharp-0355-qualification-20261006.json.
+
+Review follow-up, 2026-10-06: the co-op relays the command center's ruling
+task-ns2604-coop-20261006T170124Z, ruling 2, accepting the disclosed browser gap
+for the urgent security landing conditional on a fresh frozen install/frontend
+build and restoration of the unrelated Mako JSON escape spelling. Both fresh
+commands exit 0. The exact recipe `make postgres-init` exits 2 because its
+PostgreSQL 18.6 initdb binary is absent (inner 127); its source-build installer
+is not run. Recipe Makefile/config fix the browser URL to 18080, held by the
+local alert service, which remains untouched. New-head ACK still belongs to CC.
+
+Dated follow-up: after the tools window and outside paper/heavy exclusions,
+qualify the dedicated test DB through an upstream-supported release and run the
+unchanged browser cases in an isolated network namespace if the recipe still
+offers no supported port override. This is unfinished acceptance, not a passing
+test or permanent waiver. Preserve the original failed attempts unchanged.
+Fresh argv/exits/outputs and bounds are in
+evidence/receipts/sharp-review-followup-20261006.json and the review-* outputs.

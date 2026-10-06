@@ -185,7 +185,7 @@
         "retained_path": "history/uv.lock.ecfa1127"
       },
       "current_sha256": "0f5e1fbdb0aaa20697eda0f3721610275bd2f80e7223b63993b84ec21d7f6b50",
-      "change": "2026-10-06 dated security supersession: Mako1.4.1→1.4.2 for GHSA-5639-2j2p-m4mx, pinned uv0.12.22 targeted upgrade. Only the Mako package entry changes; native lock format revision3→5 is recorded separately. Original frozen bytes are retained and are not qualified as current dependencies.",
+      "change": "2026-10-06 dated security supersession: Mako1.4.1\u21921.4.2 for GHSA-5639-2j2p-m4mx, pinned uv0.12.22 targeted upgrade. Only the Mako package entry changes; native lock format revision3\u21925 is recorded separately. Original frozen bytes are retained and are not qualified as current dependencies.",
       "verification": {
         "status": "passed",
         "receipt": "evidence/receipts/mako-142-qualification-20261005.json",
