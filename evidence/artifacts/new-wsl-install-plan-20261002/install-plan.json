@@ -2568,7 +2568,7 @@
           "scope": "Empty public template; operator separately supplies canonical native roots in a private registry"
         },
         "readback_gate": "Provisioned cc-lanes UID plus panel-query results for1h/24h and browser readback of current native identities, freshness and unknown rows; not accepted by source rendering",
-        "rollback": "Withdraw/restore grafana-dashboards/lanes.json under the same Token efficiency provider; disableDeletion=true means withdrawal also requires operator removal of UID cc-lanes in Grafana. Preserve other dashboards, provider and private registry."
+          "rollback": "File-based rollback under the same Token efficiency provider: restore the previous grafana-dashboards/lanes.json if retaining Lanes. To withdraw cc-lanes, remove only that lanes.json and temporarily set disableDeletion=false on the nativestack2604-token-layer provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-lanes returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve token-layer.json, the provider, all other dashboards and the private registry. No administrator login or Grafana UI mutation is required."
       }
     },
     {

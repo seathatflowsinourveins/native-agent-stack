@@ -305,6 +305,9 @@ native-data collector on this host, which is not part of this row.
 
 Apply from the long-lived main checkout once it contains the merged change;
 keep that checkout in place because the emitter unit records its absolute path.
+While the timer is enabled, retain a revision compatible with the installed
+emitter; do not move that checkout to a revision that removes or incompatibly
+changes the emitter entry point. Disable the timer before withdrawing it.
 Run the commands below from that checkout's install-plan directory. Restart
 Grafana, which reads provider files and `grafana.ini` when it starts, then wait
 for its health endpoint before acceptance:
@@ -337,14 +340,41 @@ steps outside the paper windows (6:35–9:45 AM EDT / 10:35–13:45Z, and
 `$config_root/ecosystem-grafana-dashboards/` directory, the three dashboard
 template copies and two research-unit template copies in `$config_root/`, the
 two research-unit files in `$config_root/systemd/` (remove that directory only
-if empty), and the observation data folder's `grand-dashboard/` cache. Remove
-the now-empty Ecosystem folder through Grafana's existing administrator
-interface. Preserve unrelated configuration and data. On start
+if empty), and the observation data folder's `grand-dashboard/` cache. Retain
+any empty Grafana Ecosystem folder because
+anonymous Viewer has no folder-deletion path. Preserve unrelated configuration
+and data. On start
 Grafana deletes the dashboards of a provider that is no longer configured (Grafana
 v13.2.3 `pkg/services/provisioning/dashboards/dashboard.go:127-141`); removing
 only a dashboard file would not, because the provider sets `disableDeletion: true`.
 The Ecosystem provider reads a sibling folder of `grafana-dashboards/` because
 the file reader walks its path recursively (`file_reader.go:181`).
+
+Lanes has a separate file-based rollback within the retained Token efficiency
+provider. Restore the previous `$config_root/grafana-dashboards/lanes.json` to
+roll back its contents. To withdraw `cc-lanes`, remove only that file, temporarily
+set `disableDeletion: false` for `nativestack2604-token-layer`, and restart
+`ns2604-grafana.service` in the permitted slot. Verify the anonymous
+`/api/dashboards/uid/cc-lanes` returns 404, then restore `disableDeletion: true`
+and restart/read back the provider configuration. Keep `token-layer.json`, the
+provider, unrelated dashboards and the private registry. The shipped anonymous
+Viewer configuration supplies no administrator UI deletion path.
+
+Remaining `13000` references are retained source/observation fields, not the
+NativeStack2604 dashboard URL. At the reviewed source head `d55a5927`, their
+complete disposition is:
+
+| Source | Disposition |
+| --- | --- |
+| `docs/token-efficiency-stack.json:7225` | Retained authoring/workstation Grafana health-command form on 13000, with the row's dated result. |
+| `docs/token-efficiency-stack.json:7226` | Second retained workstation health-command form on 13000; current NativeStack2604 directions use 21301 with the quiet-output flags. |
+| `blueprints/token-native-focus/saturation-audit.json:3588` | Dated documented recipe command, explicitly not current-host recertification. |
+| `observability/grand-dashboard/passwordless.json:9` | Historical configured listener in the 2026-09-19 receipt. |
+| `observability/grand-dashboard/passwordless.json:48` | Historical native socket-observation command (`ss`) in that receipt. |
+| `observability/grand-dashboard/passwordless.json:50` | Historical listener result paired with the line-48 command. |
+
+The NativeStack2604 renderer and provider use 21301; these retained records do
+not configure that listener or supersede this host's read-back.
 
 Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
 the disarmed sink until the selected receiver's private files exist. ntfy.sh was

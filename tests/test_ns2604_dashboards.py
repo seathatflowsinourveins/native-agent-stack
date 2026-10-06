@@ -159,6 +159,73 @@ class Ns2604DashboardTests(unittest.TestCase):
             stale.write_text(stale.read_text().replace("ns2604-prometheus", "ecosystem-prometheus"))
             self.assertEqual(1, run("grafana-check").returncode)
 
+    def test_all_provisioned_codex_token_panels_have_lower_bound_qualification(self):
+        """Exercise the actual template-copy publisher, including token-layer."""
+        config_module = G.GRAFANA_POLICY
+
+        def panels(items):
+            for panel in items:
+                yield panel
+                yield from panels(panel.get("panels", []))
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = self.render(root)("grafana", "--source-root", str(PLAN / "config"))
+            self.assertEqual(0, result.returncode, result.stderr)
+            provisioned, matched, unqualified = set(), {}, []
+            for _, output in config_module.GRAFANA_FILES:
+                if not output.endswith(".json"):
+                    continue
+                board = json.loads((root / "config" / output).read_text())
+                provisioned.add(board["uid"])
+                for panel in panels(board["panels"]):
+                    if not any(re.search(r"\b(?:ecosystem_)?codex_turn_token_usage_sum\b", target.get("expr", ""))
+                               for target in panel.get("targets", [])):
+                        continue
+                    matched.setdefault(board["uid"], set()).add(panel["id"])
+                    if "lower bound" not in panel.get("title", "").lower() or "lower bound" not in panel.get("description", "").lower():
+                        unqualified.append((board["uid"], panel["id"]))
+                    elif "newly born single-turn" not in panel["description"]:
+                        unqualified.append((board["uid"], panel["id"], "missing reconciliation gate"))
+            # Non-vacuous and exhaustive: enumerate every provisioned JSON asset,
+            # and require all previously missed token-layer panels explicitly.
+            self.assertEqual(set(config_module.DASHBOARD_UIDS.values()) | {"token-layer"}, provisioned)
+            self.assertTrue({"token-layer", "ecosystem-native", "native-foundation-data", "cc-lanes"} <= set(matched))
+            self.assertTrue({6, 21, 22} <= matched["token-layer"])
+            self.assertGreaterEqual(sum(map(len, matched.values())), 7)
+            self.assertEqual([], unqualified)
+
+    def test_native_renderer_generates_qualified_token_layer(self):
+        board = G.dashboards()["grafana-token-layer.json"]
+        token_panels = {panel["id"]: panel for panel in board["panels"] if panel["id"] in (6, 21, 22)}
+        self.assertEqual({6, 21, 22}, set(token_panels))
+        for panel in token_panels.values():
+            self.assertIn("lower bound", panel["title"].lower())
+            self.assertIn("lower bound", panel["description"].lower())
+            self.assertIn("newly born single-turn", panel["description"])
+
+    def test_standalone_grafana_publisher_needs_no_repository_policy_module(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            script = root / "installed-observability-config.py"
+            shutil.copy(PLAN / "config/observability_config.py", script)
+            # Synthetic emitter-only checkout: no ns2604_dashboards.py or other
+            # helper module is present. The progress script is never executed.
+            emitter = root / "checkout/observability/grand-dashboard/progress.py"
+            emitter.parent.mkdir(parents=True)
+            emitter.write_text("# local synthetic packaging fixture; never executed\n")
+            env = dict(os.environ, NS2604_OBSERVABILITY_DATA=str(root / "data"), XDG_CONFIG_HOME=str(root / "xdg"))
+            result = subprocess.run([
+                sys.executable, str(script), "grafana", "--config-root", str(root / "config"),
+                "--source-root", str(PLAN / "config"), "--repo-root", str(root / "checkout"),
+            ], capture_output=True, text=True, env=env)
+            self.assertEqual(0, result.returncode, result.stderr)
+            board = json.loads((root / "config/grafana-dashboards/token-layer.json").read_text())
+            for panel in board["panels"]:
+                if panel["id"] in (6, 21, 22):
+                    self.assertIn("lower bound", panel["title"].lower())
+                    self.assertIn("lower bound", panel["description"].lower())
+
     def test_grafana_render_preserves_the_operator_private_lane_registry(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

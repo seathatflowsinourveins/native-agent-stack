@@ -180,7 +180,7 @@
     },
     {
       "id": 6,
-      "title": "GPT tokens (Codex, shared writer)",
+      "title": "GPT tokens (Codex, shared writer) \u2014 lower bound until step 7 read-back",
       "type": "stat",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -208,7 +208,8 @@
           "noValue": "No observation"
         },
         "overrides": []
-      }
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 7,
@@ -670,7 +671,7 @@
     },
     {
       "id": 21,
-      "title": "GPT token counters per hour by model (shared writer)",
+      "title": "GPT token counters per hour by model (shared writer) \u2014 lower bound until step 7 read-back",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -698,11 +699,12 @@
           "noValue": "No observation"
         },
         "overrides": []
-      }
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 22,
-      "title": "GPT token types per hour (shared writer; not additive)",
+      "title": "GPT token types per hour (shared writer; not additive) \u2014 lower bound until step 7 read-back",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -730,7 +732,8 @@
           "noValue": "No observation"
         },
         "overrides": []
-      }
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 23,
@@ -987,7 +990,7 @@
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "noValue": "No observation · coverage unverified"
+          "noValue": "No observation \u00b7 coverage unverified"
         },
         "overrides": []
       }
@@ -1016,14 +1019,14 @@
           "interval": "1m",
           "instant": false,
           "range": true,
-          "legendFormat": "{{service_name}} · RTK prefix={{shell_rtk}}"
+          "legendFormat": "{{service_name}} \u00b7 RTK prefix={{shell_rtk}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "noValue": "No observation · coverage unverified"
+          "noValue": "No observation \u00b7 coverage unverified"
         },
         "overrides": []
       }
@@ -1052,14 +1055,14 @@
           "interval": "1m",
           "instant": false,
           "range": true,
-          "legendFormat": "{{service_name}} · {{hook_name}}"
+          "legendFormat": "{{service_name}} \u00b7 {{hook_name}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "noValue": "No observation · coverage unverified"
+          "noValue": "No observation \u00b7 coverage unverified"
         },
         "overrides": []
       }
@@ -1088,14 +1091,14 @@
           "interval": "1m",
           "instant": false,
           "range": true,
-          "legendFormat": "{{service_name}} · {{source}}"
+          "legendFormat": "{{service_name}} \u00b7 {{source}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "noValue": "No observation · coverage unverified"
+          "noValue": "No observation \u00b7 coverage unverified"
         },
         "overrides": []
       }
@@ -1121,7 +1124,7 @@
           "datasource": {
             "uid": "ns2604-prometheus"
           },
-          "legendFormat": "{{hook_name}} · {{status}}",
+          "legendFormat": "{{hook_name}} \u00b7 {{status}}",
           "instant": true,
           "range": false
         }
@@ -1130,7 +1133,7 @@
         "defaults": {
           "unit": "short",
           "decimals": 1,
-          "noValue": "No observation · metric coverage unverified"
+          "noValue": "No observation \u00b7 metric coverage unverified"
         },
         "overrides": []
       }
@@ -1171,7 +1174,7 @@
           "datasource": {
             "uid": "ns2604-loki"
           },
-          "legendFormat": "{{hook_event}} · successful",
+          "legendFormat": "{{hook_event}} \u00b7 successful",
           "instant": true,
           "range": false
         },
@@ -1181,7 +1184,7 @@
           "datasource": {
             "uid": "ns2604-loki"
           },
-          "legendFormat": "{{hook_event}} · blocking",
+          "legendFormat": "{{hook_event}} \u00b7 blocking",
           "instant": true,
           "range": false
         },
@@ -1191,7 +1194,7 @@
           "datasource": {
             "uid": "ns2604-loki"
           },
-          "legendFormat": "{{hook_event}} · non-blocking error",
+          "legendFormat": "{{hook_event}} \u00b7 non-blocking error",
           "instant": true,
           "range": false
         },
@@ -1201,7 +1204,7 @@
           "datasource": {
             "uid": "ns2604-loki"
           },
-          "legendFormat": "{{hook_event}} · cancelled",
+          "legendFormat": "{{hook_event}} \u00b7 cancelled",
           "instant": true,
           "range": false
         }
@@ -1210,7 +1213,7 @@
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "noValue": "No observation · hook event coverage unverified"
+          "noValue": "No observation \u00b7 hook event coverage unverified"
         },
         "overrides": []
       }
