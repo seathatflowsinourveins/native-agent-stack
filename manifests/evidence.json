@@ -5196,13 +5196,13 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "16bc3bdafa3260f38f8e62dd07bc549da77f0f162198bd9fcfbe11c854e50fb1",
-      "bytes": 22876
+      "sha256": "2f6b0d8d36efb6bec4ca339a620e8b21e642c23503e34a4144f8adb0d224e4d7",
+      "bytes": 23336
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "09f280caa8ce33670a270cacba5648eb4372dda90c960be4c7bff44528af1418",
-      "bytes": 59044
+      "sha256": "5d8c62e50a3e0b26107d6bd0b7bf45b70c6b41cfbf2aac606b5d0070e084dc58",
+      "bytes": 59072
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -17609,6 +17609,11 @@
       "path": "docs/decisions/2026-10-06-skill-recording-and-live-catalog-budgets.md",
       "sha256": "5926a2a7c531fe07387aca405b53ea74b4206bfc4061cb2f0936112ffd110abc",
       "bytes": 10562
+    },
+    {
+      "path": "docs/decisions/2026-10-06-skill-recording-cap-amendment.md",
+      "sha256": "7190aef410a138548ebf0143e013346e5c5ece925043c488f00089161750a161",
+      "bytes": 2525
     },
     {
       "path": "docs/direct-results.md",
@@ -55782,8 +55787,8 @@
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "aaa5bbb72ae06f9f02101b74019eec670f86f8f01fe9ff562409ba16790d732f",
-      "bytes": 20617
+      "sha256": "18397655e1b96e250cca5ac514e57716abba654e1f752831cb05241ead81c873",
+      "bytes": 20820
     },
     {
       "path": "tests/test_skills_status.py",
@@ -55997,8 +56002,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "243ee7435e4c6a434eb8a79086973cb777a28dc43dbbea81de7bfe3f0e88cd74",
-      "bytes": 63212
+      "sha256": "f0e403ea0261e4d84cd89cfc37dd4aa5abd827035877004ff0d120dec49d711f",
+      "bytes": 63209
     },
     {
       "path": "tools/adoption/managed_block.py",
