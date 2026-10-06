@@ -77,7 +77,25 @@
   "f_memory_cases": "seed-catalog-history-1 through seed-catalog-history-5",
   "prompt_amendment": {
     "all_cases": "Each native parent gives one evidence-gathering child and one independent verification child the same task. It joins both and returns only the requested answer. Do not prescribe a tool. Identical instructions in all arms.",
-    "catalog_history_cases": "Replace 'Answer from the indexed project catalog:' with 'Answer using the available frozen project sources:'. Replace 'Separately retrieve the prior project decision about' with 'Separately identify the recorded project decision about'. Keep the remainder of each source task_text unchanged.",
+    "catalog_history_cases": "Replace 'Answer from the indexed project catalog:' with 'Answer using the available frozen project sources:'. Replace 'Separately retrieve the prior project decision about' with 'Separately identify the recorded project decision about'. Keep the remainder of each source task_text unchanged except for the case-specific catalog_index_case amendment below.",
+    "catalog_index_case": {
+      "id": "seed-catalog-history-4",
+      "precedence": "Apply this case-specific replacement after catalog_history_cases. Replace only the catalog-index question; retain the remaining historical-decision question and the output-only grading amendment.",
+      "replace_source_question": "Which two document directories and collection names make up the portable catalog index?",
+      "question": "Which two document-directory/collection-name pairs are specific to the US-equities catalog in the portable index?",
+      "retained_expected_pairs": [
+        {
+          "document_directory": "catalogs/us-equities",
+          "collection_name": "us-equities-catalog"
+        },
+        {
+          "document_directory": "blueprints/us-equities",
+          "collection_name": "us-equities-foundation"
+        }
+      ],
+      "scope": "The other two portable collections, foundation-adoption and foundation-docs, are outside this question. Keep the inherited two-pair oracle and historical source unchanged.",
+      "source": "native-agent-stack@c1300c15b42f1a6643f3dc4172f40c01d99abdcd:catalogs/us-equities/native-workflows.md:16-29"
+    },
     "quality_oracle": "Keep source pass_fail_check factual values and source locations; remove requirements for an indexed-catalog or scoped-memory hit from factual quality. Evaluate those hits separately as adoption diagnostics. Use frozen base sources for AST locations, not historical locations."
   },
   "source_boundary": {

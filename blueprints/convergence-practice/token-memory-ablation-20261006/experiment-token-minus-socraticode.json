@@ -188,7 +188,7 @@
     "inputs": [
       {
         "path": "blueprints/convergence-practice/token-memory-ablation-20261006/tasks.json",
-        "sha256": "2f97a74c1165784ce61650cd7b429714d7e258a50a5f7d6c610ff329b1f298ac"
+        "sha256": "6a84e93c9bf7ba64a09cfd3d0d717abc6c44fd0cbce7717c27aa42a847fe32bb"
       },
       {
         "path": "blueprints/convergence-practice/token-memory-ablation-20261006/organic-census.json",
