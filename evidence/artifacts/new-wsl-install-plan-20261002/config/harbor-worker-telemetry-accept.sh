@@ -5,7 +5,7 @@
 # docs-mintlify/core-concepts/agents/atif.mdx:121-128;
 # tests/integration/test_hello_user_e2e.py:50-53.
 set -euo pipefail
-if [[ -v CODEX_AUTH_JSON_PATH || -v CODEX_FORCE_AUTH_JSON ]]; then
+if [[ -n "${CODEX_AUTH_JSON_PATH+x}" || -n "${CODEX_FORCE_AUTH_JSON+x}" ]]; then
   printf 'needs_user: auth-store upload is forbidden; unset CODEX_AUTH_JSON_PATH and CODEX_FORCE_AUTH_JSON and use the OpenAI key runner.\n' >&2
   exit 78
 fi
