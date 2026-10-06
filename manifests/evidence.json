@@ -17447,6 +17447,11 @@
       "bytes": 3898
     },
     {
+      "path": "docs/decisions/2026-10-06-sweep-discovery-memory-and-source-order.md",
+      "sha256": "a31b97e3f76a0c2f3c5ddcf671dd417d3833ea6f4c60d2efa61502c5a5104b92",
+      "bytes": 10090
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -49187,6 +49192,21 @@
       "bytes": 1302
     },
     {
+      "path": "evidence/artifacts/sweep-harness-discovery-20261006/source-review.json",
+      "sha256": "a6eab1adcba38013fe34b0e8cfe08ef8a11d4298842b72cefd960728601060c7",
+      "bytes": 2927
+    },
+    {
+      "path": "evidence/artifacts/sweep-harness-discovery-20261006/verification-final.json",
+      "sha256": "8156340e9a68c5225fc1c2ee8cf3b4e4a115e7f5f0f55d33b2ce8e9967809d2d",
+      "bytes": 2103
+    },
+    {
+      "path": "evidence/artifacts/sweep-harness-discovery-20261006/verification.json",
+      "sha256": "6806c03e6ddcad9ccadce6f5436ef3b57af7cb8c3e110aa6ca7bb2edca96bdd4",
+      "bytes": 4620
+    },
+    {
       "path": "evidence/artifacts/tavily-research-qualification-20260926/run.log",
       "sha256": "fdb738a4c9c28d554a79c8f07aba649b927aa3ffba1cf663cbc1f2f76c63a027",
       "bytes": 735
@@ -55137,9 +55157,14 @@
       "bytes": 86746
     },
     {
+      "path": "tests/test_landscape_sweep_discovery_history.py",
+      "sha256": "3aea7aaa31dd4cbd537955d84439f24fefc984d5145555fb2dc815d1aa3f71a0",
+      "bytes": 15516
+    },
+    {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "472f0c0fbae4fc006345df7b1ba7150d2d72643a6838a48076ca2f482d9113e3",
-      "bytes": 377687
+      "sha256": "e76b876aef77480d2e60890cb45f54c45e9f01708e00f4a104d2c39e35dd5c71",
+      "bytes": 378861
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -55968,8 +55993,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "f12c5749eff044ed59fdf26a78fa127236262a46ece7a590d0e1baf45a683a86",
-      "bytes": 112622
+      "sha256": "a0b39573605fc72366563553f38c54dbad982dbebfb9e67dfdb88c4075ddbcb8",
+      "bytes": 114421
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -55978,8 +56003,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
-      "sha256": "ec0bf5f398349e2b5313fff34d228ac89d86f1059ff04bfec1dc48be45d9625d",
-      "bytes": 62451
+      "sha256": "9ba0dd5d4d3c0e35c3c9c8eb15921f65037eb622dd106668e15e1514712224a6",
+      "bytes": 73222
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_call.sh",
@@ -56068,8 +56093,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/templates.json",
-      "sha256": "738af1b178ed50fa7504c28458c996dfad7f29c2e3037d2d6800815e38270ff4",
-      "bytes": 29737
+      "sha256": "20e6839853a31847048e9b9817eedc2e567d1e2f09fbc33b488094a2a03a0d1d",
+      "bytes": 32743
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
