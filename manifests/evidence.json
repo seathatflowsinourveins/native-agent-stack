@@ -4882,8 +4882,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "2234bfd59a7c87f7d0b18d22150d058773ab8a052111e3e2097796053fe64852",
-      "bytes": 55293
+      "sha256": "dec100f075d8e0fe5ddaea4b07af505f2ece92a39e25ab96fa4faa7544044074",
+      "bytes": 55553
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -4902,8 +4902,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "ed5181e95d843a49b197ca04c0e671c8ded3b31e0e484706bebe813378110db0",
-      "bytes": 4479
+      "sha256": "16a2942d0538d7a3ffbf5fbe8a57db3aaefb036253350fae229cb824ade6dc6b",
+      "bytes": 4579
     },
     {
       "path": "adoption/paired/README.md",
@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe",
-      "bytes": 92982
+      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec",
+      "bytes": 93206
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -16838,8 +16838,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "3eb5161caa86df7fc1edb86c84a208700ae9243240501df468acfddbd237cdb6",
-      "bytes": 146232
+      "sha256": "1c20e7da87850c067b1fe174f100f57747d2ae7de693284f25fd9d8c6f18d852",
+      "bytes": 146558
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -17038,8 +17038,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "549a70f992717568f6fe8811b3f4d7ffbe3299015458686643fffe54a6f86d7b",
-      "bytes": 134812
+      "sha256": "2bcc4e1c173e1780cd6f48f863e6e4fcb134d9374971f95d1217e755e7f336d4",
+      "bytes": 135623
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17178,8 +17178,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
-      "sha256": "aa1e7b5ad354b6a86c9dac099053944aaadcfd951c08ec861430812a64552805",
-      "bytes": 6304
+      "sha256": "e025fdf43cb7c4051b2e74ed89cca78aa15e60f655934bf8da9694ba4bf61b87",
+      "bytes": 7847
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md",
@@ -17207,6 +17207,11 @@
       "bytes": 16799
     },
     {
+      "path": "docs/decisions/2026-10-04-round2-plan-g1-messaging.md",
+      "sha256": "fd77b23847ac8a365893167de37e25052aabb15e3b1a098c2efb86a23cb2e6d8",
+      "bytes": 15472
+    },
+    {
       "path": "docs/decisions/2026-10-04-rtk-file-list-control.md",
       "sha256": "cbe7566aa8843bc18c1d25018dec6ddd04c871a599554aaa1d75a36954a2db9c",
       "bytes": 15171
@@ -17230,6 +17235,11 @@
       "path": "docs/decisions/2026-10-05-adaptive-paper-xnys-primary.md",
       "sha256": "e680ce187ddbb0cde726406710ec3e3272576e276050310b2aca2a7ca47448b7",
       "bytes": 22253
+    },
+    {
+      "path": "docs/decisions/2026-10-05-codex-service-tier-migration.md",
+      "sha256": "5efb729f1b102601b368929927a9d1ac9664b76be35abaefceb27b3f4f9367ae",
+      "bytes": 8411
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
@@ -17270,6 +17280,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
+      "sha256": "bd84b15362e59af085965d7e0e52581b1e195762f461b602a1d093d3e2dbe978",
+      "bytes": 15774
     },
     {
       "path": "docs/direct-results.md",
@@ -17533,12 +17548,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e",
+      "sha256": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda",
       "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+      "sha256": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
       "bytes": 362513
     },
     {
@@ -18835,6 +18850,16 @@
       "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
       "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
       "bytes": 14536
+    },
+    {
+      "path": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json",
+      "sha256": "76dff0d9fcac36c10cf9a86e6a63915794aca4b6465f5ea83e69554a75a38464",
+      "bytes": 6940
+    },
+    {
+      "path": "evidence/artifacts/codex-service-tier-migration-20261005/receipt.json",
+      "sha256": "dcae2dc2a2ba0b8b0b82f529d0a5a3ea5f41e7f0b4f85287f6890ff598ec2ec4",
+      "bytes": 13257
     },
     {
       "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt",
@@ -39673,8 +39698,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749",
-      "bytes": 12145
+      "sha256": "37815008b4e7078e11880d28542a9ecd89c7606a292b1b4a64e28ba5bebebbed",
+      "bytes": 13039
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -39683,8 +39708,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "cadff4ebe6b3df91f35fb2929555b78f9114c42fbbcf3455cc9a99ac7dcd80e2",
-      "bytes": 79508
+      "sha256": "009bb7c585d635e4916676e2ce244052e2a029369ec084659398de30d2bc6845",
+      "bytes": 79919
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -39838,8 +39863,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-accept.sh",
-      "sha256": "27a18055eb97e4696c3ccec06d1bdfadc882053a862ddd47946528dee7aac02e",
-      "bytes": 5456
+      "sha256": "a79b419cd4fe40faa26e9f45810d6111dfc932200b03cda04bd113e33a2d2490",
+      "bytes": 5470
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-contract.md",
@@ -39998,8 +40023,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "ece4b4529f4e098b7bc6d2edbcacd50de02dbd52ff55ac46412b5a41d28f5998",
-      "bytes": 387343
+      "sha256": "d94ec63c40e64c24caeb7f5c2f1af3ae6571369c6c724d6a012d546744f14789",
+      "bytes": 387867
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54993,8 +55018,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "0f5546415a0f6dd53169cf622741f600f2b36a72c3c3ae938c97b5879246d769",
-      "bytes": 283029
+      "sha256": "f8afd31beb37989ecf501d92b2818e75503452fc8cd0d4bf8eaa570b3adc02ed",
+      "bytes": 298811
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -55473,8 +55498,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "ae8f67fd2ed4028998bbf7524dc758491ba98c2b9c2b6ed82312c50b9faa4127",
-      "bytes": 153006
+      "sha256": "08639afa0c43d537a9071055fbae81b219bff9550be76b2afaba50d386c2e147",
+      "bytes": 160807
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",

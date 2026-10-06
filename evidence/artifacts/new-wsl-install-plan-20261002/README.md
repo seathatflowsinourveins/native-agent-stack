@@ -281,6 +281,9 @@ the disarmed sink until the selected receiver's private files exist. ntfy.sh was
 the coordinator's delegated pick on 2026-10-04. The user personally configured
 and accepted Telegram on NativeStack2604 at about 06:58Z on 2026-10-05; that live
 choice supersedes the delegated pick, and no supported receiver was overturned.
+Note: with ntfy.sh or Telegram the alert text leaves the host. Sources:
+[main `2d849ba1f`'s receiver note, :7](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-summary.md#L7)
+and [Alertmanager v0.34.1's Telegram receiver, :1862](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/configuration.md#L1862).
 The plan never reads or prints those private files. The default
 webhook pointer is
 `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/alertmanager-webhook-url`;

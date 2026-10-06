@@ -143,7 +143,7 @@ The manifest applies one rule per candidate, in order:
 | mcp-builder | anthropics/skills@3337550 | trial | on | no | 22 files wire MCP servers; building or fixing one has no procedure. |
 | frontend-design | anthropics/skills@3337550 | trial | on | no | The generated ecosystem guide and grand dashboard (19 HTML files) are hand-styled. |
 | agent-browser | vercel-labs/agent-browser@d01253d | trial | on | no | Browser acceptance uses the pinned `agent-browser` CLI; the skill documents its commands (925-char description). |
-| find-skills | vercel-labs/skills@7407f38 | trial | user-invocable-only | no | User-invoked registry search; anything it finds still needs pinning in this manifest before install. |
+| find-skills | vercel-labs/skills@7407f38 | trial | on | yes | Registry discovery the model invokes; anything it finds still needs pinning in this manifest before install. |
 
 ## Excluded groups
 
@@ -1764,4 +1764,4 @@ adds the [held state](../../adoption/skills/lifecycle.md#held).
 mattpocock skills are the coordinator's steps (wave-2 synthesis 1.6). The overturn conditions are in each retired
 entry; for agent-browser, the browser-tool measurement's result.
 
-> **Amendment 2026-10-05 (pinned Listing column):** the five rows that read `name-only` (typesafe-ai, iterative-retrieval, search-first, agent-browser, security-audit) now read `on`, the state the user's every-skill-on directive set on 2026-09-30 ([2026-09-30-skills-llm-native-listing.md](2026-09-30-skills-llm-native-listing.md), :43) and that `adoption/skills/manifest.json` already carries. The table is the pinned listing source that `tests/test_install_claude_profile.py` reads.
+> **Amendment 2026-10-05 (pinned Listing column):** the five rows that read `name-only` (typesafe-ai, iterative-retrieval, search-first, agent-browser, security-audit) now read `on`, the state the user's every-skill-on directive set on 2026-09-30 ([2026-09-30-skills-llm-native-listing.md](2026-09-30-skills-llm-native-listing.md), :43) and that `adoption/skills/manifest.json` already carries. The find-skills row now reads `on` and Codex `yes`, matching the manifest's `claude_listing: "on"` and `codex_enabled: true`; its gap names model-invoked registry discovery ([manifest at main `2d849ba1f`, :542-564](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/adoption/skills/manifest.json#L542-L564)). The table is the pinned listing source that `tests/test_install_claude_profile.py` reads.
