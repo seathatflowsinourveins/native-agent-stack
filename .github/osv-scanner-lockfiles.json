@@ -269,6 +269,11 @@
       "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
       "reason": "Retirement guard of the retired WSL retrieval partition: private, with no dependency, workspace, override or script field, and devEngines.runtime.name=retired-wsl-retrieval with onFail=error. Its historical lock is kept byte-identical as package-lock.json.frozen since 2026-10-04, a name no scanner reads, so there is no dependency here for OSV-Scanner or GitHub's dependency graph to report.",
       "evidence": "evidence/receipts/wsl-lock-frozen-rename-20261004.json"
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/package.json",
+      "reason": "Dependency-free authored routing negative fixture: package metadata and a verify script only, with no dependency declarations or sibling lock. B13 cases and fixture bytes remain frozen; this is not an install or build input.",
+      "evidence": "evidence/artifacts/skills-held-routing-20261006/source-review.json"
     }
   ],
   "excluded": [

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "skills-held-routing-dependency-inventory-correction-20261006",
+  "evidence_class": "local_integration_check",
+  "checked_at": "2026-10-06",
+  "scope": "Repository dependency-inventory coverage and its mutation fixtures. No scanner acceptance, model run, hook application or B13 efficacy claim.",
+  "sources": [
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:tests/test_osv_lockfile_coverage.py:386-425,981-1016",
+    "https://github.com/google/osv-scanner/blob/v2.6.0/docs/supported_languages_and_lockfiles.md",
+    "evidence/artifacts/skills-held-routing-20261006/source-review.json"
+  ],
+  "repairs": [
+    "The post-publication required coverage check found the frozen B13 package.json absent from the dependency inventory. Appended one dependency_free entry with an explicit reason and existing evidence locator; preserved all main entries.",
+    "The complete inventory suite then exposed a fixture setup that copied only the first dependency_free entry while the actual check validates all entries. Setup now copies all unchanged entries and evidence before mutating the first; check and rejection assertions are unchanged."
+  ],
+  "attempts": [
+    {
+      "command_scope": "Required lockfile inventory, blueprint classification and published workflow coverage methods",
+      "exit_code": 1,
+      "tests": 3,
+      "failures": 1,
+      "skips": 0,
+      "actual_failure": "Frozen B13 package.json missing from inventory",
+      "private_log": {"name": "required-checks.log", "bytes": 1699, "sha256": "4f0d2dc4b0381de612d6f0a84572c38c885170ecb4d7298f8949bac018c2bd69"}
+    },
+    {
+      "command_scope": "Complete tests.test_osv_lockfile_coverage plus required blueprint and workflow methods",
+      "exit_code": 1,
+      "tests": 59,
+      "failures": 1,
+      "skips": 0,
+      "actual_failure": "Unchanged-copy fixture omitted the second entry's evidence",
+      "private_log": {"name": "required-checks-2.log", "bytes": 11460, "sha256": "3c97493623a030d5602008efa1df771d73fed31736f66932a043f40c75e20ec9"}
+    },
+    {
+      "command_scope": "Complete tests.test_osv_lockfile_coverage plus required blueprint and workflow methods",
+      "exit_code": 0,
+      "tests": 59,
+      "failures": 0,
+      "skips": 0,
+      "duration_seconds": 10.411,
+      "private_log": {"name": "required-checks-3.log", "bytes": 10168, "sha256": "cc9490c8867caab2bb9d24cbe53507e030a610468bedbad3da288d902e12499f"}
+    }
+  ],
+  "retained_inputs": {
+    "original_public_head": "820be3ee0e3402053af7602b5eba9cf607eba51b",
+    "original_receipt": "evidence/artifacts/skills-held-routing-20261006/source-review.json",
+    "cases_sha256": "0e8377d63b452f7dd24e7526aaa82bd09dc9a47a7c1b37d794649937f4f78759",
+    "boundary": "Hook runtime, frozen cases and fixture package bytes remain unchanged. Original 33-test and validator results are retained, not rewritten."
+  },
+  "publication_gate": "Rebuild the registry from main through register_file, validate the correction, commit registry last, and report the actual validator outcome in the PR/status.",
+  "limits": [
+    "These are authored integration and mutation checks, not unchanged OSV-Scanner tests or dependency-graph observations.",
+    "Native keyless route, hook firing/trust, B13 and CC ACK remain prerequisites before live."
+  ]
+}
