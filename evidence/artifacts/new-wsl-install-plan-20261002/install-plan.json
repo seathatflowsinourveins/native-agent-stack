@@ -1610,11 +1610,11 @@
           }
         },
         "service_health": {
-          "command": "curl -fsS http://127.0.0.1:29374/healthz\nAI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json",
+          "command": "curl -fsS http://127.0.0.1:29374/healthz\nAI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json | jq -e '.client.server_url == \"http://127.0.0.1:29374\"' >/dev/null",
           "kind": "health",
           "source": {
-            "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712",
-            "line": 2712
+            "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/status.rs#L231",
+            "line": 231
           }
         }
       },

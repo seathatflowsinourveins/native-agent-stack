@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "kind": "ai_memory_health_endpoint_observation",
+  "date_utc": "2026-10-06",
+  "base_commit": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "source_pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+  "sources": [
+    "akitaonrails/ai-memory@7580b74d:crates/ai-memory-cli/src/config.rs:664,1655-1656",
+    "akitaonrails/ai-memory@7580b74d:crates/ai-memory-cli/src/commands/status.rs:203,231"
+  ],
+  "correction": "The canonical plan already supplies AI_MEMORY_SERVER_URL=29374; the co-op's reported default-target failure belongs to its H2H caller. This change verifies the returned native endpoint and preserves the existing selector.",
+  "evidence_classes": ["source_review", "synthetic", "local_integration"],
+  "target": "http://127.0.0.1:29374",
+  "controls": {
+    "red_wrong_reported_endpoint": {"exit_code": 1, "tests": 3, "failures": 1},
+    "green": {"exit_code": 0, "tests": 3},
+    "negative_cases": ["bare old-target caller", "nonzero native status", "zero-exit status reporting old endpoint"],
+    "real_host_requests": 0,
+    "upstream_suite": false
+  },
+  "organic_counts": {
+    "before": {"count": null, "window": null, "status": "unknown; no task-specific organic census"},
+    "after": {"count": null, "window": null, "status": "unknown; no host apply or task-specific organic census"},
+    "historical_reference": {
+      "artifact": "invoke-rates-baseline-T0-20261005T013741Z.json",
+      "sha256": "e193374679da4960320f3ca03a66c12e8e8f2c92c2e74d9b44b4005f18cf3b51",
+      "claude": {"pointer": "/items/181", "count": 0, "window": "2026-10-02T16:02:48Z..2026-10-04T19:28:51Z"},
+      "codex": {"pointer": "/items/190", "count": 0, "window": "92 rollouts from2026-10-02T16:02:52Z beforeT0; exact terminal boundary not supplied"},
+      "limitation": "Late installation/configuration gives inadequate exposure; these are not current before/after counts."
+    }
+  },
+  "host_acceptance": "pending CC ACK and sole co-op stage check",
+  "privacy": {"credentials_read_printed_copied": false, "credential_or_config_stores_read": false, "models_run": false, "host_writes_by_lane": false}
+}

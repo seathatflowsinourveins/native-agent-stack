@@ -605,9 +605,9 @@ memory-owner() {
 jq -e '\''[("SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd") as $event | any(.hooks[$event][]?.hooks[]?; (.command // "") | contains("ai-memory"))] | all'\'' "${CODEX_HOME:-$HOME/.codex}/hooks.json" >/dev/null'
       ;;
     service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712 (/healthz); status: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L2149
+      # Kind: health; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/status.rs#L231 (selected client.server_url); https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L1655 (per-command server override); https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712 (/healthz)
       check memory-owner health 'curl -fsS http://127.0.0.1:29374/healthz
-AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json'
+AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json | jq -e '\''.client.server_url == "http://127.0.0.1:29374"'\'' >/dev/null'
       ;;
     *) skipped memory-owner ;;
   esac
