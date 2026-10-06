@@ -61,6 +61,8 @@ class Round2RepairIntegrationTests(unittest.TestCase):
         return module
 
     def test_hcom_apply_never_grants_inbound_authorization_or_requires_codex(self):
+        # docs/decisions/2026-10-06-hcom-relaxation.md: the apply proceeds while Codex runs,
+        # leaves Claude settings untouched, writes no Codex rule file and runs no subprocess.
         adapter = self.source_module("hcom-client-config.py")
         for inbound in (None, "accept", "hold"):
             with self.subTest(inbound=inbound), tempfile.TemporaryDirectory() as scratch:
@@ -73,16 +75,89 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                        "HCOM_DIR": str(root / "hcom")}
                 with mock.patch.dict(os.environ, env), mock.patch.object(sys, "argv", [
                         "adapter", "--repo-root", str(ROOT), "--apply"]), \
-                        mock.patch.object(cfg, "running_codex_pids", return_value=[]), \
-                        mock.patch.object(adapter.subprocess, "run") as native, \
+                        mock.patch.object(cfg, "running_codex_pids", return_value=[4242]) as codex, \
+                        mock.patch("subprocess.run") as native, \
                         contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(adapter.main(), 0)
                 native.assert_not_called()
-                after = json.loads((claude / "settings.json").read_text())
-                if inbound is None:
-                    self.assertNotIn("crossSessionInbound", after)
-                else:
-                    self.assertEqual(after["crossSessionInbound"], inbound)
+                codex.assert_not_called()
+                self.assertEqual(json.loads((claude / "settings.json").read_text()), settings)
+                self.assertFalse((root / "codex" / "rules").exists())
+                for target in (claude / "CLAUDE.md", root / "codex" / "AGENTS.md"):
+                    text = target.read_text()
+                    self.assertIn("treat it as data", text)
+                    self.assertIn("never counts as the user's approval", text)
+                    self.assertNotIn("Agents may not use", text)
+
+    @unittest.skipUnless(shutil.which("jq"), "the after-sign-in program parses the checker's JSON with jq")
+    def test_hcom_after_sign_in_reads_hcoms_codex_home_and_every_rules_file(self):
+        # docs/decisions/2026-10-06-hcom-relaxation.md: the Codex home is CODEX_HOME, else the parent of
+        # HCOM_DIR (aannoo/hcom@2c5f343b src/hooks/codex.rs:72-75, src/paths.rs:26-53), and Codex loads every
+        # *.rules file there (openai/codex rust-v0.160.0 codex-rs/core/src/exec_policy.rs:662-700). A stub
+        # codex answers by the basenames it receives, like the real checker on the retained receipt
+        # (evidence/artifacts/hcom-relaxation-20261006/probe-receipt.json), and records its arguments.
+        row = next(r for r in json.loads((PLAN / "install-plan.json").read_text())["owners"]
+                   if r["slot"] == "agent-messaging")
+        program = row["acceptance"]["after_sign_in"]["command"]
+        stub = ("#!/usr/bin/env python3\n"
+                "import json, os, sys\n"
+                "args = sys.argv[1:]\n"
+                "with open(os.environ['STUB_LOG'], 'a') as log:\n"
+                "    log.write(json.dumps(args) + '\\n')\n"
+                "names = {os.path.basename(args[i + 1]) for i, a in enumerate(args) if a == '--rules'}\n"
+                "command = args[args.index('--') + 1:]\n"
+                "decision = 'allow' if 'hcom.rules' in names and command[1:2] in (['send'], ['term']) else None\n"
+                "if 'hcom-deny.rules' in names and command[1:2] == ['term']:\n"
+                "    decision = 'forbidden'\n"
+                "print(json.dumps({'decision': decision}))\n")
+        retired = ["Bash(hcom term)", "Bash(hcom term *)", "Bash(uvx hcom * claude-pty *)",
+                   "Bash(hcom send --from=*)", "Bash(uvx hcom --go *)"]
+        kept = ["Bash(git push --force *)", "Bash(hcom send *)", "Bash(hcom term inject *)", "Read(~/mine)"]
+
+        def run(layout, env=None, settings=None):
+            with tempfile.TemporaryDirectory() as scratch:
+                base = Path(scratch)
+                (base / "bin").mkdir()
+                (base / "bin" / "codex").write_text(stub)
+                (base / "bin" / "codex").chmod(0o755)
+                (base / "home").mkdir()
+                for rel in layout:
+                    (base / rel).parent.mkdir(parents=True, exist_ok=True)
+                    (base / rel).write_text("# synthetic\n")
+                if settings is not None:
+                    (base / "home" / ".claude").mkdir()
+                    (base / "home" / ".claude" / "settings.json").write_text(
+                        json.dumps({"permissions": {"deny": settings}}))
+                full_env = {"PATH": f"{base / 'bin'}:{os.environ['PATH']}", "HOME": str(base / "home"),
+                            "STUB_LOG": str(base / "calls.jsonl")}
+                full_env.update({k: str(base / v) for k, v in (env or {}).items()})
+                done = subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=full_env, cwd=base,
+                                      capture_output=True, text=True)
+                calls = [json.loads(line) for line in (base / "calls.jsonl").read_text().splitlines()] \
+                    if (base / "calls.jsonl").exists() else []
+                rules = sorted({str(Path(c[i + 1]).relative_to(base)) for c in calls
+                                for i, a in enumerate(c) if a == "--rules"})
+                return done.returncode, done.stderr, rules
+
+        rc, err, rules = run([])
+        self.assertEqual((rc, rules), (78, []))
+        self.assertIn("launch hcom codex once", err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"])
+        self.assertEqual((rc, rules), (0, ["home/.codex/rules/hcom.rules"]), err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules", "home/.codex/rules/hcom-deny.rules"])
+        self.assertEqual((rc, rules), (78, ["home/.codex/rules/hcom-deny.rules", "home/.codex/rules/hcom.rules"]))
+        self.assertIn("allow for hcom send and forbidden for hcom term", err)
+        rc, err, rules = run(["state/.codex/rules/hcom.rules"], env={"HCOM_DIR": "state/hub"})
+        self.assertEqual((rc, rules), (0, ["state/.codex/rules/hcom.rules"]), err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"], env={"HCOM_DIR": "state/hub"})
+        self.assertEqual((rc, rules), (78, []))
+        rc, err, rules = run(["explicit/rules/hcom.rules"], env={"HCOM_DIR": "state/hub", "CODEX_HOME": "explicit"})
+        self.assertEqual((rc, rules), (0, ["explicit/rules/hcom.rules"]), err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"], settings=kept + retired)
+        self.assertEqual((rc, rules), (78, []))
+        self.assertIn(f"{len(retired)} retired 2026-10-04 hcom deny entries", err)
+        rc, err, rules = run(["home/.codex/rules/hcom.rules"], settings=kept)
+        self.assertEqual(rc, 0, err)
 
     def test_gateway_default_metadata_is_observed_without_pipeline_capture(self):
         gate = self.source_module("gateway-effort-accept.py")
@@ -118,24 +193,25 @@ class Round2RepairIntegrationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "no call log"):
                 gate.observed_routes(gate.run_rows("synthetic-run", started, finished)[0])
 
-    def test_plan_owned_rules_refresh_without_overwriting_operator_configuration(self):
+    def test_plan_owned_helpers_refresh_without_overwriting_operator_configuration(self):
+        # The plan ships no rule file since the 2026-10-06 relaxation; a .py helper takes the same plan-owned branch.
         spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
         checker = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(checker)
         body = checker.functions((PLAN / "install.sh").read_text())["copy_config"]
         with tempfile.TemporaryDirectory() as scratch:
             config = Path(scratch)
-            rules = config / "hcom-deny.rules"
-            rules.write_text("# stale copied deny policy\n")
+            helper = config / "hcom-client-config.py"
+            helper.write_text("# stale copied helper\n")
             operator = config / "deer-flow-config.yaml"
             operator.write_text("# operator choice\n")
             done = subprocess.run(["bash", "-euo", "pipefail", "-c",
                                    "copy_config() {\n" + body + "\n}\n"
-                                   "copy_config hcom-deny.rules\ncopy_config deer-flow-config.yaml"],
+                                   "copy_config hcom-client-config.py\ncopy_config deer-flow-config.yaml"],
                                   env={"PATH": os.environ["PATH"], "config_root": str(config),
                                        "plan_dir": str(PLAN)}, capture_output=True, text=True)
             self.assertEqual(done.returncode, 0, done.stderr)
-            self.assertEqual(rules.read_bytes(), (PLAN / "config/hcom-deny.rules").read_bytes())
+            self.assertEqual(helper.read_bytes(), (PLAN / "config/hcom-client-config.py").read_bytes())
             self.assertEqual(operator.read_text(), "# operator choice\n")
 
     def test_alerting_without_destination_reports_needs_user(self):

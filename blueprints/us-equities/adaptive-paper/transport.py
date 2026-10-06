@@ -318,6 +318,25 @@ def halt_statuses_supported(feed):
     return feed == "sip"
 
 
+def quote_stream_data_timeout(quote_timeout, extended_hours_allowed):
+    """The quote stream's alpaca-py `data_timeout`: seconds without market data before the SDK
+    closes the connection itself and reconnects. The pinned SDK (alpaca-py 0.44.0,
+    DataStream.__init__) leaves it off by default, because a legitimately quiet subscription
+    would otherwise reconnect periodically. Here every such close reaches _connection as
+    quotes_disconnected, and both runners stop on any freeze reason other than stale quotes.
+    A run that allows extended hours trades thin sessions, where the whole subscription can
+    stay quiet longer than quote_timeout (trial 20260923-post-extended-hours; Account 2's
+    ext-20261006 recovery, 2026-10-06), so it keeps the SDK default. The cost: such a run,
+    its regular-session part included, no longer reconnects a connected-but-mute socket,
+    which websocket ping/pong cannot detect (ping/pong still closes half-open sockets). A
+    persistently mute transport stays frozen on quote_stale, with no entry and no
+    quote-priced exit, until a new transport is built. Recovery builds one only for residual
+    positions or unresolved orders, and an accepted overnight hold skips it. Freshness gating
+    is unchanged: the quote_stale watchdog and the order-time quote age still apply. A
+    regular-session run keeps the watchdog. stream_health() records the selected value."""
+    return None if extended_hours_allowed else quote_timeout
+
+
 def decimal_string(value, *, positive=False):
     try:
         number = Decimal(str(value))
@@ -1207,6 +1226,7 @@ class AlpacaPaperTransport:
         self._stopping = False
         self._started = False
         self._ever_ready = False
+        self._terminal_stream_health = None  # stream_health() as stop() began
         self._threads = []
         self._tasks = []
         self._operation_lock = asyncio.Lock()
@@ -1222,10 +1242,11 @@ class AlpacaPaperTransport:
         self._orders_stream = Orders(api_key, secret_key, paper=True, raw_data=True,
                                      url_override=PAPER_WS, websocket_params=dict(parameters,
                                      create_protocol=_protocol_factory(PAPER_WS)))
+        self.quote_data_timeout = quote_stream_data_timeout(quote_timeout, self.extended_hours_allowed)
         self._quotes_stream = Quotes(api_key, secret_key, feed=DataFeed(self.feed), raw_data=True,
                                      url_override=self.data_ws, websocket_params=dict(parameters,
                                      create_protocol=_protocol_factory(self.data_ws)),
-                                     data_timeout=quote_timeout)
+                                     data_timeout=self.quote_data_timeout)
         self._orders_stream.owner = self
         self._quotes_stream.owner = self
 
@@ -1249,6 +1270,18 @@ class AlpacaPaperTransport:
     @property
     def ready(self):
         return self.health["ready"]
+
+    def stream_health(self):
+        """A run receipt's view of the stream: whether health is frozen and why, whether the
+        required quotes are fresh, and the quote stream's mute-watchdog policy
+        (data_timeout_seconds: None is the SDK default, off). Once stop() has begun it returns
+        the view taken as stop() began, before teardown, so every outcome path reads the
+        terminal state. It does not tell a legitimately quiet subscription from a mute socket."""
+        if self._terminal_stream_health is not None:
+            return dict(self._terminal_stream_health)
+        health = self.health
+        return {"frozen": health["frozen"], "reasons": health["reasons"],
+                "fresh_quotes": health["fresh_quotes"], "data_timeout_seconds": self.quote_data_timeout}
 
     def freeze_health(self, reason):
         with self._state_lock:
@@ -1748,6 +1781,8 @@ class AlpacaPaperTransport:
                 raise TransportError("snapshot incomplete; admissions remain frozen") from None
 
     async def stop(self):
+        if self._terminal_stream_health is None:
+            self._terminal_stream_health = self.stream_health()
         self._stopping = True
         futures = []
         for stream in (self._orders_stream, self._quotes_stream):

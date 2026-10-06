@@ -1,6 +1,7 @@
 """Local synthetic transport failure tests; no credentials or broker requests."""
 import asyncio
 import importlib.util
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -1428,6 +1429,71 @@ class DataFeedSelection(unittest.TestCase):
             asyncio.run(stream._connect())
 
 
+class QuoteStreamDataTimeout(unittest.TestCase):
+    """The SDK's mute-stream reconnect is opted into for regular-session runs only."""
+
+    def test_regular_session_opts_into_the_watchdog_at_the_quote_timeout(self):
+        for quote_timeout in (3, 30):
+            with self.subTest(quote_timeout=quote_timeout):
+                self.assertEqual(t.quote_stream_data_timeout(quote_timeout, False), quote_timeout)
+
+    def test_extended_hours_keep_the_sdk_default(self):
+        for quote_timeout in (3, 30):
+            with self.subTest(quote_timeout=quote_timeout):
+                self.assertIsNone(t.quote_stream_data_timeout(quote_timeout, True))
+
+    def build_without_sdk(self, extended_hours_allowed):
+        """The real constructor with its SDK seams stubbed (client, protocol guard, stream classes and the
+        scoped DataFeed import), so this wiring check runs in SDK-free CI as well."""
+        import types
+        captured = []
+
+        class Capturing(FakeStream):
+            def __init__(self, *args, **kwargs):
+                captured.append(kwargs)
+                super().__init__(*args, **kwargs)
+        enums = types.ModuleType("alpaca.data.enums")
+        enums.DataFeed = lambda value: value
+        stubs = {"alpaca": types.ModuleType("alpaca"), "alpaca.data": types.ModuleType("alpaca.data"),
+                 "alpaca.data.enums": enums}
+        with patch.dict(sys.modules, stubs), patch.object(t, "_sdk_client", return_value=Mock()), \
+                patch.object(t, "_protocol_factory", return_value=None), \
+                patch.object(t, "_stream_classes", return_value=(Capturing, Capturing)):
+            port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY"],
+                                          before_request=lambda *a, **k: None, before_submit=lambda intent: None,
+                                          sink_observation=lambda observation: None, quote_timeout=30,
+                                          feed="sip", extended_hours_allowed=extended_hours_allowed)
+        quotes = [row for row in captured if "feed" in row]
+        self.assertEqual(len(quotes), 1)
+        return port, quotes[0]
+
+    def test_the_constructor_passes_the_policy_to_the_quote_stream(self):
+        # The command center's #812 review (P2): the real constructor, not only the helper, under SDK-free CI.
+        for extended_hours_allowed, expected in ((False, 30), (True, None)):
+            with self.subTest(extended_hours_allowed=extended_hours_allowed):
+                port, quotes = self.build_without_sdk(extended_hours_allowed)
+                self.assertIn("data_timeout", quotes)
+                self.assertEqual(quotes["data_timeout"], expected)
+                self.assertEqual(port.quote_data_timeout, expected)
+                self.assertEqual(port.quote_timeout, 30)  # the quote_stale watchdog is unchanged
+                self.assertEqual(port.stream_health()["data_timeout_seconds"], expected)
+
+    def test_stream_health_keeps_the_view_taken_as_stop_began(self):
+        # #812 review (P2): receipts read the terminal freeze and policy, not the state after teardown.
+        port, _ = self.build_without_sdk(True)
+        port.freeze_health("quote_stale")
+        asyncio.run(port.stop())
+        port.freeze_health("stream_stop_timeout")  # teardown's own freeze, after the view was taken
+        self.assertEqual(port.stream_health(), {"frozen": True, "reasons": ["quote_stale"], "fresh_quotes": False,
+                                                "data_timeout_seconds": None})
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_the_pinned_sdk_default_is_off(self):
+        from alpaca.data.live.stock import StockDataStream
+        default = inspect.signature(StockDataStream.__init__).parameters["data_timeout"].default
+        self.assertIsNone(default)
+
+
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
 class ConfiguredQuoteFeed(unittest.TestCase):
     """No broker request is made; only the constructed stream arguments are read."""
@@ -1469,6 +1535,19 @@ class ConfiguredQuoteFeed(unittest.TestCase):
         port, _, quotes = self.build()
         self.assertEqual(port.feed, "iex")
         self.assertEqual(quotes["url_override"], "wss://stream.data.alpaca.markets/v2/iex")
+
+    def test_regular_session_quote_stream_keeps_the_data_timeout_watchdog(self):
+        _, _, quotes = self.build(feed="sip", quote_timeout=30)
+        self.assertEqual(quotes["data_timeout"], 30)
+
+    def test_extended_hours_quote_stream_keeps_the_sdk_default_data_timeout(self):
+        # A quiet thin-session subscription must not make the SDK close the socket itself:
+        # each such close freezes health as quotes_disconnected, which stops the runners.
+        port, _, quotes = self.build(feed="sip", quote_timeout=30, extended_hours_allowed=True)
+        self.assertTrue(port.extended_hours_allowed)
+        self.assertIn("data_timeout", quotes)
+        self.assertIsNone(quotes["data_timeout"])
+        self.assertEqual(port.quote_timeout, 30)  # the engine's own quote_stale watchdog is unchanged
 
     def test_unqualified_feed_refused_before_any_stream_is_constructed(self):
         with self.assertRaises(t.UnsupportedDataFeed):
