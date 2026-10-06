@@ -1,0 +1,2033 @@
+{
+  "schema_version": 1,
+  "kind": "native_bar_operational_recount",
+  "recorded_at_utc": "2026-10-06T14:09:07Z",
+  "host_scope": "NativeStack2604",
+  "source_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "north_star_action": "Finish the native foundation used for US-equities research and historical simulation; research and paper operation continue under their separate gates.",
+  "claim_boundary": "Operational source/evidence reconciliation, not a new 80-slot E2E or final S4 qualification. One landed policy disposition closes custody. Partial host observations, PR source tests, liveness and proposed exclusions do not close remaining native gates.",
+  "slots_total": 80,
+  "ceiling": 79,
+  "counts": {
+    "READY": 13,
+    "BY_DESIGN": 14,
+    "IN_PROGRESS": 22,
+    "BLOCKED": 7,
+    "NOT_STARTED": 24
+  },
+  "operational_closed": 27,
+  "open_slots": 53,
+  "additional_closures_to_79": 52,
+  "historical_official": {
+    "closed": 30,
+    "total": 80,
+    "bar": "historical #700; preserved",
+    "source": "evidence/artifacts/ns2604-e2e-20261004/slots.json"
+  },
+  "native_baseline": {
+    "closed": 26,
+    "total": 80,
+    "ready": 13,
+    "by_design": 13,
+    "reported_as_of_utc": "2026-10-06T06:47:00Z",
+    "source": "native-census",
+    "scope": "Adjudicated inherited native/organic classification; not fresh execution at 06:47 or after this reboot."
+  },
+  "final_s4_qualified_count": null,
+  "changes": [
+    {
+      "slot": "secrets-credentials/credential-custody",
+      "from": "IN_PROGRESS",
+      "to": "BY_DESIGN",
+      "closure": true,
+      "evidence": "landed-custody-decision",
+      "reason": "The exact census's remaining action was publication of this dated policy disposition; PR 715 has landed."
+    },
+    {
+      "slot": "instructions-skills/trail-of-bits-security-skills-trailofbits-skills",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-skills-lifecycle",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    },
+    {
+      "slot": "instructions-skills/engineering-process-skills",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-skills-lifecycle",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    },
+    {
+      "slot": "instructions-skills/skill-authoring",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-skills-lifecycle",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    },
+    {
+      "slot": "semantic-rag/embedding-model",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-memory-h2h",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    },
+    {
+      "slot": "observation-inference/local-model-server",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-memory-h2h",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    },
+    {
+      "slot": "document-retrieval/tobi-qmd",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-lm-qmd",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    },
+    {
+      "slot": "token-efficiency/command-output",
+      "from": "NOT_STARTED",
+      "to": "IN_PROGRESS",
+      "closure": false,
+      "evidence": "lane-overlap-token",
+      "reason": "Current bounded lane work or native partial integration is observed; required full-slot gates remain."
+    }
+  ],
+  "landings": [
+    {
+      "pr": 765,
+      "merged_at_utc": "2026-10-06T10:06:42Z",
+      "revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+      "effect": "Security relock and retained artifact qualification; no new whole-slot native closure."
+    },
+    {
+      "pr": 752,
+      "merged_at_utc": "2026-10-06T10:59:27Z",
+      "revision": "1fa865066b4a9e82522170ca48759ffebc07ed0c",
+      "effect": "Client/configuration source and synthetic integration; no host apply or fresh provider acceptance inferred."
+    },
+    {
+      "pr": 753,
+      "merged_at_utc": "2026-10-06T11:32:59Z",
+      "revision": "9f3af37dd4659d8686c454d8ac727a3de73452a4",
+      "effect": "Maintenance/anti-pattern decision; no additional 80-slot closure."
+    },
+    {
+      "pr": 778,
+      "merged_at_utc": "2026-10-06T12:23:45Z",
+      "revision": "b0df1fb0440698b0f210cb6becdcb24c685e232b",
+      "effect": "Trading preregistration, outside this foundation denominator."
+    },
+    {
+      "pr": 715,
+      "merged_at_utc": "2026-10-06T13:37:49Z",
+      "revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "effect": "Publishes custody's dated exclusion. Preserves historical 30/80 and leaves final native qualification unmeasured."
+    }
+  ],
+  "owner_policy": {
+    "meaning": "One named accountable lane for every row. Proposed dispatches are explicit recommendations requiring co-op handoff/acceptance, not a claim those lanes already accepted new scope.",
+    "open_without_named_owner": 0,
+    "proposed_open_dispatches": 18,
+    "configuration_and_scope_decisions": "Command center/user retain their existing authority; naming a lane never authorizes configuration, credentials, trust, sudo or merges."
+  },
+  "eta_to_79": {
+    "assessment_at_utc": "2026-10-06T14:09:07Z",
+    "earliest_planning_bound_utc": "2026-10-08T22:00:00Z",
+    "working_planning_target_utc": "2026-10-09T22:00:00Z",
+    "confidence": "low",
+    "owner_committed_delivery": false,
+    "basis": "Refreshed dependency assessment after five landings and custody's policy closure. The prior earliest bound is retained; Friday 22:00Z is a planning target, not a measured or owner-committed completion time. No unsupported acceleration is inferred from landings.",
+    "constraints": [
+      "52 additional operational closures and an independently reviewed same-80-slot S4 remain.",
+      "Proposed owner dispatches, D01/D04 and other CC scope/configuration readbacks must be resolved.",
+      "5f owns queued PR writes/landing; connector threads and exact-head reviews precede queues.",
+      "Organic counts, account quota gates and a held configuration freeze remain unmeasured dependencies.",
+      "No heavy phase from 2026-10-06T19:50:00Z through 2026-10-07T00:10:00Z; future paper windows need current confirmation.",
+      "Base-distribution stays externally blocked and is excluded only from the 79 ceiling, never from the 80 denominator."
+    ]
+  },
+  "dashboard_delivery": {
+    "route": "Replace the existing new-wsl-distribution-20261002 checkpoint gate with a summary and evidence link to this complete board.",
+    "checkpoint": "observability/grand-dashboard/state.json",
+    "existing_gate": "new-wsl-distribution-20261002",
+    "capacity": "118 entities, 128 with ten native Dagu runs; no new entities or capacity/schema change.",
+    "native_publication": "CC/co-op must place the landed checkpoint at the existing persistent emitter's repository and read back its generation. This source change alone is not a live-dashboard readback."
+  },
+  "followup": {
+    "r2a_receipt_pr": 789,
+    "r2a_head": "4650b6cef1df814b8c0c05dd0548b4e9678d37f6",
+    "r2a_state": "draft open at bounded remote observation; accepted REPRODUCED/0; review/landing pending",
+    "meta_writer": "Private durable helper fixed; exit-0 and exit-3 controls preserve native/sanitizer/wrapper statuses. No R2a replay required after reboot."
+  },
+  "sources": [
+    {
+      "id": "native-census",
+      "locator": "coordination:e2e-truth-20261006/foundation-eta-rerun-wf_91416191-566.json",
+      "sha256": "558519cdee406865a169004772fe5e68c4448fdcdee40adc5076fc1338e88bfc",
+      "evidence_class": "source_review",
+      "scope": "Exact durable 80-row operational census reported as of 06:47Z; underlying native adjudication window ended the previous day."
+    },
+    {
+      "id": "native-adjudication",
+      "locator": "coordination:ns2604-coop/organic-e2e-20261005/rebaseline-20261005/adjudication.json",
+      "sha256": "e25fedeec872b9a96bb6c9b175ce60446502d07e93de006c15e271abf3b1cd86",
+      "evidence_class": "source_review",
+      "scope": "Inherited 13 READY plus 13 BY_DESIGN; no fresh post-reboot execution by this recount."
+    },
+    {
+      "id": "current-mission",
+      "locator": "coordination:command-center/ITEM-ns2604-coop-20261006T135131Z.md",
+      "sha256": "5f5b219a9eacdd812c3241d779d42ae79784f9cfd330a3ccac3f8deebdae7bee",
+      "evidence_class": "source_review",
+      "scope": "80-slot scope, 79 ceiling, operational closure on landed evidence/readback/dated decision, and named workstream owners."
+    },
+    {
+      "id": "landed-requalification",
+      "locator": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "evidence_class": "source_review",
+      "scope": "Historical and later scoped observations, not a fresh native aggregate."
+    },
+    {
+      "id": "landed-custody-decision",
+      "locator": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
+      "revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "evidence_class": "source_review",
+      "scope": "Dated custody exclusion published by PR 715; sole new operational closure."
+    },
+    {
+      "id": "orchestration-observation",
+      "locator": "coordination:ns2604-coop/orchestration-round2-20261006/receipt.md",
+      "evidence_class": "source_review",
+      "scope": "Retained native hcom/Codex terminal/hook/delivery and agentsview idle observations; controls/failures and unrun checks remain in the original receipt.",
+      "underlying_evidence": "Reported retained native/local-integration operations; exact original receipts and their separate limits govern acceptance."
+    },
+    {
+      "id": "model-observation",
+      "locator": "coordination:ns2604-coop/local-models-20261006.md",
+      "evidence_class": "source_review",
+      "scope": "Retained serving/vector/index/known-answer integration; not an accepted quality benchmark or whole-slot closure.",
+      "underlying_evidence": "Reported retained native/local-integration operations; exact original receipts and their separate limits govern acceptance."
+    },
+    {
+      "id": "dagu-cc-readback",
+      "locator": "coordination:command-center/ITEM-ns2604-coop-20261006T102431Z-prs.md",
+      "evidence_class": "source_review",
+      "scope": "CC reports its loopback-only auth mode none application and API/UI HTTP 200; not executed by this recount."
+    },
+    {
+      "id": "lane-skills-lifecycle",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/0",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/skills-lifecycle.status.md",
+      "origin_sha256_at_capture": "207b8e0b0bef27ac33e115e30841bebe825ed8f9d40853274183e61a7bd419fa"
+    },
+    {
+      "id": "lane-memory-h2h",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/1",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/memory-h2h.status.md",
+      "origin_sha256_at_capture": "1dfc32c8a88634693cfa58d5e6bd666f6b4c5c477a74a79b69aa7b588db1c877"
+    },
+    {
+      "id": "lane-lm-qmd",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/2",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/lm-qmd.status.md",
+      "origin_sha256_at_capture": "1548fa9ead0983ed307849a051b23930318899b6c33aef2eedc4bc3eac724668"
+    },
+    {
+      "id": "lane-overlap-token",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/3",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/overlap-token.status.md",
+      "origin_sha256_at_capture": "6bfdce0912d1b18a79fc972e0e11bae6404692a9167ad49d8443b1e852d02be5"
+    },
+    {
+      "id": "lane-orch-records",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/4",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/orch-records.status.md",
+      "origin_sha256_at_capture": "02f5ef825cf00fab4909f94515b8b71504acb55eec34b0a942a7781bef62d6b4"
+    },
+    {
+      "id": "lane-grand-catalog",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/5",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/grand-catalog.status.md",
+      "origin_sha256_at_capture": "791b1802a9d79dc264704077cc8e95a04829536037254eea1c20588a10624246"
+    },
+    {
+      "id": "lane-fixwave-defects",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/6",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/fixwave-defects.status.md",
+      "origin_sha256_at_capture": "697bae67051944c81a1e1fce56032c93e9a57d77a6fa3719267de1e20db43177"
+    },
+    {
+      "id": "lane-github-ci-finalize",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/7",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/github-ci-finalize.status.md",
+      "origin_sha256_at_capture": "9040779af4b708af845cca1c93c15a1c2b0245cb96b4c737dc509acca14a7a4e"
+    },
+    {
+      "id": "lane-codex-token-parity",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/8",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/codex-token-parity.status.md",
+      "origin_sha256_at_capture": "c1461d860a1a07b34d8ff8a9f71bc301143378a92c8a0041a2cf1151f784bf7a"
+    },
+    {
+      "id": "lane-overlap-codenav",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/9",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/overlap-codenav.status.md",
+      "origin_sha256_at_capture": "5714361fa5f2abd26a1a7cb5f53970e92c30821c54307142f40a5ae7f6358853"
+    },
+    {
+      "id": "lane-currency",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/10",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/currency.status.md",
+      "origin_sha256_at_capture": "968a38b1a5f1bd4344ce7aa127cf35faa8c74b55b98da2b674145e2bfb4e8693"
+    },
+    {
+      "id": "lane-convergence-practice",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/11",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/convergence-practice.status.md",
+      "origin_sha256_at_capture": "d6c9ff5041962301c6a00ba4f934344e7a8cd272b8b108fffb1707e17b0303c7"
+    },
+    {
+      "id": "lane-supersession-ledger",
+      "locator": "coordination:ns2604-coop/readiness-20261005/jobs/WS1-native-bar-20261006/lane-source-snapshots.json",
+      "sha256": "abf7c499f55c9e246e329f28c13845477325328ff877e2d12e2d6326f5e48e8e",
+      "evidence_class": "source_review",
+      "scope": "Immutable sanitized bounded source-review excerpts; original live-file digest is capture provenance, not a claim the mutable file stays unchanged. Omitted line characters are explicit. No new native acceptance.",
+      "pointer": "/items/12",
+      "captured_at_utc": "2026-10-06T14:09:07Z",
+      "origin_locator": "coordination:ns2604-coop/lanes/supersession-ledger.status.md",
+      "origin_sha256_at_capture": "bb02bcd98cae30eed483e6138661885e68ed6b7698739c8b4417ac173d40b20d"
+    }
+  ],
+  "slots": [
+    {
+      "slot": "native-clients/claude-code",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/0"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/native-clients~1claude-code"
+        }
+      ],
+      "remaining_gate": "D01 configuration/scope decision and native readback; fresh session proof."
+    },
+    {
+      "slot": "native-clients/codex",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/1"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/native-clients~1codex"
+        }
+      ],
+      "remaining_gate": "D04 stack-worker-route scope or approved configuration/readback; fresh session proof. The service-tier migration source alone does not close it."
+    },
+    {
+      "slot": "agent-sdks/claude-agent-sdk",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/2"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/agent-sdks~1claude-agent-sdk"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "agent-sdks/codex-sdk-and-codex-exec-app-server",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/3"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/agent-sdks~1codex-sdk-and-codex-exec-app-server"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "instructions-skills/trail-of-bits-security-skills-trailofbits-skills",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "skills-lifecycle",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/4"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/instructions-skills~1trail-of-bits-security-skills-trailofbits-skills"
+        },
+        {
+          "source": "lane-skills-lifecycle",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        }
+      ],
+      "remaining_gate": "Phase 3 (PLAN:138): one upstream acceptance run at pin plus native skill routing with no harness text, or a dated exclusion"
+    },
+    {
+      "slot": "instructions-skills/engineering-process-skills",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "skills-lifecycle",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/5"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/instructions-skills~1engineering-process-skills"
+        },
+        {
+          "source": "lane-skills-lifecycle",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        }
+      ],
+      "remaining_gate": "Fresh headless Claude activation plus upstream acceptance, or a dated exclusion"
+    },
+    {
+      "slot": "instructions-skills/skill-discovery",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "skills-lifecycle",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/6"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/instructions-skills~1skill-discovery"
+        }
+      ],
+      "remaining_gate": "Confirm the proposed handoff from fixwave-defects, repair the native evidence capture and retain organic discovery use or an accepted dated exclusion."
+    },
+    {
+      "slot": "instructions-skills/skill-authoring",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "skills-lifecycle",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/7"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/instructions-skills~1skill-authoring"
+        },
+        {
+          "source": "lane-skills-lifecycle",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        }
+      ],
+      "remaining_gate": "One organic skill creation or evaluation in either client (routing fix); weak exclusion candidate"
+    },
+    {
+      "slot": "instructions-skills/research-skill",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/8"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/instructions-skills~1research-skill"
+        }
+      ],
+      "remaining_gate": "Complete the authorized round-2 leg and record the dated scope decision; do not infer an exclusion from a proposal."
+    },
+    {
+      "slot": "mcp-surfaces/mcporter",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/9"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/mcp-surfaces~1mcporter"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "mcp-surfaces/mcp-inspector",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/10"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/mcp-surfaces~1mcp-inspector"
+        }
+      ],
+      "remaining_gate": "Land #723, re-apply; scan transcripts for organic Inspector use, else dated exclusion (overlaps mcporter, ADJ fix_lever)"
+    },
+    {
+      "slot": "workers/agent-messaging",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "orch-records",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/11"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/workers~1agent-messaging"
+        },
+        {
+          "source": "orchestration-observation",
+          "scope": "Bounded pre-reboot native observation; remaining predicates preserved."
+        }
+      ],
+      "remaining_gate": "Hcom terminal/hook adoption and bounded Codex delivery are observed. Retain the both-client messaging/policy qualification and reviewed records; unresolved extended checks stay explicit."
+    },
+    {
+      "slot": "cross:gpt6-harnesses/gpt-gateway",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/12"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/cross:gpt6-harnesses~1gpt-gateway"
+        }
+      ],
+      "remaining_gate": "Finish current gateway records/fold-in, CC application and pinned native route acceptance. The security relock landing removes a queue prerequisite only."
+    },
+    {
+      "slot": "cross:runtime-workers/agent-runtime-worker",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/13"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/cross:runtime-workers~1agent-runtime-worker"
+        }
+      ],
+      "remaining_gate": "Defect-12 repair under production srt policy (RUL:24), re-measure organic use; else dated exclusion (overlaps native sub-agents)"
+    },
+    {
+      "slot": "cross:runtime-workers/research-harnesses",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "convergence-practice",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/14"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/cross:runtime-workers~1research-harnesses"
+        }
+      ],
+      "remaining_gate": "Fix DeerFlow gate, foreground completion, web-search selection (RUL:23), re-measure; else exclusion (overlaps Codex web/run)"
+    },
+    {
+      "slot": "code-navigation/serena",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-codenav",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/15"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/code-navigation~1serena"
+        }
+      ],
+      "remaining_gate": "Persist condition-absent controls; delete harness text naming serena (PLAN:139) and re-measure organic choice"
+    },
+    {
+      "slot": "code-navigation/claude-plugins-official-code-intelligence-lsp-pl",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "overlap-codenav",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/16"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/code-navigation~1claude-plugins-official-code-intelligence-lsp-pl"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "code-navigation/structural-search",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-codenav",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/17"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/code-navigation~1structural-search"
+        }
+      ],
+      "remaining_gate": "Dated exclusion (overlaps Grep/rg and serena search_for_pattern) or routing fix (ADJ fix_lever)"
+    },
+    {
+      "slot": "semantic-rag/code-search",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "memory-h2h",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/18"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/semantic-rag~1code-search"
+        },
+        {
+          "source": "model-observation",
+          "scope": "Vector/consumer integration and liveness are separate from final slot qualification; generation exclusion unadopted."
+        }
+      ],
+      "remaining_gate": "Finish the Qdrant/client cutover and accepted known-answer gates. Preserve the approved confirmatory-design/preregistration locator and recorded #723 repair prerequisite before quality execution. The indexed native known-answer result is integration evidence, not complete retrieval-quality qualification."
+    },
+    {
+      "slot": "semantic-rag/embedding-model",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "memory-h2h",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/19"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/semantic-rag~1embedding-model"
+        },
+        {
+          "source": "lane-memory-h2h",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        },
+        {
+          "source": "model-observation",
+          "scope": "Vector/consumer integration and liveness are separate from final slot qualification; generation exclusion unadopted."
+        }
+      ],
+      "remaining_gate": "Join the adopted model pin, native vector/reference checks and accepted consumer readback. A running Nemotron service alone does not close the slot."
+    },
+    {
+      "slot": "semantic-rag/reranker-model",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "memory-h2h",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/20"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/semantic-rag~1reranker-model"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "document-retrieval/tobi-qmd",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "lm-qmd",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/21"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/document-retrieval~1tobi-qmd"
+        },
+        {
+          "source": "lane-lm-qmd",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        }
+      ],
+      "remaining_gate": "Complete the dedicated named-index blue/green change and native qmd bench before/after. Also retain the unresolved refresh lifecycle (qmd update/embed on the planned persistent Dagu timer) and organic query/get or an accepted CC scope ruling; benchmark-only completion is insufficient."
+    },
+    {
+      "slot": "document-retrieval/mineru",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "skills-lifecycle",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/22"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/document-retrieval~1mineru"
+        }
+      ],
+      "remaining_gate": "Routing fix (point PDF parsing at the mineru skill) or dated exclusion (overlaps Read of PDFs, markitdown)"
+    },
+    {
+      "slot": "web-research/trafilatura",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/23"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/web-research~1trafilatura"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "web-research/playwright-cli",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "currency",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/24"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/web-research~1playwright-cli"
+        }
+      ],
+      "remaining_gate": "User sudo consent and sign-ins, rerun after_sign_in; else dated exclusion for text retrieval (overlaps Codex web/run)"
+    },
+    {
+      "slot": "web-research/web-search-provider",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/25"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/web-research~1web-search-provider"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "durable-memory/memory-owner",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "memory-h2h",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/26"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/durable-memory~1memory-owner"
+        }
+      ],
+      "remaining_gate": "Memory-h2h prepares hook/scope/handoff and pre-binding inventory. CC applies and binds; 5f executes the native gates. Ordinary recall/handoff remains partial."
+    },
+    {
+      "slot": "token-efficiency/ccusage",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/27"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1ccusage"
+        }
+      ],
+      "remaining_gate": "PLAN:148: sign in or exclude; weak exclusion candidate (overlaps agentsview, OTel token metrics)"
+    },
+    {
+      "slot": "token-efficiency/context-supply",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/28"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1context-supply"
+        }
+      ],
+      "remaining_gate": "PLAN:148 dated Harbor A/B, or ctx-doctor verify plus Claude wiring fix"
+    },
+    {
+      "slot": "token-efficiency/statusline",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/29"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1statusline"
+        }
+      ],
+      "remaining_gate": "Capture HUD and Codex footer per ruling 8; then BY_DESIGN or READY"
+    },
+    {
+      "slot": "token-efficiency/command-output",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/30"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1command-output"
+        },
+        {
+          "source": "lane-overlap-token",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        }
+      ],
+      "remaining_gate": "Finish the RTK hook/logger proposal, CC application and hook-disarmed controls with organic before/after invocation/dashboard counts."
+    },
+    {
+      "slot": "token-efficiency/output-compression",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/31"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1output-compression"
+        }
+      ],
+      "remaining_gate": "Dated exclusion (overlaps context-mode and rtk, ADJ) or Harbor A/B"
+    },
+    {
+      "slot": "token-efficiency/code-index",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/32"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1code-index"
+        }
+      ],
+      "remaining_gate": "Dated exclusion (overlaps serena) or Harbor A/B"
+    },
+    {
+      "slot": "token-efficiency/code-graph",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/33"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1code-graph"
+        }
+      ],
+      "remaining_gate": "Dated exclusion (overlaps serena find_referencing_symbols) or Harbor A/B"
+    },
+    {
+      "slot": "token-efficiency/repo-packing",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/34"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1repo-packing"
+        }
+      ],
+      "remaining_gate": "Upstream acceptance then measure; else dated exclusion (overlaps Read/Grep, ctx_batch_execute)"
+    },
+    {
+      "slot": "token-efficiency/structured-data",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/35"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1structured-data"
+        }
+      ],
+      "remaining_gate": "Upstream acceptance then measure; else dated exclusion (overlaps jq via ctx_execute)"
+    },
+    {
+      "slot": "token-efficiency/doc-conversion",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/36"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1doc-conversion"
+        }
+      ],
+      "remaining_gate": "Upstream acceptance then measure; else dated exclusion (overlaps ctx_fetch_and_index, mineru)"
+    },
+    {
+      "slot": "token-efficiency/api-docs",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "codex-token-parity",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/37"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1api-docs"
+        }
+      ],
+      "remaining_gate": "Upstream acceptance plus D04 wiring then measure; else dated exclusion (overlaps Codex web/run)"
+    },
+    {
+      "slot": "token-efficiency/trace-viewer",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/38"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1trace-viewer"
+        }
+      ],
+      "remaining_gate": "Add upstream test targets to plan, run; else dated exclusion"
+    },
+    {
+      "slot": "token-efficiency/token-lane-carriers",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": false,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/39"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/token-efficiency~1token-lane-carriers"
+        }
+      ],
+      "remaining_gate": "Confirm a named implementation owner, apply reviewed role-agent grants through CC, and retain organic invocation counts and the dated acceptance comparison."
+    },
+    {
+      "slot": "observation-inference/otel-collector-contrib",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/40"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1otel-collector-contrib"
+        }
+      ],
+      "remaining_gate": "Keep/hold decision via #642 re-pin, re-run acceptance, native telemetry use"
+    },
+    {
+      "slot": "observation-inference/prometheus",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/41"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1prometheus"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "observation-inference/loki",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/42"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1loki"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "observation-inference/grafana",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/43"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1grafana"
+        }
+      ],
+      "remaining_gate": "Finish the dashboard/countability source, CC application/readback and accepted native counts. This board update is separate from those slot gates."
+    },
+    {
+      "slot": "observation-inference/phoenix",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/44"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1phoenix"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "observation-inference/local-model-server",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "memory-h2h",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/45"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1local-model-server"
+        },
+        {
+          "source": "lane-memory-h2h",
+          "scope": "Active repair/qualification work; no whole-slot closure."
+        },
+        {
+          "source": "model-observation",
+          "scope": "Vector/consumer integration and liveness are separate from final slot qualification; generation exclusion unadopted."
+        }
+      ],
+      "remaining_gate": "Join the adopted serving pin, workload acceptance and consumer/client readback; live vLLM alone is insufficient."
+    },
+    {
+      "slot": "observation-inference/alerting",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "overlap-token",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/46"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1alerting"
+        }
+      ],
+      "remaining_gate": "Finish alert/countability source, CC application/readback and the accepted end-to-end notification gate."
+    },
+    {
+      "slot": "observation-inference/local-generation-model",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "memory-h2h",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/47"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1local-generation-model"
+        },
+        {
+          "source": "model-observation",
+          "scope": "Vector/consumer integration and liveness are separate from final slot qualification; generation exclusion unadopted."
+        }
+      ],
+      "remaining_gate": "The generation-model exclusion is a proposal marked NOT APPLIED. Obtain the dated decision or the pinned native workload qualification."
+    },
+    {
+      "slot": "observation-inference/session-analytics",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "orch-records",
+      "owner_assignment": "proposed_dispatch",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/48"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/observation-inference~1session-analytics"
+        },
+        {
+          "source": "orchestration-observation",
+          "scope": "Bounded pre-reboot native observation; remaining predicates preserved."
+        }
+      ],
+      "remaining_gate": "Retain the pre-reboot successful agentsview idle/API observation separately from the complete slot predicates and post-reboot lifecycle qualification."
+    },
+    {
+      "slot": "quality-evaluation/inspect-ai",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/49"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/quality-evaluation~1inspect-ai"
+        }
+      ],
+      "remaining_gate": "Land #723 and re-apply; routing fix or dated exclusion (overlaps promptfoo)"
+    },
+    {
+      "slot": "quality-evaluation/harbor-containerized-agent-e2e-runner",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/50"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/quality-evaluation~1harbor-containerized-agent-e2e-runner"
+        }
+      ],
+      "remaining_gate": "CC class ruling (infrastructure keeps READY under G5) or routing fix"
+    },
+    {
+      "slot": "quality-evaluation/promptfoo",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/51"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/quality-evaluation~1promptfoo"
+        }
+      ],
+      "remaining_gate": "Repair defect 13; add the Claude route ID from live /v1/models (RUL:14)"
+    },
+    {
+      "slot": "ci-supply-chain/zizmor",
+      "state": "READY",
+      "closed": true,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/52"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/ci-supply-chain~1zizmor"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "ci-supply-chain/attest",
+      "state": "READY",
+      "closed": true,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/53"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/ci-supply-chain~1attest"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "ci-supply-chain/syft",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/54"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/ci-supply-chain~1syft"
+        }
+      ],
+      "remaining_gate": "Land #642 (or split) so metadata follows 1.54.0, re-run acceptance"
+    },
+    {
+      "slot": "ci-supply-chain/dependabot",
+      "state": "READY",
+      "closed": true,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/55"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/ci-supply-chain~1dependabot"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "ci-supply-chain/codeql-sarif",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/56"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/ci-supply-chain~1codeql-sarif"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "ci-supply-chain/actionlint-kjanat",
+      "state": "READY",
+      "closed": true,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/57"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/ci-supply-chain~1actionlint-kjanat"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "git-github-automation/git",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/58"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1git"
+        }
+      ],
+      "remaining_gate": "Upstream test or native operation at pin (RUL:12); user identity confirmation; lean-rules re-measure"
+    },
+    {
+      "slot": "git-github-automation/gh-github-cli",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/59"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1gh-github-cli"
+        }
+      ],
+      "remaining_gate": "Delete harness text naming gh (PLAN:139) and measure organic use in final E2E, or CC ruling (b)"
+    },
+    {
+      "slot": "git-github-automation/worktrunk",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/60"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1worktrunk"
+        }
+      ],
+      "remaining_gate": "Re-run after_sign_in at plan pin; stack.json via #642"
+    },
+    {
+      "slot": "git-github-automation/difftastic",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "grand-catalog",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/61"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1difftastic"
+        }
+      ],
+      "remaining_gate": "Dated exclusion (overlaps git diff) or routing fix"
+    },
+    {
+      "slot": "git-github-automation/claude-code-action",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/62"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1claude-code-action"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "git-github-automation/agent-structural-diff",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/63"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1agent-structural-diff"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "git-github-automation/cross-family-review",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/64"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/git-github-automation~1cross-family-review"
+        }
+      ],
+      "remaining_gate": "Fix Claude-leg false pass, bind model/effort from argv, repaired run with dispositions"
+    },
+    {
+      "slot": "scheduling-supervision/dagu",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "grand-catalog",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/65"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/scheduling-supervision~1dagu"
+        },
+        {
+          "source": "dagu-cc-readback",
+          "scope": "Loopback configuration/API/UI readback; full scheduling acceptance pending."
+        }
+      ],
+      "remaining_gate": "CC read back loopback auth mode none with API/UI HTTP 200; eight DAG inventory is observed. Retain green runs and the remaining scheduling/lifecycle predicates; records PR is separate."
+    },
+    {
+      "slot": "hosting-services/docker-compose",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/66"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/hosting-services~1docker-compose"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "hosting-services/container-engine",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/67"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/hosting-services~1container-engine"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "hosting-services/gpu-container-runtime",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/68"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/hosting-services~1gpu-container-runtime"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "cross:wsl-distro/base-distribution",
+      "state": "BLOCKED",
+      "closed": false,
+      "owner": "currency",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "BLOCKED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/69"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/cross:wsl-distro~1base-distribution"
+        }
+      ],
+      "remaining_gate": "Await a supported microsoft/WSL or ubuntu/wsl-setup release passing the unchanged assertion without the local exception. This is the single 80th-slot external hold."
+    },
+    {
+      "slot": "isolation/sandbox-runtime-srt",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "fixwave-defects",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/70"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/isolation~1sandbox-runtime-srt"
+        }
+      ],
+      "remaining_gate": "Defect-12 test leg under production srt policy (RUL:24)"
+    },
+    {
+      "slot": "isolation/isolation-container-boundary",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/71"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/isolation~1isolation-container-boundary"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "secrets-credentials/betterleaks",
+      "state": "IN_PROGRESS",
+      "closed": false,
+      "owner": "github-ci-finalize",
+      "owner_assignment": "recorded_lane",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/72"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/secrets-credentials~1betterleaks"
+        }
+      ],
+      "remaining_gate": "Set hooksPath (gitleaks 8.30.1 via mise aqua, or betterleaks with cited equivalence); run P1 swap test by 10-20"
+    },
+    {
+      "slot": "secrets-credentials/trufflehog",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/73"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/secrets-credentials~1trufflehog"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "secrets-credentials/credential-custody",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "IN_PROGRESS",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/74"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/secrets-credentials~1credential-custody"
+        },
+        {
+          "source": "landed-custody-decision",
+          "pointer": "/dated_disposition_changes/0",
+          "scope": "Landed dated policy exclusion; source review, provisional; no credential inspection or native acceptance."
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "cross:credential-practice/credential-guard",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/75"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/cross:credential-practice~1credential-guard"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "recovery-portability/mise",
+      "state": "NOT_STARTED",
+      "closed": false,
+      "owner": "ns2604-coop",
+      "owner_assignment": "coordinator_gate",
+      "baseline_state": "NOT_STARTED",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/76"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/recovery-portability~1mise"
+        }
+      ],
+      "remaining_gate": "Verify version at plan pin and re-run acceptance"
+    },
+    {
+      "slot": "recovery-portability/restic",
+      "state": "READY",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/77"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/recovery-portability~1restic"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "recovery-portability/chezmoi",
+      "state": "BY_DESIGN",
+      "closed": true,
+      "owner": "ns2604-coop",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "BY_DESIGN",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/78"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/recovery-portability~1chezmoi"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    },
+    {
+      "slot": "cross:convergence-practice/convergence-validators",
+      "state": "READY",
+      "closed": true,
+      "owner": "convergence-practice",
+      "owner_assignment": "retained_closed_scope",
+      "baseline_state": "READY",
+      "foundation_prerequisite": true,
+      "evidence": [
+        {
+          "source": "native-census",
+          "pointer": "/result/units/0/result/items/79"
+        },
+        {
+          "source": "landed-requalification",
+          "pointer": "/slots/cross:convergence-practice~1convergence-validators"
+        }
+      ],
+      "remaining_gate": "None in this operational scope; retain its source boundary and reopen on contrary evidence."
+    }
+  ]
+}
