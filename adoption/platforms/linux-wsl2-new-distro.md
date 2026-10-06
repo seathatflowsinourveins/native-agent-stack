@@ -1041,7 +1041,10 @@ and the tool were added after `v2026.09.26.2`. The tool comes before the sign-in
 session a person starts. It merges into what the plan and the clients leave behind. The plan's
 `codex plugin marketplace add` writes `~/.codex/config.toml`, so that file usually exists: every key and table in it stays
 as it is, what the render has and it lacks is added, and a value that differs stays, printed beside the render's, with
-the step ending `merged with conflicts kept`. Claude Code's `settings.json` is merged too: the template's values win,
+the step ending `merged with conflicts kept`.
+The declared one-time [`service_tier` migration](../../docs/decisions/2026-10-05-codex-service-tier-migration.md)
+changes only the previous managed `fast` to `default`; its completion marker preserves later `/fast` choices.
+Claude Code's `settings.json` is merged too: the template's values win,
 except the theme, which stays as the file has it, and the authorization settings, which are not written by default
 (below). No step of `--apply` needs a signed-in client. The tool needs the host
 file from F8, installs no tool, backs up what it changes and runs again to the same files; `--dry-run` shows its steps

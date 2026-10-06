@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "f5ffdaedcf9f1bdc80184c2b533db37bcd68f2d105e002ff930660bbf9eb47d6",
-    "docs/new-wsl-handbook.json": "8768967ff912ab900ad83c7f8d749fc20a86a785194630d2d248f17c6688be80"
+    "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+    "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
   },
   "inventory": {
     "layers": 37,
@@ -272,6 +272,28 @@
     },
     {
       "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #703 refreshed onto main 2d849ba1f (after #713, #726, #736 and the other afternoon landings); its merged catalog and stack inputs changed the handbook's source digests; regenerated from this PR's tree.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
+        "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #752 added one-time service-tier migration prose to the hashed distro guide without regenerating the handbook. Validate run 37401702955 failed its existing freshness test at head d2f6d8c. Regenerated through the unchanged native builder; both output deltas are only the distro-guide provenance digest.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+        "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "repair_evidence": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json"
+    },
+    {
+      "date": "2026-10-05",
       "source_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "native_exit_code": 0,
@@ -370,16 +392,6 @@
     {
       "date": "2026-10-05",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
-      "cause": "PR #703 refreshed onto main 2d849ba1f (after #713, #726, #736 and the other afternoon landings); its merged catalog and stack inputs changed the handbook's source digests; regenerated from this PR's tree.",
-      "previous_outputs": {
-        "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
-        "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
-      },
-      "check": "python3 scripts/build_new_wsl_handbook.py --check"
-    },
-    {
-      "date": "2026-10-05",
-      "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "cause": "PR #715 refreshed onto main ecfa11276 (after #703 landed). The catalog merged cleanly as text from #703's and #715's changes, and #715's generator and inputs changed the handbook's source digests; regenerated with --write, and --check passed. The receipt's regenerations were united at the entry level: base 7, #715's 5 and main's #703 entry.",
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
@@ -426,6 +438,18 @@
         "docs/new-wsl-handbook.md": "90d4fa2e4d46eaaf8a2ede82f29fe864100c837f966c9df1a61746c1ea481c30",
         "docs/new-wsl-handbook.json": "d569771bf8e8e73538758c68e43045973b9b7010fb32cec8ad2f170cce0cea12"
       },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Custody refresh of PR #715 onto main b0df1fb04: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "b0df1fb0440698b0f210cb6becdcb24c685e232b",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
+        "docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda"
+      },
+      "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]
