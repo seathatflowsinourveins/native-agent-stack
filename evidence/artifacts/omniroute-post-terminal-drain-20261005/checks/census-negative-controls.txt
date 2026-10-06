@@ -1,0 +1,535 @@
+# Negative controls of the round after the full-scope read r10 of 6b734c6bf (2026-10-06 UTC): the controls of this round (scripts/acceptance-controls/census-controls.py.txt, sha256 7e1d1ac66a9c7a97cb8970c8b7bdb20f23e53c6d16a94a13ccfd9e8c4efa0465) run, with plain python3 (the matching cross-check X3 needs scipy and says NOT RUN there; the matching functions did not change), against the census that r10 read
+# (superseded/window-census-r11.py.txt, sha256 e6bcf75da93e61eeb5f05b8935a16a47a718a2ae55db45141abc940478924944), against the census of head 41a671681 (superseded/window-census-r12.py.txt, sha256 29fe758004e1e580ffade5a223d39967affa1360afbca7dfde9d01e00180e76a) and against the census before the second review of the journal check (superseded/window-census-r16.py.txt, sha256 3caec325d35d0f80d24ca9f6148dbb83f42155a9660bbaa0687fba2f2441b424), next to the current census (scripts/window-census.py.txt, sha256 9350953cd4d6a005a4aa1817f8b3de743d6b15ae4d8697bb91b8c61a9c45fb9c; its run is checks/census-controls.txt). A control that does not fail on the census it was written for tests nothing:
+# where the right answer is INCONCLUSIVE, `FALSE PASS` marks a window that the old census accepted. On the census r10 read the false passes are J1, J2, J3, J4, J7, J8, J9, J11, F1a, F1b, F1c, F1d, F2a, F2b, F3a, F3b, F4dblsp, F4colon, F4tab, F4removed, F4e, F7a, F7b, F7c, F7d, F7e, F8-run-status-04, F8-run-status-lower, F8-run-status-bom, F8-result-bom, F8-result-zwsp, F8-result-nul, F8-result-esc, F8-result-nbsp, F8-result-case, F9, F10c, Y11, Y12a, Y12b, Y12d, D1, D2, D3, D4, D7, D8, K3, Y4b, Y4c, Y2e, Y2f, Y2g, Y2h, Y9c, Y10c, Y13a, Y13b, G11, G11b, G11c, G11d, G11f, G12, G12b, W2, W3, J12a, J12b, J13a, J13b, J13c, J13d, J13e, J13f, J13g, J13h, J13i, J13j, J16, J17, J18, J19a, J20; on the census of 41a671681 they are J1, J2, J3, J4, J7, J8, J9, J11, F1a, F1b, F1c, F1d, F2a, F2b, F3a, F3b, F4dblsp, F4colon, F4tab, F4removed, F4e, F7a, F7b, F7c, F7d, F7e, F8-run-status-04, F8-run-status-lower, F8-run-status-bom, F8-result-bom, F8-result-zwsp, F8-result-nul, F8-result-esc, F8-result-nbsp, F8-result-case, F9, F10c, Y12a, Y12b, Y12d, D1, D2, D3, D4, D7, D8, K3, Y4b, Y4c, Y2e, Y2f, Y2g, Y2h, Y9b, Y9c, Y10c, Y13a, Y13b, G11, G11b, G11c, G11d, G11f, G12, G12b, W2, W3, J12a, J12b, J13a, J13b, J13c, J13d, J13e, J13f, J13g, J13h, J13i, J13j, J16, J17, J18, J19a, J20, Y7a; on the census before the second review they are J12a, J12b, J13a, J13b, J13c, J13d, J13e, J13f, J13g, J13h, J16, J19a, Y7a. Y11 is the reviewer's own reproduction (a PASS on the census r10 read; an INCONCLUSIVE on 41a671681, whose pad already catches it);
+# Y12a-b are the pad's own edge, which only the exact check closes. Y7a (a call row with a NULL path) answers INCONCLUSIVE since the journal pairing is by path, a tightening of this round: its FALSE PASS on the censuses before it is that change of the expected result, not a defect those censuses were tested for (the live store holds no call row with a NULL or empty path: 0 of 24,532 on 2026-10-06). Some scenarios of the older censuses also come out as UNEXPECTED by their expected TEXTS (P1, P4: the `scope=` and `OBSERVED-AT` lines; Y12c, D5, W1, W1b: reasons that the older censuses do not give; for the census before the second review also the receipt lines it did not yet print: the JOURNAL-COMMAND line, the pairing by path, the escaped labels), although their exit is right; the table below is exits only. The raw lines follow.
+
+## per scenario: the answer of each census (exit status)
+| scenario | right answer | the census r10 read | the census of `41a671681` | the census before the second review (`superseded/window-census-r16.py.txt`) | the current census |
+| --- | --- | --- | --- | --- | --- |
+| J1 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J2 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J3 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J4 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J7 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J8 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J9 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J11 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F1a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F1b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F1c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F1d | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F2a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F2b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F2c | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F3a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F3b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F4dblsp | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F4colon | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F4tab | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F4removed | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F4e | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F5a | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F5b | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F7a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F7b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F7c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F7d | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F7e | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-run-status-04 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-run-status-lower | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-run-status-bom | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-result-bom | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-result-zwsp | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-result-nul | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-result-esc | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-result-nbsp | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F8-result-case | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F9 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F10a | INCONCLUSIVE (exit 2) | usage error (exit 3) WRONG ANSWER | usage error (exit 3) WRONG ANSWER | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F10b | INCONCLUSIVE (exit 2) | usage error (exit 3) WRONG ANSWER | usage error (exit 3) WRONG ANSWER | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| F10c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y11 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y12a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y12b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y12c | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y12d | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y12e | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D1 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D2 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D3 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D4 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D5 | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D6 | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) |
+| D7 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| D8 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| K3 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y4b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y4c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y2e | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y2f | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y2g | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y2h | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y2i | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y9b | INCONCLUSIVE (exit 2) | usage error (exit 3) WRONG ANSWER | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y9c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y10c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y13a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y13b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| R3b | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G11 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G11b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G11c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G11d | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G11e | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) |
+| G11f | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G11g | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G12 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| G12b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| W2 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| W3 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J12a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J12b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J12c | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) |
+| J13a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13b | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13c | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13d | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13e | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13f | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13g | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13h | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J13i | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J13j | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J14 | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) |
+| J15 | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) |
+| J16 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J17 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J18 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| J19a | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+| J19b | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) | PASS (exit 0) |
+| J20 | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) |
+| Y7a | INCONCLUSIVE (exit 2) | INCONCLUSIVE (exit 2) | PASS (exit 0) FALSE PASS | PASS (exit 0) FALSE PASS | INCONCLUSIVE (exit 2) |
+
+## scenarios not as expected, by census
+- census r10 read (121): C7 D1 D2 D3 D4 D5 D6 D7 D8 F10a F10b F10c F11 F1a F1b F1c F1d F2a F2b F2c F3a F3b F4colon F4dblsp F4e F4removed F4tab F5b F7a F7b F7c F7d F7e F8-result-bom F8-result-case F8-result-esc F8-result-nbsp F8-result-nul F8-result-zwsp F8-run-status-04 F8-run-status-bom F8-run-status-lower F9 G11 G11b G11c G11d G11f G12 G12b J1 J10 J11 J12a J12b J13a J13b J13c J13d J13e J13f J13g J13h J13i J13j J14 J15 J16 J17 J18 J19a J19b J2 J20 J3 J4 J5 J6 J7 J8 J9 K3 P1 P4 R3 W1 W2 W3 Y1 Y10a Y10b Y10c Y11 Y12a Y12b Y12c Y12d Y13a Y13b Y2a Y2b Y2c Y2d Y2e Y2f Y2g Y2h Y2i Y3 Y4 Y4b Y4c Y5a Y5b Y5c Y6 Y7a Y8 Y9 Y9b Y9c
+- census of 41a671681 (105): D1 D2 D3 D4 D5 D6 D7 D8 F10a F10b F10c F11 F1a F1b F1c F1d F2a F2b F2c F3a F3b F4colon F4dblsp F4e F4removed F4tab F5b F7a F7b F7c F7d F7e F8-result-bom F8-result-case F8-result-esc F8-result-nbsp F8-result-nul F8-result-zwsp F8-run-status-04 F8-run-status-bom F8-run-status-lower F9 G11 G11b G11c G11d G11f G12 G12b J1 J10 J11 J12a J12b J13a J13b J13c J13d J13e J13f J13g J13h J13i J13j J14 J15 J16 J17 J18 J19a J19b J2 J20 J3 J4 J5 J6 J7 J8 J9 K3 P1 P4 R3 W1 W2 W3 Y10c Y11 Y12a Y12b Y12c Y12d Y13a Y13b Y2e Y2f Y2g Y2h Y2i Y4b Y4c Y7a Y9b Y9c
+- census before the second review (24): J1 J11 J12a J12b J13a J13b J13c J13d J13e J13f J13g J13h J13j J14 J16 J17 J18 J19a J19b J2 J3 J7 J9 Y7a
+- current census: none
+
+## raw CONTROL-RESULT lines of the new scenarios
+### census r10 read
+CONTROL-RESULT Y7a expected_exit=2 observed_exit=2 UNEXPECTED :: an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt
+CONTROL-RESULT Y11 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-1 (the reviewer's reproduction, four arms with canary headers): a foreign call at T-0.100 s with its usage row at T-0.104 s replaces the dropped usage row of an own call at T+0.5 s: INCONCLUSIVE
+CONTROL-RESULT Y12a expected_exit=2 observed_exit=0 UNEXPECTED :: boundary substitution at the window's LEADING edge: the foreign call row 1 ms outside the padded read (T-3.001 s), its usage row inside it (T-2.997 s) and the only candidate of an own call at T+0.0 s whose usage row was dropped: INCONCLUSIVE through the exact check (the window's pad alone would PASS)
+CONTROL-RESULT Y12b expected_exit=2 observed_exit=0 UNEXPECTED :: boundary substitution at the window's TRAILING edge: the foreign call row 1 ms after the window's end, its usage row inside it, the only candidate of an own call 2.0 s after its arm's end whose usage row was dropped: INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12c expected_exit=2 observed_exit=2 UNEXPECTED :: contrast: the same substitution with the foreign pair 1 s INSIDE the window: INCONCLUSIVE as a foreign call row (and as a competing owner)
+CONTROL-RESULT D1 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-3: the default four-arm gate with four DIRECT outputs (no wrapper header, no identity line): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT D2 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-3: four canary-header outputs with every identity line removed: INCONCLUSIVE
+CONTROL-RESULT D3 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-3: four outputs that keep the identity lines but have no wrapper header: INCONCLUSIVE
+CONTROL-RESULT D4 expected_exit=2 observed_exit=0 UNEXPECTED :: three of the four arms carry an identity line: INCONCLUSIVE (every comparison must succeed)
+CONTROL-RESULT D5 expected_exit=2 observed_exit=2 UNEXPECTED :: the guard receipt has no identity line (the arms have): INCONCLUSIVE
+CONTROL-RESULT D6 expected_exit=0 observed_exit=0 UNEXPECTED :: a trial of fewer arms (the two direct arms, --require-arms 2) still PASSes and says it is a trial, not canary acceptance
+CONTROL-RESULT G11 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-4: a receipt with clean_for=30 and identical start and end (a zero-duration observation): INCONCLUSIVE
+CONTROL-RESULT G11b expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt whose start is AFTER its end (reversed)
+CONTROL-RESULT G11c expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt whose start= is unparsable
+CONTROL-RESULT G11d expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt that observed 29.9 s but declares clean_for=30
+CONTROL-RESULT G11e expected_exit=0 observed_exit=0 OK :: a receipt that observed exactly 30.0 s: enough
+CONTROL-RESULT G11f expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt that declares clean_for=60 but observed 35 s (start to end)
+CONTROL-RESULT G11g expected_exit=2 observed_exit=2 OK :: a GUARD line without a start= field: not a guard 5 receipt
+CONTROL-RESULT W2 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took 2.5 s)
+CONTROL-RESULT W3 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-2: a declared interval that ends an hour AHEAD of the host clock (a wrong stamp or clock): no wait, INCONCLUSIVE with the reason
+CONTROL-RESULT Y12d expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-9, built as the reviewer built it: an own call 2 s after the last arm's end with its usage row dropped, a foreign usage row at +4.9 s whose foreign call row exists at +5.1 s (outside the window's call read): INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12e expected_exit=2 observed_exit=2 OK :: contrast: the same trailing substitution with the foreign call row INSIDE the window (+4.5 s): INCONCLUSIVE as a foreign call row
+CONTROL-RESULT D7 expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-6: the guard receipt AND every arm without an identity line (nothing compared): INCONCLUSIVE
+CONTROL-RESULT D8 expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-6: four arms without a wrapper header AND without identity lines: INCONCLUSIVE
+CONTROL-RESULT K3 expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-4: the raw set's output has 16 RESULT lines where the canary's frozen command makes 17 (a vanished request leaves no trace in the rows): INCONCLUSIVE
+CONTROL-RESULT Y4b expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-4: both rows of one raw request dropped and its RESULT line written with a TAB after RESULT: INCONCLUSIVE (it used to vanish from attribution and the census PASSed)
+CONTROL-RESULT Y4c expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-4: the same with a leading space before RESULT
+CONTROL-RESULT Y2e expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 2026-99-06T12:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2f expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp xxxx-xx-xxTxx:xx:xx.xxxZ has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2g expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 9999-12-31T23:59:59.999Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2h expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T25:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2i expected_exit=2 observed_exit=2 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T12:01:60.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y9b expected_exit=2 observed_exit=3 UNEXPECTED :: r11 P2-5: ONLY the SUMMARY end is year 9999 while the wrapper's `# finished` stamp is valid: INCONCLUSIVE (the valid stamp must not rescue the invalid one; the census used to PASS)
+CONTROL-RESULT Y9c expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-5: an extra malformed SUMMARY line
+CONTROL-RESULT Y10c expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-5: an EMPTY FROZEN start= beside a valid wrapper stamp
+CONTROL-RESULT Y13a expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P3-4: an own call row with a NULL time to first token (the association skips that comparison), its usage row dropped, a foreign usage row with the same numbers and a time to first token of 900000 ms: INCONCLUSIVE
+CONTROL-RESULT Y13b expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P3-4: the own usage row dropped and a foreign usage row whose latency is the text 'nan' (a NaN passes the scripts' latency comparison): INCONCLUSIVE
+CONTROL-RESULT R3b expected_exit=2 observed_exit=2 OK :: the combined mitigation of the residual: the R3 world with a journal count of 1 (a persistence failure the journal covers): INCONCLUSIVE
+CONTROL-RESULT G12 expected_exit=2 observed_exit=0 UNEXPECTED :: r11: a guard receipt that holds two GUARD lines (two runs concatenated)
+CONTROL-RESULT G12b expected_exit=2 observed_exit=0 UNEXPECTED :: r11: a guard receipt that holds two IDENTITY lines
+CONTROL-RESULT J1 expected_exit=2 observed_exit=0 UNEXPECTED :: the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution
+CONTROL-RESULT J2 expected_exit=2 observed_exit=0 UNEXPECTED :: a foreign request that left NO row at all (a journal line only): INCONCLUSIVE
+CONTROL-RESULT J3 expected_exit=2 observed_exit=0 UNEXPECTED :: an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed
+CONTROL-RESULT J4 expected_exit=2 observed_exit=0 UNEXPECTED :: journalctl fails (exit 1): INCONCLUSIVE, the independent record is missing
+CONTROL-RESULT J7 expected_exit=2 observed_exit=0 UNEXPECTED :: a journal line that is not JSON (truncated output): INCONCLUSIVE, fail closed
+CONTROL-RESULT J8 expected_exit=2 observed_exit=0 UNEXPECTED :: an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE
+CONTROL-RESULT J9 expected_exit=2 observed_exit=0 UNEXPECTED :: a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time
+CONTROL-RESULT J11 expected_exit=2 observed_exit=0 UNEXPECTED :: an own request's arrival line written TWICE (arrival-line uniqueness: the 43 requests of the baseline arms left 43 lines, so a duplicate would be unexplained): INCONCLUSIVE, the second line has no own call row
+CONTROL-RESULT F1a expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: a foreign call row whose stamp starts with an Arabic-Indic digit (\u0662026-10-06T12:01:24.500Z), inside the window: INCONCLUSIVE (it used to PASS, the string bounds never read it)
+CONTROL-RESULT F1b expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: SUBSTITUTION: an own raw request's usage row dropped; a foreign call row WRITTEN 200 ms later with identical numbers but a stamp with an Arabic-Indic digit; its ASCII usage row stands in: INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT F1c expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: an orphan usage row hidden by a stamp with an Arabic-Indic digit: INCONCLUSIVE
+CONTROL-RESULT F1d expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: the pad's-edge substitution (Y12a) with the stand-in usage row's stamp ending in an Arabic-Indic digit (the exact competing-owner check used to skip it silently): INCONCLUSIVE
+CONTROL-RESULT F2a expected_exit=2 observed_exit=0 UNEXPECTED :: review F2: a tool-call turn with both rows dropped and its RESULT line printing min_rows=0: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F2b expected_exit=2 observed_exit=0 UNEXPECTED :: review F2: a two-request turn with its second row pair dropped and its RESULT line printing min_rows=1: INCONCLUSIVE
+CONTROL-RESULT F2c expected_exit=2 observed_exit=2 UNEXPECTED :: review F2: arm 4 replaced by eight one-row astra-max turns (a different command than the canary's tool-call set): INCONCLUSIVE
+CONTROL-RESULT F3a expected_exit=2 observed_exit=0 UNEXPECTED :: review F3: the last arm's wrapper output cut off after the journal line, its after-identity showing another MainPID (a restart): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F3b expected_exit=2 observed_exit=0 UNEXPECTED :: review F3: the same cut-off with an unchanged after-identity: INCONCLUSIVE (the wrapper's output is incomplete: no RUN-STATUS, no `# finished`)
+CONTROL-RESULT F4dblsp expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line dblsp: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4colon expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line colon: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4tab expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line tab: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4removed expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line removed: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4e expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: an arm whose SUMMARY end lies two hours before its own FROZEN start (the wrapper's stamp rescued it): INCONCLUSIVE
+CONTROL-RESULT F5a expected_exit=2 observed_exit=2 OK :: review F5: every FROZEN line says a RELATIVE db= (cwd=/tmp: the scripts read /tmp/rel.sqlite): INCONCLUSIVE
+CONTROL-RESULT F5b expected_exit=2 observed_exit=2 UNEXPECTED :: review F5: every FROZEN line says db=~/x.sqlite (the scripts' file: URI does not expand ~): INCONCLUSIVE
+CONTROL-RESULT F7a expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: a second, DIRTY IDLE-RESULT line (indented) after the clean one: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F7b expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: an extra GUARD-RESULT line in an idle-only receipt: INCONCLUSIVE
+CONTROL-RESULT F7c expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: the CHECK line says FAIL while IDLE-RESULT says clean: INCONCLUSIVE
+CONTROL-RESULT F7d expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: a receipt of another script than guard 5 (sha256 of zeros): INCONCLUSIVE
+CONTROL-RESULT F7e expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: a sampling interval of 30 s (two samples in the observation): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-04 expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: arm 3's RUN-STATUS line replaced by 'RUN-STATUS x status=04 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-lower expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: arm 3's RUN-STATUS line replaced by 'run-status x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-bom expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: arm 3's RUN-STATUS line replaced by '\ufeffRUN-STATUS x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-result-bom expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\ufeff' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-zwsp expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\u200b' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nul expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x00' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-esc expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x1b[0m' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nbsp expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\xa0' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-case expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line written `result mode=...`: INCONCLUSIVE
+CONTROL-RESULT F9 expected_exit=2 observed_exit=0 UNEXPECTED :: review F9: a trial of one request whose own call row has a NULL id and a foreign NULL-id row in the window (two NULL ids were one row): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F10a expected_exit=2 observed_exit=3 UNEXPECTED :: review F10: a native RESULT line with min_rows= followed by 5000 digits: INCONCLUSIVE with a receipt (it used to exit 3 with a ValueError)
+CONTROL-RESULT F10b expected_exit=2 observed_exit=3 UNEXPECTED :: review F10: a NUL byte in a FROZEN db= value: INCONCLUSIVE with a receipt
+CONTROL-RESULT F10c expected_exit=2 observed_exit=0 UNEXPECTED :: review F10: the whole world in the last minutes of 2100 (the window's padded end falls in 2101): INCONCLUSIVE with a receipt (it used to exit 3 with a TypeError)
+CONTROL-RESULT J12a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT J12b expected_exit=2 observed_exit=0 UNEXPECTED :: review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE
+CONTROL-RESULT J12c expected_exit=0 observed_exit=0 OK :: the counted range's own boundary: the same line 4.5 s before the window's start is not counted (a foreign request that early cannot be the stand-in of a request that starts inside the window): the store side passes the residual
+CONTROL-RESULT J13a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a null MESSAGE (journalctl writes a field over 4096 bytes as null unless it is given --all) in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13b expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a byte-array MESSAGE with a value outside 0-255 in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13c expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: an object MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13d expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a numeric MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13e expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a MESSAGE that starts with { and does not parse in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13f expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a negative __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13g expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a boolean __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13h expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: an arrival marker that is not counted in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13i expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)
+CONTROL-RESULT J13j expected_exit=2 observed_exit=0 UNEXPECTED :: review F-8: a foreign arrival line with a byte that is not valid UTF-8 (0xFF) on journalctl's stdout: decoded with replacement and counted, so the window is INCONCLUSIVE with the whole receipt measured (it used to end with `the measurement failed (UnicodeDecodeError)` and no journal block)
+CONTROL-RESULT J14 expected_exit=0 observed_exit=0 UNEXPECTED :: review F-9: the receipt prints the exact journalctl command, the binary and its version, and the census asks for `--user -u omniroute.service -o json --all` with an explicit UTC suffix
+CONTROL-RESULT J15 expected_exit=0 observed_exit=0 UNEXPECTED :: review F-3 (documented): THE CHAIN WIDTH (expected PASS): a lost own line balanced by a foreign line of the same path that is MORE than 3 s from it but within 3 s of the next own request's line (rows 1.5 s apart): the pairing's width is 3 s per link
+CONTROL-RESULT J16 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path
+CONTROL-RESULT J17 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-7: three own rows whose lines are lost and three foreign lines (every row has a candidate line, the best matching leaves ONE row and ONE line): the receipt counts exactly that
+CONTROL-RESULT J18 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-8: an own row whose duration is 1e15 ms (an overflow in the arrival): INCONCLUSIVE with the journal lines in the receipt, not a lost measurement
+CONTROL-RESULT J19a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-9: journalctl writes `File ... is truncated, ignoring file.` on stderr (and prints one line less) and exits 0: INCONCLUSIVE
+CONTROL-RESULT J19b expected_exit=0 observed_exit=0 UNEXPECTED :: a harmless stderr hint of journalctl (no word of loss): the receipt records it, PASS
+CONTROL-RESULT J20 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-4 and F-5: arrival lines whose labels hold a newline with a forged `CENSUS-RESULT PASS` line and an escaped lone surrogate (both attacker-reachable): one CENSUS-RESULT line (1), not a PASS, the forged text escaped, no crash
+### census of 41a671681
+CONTROL-RESULT Y7a expected_exit=2 observed_exit=0 UNEXPECTED :: an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt
+CONTROL-RESULT Y11 expected_exit=2 observed_exit=2 UNEXPECTED :: r10 P2-1 (the reviewer's reproduction, four arms with canary headers): a foreign call at T-0.100 s with its usage row at T-0.104 s replaces the dropped usage row of an own call at T+0.5 s: INCONCLUSIVE
+CONTROL-RESULT Y12a expected_exit=2 observed_exit=0 UNEXPECTED :: boundary substitution at the window's LEADING edge: the foreign call row 1 ms outside the padded read (T-3.001 s), its usage row inside it (T-2.997 s) and the only candidate of an own call at T+0.0 s whose usage row was dropped: INCONCLUSIVE through the exact check (the window's pad alone would PASS)
+CONTROL-RESULT Y12b expected_exit=2 observed_exit=0 UNEXPECTED :: boundary substitution at the window's TRAILING edge: the foreign call row 1 ms after the window's end, its usage row inside it, the only candidate of an own call 2.0 s after its arm's end whose usage row was dropped: INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12c expected_exit=2 observed_exit=2 UNEXPECTED :: contrast: the same substitution with the foreign pair 1 s INSIDE the window: INCONCLUSIVE as a foreign call row (and as a competing owner)
+CONTROL-RESULT D1 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-3: the default four-arm gate with four DIRECT outputs (no wrapper header, no identity line): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT D2 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-3: four canary-header outputs with every identity line removed: INCONCLUSIVE
+CONTROL-RESULT D3 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-3: four outputs that keep the identity lines but have no wrapper header: INCONCLUSIVE
+CONTROL-RESULT D4 expected_exit=2 observed_exit=0 UNEXPECTED :: three of the four arms carry an identity line: INCONCLUSIVE (every comparison must succeed)
+CONTROL-RESULT D5 expected_exit=2 observed_exit=2 UNEXPECTED :: the guard receipt has no identity line (the arms have): INCONCLUSIVE
+CONTROL-RESULT D6 expected_exit=0 observed_exit=0 UNEXPECTED :: a trial of fewer arms (the two direct arms, --require-arms 2) still PASSes and says it is a trial, not canary acceptance
+CONTROL-RESULT G11 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-4: a receipt with clean_for=30 and identical start and end (a zero-duration observation): INCONCLUSIVE
+CONTROL-RESULT G11b expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt whose start is AFTER its end (reversed)
+CONTROL-RESULT G11c expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt whose start= is unparsable
+CONTROL-RESULT G11d expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt that observed 29.9 s but declares clean_for=30
+CONTROL-RESULT G11e expected_exit=0 observed_exit=0 OK :: a receipt that observed exactly 30.0 s: enough
+CONTROL-RESULT G11f expected_exit=2 observed_exit=0 UNEXPECTED :: a receipt that declares clean_for=60 but observed 35 s (start to end)
+CONTROL-RESULT G11g expected_exit=2 observed_exit=2 OK :: a GUARD line without a start= field: not a guard 5 receipt
+CONTROL-RESULT W2 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took 2.5 s)
+CONTROL-RESULT W3 expected_exit=2 observed_exit=0 UNEXPECTED :: r10 P2-2: a declared interval that ends an hour AHEAD of the host clock (a wrong stamp or clock): no wait, INCONCLUSIVE with the reason
+CONTROL-RESULT Y12d expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-9, built as the reviewer built it: an own call 2 s after the last arm's end with its usage row dropped, a foreign usage row at +4.9 s whose foreign call row exists at +5.1 s (outside the window's call read): INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12e expected_exit=2 observed_exit=2 OK :: contrast: the same trailing substitution with the foreign call row INSIDE the window (+4.5 s): INCONCLUSIVE as a foreign call row
+CONTROL-RESULT D7 expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-6: the guard receipt AND every arm without an identity line (nothing compared): INCONCLUSIVE
+CONTROL-RESULT D8 expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-6: four arms without a wrapper header AND without identity lines: INCONCLUSIVE
+CONTROL-RESULT K3 expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-4: the raw set's output has 16 RESULT lines where the canary's frozen command makes 17 (a vanished request leaves no trace in the rows): INCONCLUSIVE
+CONTROL-RESULT Y4b expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-4: both rows of one raw request dropped and its RESULT line written with a TAB after RESULT: INCONCLUSIVE (it used to vanish from attribution and the census PASSed)
+CONTROL-RESULT Y4c expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-4: the same with a leading space before RESULT
+CONTROL-RESULT Y2e expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 2026-99-06T12:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2f expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp xxxx-xx-xxTxx:xx:xx.xxxZ has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2g expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 9999-12-31T23:59:59.999Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2h expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T25:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2i expected_exit=2 observed_exit=2 UNEXPECTED :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T12:01:60.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y9b expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-5: ONLY the SUMMARY end is year 9999 while the wrapper's `# finished` stamp is valid: INCONCLUSIVE (the valid stamp must not rescue the invalid one; the census used to PASS)
+CONTROL-RESULT Y9c expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-5: an extra malformed SUMMARY line
+CONTROL-RESULT Y10c expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P2-5: an EMPTY FROZEN start= beside a valid wrapper stamp
+CONTROL-RESULT Y13a expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P3-4: an own call row with a NULL time to first token (the association skips that comparison), its usage row dropped, a foreign usage row with the same numbers and a time to first token of 900000 ms: INCONCLUSIVE
+CONTROL-RESULT Y13b expected_exit=2 observed_exit=0 UNEXPECTED :: r11 P3-4: the own usage row dropped and a foreign usage row whose latency is the text 'nan' (a NaN passes the scripts' latency comparison): INCONCLUSIVE
+CONTROL-RESULT R3b expected_exit=2 observed_exit=2 OK :: the combined mitigation of the residual: the R3 world with a journal count of 1 (a persistence failure the journal covers): INCONCLUSIVE
+CONTROL-RESULT G12 expected_exit=2 observed_exit=0 UNEXPECTED :: r11: a guard receipt that holds two GUARD lines (two runs concatenated)
+CONTROL-RESULT G12b expected_exit=2 observed_exit=0 UNEXPECTED :: r11: a guard receipt that holds two IDENTITY lines
+CONTROL-RESULT J1 expected_exit=2 observed_exit=0 UNEXPECTED :: the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution
+CONTROL-RESULT J2 expected_exit=2 observed_exit=0 UNEXPECTED :: a foreign request that left NO row at all (a journal line only): INCONCLUSIVE
+CONTROL-RESULT J3 expected_exit=2 observed_exit=0 UNEXPECTED :: an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed
+CONTROL-RESULT J4 expected_exit=2 observed_exit=0 UNEXPECTED :: journalctl fails (exit 1): INCONCLUSIVE, the independent record is missing
+CONTROL-RESULT J7 expected_exit=2 observed_exit=0 UNEXPECTED :: a journal line that is not JSON (truncated output): INCONCLUSIVE, fail closed
+CONTROL-RESULT J8 expected_exit=2 observed_exit=0 UNEXPECTED :: an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE
+CONTROL-RESULT J9 expected_exit=2 observed_exit=0 UNEXPECTED :: a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time
+CONTROL-RESULT J11 expected_exit=2 observed_exit=0 UNEXPECTED :: an own request's arrival line written TWICE (arrival-line uniqueness: the 43 requests of the baseline arms left 43 lines, so a duplicate would be unexplained): INCONCLUSIVE, the second line has no own call row
+CONTROL-RESULT F1a expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: a foreign call row whose stamp starts with an Arabic-Indic digit (\u0662026-10-06T12:01:24.500Z), inside the window: INCONCLUSIVE (it used to PASS, the string bounds never read it)
+CONTROL-RESULT F1b expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: SUBSTITUTION: an own raw request's usage row dropped; a foreign call row WRITTEN 200 ms later with identical numbers but a stamp with an Arabic-Indic digit; its ASCII usage row stands in: INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT F1c expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: an orphan usage row hidden by a stamp with an Arabic-Indic digit: INCONCLUSIVE
+CONTROL-RESULT F1d expected_exit=2 observed_exit=0 UNEXPECTED :: review F1: the pad's-edge substitution (Y12a) with the stand-in usage row's stamp ending in an Arabic-Indic digit (the exact competing-owner check used to skip it silently): INCONCLUSIVE
+CONTROL-RESULT F2a expected_exit=2 observed_exit=0 UNEXPECTED :: review F2: a tool-call turn with both rows dropped and its RESULT line printing min_rows=0: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F2b expected_exit=2 observed_exit=0 UNEXPECTED :: review F2: a two-request turn with its second row pair dropped and its RESULT line printing min_rows=1: INCONCLUSIVE
+CONTROL-RESULT F2c expected_exit=2 observed_exit=2 UNEXPECTED :: review F2: arm 4 replaced by eight one-row astra-max turns (a different command than the canary's tool-call set): INCONCLUSIVE
+CONTROL-RESULT F3a expected_exit=2 observed_exit=0 UNEXPECTED :: review F3: the last arm's wrapper output cut off after the journal line, its after-identity showing another MainPID (a restart): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F3b expected_exit=2 observed_exit=0 UNEXPECTED :: review F3: the same cut-off with an unchanged after-identity: INCONCLUSIVE (the wrapper's output is incomplete: no RUN-STATUS, no `# finished`)
+CONTROL-RESULT F4dblsp expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line dblsp: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4colon expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line colon: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4tab expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line tab: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4removed expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line removed: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4e expected_exit=2 observed_exit=0 UNEXPECTED :: review F4: an arm whose SUMMARY end lies two hours before its own FROZEN start (the wrapper's stamp rescued it): INCONCLUSIVE
+CONTROL-RESULT F5a expected_exit=2 observed_exit=2 OK :: review F5: every FROZEN line says a RELATIVE db= (cwd=/tmp: the scripts read /tmp/rel.sqlite): INCONCLUSIVE
+CONTROL-RESULT F5b expected_exit=2 observed_exit=2 UNEXPECTED :: review F5: every FROZEN line says db=~/x.sqlite (the scripts' file: URI does not expand ~): INCONCLUSIVE
+CONTROL-RESULT F7a expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: a second, DIRTY IDLE-RESULT line (indented) after the clean one: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F7b expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: an extra GUARD-RESULT line in an idle-only receipt: INCONCLUSIVE
+CONTROL-RESULT F7c expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: the CHECK line says FAIL while IDLE-RESULT says clean: INCONCLUSIVE
+CONTROL-RESULT F7d expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: a receipt of another script than guard 5 (sha256 of zeros): INCONCLUSIVE
+CONTROL-RESULT F7e expected_exit=2 observed_exit=0 UNEXPECTED :: review F7: a sampling interval of 30 s (two samples in the observation): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-04 expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: arm 3's RUN-STATUS line replaced by 'RUN-STATUS x status=04 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-lower expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: arm 3's RUN-STATUS line replaced by 'run-status x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-bom expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: arm 3's RUN-STATUS line replaced by '\ufeffRUN-STATUS x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-result-bom expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\ufeff' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-zwsp expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\u200b' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nul expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x00' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-esc expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x1b[0m' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nbsp expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\xa0' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-case expected_exit=2 observed_exit=0 UNEXPECTED :: review F8: both rows of one raw request dropped and its RESULT line written `result mode=...`: INCONCLUSIVE
+CONTROL-RESULT F9 expected_exit=2 observed_exit=0 UNEXPECTED :: review F9: a trial of one request whose own call row has a NULL id and a foreign NULL-id row in the window (two NULL ids were one row): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F10a expected_exit=2 observed_exit=3 UNEXPECTED :: review F10: a native RESULT line with min_rows= followed by 5000 digits: INCONCLUSIVE with a receipt (it used to exit 3 with a ValueError)
+CONTROL-RESULT F10b expected_exit=2 observed_exit=3 UNEXPECTED :: review F10: a NUL byte in a FROZEN db= value: INCONCLUSIVE with a receipt
+CONTROL-RESULT F10c expected_exit=2 observed_exit=0 UNEXPECTED :: review F10: the whole world in the last minutes of 2100 (the window's padded end falls in 2101): INCONCLUSIVE with a receipt (it used to exit 3 with a TypeError)
+CONTROL-RESULT J12a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT J12b expected_exit=2 observed_exit=0 UNEXPECTED :: review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE
+CONTROL-RESULT J12c expected_exit=0 observed_exit=0 OK :: the counted range's own boundary: the same line 4.5 s before the window's start is not counted (a foreign request that early cannot be the stand-in of a request that starts inside the window): the store side passes the residual
+CONTROL-RESULT J13a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a null MESSAGE (journalctl writes a field over 4096 bytes as null unless it is given --all) in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13b expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a byte-array MESSAGE with a value outside 0-255 in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13c expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: an object MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13d expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a numeric MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13e expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a MESSAGE that starts with { and does not parse in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13f expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a negative __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13g expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a boolean __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13h expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: an arrival marker that is not counted in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13i expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)
+CONTROL-RESULT J13j expected_exit=2 observed_exit=0 UNEXPECTED :: review F-8: a foreign arrival line with a byte that is not valid UTF-8 (0xFF) on journalctl's stdout: decoded with replacement and counted, so the window is INCONCLUSIVE with the whole receipt measured (it used to end with `the measurement failed (UnicodeDecodeError)` and no journal block)
+CONTROL-RESULT J14 expected_exit=0 observed_exit=0 UNEXPECTED :: review F-9: the receipt prints the exact journalctl command, the binary and its version, and the census asks for `--user -u omniroute.service -o json --all` with an explicit UTC suffix
+CONTROL-RESULT J15 expected_exit=0 observed_exit=0 UNEXPECTED :: review F-3 (documented): THE CHAIN WIDTH (expected PASS): a lost own line balanced by a foreign line of the same path that is MORE than 3 s from it but within 3 s of the next own request's line (rows 1.5 s apart): the pairing's width is 3 s per link
+CONTROL-RESULT J16 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path
+CONTROL-RESULT J17 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-7: three own rows whose lines are lost and three foreign lines (every row has a candidate line, the best matching leaves ONE row and ONE line): the receipt counts exactly that
+CONTROL-RESULT J18 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-8: an own row whose duration is 1e15 ms (an overflow in the arrival): INCONCLUSIVE with the journal lines in the receipt, not a lost measurement
+CONTROL-RESULT J19a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-9: journalctl writes `File ... is truncated, ignoring file.` on stderr (and prints one line less) and exits 0: INCONCLUSIVE
+CONTROL-RESULT J19b expected_exit=0 observed_exit=0 UNEXPECTED :: a harmless stderr hint of journalctl (no word of loss): the receipt records it, PASS
+CONTROL-RESULT J20 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-4 and F-5: arrival lines whose labels hold a newline with a forged `CENSUS-RESULT PASS` line and an escaped lone surrogate (both attacker-reachable): one CENSUS-RESULT line (1), not a PASS, the forged text escaped, no crash
+### census before the second review (r16)
+CONTROL-RESULT Y7a expected_exit=2 observed_exit=0 UNEXPECTED :: an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt
+CONTROL-RESULT Y11 expected_exit=2 observed_exit=2 OK :: r10 P2-1 (the reviewer's reproduction, four arms with canary headers): a foreign call at T-0.100 s with its usage row at T-0.104 s replaces the dropped usage row of an own call at T+0.5 s: INCONCLUSIVE
+CONTROL-RESULT Y12a expected_exit=2 observed_exit=2 OK :: boundary substitution at the window's LEADING edge: the foreign call row 1 ms outside the padded read (T-3.001 s), its usage row inside it (T-2.997 s) and the only candidate of an own call at T+0.0 s whose usage row was dropped: INCONCLUSIVE through the exact check (the window's pad alone would PASS)
+CONTROL-RESULT Y12b expected_exit=2 observed_exit=2 OK :: boundary substitution at the window's TRAILING edge: the foreign call row 1 ms after the window's end, its usage row inside it, the only candidate of an own call 2.0 s after its arm's end whose usage row was dropped: INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12c expected_exit=2 observed_exit=2 OK :: contrast: the same substitution with the foreign pair 1 s INSIDE the window: INCONCLUSIVE as a foreign call row (and as a competing owner)
+CONTROL-RESULT D1 expected_exit=2 observed_exit=2 OK :: r10 P2-3: the default four-arm gate with four DIRECT outputs (no wrapper header, no identity line): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT D2 expected_exit=2 observed_exit=2 OK :: r10 P2-3: four canary-header outputs with every identity line removed: INCONCLUSIVE
+CONTROL-RESULT D3 expected_exit=2 observed_exit=2 OK :: r10 P2-3: four outputs that keep the identity lines but have no wrapper header: INCONCLUSIVE
+CONTROL-RESULT D4 expected_exit=2 observed_exit=2 OK :: three of the four arms carry an identity line: INCONCLUSIVE (every comparison must succeed)
+CONTROL-RESULT D5 expected_exit=2 observed_exit=2 OK :: the guard receipt has no identity line (the arms have): INCONCLUSIVE
+CONTROL-RESULT D6 expected_exit=0 observed_exit=0 OK :: a trial of fewer arms (the two direct arms, --require-arms 2) still PASSes and says it is a trial, not canary acceptance
+CONTROL-RESULT G11 expected_exit=2 observed_exit=2 OK :: r10 P2-4: a receipt with clean_for=30 and identical start and end (a zero-duration observation): INCONCLUSIVE
+CONTROL-RESULT G11b expected_exit=2 observed_exit=2 OK :: a receipt whose start is AFTER its end (reversed)
+CONTROL-RESULT G11c expected_exit=2 observed_exit=2 OK :: a receipt whose start= is unparsable
+CONTROL-RESULT G11d expected_exit=2 observed_exit=2 OK :: a receipt that observed 29.9 s but declares clean_for=30
+CONTROL-RESULT G11e expected_exit=0 observed_exit=0 OK :: a receipt that observed exactly 30.0 s: enough
+CONTROL-RESULT G11f expected_exit=2 observed_exit=2 OK :: a receipt that declares clean_for=60 but observed 35 s (start to end)
+CONTROL-RESULT G11g expected_exit=2 observed_exit=2 OK :: a GUARD line without a start= field: not a guard 5 receipt
+CONTROL-RESULT W2 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took 8.4 s)
+CONTROL-RESULT W3 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a declared interval that ends an hour AHEAD of the host clock (a wrong stamp or clock): no wait, INCONCLUSIVE with the reason
+CONTROL-RESULT Y12d expected_exit=2 observed_exit=2 OK :: r11 P2-9, built as the reviewer built it: an own call 2 s after the last arm's end with its usage row dropped, a foreign usage row at +4.9 s whose foreign call row exists at +5.1 s (outside the window's call read): INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12e expected_exit=2 observed_exit=2 OK :: contrast: the same trailing substitution with the foreign call row INSIDE the window (+4.5 s): INCONCLUSIVE as a foreign call row
+CONTROL-RESULT D7 expected_exit=2 observed_exit=2 OK :: r11 P2-6: the guard receipt AND every arm without an identity line (nothing compared): INCONCLUSIVE
+CONTROL-RESULT D8 expected_exit=2 observed_exit=2 OK :: r11 P2-6: four arms without a wrapper header AND without identity lines: INCONCLUSIVE
+CONTROL-RESULT K3 expected_exit=2 observed_exit=2 OK :: r11 P2-4: the raw set's output has 16 RESULT lines where the canary's frozen command makes 17 (a vanished request leaves no trace in the rows): INCONCLUSIVE
+CONTROL-RESULT Y4b expected_exit=2 observed_exit=2 OK :: r11 P2-4: both rows of one raw request dropped and its RESULT line written with a TAB after RESULT: INCONCLUSIVE (it used to vanish from attribution and the census PASSed)
+CONTROL-RESULT Y4c expected_exit=2 observed_exit=2 OK :: r11 P2-4: the same with a leading space before RESULT
+CONTROL-RESULT Y2e expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 2026-99-06T12:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2f expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp xxxx-xx-xxTxx:xx:xx.xxxZ has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2g expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 9999-12-31T23:59:59.999Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2h expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T25:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2i expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T12:01:60.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y9b expected_exit=2 observed_exit=2 OK :: r11 P2-5: ONLY the SUMMARY end is year 9999 while the wrapper's `# finished` stamp is valid: INCONCLUSIVE (the valid stamp must not rescue the invalid one; the census used to PASS)
+CONTROL-RESULT Y9c expected_exit=2 observed_exit=2 OK :: r11 P2-5: an extra malformed SUMMARY line
+CONTROL-RESULT Y10c expected_exit=2 observed_exit=2 OK :: r11 P2-5: an EMPTY FROZEN start= beside a valid wrapper stamp
+CONTROL-RESULT Y13a expected_exit=2 observed_exit=2 OK :: r11 P3-4: an own call row with a NULL time to first token (the association skips that comparison), its usage row dropped, a foreign usage row with the same numbers and a time to first token of 900000 ms: INCONCLUSIVE
+CONTROL-RESULT Y13b expected_exit=2 observed_exit=2 OK :: r11 P3-4: the own usage row dropped and a foreign usage row whose latency is the text 'nan' (a NaN passes the scripts' latency comparison): INCONCLUSIVE
+CONTROL-RESULT R3b expected_exit=2 observed_exit=2 OK :: the combined mitigation of the residual: the R3 world with a journal count of 1 (a persistence failure the journal covers): INCONCLUSIVE
+CONTROL-RESULT G12 expected_exit=2 observed_exit=2 OK :: r11: a guard receipt that holds two GUARD lines (two runs concatenated)
+CONTROL-RESULT G12b expected_exit=2 observed_exit=2 OK :: r11: a guard receipt that holds two IDENTITY lines
+CONTROL-RESULT J1 expected_exit=2 observed_exit=2 UNEXPECTED :: the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution
+CONTROL-RESULT J2 expected_exit=2 observed_exit=2 UNEXPECTED :: a foreign request that left NO row at all (a journal line only): INCONCLUSIVE
+CONTROL-RESULT J3 expected_exit=2 observed_exit=2 UNEXPECTED :: an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed
+CONTROL-RESULT J4 expected_exit=2 observed_exit=2 OK :: journalctl fails (exit 1): INCONCLUSIVE, the independent record is missing
+CONTROL-RESULT J7 expected_exit=2 observed_exit=2 UNEXPECTED :: a journal line that is not JSON (truncated output): INCONCLUSIVE, fail closed
+CONTROL-RESULT J8 expected_exit=2 observed_exit=2 OK :: an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE
+CONTROL-RESULT J9 expected_exit=2 observed_exit=2 UNEXPECTED :: a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time
+CONTROL-RESULT J11 expected_exit=2 observed_exit=2 UNEXPECTED :: an own request's arrival line written TWICE (arrival-line uniqueness: the 43 requests of the baseline arms left 43 lines, so a duplicate would be unexplained): INCONCLUSIVE, the second line has no own call row
+CONTROL-RESULT F1a expected_exit=2 observed_exit=2 OK :: review F1: a foreign call row whose stamp starts with an Arabic-Indic digit (\u0662026-10-06T12:01:24.500Z), inside the window: INCONCLUSIVE (it used to PASS, the string bounds never read it)
+CONTROL-RESULT F1b expected_exit=2 observed_exit=2 OK :: review F1: SUBSTITUTION: an own raw request's usage row dropped; a foreign call row WRITTEN 200 ms later with identical numbers but a stamp with an Arabic-Indic digit; its ASCII usage row stands in: INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT F1c expected_exit=2 observed_exit=2 OK :: review F1: an orphan usage row hidden by a stamp with an Arabic-Indic digit: INCONCLUSIVE
+CONTROL-RESULT F1d expected_exit=2 observed_exit=2 OK :: review F1: the pad's-edge substitution (Y12a) with the stand-in usage row's stamp ending in an Arabic-Indic digit (the exact competing-owner check used to skip it silently): INCONCLUSIVE
+CONTROL-RESULT F2a expected_exit=2 observed_exit=2 OK :: review F2: a tool-call turn with both rows dropped and its RESULT line printing min_rows=0: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F2b expected_exit=2 observed_exit=2 OK :: review F2: a two-request turn with its second row pair dropped and its RESULT line printing min_rows=1: INCONCLUSIVE
+CONTROL-RESULT F2c expected_exit=2 observed_exit=2 OK :: review F2: arm 4 replaced by eight one-row astra-max turns (a different command than the canary's tool-call set): INCONCLUSIVE
+CONTROL-RESULT F3a expected_exit=2 observed_exit=2 OK :: review F3: the last arm's wrapper output cut off after the journal line, its after-identity showing another MainPID (a restart): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F3b expected_exit=2 observed_exit=2 OK :: review F3: the same cut-off with an unchanged after-identity: INCONCLUSIVE (the wrapper's output is incomplete: no RUN-STATUS, no `# finished`)
+CONTROL-RESULT F4dblsp expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line dblsp: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4colon expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line colon: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4tab expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line tab: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4removed expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line removed: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4e expected_exit=2 observed_exit=2 OK :: review F4: an arm whose SUMMARY end lies two hours before its own FROZEN start (the wrapper's stamp rescued it): INCONCLUSIVE
+CONTROL-RESULT F5a expected_exit=2 observed_exit=2 OK :: review F5: every FROZEN line says a RELATIVE db= (cwd=/tmp: the scripts read /tmp/rel.sqlite): INCONCLUSIVE
+CONTROL-RESULT F5b expected_exit=2 observed_exit=2 OK :: review F5: every FROZEN line says db=~/x.sqlite (the scripts' file: URI does not expand ~): INCONCLUSIVE
+CONTROL-RESULT F7a expected_exit=2 observed_exit=2 OK :: review F7: a second, DIRTY IDLE-RESULT line (indented) after the clean one: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F7b expected_exit=2 observed_exit=2 OK :: review F7: an extra GUARD-RESULT line in an idle-only receipt: INCONCLUSIVE
+CONTROL-RESULT F7c expected_exit=2 observed_exit=2 OK :: review F7: the CHECK line says FAIL while IDLE-RESULT says clean: INCONCLUSIVE
+CONTROL-RESULT F7d expected_exit=2 observed_exit=2 OK :: review F7: a receipt of another script than guard 5 (sha256 of zeros): INCONCLUSIVE
+CONTROL-RESULT F7e expected_exit=2 observed_exit=2 OK :: review F7: a sampling interval of 30 s (two samples in the observation): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-04 expected_exit=2 observed_exit=2 OK :: review F8: arm 3's RUN-STATUS line replaced by 'RUN-STATUS x status=04 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-lower expected_exit=2 observed_exit=2 OK :: review F8: arm 3's RUN-STATUS line replaced by 'run-status x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-bom expected_exit=2 observed_exit=2 OK :: review F8: arm 3's RUN-STATUS line replaced by '\ufeffRUN-STATUS x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-result-bom expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\ufeff' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-zwsp expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\u200b' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nul expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x00' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-esc expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x1b[0m' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nbsp expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\xa0' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-case expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line written `result mode=...`: INCONCLUSIVE
+CONTROL-RESULT F9 expected_exit=2 observed_exit=2 OK :: review F9: a trial of one request whose own call row has a NULL id and a foreign NULL-id row in the window (two NULL ids were one row): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F10a expected_exit=2 observed_exit=2 OK :: review F10: a native RESULT line with min_rows= followed by 5000 digits: INCONCLUSIVE with a receipt (it used to exit 3 with a ValueError)
+CONTROL-RESULT F10b expected_exit=2 observed_exit=2 OK :: review F10: a NUL byte in a FROZEN db= value: INCONCLUSIVE with a receipt
+CONTROL-RESULT F10c expected_exit=2 observed_exit=2 OK :: review F10: the whole world in the last minutes of 2100 (the window's padded end falls in 2101): INCONCLUSIVE with a receipt (it used to exit 3 with a TypeError)
+CONTROL-RESULT J12a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT J12b expected_exit=2 observed_exit=0 UNEXPECTED :: review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE
+CONTROL-RESULT J12c expected_exit=0 observed_exit=0 OK :: the counted range's own boundary: the same line 4.5 s before the window's start is not counted (a foreign request that early cannot be the stand-in of a request that starts inside the window): the store side passes the residual
+CONTROL-RESULT J13a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a null MESSAGE (journalctl writes a field over 4096 bytes as null unless it is given --all) in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13b expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a byte-array MESSAGE with a value outside 0-255 in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13c expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: an object MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13d expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a numeric MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13e expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a MESSAGE that starts with { and does not parse in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13f expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a negative __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13g expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: a boolean __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13h expected_exit=2 observed_exit=0 UNEXPECTED :: review F-2: an arrival marker that is not counted in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13i expected_exit=2 observed_exit=2 OK :: review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)
+CONTROL-RESULT J13j expected_exit=2 observed_exit=2 UNEXPECTED :: review F-8: a foreign arrival line with a byte that is not valid UTF-8 (0xFF) on journalctl's stdout: decoded with replacement and counted, so the window is INCONCLUSIVE with the whole receipt measured (it used to end with `the measurement failed (UnicodeDecodeError)` and no journal block)
+CONTROL-RESULT J14 expected_exit=0 observed_exit=0 UNEXPECTED :: review F-9: the receipt prints the exact journalctl command, the binary and its version, and the census asks for `--user -u omniroute.service -o json --all` with an explicit UTC suffix
+CONTROL-RESULT J15 expected_exit=0 observed_exit=0 OK :: review F-3 (documented): THE CHAIN WIDTH (expected PASS): a lost own line balanced by a foreign line of the same path that is MORE than 3 s from it but within 3 s of the next own request's line (rows 1.5 s apart): the pairing's width is 3 s per link
+CONTROL-RESULT J16 expected_exit=2 observed_exit=0 UNEXPECTED :: review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path
+CONTROL-RESULT J17 expected_exit=2 observed_exit=2 UNEXPECTED :: review F-7: three own rows whose lines are lost and three foreign lines (every row has a candidate line, the best matching leaves ONE row and ONE line): the receipt counts exactly that
+CONTROL-RESULT J18 expected_exit=2 observed_exit=2 UNEXPECTED :: review F-8: an own row whose duration is 1e15 ms (an overflow in the arrival): INCONCLUSIVE with the journal lines in the receipt, not a lost measurement
+CONTROL-RESULT J19a expected_exit=2 observed_exit=0 UNEXPECTED :: review F-9: journalctl writes `File ... is truncated, ignoring file.` on stderr (and prints one line less) and exits 0: INCONCLUSIVE
+CONTROL-RESULT J19b expected_exit=0 observed_exit=0 UNEXPECTED :: a harmless stderr hint of journalctl (no word of loss): the receipt records it, PASS
+CONTROL-RESULT J20 expected_exit=2 observed_exit=2 OK :: review F-4 and F-5: arrival lines whose labels hold a newline with a forged `CENSUS-RESULT PASS` line and an escaped lone surrogate (both attacker-reachable): one CENSUS-RESULT line (1), not a PASS, the forged text escaped, no crash
+### current census
+CONTROL-RESULT Y7a expected_exit=2 observed_exit=2 OK :: an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt
+CONTROL-RESULT Y11 expected_exit=2 observed_exit=2 OK :: r10 P2-1 (the reviewer's reproduction, four arms with canary headers): a foreign call at T-0.100 s with its usage row at T-0.104 s replaces the dropped usage row of an own call at T+0.5 s: INCONCLUSIVE
+CONTROL-RESULT Y12a expected_exit=2 observed_exit=2 OK :: boundary substitution at the window's LEADING edge: the foreign call row 1 ms outside the padded read (T-3.001 s), its usage row inside it (T-2.997 s) and the only candidate of an own call at T+0.0 s whose usage row was dropped: INCONCLUSIVE through the exact check (the window's pad alone would PASS)
+CONTROL-RESULT Y12b expected_exit=2 observed_exit=2 OK :: boundary substitution at the window's TRAILING edge: the foreign call row 1 ms after the window's end, its usage row inside it, the only candidate of an own call 2.0 s after its arm's end whose usage row was dropped: INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12c expected_exit=2 observed_exit=2 OK :: contrast: the same substitution with the foreign pair 1 s INSIDE the window: INCONCLUSIVE as a foreign call row (and as a competing owner)
+CONTROL-RESULT D1 expected_exit=2 observed_exit=2 OK :: r10 P2-3: the default four-arm gate with four DIRECT outputs (no wrapper header, no identity line): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT D2 expected_exit=2 observed_exit=2 OK :: r10 P2-3: four canary-header outputs with every identity line removed: INCONCLUSIVE
+CONTROL-RESULT D3 expected_exit=2 observed_exit=2 OK :: r10 P2-3: four outputs that keep the identity lines but have no wrapper header: INCONCLUSIVE
+CONTROL-RESULT D4 expected_exit=2 observed_exit=2 OK :: three of the four arms carry an identity line: INCONCLUSIVE (every comparison must succeed)
+CONTROL-RESULT D5 expected_exit=2 observed_exit=2 OK :: the guard receipt has no identity line (the arms have): INCONCLUSIVE
+CONTROL-RESULT D6 expected_exit=0 observed_exit=0 OK :: a trial of fewer arms (the two direct arms, --require-arms 2) still PASSes and says it is a trial, not canary acceptance
+CONTROL-RESULT G11 expected_exit=2 observed_exit=2 OK :: r10 P2-4: a receipt with clean_for=30 and identical start and end (a zero-duration observation): INCONCLUSIVE
+CONTROL-RESULT G11b expected_exit=2 observed_exit=2 OK :: a receipt whose start is AFTER its end (reversed)
+CONTROL-RESULT G11c expected_exit=2 observed_exit=2 OK :: a receipt whose start= is unparsable
+CONTROL-RESULT G11d expected_exit=2 observed_exit=2 OK :: a receipt that observed 29.9 s but declares clean_for=30
+CONTROL-RESULT G11e expected_exit=0 observed_exit=0 OK :: a receipt that observed exactly 30.0 s: enough
+CONTROL-RESULT G11f expected_exit=2 observed_exit=2 OK :: a receipt that declares clean_for=60 but observed 35 s (start to end)
+CONTROL-RESULT G11g expected_exit=2 observed_exit=2 OK :: a GUARD line without a start= field: not a guard 5 receipt
+CONTROL-RESULT W2 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took 8.7 s)
+CONTROL-RESULT W3 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a declared interval that ends an hour AHEAD of the host clock (a wrong stamp or clock): no wait, INCONCLUSIVE with the reason
+CONTROL-RESULT Y12d expected_exit=2 observed_exit=2 OK :: r11 P2-9, built as the reviewer built it: an own call 2 s after the last arm's end with its usage row dropped, a foreign usage row at +4.9 s whose foreign call row exists at +5.1 s (outside the window's call read): INCONCLUSIVE through the exact check
+CONTROL-RESULT Y12e expected_exit=2 observed_exit=2 OK :: contrast: the same trailing substitution with the foreign call row INSIDE the window (+4.5 s): INCONCLUSIVE as a foreign call row
+CONTROL-RESULT D7 expected_exit=2 observed_exit=2 OK :: r11 P2-6: the guard receipt AND every arm without an identity line (nothing compared): INCONCLUSIVE
+CONTROL-RESULT D8 expected_exit=2 observed_exit=2 OK :: r11 P2-6: four arms without a wrapper header AND without identity lines: INCONCLUSIVE
+CONTROL-RESULT K3 expected_exit=2 observed_exit=2 OK :: r11 P2-4: the raw set's output has 16 RESULT lines where the canary's frozen command makes 17 (a vanished request leaves no trace in the rows): INCONCLUSIVE
+CONTROL-RESULT Y4b expected_exit=2 observed_exit=2 OK :: r11 P2-4: both rows of one raw request dropped and its RESULT line written with a TAB after RESULT: INCONCLUSIVE (it used to vanish from attribution and the census PASSed)
+CONTROL-RESULT Y4c expected_exit=2 observed_exit=2 OK :: r11 P2-4: the same with a leading space before RESULT
+CONTROL-RESULT Y2e expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 2026-99-06T12:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2f expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp xxxx-xx-xxTxx:xx:xx.xxxZ has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2g expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 9999-12-31T23:59:59.999Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2h expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T25:01:24.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y2i expected_exit=2 observed_exit=2 OK :: r11 P2-3: a foreign call row whose timestamp 2026-10-06T12:01:60.500Z has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE
+CONTROL-RESULT Y9b expected_exit=2 observed_exit=2 OK :: r11 P2-5: ONLY the SUMMARY end is year 9999 while the wrapper's `# finished` stamp is valid: INCONCLUSIVE (the valid stamp must not rescue the invalid one; the census used to PASS)
+CONTROL-RESULT Y9c expected_exit=2 observed_exit=2 OK :: r11 P2-5: an extra malformed SUMMARY line
+CONTROL-RESULT Y10c expected_exit=2 observed_exit=2 OK :: r11 P2-5: an EMPTY FROZEN start= beside a valid wrapper stamp
+CONTROL-RESULT Y13a expected_exit=2 observed_exit=2 OK :: r11 P3-4: an own call row with a NULL time to first token (the association skips that comparison), its usage row dropped, a foreign usage row with the same numbers and a time to first token of 900000 ms: INCONCLUSIVE
+CONTROL-RESULT Y13b expected_exit=2 observed_exit=2 OK :: r11 P3-4: the own usage row dropped and a foreign usage row whose latency is the text 'nan' (a NaN passes the scripts' latency comparison): INCONCLUSIVE
+CONTROL-RESULT R3b expected_exit=2 observed_exit=2 OK :: the combined mitigation of the residual: the R3 world with a journal count of 1 (a persistence failure the journal covers): INCONCLUSIVE
+CONTROL-RESULT G12 expected_exit=2 observed_exit=2 OK :: r11: a guard receipt that holds two GUARD lines (two runs concatenated)
+CONTROL-RESULT G12b expected_exit=2 observed_exit=2 OK :: r11: a guard receipt that holds two IDENTITY lines
+CONTROL-RESULT J1 expected_exit=2 observed_exit=2 OK :: the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution
+CONTROL-RESULT J2 expected_exit=2 observed_exit=2 OK :: a foreign request that left NO row at all (a journal line only): INCONCLUSIVE
+CONTROL-RESULT J3 expected_exit=2 observed_exit=2 OK :: an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed
+CONTROL-RESULT J4 expected_exit=2 observed_exit=2 OK :: journalctl fails (exit 1): INCONCLUSIVE, the independent record is missing
+CONTROL-RESULT J7 expected_exit=2 observed_exit=2 OK :: a journal line that is not JSON (truncated output): INCONCLUSIVE, fail closed
+CONTROL-RESULT J8 expected_exit=2 observed_exit=2 OK :: an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE
+CONTROL-RESULT J9 expected_exit=2 observed_exit=2 OK :: a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time
+CONTROL-RESULT J11 expected_exit=2 observed_exit=2 OK :: an own request's arrival line written TWICE (arrival-line uniqueness: the 43 requests of the baseline arms left 43 lines, so a duplicate would be unexplained): INCONCLUSIVE, the second line has no own call row
+CONTROL-RESULT F1a expected_exit=2 observed_exit=2 OK :: review F1: a foreign call row whose stamp starts with an Arabic-Indic digit (\u0662026-10-06T12:01:24.500Z), inside the window: INCONCLUSIVE (it used to PASS, the string bounds never read it)
+CONTROL-RESULT F1b expected_exit=2 observed_exit=2 OK :: review F1: SUBSTITUTION: an own raw request's usage row dropped; a foreign call row WRITTEN 200 ms later with identical numbers but a stamp with an Arabic-Indic digit; its ASCII usage row stands in: INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT F1c expected_exit=2 observed_exit=2 OK :: review F1: an orphan usage row hidden by a stamp with an Arabic-Indic digit: INCONCLUSIVE
+CONTROL-RESULT F1d expected_exit=2 observed_exit=2 OK :: review F1: the pad's-edge substitution (Y12a) with the stand-in usage row's stamp ending in an Arabic-Indic digit (the exact competing-owner check used to skip it silently): INCONCLUSIVE
+CONTROL-RESULT F2a expected_exit=2 observed_exit=2 OK :: review F2: a tool-call turn with both rows dropped and its RESULT line printing min_rows=0: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F2b expected_exit=2 observed_exit=2 OK :: review F2: a two-request turn with its second row pair dropped and its RESULT line printing min_rows=1: INCONCLUSIVE
+CONTROL-RESULT F2c expected_exit=2 observed_exit=2 OK :: review F2: arm 4 replaced by eight one-row astra-max turns (a different command than the canary's tool-call set): INCONCLUSIVE
+CONTROL-RESULT F3a expected_exit=2 observed_exit=2 OK :: review F3: the last arm's wrapper output cut off after the journal line, its after-identity showing another MainPID (a restart): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F3b expected_exit=2 observed_exit=2 OK :: review F3: the same cut-off with an unchanged after-identity: INCONCLUSIVE (the wrapper's output is incomplete: no RUN-STATUS, no `# finished`)
+CONTROL-RESULT F4dblsp expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line dblsp: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4colon expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line colon: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4tab expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line tab: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4removed expected_exit=2 observed_exit=2 OK :: review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line removed: INCONCLUSIVE (it used to PASS: the window shrank)
+CONTROL-RESULT F4e expected_exit=2 observed_exit=2 OK :: review F4: an arm whose SUMMARY end lies two hours before its own FROZEN start (the wrapper's stamp rescued it): INCONCLUSIVE
+CONTROL-RESULT F5a expected_exit=2 observed_exit=2 OK :: review F5: every FROZEN line says a RELATIVE db= (cwd=/tmp: the scripts read /tmp/rel.sqlite): INCONCLUSIVE
+CONTROL-RESULT F5b expected_exit=2 observed_exit=2 OK :: review F5: every FROZEN line says db=~/x.sqlite (the scripts' file: URI does not expand ~): INCONCLUSIVE
+CONTROL-RESULT F7a expected_exit=2 observed_exit=2 OK :: review F7: a second, DIRTY IDLE-RESULT line (indented) after the clean one: INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F7b expected_exit=2 observed_exit=2 OK :: review F7: an extra GUARD-RESULT line in an idle-only receipt: INCONCLUSIVE
+CONTROL-RESULT F7c expected_exit=2 observed_exit=2 OK :: review F7: the CHECK line says FAIL while IDLE-RESULT says clean: INCONCLUSIVE
+CONTROL-RESULT F7d expected_exit=2 observed_exit=2 OK :: review F7: a receipt of another script than guard 5 (sha256 of zeros): INCONCLUSIVE
+CONTROL-RESULT F7e expected_exit=2 observed_exit=2 OK :: review F7: a sampling interval of 30 s (two samples in the observation): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-04 expected_exit=2 observed_exit=2 OK :: review F8: arm 3's RUN-STATUS line replaced by 'RUN-STATUS x status=04 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-lower expected_exit=2 observed_exit=2 OK :: review F8: arm 3's RUN-STATUS line replaced by 'run-status x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-run-status-bom expected_exit=2 observed_exit=2 OK :: review F8: arm 3's RUN-STATUS line replaced by '\ufeffRUN-STATUS x status=4 (VOID)' (a VOID run): INCONCLUSIVE
+CONTROL-RESULT F8-result-bom expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\ufeff' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-zwsp expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\u200b' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nul expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x00' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-esc expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\x1b[0m' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-nbsp expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line prefixed with '\xa0' (trial of two arms): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F8-result-case expected_exit=2 observed_exit=2 OK :: review F8: both rows of one raw request dropped and its RESULT line written `result mode=...`: INCONCLUSIVE
+CONTROL-RESULT F9 expected_exit=2 observed_exit=2 OK :: review F9: a trial of one request whose own call row has a NULL id and a foreign NULL-id row in the window (two NULL ids were one row): INCONCLUSIVE (it used to PASS)
+CONTROL-RESULT F10a expected_exit=2 observed_exit=2 OK :: review F10: a native RESULT line with min_rows= followed by 5000 digits: INCONCLUSIVE with a receipt (it used to exit 3 with a ValueError)
+CONTROL-RESULT F10b expected_exit=2 observed_exit=2 OK :: review F10: a NUL byte in a FROZEN db= value: INCONCLUSIVE with a receipt
+CONTROL-RESULT F10c expected_exit=2 observed_exit=2 OK :: review F10: the whole world in the last minutes of 2100 (the window's padded end falls in 2101): INCONCLUSIVE with a receipt (it used to exit 3 with a TypeError)
+CONTROL-RESULT J12a expected_exit=2 observed_exit=2 OK :: review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)
+CONTROL-RESULT J12b expected_exit=2 observed_exit=2 OK :: review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE
+CONTROL-RESULT J12c expected_exit=0 observed_exit=0 OK :: the counted range's own boundary: the same line 4.5 s before the window's start is not counted (a foreign request that early cannot be the stand-in of a request that starts inside the window): the store side passes the residual
+CONTROL-RESULT J13a expected_exit=2 observed_exit=2 OK :: review F-2: a null MESSAGE (journalctl writes a field over 4096 bytes as null unless it is given --all) in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13b expected_exit=2 observed_exit=2 OK :: review F-2: a byte-array MESSAGE with a value outside 0-255 in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13c expected_exit=2 observed_exit=2 OK :: review F-2: an object MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13d expected_exit=2 observed_exit=2 OK :: review F-2: a numeric MESSAGE in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13e expected_exit=2 observed_exit=2 OK :: review F-2: a MESSAGE that starts with { and does not parse in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13f expected_exit=2 observed_exit=2 OK :: review F-2: a negative __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13g expected_exit=2 observed_exit=2 OK :: review F-2: a boolean __REALTIME_TIMESTAMP in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13h expected_exit=2 observed_exit=2 OK :: review F-2: an arrival marker that is not counted in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)
+CONTROL-RESULT J13i expected_exit=2 observed_exit=2 OK :: review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)
+CONTROL-RESULT J13j expected_exit=2 observed_exit=2 OK :: review F-8: a foreign arrival line with a byte that is not valid UTF-8 (0xFF) on journalctl's stdout: decoded with replacement and counted, so the window is INCONCLUSIVE with the whole receipt measured (it used to end with `the measurement failed (UnicodeDecodeError)` and no journal block)
+CONTROL-RESULT J14 expected_exit=0 observed_exit=0 OK :: review F-9: the receipt prints the exact journalctl command, the binary and its version, and the census asks for `--user -u omniroute.service -o json --all` with an explicit UTC suffix
+CONTROL-RESULT J15 expected_exit=0 observed_exit=0 OK :: review F-3 (documented): THE CHAIN WIDTH (expected PASS): a lost own line balanced by a foreign line of the same path that is MORE than 3 s from it but within 3 s of the next own request's line (rows 1.5 s apart): the pairing's width is 3 s per link
+CONTROL-RESULT J16 expected_exit=2 observed_exit=2 OK :: review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path
+CONTROL-RESULT J17 expected_exit=2 observed_exit=2 OK :: review F-7: three own rows whose lines are lost and three foreign lines (every row has a candidate line, the best matching leaves ONE row and ONE line): the receipt counts exactly that
+CONTROL-RESULT J18 expected_exit=2 observed_exit=2 OK :: review F-8: an own row whose duration is 1e15 ms (an overflow in the arrival): INCONCLUSIVE with the journal lines in the receipt, not a lost measurement
+CONTROL-RESULT J19a expected_exit=2 observed_exit=2 OK :: review F-9: journalctl writes `File ... is truncated, ignoring file.` on stderr (and prints one line less) and exits 0: INCONCLUSIVE
+CONTROL-RESULT J19b expected_exit=0 observed_exit=0 OK :: a harmless stderr hint of journalctl (no word of loss): the receipt records it, PASS
+CONTROL-RESULT J20 expected_exit=2 observed_exit=2 OK :: review F-4 and F-5: arrival lines whose labels hold a newline with a forged `CENSUS-RESULT PASS` line and an escaped lone surrogate (both attacker-reachable): one CENSUS-RESULT line (1), not a PASS, the forged text escaped, no crash

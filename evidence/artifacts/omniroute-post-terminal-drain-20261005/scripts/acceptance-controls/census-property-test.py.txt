@@ -28,11 +28,11 @@ work.mkdir(parents=True, exist_ok=True)
 ctrl.ARGS = argparse.Namespace(work=str(work), schema=args.schema, census=args.census)
 rng = random.Random(args.seed)
 plus, call, usage_for = ctrl.plus, ctrl.call, ctrl.usage_for
-MUST_DETECT = ["drop_usage", "dup_usage", "foreign_call", "foreign_usage_distinct", "foreign_usage_second_candidate", "drop_call", "latency_outside", "usage_timestamp_outside"]
-NO_EFFECT = ["latency_at_tolerance", "foreign_after_window", "foreign_before_window"]
+MUST_DETECT = ["drop_usage", "dup_usage", "foreign_call", "foreign_usage_distinct", "foreign_usage_second_candidate", "drop_call", "latency_outside", "usage_timestamp_outside", "foreign_post_only", "drop_post", "residual_logged"]
+NO_EFFECT = ["latency_at_tolerance", "foreign_after_window", "foreign_before_window", "post_outside_window"]
 ALL = MUST_DETECT + NO_EFFECT
 print(f"# census property test: seed {args.seed}, {args.worlds} worlds; census {Path(args.census).name}")
-print("# fault groups: must be INCONCLUSIVE: " + ", ".join(MUST_DETECT) + "; must PASS: " + ", ".join(NO_EFFECT) + ", no fault; documented residual (expected PASS): drop_usage + foreign_usage_identical_no_call_row on the same request")
+print("# fault groups: must be INCONCLUSIVE: " + ", ".join(MUST_DETECT) + "; must PASS: " + ", ".join(NO_EFFECT) + ", no fault; documented residual in its narrowest form (expected PASS: the foreign request is absent from the gateway journal too): drop_usage + a foreign usage row with identical metadata and no call row on the same request")
 tally = {}
 bad = []
 
@@ -52,8 +52,9 @@ def apply(spec_, kind, a, r):
         spec_["foreign_usage"].append(usage_for(call(c["ts"], 91, 9, 411, c["path"]), ts=c["ts"] + dt.timedelta(seconds=rng.choice([1, 12, 30]))))
     elif kind == "foreign_usage_second_candidate":
         spec_["foreign_usage"].append(usage_for(c, ts=c["ts"] + dt.timedelta(milliseconds=rng.choice([-1000, -2, 3, 900]))))
-    elif kind == "drop_call":
+    elif kind == "drop_call":   # the request arrived (the journal shows it) but its call row was never written
         req["calls"].pop()
+        spec_.setdefault("journal_extra", []).append(c["ts"] - dt.timedelta(milliseconds=c["duration"]))
     elif kind == "latency_outside":
         req["usage"][-1]["latency"] = c["duration"] + rng.choice([-101, 101, 500])
     elif kind == "usage_timestamp_outside":
@@ -68,9 +69,19 @@ def apply(spec_, kind, a, r):
         f = call(plus(-60 - rng.random() * 100), 33, 3, 100)
         spec_["foreign_calls"].append(f)
         spec_["foreign_usage"].append(usage_for(f))
-    elif kind == "residual":
+    elif kind == "residual":   # the documented residual in its narrowest form: the foreign request is absent from the gateway journal too
         req["usage"].pop()
         spec_["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+    elif kind == "residual_logged":   # the same world, but the foreign request's arrival is in the journal (as it is on a real gateway): the independent record closes it
+        req["usage"].pop()
+        spec_["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+        spec_.setdefault("journal_extra", []).append(c["ts"] - dt.timedelta(milliseconds=400))
+    elif kind == "foreign_post_only":   # a foreign request that left no row at all
+        spec_.setdefault("journal_extra", []).append(c["ts"] + dt.timedelta(seconds=rng.choice([2, 10, 25])))
+    elif kind == "drop_post":   # an own request's inbound line is missing from the journal
+        spec_.setdefault("journal_drop", set()).add((a, r, len(req["calls"]) - 1))
+    elif kind == "post_outside_window":
+        spec_.setdefault("journal_extra", []).append(plus(rng.choice([-1, 1]) * (500 + rng.random() * 100)) if rng.random() < 0.5 else plus(-60 - rng.random() * 100))
     else:
         raise AssertionError(kind)
 
@@ -81,6 +92,9 @@ for i in range(args.worlds):
     pairs = [(a, r) for a, arm in enumerate(spec_["arms"]) for r in range(len(arm["requests"]))]
     rng.shuffle(pairs)
     kinds = [rng.choice(ALL + ["residual"] * 2) for _ in range(rng.choice([0, 0, 1, 1, 2, 3]))]
+    COUNT_UP = ("foreign_post_only", "residual_logged", "drop_call", "foreign_call")
+    if "drop_post" in kinds and any(k in COUNT_UP for k in kinds):   # a lost own line balanced by a foreign line: two journal faults that the pairing catches only outside its 3 s width (the controls J9 and J10): not generated here
+        kinds = [k for k in kinds if k != "drop_post"]
     for kind, (a, r) in zip(kinds, pairs):
         apply(spec_, kind, a, r)
     expect = 2 if any(k in MUST_DETECT for k in kinds) else 0

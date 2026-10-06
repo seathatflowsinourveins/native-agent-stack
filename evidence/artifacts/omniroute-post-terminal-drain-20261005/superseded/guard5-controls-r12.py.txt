@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Controls for pre-switch guard version 5 (full-scope read of 8f9d89662, P2-2 and P2-3): the strict `ss` parse and the full-tuple connection keys, on fixtures built from records CAPTURED on the live host (2026-10-06, `ss -O -Htnpi state established '( sport = :20128 or dport = :20128 )'`).
 Guard version 4 (pre-switch-guard-20261006-v4.py, superseded) runs on the same records in its own two-line format where a control reproduces a defect the review named. Part K: the connection parser in-process (the module is loaded without its trailing main() call and `sh` is replaced by a fixture, so no host state is read);
-part E: the whole guard in --idle-only mode as a subprocess with an `ss` shim first on PATH, a stub identity script and a scratch database, INSIDE A PRIVATE NETWORK NAMESPACE (`unshare -rn`; ROUND-13, full-scope read r10 P2-5)
-in which 127.0.0.1:20128, the guard's default port, is the controls' own stub of the one endpoint the guard reads (`/api/usage/history`): no request of Part E can reach the host's gateway. The earlier executions of Part E (before this
-round) did not have that isolation: the guard's `pending_total` sent read-only GETs to the live gateway (two per guard run at most); the recorded statement that no gateway request was sent was wrong for them.
+part E: the whole guard in --idle-only mode as a subprocess with an `ss` shim first on PATH, a stub identity script and a scratch database.
 usage: guard5-controls.py [--guard5 FILE] [--guard4 FILE]
 """
 import argparse
@@ -178,7 +176,7 @@ show("K11b", "no connections at all (empty output): an idle gateway, accepted", 
 show("K11c", "a line that is not a record (an error text on stdout)", "ObservationError", ["RTNETLINK answers: Invalid argument"] + conn("127.0.0.1", 57001))
 
 # ---- part E: the whole guard (idle-only) as a subprocess ------------------------------------------------------------------------------------------------
-print("\n### part E: the whole guard 5 in --idle-only mode against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1), every run inside a private network namespace (unshare -rn) whose 127.0.0.1:20128 is the controls' own stub")
+print("\n### part E: the whole guard 5 in --idle-only mode against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1)")
 work = Path(tempfile.mkdtemp(prefix="guard5-controls-", dir=Path.home() / ".cache"))
 os.chmod(work, 0o700)
 db = work / "calls.sqlite"
@@ -208,93 +206,17 @@ MY_UNIT = unit_segment()
 MINE = ("bash", os.getppid(), 3)   # an owner pid whose cgroup is this session's own unit (visible here), used as the tolerated unit's process
 
 
-LAUNCHER = r'''import http.server, json, os, subprocess, sys, threading
-# runs INSIDE the private network namespace: bring loopback up, serve the one endpoint the guard reads on 127.0.0.1:20128 (marked with X-Controls-Stub), run the command, report the namespace and what reached the stub
-subprocess.run(["ip", "link", "set", "lo", "up"], check=True)
-hits = []
-
-
-class H(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        hits.append(self.path)
-        body = json.dumps({"pending": {"byAccount": {}}}).encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("X-Controls-Stub", "1")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
-    def log_message(self, *a):
-        pass
-
-
-srv = http.server.ThreadingHTTPServer(("127.0.0.1", 20128), H)
-threading.Thread(target=srv.serve_forever, daemon=True).start()
-p = subprocess.run(sys.argv[1:], capture_output=True, text=True)
-sys.stdout.write(p.stdout)
-sys.stderr.write(p.stderr)
-sys.stderr.write("NETNS-STUB netns=%s hits=%d paths=%s\\n" % (os.readlink("/proc/self/ns/net"), len(hits), sorted(set(hits))))
-sys.exit(p.returncode)
-'''
-launcher = work / "netns-launcher.py"
-launcher.write_text(LAUNCHER)
-HOST_NETNS = os.readlink("/proc/self/ns/net")
-
-
-def in_netns(cmd, env=None, timeout=120):
-    """Run cmd inside a fresh private network namespace with the stub on 127.0.0.1:20128; (CompletedProcess, stub hits, netns id)."""
-    p = subprocess.run(["unshare", "-rn", "--", sys.executable, str(launcher)] + cmd, capture_output=True, text=True, env=env, timeout=timeout)
-    m = re.search(r"NETNS-STUB netns=(\S+) hits=(\d+) paths=(.*)", p.stderr)
-    return p, (int(m.group(2)) if m else None), (m.group(1) if m else None)
-
-
-# E0: the isolation itself. Inside the namespace a GET to 127.0.0.1:20128 is answered by the controls' stub (its marker header), the namespace is not the host's, and the stub counted the request.
-probe = "import urllib.request; r = urllib.request.urlopen('http://127.0.0.1:20128/api/usage/history', timeout=5); print('marker=' + str(r.headers.get('X-Controls-Stub')))"
-p0, hits0, netns0 = in_netns([sys.executable, "-c", probe])
-host_listener = subprocess.run(["ss", "-Htln", "sport = :20128"], capture_output=True, text=True).stdout.strip()
-ok0 = p0.returncode == 0 and "marker=1" in p0.stdout and hits0 == 1 and netns0 is not None and netns0 != HOST_NETNS
-print(f"### E0: a private network namespace answers 127.0.0.1:20128 with the controls' own stub: exit={p0.returncode} {p0.stdout.strip()} stub_hits={hits0} namespace {netns0} vs the host's {HOST_NETNS} (the host {'has' if host_listener else 'has no'} listener on :20128 in its own namespace, unreachable from inside)   [{'as expected' if ok0 else 'UNEXPECTED'}]")
-if not ok0:
-    UNEXPECTED.append("E0")
-    print(f"    {p0.stderr.strip()[-300:]}")
-    print("    Part E is NOT RUN: without the private namespace the guard would reach the host's gateway")
-    print(f"# finished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; scenarios not as expected: {UNEXPECTED}")
-    sys.exit(1)
-
-# E0b: the guard's only network call, by AST: urlopen inside pending_total, and no other network primitive (so the one call is the one the namespace and the stub account for)
-import ast
-tree = ast.parse(Path(args.guard5).read_text(encoding="utf-8"))
-network_calls, network_imports = [], []
-for fn in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-    for node in ast.walk(fn):
-        if isinstance(node, ast.Call):
-            name = node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
-            owner = getattr(node.func.value, "id", "") if isinstance(node.func, ast.Attribute) else ""
-            if name in ("urlopen", "urlretrieve", "create_connection", "getaddrinfo", "gethostbyname", "HTTPConnection", "HTTPSConnection") or (name == "connect" and owner != "sqlite3"):   # sqlite3.connect opens a local file
-                network_calls.append((fn.name, name))
-for node in ast.walk(tree):
-    if isinstance(node, ast.Import):
-        network_imports += [a.name for a in node.names if a.name.split(".")[0] in ("socket", "requests", "httpx", "aiohttp", "urllib3", "http")]
-    elif isinstance(node, ast.ImportFrom) and node.module and node.module.split(".")[0] in ("socket", "requests", "httpx", "aiohttp", "urllib3", "http"):
-        network_imports.append(node.module)
-ok0b = network_calls == [("pending_total", "urlopen")] and not network_imports
-print(f"### E0b: the guard's network primitives, by AST: calls {sorted(set(network_calls))}, imports {network_imports or 'none besides urllib.request'}   [{'as expected' if ok0b else 'UNEXPECTED'}]")
-if not ok0b:
-    UNEXPECTED.append("E0b")
-
-
 def guard_e(case, title, records, expect_exit, expect_text, extra=()):
     rf = work / f"records-{case}.txt"
     rf.write_text("\n".join(records) + ("\n" if records else ""))
     env = dict(os.environ, PATH=f"{shim_dir}:{os.environ['PATH']}", SS_LISTEN=str(listen_file), SS_RECORDS=str(rf))
     cmd = [sys.executable, args.guard5, "--idle-only", "--identity-script", str(ident), "--db", str(db), "--worker-pattern", "nonexistent-process-pattern-for-the-controls", "--clean-for", "2", "--interval", "1", "--tolerate-unit", MY_UNIT, *extra]
-    p, hits, netns = in_netns(cmd, env=env)
+    p = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=120)
     out = p.stdout
     last = [l for l in out.splitlines() if l.startswith(("IDLE-RESULT", "GUARD-RESULT"))][-1:]
     fails = [l.strip()[:200] for l in out.splitlines() if "the socket observation failed" in l or "ACTIVE connection" in l][:1]
-    ok = p.returncode == expect_exit and (expect_text in out or not expect_text) and hits is not None and hits >= 1 and netns != HOST_NETNS
-    print(f"### {case}: {title}\n    exit={p.returncode} {last[0] if last else p.stderr.strip()[:160]}" + (f"\n    {fails[0]}" if fails else "") + f"\n    the guard's HTTP read reached the private stub {hits} time(s), in namespace {netns} (the host's is {HOST_NETNS})   [{'as expected' if ok else 'UNEXPECTED'}]")
+    ok = p.returncode == expect_exit and (expect_text in out or not expect_text)
+    print(f"### {case}: {title}\n    exit={p.returncode} {last[0] if last else p.stderr.strip()[:160]}" + (f"\n    {fails[0]}" if fails else "") + f"   [{'as expected' if ok else 'UNEXPECTED'}]")
     if not ok:
         UNEXPECTED.append(case)
 

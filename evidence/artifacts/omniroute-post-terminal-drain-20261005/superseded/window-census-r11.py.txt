@@ -1,0 +1,618 @@
+#!/usr/bin/env python3
+"""Window census gate for the 20128 canary, VERSION 1 (new, not frozen; the command center's round-9 ruling on #757 P2-1: the in-script usage association of raw script 2.2 and native script 2.1 stays as it is, a recorded residual, and this gate closes the attribution gap).
+Run it ONCE after the canary arms (the wrapper run-acceptance-20261006.sh canary ..., or the frozen scripts run directly) have finished, on the arms' PRIVATE output files (the committed copies have their correlation ids shortened and are refused), with the guard 5 receipt of the pre-arm idle check:
+    python3 omniroute-window-census-20261006.py --guard-receipt GUARD.txt [--require-arms 4] OUT/live-acceptance-canary-raw.txt OUT/live-acceptance-canary-race.txt OUT/live-acceptance-canary-native.txt OUT/live-acceptance-canary-native-tworequest.txt
+usage_history has no request key: a usage row can be tied to a request only by its metadata (model, token counts, time, provider, account, endpoint, latency, time to first token). The scripts judge each request alone, so one foreign row that looks like a dropped own row could stand in for it.
+The census closes that over the whole window, on the gateway's own rows, read-only (SQLite mode=ro). It evaluates EVERY condition and prints every measurement; it stops at nothing, and any failed condition makes the result INCONCLUSIVE:
+  (i)   own call rows are found by their TAG only: the correlation id or response id the raw script printed (RESULT ... corr= response_id=), the X-OmniRoute-Session-Id the native script printed (RESULT ... session_id=): the same predicates as the scripts; every other call_logs row in the window is FOREIGN, whatever its path
+        (no exemption: the gateway's own hourly /api/providers/test rows are listed and make the window INCONCLUSIVE); a request that carries no full id (None, or a shortened id of a committed copy) cannot be attributed and is INCONCLUSIVE;
+  (ii)  completeness: exactly one own call row per raw request, at least the printed min_rows per judged native turn; and the own call rows and the usage rows of the window form connected components, each with as many usage rows as call rows and a UNIQUE PERFECT MATCHING
+        (the candidate query and `associated()` are the scripts' own, copied byte for byte; unique perfect matching: a perfect matching M exists and no edge of M can be left out without losing perfection);
+  (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row;
+  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an observation of at least 30 s (clean_for), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier; the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
+        no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
+  (v)   the clocks agree: every own call row lies inside its arm's recorded interval with a margin of 2 s (the arm's interval is taken from the output's own lines: the wrapper's `started`/`# finished` stamps when present and the frozen script's FROZEN start= / SUMMARY end=; those are the host clock, the rows' timestamps are the gateway process's own clock, on the same machine); the arms must not overlap (the wrapper's stamps are whole seconds, so 1 s of overlap is tolerated);
+  (vi)  the gateway is the same process throughout: the MainPID and ExecMainStartTimestamp of the guard receipt's identity line equal those of every arm's first identity line (the wrapper's; a direct run carries none and is not compared);
+  (vii) the inputs are the frozen scripts' outputs (a frozen script run directly prints no `journal_failed_to_save_call_log=` line, the wrapper's: add it to the output, as scripts/census-live-trial.sh.txt does, or the arm is INCONCLUSIVE; with the default four arms the shape raw, raw, native, native and a wrapper header that says `canary` are required) (FROZEN version and script_sha256 equal the frozen values, the store path equals --db, a SUMMARY line exists, a wrapper VOID is refused), every timestamp on the window's dates has the gateway's format (otherwise a string bound would skip a row silently), and
+        the journal scan of every arm (`journal_failed_to_save_call_log=0`, the wrapper's own line) is clean: it is the named check for the one thing the census cannot exclude.
+The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE.
+What it cannot exclude: a usage row of a foreign request whose own call_logs row was never written and whose metadata equals an own request's (the four-fault coincidence: foreign traffic in the window, its call row dropped, an own usage row dropped, identical metadata); the journal scan for `Failed to save call log` is the named check for the usual cause.
+--require-arms N (default 4, the canary's four arms: raw, race, native, native tool-call): the number of arm outputs that must be given; fewer or more is INCONCLUSIVE, so that an omitted arm cannot pass unnoticed (a live trial of fewer arms states its own number).
+--diagnostic: measure and print without a guard receipt (for windows that had none, e.g. the baseline arms); the result can then only be INCONCLUSIVE.
+Exit status: 0 PASS, 2 INCONCLUSIVE, 3 usage error (bad arguments, an input file that cannot be read). The receipt on stdout holds the exact queries with their bounds, the window and its clock sources, the measured margins, all counts (own and foreign call rows, usage rows, components, orphans; per account (hashed), endpoint and model) and the verdict; ids appear only as 8 hex characters of their sha256.
+The matching and parsing functions are importable (the controls cross-check them against scipy's maximum_bipartite_matching and a brute force)."""
+import argparse
+import collections
+import datetime as dt
+import hashlib
+import os
+import re
+import sqlite3
+import sys
+from pathlib import Path
+
+VERSION = 1
+# The usage_history row of a request is associated with its call_logs row by the scripts' own rule (raw script 2.2 L66-69 and L153-161, native script 2.1 L97-105): the same constants and the same function.
+LATENCY_TOLERANCE_MS = 100
+TTFT_TOLERANCE_MS = 1.0
+CANDIDATE_SECONDS = 3
+GUARD_MAX_AGE_S = 600
+GUARD_EXPECT = {"port": "20128", "unit": "omniroute.service", "tolerated": "['omniroute-fw.service']"}   # the standard invocation of `pre-switch-guard.py --idle-only` for the 20128 canary
+GUARD_MIN_CLEAN_FOR_S = 30.0   # the guard's default observation (--clean-for 30); a shorter receipt proves too little
+DEFAULT_REQUIRED_ARMS = 4
+SETTLE_S = 5
+CLOCK_MARGIN_S = 2
+STAMP_RESOLUTION_S = 1   # the wrapper's `date -u +%FT%TZ` stamps are whole seconds (truncated), the scripts' own stamps have milliseconds
+MIN_ID_LENGTH = 20
+FROZEN_SCRIPT_SHA = {
+    "2.2": "52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75",
+    "2.1": "db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd",
+}
+DEFAULT_DB = os.path.expanduser("~/.local/share/omniroute/storage.sqlite")
+TS_GLOB = "????-??-??T??:??:??.???Z"
+
+CALL_COLUMNS = ("id", "timestamp", "path", "status", "model", "requested_model", "tokens_in", "tokens_out", "provider", "connection_id", "api_key_id", "duration", "ttft_ms", "correlation_id", "response_id", "session_tag")
+USAGE_COLUMNS = ("id", "timestamp", "model", "status", "tokens_input", "tokens_output", "provider", "connection_id", "api_key_id", "endpoint", "latency_ms", "ttft_ms")
+_CALL_SELECT = "select " + ", ".join(CALL_COLUMNS) + " from call_logs "
+_USAGE_SELECT = "select " + ", ".join(USAGE_COLUMNS) + " from usage_history "
+# The own-row predicates of the scripts: raw 2.2 read_rows (L170-173) and native 2.1 read_turn (L111-113); the column list is wider, the predicate and the order are the scripts' own.
+SQL_OWN_RAW = _CALL_SELECT + "where (correlation_id is not null and correlation_id = ?) or (response_id is not null and response_id = ?) order by timestamp"
+SQL_OWN_NATIVE = _CALL_SELECT + "where session_tag = ? order by timestamp"
+# The candidate query of the scripts, byte for byte (raw 2.2 L183, native 2.1 L120).
+SQL_CANDIDATES = "select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp"
+SQL_WINDOW_CALLS = _CALL_SELECT + "where timestamp >= ? and timestamp <= ? order by timestamp, id"
+SQL_WINDOW_USAGE = _USAGE_SELECT + "where timestamp >= ? and timestamp <= ? order by timestamp, id"
+SQL_ODD_CALLS = "select count(*) from call_logs where timestamp like ? and timestamp not glob ?"
+SQL_ODD_USAGE = "select count(*) from usage_history where timestamp like ? and timestamp not glob ?"
+
+
+class UsageError(Exception):
+    """A usage error: bad arguments or an input file that cannot be read; exit status 3, never a verdict."""
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        raise UsageError(message)
+
+
+def utc(ts):
+    return ts.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def shift(ts, seconds):
+    base = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)
+    return utc(base + dt.timedelta(seconds=seconds))
+
+
+def id8(value):
+    return hashlib.sha256(str(value).encode()).hexdigest()[:8]
+
+
+def parse_ts(text):
+    """The UTC datetime of `2026-10-06T11:50:17Z` or `2026-10-06T11:50:17.123Z`; None for anything else."""
+    m = re.fullmatch(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,6}))?Z", text or "")
+    if not m:
+        return None
+    try:
+        base = dt.datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        return None
+    return base + dt.timedelta(microseconds=int((m.group(2) or "0").ljust(6, "0")))
+
+
+def associated(c, u):
+    """True when the usage_history row u carries the same request's identity as the call_logs row c: provider, account (connection_id and api_key_id), endpoint (the call's path), latency and time to first token agree."""
+    if u["provider"] != c["provider"] or u["connection_id"] != c["connection_id"] or u["api_key_id"] != c["api_key_id"] or u["endpoint"] != c["path"]:
+        return False
+    if c["duration"] is None or u["latency_ms"] is None or abs(float(u["latency_ms"]) - float(c["duration"])) > LATENCY_TOLERANCE_MS:
+        return False
+    if c["ttft_ms"] is not None and u["ttft_ms"] is not None and abs(float(u["ttft_ms"]) - float(c["ttft_ms"])) > TTFT_TOLERANCE_MS:
+        return False
+    return True
+
+
+# ---------------------------------------------------------------- matching (importable; cross-checked in the controls)
+def maximum_matching(adj, calls, skip=None):
+    """Augmenting-path (Kuhn) maximum matching of the bipartite graph adj ({call id: [usage ids]}) over `calls`: {usage id: call id}. `skip` is one edge (call id, usage id) to leave out."""
+    match = {}
+
+    def augment(call, seen):
+        for usage in adj[call]:
+            if (call, usage) == skip or usage in seen:
+                continue
+            seen.add(usage)
+            if usage not in match or augment(match[usage], seen):
+                match[usage] = call
+                return True
+        return False
+
+    for call in calls:
+        augment(call, set())
+    return match
+
+
+def matching_status(adj, calls, usages):
+    """(status, pairs) of one connected component: 'unequal' (another number of usage rows than call rows), 'none' (no perfect matching), 'multiple' (more than one) or 'unique' (exactly one; pairs holds it).
+    A perfect matching M is the only one exactly when removing any single edge of M leaves no perfect matching."""
+    if len(calls) != len(usages):
+        return "unequal", []
+    match = maximum_matching(adj, calls)
+    if len(match) != len(calls):
+        return "none", []
+    pairs = sorted((call, usage) for usage, call in match.items())
+    for call, usage in pairs:
+        if len(maximum_matching(adj, calls, skip=(call, usage))) == len(calls):
+            return "multiple", pairs
+    return "unique", pairs
+
+
+def components(edges):
+    """Connected components of the bipartite graph over the call ids of `edges` ({call id: [usage ids]}) and the usage ids that have an edge: a list of (sorted call ids, sorted usage ids)."""
+    parent = {}
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for call, usages in edges.items():
+        parent.setdefault(("c", call), ("c", call))
+        for usage in usages:
+            parent.setdefault(("u", usage), ("u", usage))
+            ra, rb = find(("c", call)), find(("u", usage))
+            if ra != rb:
+                parent[ra] = rb
+    groups = {}
+    for node in parent:
+        groups.setdefault(find(node), []).append(node)
+    out = [(sorted(i for k, i in nodes if k == "c"), sorted(i for k, i in nodes if k == "u")) for nodes in groups.values()]
+    return sorted(out, key=lambda comp: (comp[0], comp[1]))
+
+
+# ---------------------------------------------------------------- the inputs
+def read_text(path, what):
+    try:
+        return Path(path).read_text(encoding="utf-8", errors="replace")
+    except OSError as error:
+        raise UsageError(f"cannot read {what} {path!r}: {type(error).__name__}")
+
+
+def full_id(value):
+    """True for an id that is not None and not shortened (a committed copy shows 8 hex characters or an ellipsis)."""
+    return value not in (None, "None") and len(value) >= MIN_ID_LENGTH and "…" not in value and "..." not in value
+
+
+def parse_arm(path):
+    """One arm's private output -> a dict: name, kind (raw or native), version, script sha, interval (start, end, source), db, requests, journal, problems."""
+    arm = {"name": os.path.basename(path), "kind": None, "version": None, "script_sha": None, "db": None, "requests": [], "journal": "missing", "problems": [], "source": "", "run_status": None, "pid": None, "unit_started": None, "wrapper_kind": None}
+    wrapper_start = wrapper_end = script_start = script_end = None
+    summary_seen = False
+    for line in read_text(path, "arm output").splitlines():
+        m = re.match(r"^# .*; started (\S+); wrapper kind=(\S+)\s*$", line)
+        if m and wrapper_start is None:
+            arm["wrapper_kind"] = m.group(2)
+            wrapper_start = parse_ts(m.group(1))
+            if wrapper_start is None:
+                arm["problems"].append(f"unparsable wrapper start stamp {m.group(1)!r}")
+            continue
+        m = re.match(r"^# finished (\S+)\s*$", line)
+        if m:
+            wrapper_end = parse_ts(m.group(1))
+            if wrapper_end is None:
+                arm["problems"].append(f"unparsable wrapper finish stamp {m.group(1)!r}")
+            continue
+        if line.startswith("FROZEN ") and arm["version"] is None:
+            arm["version"] = (re.search(r"\bversion=(\S+)", line) or [None, None])[1]
+            arm["script_sha"] = (re.search(r"\bscript_sha256=([0-9a-f]{64})\b", line) or [None, None])[1]
+            script_start = parse_ts((re.search(r"\bstart=(\S+)", line) or [None, None])[1])
+            arm["db"] = (re.search(r"\bdb=(\S+)", line) or [None, None])[1]
+            continue
+        m = re.match(r"^RESULT mode=(\S+) http=(\S+) .*? corr=(\S+) response_id=(\S+) read1_call_logs=", line)
+        if m:
+            arm["requests"].append({"kind": "raw", "mode": m.group(1), "http": m.group(2), "corr": m.group(3), "rid": m.group(4)})
+            continue
+        m = re.match(r"^RESULT shape=(\S+) session_id=(\S+) .*? min_rows=(\d+) exec_exit=(\S+)", line)
+        if m:
+            arm["requests"].append({"kind": "native", "shape": m.group(1), "tag": m.group(2), "min_rows": int(m.group(3)), "exec_exit": m.group(4), "judged": " read1_call_logs=" in line})
+            continue
+        m = re.match(r"^SUMMARY .* end=(\S+) exit=(\d+)\s*$", line)
+        if m:
+            summary_seen = True
+            script_end = parse_ts(m.group(1))
+            continue
+        m = re.match(r"^journal_failed_to_save_call_log=(\S+)", line)
+        if m:
+            arm["journal"] = m.group(1)
+            continue
+        m = re.match(r"^IDENTITY .*?\bMainPID=(\d+) ExecMainStartTimestamp=(\S+)", line)
+        if m and arm["pid"] is None:
+            arm["pid"], arm["unit_started"] = m.group(1), m.group(2)
+            continue
+        m = re.match(r"^RUN-STATUS \S+ status=(\d)", line)
+        if m:
+            arm["run_status"] = int(m.group(1))
+    if arm["version"] not in FROZEN_SCRIPT_SHA:
+        arm["problems"].append(f"no FROZEN line of a frozen script (version {arm['version']!r}): not an output of raw script 2.2 or native script 2.1")
+    else:
+        arm["kind"] = "raw" if arm["version"] == "2.2" else "native"
+        if arm["script_sha"] != FROZEN_SCRIPT_SHA[arm["version"]]:
+            arm["problems"].append(f"the script of version {arm['version']} had sha256 {str(arm['script_sha'])[:12]}, not the frozen {FROZEN_SCRIPT_SHA[arm['version']][:12]}")
+    if not summary_seen:
+        arm["problems"].append("no SUMMARY line: a run without one is not a verdict")
+    if arm["run_status"] == 4:
+        arm["problems"].append("the wrapper marked this run VOID (RUN-STATUS status=4)")
+    if script_start is None and wrapper_start is None:
+        arm["problems"].append("no start time (neither FROZEN start= nor the wrapper's started stamp)")
+    if script_end is None and wrapper_end is None:
+        arm["problems"].append("no end time (neither SUMMARY end= nor the wrapper's # finished stamp)")
+    starts = [t for t in (wrapper_start, script_start) if t is not None]
+    ends = [t for t in (wrapper_end, script_end) if t is not None]
+    arm["start"] = min(starts) if starts else None
+    arm["end"] = max(ends) if ends else None
+    arm["first_request_floor"] = script_start or wrapper_start   # the precise stamp when there is one: the wrapper's `date -u` stamp is whole seconds, truncated, so it can read up to 1 s BEFORE the script began
+    arm["source"] = ("wrapper stamps and " if wrapper_start or wrapper_end else "") + "the script's FROZEN start= and SUMMARY end="
+    if not arm["requests"]:
+        arm["problems"].append("no RESULT line: no request to attribute")
+    wrong = [r for r in arm["requests"] if arm["kind"] and r["kind"] != arm["kind"]]
+    if wrong:
+        arm["problems"].append(f"{len(wrong)} RESULT line(s) of the other script's shape in a version {arm['version']} output")
+    for index, request in enumerate(arm["requests"], 1):
+        if request["kind"] == "raw":
+            ids = [request["corr"], request["rid"]]
+            if all(i == "None" for i in ids):
+                arm["problems"].append(f"request {index} ({request['mode']}) carries neither a correlation id nor a response id: its rows cannot be attributed")
+            elif any(i != "None" and not full_id(i) for i in ids):
+                arm["problems"].append(f"request {index} ({request['mode']}) carries a shortened id (a committed copy?): the private output is needed")
+        elif not (request["tag"].startswith("acceptance-") and "…" not in request["tag"] and len(request["tag"]) >= MIN_ID_LENGTH):
+            arm["problems"].append(f"turn {index} ({request['shape']}) carries no full session id")
+    return arm
+
+
+def parse_guard(path):
+    """The guard 5 --idle-only receipt -> a dict: version, mode, start, end, clean, problems."""
+    g = {"pid": None, "unit_started": None, "name": os.path.basename(path), "version": None, "mode": None, "start": None, "end": None, "clean": None, "problems": [], "clean_for": None}
+    results = []
+    for line in read_text(path, "guard receipt").splitlines():
+        m = re.match(r"^GUARD version=(\S+) mode=(\S+) script_sha256=([0-9a-f]{64}) start=(\S+) .*?\bclean_for=(\S+)", line)
+        if m and g["version"] is None:
+            g["version"], g["mode"], g["start"], g["clean_for"] = m.group(1), m.group(2), parse_ts(m.group(4)), m.group(5)
+            g["port"] = (re.search(r"\bport=(\d+)", line) or [None, None])[1]
+            g["unit"] = (re.search(r"\bunit=(\S+)", line) or [None, None])[1]
+            g["tolerated"] = (re.search(r"\btolerate_units=(\[[^\]]*\])", line) or [None, None])[1]
+            continue
+        m = re.match(r"^\s+IDENTITY .*?\bMainPID=(\d+) ExecMainStartTimestamp=(\S+)", line)
+        if m and g["pid"] is None:
+            g["pid"], g["unit_started"] = m.group(1), m.group(2)
+            continue
+        m = re.match(r"^IDLE-RESULT clean=(True|False) failed_checks=(\[.*\]) end=(\S+)\s*$", line)
+        if m:
+            results.append((m.group(1) == "True", m.group(2), parse_ts(m.group(3))))
+    if g["version"] != "5":
+        g["problems"].append(f"the receipt is not from guard version 5 (GUARD version={g['version']!r})")
+    if g["mode"] != "idle-only":
+        g["problems"].append(f"the receipt is not an --idle-only receipt (mode={g['mode']!r})")
+    try:
+        observed = float(g["clean_for"])
+    except (TypeError, ValueError):
+        observed = None
+    for key, label in (("port", "port"), ("unit", "unit"), ("tolerated", "tolerated units")):
+        if g.get(key) != GUARD_EXPECT[key]:
+            g["problems"].append(f"the receipt's {label} is {g.get(key)!r}, not the standard {GUARD_EXPECT[key]!r} of the 20128 canary")
+    if observed is None or observed < GUARD_MIN_CLEAN_FOR_S:
+        g["problems"].append(f"the idle observation lasted {g['clean_for']} s (clean_for), shorter than the {GUARD_MIN_CLEAN_FOR_S:.0f} s the protocol requires")
+    if len(results) != 1:
+        g["problems"].append(f"{len(results)} IDLE-RESULT line(s) (exactly one is needed)")
+    else:
+        clean, failed, end = results[0]
+        g["clean"], g["end"] = clean, end
+        if not clean or failed != "[]":
+            g["problems"].append(f"the idle check was not clean (clean={clean}, failed_checks={failed})")
+        if end is None:
+            g["problems"].append("unparsable end time of the idle check")
+    return g
+
+
+# ---------------------------------------------------------------- the report
+class Report:
+    def __init__(self):
+        self.lines = []
+        self.reasons = []
+
+    def say(self, text=""):
+        self.lines.append(text)
+
+    def bad(self, reason):
+        self.reasons.append(reason)
+        self.lines.append("PROBLEM " + reason)
+
+    @property
+    def state(self):
+        return "INCONCLUSIVE" if self.reasons else "PASS"
+
+
+def row_dict(columns, values):
+    return dict(zip(columns, values))
+
+
+def shown_db(db):
+    home = os.path.expanduser("~")
+    return ("~" + db[len(home):]) if db.startswith(home + os.sep) else db
+
+
+def open_store(db):
+    """The store, read-only; raises sqlite3.Error (also for a missing file or a missing column) when it cannot be read."""
+    con = sqlite3.connect(Path(db).absolute().as_uri() + "?mode=ro", uri=True)
+    con.execute("select " + ", ".join(CALL_COLUMNS) + " from call_logs limit 1")
+    con.execute("select " + ", ".join(USAGE_COLUMNS) + " from usage_history limit 1")
+    return con
+
+
+def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_REQUIRED_ARMS):
+    """Everything the census measures and decides; returns the Report (never raises for a bad store or a bad arm: those are problems)."""
+    rep = Report()
+    me = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    rep.say(f"CENSUS version={VERSION} script_sha256={me} db={shown_db(db)} arms={len(arm_paths)} required_arms={require_arms} guard_receipt={'none (diagnostic run)' if guard_path is None else os.path.basename(guard_path)} diagnostic={diagnostic}")
+    # ---- arms
+    if len(arm_paths) != require_arms:
+        rep.bad(f"{len(arm_paths)} arm output(s) given, {require_arms} required (--require-arms; the canary has four: raw, race, native, native tool-call): an omitted arm would leave its requests unattributed")
+    arms = [parse_arm(p) for p in arm_paths]
+    for index, arm in enumerate(arms, 1):
+        rep.say(f"INPUT arm={index} file={arm['name']} kind={arm['kind']} script_version={arm['version']} script_sha256={str(arm['script_sha'])[:12]} requests={len(arm['requests'])} start={utc(arm['start']) if arm['start'] else None} end={utc(arm['end']) if arm['end'] else None} "
+                f"interval_source=({arm['source']}) store_in_script_line={shown_db(arm['db']) if arm['db'] else None} journal_failed_to_save_call_log={arm['journal']}")
+        for problem in arm["problems"]:
+            rep.bad(f"arm {index} ({arm['name']}): {problem}")
+        if not arm["db"]:
+            rep.bad(f"arm {index} ({arm['name']}): the FROZEN line names no store (db=): the census cannot tell that the script read the store it reads")
+        elif os.path.realpath(os.path.expanduser(arm["db"])) != os.path.realpath(db):
+            rep.bad(f"arm {index} ({arm['name']}): the script read the store {shown_db(arm['db'])}, the census reads {shown_db(db)}")
+        if arm["journal"] != "0":
+            rep.bad(f"arm {index} ({arm['name']}): journal_failed_to_save_call_log={arm['journal']} (0 is needed: the named check for what the census cannot exclude)")
+    timed = sorted((a for a in arms if a["start"] and a["end"]), key=lambda a: a["start"])
+    if require_arms == DEFAULT_REQUIRED_ARMS and not diagnostic:   # the canary's shape: raw set, race set, native one-request set, native tool-call set, from `run-acceptance.sh canary`
+        shape = [a["kind"] for a in timed]
+        if shape != ["raw", "raw", "native", "native"]:
+            rep.bad(f"the arms in time order are {shape}; the canary's are ['raw', 'raw', 'native', 'native']")
+        for a in timed:
+            if a["wrapper_kind"] not in (None, "canary"):
+                rep.bad(f"arm {a['name']} is a wrapper `{a['wrapper_kind']}` run, not a canary run")
+    for a, b in zip(timed, timed[1:]):
+        if b["start"] < a["end"] - dt.timedelta(seconds=STAMP_RESOLUTION_S):
+            rep.bad(f"arms overlap: {a['name']} ends {utc(a['end'])}, {b['name']} starts {utc(b['start'])} (stamps of whole seconds are tolerated: {STAMP_RESOLUTION_S} s)")
+    for a in timed:
+        if a["end"] < a["start"]:
+            rep.bad(f"arm {a['name']} ends before it starts")
+    # ---- guard and window
+    guard = None
+    if diagnostic:
+        rep.bad("--diagnostic run: the measurements are printed, but PASS is not possible (the verdict of a window needs the guard receipt of a real acceptance run)")
+    if guard_path is None:
+        if not diagnostic:
+            rep.bad("no guard receipt: the window's idle start is not established, so PASS is not possible")
+    else:
+        guard = parse_guard(guard_path)
+        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']}")
+        for problem in guard["problems"]:
+            rep.bad(f"guard receipt: {problem}")
+        compared = 0
+        for index, arm in enumerate(arms, 1):
+            if arm["pid"] is None:
+                continue
+            compared += 1
+            if guard["pid"] is None:
+                rep.bad(f"arm {index} ({arm['name']}) carries the wrapper's identity line but the guard receipt has none: the process cannot be compared")
+            elif (arm["pid"], arm["unit_started"]) != (guard["pid"], guard["unit_started"]):
+                rep.bad(f"arm {index} ({arm['name']}): the gateway was MainPID {arm['pid']} started {arm['unit_started']}, the idle receipt saw MainPID {guard['pid']} started {guard['unit_started']}: a restart between them voids the idle claim")
+        rep.say(f"IDENTITY-CHECK guard MainPID={guard['pid']} started={guard['unit_started']}; compared with {compared} of {len(arms)} arm(s) (a direct run carries no identity line)")
+        if guard["end"] is not None and timed:
+            gap = (timed[0]["first_request_floor"] - guard["end"]).total_seconds()
+            rep.say(f"GUARD-TO-FIRST-ARM gap_s={gap:.1f} (the guard's end to the first script's own start; needed: 0 <= gap <= {GUARD_MAX_AGE_S})")
+            if gap < 0:
+                rep.bad(f"the guard receipt ended {-gap:.1f} s AFTER the first arm began: it does not cover the start of the window")
+            elif gap > GUARD_MAX_AGE_S:
+                rep.bad(f"the guard receipt ended {gap:.0f} s before the first arm began (more than {GUARD_MAX_AGE_S} s): an idle claim that does not reach the window proves nothing")
+    if not timed:
+        rep.bad("no arm with a usable interval: no window")
+        rep.say(f"CENSUS-RESULT INCONCLUSIVE exit=2 problems={len(rep.reasons)}")
+        return rep
+    guard_start_ok = bool(guard and guard["end"] and guard["end"] <= timed[0]["first_request_floor"] and (timed[0]["first_request_floor"] - guard["end"]).total_seconds() <= GUARD_MAX_AGE_S)
+    w0 = guard["end"] if guard_start_ok else timed[0]["start"]
+    w1 = max(a["end"] for a in timed) + dt.timedelta(seconds=SETTLE_S)
+    w0s, w1s = utc(w0), utc(w1)
+    u0s, u1s = shift(w0s, -CANDIDATE_SECONDS), shift(w1s, CANDIDATE_SECONDS)
+    bounds = [w0] + [a["end"] for a in timed[:-1]] + [w1]
+    rep.say(f"WINDOW start={w0s} end={w1s} ({'the guard receipt end' if guard_start_ok else 'the first arm start: no usable guard receipt'} .. the last arm end + {SETTLE_S} s); usage rows read {u0s} .. {u1s} (the window padded by the {CANDIDATE_SECONDS} s of the scripts' candidate query)")
+    rep.say("TILES " + " | ".join(f"{k}: {a['name']} {utc(bounds[k - 1])}..{utc(bounds[k])}" for k, a in enumerate(timed, 1)))
+    rep.say("CLOCKS arm intervals: the host clock (the wrapper's date -u stamps, the scripts' datetime.now(UTC)); rows: the gateway process's own clock (new Date() in UTC), same machine; own rows must lie inside their arm's interval with a margin of "
+            f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
+    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
+    # ---- queries (printed first, so a failure below still leaves them in the receipt)
+    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("odd-calls", SQL_ODD_CALLS), ("odd-usage", SQL_ODD_USAGE)):
+        rep.say(f"QUERY {name}: {sql}")
+    rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({w0s}, {w1s}); window-usage: ({u0s}, {u1s}); "
+            f"candidates: (shift(call row timestamp, -{CANDIDATE_SECONDS}), shift(call row timestamp, {CANDIDATE_SECONDS}), model, tokens_in, tokens_out) per own call row; odd-*: (the date + '%', '{TS_GLOB}') for each date of the padded window")
+    try:
+        con = open_store(db)
+    except (sqlite3.Error, OSError) as error:
+        rep.say(f"STORE {shown_db(db)} readable=False error={type(error).__name__}")
+        rep.bad(f"the gateway store cannot be read ({type(error).__name__}): nothing was measured")
+        rep.say(f"CENSUS-RESULT INCONCLUSIVE exit=2 problems={len(rep.reasons)}")
+        return rep
+    rep.say(f"STORE {shown_db(db)} readable=True (opened with mode=ro)")
+    try:
+        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds)
+    except Exception as error:   # whatever fails here, the receipt printed so far stays and the result is INCONCLUSIVE, never a crash without a receipt and never a PASS
+        rep.bad(f"the measurement failed ({type(error).__name__}: {str(error)[:80]}): the rest was not measured, so nothing here is a PASS")
+    finally:
+        con.close()
+    rep.say("NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata equal to an own request's, standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)")
+    rep.say(f"CENSUS-RESULT {rep.state} exit={0 if rep.state == 'PASS' else 2} problems={len(rep.reasons)}")
+    return rep
+
+
+def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
+    # ---- timestamp format: a row whose timestamp has another format would be skipped by the string bounds, silently
+    dates = sorted({u0s[:10], u1s[:10], w0s[:10], w1s[:10]})
+    odd_calls = sum(con.execute(SQL_ODD_CALLS, (d + "%", TS_GLOB)).fetchone()[0] for d in dates)
+    odd_usage = sum(con.execute(SQL_ODD_USAGE, (d + "%", TS_GLOB)).fetchone()[0] for d in dates)
+    rep.say(f"FORMAT dates={dates} call_logs_rows_with_another_timestamp_format={odd_calls} usage_history_rows_with_another_timestamp_format={odd_usage}")
+    if odd_calls or odd_usage:
+        rep.bad(f"{odd_calls} call_logs and {odd_usage} usage_history row(s) on the window's dates have a timestamp that is not {TS_GLOB}: the window's string bounds would skip them silently")
+    # ---- own rows, by tag, per request
+    own, claims = {}, collections.defaultdict(list)
+    per_arm_own = collections.Counter()
+    for k, arm in enumerate(timed, 1):
+        for j, request in enumerate(arm["requests"], 1):
+            if request["kind"] == "raw":
+                params = (None if request["corr"] == "None" else request["corr"], None if request["rid"] == "None" else request["rid"])
+                if params == (None, None):
+                    continue
+                rows = [row_dict(CALL_COLUMNS, r) for r in con.execute(SQL_OWN_RAW, params).fetchall()]
+                label = f"request {j} ({request['mode']}, corr {'None' if request['corr'] == 'None' else id8(request['corr'])}, response {'None' if request['rid'] == 'None' else id8(request['rid'])})"
+                if len(rows) != 1:
+                    rep.bad(f"arm {k} {label}: {len(rows)} own call row(s) (exactly 1 is needed)")
+            else:
+                if not request["tag"].startswith("acceptance-"):
+                    continue
+                rows = [row_dict(CALL_COLUMNS, r) for r in con.execute(SQL_OWN_NATIVE, (request["tag"],)).fetchall()]
+                label = f"turn {j} ({request['shape']}, session {id8(request['tag'])})"
+                if not request["judged"]:
+                    rep.bad(f"arm {k} {label}: the script did not judge this turn (the exec did not complete): its rows may be incomplete")
+                elif len(rows) < request["min_rows"]:
+                    rep.bad(f"arm {k} {label}: {len(rows)} own call row(s) (at least {request['min_rows']} are needed)")
+            for row in rows:
+                own[row["id"]] = row
+                claims[row["id"]].append((k, j))
+                per_arm_own[k] += 1
+    for rid, who in claims.items():
+        if len(who) > 1:
+            rep.bad(f"own call row {id8(rid)} is claimed by {len(who)} requests {who}")
+    rep.say(f"OWN call rows={len(own)} per arm={dict(sorted(per_arm_own.items()))}")
+    # ---- clocks: own rows inside their arm's interval and inside the window
+    margin = dt.timedelta(seconds=CLOCK_MARGIN_S)
+    for k, arm in enumerate(timed, 1):
+        leads, lags = [], []
+        for rid, who in claims.items():
+            if who[0][0] != k:
+                continue
+            ts = parse_ts(own[rid]["timestamp"])
+            if ts is None:
+                rep.bad(f"own call row {id8(rid)} has an unparsable timestamp {own[rid]['timestamp']!r}")
+                continue
+            leads.append((ts - arm["start"]).total_seconds())
+            lags.append((arm["end"] - ts).total_seconds())
+            if ts < arm["start"] - margin or ts > arm["end"] + margin:
+                rep.bad(f"own call row {id8(rid)} (arm {k}) at {own[rid]['timestamp']} lies outside the arm's interval {utc(arm['start'])}..{utc(arm['end'])} (margin {CLOCK_MARGIN_S} s): the clocks disagree or the row is not this arm's")
+        rep.say(f"CLOCK arm={k} own_rows={len(leads)} min_s_after_arm_start={min(leads):.1f} min_s_before_arm_end={min(lags):.1f}" if leads else f"CLOCK arm={k} own_rows=0")
+    for rid, row in own.items():
+        if not (w0s <= row["timestamp"] <= w1s):
+            rep.bad(f"own call row {id8(rid)} at {row['timestamp']} lies outside the window {w0s}..{w1s}")
+    # ---- window rows: foreign call rows, usage rows
+    calls_win = [row_dict(CALL_COLUMNS, r) for r in con.execute(SQL_WINDOW_CALLS, (w0s, w1s)).fetchall()]
+    usage_win = [row_dict(USAGE_COLUMNS, r) for r in con.execute(SQL_WINDOW_USAGE, (u0s, u1s)).fetchall()]
+    foreign = [c for c in calls_win if c["id"] not in own]
+    rep.say(f"WINDOW-ROWS call_logs={len(calls_win)} own={len(calls_win) - len(foreign)} foreign={len(foreign)}; usage_history={len(usage_win)}")
+
+    def tile(ts):
+        for k in range(1, len(bounds)):
+            if ts < utc(bounds[k]) or k == len(bounds) - 1:
+                return k
+        return len(bounds) - 1
+
+    foreign_by = collections.Counter((tile(c["timestamp"]), c["path"], c["status"], c["model"]) for c in foreign)
+    for (k, path, status, model), n in sorted(foreign_by.items()):
+        times = sorted(c["timestamp"] for c in foreign if (tile(c["timestamp"]), c["path"], c["status"], c["model"]) == (k, path, status, model))
+        rep.say(f"FOREIGN tile={k} path={path} status={status} model={model} rows={n} first={times[0]} last={times[-1]}")
+    for c in foreign[:20]:
+        rep.say(f"   foreign call row id8={id8(c['id'])} at {c['timestamp']} path={c['path']} status={c['status']} model={c['model']} provider={c['provider']} connection={id8(c['connection_id'])}")
+    if foreign:
+        rep.bad(f"{len(foreign)} foreign call row(s) in the window (any call row without an own tag): a foreign request ran, so a foreign usage row could stand in for an own one")
+    # ---- edges: the scripts' candidate query per own call row, intersected with associated()
+    edges, lookalikes = {}, 0
+    for cid, c in sorted(own.items(), key=lambda kv: (kv[1]["timestamp"], kv[0])):
+        try:
+            lo, hi = shift(c["timestamp"], -CANDIDATE_SECONDS), shift(c["timestamp"], CANDIDATE_SECONDS)
+        except ValueError:   # a timestamp that is not the gateway's format (the FORMAT check above has reported it): the candidate window cannot be computed
+            rep.bad(f"own call row {id8(cid)} has a timestamp {c['timestamp']!r} that is not {TS_GLOB}: its candidate usage rows cannot be looked up")
+            edges[cid] = []
+            continue
+        rows = [row_dict(USAGE_COLUMNS, r) for r in con.execute(SQL_CANDIDATES, (lo, hi, c["model"], c["tokens_in"], c["tokens_out"])).fetchall()]
+        strong = []
+        for u in rows:
+            try:
+                ok = associated(c, u)
+            except (TypeError, ValueError):   # a latency or time to first token that is not a number: the scripts' own function would raise too; here it is a problem, not a crash
+                rep.bad(f"own call row {id8(cid)} or its candidate usage row {id8(u['id'])} has a latency or time to first token that is not a number: the association cannot be evaluated")
+                ok = False
+            if ok:
+                strong.append(u)
+        lookalikes += len(rows) - len(strong)
+        edges[cid] = [u["id"] for u in strong]
+    comps = components(edges)
+    statuses = collections.Counter()
+    for calls, usages in comps:
+        if not usages:
+            continue   # an own call row without any associated usage row: reported below
+        adj = {c: edges[c] for c in calls}
+        status, _pairs = matching_status(adj, calls, usages)
+        statuses[status] += 1
+        if status != "unique":
+            rep.say(f"   component calls={[id8(c) for c in calls]} usage_rows={len(usages)} status={status}")
+            rep.bad(f"a component of {len(calls)} own call row(s) and {len(usages)} usage row(s) has no unique perfect matching (status {status}): the usage rows of these calls cannot be established one to one")
+    with_edges = {u for us in edges.values() for u in us}
+    uncovered = [cid for cid, us in edges.items() if not us]
+    for cid in uncovered:
+        rep.bad(f"own call row {id8(cid)} ({own[cid]['path']}, status {own[cid]['status']}, tokens {own[cid]['tokens_in']}/{own[cid]['tokens_out']}) has no associated usage row (same model and token counts within {CANDIDATE_SECONDS} s, and provider, account, endpoint, latency, time to first token)")
+    rep.say(f"MATCHING own_call_rows={len(edges)} components={len(comps)} statuses={dict(sorted(statuses.items()))} own_call_rows_without_usage_row={len(uncovered)} look_alike_usage_rows_that_do_not_associate={lookalikes}")
+    # ---- orphans: usage rows of the padded window with no edge from an own call row
+    orphans = [u for u in usage_win if u["id"] not in with_edges]
+    for u in orphans[:20]:
+        rep.say(f"   orphan usage row id8={id8(u['id'])} at {u['timestamp']} endpoint={u['endpoint']} model={u['model']} provider={u['provider']} connection={id8(u['connection_id'])} tokens={u['tokens_input']}/{u['tokens_output']}")
+    rep.say(f"ORPHANS usage_rows_in_window={len(usage_win)} associated_with_an_own_call_row={len(usage_win) - len(orphans)} orphans={len(orphans)}")
+    if orphans:
+        rep.bad(f"{len(orphans)} orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written")
+    # ---- counts by account (hashed), endpoint and model
+    rep.say("COUNTS own call rows by (connection, path, model): " + str(sorted(collections.Counter((id8(c["connection_id"]), c["path"], c["model"]) for c in own.values()).items())))
+    rep.say("COUNTS usage rows of the window by (connection, endpoint, model): " + str(sorted(collections.Counter((id8(u["connection_id"]), u["endpoint"], u["model"]) for u in usage_win).items())))
+    per_tile = collections.defaultdict(lambda: {"own_calls": 0, "foreign_calls": 0, "usage": 0, "orphans": 0})
+    for c in calls_win:
+        per_tile[tile(c["timestamp"])]["own_calls" if c["id"] in own else "foreign_calls"] += 1
+    for u in usage_win:
+        per_tile[tile(u["timestamp"])]["orphans" if u["id"] not in with_edges else "usage"] += 1
+    for k in range(1, len(bounds)):
+        rep.say(f"TILE {k}: " + ", ".join(f"{name}={value}" for name, value in sorted(per_tile[k].items())))
+
+
+def run(argv):
+    ap = Parser(add_help=False)
+    ap.add_argument("--guard-receipt")
+    ap.add_argument("--diagnostic", action="store_true")
+    ap.add_argument("--require-arms", type=int, default=DEFAULT_REQUIRED_ARMS)
+    ap.add_argument("--db", default=DEFAULT_DB)
+    ap.add_argument("arms", nargs="+")
+    args = ap.parse_args(argv)
+    if not args.guard_receipt and not args.diagnostic:
+        raise UsageError("--guard-receipt is required (the guard 5 --idle-only receipt of the pre-arm check); --diagnostic measures without one and can only be INCONCLUSIVE")
+    for p in args.arms + ([args.guard_receipt] if args.guard_receipt else []):
+        if not os.path.isfile(p):
+            raise UsageError(f"not a readable file: {p!r}")
+    rep = evaluate(args.arms, args.guard_receipt, os.path.expanduser(args.db), diagnostic=args.diagnostic, require_arms=args.require_arms)
+    return (0 if rep.state == "PASS" else 2), "\n".join(rep.lines) + "\n"
+
+
+def main():
+    sys.setrecursionlimit(10000)
+    try:
+        code, text = run(sys.argv[1:])
+    except UsageError as error:
+        print(f"ERROR {error}", file=sys.stderr)
+        sys.exit(3)
+    except Exception as error:   # the contract is 0, 2 or 3: an unforeseen failure is not a verdict
+        print(f"ERROR internal: {type(error).__name__}: {error}", file=sys.stderr)
+        sys.exit(3)
+    sys.stdout.write(text)
+    sys.exit(code)
+
+
+if __name__ == "__main__":
+    main()

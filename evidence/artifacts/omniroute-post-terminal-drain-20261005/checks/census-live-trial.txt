@@ -1,7 +1,7 @@
 # The census on a live quiet window of the UNPATCHED 20128 (build `cf6748d04`, MainPID 341 throughout), 2026-10-06 17:20:02Z-17:26:36Z, with the guard 5 --idle-only receipt of 17:20:33Z (checks/guard-live-trial.txt) taken immediately before the first arm; runner: scripts/census-live-trial.sh.txt.
 # Three real arms through the frozen scripts (client requests of a trivial prompt through the Codex lane: A two requests, B two requests, C one native tool-call turn; the slot was agreed with 5f, whose own launches were held): A raw `responses:eof chat:eof`, B raw `responses:early:0` x2, C one native tool-call turn. The arms' outputs are checks/census-live-trial-arm-*.txt (ids shortened).
-# Result 1, the census on arm A alone (PASS, exit 0): 2 own call rows, 2 usage rows, 2 unique components, 0 foreign rows, 0 orphans, over the window from the guard's end to 5 s after the arm's end. This is the census's exact-match PASS on the live gateway.
-# Result 2, the census on the three arms together (INCONCLUSIVE, exit 2): the same zero foreign rows and zero orphans, and three problems that ARE the bug the patch fixes: the two `responses:early:0` requests of arm B left no call row, and the native tool-call turn of arm C left one of its two call rows. (The scripts judge those: arm B FAIL 2, arm C FAIL 1; the census says INCONCLUSIVE and never FAIL.)
+# Result 1, the census on arm A alone (INCONCLUSIVE, exit 2): on the store alone this is an exact match (2 own call rows, 2 usage rows, 2 unique components, 0 foreign rows, 0 orphans, over the window from the guard's end to 5 s after the arm's end) and the journal check refuses it: the gateway's journal shows 3 inbound requests in that window, the third being arm B's first request, which arrived 0.44 s after arm A's end (inside the 5 s settle) and left no row on the unpatched build. The store cannot see that request; the journal does. No live PASS exists yet (the exact-match PASS is shown by the controls P1 and P4 and needs a window in which nothing follows the last arm).
+# Result 2, the census on the three arms together (INCONCLUSIVE, exit 2): the same zero foreign rows and zero orphans, three problems that ARE the bug the patch fixes (the two `responses:early:0` requests of arm B left no call row, and the native tool-call turn of arm C left one of its two call rows) and the journal's answer to the same: 6 inbound requests against 3 own call rows. (The scripts judge those: arm B FAIL 2, arm C FAIL 1; the census says INCONCLUSIVE and never FAIL.)
 # In the runner's log the line `ACTIVE control ... exit=4` is the mid-arm guard run: it was not clean by the call_logs recency rule, not because it saw an active connection (checks/guard-live-trial.txt).
 # The runner's own log, then the two census outputs, raw (home directory written $HOME; 8-hex ids only).
 
@@ -18,8 +18,9 @@ identity after: exit=0 IDENTITY label=trial-after time=2026-10-06T17:26:36Z unit
 trial end 2026-10-06T17:26:36Z
 
 ## census on arm A alone: python3 window-census.py --guard-receipt guard-idle-1.txt --require-arms 1 arm-A-raw.txt
-CENSUS version=1 script_sha256=29fe758004e1e580ffade5a223d39967affa1360afbca7dfde9d01e00180e76a db=~/.local/share/omniroute/storage.sqlite arms=1 required_arms=1 guard_receipt=guard-idle-1.txt diagnostic=False
+CENSUS version=1 script_sha256=9350953cd4d6a005a4aa1817f8b3de743d6b15ae4d8697bb91b8c61a9c45fb9c db=~/.local/share/omniroute/storage.sqlite arms=1 required_arms=1 guard_receipt=guard-idle-1.txt diagnostic=False
 INPUT arm=1 file=arm-A-raw.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=2 start=2026-10-06T17:20:33.000Z end=2026-10-06T17:24:05.012Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
+SCOPE trial: not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance
 GUARD file=guard-idle-1.txt version=5 mode=idle-only clean_for=30.0 start=2026-10-06T17:20:02.625Z end=2026-10-06T17:20:33.262Z clean=True
 IDENTITY-CHECK guard MainPID=341 started=Tue_2026-10-06_09:51:19_EDT; compared with 0 of 1 arm(s) (a direct run carries no identity line)
 GUARD-TO-FIRST-ARM gap_s=0.1 (the guard's end to the first script's own start; needed: 0 <= gap <= 600)
@@ -32,28 +33,43 @@ QUERY own-native: select id, timestamp, path, status, model, requested_model, to
 QUERY window-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id
 QUERY window-usage: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? order by timestamp, id
 QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp
-QUERY odd-calls: select count(*) from call_logs where typeof(timestamp) != 'text' or timestamp not glob ?
-QUERY odd-usage: select count(*) from usage_history where typeof(timestamp) != 'text' or timestamp not glob ?
-BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T17:20:30.262Z, 2026-10-06T17:24:10.012Z) (the window's start padded by the same 3 s as the usage rows); window-usage: (2026-10-06T17:20:30.262Z, 2026-10-06T17:24:13.012Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; odd-*: ('????-??-??T??:??:??.???Z') over the WHOLE tables (a row of any other type or format)
-STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro)
+QUERY competing-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? and model = ? and tokens_in = ? and tokens_out = ? order by timestamp, id
+QUERY all-call-stamps: select timestamp from call_logs
+QUERY all-usage-stamps: select timestamp from usage_history
+QUERY journal: journalctl --user -u omniroute.service --since <window start - 6 s> UTC --until <window end + 2 s> UTC -o json --all --no-pager (every `tag=HTTP method=POST` line whose message starts with the inbound-request marker, counted by the journal's own timestamp from 4 s before the window's start to its end and compared with the own call rows; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line)
+BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T17:20:30.262Z, 2026-10-06T17:24:10.012Z) (the window's start padded by the same 3 s as the usage rows); window-usage: (2026-10-06T17:20:30.262Z, 2026-10-06T17:24:13.012Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; competing-calls: (shift(usage row timestamp, -3), shift(usage row timestamp, 3), model, tokens_input, tokens_output) per usage row an own call row can claim; all-*-stamps: every timestamp of the two tables, each validated here (text, the gateway's format ????-??-??T??:??:??.???Z, calendar-valid, year 2000-2100)
+OBSERVED-AT 2026-10-06T21:57:20.839Z (host clock) declared_interval_end=2026-10-06T17:24:13.012Z seconds_after_it_ended=16387.8 (needed: at least 2 s, waited for when less than 30 s remain)
+STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro; one read transaction for all queries)
 FORMAT scope=whole tables call_logs_rows_with_another_timestamp_format=0 usage_history_rows_with_another_timestamp_format=0
+IDS call_logs_rows_without_a_text_id=0 usage_history_rows_without_an_integer_id=0
 OWN call rows=2 per arm={1: 2}
+JOURNAL-COMMAND argv=journalctl --user -u omniroute.service --since 2026-10-06 17:20:27 UTC --until 2026-10-06 17:24:13 UTC -o json --all --no-pager binary=/usr/bin/journalctl version='systemd 255 (255.4-1ubuntu8.17)' stderr='' entries_read=28 arrival_lines_read=3
+JOURNAL unit=omniroute.service readable=True inbound_POST_lines_in_window=3 own_call_rows=2 (counted by the journal's own timestamp from 2026-10-06T17:20:29.262Z, 4 s before the window's start, to 2026-10-06T17:24:10.012Z, the window's end)
+   journal request line at 2026-10-06T17:20:33.358Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+   journal request line at 2026-10-06T17:21:57.103Z 📥 POST /v1/chat/completions | cx/gpt-6-astra | 1 msgs
+   journal request line at 2026-10-06T17:24:05.456Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+PROBLEM the gateway's journal shows 3 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 2 own call row(s): a request that left no call row (dropped, or another client's) cannot be excluded
+JOURNAL-PAIRING each own call row to one inbound line of the same path within 3 s of (its timestamp - its duration): own_call_rows_without_a_line=0 inbound_lines_without_an_own_call_row=1
+   inbound line with no own call row at 2026-10-06T17:24:05.456Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+PROBLEM the gateway's journal and the own call rows do not pair one to one by time and path: 0 own call row(s) have no inbound line of their path within 3 s of their arrival and 1 inbound line(s) have no own call row (a lost line balanced by another client's request cannot pass)
 CLOCK arm=1 own_rows=2 min_s_after_arm_start=6.1 min_s_before_arm_end=126.0
 WINDOW-ROWS call_logs=2 own=2 foreign=0; usage_history=2
+COMPETING-OWNERS usage_rows_an_own_call_row_can_claim=2 not_own_call_rows_that_could_own_them=0
 MATCHING own_call_rows=2 components=2 statuses={'unique': 2} own_call_rows_without_usage_row=0 look_alike_usage_rows_that_do_not_associate=0
 DUPLICATES groups_of_usage_rows_with_identical_metadata=0 rows=0
 ORPHANS usage_rows_in_window=2 associated_with_an_own_call_row=2 orphans=0
 COUNTS own call rows by (connection, path, model): [(('f687e62f', '/v1/chat/completions', 'gpt-6-astra'), 1), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
 COUNTS usage rows of the window by (connection, endpoint, model): [(('f687e62f', '/v1/chat/completions', 'gpt-6-astra'), 1), (('f687e62f', '/v1/responses', 'gpt-6-astra'), 1)]
 TILE 1: foreign_calls=0, orphans=0, own_calls=2, usage=2
-NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata the association cannot tell from an own request's (same model, counts, account and endpoint; latency within 100 ms, time to first token within 1 ms, within 3 s), standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)
-CENSUS-RESULT PASS exit=0 problems=0
+NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore rests on the gateway's journal as the independent record: the number of inbound POST requests it logged in the window equals the number of own call rows and the lines pair with them one to one by time and path within 3 s (so a foreign request leaves a line even when its call row was never written), and the rows are paired one to one. What stays outside: a foreign request that the gateway did not log on arrival while the own requests' lines are all present, a lost own line balanced by a foreign line of the same path that arrives within 3 s of it or of a chain of neighbouring own requests' lines (3 s per link), a persistence failure that is not logged (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup), and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure
+CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial
 
 ## census on arms A, B and C: python3 window-census.py --guard-receipt guard-idle-1.txt --require-arms 3 arm-A-raw.txt arm-B-race.txt arm-C-native.txt
-CENSUS version=1 script_sha256=29fe758004e1e580ffade5a223d39967affa1360afbca7dfde9d01e00180e76a db=~/.local/share/omniroute/storage.sqlite arms=3 required_arms=3 guard_receipt=guard-idle-1.txt diagnostic=False
+CENSUS version=1 script_sha256=9350953cd4d6a005a4aa1817f8b3de743d6b15ae4d8697bb91b8c61a9c45fb9c db=~/.local/share/omniroute/storage.sqlite arms=3 required_arms=3 guard_receipt=guard-idle-1.txt diagnostic=False
 INPUT arm=1 file=arm-A-raw.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=2 start=2026-10-06T17:20:33.000Z end=2026-10-06T17:24:05.012Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
 INPUT arm=2 file=arm-B-race.txt kind=raw script_version=2.2 script_sha256=52b1d749dc6b requests=2 start=2026-10-06T17:24:05.000Z end=2026-10-06T17:25:25.262Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
 INPUT arm=3 file=arm-C-native.txt kind=native script_version=2.1 script_sha256=db2a4d42d6ca requests=1 start=2026-10-06T17:25:25.000Z end=2026-10-06T17:26:36.548Z interval_source=(wrapper stamps and the script's FROZEN start= and SUMMARY end=) store_in_script_line=~/.local/share/omniroute/storage.sqlite journal_failed_to_save_call_log=0
+SCOPE trial: not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance
 GUARD file=guard-idle-1.txt version=5 mode=idle-only clean_for=30.0 start=2026-10-06T17:20:02.625Z end=2026-10-06T17:20:33.262Z clean=True
 IDENTITY-CHECK guard MainPID=341 started=Tue_2026-10-06_09:51:19_EDT; compared with 0 of 3 arm(s) (a direct run carries no identity line)
 GUARD-TO-FIRST-ARM gap_s=0.1 (the guard's end to the first script's own start; needed: 0 <= gap <= 600)
@@ -66,19 +82,38 @@ QUERY own-native: select id, timestamp, path, status, model, requested_model, to
 QUERY window-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id
 QUERY window-usage: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? order by timestamp, id
 QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp
-QUERY odd-calls: select count(*) from call_logs where typeof(timestamp) != 'text' or timestamp not glob ?
-QUERY odd-usage: select count(*) from usage_history where typeof(timestamp) != 'text' or timestamp not glob ?
-BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T17:20:30.262Z, 2026-10-06T17:26:41.548Z) (the window's start padded by the same 3 s as the usage rows); window-usage: (2026-10-06T17:20:30.262Z, 2026-10-06T17:26:44.548Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; odd-*: ('????-??-??T??:??:??.???Z') over the WHOLE tables (a row of any other type or format)
-STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro)
+QUERY competing-calls: select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, provider, connection_id, api_key_id, duration, ttft_ms, correlation_id, response_id, session_tag from call_logs where timestamp >= ? and timestamp <= ? and model = ? and tokens_in = ? and tokens_out = ? order by timestamp, id
+QUERY all-call-stamps: select timestamp from call_logs
+QUERY all-usage-stamps: select timestamp from usage_history
+QUERY journal: journalctl --user -u omniroute.service --since <window start - 6 s> UTC --until <window end + 2 s> UTC -o json --all --no-pager (every `tag=HTTP method=POST` line whose message starts with the inbound-request marker, counted by the journal's own timestamp from 4 s before the window's start to its end and compared with the own call rows; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line)
+BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: (2026-10-06T17:20:30.262Z, 2026-10-06T17:26:41.548Z) (the window's start padded by the same 3 s as the usage rows); window-usage: (2026-10-06T17:20:30.262Z, 2026-10-06T17:26:44.548Z); candidates: (shift(call row timestamp, -3), shift(call row timestamp, 3), model, tokens_in, tokens_out) per own call row; competing-calls: (shift(usage row timestamp, -3), shift(usage row timestamp, 3), model, tokens_input, tokens_output) per usage row an own call row can claim; all-*-stamps: every timestamp of the two tables, each validated here (text, the gateway's format ????-??-??T??:??:??.???Z, calendar-valid, year 2000-2100)
+OBSERVED-AT 2026-10-06T21:57:21.276Z (host clock) declared_interval_end=2026-10-06T17:26:44.548Z seconds_after_it_ended=16236.7 (needed: at least 2 s, waited for when less than 30 s remain)
+STORE ~/.local/share/omniroute/storage.sqlite readable=True (opened with mode=ro; one read transaction for all queries)
 FORMAT scope=whole tables call_logs_rows_with_another_timestamp_format=0 usage_history_rows_with_another_timestamp_format=0
+IDS call_logs_rows_without_a_text_id=0 usage_history_rows_without_an_integer_id=0
 PROBLEM arm 2 request 1 (responses:early:0, corr e0c91234, response 45523cc1): 0 own call row(s) (exactly 1 is needed)
 PROBLEM arm 2 request 2 (responses:early:0, corr ab8ed6a6, response aced4bc1): 0 own call row(s) (exactly 1 is needed)
 PROBLEM arm 3 turn 1 (two-request, session fdebb41c): 1 own call row(s) (at least 2 are needed)
 OWN call rows=3 per arm={1: 2, 3: 1}
+JOURNAL-COMMAND argv=journalctl --user -u omniroute.service --since 2026-10-06 17:20:27 UTC --until 2026-10-06 17:26:44 UTC -o json --all --no-pager binary=/usr/bin/journalctl version='systemd 255 (255.4-1ubuntu8.17)' stderr='' entries_read=54 arrival_lines_read=6
+JOURNAL unit=omniroute.service readable=True inbound_POST_lines_in_window=6 own_call_rows=3 (counted by the journal's own timestamp from 2026-10-06T17:20:29.262Z, 4 s before the window's start, to 2026-10-06T17:26:41.548Z, the window's end)
+   journal request line at 2026-10-06T17:20:33.358Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+   journal request line at 2026-10-06T17:21:57.103Z 📥 POST /v1/chat/completions | cx/gpt-6-astra | 1 msgs
+   journal request line at 2026-10-06T17:24:05.456Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+   journal request line at 2026-10-06T17:24:21.983Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+   journal request line at 2026-10-06T17:25:26.056Z 📥 POST /v1/responses | cx/gpt-6-astra | 7 msgs | effort=max
+   journal request line at 2026-10-06T17:25:29.144Z 📥 POST /v1/responses | cx/gpt-6-astra | 9 msgs | effort=max
+PROBLEM the gateway's journal shows 6 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 3 own call row(s): a request that left no call row (dropped, or another client's) cannot be excluded
+JOURNAL-PAIRING each own call row to one inbound line of the same path within 3 s of (its timestamp - its duration): own_call_rows_without_a_line=0 inbound_lines_without_an_own_call_row=3
+   inbound line with no own call row at 2026-10-06T17:24:05.456Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+   inbound line with no own call row at 2026-10-06T17:24:21.983Z 📥 POST /v1/responses | cx/gpt-6-astra | 14 msgs | effort=max
+   inbound line with no own call row at 2026-10-06T17:25:29.144Z 📥 POST /v1/responses | cx/gpt-6-astra | 9 msgs | effort=max
+PROBLEM the gateway's journal and the own call rows do not pair one to one by time and path: 0 own call row(s) have no inbound line of their path within 3 s of their arrival and 3 inbound line(s) have no own call row (a lost line balanced by another client's request cannot pass)
 CLOCK arm=1 own_rows=2 min_s_after_arm_start=6.1 min_s_before_arm_end=126.0
 CLOCK arm=2 own_rows=0
 CLOCK arm=3 own_rows=1 min_s_after_arm_start=4.0 min_s_before_arm_end=67.6
 WINDOW-ROWS call_logs=3 own=3 foreign=0; usage_history=3
+COMPETING-OWNERS usage_rows_an_own_call_row_can_claim=3 not_own_call_rows_that_could_own_them=0
 MATCHING own_call_rows=3 components=3 statuses={'unique': 3} own_call_rows_without_usage_row=0 look_alike_usage_rows_that_do_not_associate=0
 DUPLICATES groups_of_usage_rows_with_identical_metadata=0 rows=0
 ORPHANS usage_rows_in_window=3 associated_with_an_own_call_row=3 orphans=0
@@ -87,5 +122,5 @@ COUNTS usage rows of the window by (connection, endpoint, model): [(('c598365c',
 TILE 1: foreign_calls=0, orphans=0, own_calls=2, usage=2
 TILE 2: foreign_calls=0, orphans=0, own_calls=0, usage=0
 TILE 3: foreign_calls=0, orphans=0, own_calls=1, usage=1
-NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written, with metadata the association cannot tell from an own request's (same model, counts, account and endpoint; latency within 100 ms, time to first token within 1 ms, within 3 s), standing in for a dropped own usage row (four coincident faults); named check: journal_failed_to_save_call_log per arm (above)
-CENSUS-RESULT INCONCLUSIVE exit=2 problems=3
+NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore rests on the gateway's journal as the independent record: the number of inbound POST requests it logged in the window equals the number of own call rows and the lines pair with them one to one by time and path within 3 s (so a foreign request leaves a line even when its call row was never written), and the rows are paired one to one. What stays outside: a foreign request that the gateway did not log on arrival while the own requests' lines are all present, a lost own line balanced by a foreign line of the same path that arrives within 3 s of it or of a chain of neighbouring own requests' lines (3 s per link), a persistence failure that is not logged (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup), and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure
+CENSUS-RESULT INCONCLUSIVE exit=2 problems=5 scope=trial

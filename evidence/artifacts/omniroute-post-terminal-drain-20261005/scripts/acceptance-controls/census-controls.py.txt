@@ -7,6 +7,7 @@ Each scenario prints `CONTROL-RESULT <id> expected_exit=N observed_exit=M OK|UNE
   exact match (P1, P2), unique 2x2 (P3), replacement case (R1 distinguishable, R2 identical with a foreign call row, R3 identical with the foreign call row also dropped: the RESIDUAL, expected PASS), one row short (I1), one foreign call row (I2), the gateway's own provider-test rows (I3),
   two candidates (I4), complete 2x2 (I5), an orphan (I6), an unreadable store (U1-U4), and the guard, input, clock, tiling and format controls; X1-X3 check predicate parity with the frozen scripts (by AST, never by importing them: they run their main at import) and the matching functions
   against a brute force and scipy.
+Added after the full-scope reads r10 and r11 of #757: Y11-Y13b (the reviewers' reproductions and the exact boundary check), D1-D8 and K3 (the canary gate's contract and the frozen request counts), G11-G12b (the guard receipt), W1-W3b (the declared interval in real time), P5, R3b, S1 (one read snapshot) and J1-J20 (the gateway's journal as the independent record of every inbound request: every world carries a journal fixture served by a `journalctl` shim first on the census's PATH; J12a-J20 and J13j reproduce the second independent review of the journal check: the counted range from 4 s before the window, every journal form that cannot be read, the pairing by path and its documented chain width, the leftovers of a maximum matching, an overflowing duration, the exact command in the receipt, journalctl's stderr and the escaping of labels).
 Exit status 0 when every scenario behaved as expected."""
 import argparse
 import ast
@@ -14,13 +15,17 @@ import datetime as dt
 import hashlib
 import importlib.util
 import itertools
+import json
+import os
 import random
 import re
 import sqlite3
 import subprocess
 import sys
+import time
 from pathlib import Path
 
+GUARD_SHA = "62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b"   # pre-switch guard 5, pinned by the census
 RAW_SHA = "52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75"
 NATIVE_SHA = "db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd"
 FAILED = []
@@ -39,7 +44,7 @@ def at(s):
     return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)
 
 
-T0 = at("2026-10-06T20:00:00.000Z")
+T0 = at("2026-10-06T12:00:00.000Z")   # a fixed past date: the census waits for the declared interval to end on the host clock, so fixtures must lie in the past (the real-time controls W1-W3 shift their own)
 
 
 def plus(seconds):
@@ -87,8 +92,8 @@ def default_spec(name):
 
 
 def write_guard(path, g):
-    L = [f"GUARD version={g['version']} mode={g['mode']} script_sha256={'6' * 64} start={utc(g['start'])} port={g.get('port', 20128)} unit={g.get('unit', 'omniroute.service')} clean_for={g.get('clean_for', 30.0)} interval=5.0 tolerate_units={g.get('tolerated', "['omniroute-fw.service']")}",
-         "   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok",
+    L = [f"GUARD version={g['version']} mode={g['mode']} script_sha256={GUARD_SHA} start={utc(g['start'])} port={g.get('port', 20128)} unit={g.get('unit', 'omniroute.service')} clean_for={g.get('clean_for', 30.0)} interval=5.0 tolerate_units={g.get('tolerated', "['omniroute-fw.service']")}",
+         *([] if g.get("no_identity") else ["   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok"]),
          "CHECK nothing in flight for 30 s (7 samples): " + ("ok (0 idle and 0 tolerated connection(s))" if g["clean"] else "FAIL ['an active connection']")]
     if g["result"]:
         if g["version"] == "4":
@@ -104,8 +109,10 @@ def write_arm(path, arm, db):
     L = []
     wrapper = arm["wrapper_start"] is not None
     if wrapper:
-        L.append(f"# trial arm ({arm['kind']}); started {stamp(arm['wrapper_start'])}; wrapper kind={arm.get('wrapper_kind', 'canary')}")
-        L.append(f"IDENTITY label=before-x time=x unit=omniroute.service MainPID={arm.get('pid', 1)} ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok")
+        if not arm.get("no_header"):
+            L.append(f"# trial arm ({arm['kind']}); started {stamp(arm['wrapper_start'])}; wrapper kind={arm.get('wrapper_kind', 'canary')}")
+        if not arm.get("no_identity"):
+            L.append(f"IDENTITY label=before-x time=x unit=omniroute.service MainPID={arm.get('pid', 1)} ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok")
     if arm["kind"] == "raw":
         L.append(f"FROZEN version={arm['version']} script_sha256={arm['sha']} argv=['--expect', 'all-logged'] cwd=/tmp start={utc(arm['script_start'])} expect=all-logged wait1=12.0 wait2=60.0 port=20128{db_field} effort_close_after=10.0 baseline=None baseline_sha256=None")
     else:
@@ -122,6 +129,8 @@ def write_arm(path, arm, db):
         L.append(f"SUMMARY {{\"PASS\": {len(arm['requests'])}}} end={utc(arm['script_end'])} exit=0")
     if wrapper:
         L.append("exit=0")
+        if not arm.get("no_identity"):
+            L.append(f"IDENTITY label=after-x time=x unit=omniroute.service MainPID={arm.get('after_pid', arm.get('pid', 1))} ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok")
         if arm["journal"] != "missing":
             L.append(f"journal_failed_to_save_call_log={arm['journal']} (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')")
         L.append(f"RUN-STATUS {Path(path).name} status={arm['run_status']} ({'VOID' if arm['run_status'] == 4 else 'ok'})")
@@ -163,6 +172,45 @@ def materialize(spec, work):
         put_usage(u)
     con.commit()
     con.close()
+    # ROUND-15: the gateway journal fixture: one inbound-request line per own and per foreign inference call row (the gateway logs it when the request ARRIVES, about `duration` before its row is written), plus noise
+    journal = []
+
+    def post_line(ts, label="/v1/responses | cx/gpt-6-astra | 14 msgs | effort=max"):
+        journal.append(json.dumps({"__REALTIME_TIMESTAMP": str(int(ts.timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "time": utc(ts), "service": "omniroute", "module": "sse", "tag": "HTTP", "method": "POST", "path": label, "msg": "\U0001F4E5 POST " + label})}))
+
+    for a_index, arm in enumerate(spec["arms"]):
+        for r_index, r in enumerate(arm["requests"]):
+            for c_index, c in enumerate(r["calls"]):
+                if isinstance(c["ts"], (str, bytes)) or (a_index, r_index, c_index) in spec.get("journal_drop", ()):
+                    continue
+                try:
+                    arrival = c["ts"] - dt.timedelta(milliseconds=float(c["duration"]))
+                except (TypeError, ValueError, OverflowError):
+                    arrival = arm["script_start"]   # a duration that is not a number or not representable (controls about exactly that): the arrival is taken at the arm's start
+                post_line(max(arrival, arm["script_start"]), f"{c['path']} | cx/{c['model']} | 14 msgs")
+    for c in spec["foreign_calls"]:
+        if not isinstance(c["ts"], (str, bytes)) and not str(c["path"]).startswith("/api/"):   # the gateway's own provider-test calls are not inbound requests
+            post_line(c["ts"] - dt.timedelta(milliseconds=c["duration"] if isinstance(c["duration"], (int, float)) else 0), f"{c['path']} | cx/{c['model']} | 14 msgs")
+    for item in spec.get("journal_extra", ()):   # ROUND-17: a datetime, or (datetime, path)
+        if isinstance(item, tuple):
+            post_line(item[0], f"{item[1]} | cx/gpt-6-astra | 14 msgs")
+        else:
+            post_line(item)
+    base = plus(-5)
+    journal += [json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": "[ProxyEgress] codex status=success"}),
+                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "time": utc(base), "tag": "AUTH", "msg": "Using codex account: ***..."})}),
+                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "time": utc(base), "tag": "HTTP", "method": "GET", "msg": "\U0001F4E5 GET /v1/models"})}),
+                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": [27, 91, 51, 50, 109, 91, 85, 83, 65, 71, 69, 93, 27, 91, 48, 109]})]
+    journal += list(spec.get("journal_noise", ()))
+    (Path(work) / f"{spec['name']}-journal.jsonl").write_text("\n".join(journal) + "\n")
+    if spec.get("journal_raw"):   # raw bytes after the text lines (a journal line that is not valid UTF-8)
+        with open(Path(work) / f"{spec['name']}-journal.jsonl", "ab") as handle:
+            handle.write(spec["journal_raw"])
+    (Path(work) / f"{spec['name']}-journal.rc").write_text(str(spec.get("journal_rc", 0)))
+    (Path(work) / f"{spec['name']}-journal.err").write_text(spec.get("journal_stderr", ""))
+    argv_log = Path(work) / f"{spec['name']}-journal.argv"
+    if argv_log.exists():
+        argv_log.unlink()
     files = []
     for arm in spec["arms"]:
         p = work / f"{spec['name']}-{arm['file']}"
@@ -171,6 +219,18 @@ def materialize(spec, work):
     guard = work / f"{spec['name']}-guard.txt"
     write_guard(guard, spec["guard"])
     return db, files, guard
+
+
+def journal_env(guard):
+    """The environment of every census run (ROUND-15): a `journalctl` shim first on PATH that serves the world's journal fixture (derived from the guard receipt's name) and its exit status."""
+    shim = Path(ARGS.work) / "journal-shim"
+    shim.mkdir(exist_ok=True)
+    (shim / "journalctl").write_text('#!/bin/sh\n[ -n "$JOURNAL_ARGV_LOG" ] && printf \'%s\\n\' "$*" >> "$JOURNAL_ARGV_LOG"\ncase "$1" in --version) echo "systemd 255 (255.4-1ubuntu8.17)"; exit 0;; esac\n[ -n "$JOURNAL_STDERR_FILE" ] && [ -s "$JOURNAL_STDERR_FILE" ] && cat "$JOURNAL_STDERR_FILE" >&2\n[ -n "$JOURNAL_FIXTURE" ] && [ -f "$JOURNAL_FIXTURE" ] && cat "$JOURNAL_FIXTURE"\nexit "${JOURNAL_RC:-0}"\n')
+    (shim / "journalctl").chmod(0o755)
+    fixture = Path(str(guard).replace("-guard.txt", "-journal.jsonl"))
+    rc_file = Path(str(guard).replace("-guard.txt", "-journal.rc"))
+    return dict(os.environ, PATH=f"{shim}:{os.environ['PATH']}", JOURNAL_FIXTURE=str(fixture), JOURNAL_RC=rc_file.read_text().strip() if rc_file.exists() else "0",
+                JOURNAL_STDERR_FILE=str(Path(str(guard).replace("-guard.txt", "-journal.err"))), JOURNAL_ARGV_LOG=str(Path(str(guard).replace("-guard.txt", "-journal.argv"))))
 
 
 def run_census(db, files, guard, diagnostic=False, no_guard_arg=False, extra=None):
@@ -185,7 +245,7 @@ def run_census(db, files, guard, diagnostic=False, no_guard_arg=False, extra=Non
     elif "--require-arms" not in extra:
         extra += ["--require-arms", str(len(files))]   # the fixtures have two arms
     cmd += ["--db", str(db)] + [str(guard) if x == "@GUARD@" else x for x in extra] + [str(f) for f in files]
-    p = subprocess.run(cmd, capture_output=True, text=True)
+    p = subprocess.run(cmd, capture_output=True, text=True, env=journal_env(guard))
     return p.returncode, p.stdout, p.stderr
 
 
@@ -262,8 +322,8 @@ def main():
         p1_post.before = hashlib.sha256(db.read_bytes()).hexdigest()
     ok = scenario("P1", "exact match: 3 raw requests and 3 native call rows, each with its usage row, guard clean, no foreign row: PASS, and the receipt holds the exact queries, the window, the clocks, the counts and no full id",
                   want=0, must=["CENSUS-RESULT PASS", "foreign=0", "orphans=0", "statuses={'unique': 6}", "QUERY candidates: select id, timestamp, model, status, tokens_input, tokens_output, provider, connection_id, api_key_id, endpoint, latency_ms, ttft_ms from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp",
-                                          "WINDOW start=2026-10-06T20:00:00.000Z end=2026-10-06T20:05:36.000Z", "CLOCK arm=1", "CLOCK arm=2", "COUNTS own call rows", "TILE 2:", "IDLE-MEANING", "NOT-EXCLUDED"],
-                  mustnot=["/home/", "resp_", "call-"], post=p1_post)
+                                          "WINDOW start=2026-10-06T12:00:00.000Z end=2026-10-06T12:05:36.000Z", "SCOPE trial", "scope=trial", "OBSERVED-AT", "JOURNAL unit=omniroute.service readable=True inbound_POST_lines_in_window=6 own_call_rows=6", "CLOCK arm=1", "CLOCK arm=2", "COUNTS own call rows", "TILE 2:", "IDLE-MEANING", "NOT-EXCLUDED"],
+                  mustnot=["/home/", "resp_", "call-p1"], post=p1_post)
     # the receipt holds no full uuid, and the census leaves the store untouched (read-only)
     db1 = Path(ARGS.work) / "p1.sqlite"
     rc, out, err = run_census(db1, [Path(ARGS.work) / "p1-arm-1-raw.txt", Path(ARGS.work) / "p1-arm-2-native.txt"], Path(ARGS.work) / "p1-guard.txt")
@@ -294,8 +354,8 @@ def main():
         c = spec["arms"][0]["requests"][1]["calls"][0]
         drop_usage(spec, 0, 1)
         spec["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
-    scenario("R3", "RESIDUAL (expected PASS: the documented limit): own usage row dropped + a foreign usage row with identical metadata whose foreign call row was also never written; the named check is the journal scan", mutate=residual, want=0,
-             must=["CENSUS-RESULT PASS", "NOT-EXCLUDED a usage row of a foreign request whose own call_logs row was never written"])
+    scenario("R3", "RESIDUAL in its narrowest form (expected PASS): own usage row dropped + a foreign usage row with identical metadata whose foreign call row was also never written AND whose arrival the gateway journal does not show either (J1 is the same world with the journal line)", mutate=residual, want=0,
+             must=["CENSUS-RESULT PASS", "NOT-EXCLUDED the rows alone cannot attribute a usage row to its request"])
 
     # ---- INCONCLUSIVE controls
     scenario("I1", "one row short: request 2's usage row is missing", mutate=lambda s: drop_usage(s, 0, 1), want=2, must=["CENSUS-RESULT INCONCLUSIVE", "has no associated usage row"])
@@ -360,7 +420,7 @@ def main():
              post=None)
     scenario("G3", "the guard ended AFTER the first arm began", mutate=g(start=plus(-5), end=plus(8)), want=2, must=["AFTER the first arm began"])
     scenario("G3b", "the guard ended 0.3 s after the first script's own start (FROZEN start=), although the wrapper's whole-second stamp reads earlier: judged on the script's own start: INCONCLUSIVE", mutate=g(start=plus(-25), end=plus(5.6)), want=2, must=["AFTER the first arm began"])
-    scenario("G8", "the guard ended 0.1 s BEFORE the first script's own start (plus the wrapper's truncated stamp 20:00:05Z, which reads 0.2 s before the guard's end): accepted (the stamps are whole seconds)", mutate=g(start=plus(-25), end=plus(5.2)), want=0, must=["CENSUS-RESULT PASS", "GUARD-TO-FIRST-ARM gap_s=0.1"])
+    scenario("G8", "the guard ended 0.1 s BEFORE the first script's own start (plus the wrapper's truncated stamp 12:00:05Z, which reads 0.2 s before the guard's end): accepted (the stamps are whole seconds)", mutate=g(start=plus(-25), end=plus(5.2)), want=0, must=["CENSUS-RESULT PASS", "GUARD-TO-FIRST-ARM gap_s=0.1"])
     scenario("G9", "an idle observation of 10 s (clean_for=10): shorter than the 30 s the protocol requires", mutate=g(clean_for=10.0), want=2, must=["shorter than the 30 s"])
     scenario("G9b", "an idle observation of exactly 30 s is enough", mutate=g(clean_for=30.0), want=0, must=["CENSUS-RESULT PASS"])
     scenario("R4", "the default --require-arms 4 with only two arm outputs (an omitted arm): INCONCLUSIVE", extra=["@NO_REQUIRE_ARMS@"], want=2, must=["2 arm output(s) given, 4 required"])
@@ -375,24 +435,38 @@ def main():
                 row["ts"] = row["ts"] + delta
 
     def four_arms(spec, last_kind="native", wrapper_kind="canary"):
+        """The canary's four arms with the frozen request counts (17 raw requests, 6 race requests, 4 native one-request turns, 8 native tool-call turns of two call rows each): every request has its own row(s) and distinguishable numbers (ROUND-14)."""
         n = spec["name"]
-        shift_arm(spec["arms"][1], 100)   # the one-request/tool-call native arm now starts at +280 s
-        reqs = []
-        for i, off in enumerate((190.0, 215.0), 1):
-            tag = f"{n}-race-{i}"
-            c = call(plus(off + 0.1), 22, 30 + i, 900 + 10 * i)
-            reqs.append({"kind": "raw", "mode": "responses:early:0", "corr": corr_id(tag), "rid": resp_id(tag), "calls": [c], "usage": [usage_for(c)]})
-        spec["arms"].insert(1, {"file": "arm-2-race.txt", "kind": "raw", "version": "2.2", "sha": RAW_SHA, "wrapper_start": plus(180.0), "script_start": plus(180.3), "script_end": plus(270.2), "wrapper_end": plus(271.0),
-                                "journal": "0", "summary": True, "run_status": 0, "requests": reqs, "db_override": None, "wrapper_kind": wrapper_kind})
-        spec["arms"][2]["file"] = "arm-3-native.txt"
-        c2, c3 = call(plus(470.0), 15200, 41, 3100), call(plus(471.5), 15250, 38, 2600)
-        nreqs = [{"kind": "native", "shape": "two-request", "tag": f"acceptance-20261006T200800-two-request-{n[:6]}-4", "min_rows": 2, "judged": True, "calls": [c2, c3], "usage": [usage_for(c2), usage_for(c3)]}]
+        counter = itertools.count(1)
+
+        def raw_request(arm_no, i, mode, off):
+            k = next(counter)
+            tag = f"{n}-a{arm_no}-{i}"
+            path_ = "/v1/chat/completions" if mode.startswith("chat") else "/v1/responses"
+            c = call(plus(off + 0.1), 100 + k, 20 + k % 7, 900 + 13 * k, path_)
+            return {"kind": "raw", "mode": mode, "corr": corr_id(tag), "rid": None if mode.startswith("chat") else resp_id(tag), "calls": [c], "usage": [usage_for(c)]}
+
+        def native_request(shape, i, off, rows):
+            k = next(counter)
+            calls = [call(plus(off + 1.5 * j), 15000 + 10 * k + j, 30 + k % 9 + j, 2500 + 17 * k + 11 * j) for j in range(rows)]
+            return {"kind": "native", "shape": shape, "tag": f"acceptance-20261006T120300-{shape}-{n[:6]}-{i}", "min_rows": rows, "judged": True, "calls": calls, "usage": [usage_for(c) for c in calls]}
+
+        def make_arm(file, kind, version, sha, begin, finish, reqs):
+            return {"file": file, "kind": kind, "version": version, "sha": sha, "wrapper_start": plus(begin), "script_start": plus(begin + 0.3), "script_end": plus(finish), "wrapper_end": plus(finish + 0.8),
+                    "journal": "0", "summary": True, "run_status": 0, "requests": reqs, "db_override": None, "wrapper_kind": wrapper_kind}
+
+        modes = ["effort:cx/gpt-6-astra:max"] * 3 + ["effort:cx/gpt-6.1-sol-max"] * 3 + ["effort:cx/gpt-6.1-sol:max"] * 3 + ["responses:early:0"] * 2 + ["chat:early:0"] * 2 + ["responses:eof", "chat:eof", "responses:early:2", "responses:early:0.5"]
+        raw = [raw_request(1, i, modes[i], 10 + 8 * i) for i in range(17)]
+        race = [raw_request(2, i, "responses:early:0", 160 + 10 * i) for i in range(6)]
+        nat1 = [native_request("astra-max", i, 230 + 12 * i, 1) for i in range(4)]
         if last_kind == "raw":   # a wrong shape: the fourth arm is a raw arm
-            c4 = call(plus(470.0), 22, 21, 1000)
-            nreqs = [{"kind": "raw", "mode": "responses:eof", "corr": corr_id(n + "-last"), "rid": resp_id(n + "-last"), "calls": [c4], "usage": [usage_for(c4)]}]
-        spec["arms"].append({"file": "arm-4-last.txt", "kind": last_kind, "version": "2.1" if last_kind == "native" else "2.2", "sha": NATIVE_SHA if last_kind == "native" else RAW_SHA, "wrapper_start": plus(440.0), "script_start": plus(440.4), "script_end": plus(520.2), "wrapper_end": plus(521.0),
-                             "journal": "0", "summary": True, "run_status": 0, "requests": nreqs, "db_override": None})
-    scenario("P4", "four arms in the canary's order (raw, race, native one-request, native tool-call) with the census's own default --require-arms 4: PASS", mutate=four_arms, extra=["@NO_REQUIRE_ARMS@"], want=0, must=["CENSUS-RESULT PASS", "required_arms=4", "TILE 4:"])
+            nat2 = [raw_request(4, i, "responses:eof", 300 + 12 * i) for i in range(8)]
+        else:
+            nat2 = [native_request("two-request", i, 300 + 12 * i, 2) for i in range(8)]
+        spec["arms"] = [make_arm("arm-1-raw.txt", "raw", "2.2", RAW_SHA, 5.0, 150.2, raw), make_arm("arm-2-race.txt", "raw", "2.2", RAW_SHA, 155.0, 220.2, race),
+                        make_arm("arm-3-native.txt", "native", "2.1", NATIVE_SHA, 225.0, 290.2, nat1),
+                        make_arm("arm-4-last.txt", last_kind, "2.1" if last_kind == "native" else "2.2", NATIVE_SHA if last_kind == "native" else RAW_SHA, 295.0, 400.2, nat2)]
+    scenario("P4", "four arms in the canary's order (raw, race, native one-request, native tool-call) with the census's own default --require-arms 4: PASS", mutate=four_arms, extra=["@NO_REQUIRE_ARMS@"], want=0, must=["CENSUS-RESULT PASS", "required_arms=4", "TILE 4:", "compared with 4 of 4 arm(s)", "scope=canary", "SCOPE canary"])
     scenario("K1", "four arms, but the last one is a raw arm (not the canary's shape): INCONCLUSIVE", mutate=lambda s: four_arms(s, last_kind="raw"), extra=["@NO_REQUIRE_ARMS@"], want=2, must=["the canary's are ['raw', 'raw', 'native', 'native']"])
     scenario("K2", "four arms whose wrapper header says `baseline` (the baseline's outputs fed to a canary census): INCONCLUSIVE", mutate=lambda s: four_arms(s, wrapper_kind="baseline"), extra=["@NO_REQUIRE_ARMS@"], want=2, must=["is a wrapper `baseline` run, not a canary run"])
     scenario("G10", "the idle receipt is for port 20129, not 20128", mutate=g(port=20129), want=2, must=["the receipt's port is '20129'"])
@@ -485,7 +559,7 @@ def main():
     scenario("C6b", "a foreign call row 10 s after the last arm's end (outside the window): not counted", mutate=lambda s: add_foreign(s, ts=341.0), want=0, must=["CENSUS-RESULT PASS", "foreign=0"])
     scenario("C7", "a foreign request 2 s BEFORE the window (before the guard's end): its call row and its usage row both lie in the 3 s pad that is read: a foreign call row and an orphan", mutate=lambda s: add_foreign(s, ts=-2.0), want=2, must=["1 foreign call row(s) in the window", "1 orphan usage row(s)"])
     scenario("C7b", "a foreign call row 20 s before the window (its usage row too): not counted", mutate=lambda s: add_foreign(s, ts=-20.0), want=0, must=["CENSUS-RESULT PASS"])
-    scenario("F1", "a call_logs row on the window's date whose timestamp lacks the milliseconds (a string bound would skip it silently)", mutate=lambda s: s["odd_calls"].append(call("2026-10-06T20:01:30Z", 5, 5, 100)), want=2,
+    scenario("F1", "a call_logs row on the window's date whose timestamp lacks the milliseconds (a string bound would skip it silently)", mutate=lambda s: s["odd_calls"].append(call("2026-10-06T12:01:30Z", 5, 5, 100)), want=2,
              must=["another timestamp format=1".replace("another timestamp format=1", "call_logs_rows_with_another_timestamp_format=1"), "would skip them silently"])
 
     def nulltok(spec):
@@ -497,7 +571,7 @@ def main():
 
     def own_odd(spec):
         c = spec["arms"][0]["requests"][0]["calls"][0]
-        c["ts"] = "2026-10-06T20:00:20Z"   # an OWN call row whose timestamp lacks the milliseconds
+        c["ts"] = "2026-10-06T12:00:20Z"   # an OWN call row whose timestamp lacks the milliseconds
     scenario("N2", "an own call row whose timestamp lacks the milliseconds: INCONCLUSIVE (exit 2), not a crash (exit 3)", mutate=own_odd, want=2, must=["is not ????-??-??T??:??:??.???Z", "its candidate usage rows cannot be looked up"])
 
 
@@ -519,9 +593,9 @@ def main():
             spec["odd_calls"].append(call(ts_value, 5, 5, 100))
         return m
     scenario("Y2a", "a foreign call row whose timestamp is epoch text (it does not start with the window's date)", mutate=odd_foreign("1791316884500"), want=2, must=["would skip them silently"])
-    scenario("Y2b", "a foreign call row whose timestamp has a leading space", mutate=odd_foreign(" 2026-10-06T20:01:24.500Z"), want=2, must=["would skip them silently"])
+    scenario("Y2b", "a foreign call row whose timestamp has a leading space", mutate=odd_foreign(" 2026-10-06T12:01:24.500Z"), want=2, must=["would skip them silently"])
     scenario("Y2c", "a foreign call row whose timestamp has another offset", mutate=odd_foreign("2026-10-07T01:31:24.500+05:30"), want=2, must=["would skip them silently"])
-    scenario("Y2d", "a foreign call row whose timestamp is a BLOB", mutate=odd_foreign(b"2026-10-06T20:01:24.500Z"), want=2, must=["would skip them silently"])
+    scenario("Y2d", "a foreign call row whose timestamp is a BLOB", mutate=odd_foreign(b"2026-10-06T12:01:24.500Z"), want=2, must=["would skip them silently"])
 
     def dup_shared(spec):
         r = spec["arms"][1]["requests"][1]
@@ -538,7 +612,7 @@ def main():
     scenario("Y4", "a RESULT line the census cannot parse (a double space): INCONCLUSIVE, never skipped", want=2, must=["a RESULT line the census cannot parse"],
              post=edit_arm(0, lambda t: t.replace("RESULT mode=chat:eof", "RESULT  mode=chat:eof", 1)))
     scenario("Y5a", "a second FROZEN line in one arm file (a hand-concatenated output)", want=2, must=["2 FROZEN lines"],
-             post=edit_arm(0, lambda t: t.replace("\nRESULT ", "\nFROZEN version=2.2 script_sha256=" + "0" * 64 + " start=2026-10-06T20:00:06.000Z db=x\nRESULT ", 1)))
+             post=edit_arm(0, lambda t: t.replace("\nRESULT ", "\nFROZEN version=2.2 script_sha256=" + "0" * 64 + " start=2026-10-06T12:00:06.000Z db=x\nRESULT ", 1)))
     scenario("Y5b", "a VOID earlier in the file followed by a real status 0", want=2, must=["marked this run VOID"],
              post=edit_arm(0, lambda t: t.replace("\nRESULT ", "\nRUN-STATUS earlier status=4 (VOID)\nRESULT ", 1)))
     scenario("Y5c", "two journal lines in one arm file", want=2, must=["2 journal_failed_to_save_call_log lines"],
@@ -550,7 +624,7 @@ def main():
         for r in spec["arms"][0]["requests"][:1]:
             r["calls"][0]["path"] = None
             r["usage"][0]["endpoint"] = None
-    scenario("Y7a", "an own call row with a NULL path whose usage row has a NULL endpoint (they associate): no crash, PASS", mutate=null_columns, want=0, must=["CENSUS-RESULT PASS"])
+    scenario("Y7a", "an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt", mutate=null_columns, want=2, must=["CENSUS-RESULT INCONCLUSIVE", "do not pair one to one by time and path"])
 
     def null_foreign(spec):
         f = call(plus(120.0), 33, 3, 100, None, model=None)
@@ -558,16 +632,544 @@ def main():
         spec["foreign_calls"].append(f)
     scenario("Y7b", "a foreign call row with NULL path, model and status: INCONCLUSIVE with the receipt, no crash", mutate=null_foreign, want=2, must=["1 foreign call row(s) in the window", "FOREIGN tile="])
     scenario("Y9", "a SUMMARY end of year 9999: an unparsable stamp (INCONCLUSIVE), not an overflow (exit 3)", want=2, must=["no end time", "CENSUS-RESULT INCONCLUSIVE"],
-             post=edit_arm(1, lambda t: t.replace("end=2026-10-06T20:05:30.200Z", "end=9999-12-31T23:59:59.999Z", 1).replace("# finished 2026-10-06T20:05:31Z", "# finished 9999-12-31T23:59:59Z", 1)))
+             post=edit_arm(1, lambda t: t.replace("end=2026-10-06T12:05:30.200Z", "end=9999-12-31T23:59:59.999Z", 1).replace("# finished 2026-10-06T12:05:31Z", "# finished 9999-12-31T23:59:59Z", 1)))
     scenario("Y10a", "a guard receipt with clean_for=nan", mutate=g(clean_for="nan"), want=2, must=["shorter than the 30 s"])
     scenario("Y10b", "an unparsable FROZEN start= while the wrapper's stamp is present", want=2, must=["unparsable FROZEN start="],
-             post=edit_arm(0, lambda t: t.replace("start=2026-10-06T20:00:05.300Z", "start=garbage", 1)))
+             post=edit_arm(0, lambda t: t.replace("start=2026-10-06T12:00:05.300Z", "start=garbage", 1)))
     spaced = Path(ARGS.work) / "dir with space"
     spaced.mkdir(exist_ok=True)
     spec_sp = default_spec("sp1")
     db_sp, files_sp, guard_sp = materialize(spec_sp, spaced)
     rc_sp, out_sp, err_sp = run_census(db_sp, files_sp, guard_sp)
     check("Y8", "the store path contains a space (the FROZEN line's db= field is read up to the next field): PASS", rc_sp, out_sp, err_sp, 0, must=["CENSUS-RESULT PASS"])
+
+    # ---- ROUND-13: the reproductions of the full-scope read r10 (6b734c6bf) and the exact boundary check
+    def r10_leading(spec):
+        # r10 P2-1 as reproduced by the reviewer: the canary's four arms with their wrapper headers, a 35 s idle receipt ending at T, the first arm starting at once; a foreign call at T-0.100 s with its usage row at T-0.104 s replaces the dropped usage row of an own call at T+0.5 s
+        four_arms(spec)
+        arm = spec["arms"][0]
+        arm["wrapper_start"], arm["script_start"] = plus(0.0), plus(0.2)
+        r = arm["requests"][0]
+        c = r["calls"][0]
+        c["ts"] = plus(0.5)
+        r["usage"] = []
+        f = call(plus(-0.100), c["tin"], c["tout"], c["duration"], c["path"])
+        spec["foreign_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(f, ts=plus(-0.104)))
+    scenario("Y11", "r10 P2-1 (the reviewer's reproduction, four arms with canary headers): a foreign call at T-0.100 s with its usage row at T-0.104 s replaces the dropped usage row of an own call at T+0.5 s: INCONCLUSIVE", mutate=r10_leading, extra=["@NO_REQUIRE_ARMS@"], want=2,
+             must=["1 foreign call row(s) in the window", "could own a usage row that an own call row can claim"])
+
+    def sliver_leading(spec):
+        # the pad's own edge: the foreign call lies 1 ms outside the padded call window (T-3.001 s), its usage row 3 ms inside the padded usage window (T-2.997 s), an own call at T+0.0 s with its usage row dropped: the usage row is the only candidate of the own call, the foreign call row is not read
+        arm = spec["arms"][0]
+        arm["wrapper_start"], arm["script_start"] = plus(0.0), plus(0.0)
+        r = arm["requests"][0]
+        c = r["calls"][0]
+        c["ts"] = plus(0.0)
+        r["usage"] = []
+        f = call(plus(-3.001), c["tin"], c["tout"], c["duration"], c["path"])
+        spec["foreign_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(f, ts=plus(-2.997)))
+    scenario("Y12a", "boundary substitution at the window's LEADING edge: the foreign call row 1 ms outside the padded read (T-3.001 s), its usage row inside it (T-2.997 s) and the only candidate of an own call at T+0.0 s whose usage row was dropped: INCONCLUSIVE through the exact check (the window's pad alone would PASS)",
+             mutate=sliver_leading, want=2, must=["could own a usage row that an own call row can claim", "COMPETING-OWNERS usage_rows_an_own_call_row_can_claim=6 not_own_call_rows_that_could_own_them=1"], mustnot=["1 foreign call row(s) in the window"])
+
+    def sliver_trailing(spec):
+        # the trailing edge: an own call at its arm's end + 2.0 s (the clock margin's limit) with its usage row dropped; the foreign call lies 1 ms after the window's end (+5.001 s), its usage row 3 ms before it
+        arm = spec["arms"][1]
+        r = arm["requests"][1]
+        end = arm["wrapper_end"]
+        c3 = r["calls"][1]
+        c3["ts"] = end + dt.timedelta(seconds=2.0)
+        r["usage"] = r["usage"][:1]
+        f = call(end + dt.timedelta(seconds=5.001), c3["tin"], c3["tout"], c3["duration"], c3["path"])
+        spec["foreign_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(f))
+    scenario("Y12b", "boundary substitution at the window's TRAILING edge: the foreign call row 1 ms after the window's end, its usage row inside it, the only candidate of an own call 2.0 s after its arm's end whose usage row was dropped: INCONCLUSIVE through the exact check",
+             mutate=sliver_trailing, want=2, must=["could own a usage row that an own call row can claim"], mustnot=["foreign call row(s) in the window"])
+
+    def inside_contrast(spec):
+        sliver_leading(spec)
+        spec["foreign_calls"][-1]["ts"] = plus(1.0)
+        spec["foreign_usage"][-1]["ts"] = plus(0.996)
+    scenario("Y12c", "contrast: the same substitution with the foreign pair 1 s INSIDE the window: INCONCLUSIVE as a foreign call row (and as a competing owner)", mutate=inside_contrast, want=2, must=["1 foreign call row(s) in the window", "could own a usage row that an own call row can claim"])
+
+    def d_all(**flags):
+        def m(spec):
+            four_arms(spec)
+            for a in spec["arms"]:
+                a.update(flags)
+        return m
+
+    def d_direct(spec):
+        four_arms(spec)
+        for a in spec["arms"]:
+            a["wrapper_start"], a["wrapper_end"] = None, None
+    scenario("D1", "r10 P2-3: the default four-arm gate with four DIRECT outputs (no wrapper header, no identity line): INCONCLUSIVE (it used to PASS)", mutate=d_direct, extra=["@NO_REQUIRE_ARMS@"], want=2,
+             must=["has no wrapper header", "has no usable wrapper identity line", "compared for 0 of 4 arm(s)", "scope=canary"])
+    scenario("D2", "r10 P2-3: four canary-header outputs with every identity line removed: INCONCLUSIVE", mutate=d_all(no_identity=True), extra=["@NO_REQUIRE_ARMS@"], want=2,
+             must=["has no usable wrapper identity line", "compared for 0 of 4 arm(s)"], mustnot=["has no wrapper header"])
+    scenario("D3", "r10 P2-3: four outputs that keep the identity lines but have no wrapper header: INCONCLUSIVE", mutate=d_all(no_header=True), extra=["@NO_REQUIRE_ARMS@"], want=2, must=["has no wrapper header"])
+
+    def d_one_missing(spec):
+        four_arms(spec)
+        spec["arms"][2]["no_identity"] = True
+    scenario("D4", "three of the four arms carry an identity line: INCONCLUSIVE (every comparison must succeed)", mutate=d_one_missing, extra=["@NO_REQUIRE_ARMS@"], want=2, must=["compared for 3 of 4 arm(s)"])
+
+    def d_guard(spec):
+        four_arms(spec)
+        spec["guard"]["no_identity"] = True
+    scenario("D5", "the guard receipt has no identity line (the arms have): INCONCLUSIVE", mutate=d_guard, extra=["@NO_REQUIRE_ARMS@"], want=2, must=["the guard receipt has no identity line", "carries the wrapper's identity line but the guard receipt has none"])
+    scenario("D6", "a trial of fewer arms (the two direct arms, --require-arms 2) still PASSes and says it is a trial, not canary acceptance", mutate=direct, want=0, must=["CENSUS-RESULT PASS", "scope=trial", "SCOPE trial: not the canary's four arms"])
+
+    def edit_guard(fn):
+        def post(db, files, guard):
+            guard.write_text(fn(guard.read_text()))
+        return post
+    scenario("G11", "r10 P2-4: a receipt with clean_for=30 and identical start and end (a zero-duration observation): INCONCLUSIVE", mutate=g(start=plus(0), end=plus(0)), want=2, must=["observed interval (GUARD start= to IDLE-RESULT end=) is 0.0 s"])
+    scenario("G11b", "a receipt whose start is AFTER its end (reversed)", mutate=g(start=plus(5), end=plus(0)), want=2, must=["is -5.0 s"])
+    scenario("G11c", "a receipt whose start= is unparsable", want=2, must=["no parsable start time"], post=edit_guard(lambda t: re.sub(r"start=\S+", "start=garbage", t, count=1)))
+    scenario("G11d", "a receipt that observed 29.9 s but declares clean_for=30", mutate=g(start=plus(-29.9), end=plus(0)), want=2, must=["is 29.9 s"])
+    scenario("G11e", "a receipt that observed exactly 30.0 s: enough", mutate=g(start=plus(-30.0), end=plus(0)), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("G11f", "a receipt that declares clean_for=60 but observed 35 s (start to end)", mutate=g(clean_for=60.0), want=2, must=["declares clean_for=60.0 s but its observed interval (start to end) is only 35.0 s"])
+    scenario("G11g", "a GUARD line without a start= field: not a guard 5 receipt", want=2, must=["not from guard version 5"], post=edit_guard(lambda t: re.sub(r" start=\S+", "", t, count=1)))
+
+    # ---- ROUND-13 real-time controls (r10 P2-2): the census must not read the store before the declared interval has ended on the host clock
+    def shift_spec(spec, seconds):
+        delta = dt.timedelta(seconds=seconds)
+        spec["guard"]["start"] += delta
+        spec["guard"]["end"] += delta
+        for arm in spec["arms"]:
+            shift_arm(arm, seconds)
+        for row in spec["foreign_calls"] + spec["foreign_usage"]:
+            if not isinstance(row["ts"], (str, bytes)):
+                row["ts"] += delta
+
+    def realtime_spec(name, last_arm_end_ago):
+        spec = default_spec(name)
+        last_end = max(a["wrapper_end"] for a in spec["arms"])
+        shift_spec(spec, (dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=last_arm_end_ago) - last_end).total_seconds())
+        return spec, max(a["wrapper_end"] for a in spec["arms"])
+
+    def census_command(db, files, guard):
+        return [sys.executable, ARGS.census, "--guard-receipt", str(guard), "--db", str(db), "--require-arms", str(len(files))] + [str(f) for f in files]
+
+    def timed_run(cmd, insert=None, insert_after=2.0, guard=None):
+        started = time.monotonic()
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=journal_env(guard))
+        if insert:
+            time.sleep(insert_after)
+            insert()
+        out, err = proc.communicate()
+        return proc.returncode, out, err, time.monotonic() - started
+
+    spec_w1, end_w1 = realtime_spec("w1", 1.0)
+    db_w1, files_w1, guard_w1 = materialize(spec_w1, ARGS.work)
+    rc, out, err, took = timed_run(census_command(db_w1, files_w1, guard_w1), guard=guard_w1)
+    seconds_after = re.search(r"seconds_after_it_ended=(-?[\d.]+)", out)
+    ok = check("W1", f"r10 P2-2: the census is started 1 s after the last arm ended (the declared interval ends 8 s later, +2 s settling): it WAITS, then reads (took {took:.1f} s) and PASSes; the receipt says how long after the interval's end the store was read",
+               rc, out, err, 0, must=["WAIT the declared interval", "OBSERVED-AT", "CENSUS-RESULT PASS"])
+    waited = re.search(r"waiting ([\d.]+) s before the store is read", out)
+    good = ok and waited is not None and float(waited.group(1)) >= 5.0 and took >= float(waited.group(1)) - 0.2 and seconds_after is not None and float(seconds_after.group(1)) >= 1.95
+    print(f"CONTROL-RESULT W1b {'OK' if good else 'UNEXPECTED'} :: it did wait ({waited.group(1) if waited else None} s announced, at least 5 s were due: the interval had 1 s of its 10 s behind it; the run took {took:.1f} s) and read the store at least 2 s after the interval's end ({seconds_after.group(1) if seconds_after else None} s)\n")
+    if not good:
+        FAILED.append("W1b")
+
+    spec_w2, end_w2 = realtime_spec("w2", 1.0)
+    db_w2, files_w2, guard_w2 = materialize(spec_w2, ARGS.work)
+
+    def late_foreign():
+        f = call(end_w2 + dt.timedelta(seconds=3.0), 40, 7, 800)   # a foreign request inside the declared tail, written while the census is still waiting
+        con = sqlite3.connect(db_w2)
+        con.execute("insert into call_logs (id, timestamp, path, status, model, requested_model, provider, connection_id, api_key_id, duration, ttft_ms, tokens_in, tokens_out, correlation_id, response_id, session_tag) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    ("call-late-1", utc(f["ts"]), f["path"], f["status"], f["model"], "codex/" + f["model"], f["provider"], f["conn"], f["key"], f["duration"], f["ttft"], f["tin"], f["tout"], corr_id("late-foreign"), None, None))
+        u = usage_for(f)
+        con.execute("insert into usage_history (provider, model, connection_id, api_key_id, tokens_input, tokens_output, status, latency_ms, ttft_ms, timestamp, endpoint) values (?,?,?,?,?,?,?,?,?,?,?)",
+                    (u["provider"], u["model"], u["conn"], u["key"], u["tin"], u["tout"], u["status"], u["latency"], u["ttft"], utc(u["ts"]), u["endpoint"]))
+        con.commit()
+        con.close()
+    rc, out, err, took = timed_run(census_command(db_w2, files_w2, guard_w2), insert=late_foreign, insert_after=2.5, guard=guard_w2)
+    check("W2", f"r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took {took:.1f} s)",
+          rc, out, err, 2, must=["WAIT the declared interval", "foreign=1", "1 foreign call row(s) in the window"])
+
+    spec_w3, end_w3 = realtime_spec("w3", -3600.0)
+    db_w3, files_w3, guard_w3 = materialize(spec_w3, ARGS.work)
+    rc, out, err, took = timed_run(census_command(db_w3, files_w3, guard_w3), guard=guard_w3)
+    good = took < 8.0
+    check("W3", "r10 P2-2: a declared interval that ends an hour AHEAD of the host clock (a wrong stamp or clock): no wait, INCONCLUSIVE with the reason", rc, out, err, 2, must=["more than the 30 s the census waits for", "OBSERVED-AT", "CENSUS-RESULT INCONCLUSIVE"], mustnot=["WAIT the declared interval"])
+    print(f"CONTROL-RESULT W3b {'OK' if good else 'UNEXPECTED'} :: it did not wait (took {took:.1f} s)\n")
+    if not good:
+        FAILED.append("W3b")
+
+    # ---- ROUND-14: the reproductions of the full-scope read r11 of 41a671681
+    def r11_trailing(spec):
+        # r11 P2-9: an own call 2 s after the last arm's end (the clock margin), its usage row dropped; a foreign usage row at +4.9 s whose foreign call row exists at +5.1 s, just outside the window's call read (it ends 5 s after the arm)
+        arm = spec["arms"][1]
+        end = arm["wrapper_end"]
+        r = arm["requests"][1]
+        c3 = r["calls"][1]
+        c3["ts"] = end + dt.timedelta(seconds=2.0)
+        r["usage"] = r["usage"][:1]
+        f = call(end + dt.timedelta(seconds=5.1), c3["tin"], c3["tout"], c3["duration"], c3["path"])
+        spec["foreign_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(f, ts=end + dt.timedelta(seconds=4.9)))
+    scenario("Y12d", "r11 P2-9, built as the reviewer built it: an own call 2 s after the last arm's end with its usage row dropped, a foreign usage row at +4.9 s whose foreign call row exists at +5.1 s (outside the window's call read): INCONCLUSIVE through the exact check", mutate=r11_trailing, want=2,
+             must=["could own a usage row that an own call row can claim"], mustnot=["foreign call row(s) in the window"])
+
+    def trailing_inside(spec):
+        r11_trailing(spec)
+        end = spec["arms"][1]["wrapper_end"]
+        spec["foreign_calls"][-1]["ts"] = end + dt.timedelta(seconds=4.5)
+        spec["foreign_usage"][-1]["ts"] = end + dt.timedelta(seconds=4.3)
+    scenario("Y12e", "contrast: the same trailing substitution with the foreign call row INSIDE the window (+4.5 s): INCONCLUSIVE as a foreign call row", mutate=trailing_inside, want=2, must=["1 foreign call row(s) in the window"])
+
+    def d_both(spec):
+        four_arms(spec)
+        spec["guard"]["no_identity"] = True
+        for a in spec["arms"]:
+            a["no_identity"] = True
+    scenario("D7", "r11 P2-6: the guard receipt AND every arm without an identity line (nothing compared): INCONCLUSIVE", mutate=d_both, extra=["@NO_REQUIRE_ARMS@"], want=2, must=["the guard receipt has no identity line", "compared for 0 of 4 arm(s)"])
+    scenario("D8", "r11 P2-6: four arms without a wrapper header AND without identity lines: INCONCLUSIVE", mutate=d_all(no_header=True, no_identity=True), extra=["@NO_REQUIRE_ARMS@"], want=2, must=["has no wrapper header", "compared for 0 of 4 arm(s)"])
+
+    def k3(spec):
+        four_arms(spec)
+        spec["arms"][0]["requests"].pop(5)   # a request of the raw set has no RESULT line (and its rows are not in the store): the world is consistent, the output is short
+    scenario("K3", "r11 P2-4: the raw set's output has 16 RESULT lines where the canary's frozen command makes 17 (a vanished request leaves no trace in the rows): INCONCLUSIVE", mutate=k3, extra=["@NO_REQUIRE_ARMS@"], want=2, must=["carry (16, 6, 4, 8) RESULT line(s)"])
+
+    def dropped_request(spec):
+        r = spec["arms"][0]["requests"][1]
+        r["calls"], r["usage"] = [], []   # both rows of one raw request were dropped (the bug the patch fixes) ...
+    scenario("Y4b", "r11 P2-4: both rows of one raw request dropped and its RESULT line written with a TAB after RESULT: INCONCLUSIVE (it used to vanish from attribution and the census PASSed)", mutate=dropped_request, want=2, must=["a RESULT line the census cannot parse"],
+             post=edit_arm(0, lambda t: t.replace("RESULT mode=chat:eof", "RESULT\tmode=chat:eof", 1)))
+    scenario("Y4c", "r11 P2-4: the same with a leading space before RESULT", mutate=dropped_request, want=2, must=["a RESULT line the census cannot parse"],
+             post=edit_arm(0, lambda t: t.replace("\nRESULT mode=chat:eof", "\n RESULT mode=chat:eof", 1)))
+
+    for sid, value in (("Y2e", "2026-99-06T12:01:24.500Z"), ("Y2f", "xxxx-xx-xxTxx:xx:xx.xxxZ"), ("Y2g", "9999-12-31T23:59:59.999Z"), ("Y2h", "2026-10-06T25:01:24.500Z"), ("Y2i", "2026-10-06T12:01:60.500Z")):
+        scenario(sid, f"r11 P2-3: a foreign call row whose timestamp {value} has the SHAPE of a stamp but is not one (calendar or range): INCONCLUSIVE", mutate=odd_foreign(value), want=2, must=["would skip them silently"])
+
+    scenario("Y9b", "r11 P2-5: ONLY the SUMMARY end is year 9999 while the wrapper's `# finished` stamp is valid: INCONCLUSIVE (the valid stamp must not rescue the invalid one; the census used to PASS)", want=2, must=["unparsable SUMMARY end="],
+             post=edit_arm(1, lambda t: t.replace("end=2026-10-06T12:05:30.200Z", "end=9999-12-31T23:59:59.999Z", 1)))
+    scenario("Y9c", "r11 P2-5: an extra malformed SUMMARY line", want=2, must=["a SUMMARY line the census cannot parse"], post=edit_arm(0, lambda t: t + "SUMMARY garbage without an end stamp\n"))
+    scenario("Y10c", "r11 P2-5: an EMPTY FROZEN start= beside a valid wrapper stamp", want=2, must=["no start= value"], post=edit_arm(0, lambda t: t.replace("start=2026-10-06T12:00:05.300Z ", "start= ", 1)))
+
+    def y13a(spec):
+        r = spec["arms"][0]["requests"][0]
+        c = r["calls"][0]
+        c["ttft"] = None
+        r["usage"] = []
+        spec["foreign_usage"].append(usage_for(c, ttft=900000.0, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+    scenario("Y13a", "r11 P3-4: an own call row with a NULL time to first token (the association skips that comparison), its usage row dropped, a foreign usage row with the same numbers and a time to first token of 900000 ms: INCONCLUSIVE", mutate=y13a, want=2,
+             must=["is longer than the latency"])
+
+    def y13b(spec):
+        r = spec["arms"][0]["requests"][0]
+        c = r["calls"][0]
+        r["usage"] = []
+        spec["foreign_usage"].append(usage_for(c, latency="nan", ts=c["ts"] - dt.timedelta(milliseconds=2)))
+    scenario("Y13b", "r11 P3-4: the own usage row dropped and a foreign usage row whose latency is the text 'nan' (a NaN passes the scripts' latency comparison): INCONCLUSIVE", mutate=y13b, want=2, must=["is not a finite non-negative number"])
+
+    def p5(spec):
+        spec["arms"][0]["requests"][0]["calls"][0]["ttft"] = None
+    scenario("P5", "an own call row with a NULL time to first token and a usage row that has one (32 of the 244 associated pairs of this host's store today are like that): PASS", mutate=p5, want=0, must=["CENSUS-RESULT PASS"])
+
+    def r3_journal(spec):
+        residual(spec)
+        spec["arms"][0]["journal"] = "1"
+    scenario("R3b", "the combined mitigation of the residual: the R3 world with a journal count of 1 (a persistence failure the journal covers): INCONCLUSIVE", mutate=r3_journal, want=2, must=["journal_failed_to_save_call_log=1"])
+
+    scenario("G12", "r11: a guard receipt that holds two GUARD lines (two runs concatenated)", want=2, must=["2 GUARD line(s)"], post=edit_guard(lambda t: t + t.split("\n", 1)[0] + "\n"))
+    scenario("G12b", "r11: a guard receipt that holds two IDENTITY lines", want=2, must=["2 IDENTITY line(s)"],
+             post=edit_guard(lambda t: t.replace("\nCHECK ", "\n   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok\nCHECK ", 1)))
+
+    # ---- ROUND-15: the gateway journal as an independent record of every inbound request
+    def j1(spec):
+        residual(spec)
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        spec["journal_extra"] = [c["ts"] - dt.timedelta(milliseconds=400)]   # the foreign request's arrival, which a real gateway logs whatever happens to its rows
+    scenario("J1", "the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution", mutate=j1, want=2, must=["the gateway's journal shows 7 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 6 own call row(s)"])
+    scenario("J2", "a foreign request that left NO row at all (a journal line only): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_extra", [plus(120.0)]), want=2, must=["inbound POST request(s) in the window (counted from 4 s before its start) and the store holds"])
+    scenario("J3", "an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed", mutate=lambda s: s.__setitem__("journal_drop", {(0, 1, 0)}), want=2, must=["the gateway's journal shows 5 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 6"])
+    scenario("J4", "journalctl fails (exit 1): INCONCLUSIVE, the independent record is missing", mutate=lambda s: s.__setitem__("journal_rc", 1), want=2, must=["the gateway journal cannot be read (journalctl exited with status 1)", "readable=False"])
+    scenario("J5", "inbound lines 30 s before the window and 3 minutes after it are not the window's: PASS", mutate=lambda s: s.__setitem__("journal_extra", [plus(-30.0), plus(520.0)]), want=0, must=["CENSUS-RESULT PASS", "inbound_POST_lines_in_window=6"])
+    scenario("J6", "noise in the journal (plain-text lines, a GET line, another tag, a message that is a byte array with control characters) is ignored: PASS", want=0, must=["CENSUS-RESULT PASS", "inbound_POST_lines_in_window=6"])
+    scenario("J7", "a journal line that is not JSON (truncated output): INCONCLUSIVE, fail closed", mutate=lambda s: s.__setitem__("journal_noise", ["{not json"]), want=2, must=["journal entry(ies) could not be read"])
+    scenario("J8", "an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_extra", [max(a["wrapper_end"] for a in s["arms"]) + dt.timedelta(seconds=3.0)]), want=2, must=["inbound POST request(s) in the window"])
+
+    def j9(spec):
+        # a lost own line (arm 0, request 1) balanced by a foreign request's line elsewhere: the COUNT is exact, the PAIRING is not
+        spec["journal_drop"] = {(0, 1, 0)}
+        spec["journal_extra"] = [plus(120.0)]
+    scenario("J9", "a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time", mutate=j9, want=2, mustnot=["inbound POST request(s) in the window (counted from 4 s before its start) and the store holds"],
+             must=["do not pair one to one by time and path: 1 own call row(s) have no inbound line of their path", "1 inbound line(s) have no own call row"])
+
+    def j10(spec):
+        # the documented width of the pairing: the foreign line arrives within 3 s of the missing own line
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        spec["journal_drop"] = {(0, 1, 0)}
+        spec["journal_extra"] = [(c["ts"] - dt.timedelta(milliseconds=c["duration"]) + dt.timedelta(seconds=1.0), c["path"])]   # the same path as the lost line
+    scenario("J10", "THE LIMIT of the pairing (expected PASS): a lost own line balanced by a foreign request's line of the same path that arrives within 3 s of it (two journal faults and a request within the pairing width)", mutate=j10, want=0, must=["CENSUS-RESULT PASS", "own_call_rows_without_a_line=0"])
+
+    def j11(spec):
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        spec["journal_extra"] = [max(c["ts"] - dt.timedelta(milliseconds=c["duration"]), spec["arms"][0]["script_start"])]   # the same request's arrival line written twice
+    scenario("J11", "an own request's arrival line written TWICE (arrival-line uniqueness: the 43 requests of the baseline arms left 43 lines, so a duplicate would be unexplained): INCONCLUSIVE, the second line has no own call row", mutate=j11, want=2,
+             must=["the gateway's journal shows 7 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 6", "1 inbound line(s) have no own call row"])
+
+    # ---- ROUND-16: the reproductions of the independent adversarial review of the census 385e891a (F1-F11)
+    def sql_exec(db, statement, params=()):
+        con = sqlite3.connect(db)
+        con.execute(statement, params)
+        con.commit()
+        con.close()
+
+    INSERT_USAGE = "insert into usage_history (provider, model, connection_id, api_key_id, tokens_input, tokens_output, status, latency_ms, ttft_ms, timestamp, endpoint) values (?,?,?,?,?,?,?,?,?,?,?)"
+
+    def usage_row(u, stamp):
+        return (u["provider"], u["model"], u["conn"], u["key"], u["tin"], u["tout"], u["status"], u["latency"], u["ttft"], stamp, u["endpoint"])
+
+    def canary(mut=None):
+        def m(spec):
+            four_arms(spec)
+            if mut:
+                mut(spec)
+        return m
+    NOREQ = ["@NO_REQUIRE_ARMS@"]
+    ARABIC = "٢"
+
+    # F1 (P1): a stamp with non-ASCII digits matches \d and strptime but sorts outside every string bound
+    scenario("F1a", "review F1: a foreign call row whose stamp starts with an Arabic-Indic digit (\\u0662026-10-06T12:01:24.500Z), inside the window: INCONCLUSIVE (it used to PASS, the string bounds never read it)", mutate=canary(lambda s: s["odd_calls"].append(call(ARABIC + "026-10-06T12:01:24.500Z", 5, 5, 100))),
+             extra=NOREQ, want=2, must=["would skip them silently"])
+
+    def f1b(spec):
+        r = spec["arms"][0]["requests"][3]
+        c = r["calls"][0]
+        r["usage"] = []
+        t = c["ts"] + dt.timedelta(milliseconds=200)
+        f = call(ARABIC + utc(t)[1:], c["tin"], c["tout"], c["duration"], c["path"])
+        spec["odd_calls"].append(f)
+        spec["foreign_usage"].append(usage_for(dict(f, ts=t), ts=t - dt.timedelta(milliseconds=4)))
+    scenario("F1b", "review F1: SUBSTITUTION: an own raw request's usage row dropped; a foreign call row WRITTEN 200 ms later with identical numbers but a stamp with an Arabic-Indic digit; its ASCII usage row stands in: INCONCLUSIVE (it used to PASS with scope=canary)", mutate=canary(f1b), extra=NOREQ, want=2,
+             must=["would skip them silently"])
+
+    def f1c(db, files, guard):
+        u = usage_for(call(plus(120.0), 99, 9, 500), ts=plus(120.0))
+        sql_exec(db, INSERT_USAGE, usage_row(u, ARABIC + utc(plus(120.0))[1:]))
+    scenario("F1c", "review F1: an orphan usage row hidden by a stamp with an Arabic-Indic digit: INCONCLUSIVE", mutate=canary(), post=f1c, extra=NOREQ, want=2, must=["would skip them silently"])
+
+    def f1d(db, files, guard):
+        stamp = utc(plus(-2.997))
+        sql_exec(db, "update usage_history set timestamp = ? where timestamp = ?", (stamp[:-2] + "٣Z", stamp))
+    scenario("F1d", "review F1: the pad's-edge substitution (Y12a) with the stand-in usage row's stamp ending in an Arabic-Indic digit (the exact competing-owner check used to skip it silently): INCONCLUSIVE", mutate=sliver_leading, post=f1d, want=2, must=["would skip them silently"])
+
+    # F2 (P1): the printed min_rows and the shape of each arm are the canary's frozen commands, not the output's own claim
+    def f2a(spec):
+        four_arms(spec)
+        r = spec["arms"][3]["requests"][2]
+        r["calls"], r["usage"], r["min_rows"] = [], [], 0
+    scenario("F2a", "review F2: a tool-call turn with both rows dropped and its RESULT line printing min_rows=0: INCONCLUSIVE (it used to PASS)", mutate=f2a, extra=NOREQ, want=2, must=["prints min_rows=0, the shape needs 2"])
+
+    def f2b(spec):
+        four_arms(spec)
+        r = spec["arms"][3]["requests"][2]
+        r["calls"], r["usage"], r["min_rows"] = r["calls"][:1], r["usage"][:1], 1
+    scenario("F2b", "review F2: a two-request turn with its second row pair dropped and its RESULT line printing min_rows=1: INCONCLUSIVE", mutate=f2b, extra=NOREQ, want=2, must=["prints min_rows=1, the shape needs 2"])
+
+    def f2c(spec):
+        four_arms(spec)
+        reqs = []
+        for i in range(8):
+            c = call(plus(300 + 12 * i + 0.1), 17000 + i, 41 + i, 3000 + 13 * i)
+            reqs.append({"kind": "native", "shape": "astra-max", "tag": f"acceptance-20261006T120300-astra-max-f2c-{i}", "min_rows": 1, "judged": True, "calls": [c], "usage": [usage_for(c)]})
+        spec["arms"][3]["requests"] = reqs
+    scenario("F2c", "review F2: arm 4 replaced by eight one-row astra-max turns (a different command than the canary's tool-call set): INCONCLUSIVE", mutate=f2c, extra=NOREQ, want=2, must=["the canary's frozen command makes {('two-request', 2): 8}"])
+
+    # F3 (P2): a wrapper output cut off after the journal line hides a restart in the last arm
+    def cut_after_journal(restart):
+        def post(db, files, guard):
+            f = files[3]
+            lines = f.read_text().split("\n")
+            i = next(k for k, line in enumerate(lines) if line.startswith("RUN-STATUS"))
+            kept = lines[:i]
+            if restart:
+                kept = [line.replace("MainPID=1 ", "MainPID=2 ") if line.startswith("IDENTITY label=after") else line for line in kept]
+            f.write_text("\n".join(kept) + "\n")
+        return post
+    scenario("F3a", "review F3: the last arm's wrapper output cut off after the journal line, its after-identity showing another MainPID (a restart): INCONCLUSIVE (it used to PASS)", mutate=canary(), post=cut_after_journal(True), extra=NOREQ, want=2,
+             must=["a restart between them voids the idle claim", "holds RUN-STATUS lines []"])
+    scenario("F3b", "review F3: the same cut-off with an unchanged after-identity: INCONCLUSIVE (the wrapper's output is incomplete: no RUN-STATUS, no `# finished`)", mutate=canary(), post=cut_after_journal(False), extra=NOREQ, want=2, must=["holds RUN-STATUS lines []", "0 `# finished` line(s)"])
+
+    # F4 (P2): a malformed `# finished` line was dropped silently and the window shrank by 5 s
+    def tail_foreign(spec):
+        four_arms(spec)
+        spec["foreign_calls"].append(call(plus(400.2 + 5.5), 41, 7, 800))
+    for label, fn, text in (("dblsp", lambda t: t.replace("# finished ", "# finished  ", 1), "a `# finished` line the census cannot parse"), ("colon", lambda t: t.replace("# finished ", "# finished: ", 1), "a `# finished` line the census cannot parse"),
+                            ("tab", lambda t: t.replace("# finished ", "#\tfinished ", 1), "a `# finished` line the census cannot parse"), ("removed", lambda t: "\n".join(line for line in t.split("\n") if not line.startswith("# finished ")), "0 `# finished` line(s)")):
+        scenario(f"F4{label}", f"review F4: a foreign call row in the tail of the last arm's window and the last arm's `# finished` line {label}: INCONCLUSIVE (it used to PASS: the window shrank)", mutate=tail_foreign, post=edit_arm(3, fn), extra=NOREQ, want=2, must=[text])
+    scenario("F4e", "review F4: an arm whose SUMMARY end lies two hours before its own FROZEN start (the wrapper's stamp rescued it): INCONCLUSIVE", mutate=canary(), post=edit_arm(2, lambda t: t.replace("end=2026-10-06T12:04:50.200Z", "end=2026-10-06T10:04:50.200Z", 1)), extra=NOREQ, want=2, must=["is before its FROZEN start"])
+
+    # F5 (P2): the store path the scripts resolved (their own cwd, no ~ expansion, a file: URI)
+    scenario("F5a", "review F5: every FROZEN line says a RELATIVE db= (cwd=/tmp: the scripts read /tmp/rel.sqlite): INCONCLUSIVE", mutate=canary(lambda s: [a.update(db_override="rel.sqlite") for a in s["arms"]]), extra=NOREQ, want=2, must=["the script read the store"])
+    scenario("F5b", "review F5: every FROZEN line says db=~/x.sqlite (the scripts' file: URI does not expand ~): INCONCLUSIVE", mutate=canary(lambda s: [a.update(db_override="~/x.sqlite") for a in s["arms"]]), extra=NOREQ, want=2, must=["a leading ~"])
+
+    # F7 (P2): guard receipt lines other than the one parsed IDLE-RESULT
+    scenario("F7a", "review F7: a second, DIRTY IDLE-RESULT line (indented) after the clean one: INCONCLUSIVE (it used to PASS)", post=edit_guard(lambda t: t + " IDLE-RESULT clean=False failed_checks=['x'] end=2026-10-06T12:00:00.000Z\n"), want=2, must=["IDLE-RESULT or GUARD-RESULT line(s) in the receipt"])
+    scenario("F7b", "review F7: an extra GUARD-RESULT line in an idle-only receipt: INCONCLUSIVE", post=edit_guard(lambda t: t + "GUARD-RESULT clean=False failed_checks=['x'] end=2026-10-06T12:00:00.000Z\n"), want=2, must=["IDLE-RESULT or GUARD-RESULT line(s) in the receipt"])
+    scenario("F7c", "review F7: the CHECK line says FAIL while IDLE-RESULT says clean: INCONCLUSIVE", post=edit_guard(lambda t: t.replace("ok (0 idle and 0 tolerated connection(s))", "FAIL ['an active connection']", 1)), want=2, must=["a CHECK line of the receipt says FAIL"])
+    scenario("F7d", "review F7: a receipt of another script than guard 5 (sha256 of zeros): INCONCLUSIVE", post=edit_guard(lambda t: t.replace(GUARD_SHA, "0" * 64, 1)), want=2, must=["not guard 5"])
+    scenario("F7e", "review F7: a sampling interval of 30 s (two samples in the observation): INCONCLUSIVE", post=edit_guard(lambda t: t.replace("interval=5.0", "interval=30.0", 1)), want=2, must=["sampling interval"])
+
+    # F8 (P2): reserved-line variants must not be skipped
+    for label, line in (("04", "RUN-STATUS x status=04 (VOID)"), ("lower", "run-status x status=4 (VOID)"), ("bom", "﻿RUN-STATUS x status=4 (VOID)")):
+        scenario(f"F8-run-status-{label}", f"review F8: arm 3's RUN-STATUS line replaced by {line!r} (a VOID run): INCONCLUSIVE", mutate=canary(),
+                 post=edit_arm(2, lambda t, line=line: "\n".join(line if row.startswith("RUN-STATUS ") else row for row in t.split("\n"))), extra=NOREQ, want=2)
+    for label, pre in (("bom", "﻿"), ("zwsp", "​"), ("nul", "\x00"), ("esc", "\x1b[0m"), ("nbsp", "\xa0")):
+        scenario(f"F8-result-{label}", f"review F8: both rows of one raw request dropped and its RESULT line prefixed with {pre!r} (trial of two arms): INCONCLUSIVE (it used to PASS)", mutate=dropped_request,
+                 post=edit_arm(0, lambda t, pre=pre: t.replace("\nRESULT mode=chat:eof", "\n" + pre + "RESULT mode=chat:eof", 1)), want=2, must=["a RESULT line the census cannot parse"])
+    scenario("F8-result-case", "review F8: both rows of one raw request dropped and its RESULT line written `result mode=...`: INCONCLUSIVE", mutate=dropped_request, post=edit_arm(0, lambda t: t.replace("RESULT mode=chat:eof", "result mode=chat:eof", 1)), want=2, must=["a RESULT line the census cannot parse"])
+
+    # F9 (P2): NULL call-row ids
+    def single_request(spec):
+        spec["arms"] = spec["arms"][:1]
+        spec["arms"][0]["requests"] = spec["arms"][0]["requests"][:1]
+
+    def f9(db, files, guard):
+        sql_exec(db, "update call_logs set id = NULL where correlation_id = ?", (corr_id("f9-raw-1"),))
+        sql_exec(db, "insert into call_logs (id, timestamp, path, status, model, provider, connection_id, api_key_id, duration, ttft_ms, tokens_in, tokens_out) values (NULL, ?, '/api/providers/test', 200, 'connection-test', 'codex', 'conn-a', 'key-1', 100, 500, 33, 3)", (utc(plus(120.0)),))
+    scenario("F9", "review F9: a trial of one request whose own call row has a NULL id and a foreign NULL-id row in the window (two NULL ids were one row): INCONCLUSIVE (it used to PASS)", mutate=single_request, post=f9, want=2, must=["without a text id"])
+
+    # F10 (P3): internal errors on readable input
+    scenario("F10a", "review F10: a native RESULT line with min_rows= followed by 5000 digits: INCONCLUSIVE with a receipt (it used to exit 3 with a ValueError)", mutate=canary(), post=edit_arm(2, lambda t: t.replace("min_rows=1 ", "min_rows=" + "9" * 5000 + " ", 1)), extra=NOREQ, want=2, must=["a RESULT line the census cannot parse"])
+    scenario("F10b", "review F10: a NUL byte in a FROZEN db= value: INCONCLUSIVE with a receipt", mutate=canary(), post=edit_arm(0, lambda t: t.replace(".sqlite effort_close_after", ".sqlite\x00x effort_close_after", 1)), extra=NOREQ, want=2, must=["a character the scripts' file: URI does not handle"])
+    year_2100 = dt.datetime(2100, 12, 31, 23, 59, 55, tzinfo=dt.timezone.utc) - dt.timedelta(seconds=401)   # the last arm ends at 2100-12-31T23:59:55Z (parseable); its window and pad end in 2101
+
+    def f10c(spec):
+        four_arms(spec)
+        shift_spec(spec, (year_2100 - T0).total_seconds())
+    scenario("F10c", "review F10: the whole world in the last minutes of 2100 (the window's padded end falls in 2101): INCONCLUSIVE with a receipt (it used to exit 3 with a TypeError)", mutate=f10c, extra=NOREQ, want=2, must=["is not a stamp of 2000-2100"])
+
+    # F6 and F11 run the census directly: a non-UTF-8 file name under a strict stdout encoding, and a file name that tries to forge a result line
+    def census_direct(label, rename, foreign=False):
+        spec = default_spec(label)
+        four_arms(spec)
+        if foreign:
+            spec["foreign_calls"].append(call(plus(120.0), 41, 7, 800))
+        db, files, guard = materialize(spec, ARGS.work)
+        files = [Path(f) for f in files]
+        files[0] = rename(files[0])
+        env = journal_env(guard)
+        env["PYTHONIOENCODING"] = "utf-8"
+        p = subprocess.run([sys.executable, ARGS.census, "--guard-receipt", str(guard), "--db", str(db)] + [os.fsdecode(f) if not isinstance(f, str) else f for f in files], capture_output=True, env=env)
+        return p.returncode, p.stdout.decode("utf-8", "replace"), p.stderr.decode("utf-8", "replace")
+
+    def rename_bytes(new_name):
+        def r(p):
+            new = os.path.join(os.fsencode(str(p.parent)), new_name)
+            os.rename(os.fsencode(str(p)), new)
+            return os.fsdecode(new)
+        return r
+    rc, out, err = census_direct("f6", rename_bytes(b"f6-arm-1-raw-\xff.txt"))
+    ok = rc in (0, 2) and "CENSUS-RESULT" in out and "Traceback" not in err
+    print(f"CONTROL-RESULT F6 expected_exit=0or2 observed_exit={rc} {'OK' if ok else 'UNEXPECTED'} :: review F6: an arm file whose name holds the byte 0xff under PYTHONIOENCODING=utf-8 (strict stdout): a receipt and an exit status of 0 or 2, never a crash with exit 1 (it used to die in sys.stdout.write)\n")
+    if not ok:
+        FAILED.append("F6")
+
+    def rename_forged(p):
+        new = p.parent / (p.name + "\nCENSUS-RESULT PASS exit=0 problems=0 scope=canary\nx")
+        os.rename(p, new)
+        return new
+    rc, out, err = census_direct("f11", rename_forged, foreign=True)
+    starts = [line for line in out.splitlines() if line.startswith("CENSUS-RESULT")]
+    ok = len(starts) == 1 and "PASS" not in starts[0] and "\\x0aCENSUS-RESULT PASS" in out
+    print(f"CONTROL-RESULT F11 expected_exit=2 observed_exit={rc} {'OK' if ok else 'UNEXPECTED'} :: review F11: an arm file name with a newline and a forged `CENSUS-RESULT PASS` line: the receipt holds exactly one line that starts with CENSUS-RESULT ({len(starts)}), it is not a PASS, and the forged text is written escaped (\\x0a)\n")
+    if not ok:
+        FAILED.append("F11")
+
+    # ---- ROUND-17: the independent adversarial review of the journal check (F-1 .. F-9)
+    def f12(arrival_before_w0):
+        def m(spec):
+            four_arms(spec)
+            spec["guard"]["start"], spec["guard"]["end"] = plus(-25.0), plus(5.2)
+            r0 = spec["arms"][0]["requests"][0]
+            c = r0["calls"][0]
+            c["ts"], c["duration"] = plus(6.6), 1000
+            r0["usage"] = []   # the own usage row dropped ...
+            spec["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(seconds=2.9)))   # ... and a foreign request's usage row stands in (a latency within 0.1 s, 2.9 s before the own row)
+            spec["journal_extra"] = [(plus(5.2 - arrival_before_w0), c["path"])]   # the foreign request's arrival line, this long before the window's start
+        return m
+    scenario("J12a", "review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)", mutate=f12(2.5), extra=NOREQ, want=2,
+             must=["inbound POST request(s) in the window (counted from 4 s before its start)"])
+    scenario("J12b", "review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE", mutate=f12(1.1), extra=NOREQ, want=2, must=["counted from 4 s before its start"])
+    scenario("J12c", "the counted range's own boundary: the same line 4.5 s before the window's start is not counted (a foreign request that early cannot be the stand-in of a request that starts inside the window): the store side passes the residual", mutate=f12(4.5), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS"])
+
+    def jline(message, stamp=None):
+        return json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(60.0).timestamp() * 1e6)) if stamp is None else stamp, "MESSAGE": message})
+    for sid, noise, what in (("J13a", jline(None), "a null MESSAGE (journalctl writes a field over 4096 bytes as null unless it is given --all)"), ("J13b", jline([300, 1]), "a byte-array MESSAGE with a value outside 0-255"), ("J13c", jline({"a": 1}), "an object MESSAGE"),
+                             ("J13d", jline(7), "a numeric MESSAGE"), ("J13e", jline("{not json at all"), "a MESSAGE that starts with { and does not parse"), ("J13f", json.dumps({"__REALTIME_TIMESTAMP": "-5000000", "MESSAGE": "x"}), "a negative __REALTIME_TIMESTAMP"),
+                             ("J13g", json.dumps({"__REALTIME_TIMESTAMP": True, "MESSAGE": "x"}), "a boolean __REALTIME_TIMESTAMP"), ("J13h", jline("an arrival marker \U0001F4E5 POST /v1/responses inside a message that is not a pino line"), "an arrival marker that is not counted")):
+        scenario(sid, f"review F-2: {what} in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)", mutate=lambda s, noise=noise: s.__setitem__("journal_noise", [noise]), want=2, must=["journal entry(ies) could not be read"])
+    scenario("J13i", "review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)", mutate=lambda s: s.__setitem__("journal_extra", [(plus(120.0), "/v1/responses | " + "x" * 5000)]), want=2, must=["inbound POST request(s) in the window"])
+
+    def raw_utf8_line(spec):
+        inner = json.dumps({"level": 30, "tag": "HTTP", "method": "POST", "msg": "\U0001F4E5 POST /v1/responses | x@ | 1 msgs"})
+        outer = json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(60.0).timestamp() * 1e6)), "MESSAGE": inner})
+        spec["journal_raw"] = outer.encode("utf-8").replace(b"x@", b"x\xff") + b"\n"
+    scenario("J13j", "review F-8: a foreign arrival line with a byte that is not valid UTF-8 (0xFF) on journalctl's stdout: decoded with replacement and counted, so the window is INCONCLUSIVE with the whole receipt measured (it used to end with `the measurement failed (UnicodeDecodeError)` and no journal block)", mutate=raw_utf8_line, want=2,
+             must=["inbound POST request(s) in the window", "JOURNAL-PAIRING"], mustnot=["the measurement failed"])
+
+    scenario("J14", "review F-9: the receipt prints the exact journalctl command, the binary and its version, and the census asks for `--user -u omniroute.service -o json --all` with an explicit UTC suffix", want=0,
+             must=["CENSUS-RESULT PASS", "JOURNAL-COMMAND argv=journalctl --user -u omniroute.service --since", "--all --no-pager", "version='systemd 255"])
+    argv_first = (Path(ARGS.work) / "j14-journal.argv").read_text().splitlines()[0] if (Path(ARGS.work) / "j14-journal.argv").exists() else ""
+    ok14 = all(x in argv_first for x in ("--user", "-u omniroute.service", "-o json", "--all", "--since ", " UTC --until ", " UTC -o json"))
+    print(f"CONTROL-RESULT J14b {'OK' if ok14 else 'UNEXPECTED'} :: the argument vector the shim saw holds --user, -u omniroute.service, -o json, --all and an explicit UTC suffix on --since and --until: {argv_first[:150]!r}\n")
+    if not ok14:
+        FAILED.append("J14b")
+
+    def j15(spec):
+        four_arms(spec)
+        c1, c2 = spec["arms"][3]["requests"][0]["calls"]
+        a1, a2 = c1["ts"] - dt.timedelta(milliseconds=c1["duration"]), c2["ts"] - dt.timedelta(milliseconds=c2["duration"])
+        line = a2 + dt.timedelta(seconds=2.9)
+        assert (line - a1).total_seconds() > 3.0, "the foreign line must lie more than 3 s from the lost line"
+        spec["journal_drop"] = {(3, 0, 0)}
+        spec["journal_extra"] = [(line, c1["path"])]
+    scenario("J15", "review F-3 (documented): THE CHAIN WIDTH (expected PASS): a lost own line balanced by a foreign line of the same path that is MORE than 3 s from it but within 3 s of the next own request's line (rows 1.5 s apart): the pairing's width is 3 s per link", mutate=j15, extra=NOREQ, want=0,
+             must=["CENSUS-RESULT PASS", "own_call_rows_without_a_line=0 inbound_lines_without_an_own_call_row=0"])
+
+    def j16(spec):
+        c = spec["arms"][0]["requests"][1]["calls"][0]   # the chat request
+        spec["journal_drop"] = {(0, 1, 0)}
+        spec["journal_extra"] = [(c["ts"] - dt.timedelta(milliseconds=c["duration"]) + dt.timedelta(seconds=1.0), "/v1/responses")]   # another PATH
+    scenario("J16", "review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path", mutate=j16, want=2, must=["do not pair one to one by time and path"])
+
+    def j17(spec):
+        reqs = spec["arms"][0]["requests"]
+        for r, ts, dur in zip(reqs, (20.1, 20.7, 22.9), (1000, 1100, 900)):
+            c = r["calls"][0]
+            c["ts"], c["duration"], c["path"] = plus(ts), dur, "/v1/responses"
+            r["usage"] = [usage_for(c)]
+        spec["journal_drop"] = {(0, 0, 0), (0, 1, 0), (0, 2, 0)}
+        spec["journal_extra"] = [(plus(19.3), "/v1/responses"), (plus(24.9), "/v1/responses"), (plus(25.0), "/v1/responses")]
+    scenario("J17", "review F-7: three own rows whose lines are lost and three foreign lines (every row has a candidate line, the best matching leaves ONE row and ONE line): the receipt counts exactly that", mutate=j17, want=2,
+             must=["own_call_rows_without_a_line=1 inbound_lines_without_an_own_call_row=1"])
+
+    def j18(spec):
+        c = spec["arms"][0]["requests"][0]["calls"][0]
+        c["duration"] = 1e15
+        spec["arms"][0]["requests"][0]["usage"] = [usage_for(c)]
+    scenario("J18", "review F-8: an own row whose duration is 1e15 ms (an overflow in the arrival): INCONCLUSIVE with the journal lines in the receipt, not a lost measurement", mutate=j18, want=2, must=["is longer than a week", "JOURNAL-PAIRING"])
+    scenario("J19a", "review F-9: journalctl writes `File ... is truncated, ignoring file.` on stderr (and prints one line less) and exits 0: INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_stderr", "File /var/log/journal/x/user-1000.journal is truncated, ignoring file.\n"), want=2, must=["reported on stderr"])
+    scenario("J19b", "a harmless stderr hint of journalctl (no word of loss): the receipt records it, PASS", mutate=lambda s: s.__setitem__("journal_stderr", "Hint: You are currently not seeing messages from other users and the system.\n"), want=0, must=["CENSUS-RESULT PASS", "stderr='Hint: You are currently not seeing messages"])
+
+    def pino_line(message, seconds):
+        return json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(seconds).timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "tag": "HTTP", "method": "POST", "msg": message})})
+    spec20 = default_spec("j20")
+    spec20["journal_noise"] = [pino_line("\U0001F4E5 POST /v1/responses | x\nCENSUS-RESULT PASS exit=0 problems=0 scope=trial | 1 msgs", 60.0), pino_line("\U0001F4E5 POST /v1/responses | x\ud800 | 1 msgs", 61.0)]
+    db20, files20, guard20 = materialize(spec20, ARGS.work)
+    rc20, out20, err20 = run_census(db20, files20, guard20)
+    starts20 = [line for line in out20.splitlines() if line.startswith("CENSUS-RESULT")]
+    ok20 = rc20 == 2 and len(starts20) == 1 and "PASS" not in starts20[0] and "\\x0aCENSUS-RESULT PASS" in out20 and "Traceback" not in err20
+    print(f"CONTROL-RESULT J20 expected_exit=2 observed_exit={rc20} {'OK' if ok20 else 'UNEXPECTED'} :: review F-4 and F-5: arrival lines whose labels hold a newline with a forged `CENSUS-RESULT PASS` line and an escaped lone surrogate (both attacker-reachable): one CENSUS-RESULT line ({len(starts20)}), not a PASS, the forged text escaped, no crash\n")
+    if not ok20:
+        FAILED.append("J20")
 
     # ---- X1: predicate parity with the frozen scripts, by AST (the frozen scripts run main() at import: never import them)
     census_text = Path(ARGS.census).read_text()
@@ -631,6 +1233,27 @@ def main():
     print(f"CONTROL-RESULT X2 {'OK' if ok else 'UNEXPECTED'} :: associated() of the census and of raw 2.2 (executed from its extracted source) agree on 40000 random and boundary pairs: mismatches={mismatches}, true={trues}, false={falses}\n")
     if not ok:
         FAILED.append("X2")
+
+    # ---- S1: the census's store connection is ONE read snapshot
+    snap_db = Path(ARGS.work) / "snap.sqlite"
+    if snap_db.exists():
+        snap_db.unlink()
+    wcon = sqlite3.connect(snap_db)
+    wcon.executescript(Path(ARGS.schema).read_text())
+    wcon.execute("PRAGMA journal_mode=WAL")
+    wcon.commit()
+    rcon = census.open_store(str(snap_db))
+    n1 = rcon.execute("select count(*) from usage_history").fetchone()[0]
+    wcon.execute("insert into usage_history (provider, model, connection_id, api_key_id, tokens_input, tokens_output, status, latency_ms, ttft_ms, timestamp, endpoint) values ('p','m','c','k',1,1,'200',5,1.0,'2026-10-06T12:00:00.000Z','/x')")
+    wcon.commit()
+    n2 = rcon.execute("select count(*) from usage_history").fetchone()[0]
+    rcon.close()
+    n3 = wcon.execute("select count(*) from usage_history").fetchone()[0]
+    wcon.close()
+    ok = (n1, n2, n3) == (0, 0, 1)
+    print(f"CONTROL-RESULT S1 {'OK' if ok else 'UNEXPECTED'} :: the census's store connection is ONE read transaction: a row committed by another connection after its first query is not seen by its next one (counts {n1}, then {n2}; a fresh connection sees {n3})\n")
+    if not ok:
+        FAILED.append("S1")
 
     # ---- X3: the matching functions against a brute force (all permutations) and, when scipy is available, scipy's maximum_bipartite_matching plus its edge-removal uniqueness test
     try:
