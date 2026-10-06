@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "90d4fa2e4d46eaaf8a2ede82f29fe864100c837f966c9df1a61746c1ea481c30",
-    "docs/new-wsl-handbook.json": "d569771bf8e8e73538758c68e43045973b9b7010fb32cec8ad2f170cce0cea12"
+    "docs/new-wsl-handbook.md": "f5ffdaedcf9f1bdc80184c2b533db37bcd68f2d105e002ff930660bbf9eb47d6",
+    "docs/new-wsl-handbook.json": "8768967ff912ab900ad83c7f8d749fc20a86a785194630d2d248f17c6688be80"
   },
   "inventory": {
     "layers": 37,
@@ -415,6 +415,16 @@
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
         "docs/new-wsl-handbook.json": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "#715 round 3 (CC ROUND3-RULINGS-20261006.md): review-715-corrections.json's bounded_repair_rulings gains an amendments list mirroring the receipts. 73d75df4b at 19:12:17Z (item 170827Z) wrote the block, and bfff257c0 at 19:28:40Z (item 181852Z) revised it (old_bar_provisional.captured_status_boundary). A per-block check over the file's git history found a matching stamp for every content revision. The changed input digest made the handbook stale; regenerated with --write, and --check passed.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "90d4fa2e4d46eaaf8a2ede82f29fe864100c837f966c9df1a61746c1ea481c30",
+        "docs/new-wsl-handbook.json": "d569771bf8e8e73538758c68e43045973b9b7010fb32cec8ad2f170cce0cea12"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }

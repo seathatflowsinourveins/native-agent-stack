@@ -336,6 +336,10 @@
   "bounded_repair_rulings": {
     "amended_at_utc": "2026-10-05T19:12:17Z",
     "amendment_source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+    "amendments": [
+      {"amended_at_utc": "2026-10-05T19:12:17Z", "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md", "commit": "73d75df4b33f390c30cd435253b6d675103eb95d", "change": "Block written: bounded repair rulings from the 17:08:27Z item."},
+      {"amended_at_utc": "2026-10-05T19:28:40Z", "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md", "commit": "bfff257c0f61be6857cdc50cf0284e57584ab873", "change": "Block revised: old_bar_provisional.captured_status_boundary added after the R2 review."}
+    ],
     "source": {
       "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
       "sha256": "5119fcb6518fc162cdd348870758545ec57710bd929ed64b4203473b4aa7f911",
