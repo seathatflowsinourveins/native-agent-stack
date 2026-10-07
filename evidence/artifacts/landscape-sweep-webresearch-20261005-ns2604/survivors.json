@@ -1,0 +1,22 @@
+[
+ {
+  "layer_id": "web-research",
+  "repository": "https://github.com/exa-labs/exa-mcp-server"
+ },
+ {
+  "layer_id": "web-research",
+  "repository": "https://github.com/adbar/trafilatura"
+ },
+ {
+  "layer_id": "web-research",
+  "repository": "https://github.com/krlabsorg/lettucedetect"
+ },
+ {
+  "layer_id": "web-research",
+  "repository": "https://github.com/commoncrawl/cdx_toolkit"
+ },
+ {
+  "layer_id": "web-research",
+  "repository": "https://github.com/vulcanlab/ipi-proxy"
+ }
+]

@@ -1,0 +1,14 @@
+{"web-research": [
+ "SEED SOURCE: the user's GitHub stars (seathatflowsinourveins), read 2026-10-05, plus the user's request to re-judge advanced LLM-native browser and crawl repos. Stars are discovery leads only, never evidence. Judge by upstream quality, LLM-native fitness (MCP server or skills, agent docs, headless JSON) and the new organic-use READY bar.",
+ "unclecode/crawl4ai: refuted_not_adopted 2026-09-26; re-judge on current release",
+ "browser-use/browser-use: unqualified in component-evidence-matrix; judge",
+ "D4Vinci/Scrapling: refuted_keep_but_compare 2026-09-26; re-judge",
+ "firecrawl/firecrawl and firecrawl/firecrawl-mcp-server: refuted_keep_but_compare 2026-09-26; re-judge the MCP surface",
+ "browserbase/stagehand: judge",
+ "microsoft/playwright-mcp: judge against playwright-cli (refuted this morning) and agent-browser",
+ "ChromeDevTools/chrome-devtools-mcp: arriving as a plan row in #713; judge it as an owner candidate",
+ "lightpanda-io/browser: refuted this morning; re-judge only on new evidence",
+ "Panniantong/Agent-Reach, KnockOutEZ/wigolo, citrolabs/ego-lite: judge, if in scope for web research",
+ "INCUMBENTS to beat: vercel-labs/agent-browser (pinned 0.38.1; upstream 0.38.2 fixes a Chrome launch freeze), Tavily CLI and skills, adbar/trafilatura, GPT Researcher and DeerFlow (the research harnesses)",
+ "OUT OF SCOPE by security posture unless the user asks: anti-detection or stealth browsers (CloakBrowser/CloakHQ, h4ckf0r0day/obscura), which exist to bypass bot protection"
+]}
