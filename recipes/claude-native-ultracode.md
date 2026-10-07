@@ -124,6 +124,13 @@ not enable the feature.
 [native model configuration](https://code.claude.com/docs/en/model-config),
 [workflow behavior](https://code.claude.com/docs/en/workflows).
 
+**Amendment (2026-10-07).** The preceding standing-default paragraph records
+the September 23 choice. The [October 7 dispatch amendment](../docs/decisions/2026-09-23-max-effort-default.md#amendment-2026-10-07-select-orchestration-per-task)
+supersedes that choice: the portable baseline omits `ultracode`, and the
+coordinator selects orchestration for a finite task through an explicit task
+prompt, session toggle or launch settings profile. The model and effort rules
+continue to apply unchanged.
+
 ## Assign models by task and verify the assignment
 
 **2026-09-23: Opus 5.5 now leads this table.** The live host's coordinator
