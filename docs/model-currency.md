@@ -2,7 +2,7 @@
 
 The model inventory is [model-currency.json](../catalogs/foundation/model-currency.json),
 with its [schema](../catalogs/foundation/model-currency.schema.json). The current
-partial inventory declares 20 artifact/model-consumer rows and seven package
+partial inventory declares 21 artifact/model-consumer rows and seven package
 snapshots, and remains `pending`. The [dated fill provenance](../evidence/artifacts/model-currency-enforcement-20261007/fill-source-review.json)
 records eight unresolved groups and the sources for each date and exact revision.
 This is not evidence that every installed or shipped model has been inventoried
@@ -52,8 +52,18 @@ the effective age. The weight identity, original release date and source remain
 recorded, even if old. An old shipping package still needs the same seven-day
 landscape exception. A declared latest package is a recorded claim, not proof
 of upstream currency: the daily check separately compares the primary source.
-Package-bound checks always follow the package's release line, even when the
-model also retains its own weight line.
+Every model retains its origin `release_line`, including package-bound rows.
+Hub origins require an exact 40-character SHA regardless of the effective age.
+Package-bound daily checks follow the package's release line; that does not
+replace the recorded identity of the original weight or derived artifact.
+
+Inventory objects reject extra keys at every defined level, so a misspelled
+exception field cannot be ignored. Primary source URLs must be HTTPS without
+credentials, whitespace or control characters, and their ports must parse.
+
+Currency follows the newest release within a model's own line. The background
+slot retains Haiku 4.5 as a dated exception for simple work; currency alone does
+not promote it to Sonnet or Opus. A published Haiku 5.x ID reopens that selection.
 
 ## Daily review proposals
 
@@ -119,5 +129,14 @@ complete inventory coverage, current deployed models or upstream acceptance.
 
 For the proposed persistent MinerU source carrier, use the [local-service recipe](../recipes/mineru-local-service.md).
 The CC owns activation and fresh-shell parsing. Its source override is separate
-from the still-unaccepted embedded-engine CPU guard. The revised ai-memory example
-requires 2.5.2 prefix support; component/installer alignment remains with its owner.
+from the embedded-engine CPU-guard gap dated October 7. The unit ships without
+that guard; the CPU precondition is a CC window step before activation.
+
+The revised ai-memory example requires 2.5.2 prefix support. The six-field
+install-plan fold is a prerequisite owned by fixwave, routed through #810 after
+its finding-2 repair. That owner also records the hand-maintained plan boundary:
+the original U2 generator was never committed and was not located in the bounded
+owner sources. This PR does not hand-edit or recreate the generated installer.
+The existing stack component pin stays 2.4.1 until its owner supplies the pin,
+saturation-audit row and qualification receipt. FILL item 7 is partial until that
+plan-owner amendment lands; the independent example and model metadata are ready.

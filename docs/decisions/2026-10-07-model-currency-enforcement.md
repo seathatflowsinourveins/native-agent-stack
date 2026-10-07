@@ -163,3 +163,61 @@ items. The embedded engine's CPU guard remains unqualified: its explicit
 99-GPU-layer argument is not overridden by the separate external wrapper's
 environment variable. The template supplies source only and does not claim
 CPU-only acceptance or a native running-source getter.
+
+## Amendment (2026-10-07): J826 validation corrections and background-line ruling
+
+The exact-head GPT review of the scaffold identified three declaration gaps.
+Every model now retains origin metadata independently of its shipping package's
+effective age; a package-bound Hub model still needs an exact SHA. Every complete
+schema object and matching validator object rejects unknown keys. The source URL
+check rejects raw whitespace/control characters and evaluates the parsed port,
+including its native invalid-port exception. Existing UTC and 42/7-day boundaries,
+pending-inventory exemption and package-latest join remain the same.
+
+Sources: [Python 3.13.16 URL parsing](https://docs.python.org/3.13/library/urllib.parse.html#urllib.parse.urlsplit)
+documents lazy port errors and control/space stripping, so this check rejects
+those characters before parsing; [JSON Schema additional properties](https://json-schema.org/understanding-json-schema/reference/object#additionalproperties)
+defines closed objects. The local source reference is
+`native-agent-stack@7740e74aa4fd7ca465ccb568fcc095e56e2d2024:scripts/validate_foundation.py:49-53`,
+whose existing field checker rejects unknown keys. The exact Hub revision
+contract retains the pinned vendor CLI/metadata sources above. No new validator
+executable, dependency, transport or URL parser is introduced.
+
+The owner's later ruling at 2026-10-07T04:15Z supersedes the earlier background
+Sonnet override described in the prior amendment. Suitable simple background
+tasks stay on Haiku; currency follows the newest release of that line. The
+background row therefore keeps `claude-haiku-4-5-20251001` as a dated exception,
+reviewed on the run's October 7 date. The public release is October 15, 2025;
+the ID suffix identifies its snapshot, not its public launch date. Sources:
+[vendor announcement](https://www.anthropic.com/news/claude-haiku-4-5) and
+[current Haiku specification](https://platform.claude.com/docs/en/models/haiku-4-5/overview),
+read October 7. A Haiku 5.x ID reopens the slot; newer Sonnet/Opus releases do
+not themselves justify a heavier assignment. Sol/Astra and the other rows remain
+unchanged by this ruling.
+
+The later living source record has SHA-256
+`941c0061085c030d1484809a5726088fa584e83ce2b336ac9d1bf106efcd74cb`,
+with `owner_decision_20261007T0415Z` and apply item 1 marked reverted. The earlier
+44679 source hash and recorded source observations remain immutable. The CC
+reports removing the background override; this lane neither inspects its user
+settings nor claims a new background request. The current inventory has 21 rows
+and remains pending for the same unresolved groups. The original installer
+generator/current owner fold is still required; a generated script is not
+hand-edited to create an apparent completion.
+
+The later A26/A28 ruling names fixwave as the install-plan owner. Its six-field
+ai-memory patch is the prerequisite for FILL item 7, routed through #810 after
+finding 2; this branch carries only the independent example and model metadata.
+The original U2 generator was never committed and was not located in the bounded
+owner sources. The plan owner records the hand-maintained boundary rather than
+this lane recreating the generator or hand-editing its output. ai-memory 2.5.2
+prefix support remains required, while the component's 2.4.1 pin remains with its
+pin/audit/qualification owner.
+
+A27b records the CPU guard as a gap dated October 7: no documented embedded
+ingress was found in the inspected installed engine and pinned runtime sources.
+The unit ships without that guard. The maintained external wrapper is available
+to the CC with its own lifecycle, and the CPU precondition is a CC window step
+before activation. The source lines and value-free read-back sequence remain in
+the linked MinerU recipe; neither source review nor unit syntax proves native
+CPU-only behavior.

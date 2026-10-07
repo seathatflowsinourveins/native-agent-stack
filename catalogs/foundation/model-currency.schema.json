@@ -3,6 +3,7 @@
   "title": "Native model currency scaffold and inventory",
   "description": "The existing Python publication validator also enforces UTC date arithmetic, exact HF revisions, package joins and 42/7-day limits. Empty pending inventory is not an adopted/current model census.",
   "type": "object",
+  "additionalProperties": false,
   "required": [
     "schema_version",
     "inventory_status",
@@ -21,16 +22,30 @@
       ]
     },
     "policy": {
-      "const": {
-        "max_release_age_days": 42,
-        "max_landscape_age_days": 7,
-        "refresh_lead_days": 2
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_release_age_days",
+        "max_landscape_age_days",
+        "refresh_lead_days"
+      ],
+      "properties": {
+        "max_release_age_days": {
+          "const": 42
+        },
+        "max_landscape_age_days": {
+          "const": 7
+        },
+        "refresh_lead_days": {
+          "const": 2
+        }
       }
     },
     "packages": {
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "id",
           "latest_version",
@@ -73,6 +88,7 @@
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "id",
           "role",
@@ -82,7 +98,8 @@
           "release_date",
           "release_source",
           "checked_at",
-          "status"
+          "status",
+          "release_line"
         ],
         "properties": {
           "id": {
@@ -132,6 +149,7 @@
           },
           "package": {
             "type": "object",
+            "additionalProperties": false,
             "required": [
               "id",
               "version"
@@ -149,6 +167,7 @@
           },
           "landscape_check": {
             "type": "object",
+            "additionalProperties": false,
             "required": [
               "date",
               "sources",
@@ -178,6 +197,7 @@
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "additionalProperties": false,
                   "required": [
                     "model_id",
                     "revision",
@@ -228,11 +248,6 @@
               "required": [
                 "package"
               ]
-            },
-            "else": {
-              "required": [
-                "release_line"
-              ]
             }
           },
           {
@@ -245,6 +260,34 @@
               "required": [
                 "overturn"
               ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "release_line": {
+                  "properties": {
+                    "kind": {
+                      "const": "huggingface"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              },
+              "required": [
+                "release_line"
+              ]
+            },
+            "then": {
+              "properties": {
+                "revision": {
+                  "pattern": "^[0-9a-f]{40}$",
+                  "minLength": 40,
+                  "maxLength": 40
+                }
+              }
             }
           }
         ]
@@ -277,6 +320,7 @@
       "oneOf": [
         {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "kind",
             "repository",
@@ -298,6 +342,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "kind",
             "repository"
@@ -314,6 +359,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "kind",
             "package"
@@ -330,6 +376,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "kind",
             "url"

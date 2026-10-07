@@ -64,6 +64,14 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
     if not isinstance(document, dict) or type(document.get("schema_version")) is not int or document["schema_version"] != 1:
         return ["model currency: expected schema_version 1 object"]
 
+    def allowed_keys(value, allowed, label):
+        if isinstance(value, dict):
+            unknown = sorted(str(key) for key in value if key not in allowed)
+            if unknown:
+                errors.append(f"{label}: unknown fields: {', '.join(unknown)}")
+
+    allowed_keys(document, {"schema_version", "inventory_status", "policy", "packages", "models"}, "model currency")
+
     def text(value, label):
         if not isinstance(value, str) or not value.strip():
             errors.append(f"{label}: expected nonempty string")
@@ -84,8 +92,11 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
 
     def source(value, label):
         try:
-            parts = urlsplit(value) if isinstance(value, str) else None
+            clean = isinstance(value, str) and not any(char.isspace() or ord(char) < 32 or 127 <= ord(char) <= 159 for char in value)
+            parts = urlsplit(value) if clean else None
             valid = parts is not None and parts.scheme == "https" and bool(parts.hostname) and not parts.username and not parts.password
+            if parts is not None:
+                parts.port  # urlsplit parses lazily; malformed/out-of-range ports raise ValueError here.
         except ValueError:
             valid = False
         if not valid:
@@ -115,15 +126,19 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
             return
         kind = value.get("kind")
         if kind == "huggingface":
+            allowed_keys(value, {"kind", "repository", "ref"}, label)
             text(value.get("repository"), f"{label}.repository")
             if value.get("ref") != "main":
                 errors.append(f"{label}.ref: latest-line checks require the Hub default main branch, not a pinned revision or tag")
         elif kind == "github_release":
+            allowed_keys(value, {"kind", "repository"}, label)
             if not isinstance(value.get("repository"), str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", value["repository"]):
                 errors.append(f"{label}.repository: expected owner/repository")
         elif kind == "pypi":
+            allowed_keys(value, {"kind", "package"}, label)
             text(value.get("package"), f"{label}.package")
         elif kind == "vendor_page":
+            allowed_keys(value, {"kind", "url"}, label)
             source(value.get("url"), f"{label}.url")
         else:
             errors.append(f"{label}: unsupported release line kind")
@@ -131,12 +146,14 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
     if not isinstance(document.get("inventory_status"), str) or document["inventory_status"] not in {"pending", "complete"}:
         errors.append("model currency: inventory_status must be pending or complete")
     expected_policy = {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2}
+    allowed_keys(document.get("policy"), set(expected_policy), "model currency policy")
     if document.get("policy") != expected_policy:
         errors.append("model currency: policy must retain the 42-day/7-day limits and 2-day refresh lead")
     packages = records("packages")
     package_dates = {}
     for identifier, package in packages.items():
         label = f"model currency package {identifier}"
+        allowed_keys(package, {"id", "latest_version", "release_date", "release_source", "checked_at", "release_line"}, label)
         text(package.get("latest_version"), f"{label}.latest_version")
         package_dates[identifier] = parsed_date(package.get("release_date"), f"{label}.release_date")
         source(package.get("release_source"), f"{label}.release_source")
@@ -147,6 +164,7 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
         errors.append("model currency: a complete inventory needs model rows")
     for identifier, model in models.items():
         label = f"model currency model {identifier}"
+        allowed_keys(model, {"id", "role", "consumer", "model_id", "revision", "release_date", "release_source", "checked_at", "status", "release_line", "package", "landscape_check", "overturn"}, label)
         for field in ("role", "consumer", "model_id", "revision"):
             text(model.get(field), f"{label}.{field}")
         released = parsed_date(model.get("release_date"), f"{label}.release_date")
@@ -155,6 +173,21 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
         status = model.get("status")
         if not isinstance(status, str) or status not in {"in_use", "held", "package_bound"}:
             errors.append(f"{label}: unsupported status")
+        # Model identity and its exact origin remain independent of the shipping
+        # package used below for age/release-line checks.
+        origin = model.get("release_line")
+        release_line(origin, f"{label}.release_line")
+        if isinstance(origin, dict) and origin.get("kind") == "huggingface":
+            if not isinstance(model.get("revision"), str) or not re.fullmatch(r"[0-9a-f]{40}", model["revision"]):
+                errors.append(f"{label}.revision: expected exact Hugging Face commit SHA")
+        if "package" in model:
+            binding = model["package"]
+            if not isinstance(binding, dict):
+                errors.append(f"{label}.package: expected object")
+            else:
+                allowed_keys(binding, {"id", "version"}, f"{label}.package")
+                text(binding.get("id"), f"{label}.package.id")
+                text(binding.get("version"), f"{label}.package.version")
         effective_release = released
         if status == "package_bound":
             binding = model.get("package")
@@ -166,17 +199,13 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
                 if binding.get("version") != package.get("latest_version"):
                     errors.append(f"{label}: package version does not follow the recorded latest release")
                 effective_release = package_dates.get(package_id)
-        else:
-            release_line(model.get("release_line"), f"{label}.release_line")
-            if isinstance(model.get("release_line"), dict) and model["release_line"].get("kind") == "huggingface":
-                if not isinstance(model.get("revision"), str) or not re.fullmatch(r"[0-9a-f]{40}", model["revision"]):
-                    errors.append(f"{label}.revision: expected exact Hugging Face commit SHA")
         landscape = model.get("landscape_check")
         reviewed = None
         if landscape is not None:
             if not isinstance(landscape, dict):
                 errors.append(f"{label}.landscape_check: expected object")
             else:
+                allowed_keys(landscape, {"date", "sources", "newer_candidates", "reason"}, f"{label}.landscape_check")
                 reviewed = parsed_date(landscape.get("date"), f"{label}.landscape_check.date")
                 sources = landscape.get("sources")
                 if not isinstance(sources, list) or not sources:
@@ -193,6 +222,7 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
                         if not isinstance(candidate, dict):
                             errors.append(f"{candidate_label}: expected object")
                             continue
+                        allowed_keys(candidate, {"model_id", "revision", "source", "reason"}, candidate_label)
                         for field in ("model_id", "revision", "reason"):
                             text(candidate.get(field), f"{candidate_label}.{field}")
                         source(candidate.get("source"), f"{candidate_label}.source")

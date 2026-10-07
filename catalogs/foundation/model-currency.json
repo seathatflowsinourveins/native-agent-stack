@@ -440,6 +440,11 @@
       "package": {
         "id": "headroom-ai",
         "version": "0.40.0"
+      },
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "Qdrant/bge-small-en-v1.5-onnx-Q",
+        "ref": "main"
       }
     },
     {
@@ -456,6 +461,11 @@
       "package": {
         "id": "headroom-ai",
         "version": "0.40.0"
+      },
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "Qdrant/all-MiniLM-L6-v2-onnx",
+        "ref": "main"
       }
     },
     {
@@ -472,6 +482,11 @@
       "package": {
         "id": "headroom-ai",
         "version": "0.40.0"
+      },
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "chopratejas/technique-router-onnx",
+        "ref": "main"
       }
     },
     {
@@ -488,6 +503,11 @@
       "package": {
         "id": "headroom-ai",
         "version": "0.40.0"
+      },
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "chopratejas/siglip-image-encoder-onnx",
+        "ref": "main"
       }
     },
     {
@@ -514,6 +534,10 @@
         ],
         "newer_candidates": [],
         "reason": "The primary model changelog's latest standard model is standard_v3_3 and the current model-directory listing contains no successor. PyPI's latest non-yanked shipping release is still Magika 1.0.3. Retain the package-bundled model under the source packet's PACKAGE_BOUND decision; no runtime or GPU inference acceptance is added."
+      },
+      "release_line": {
+        "kind": "github_release",
+        "repository": "google/magika"
       }
     },
     {
@@ -530,6 +554,10 @@
       "package": {
         "id": "markitdown",
         "version": "0.1.8"
+      },
+      "release_line": {
+        "kind": "github_release",
+        "repository": "google/magika"
       }
     },
     {
@@ -546,7 +574,38 @@
       "package": {
         "id": "codebase-memory-mcp",
         "version": "v0.11.0"
+      },
+      "release_line": {
+        "kind": "github_release",
+        "repository": "DeusData/codebase-memory-mcp"
       }
+    },
+    {
+      "id": "background-haiku",
+      "role": "Simple Claude Code background tasks: titles, safety checks and quick summaries",
+      "consumer": "Claude Code 2.1.292 background slot",
+      "model_id": "claude-haiku-4-5-20251001",
+      "revision": "claude-haiku-4-5-20251001",
+      "release_date": "2025-10-15",
+      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview"
+      },
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://platform.claude.com/docs/en/about-claude/models/overview",
+          "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
+          "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
+          "https://www.anthropic.com/news/claude-haiku-4-5"
+        ],
+        "newer_candidates": [],
+        "reason": "The current official model overview and Haiku model page list Haiku 4.5 with the exact API ID claude-haiku-4-5-20251001; no newer Haiku ID was identified in those sources. Retain it as a dated exception for simple background work. Currency is assessed within the Haiku line; Sonnet and Opus are different task and model lines, so their newer releases do not justify promoting this slot. The release announcement and current specification describe Haiku as a fast, economical option suitable for low-latency tasks. This is source review, not a new quality or native-usage measurement."
+      },
+      "overturn": "An Anthropic Haiku 5.x model ID becomes available; the background slot then follows the Haiku line through the owner's review and application."
     }
   ]
 }
