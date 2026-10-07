@@ -17616,6 +17616,11 @@
       "bytes": 3898
     },
     {
+      "path": "docs/decisions/2026-10-07-user-unit-alert-lifecycle.md",
+      "sha256": "db81d89305cf3d6646ded7944ca5e95259c70a67ebf210ba2f27691e56082cd2",
+      "bytes": 8054
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -54176,6 +54181,86 @@
       "bytes": 16714
     },
     {
+      "path": "observability/alert-lifecycle/5F-HANDOFF.md",
+      "sha256": "fd4c327c70f1a576cb0f702bdce4ba51672ad289ffb4119e1aad0576ea1478c8",
+      "bytes": 3258
+    },
+    {
+      "path": "observability/alert-lifecycle/README.md",
+      "sha256": "3a337f719a96f5dcc50e6a037e289692462885dab101547034941a60103fc25e",
+      "bytes": 10580
+    },
+    {
+      "path": "observability/alert-lifecycle/WINDOW.md",
+      "sha256": "9ba40ee9d6386b5609572e48719915804663f018aef11c3edc181fb21c729153",
+      "bytes": 8351
+    },
+    {
+      "path": "observability/alert-lifecycle/alerting-pipeline.rules.example.json",
+      "sha256": "4ed30d570066bb881feca948c5d25f0cc27635913c23eea5298163ccd2219a19",
+      "bytes": 781
+    },
+    {
+      "path": "observability/alert-lifecycle/alertmanager-events.example.json",
+      "sha256": "cb6ffa687e24afe1228e245b5c94868fff81b96c5594017707f18982ebb0767c",
+      "bytes": 960
+    },
+    {
+      "path": "observability/alert-lifecycle/deadman.disabled.fragments.example.json",
+      "sha256": "4a49dcf0349c81575014a7e9eab37d7a6d096549b59e4e5d0732b15bba89f224",
+      "bytes": 677
+    },
+    {
+      "path": "observability/alert-lifecycle/ns2604-F09-DRILL.service.example",
+      "sha256": "bef20ee0dae56c771c51684e142168914a5dcf036ddebf836a4a27f272c03b2d",
+      "bytes": 310
+    },
+    {
+      "path": "observability/alert-lifecycle/pipeline-scrape.example.json",
+      "sha256": "3a03675e45910ece8031309f652060f8d93bb7177d21edf417585624d2d5c8cc",
+      "bytes": 733
+    },
+    {
+      "path": "observability/alert-lifecycle/policy.example.json",
+      "sha256": "0a987d57c898cdc5dc42a624312897b33d79b8e247968d683a6fccb222db3b3a",
+      "bytes": 210
+    },
+    {
+      "path": "observability/alert-lifecycle/receiver.example.json",
+      "sha256": "a192f17bfe757c01a110ab3656756f3d13dc5aa4c1bbc1047cb570899849c4b2",
+      "bytes": 2294
+    },
+    {
+      "path": "observability/alert-lifecycle/render.py",
+      "sha256": "67edb9bf6a4301fac4fa8b7ea66edf3427cbf995298f6509e3cdcef3603bf4c7",
+      "bytes": 8659
+    },
+    {
+      "path": "observability/alert-lifecycle/rules.example.json",
+      "sha256": "0bdc3d1483d8927b98e98ad241b1c8aedc63ebbff6d09924096b3a1015fa89f0",
+      "bytes": 2502
+    },
+    {
+      "path": "observability/alert-lifecycle/scrape.example.json",
+      "sha256": "83b3c368863033a729fe9508a1b107bd67ff006a62297e6543fb96a67ff6b78e",
+      "bytes": 269
+    },
+    {
+      "path": "observability/alert-lifecycle/user-unit-alerts.rules.json",
+      "sha256": "a95692f813eea6cde327e446a0e4eb0f4abafbc6fdc80835fe74b9a755977db3",
+      "bytes": 2085
+    },
+    {
+      "path": "observability/alert-lifecycle/user-unit-alerts.test.json",
+      "sha256": "b0456ffadcaca08e7c417b7e23d4805746b003ab2b42491f11ee59c75478971a",
+      "bytes": 39485
+    },
+    {
+      "path": "observability/alert-lifecycle/watchdog.disabled.rules.example.json",
+      "sha256": "b24e4c38447758645bb55900637f9e6feb725cbb2048571d9cb4da989b64e0c5",
+      "bytes": 529
+    },
+    {
       "path": "observability/backends/README.md",
       "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
       "bytes": 25778
@@ -55904,6 +55989,11 @@
       "path": "tests/test_us_equities_hosting.py",
       "sha256": "bd947c5a67c6265c3cae717dc0396ebe7fd1aa0919cdc5e89c8872b0c211f459",
       "bytes": 55117
+    },
+    {
+      "path": "tests/test_user_unit_alert_renderer.py",
+      "sha256": "8627f0d508910adca2e9853d12d834c65cfb0535fcc10e6b24df21d9c7fc70f2",
+      "bytes": 4759
     },
     {
       "path": "tests/test_validate.py",
