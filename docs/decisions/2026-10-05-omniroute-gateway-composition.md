@@ -125,3 +125,10 @@ Drop the affinity patch when upstream fixes the interplay (its own test passes w
 - The earlier records: `docs/decisions/2026-09-30-omniroute-rebuild.md` (the carry practice and the 09-30 update for #15167), `docs/decisions/2026-10-03-omniroute-3851-pin.md` (the release pin),
   `evidence/artifacts/omniroute-sol-max-20260930/` (the call-log effort read and the executor-level check, whose scripts this record reuses; `checks/probe-gate-before-switch.json` (C7), `checks/probe-gate-after-switch.json` and `checks/upstream-pr-15167-identity.txt`).
 - Upstream's own build and checks, unchanged: `npm ci`, `npm run build:release`, `check:pack-artifact`, `check:pack-boot`.
+
+## Amendment (2026-10-07): NativeStack2604 listener roles
+
+Standing constraint F1 (no OAuth (Codex) routing combo
+while the affinity patch runs) extends to the HTTP listener on 21128 and its WebSocket listener on 21129 for as long as that same-process composition runs there; `docs/decisions/2026-09-30-omniroute-rebuild.md` and `docs/foundation-stack.md` carry the extension. This is not two HTTP gateways: the old independent HTTP `omniroute-fw` on 20129 has no established 2604 counterpart. The 2026-10-06 listener/status-line observations and the command center's port-role correction are retained separately in `evidence/receipts/windows-terminal-2604-fragment-20261006.json`; no gateway deployment changes follow from this wording correction.
+
+This appended correction carries the listener-role wording from PR #768, with its original observations retained in [the unchanged fragment receipt](../../evidence/receipts/windows-terminal-2604-fragment-20261006.json). The prior decided text is retained as the dated record; this amendment changes no deployment or acceptance result.

@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "id": "grand-catalog-folds-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Fold owned organic counter/catalog bindings, portable Terminal fragment and dated Dagu records into #820. Original source bytes are conserved except explicitly recorded merges; the historical gateway correction is carried as a dated amendment without changing the prior decided sentence. No adoption or readiness promotion.",
+  "limitations": [
+    "Repository source-byte/hash and fixture consistency, not upstream acceptance, native deployment or a new host observation.",
+    "Old observed results, prototype/fixture bindings and all existing receipt classes remain historical and unchanged.",
+    "The one original decision file is intentionally not byte-identical to #768: A34 requires an appended amendment preserving decided text.",
+    "Native organic counts and adoption synthesis remain pending; synthetic control proof supplies no qualified native use.",
+    "Original PR closures and merge/landing belong to the co-op/5f after verification and command-center review."
+  ],
+  "retained_pr": 820,
+  "retained_base_commit": "6eb5ed83914f37c3f0baca40cba89c8172cfa9e3",
+  "sources": [
+    {
+      "original_pr": 750,
+      "source_base_commit": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "source_commit": "6cd4f403ff9c6dae18cfd560385d508ca8922ea6",
+      "files_excluding_registry": 29,
+      "identical_files": 26,
+      "file_records": [
+        {
+          "path": "catalogs/README.md",
+          "source_sha256": "9024607e5f684c1ea06bc8816dc60d66f10d1980f7113951fb894e64b351df75",
+          "retained_sha256": "9024607e5f684c1ea06bc8816dc60d66f10d1980f7113951fb894e64b351df75",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "catalogs/landscape/component-evidence-matrix.json",
+          "source_sha256": "6fb56903ebfffb5939de5bde5b4f0ba3256c8cfc9e56d94877fe70baf1b42643",
+          "retained_sha256": "7ec9b56ca1438059bd478d03f07d4520dfbd53927b80f6a0673d819c915b0102",
+          "byte_identical": false,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "catalogs/landscape/organic-use.schema.json",
+          "source_sha256": "318a0b72fefc89275adcb3b78307117636e4a1be6be459e66c579e3dc52df617",
+          "retained_sha256": "318a0b72fefc89275adcb3b78307117636e4a1be6be459e66c579e3dc52df617",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "catalogs/saturation/README.md",
+          "source_sha256": "12c7e3ccc3c8ec840475b1fb219d62775d548b9ac3578c79c4434fe8deafbe09",
+          "retained_sha256": "12c7e3ccc3c8ec840475b1fb219d62775d548b9ac3578c79c4434fe8deafbe09",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "catalogs/saturation/ledger.schema.json",
+          "source_sha256": "fb5f5002508a653860b5763dc2cc4a58fedcdf155f725813001025a184fafe09",
+          "retained_sha256": "fb5f5002508a653860b5763dc2cc4a58fedcdf155f725813001025a184fafe09",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "docs/component-evidence-matrix.md",
+          "source_sha256": "63e9fde8632e545be2d5df0616d6fb44d95421dc502174df35941fdc302af3c9",
+          "retained_sha256": "da9d870a652523187490562b738ee50838122d29359c5eb27c8f1f5179749c54",
+          "byte_identical": false,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "docs/decisions/2026-10-05-organic-use-catalog-records.md",
+          "source_sha256": "60038ef6ff8a502fc1b679dd03def1c4bcd777acfffc56ff79c5e0f6db79655e",
+          "retained_sha256": "60038ef6ff8a502fc1b679dd03def1c4bcd777acfffc56ff79c5e0f6db79655e",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+          "source_sha256": "cdf6fb9dd3e6765e7ee83625fe9f5af6c65b4f2ae150f22df74bc1cc5403191f",
+          "retained_sha256": "cdf6fb9dd3e6765e7ee83625fe9f5af6c65b4f2ae150f22df74bc1cc5403191f",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
+          "source_sha256": "dac41a540114e2e5868f8ec354e800f11569eb2406eed8e15b4cdb492b40bb3f",
+          "retained_sha256": "dac41a540114e2e5868f8ec354e800f11569eb2406eed8e15b4cdb492b40bb3f",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/artifacts/organic-counter-20261007/upstream-contract.json",
+          "source_sha256": "0f723a4309f84fe0e8e750267a900480a2762447e6ba3394ef20283f0dc4030a",
+          "retained_sha256": "0f723a4309f84fe0e8e750267a900480a2762447e6ba3394ef20283f0dc4030a",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/receipts/codex-organic-oracle-controls-20261007.json",
+          "source_sha256": "227bd42267b39a92fd779bd08045d448c5a4c7b892548a0353ca5fc9edc0a4f8",
+          "retained_sha256": "227bd42267b39a92fd779bd08045d448c5a4c7b892548a0353ca5fc9edc0a4f8",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/receipts/ns2604-organic-use-pilot-20261005.json",
+          "source_sha256": "aacec9253bc6a2fb6c71fe07acb7f6232408da01af8e4abf827c25af8204ae39",
+          "retained_sha256": "aacec9253bc6a2fb6c71fe07acb7f6232408da01af8e4abf827c25af8204ae39",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/receipts/ns2604-saturation-requirement-binding-20261007.json",
+          "source_sha256": "568788d410f64509640e55819420a20c9228b3be0bdc4638f4a994dcceb13b40",
+          "retained_sha256": "568788d410f64509640e55819420a20c9228b3be0bdc4638f4a994dcceb13b40",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/component_matrix.py",
+          "source_sha256": "e34baa87370bf62bc0ee9ec032cf6e7662d51e6bfbc477121aed5295be3312ef",
+          "retained_sha256": "e34baa87370bf62bc0ee9ec032cf6e7662d51e6bfbc477121aed5295be3312ef",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/host_receipts.py",
+          "source_sha256": "5b2cef2ae1b944001a6b800f1fcba6770edd7f86ead7be10ac2a53578868a4dc",
+          "retained_sha256": "5b2cef2ae1b944001a6b800f1fcba6770edd7f86ead7be10ac2a53578868a4dc",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/organic_use.py",
+          "source_sha256": "cf4b6228a5ddfc1de2d2a232b811db1a04f856b351b9f6c1826d0157f19ef43c",
+          "retained_sha256": "cf4b6228a5ddfc1de2d2a232b811db1a04f856b351b9f6c1826d0157f19ef43c",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/receipt_staleness.py",
+          "source_sha256": "7a2ab6dc85adb574467e08f9f1433a4a1100886acbed87ab650fdb931708eb44",
+          "retained_sha256": "7a2ab6dc85adb574467e08f9f1433a4a1100886acbed87ab650fdb931708eb44",
+          "byte_identical": true,
+          "source_mode": "100755",
+          "retained_mode": "100755",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/saturation_ledger.py",
+          "source_sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6",
+          "retained_sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/validate.py",
+          "source_sha256": "51047c25412dc5e696bc792b473a1dfb2f5e4ab205b3333ed9e1aba969c07144",
+          "retained_sha256": "d603cac42c57032f3a46696e74b9beff5bcea0555a0f996e79fe70a090df3334",
+          "byte_identical": false,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tests/test_component_matrix.py",
+          "source_sha256": "ae8cce129a77ce5f621e04c0a315fe212dd30db2151b61ab679483fdece0d38a",
+          "retained_sha256": "ae8cce129a77ce5f621e04c0a315fe212dd30db2151b61ab679483fdece0d38a",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tests/test_host_receipts.py",
+          "source_sha256": "9bedd016368d474b95df96f56b46c22bf8d288c8be93e507bb7132af6db659ff",
+          "retained_sha256": "9bedd016368d474b95df96f56b46c22bf8d288c8be93e507bb7132af6db659ff",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tests/test_organic_use.py",
+          "source_sha256": "d5bb4aa341b57c42918c08eea890cf050de95b038b4a390faba4fc53f442b0c4",
+          "retained_sha256": "d5bb4aa341b57c42918c08eea890cf050de95b038b4a390faba4fc53f442b0c4",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tests/test_receipt_staleness.py",
+          "source_sha256": "c99e4ee256b35af82ee5abe04d0bfd2e576c8c4951e94e8809ab60a2d529573c",
+          "retained_sha256": "c99e4ee256b35af82ee5abe04d0bfd2e576c8c4951e94e8809ab60a2d529573c",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tests/test_saturation_ledger.py",
+          "source_sha256": "c2b52378cb817995be919f9e83dc175a619a62d8c127701a6f43555511d15f43",
+          "retained_sha256": "c2b52378cb817995be919f9e83dc175a619a62d8c127701a6f43555511d15f43",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tools/invocation-monitoring/README.md",
+          "source_sha256": "e8c1f5cae62cd7b459f178a952b821dd1c1772bc8539499f3e60785b2d70ed3f",
+          "retained_sha256": "e8c1f5cae62cd7b459f178a952b821dd1c1772bc8539499f3e60785b2d70ed3f",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tools/invocation-monitoring/codex-counter-prototype-manifest.json",
+          "source_sha256": "e339e3039ae044a1ca5f63edb62f4c5d7af2981b246c51d930a537dacfbda5ba",
+          "retained_sha256": "e339e3039ae044a1ca5f63edb62f4c5d7af2981b246c51d930a537dacfbda5ba",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+          "source_sha256": "eb22a57c77c0bf26257c6c808ef6875d95c926bd0ee69bbb59f5f5ed69ab5367",
+          "retained_sha256": "eb22a57c77c0bf26257c6c808ef6875d95c926bd0ee69bbb59f5f5ed69ab5367",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tools/invocation-monitoring/codex_counter.py",
+          "source_sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
+          "retained_sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tools/invocation-monitoring/test_codex_counter.py",
+          "source_sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40",
+          "retained_sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        }
+      ]
+    },
+    {
+      "original_pr": 768,
+      "source_base_commit": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "source_commit": "3a02630adeb1d75f14bb3856d14a2477220d6fe4",
+      "files_excluding_registry": 10,
+      "identical_files": 8,
+      "file_records": [
+        {
+          "path": "checks/check-terminal-profiles.py",
+          "source_sha256": "acebacc0b1ed1c6f7c4e242af6506476749a13140d8a1afe9fe54c907a9b7e30",
+          "retained_sha256": "acebacc0b1ed1c6f7c4e242af6506476749a13140d8a1afe9fe54c907a9b7e30",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
+          "source_sha256": "88b7af359232314987c5763a78941e27990a89144ccfed450b63c909bf897146",
+          "retained_sha256": "69238589b9f571ca1ef758aa22b57bfab3717a48a92c6c25f6e69c6876b9e028",
+          "byte_identical": false,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "docs/decisions/2026-10-06-windows-terminal-2604-fragment.md",
+          "source_sha256": "95b8932613303acff86bab695023f77e8eddc90120bf0a3f3fb1b44e1f1336e6",
+          "retained_sha256": "95b8932613303acff86bab695023f77e8eddc90120bf0a3f3fb1b44e1f1336e6",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json",
+          "source_sha256": "240d0197ab30e6329d38b47aa9afae0316267a69a9cd55bbffad6a127808dccb",
+          "retained_sha256": "240d0197ab30e6329d38b47aa9afae0316267a69a9cd55bbffad6a127808dccb",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/terminal_profile_ids.py",
+          "source_sha256": "33127acd396afdc0070f2cf9bee3bc4987079f6e002879af52ea3a81578645c8",
+          "retained_sha256": "33127acd396afdc0070f2cf9bee3bc4987079f6e002879af52ea3a81578645c8",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "scripts/validate.py",
+          "source_sha256": "6a744e566543378c1d15af5244eaf7f389c5c57bb3cae5a085c3e64478e71192",
+          "retained_sha256": "d603cac42c57032f3a46696e74b9beff5bcea0555a0f996e79fe70a090df3334",
+          "byte_identical": false,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "tests/test_terminal_fragment.py",
+          "source_sha256": "51a332e0efd450cb368ee0590cfa9bbd602888ade4ffef4f4d2a617c3b06ab1d",
+          "retained_sha256": "51a332e0efd450cb368ee0590cfa9bbd602888ade4ffef4f4d2a617c3b06ab1d",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "windows/README.md",
+          "source_sha256": "5ce9eb3a499e66173c3f194259298ff54e24c9daef11f24fa53eab500292afe3",
+          "retained_sha256": "5ce9eb3a499e66173c3f194259298ff54e24c9daef11f24fa53eab500292afe3",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "windows/nativestack2604.json",
+          "source_sha256": "eadcf2da6bdb68c573892a5c89a033fa595867e9d8e0872bfb4f60c16942f1d6",
+          "retained_sha256": "eadcf2da6bdb68c573892a5c89a033fa595867e9d8e0872bfb4f60c16942f1d6",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "windows/ops-entry.sh",
+          "source_sha256": "05cfc1bfc7eea9ec34ac60c53f644ece166e81b9f0b09b3e4da70ad039a62aac",
+          "retained_sha256": "05cfc1bfc7eea9ec34ac60c53f644ece166e81b9f0b09b3e4da70ad039a62aac",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        }
+      ]
+    },
+    {
+      "original_pr": 787,
+      "source_base_commit": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "source_commit": "dff1c03ab3059b1e00710ee12d166e8967519277",
+      "files_excluding_registry": 7,
+      "identical_files": 7,
+      "file_records": [
+        {
+          "path": "docs/decisions/2026-10-06-dagu-loopback-auth-none.md",
+          "source_sha256": "1c11c1444d5decbf6e1cd16b065dc366850a4a25e92c06c142f42b0c6fc9474a",
+          "retained_sha256": "1c11c1444d5decbf6e1cd16b065dc366850a4a25e92c06c142f42b0c6fc9474a",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/artifacts/dagu-loopback-auth-none-20261006/native-observations.json",
+          "source_sha256": "54493115a1177753928afa9c7a74e117ed6eedf8110a6797aa4a9d3c010cb3ac",
+          "retained_sha256": "54493115a1177753928afa9c7a74e117ed6eedf8110a6797aa4a9d3c010cb3ac",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/artifacts/dagu-loopback-auth-none-20261006/owner-classification.json",
+          "source_sha256": "2ecaa7cc48bfb25b2061695c910dcaee9ddf74abc2c14fc2651359cbb881b4a6",
+          "retained_sha256": "2ecaa7cc48bfb25b2061695c910dcaee9ddf74abc2c14fc2651359cbb881b4a6",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "evidence/receipts/dagu-loopback-auth-none-20261006.json",
+          "source_sha256": "1f39d47344b907785714b1174e93ab478ef27027d2306ab7119a0175db83e2f0",
+          "retained_sha256": "1f39d47344b907785714b1174e93ab478ef27027d2306ab7119a0175db83e2f0",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "observability/backends/README.md",
+          "source_sha256": "7e56a706d7bf53d07ffcc33a4e0ead8c3aebfc266cb10a161669eac70418f459",
+          "retained_sha256": "7e56a706d7bf53d07ffcc33a4e0ead8c3aebfc266cb10a161669eac70418f459",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "observability/grand-dashboard/README.md",
+          "source_sha256": "6dfcbe4cb0f98661d75f94e052d59f1018298b74347414150c16f56c63a0ed2a",
+          "retained_sha256": "6dfcbe4cb0f98661d75f94e052d59f1018298b74347414150c16f56c63a0ed2a",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        },
+        {
+          "path": "observability/grand-dashboard/passwordless.md",
+          "source_sha256": "dfb1f5ae4614edd50f994796f3cdd773b9cf43d1b2e13eee34a8fb2460ad4ffb",
+          "retained_sha256": "dfb1f5ae4614edd50f994796f3cdd773b9cf43d1b2e13eee34a8fb2460ad4ffb",
+          "byte_identical": true,
+          "source_mode": "100644",
+          "retained_mode": "100644",
+          "mode_identical": true
+        }
+      ]
+    }
+  ],
+  "overlap_exceptions": [
+    {
+      "path": "scripts/validate.py",
+      "source_prs": [
+        750,
+        768
+      ],
+      "method": "Native three-way merge over source bases retaining both organic receipt validation and narrow terminal GUID scanning with the original #820 finalized selection guard.",
+      "retained_sha256": "d603cac42c57032f3a46696e74b9beff5bcea0555a0f996e79fe70a090df3334"
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "source_prs": [
+        750
+      ],
+      "method": "Regenerated from retained matrix inputs and union registry using the existing component_matrix.py builder; existing rows/observations retained, informational organic projection added."
+    },
+    {
+      "path": "docs/component-evidence-matrix.md",
+      "source_prs": [
+        750
+      ],
+      "method": "Same existing matrix builder; no manual generated-table merge or status flip."
+    },
+    {
+      "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
+      "source_prs": [
+        768
+      ],
+      "method": "A34 option1: original retained6eb file prefix and decided line47 unchanged; exact #768 F1 correction appended under Amendment(2026-10-07), line129.",
+      "retained_sha256": "69238589b9f571ca1ef758aa22b57bfab3717a48a92c6c25f6e69c6876b9e028",
+      "byte_identical_to_source": false,
+      "original_branch_untouched": true,
+      "original_receipt_untouched": true
+    }
+  ],
+  "registry_union": {
+    "base": "Retained #820 registry; no new main rebase.",
+    "prior_receipts": 219,
+    "source_added_receipts": 5,
+    "source_receipt_bytes_and_metadata_preserved": true,
+    "registry_updated_last": true,
+    "source_registry_files_are_not_copied_wholesale": true
+  },
+  "retained_test_adjustment": {
+    "path": "tests/test_finalized_foundation_catalog.py",
+    "reason": "Canonical organic helper is now present. Explicitly mock missing-owner and independently reject outside-owner carrier; preserve production guard."
+  },
+  "checks": {
+    "combined_touched_first": {
+      "tests": 692,
+      "exit_code": 1,
+      "skipped": 1,
+      "retained_failures": [
+        "Pre-existing auth_storage_failure notification drift under A21.",
+        "Missing optional helper assumption; fixed with explicit missing-owner and outside-carrier controls."
+      ]
+    },
+    "finalized_module_after_fix": {
+      "tests": 60,
+      "exit_code": 0
+    },
+    "organic_controls": {
+      "tests": 34,
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "native_counts": null
+    },
+    "terminal_repository_profiles": {
+      "profiles": 16,
+      "exit_code": 0
+    },
+    "matrix_generator_and_check": {
+      "rows": 32,
+      "flip_rule_violations": 0,
+      "exit_code": 0
+    },
+    "grand_list": {
+      "layers": 32,
+      "winners": 66,
+      "exit_code": 0
+    },
+    "saturation": {
+      "sweeps": 5,
+      "exit_code": 0
+    }
+  },
+  "independent_review": "pending",
+  "command_center_review": "pending",
+  "decision_refs": [
+    "docs/decisions/2026-10-07-finalized-sota-catalog.md",
+    "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+    "docs/decisions/2026-10-06-windows-terminal-2604-fragment.md",
+    "docs/decisions/2026-10-06-dagu-loopback-auth-none.md"
+  ]
+}
