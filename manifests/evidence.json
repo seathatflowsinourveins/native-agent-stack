@@ -54462,6 +54462,11 @@
       "bytes": 304
     },
     {
+      "path": "tests/lane_gateway_transport.py",
+      "sha256": "26fc91e1bfa6f57beeb8be395575db8d13ac5ba7bc7080acf0ff6978c020a803",
+      "bytes": 26103
+    },
+    {
       "path": "tests/legacy_gateway_ports_allow.json",
       "sha256": "d52aed6359df903bcf3ef44750e4a3e5c5480b0896fd090a439ee8ed9db24068",
       "bytes": 102715
@@ -55060,6 +55065,11 @@
       "path": "tests/test_landscape_sweep_harness.py",
       "sha256": "472f0c0fbae4fc006345df7b1ba7150d2d72643a6838a48076ca2f482d9113e3",
       "bytes": 377687
+    },
+    {
+      "path": "tests/test_lane_gateway_transport.py",
+      "sha256": "be5915036f62dadf172962c947e77340f97fe2ab1515c9c847745094c09178ba",
+      "bytes": 3998
     },
     {
       "path": "tests/test_lane_packets.py",
