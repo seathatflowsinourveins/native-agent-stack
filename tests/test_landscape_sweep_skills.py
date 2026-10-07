@@ -2476,9 +2476,9 @@ def yaml_provisioning_problems(text, job_id=YAML_JOB):
     problems = []
     suite = [index for index, other in enumerate(steps) if shell_ci.runs_suite(other)]
     if not suite:
-        problems.append(("order", "no step runs the whole suite"))
+        problems.append(("order", "no step runs the whole suite or a module shard"))
     elif found[0] >= suite[0]:
-        problems.append(("order", "the provisioning step does not come before the step that runs the whole suite"))
+        problems.append(("order", "the provisioning step does not precede the suite/shard step"))
     for key in ("install", "command", "default_directory"):
         if not shell_ci.mentions(step, key):
             problems.append(("derived", f"the step does not read {key} from the pin"))
@@ -2497,17 +2497,17 @@ def yaml_provisioning_problems(text, job_id=YAML_JOB):
 
 
 def yaml_ratchet_problems(texts, gaps=YAML_KNOWN_UNPROVISIONED):
-    """'unlisted': a whole-suite job lacks the yaml provisioning step and is not a recorded gap; 'stale': a recorded gap
+    """'unlisted': a suite/shard job lacks the yaml provisioning step and is not a recorded gap; 'stale': a recorded gap
     provisions, no longer runs the suite or is gone; 'required': validate.yml's job does not provision, or is a gap."""
     found = shell_ci.suite_jobs(texts)
     installing = {key for key, job_text in found.items() if yaml_provisioning_indexes(shell_ci.step_blocks(job_text))}
     without = set(found) - installing
-    problems = [("unlisted", f"{key} runs the whole suite without installing the yaml pin and is not a recorded gap")
+    problems = [("unlisted", f"{key} runs project tests without installing the yaml pin and is not a recorded gap")
                 for key in sorted(without - gaps)]
-    problems += [("stale", f"{key} is a recorded gap but does not run the whole suite without the yaml pin")
+    problems += [("stale", f"{key} is a recorded gap but does not run project tests without the yaml pin")
                  for key in sorted(gaps - without)]
     if YAML_KEY not in installing or YAML_KEY in gaps:
-        problems.append(("required", f"{YAML_KEY} must run the whole suite with the provisioning step and cannot be a gap"))
+        problems.append(("required", f"{YAML_KEY} must run project tests with the provisioning step and cannot be a gap"))
     return problems
 
 
@@ -2529,6 +2529,14 @@ class SkillsYamlProvisioningTests(unittest.TestCase):
 
     def test_every_whole_suite_job_provisions_the_yaml_pin_or_is_a_recorded_gap(self):
         self.assertEqual(yaml_ratchet_problems(self.texts), [])
+
+    def test_a_native_module_shard_requires_the_yaml_pin_too(self):
+        # Kind-3 suite/shard binding: docs/decisions/2026-10-07-validate-module-shards.md.
+        bare = {**self.texts, "new.yml": shell_ci.synthetic_workflow(build=shell_ci.SHARD_STEP)}
+        self.assertEqual([category for category, _ in yaml_ratchet_problems(bare)], ["unlisted"])
+        pin_step = f"      - name: Install the yaml pin\n        run: cat {YAML_PIN_REL}\n"
+        bare["new.yml"] = shell_ci.synthetic_workflow(build=pin_step + shell_ci.SHARD_STEP)
+        self.assertEqual(yaml_ratchet_problems(bare), [])
 
 
 class SkillsYamlProvisioningControls(unittest.TestCase):

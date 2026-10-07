@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T19:56:26Z",
+  "base_revision": "b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276",
+  "north_star_action": "Remove the foundation landing queue's serial required-test bottleneck before US-equities research and independent broker paper qualification.",
+  "decision_record": "docs/decisions/2026-10-07-validate-module-shards.md",
+  "evidence_classes": {
+    "historical_weights": "source_review of retained native execution, not a new passing run",
+    "native_discovery": "local_integration using native unittest, with no test bodies",
+    "focused_tests": "local_integration; locally authored fixtures remain synthetic",
+    "workflow_lints": "local_integration using upstream executables",
+    "hosted_matrix_acceptance": "pending"
+  },
+  "historical_source": {
+    "run_id": 37653671981,
+    "job_id": 112905135751,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37653671981/job/112905135751",
+    "log_sha256": "b1d2d43e0c9cb6a4a079910707bab69ea5302573c5396c621711b6f1b2c8b643",
+    "native_summary": {"ran": 11583, "seconds": 1524.459, "failures": 17, "skipped": 1034},
+    "weights_path": "scripts/validate_shard_weights.json",
+    "weights_sha256": "34ce9b0bbf2ccb20722c6e45cac027ee086beb588d8c82729269c9cc76db8674",
+    "boundary": "Failed historical execution is retained for approximate scheduling weights. Neither this result nor a weighted estimate is current acceptance."
+  },
+  "estimates": [
+    {"shards": 6, "max_test_seconds": 254.076373, "assumed_setup_seconds": 120, "estimated_minutes_excluding_queue_and_final": 6.235},
+    {"shards": 8, "max_test_seconds": 190.557259, "assumed_setup_seconds": 120, "estimated_minutes_excluding_queue_and_final": 5.176},
+    {"shards": 10, "max_test_seconds": 152.445901, "assumed_setup_seconds": 120, "estimated_minutes_excluding_queue_and_final": 4.541},
+    {"shards": 12, "max_test_seconds": 136.894334, "assumed_setup_seconds": 120, "estimated_minutes_excluding_queue_and_final": 4.282}
+  ],
+  "discovery_observations": [
+    {"stage": "preparation before new fixture set", "python": "3.12.3", "owners": 271, "cases": 11595, "loader_errors": 0, "ownership_counter_equals_native_discovery": true, "test_bodies_ran": false},
+    {"observed_at_utc": "2026-10-07T19:44:45Z", "stage": "partial implementation before final fixture set", "python": "3.12.3", "owners": 272, "cases": 11607, "loader_errors": 0, "strategy": "duration-weighted-native-modules", "fixture_constraints": {}, "shard_module_counts": [31, 34, 35, 34, 34, 35, 34, 35], "exit_code": 0, "test_bodies_ran": false}
+  ],
+  "local_environment": {
+    "python": "3.12.3",
+    "pyyaml": "6.0.3",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "private_python_bin_first_on_path": true,
+    "empty_private_home": true,
+    "short_private_temporary_directory_outside_home": true,
+    "pinned_parser_and_node_yaml_available": true,
+    "promotion_environment_override_available": true,
+    "new_install_performed": false,
+    "boundary": "A focused local environment, not an assertion of complete hosted-image parity. Node/npm differ from the historical hosted image. No host/client configuration or credential value was read."
+  },
+  "checks": [
+    {"command": "actionlint -color .github/workflows/validate.yml", "priority": "nice 19, ionice idle", "exit_code": 0},
+    {"command": "zizmor --offline --no-config --no-ignores --format json .github/workflows/validate.yml", "version": "1.30.1", "priority": "nice 19, ionice idle", "exit_code": 0, "native_return": "[]"},
+    {"command": "python3 -I -B -X pycache_prefix=<ignored-owned-path> -m py_compile scripts/validate_shards.py tests/test_validate_shards.py tests/test_workflow_hardening.py tests/test_shell_parser_ci.py tests/test_landscape_sweep_skills.py", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {
+      "command": "python3 -I -B -X faulthandler -c 'import sys,unittest; sys.path.insert(0,\"\"); unittest.main(module=None,argv=[\"unittest\"]+sys.argv[1:])' -q --durations 50 tests.test_validate_shards tests.test_workflow_hardening tests.test_shell_parser_ci tests.test_landscape_sweep_skills tests.test_workflow_security_coverage tests.test_promotion_gate tests.test_adoption_docs_consistency",
+      "priority": "nice 19, ionice idle",
+      "exit_code": 1,
+      "native_summary": "Ran 368 tests in 95.067s; FAILED (failures=1, skipped=5)",
+      "remaining_failure": {"test_id": "tests.test_promotion_gate.WorkflowProvisioningContract.test_unittest_step_runs_the_full_suite", "locator": "tests/test_promotion_gate.py:138", "assertion": "self.assertIn(\"python3 -m unittest\", steps[\"Test validation failure modes\"])", "cause": "Existing serial-command workflow binding; kind 3 owner handoff requested. The trading-owned file remains untouched."},
+      "skip_ids": "not retained by the quiet summary; do not infer their identities or full hosted coverage",
+      "boundary": "No full-suite phase. All other selected tests passed, including the native shard fixtures and actual hang/traceback controls."
+    }
+  ],
+  "retained_failed_attempts": [
+    {"command": "python3 scripts/host_receipts.py register_file --help", "exit_code": 2, "cause": "register_file is the documented Python API, not a CLI subcommand; corrected from docs/lanes.md:103-107 and scripts/host_receipts.py:710."},
+    {"command": "python3 -I -B scripts/validate.py", "exit_code": 1, "cause": "Registry digests not yet regenerated for the changed workflow and shell/hardening contract files. No integrity pass was claimed."},
+    {"stage": "worker synthetic fixture micro-check", "ran": 12, "seconds": 2.499, "cause": "Two fixture-authoring mistakes: a method moved into the wrong fixture class, and Counter(mapping) interpreted shard assignments as counts. Corrected before the root's combined phase.", "exit_code": "pending exact worker return", "boundary": "Synthetic failed attempt, not upstream acceptance; later root checks do not substitute for its original result."}
+  ],
+  "pending": [
+    "Command-center handoff for the one promotion workflow-contract method and lane:shared acknowledgement",
+    "Actual global-zero-discovery fixture, followed by the focused new module rerun",
+    "Final evidence registration and validate.py exit 0",
+    "Draft's real hosted wall time, per-shard provisioning/duration, exact module union and summed native counts",
+    "Exact-head co-op cross-family read, command-center ACK and the landing turn after #820"
+  ],
+  "updates": [
+    {
+      "recorded_at_utc": "2026-10-07T20:08:12Z",
+      "authority": "Command-center item task-ns2604-coop-20261007T195921Z grants the single promotion workflow-contract method change; lane:shared, trading acknowledgement requested before merge.",
+      "promotion_delta": {"test_selector": "tests.test_promotion_gate.WorkflowProvisioningContract", "exit_code": 0, "native_return": "Ran 3 tests in 0.874s; OK", "only_changed_method": "WorkflowProvisioningContract.test_unittest_step_runs_the_full_suite", "other_method_asts_preserved": 36, "before_target_bytes_identical": true, "after_target_bytes_identical": true},
+      "zero_discovery_fixture_delta": {"test_selector": "tests.test_validate_shards", "exit_code": 0, "native_return": "Ran 12 tests in 3.407s; OK"},
+      "package_hook_fixture_delta": {"test_selector": "tests.test_validate_shards", "exit_code": 0, "native_return": "Ran 13 tests in 3.383s; OK"},
+      "completeness_critic": {"scope": "source review, not official cross-family acceptance", "production_findings": 0, "fixture_findings": ["Global zero discovery was not actually exercised", "Package load_tests invoking nested discovery was not exercised"], "resolution": "Both added native boundary fixtures passed in the separate delta runs above."},
+      "worker_failed_attempt_details": {"preimplementation": {"exit_code": 1, "ran": 1, "failures": 0, "errors": 1}, "expanded_fixtures": {"exit_code": 1, "ran": 12, "failures": 1, "errors": 1, "seconds": 2.499}, "unavailable": ["original timestamps", "input hashes", "standalone raw logs", "usage"], "boundary": "Worker-retained native tool summaries, synthetic fixture failures; root later checks are distinct. Unknown fields stay unknown."},
+      "scope": "The earlier focused failure and pending state are retained unchanged. These deltas close the promotion contract and two fixture gaps; registry validation and actual hosted timing remain pending. No full-suite phase, host change or repository settings change."
+    }
+  ],
+  "setting_changes": [],
+  "other_workflow_jobs_changed": false,
+  "requirements_files_changed": false
+}

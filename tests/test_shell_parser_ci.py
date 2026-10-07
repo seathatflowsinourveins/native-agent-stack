@@ -48,7 +48,7 @@ import tempfile
 import unittest
 from types import SimpleNamespace
 
-from tests.test_workflow_hardening import jobs, runs_whole_suite, uncommented, unittest_invocations
+from tests.test_workflow_hardening import jobs, runs_project_tests, runs_whole_suite, uncommented, unittest_invocations
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
@@ -308,7 +308,8 @@ def step_blocks(job_text):
 
 
 def runs_suite(step):
-    return any(runs_whole_suite(args) for args in unittest_invocations(uncommented(step)))
+    """Serial suite or native module shard, per the 2026-10-07 kind-3 decision."""
+    return runs_project_tests(uncommented(step))
 
 
 def provisioning_indexes(steps):
@@ -336,9 +337,9 @@ def provisioning_problems(text, job_id=PROVISIONING_JOB):
     problems = []
     suite = [index for index, other in enumerate(steps) if runs_suite(other)]
     if not suite:
-        problems.append(("order", "no step runs the whole suite"))
+        problems.append(("order", "no step runs the whole suite or a module shard"))
     elif found[0] >= suite[0]:
-        problems.append(("order", "the provisioning step does not come before the step that runs the whole suite"))
+        problems.append(("order", "the provisioning step does not precede the suite/shard step"))
     pin = load_pin()
     for key in ("install", "command", "default_directory"):
         if not mentions(step, key):
@@ -368,11 +369,11 @@ def workflow_texts():
 
 
 def suite_jobs(texts):
-    """{'<workflow file>:<job id>': job text} for each job of `texts` ({workflow file: text}) that runs the whole suite."""
+    """Jobs that execute the serial suite or native module shards and need its environment."""
     found = {}
     for name, text in sorted(texts.items()):
         for job_id, job_text in jobs(text).items():
-            if any(runs_whole_suite(args) for args in unittest_invocations(job_text)):
+            if runs_suite(job_text):
                 found[f"{name}:{job_id}"] = job_text
     return found
 
@@ -384,7 +385,7 @@ def provisioning_jobs(found):
 
 def provisioning_targets(texts):
     """{'<workflow file>:<job id>': (workflow text, job id)} for the jobs whose provisioning step the structure checks
-    inspect: validate.yml's job always, so that a dropped step leaves something to fail, and every other whole-suite job
+    inspect: validate.yml's shard job always, so a dropped step leaves something to fail, and every other suite/shard job
     that reads the pin (a recorded gap that is provisioned later is checked with no edit here)."""
     targets = {}
     for key in sorted({PROVISIONING_KEY} | provisioning_jobs(suite_jobs(texts))):
@@ -394,19 +395,19 @@ def provisioning_targets(texts):
 
 
 def ratchet_problems(texts, gaps=KNOWN_UNPROVISIONED):
-    """(category, message) for each way the whole-suite jobs of `texts` ({workflow file: text}) depart from the
+    """(category, message) for each way the suite/shard jobs of `texts` ({workflow file: text}) depart from the
     ratchet. 'unlisted': a job runs the suite without a step that reads the pin and is not in `gaps`. 'stale': an entry
     of `gaps` names a job that provisions, no longer runs the suite or is gone. 'required': validate.yml's job does not
     provision, or is listed as a gap."""
     found = suite_jobs(texts)
     installing = provisioning_jobs(found)
     without = set(found) - installing
-    problems = [("unlisted", f"{key} runs the whole suite without installing the parser and is not a recorded gap: "
+    problems = [("unlisted", f"{key} runs project tests without installing the parser and is not a recorded gap: "
                              "add the provisioning step to its workflow") for key in sorted(without - gaps)]
-    problems += [("stale", f"{key} is a recorded gap but does not run the whole suite without the parser: "
+    problems += [("stale", f"{key} is a recorded gap but does not run project tests without the parser: "
                            "delete its entry from KNOWN_UNPROVISIONED") for key in sorted(gaps - without)]
     if PROVISIONING_KEY not in installing or PROVISIONING_KEY in gaps:
-        problems.append(("required", f"{PROVISIONING_KEY} must run the whole suite with the provisioning step "
+        problems.append(("required", f"{PROVISIONING_KEY} must run project tests with the provisioning step "
                                      "and cannot be a recorded gap"))
     return problems
 
@@ -419,14 +420,14 @@ def step_span(lines, index):
 
 
 def suite_step_span(lines):
-    """The [start, end) line range of the first step that runs the whole suite (runs_suite), found by what the step runs
+    """The [start, end) line range of the first suite/shard step, found by what the step runs
     rather than by how its `run:` line is spelled, which a `run: |` block or a timeout wrapper changes."""
     for index, line in enumerate(lines):
         if line.startswith("      - "):
             start, end = step_span(lines, index)
             if runs_suite("\n".join(lines[start:end])):
                 return start, end
-    raise AssertionError("no step of the workflow runs the whole suite")
+    raise AssertionError("no step of the workflow runs the suite or a module shard")
 
 
 def provisioning_span(lines):
@@ -479,7 +480,7 @@ class ProvisioningStepTests(unittest.TestCase):
         # The structure checks inspect this job by name: renaming it must not leave them with nothing to inspect.
         job = jobs(self.text).get(PROVISIONING_JOB)
         self.assertTrue(job is not None, "validate.yml has no job named as this module expects")
-        self.assertTrue(any(runs_suite(step) for step in step_blocks(job)), "that job does not run the whole suite")
+        self.assertTrue(any(runs_suite(step) for step in step_blocks(job)), "that job runs neither the suite nor a shard")
 
     def test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap(self):
         self.assertEqual(ratchet_problems(self.texts), [])
@@ -526,6 +527,8 @@ class ProvisioningControls(unittest.TestCase):
 
 
 SUITE_STEP = "      - name: Run the suite\n        run: python3 -m unittest\n"
+SHARD_STEP = ("      - name: Run a module shard\n"
+              "        run: python3 scripts/validate_shards.py run --shard 0 --shards 8 --report report.json -v\n")
 PIN_STEP = f"      - name: Install the parser\n        run: cat {PIN_PATH}\n"
 OTHER_STEP = "      - name: Something else\n        run: echo done\n"
 
@@ -537,14 +540,14 @@ def synthetic_workflow(**steps_by_job):
 
 
 def with_step(text, job_id, step_lines):
-    """`text` with the given step inserted before the first step of job `job_id` that runs the whole suite."""
+    """`text` with the given step inserted before the first suite/shard step of job `job_id`."""
     lines = text.split("\n")
     for index in range(next(i for i, line in enumerate(lines) if line == f"  {job_id}:"), len(lines)):
         if lines[index].startswith("      - "):
             start, end = step_span(lines, index)
             if runs_suite("\n".join(lines[start:end])):
                 return "\n".join(lines[:start] + step_lines + lines[start:])
-    raise AssertionError("the job has no step that runs the whole suite")
+    raise AssertionError("the job has no suite/shard step")
 
 
 class RatchetControls(unittest.TestCase):
@@ -559,6 +562,17 @@ class RatchetControls(unittest.TestCase):
     def test_a_provisioned_job_and_a_recorded_gap_pass(self):
         texts = {**self.PROVISIONED, "gap.yml": synthetic_workflow(build=SUITE_STEP)}
         self.assertEqual(ratchet_problems(texts, {"gap.yml:build"}), [])
+
+    def test_shard_runs_require_provisioning_without_becoming_serial_unittest(self):
+        self.assertTrue(runs_suite(SHARD_STEP))
+        self.assertEqual(unittest_invocations(SHARD_STEP), [])
+        for command in ("plan", "aggregate"):
+            with self.subTest(command=command):
+                self.assertFalse(runs_suite(SHARD_STEP.replace(".py run ", f".py {command} ")))
+        texts = {**self.PROVISIONED, "new.yml": synthetic_workflow(build=SHARD_STEP)}
+        self.assertEqual([category for category, _ in ratchet_problems(texts, set())], ["unlisted"])
+        texts["new.yml"] = synthetic_workflow(build=PIN_STEP + SHARD_STEP)
+        self.assertEqual(ratchet_problems(texts, set()), [])
 
     def test_an_unlisted_whole_suite_job_without_the_parser_is_reported_by_name(self):
         texts = {**self.PROVISIONED, "new.yml": synthetic_workflow(build=SUITE_STEP)}

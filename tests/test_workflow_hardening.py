@@ -859,6 +859,30 @@ def runs_whole_suite(args):
     return start.rstrip("/") in (".", "tests")
 
 
+def validate_shard_invocations(job_text):
+    """Actual shard-run arguments, distinct from a serial ``-m unittest`` command.
+
+    Kind-3 supersession: docs/decisions/2026-10-07-validate-module-shards.md.
+    Planning and aggregation do not execute a shard and require no test provisioning.
+    """
+    text = re.sub(r"[ \t]*\\\n\s*", " ", uncommented(job_text))
+    found = []
+    for match in re.finditer(r"python3? scripts/validate_shards\.py run\b([^\n]*)", text):
+        args = []
+        for token in shlex.split(match.group(1)):
+            if token in SHELL_BREAK or token.startswith((">", "2>", "|")):
+                break
+            args.append(token)
+        found.append(args)
+    return found
+
+
+def runs_project_tests(job_text):
+    """A serial whole-suite run or a module shard; both need the suite environment."""
+    return (any(runs_whole_suite(args) for args in unittest_invocations(job_text))
+            or bool(validate_shard_invocations(job_text)))
+
+
 def checkout_steps(job_text):
     return [m.group(0) for m in re.finditer(r"(?ms)^      - [^\n]*\n(?:(?!^      - ).*\n?)*", job_text)
             if "actions/checkout@" in m.group(0)]
@@ -867,13 +891,13 @@ def checkout_steps(job_text):
 class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
     """tests/test_release_pin_contents.py resolves the pinned release commit and tag, which a
     depth-1 clone of a main that has moved past the release does not contain (catalog-freshness
-    run 35931645459), so every job that runs the whole project suite must fetch full history."""
+    run 35931645459), so serial suite jobs and each module shard must fetch full history."""
 
     def test_whole_suite_jobs_set_fetch_depth_zero(self):
         suite_jobs = []
         for path in sorted(WORKFLOWS.glob("*.yml")):
             for job_id, job_text in jobs(path.read_text(encoding="utf-8")).items():
-                if any(runs_whole_suite(args) for args in unittest_invocations(job_text)):
+                if runs_project_tests(job_text):
                     suite_jobs.append(f"{path.name}:{job_id}")
                     checkouts = checkout_steps(job_text)
                     with self.subTest(job=f"{path.name}:{job_id}"):
@@ -921,7 +945,7 @@ class SessionCalendarTestPrerequisites(unittest.TestCase):
 
 
 class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
-    """The step that runs the whole suite in each job lists the 50 slowest tests and runs with faulthandler on. On the
+    """Each serial suite or module-shard step lists the 50 slowest tests and runs with faulthandler on. On the
     Linux jobs GNU timeout sends SIGABRT five minutes before the job's limit, so a hang prints every thread's Python
     traceback before the job is killed, and SIGKILL follows 60 s later. validate-macos is not wrapped: the macos-15
     image lists no GNU coreutils (actions/runner-images@6d942e630479cd99a93dadfc766af11242bfa402,
@@ -946,13 +970,18 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
         return uncommented(step_block(self.jobs[key], self.SUITE_STEPS[key]))
 
     def suite_invocation(self, key):
-        found = [args for args in unittest_invocations(self.suite_step(key)) if runs_whole_suite(args)]
-        self.assertEqual(len(found), 1, f"{key}: the named step runs the whole suite once")
+        step = self.suite_step(key)
+        if key == self.VALIDATE:
+            self.assertEqual(unittest_invocations(step), [], "a shard is not a serial whole-suite command")
+            found = validate_shard_invocations(step)
+        else:
+            found = [args for args in unittest_invocations(step) if runs_whole_suite(args)]
+        self.assertEqual(len(found), 1, f"{key}: the named step has exactly one native suite/shard invocation")
         return found[0]
 
     def test_every_whole_suite_job_names_its_suite_step(self):
         found = {key for key, job_text in self.jobs.items()
-                 if any(runs_whole_suite(args) for args in unittest_invocations(job_text))}
+                 if runs_project_tests(job_text)}
         self.assertEqual(found, set(self.SUITE_STEPS))
 
     def test_each_suite_lists_its_50_slowest_tests_with_faulthandler_on(self):
@@ -968,7 +997,8 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
             with self.subTest(key):
                 limit = int(re.search(r"(?m)^    timeout-minutes: (\d+)$", self.jobs[key]).group(1))
                 script = re.sub(r"[ \t]*\\\n\s*", " ", self.suite_step(key))
-                self.assertIn(f"timeout --signal=ABRT --kill-after=60s {limit - 5}m python3 -m unittest ", script)
+                command = "scripts/validate_shards.py run" if key == self.VALIDATE else "-m unittest"
+                self.assertIn(f"timeout --signal=ABRT --kill-after=60s {limit - 5}m python3 {command} ", script)
                 self.assertIn("set -o pipefail", script, "tee would otherwise hide the exit status of timeout and unittest")
 
     def test_the_macos_suite_has_no_gnu_timeout_wrapper(self):
@@ -983,12 +1013,186 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
         upload = step_block(job, self.UPLOAD_STEP)
         self.assertEqual(block_if(upload), "always()")
         self.assertIn("uses: actions/upload-artifact@", upload)
-        self.assertIn("path: ${{ runner.temp }}/" + log + "\n", upload)
+        self.assertRegex(upload, r"(?m)^\s+\$\{\{ runner\.temp \}\}/" + re.escape(log) + r"\s*$")
+        self.assertIn("${{ runner.temp }}/suite/report.json", upload)
+        self.assertIn("${{ matrix.shard }}", upload, "each matrix cell must retain a distinct log and report")
         self.assertLess(job.index(self.SUITE_STEPS[self.VALIDATE]), job.index(self.UPLOAD_STEP))
 
 
-@unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("bash") and shutil.which("timeout"),
-                     "the Linux suite steps run under bash with GNU coreutils timeout, as on ubuntu-24.04")
+class ValidateShardWorkflowContract(unittest.TestCase):
+    """The retained required name aggregates every matrix cell, including failed or cancelled cells.
+
+    https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context
+    https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    Contract supersession: docs/decisions/2026-10-07-validate-module-shards.md.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+        cls.jobs = jobs(cls.workflow)
+        cls.shards = cls.jobs["validate"]
+        cls.final = cls.jobs["validate-result"]
+
+    def test_eight_distinct_native_shards_keep_every_cell_running(self):
+        self.assertRegex(self.shards, r"(?m)^    name: validate-shard-\$\{\{ matrix\.shard \}\}$")
+        self.assertRegex(self.shards, r"(?m)^      fail-fast: false$")
+        matrix = re.search(r"(?m)^        shard: (\[[^\n]+\])$", self.shards)
+        self.assertIsNotNone(matrix)
+        self.assertEqual(json.loads(matrix.group(1)), list(range(8)))
+        step = step_block(self.shards, "Test validation failure modes")
+        self.assertIsNone(block_if(step), "every matrix cell must execute its assigned modules")
+        self.assertNotIn("continue-on-error", uncommented(self.shards))
+        self.assertEqual(unittest_invocations(step), [])
+        (args,) = validate_shard_invocations(step)
+        self.assertEqual(args[args.index("--shards") + 1], "8")
+        self.assertEqual(args[args.index("--shard") + 1], "$VALIDATE_SHARD")
+        self.assertIn("VALIDATE_SHARD: ${{ matrix.shard }}", step)
+
+    def test_final_required_name_runs_after_failed_cancelled_or_skipped_dependencies(self):
+        self.assertRegex(self.final, r"(?m)^    name: validate$")
+        self.assertEqual(block_if(self.final), "always()")
+        self.assertRegex(self.final, r"(?m)^    needs: validate$")
+        self.assertNotIn("continue-on-error", uncommented(self.final))
+        self.assertEqual(sum(bool(re.search(r"(?m)^    name: validate$", job))
+                             for job in self.jobs.values()), 1)
+
+    def test_final_step_passes_the_real_needs_result_and_attempt_scoped_reports(self):
+        step = step_block(self.final, "Require complete discovery coverage and success from every shard")
+        self.assertEqual(block_if(step), "always()")
+        self.assertIn("VALIDATE_SHARDS_RESULT: ${{ needs.validate.result }}", step)
+        script = re.sub(r"[ \t]*\\\n\s*", " ", run_block(step))
+        self.assertIn("python3 scripts/validate_shards.py aggregate ", script)
+        for argument in ('--reports "$RUNNER_TEMP/shards"', "--shards 8",
+                         '--job-result "$VALIDATE_SHARDS_RESULT"', '--summary "$GITHUB_STEP_SUMMARY"'):
+            self.assertIn(argument, script)
+        self.assertNotRegex(script, r"\|\||continue-on-error|\bexit 0\b")
+        download = step_block(self.final, "Download this attempt's shard reports and native logs")
+        self.assertIn("pattern: validate-shard-${{ github.run_id }}-${{ github.run_attempt }}-*", download)
+        self.assertIn("merge-multiple: false", download)
+        self.assertIn("digest-mismatch: error", download)
+
+
+@unittest.skipUnless(shutil.which("bash") and shutil.which("git"), "the real final step uses bash and Git-bound reports")
+class ValidateShardFinalStepRuns(unittest.TestCase):
+    """Execute the workflow's actual aggregate command over reports from tiny native shards.
+
+    The two fixture tests give an independent oracle for the final ran/skipped totals;
+    the shard helper remains the supported TestLoader/TextTestRunner integration.
+    No repository test suite or provisioner runs in this fixture.
+
+    Native APIs: https://github.com/python/cpython/blob/v3.12.3/Lib/unittest/loader.py
+    and https://github.com/python/cpython/blob/v3.12.3/Lib/unittest/runner.py.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scratch = Path(tempfile.mkdtemp(prefix="validate-shard-gate-"))
+        cls.addClassCleanup(shutil.rmtree, cls.scratch, ignore_errors=True)
+        cls.checkout = cls.scratch / "checkout"
+        (cls.checkout / "tests").mkdir(parents=True)
+        (cls.checkout / "scripts").mkdir()
+        (cls.checkout / "tests/__init__.py").write_text("", encoding="utf-8")
+        (cls.checkout / "tests/test_gate_fixture.py").write_text(
+            "import unittest\n\nclass GateFixture(unittest.TestCase):\n"
+            "    def test_passes(self):\n        self.assertEqual(2 + 2, 4)\n"
+            "    @unittest.skip('synthetic gate control')\n"
+            "    def test_skips(self):\n        self.fail('the skip must remain visible')\n", encoding="utf-8")
+        for name in ("validate_shards.py", "validate_shard_weights.json"):
+            shutil.copyfile(ROOT / "scripts" / name, cls.checkout / "scripts" / name)
+        cls.environment = {key: value for key, value in os.environ.items()
+                           if not key.startswith(("GITHUB_", "GIT_", "PYTHON"))}
+        cls.environment.update(PATH=f"{Path(sys.executable).parent}{os.pathsep}{os.environ.get('PATH', '')}",
+                               PYTHONDONTWRITEBYTECODE="1", GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1")
+        for args in (("init", "-q"), ("add", "."),
+                     ("-c", "user.name=Shard fixture", "-c", "user.email=fixture@example.invalid",
+                      "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", "commit", "-qm", "gate fixture")):
+            subprocess.run(["git", *args], cwd=cls.checkout, env=cls.environment, check=True, capture_output=True)
+        cls.reports = cls.scratch / "native-reports"
+        for shard in range(8):
+            report = cls.reports / f"validate-shard-fixture-{shard}" / "report.json"
+            report.parent.mkdir(parents=True)
+            proc = subprocess.run(
+                [sys.executable, "scripts/validate_shards.py", "run", "--shard", str(shard),
+                 "--shards", "8", "--report", str(report), "-v", "--durations", "50"],
+                cwd=cls.checkout, env=cls.environment, capture_output=True, text=True, timeout=30)
+            if proc.returncode:
+                raise AssertionError(f"native fixture shard {shard} failed: {proc.stdout}\n{proc.stderr}")
+        final = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate-result"]
+        cls.script = run_block(step_block(final, "Require complete discovery coverage and success from every shard"))
+
+    def run_final(self, job_result="success", mutate=None):
+        runner = Path(tempfile.mkdtemp(dir=self.scratch, prefix="attempt-"))
+        shutil.copytree(self.reports, runner / "shards")
+        if mutate is not None:
+            mutate(runner / "shards")
+        script = runner / "aggregate.sh"
+        script.write_text(self.script, encoding="utf-8")
+        environment = dict(self.environment, RUNNER_TEMP=str(runner),
+                           GITHUB_STEP_SUMMARY=str(runner / "summary.md"), VALIDATE_SHARDS_RESULT=job_result)
+        proc = subprocess.run(["bash", "-e", str(script)], cwd=self.checkout, env=environment,
+                              capture_output=True, text=True, timeout=30)
+        receipt = runner / "shards/aggregate.json"
+        return proc, json.loads(receipt.read_text(encoding="utf-8")) if receipt.exists() else None, runner
+
+    def test_final_step_reports_the_native_fixture_counts_and_complete_module_coverage(self):
+        proc, receipt, _ = self.run_final()
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertIsNotNone(receipt, "the required check must retain its aggregate receipt")
+        self.assertIs(receipt["success"], True)
+        self.assertEqual(receipt["counts"], {"ran": 2, "failures": 0, "errors": 0, "skipped": 1,
+                                           "expected_failures": 0, "unexpected_successes": 0})
+        self.assertEqual(set(receipt["executed_modules"]), {"tests", "tests.test_gate_fixture"})
+
+    def test_final_step_rejects_every_non_success_dependency_result(self):
+        for state in ("failure", "cancelled", "skipped", ""):
+            with self.subTest(state=state):
+                proc, _, _ = self.run_final(job_result=state)
+                self.assertNotEqual(proc.returncode, 0, "the required validate check accepted incomplete dependencies")
+
+    def test_final_step_rejects_a_missing_shard_report(self):
+        def remove_report(directory):
+            next(directory.glob("*/report.json")).unlink()
+        proc, _, _ = self.run_final(mutate=remove_report)
+        self.assertNotEqual(proc.returncode, 0, "the workflow's aggregate command accepted seven of eight reports")
+
+    def test_final_step_rejects_a_report_without_the_discovery_inventory(self):
+        def remove_inventory(directory):
+            report = next(directory.glob("*/report.json"))
+            payload = json.loads(report.read_text(encoding="utf-8"))
+            del payload["inventory"]
+            report.write_text(json.dumps(payload), encoding="utf-8")
+        proc, _, _ = self.run_final(mutate=remove_inventory)
+        self.assertNotEqual(proc.returncode, 0, "the required check accepted a report with no discovery inventory")
+
+    def test_final_step_rejects_an_assigned_module_missing_from_execution(self):
+        def remove_executed_module(directory):
+            for report in directory.glob("*/report.json"):
+                payload = json.loads(report.read_text(encoding="utf-8"))
+                if "tests.test_gate_fixture" in payload["assigned_modules"]:
+                    payload["executed_modules"] = []
+                    report.write_text(json.dumps(payload), encoding="utf-8")
+                    return
+            self.fail("native fixture reports contain no assignment for their test module")
+        proc, _, _ = self.run_final(mutate=remove_executed_module)
+        self.assertNotEqual(proc.returncode, 0, "the required check accepted an assigned module with no execution")
+
+    def test_final_step_rejects_a_zero_count_with_native_test_starts(self):
+        def erase_ran_count(directory):
+            for report in directory.glob("*/report.json"):
+                payload = json.loads(report.read_text(encoding="utf-8"))
+                if payload["counts"]["ran"]:
+                    payload["counts"]["ran"] = 0
+                    report.write_text(json.dumps(payload), encoding="utf-8")
+                    return
+            self.fail("the native fixture did not report any started tests")
+        proc, _, _ = self.run_final(mutate=erase_ran_count)
+        self.assertNotEqual(proc.returncode, 0, "the required check accepted counters that omit native test starts")
+
+
+@unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("bash") and shutil.which("timeout")
+                     and shutil.which("git"),
+                     "the Linux shard step uses bash, GNU timeout and a Git-bound report, as on ubuntu-24.04")
 class ValidateSuiteStepTracesAHang(unittest.TestCase):
     """validate.yml's suite script run as the runner runs a step without `shell:` (`bash -e` over the script file), in
     a scratch checkout whose one test hangs, with the step's limit cut from minutes to 3 s. With the step's
@@ -1008,15 +1212,25 @@ class ValidateSuiteStepTracesAHang(unittest.TestCase):
         (scratch / "tests").mkdir()
         (scratch / "tests/__init__.py").write_text("", encoding="utf-8")
         (scratch / "tests/test_hang.py").write_text(self.HANG, encoding="utf-8")
+        (scratch / "scripts").mkdir()
+        for name in ("validate_shards.py", "validate_shard_weights.json"):
+            shutil.copyfile(ROOT / "scripts" / name, scratch / "scripts" / name)
+        # The real shard report binds its native Git HEAD. This fixture changes the
+        # selected command, not the hang, signal, exit-code or traceback oracle.
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith(("GITHUB_", "GIT_", "PYTHON"))}
+        environment.update(GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1")
+        for args in (("init", "-q"), ("add", "."),
+                     ("-c", "user.name=Shard fixture", "-c", "user.email=fixture@example.invalid",
+                      "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", "commit", "-qm", "hang fixture")):
+            subprocess.run(["git", *args], cwd=scratch, env=environment, check=True, capture_output=True)
         tools = scratch / "bin"
         tools.mkdir()
         (tools / "python3").write_text(f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n', encoding="utf-8")
         (tools / "python3").chmod(0o755)
         (scratch / "step.sh").write_text(script, encoding="utf-8")
-        environment = {key: value for key, value in os.environ.items()
-                       if not key.startswith(("GITHUB_", "PYTHON"))}
         environment.update(PATH=f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", PYTHONDONTWRITEBYTECODE="1",
-                           RUNNER_TEMP=str(scratch / "runner-temp"))
+                           RUNNER_TEMP=str(scratch / "runner-temp"), VALIDATE_SHARD="0")
         if faulthandler:
             environment["PYTHONFAULTHANDLER"] = "1"
         proc = subprocess.run(["bash", "-e", str(scratch / "step.sh")], cwd=scratch, env=environment,
