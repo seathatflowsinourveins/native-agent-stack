@@ -291,3 +291,22 @@ selects the root-to-cwd project chain and prefers overrides.
 fixtures, alternatives and the two-host gate. A missed rule at its task trigger
 reopens disclosure; a same-version A/B or a demonstrated client fix is required
 to remove the StructuredOutput guard.
+
+## Addendum (2026-10-07): the repository file leaves the standing-sentence surfaces
+
+The [instruction-core decision](2026-10-07-instruction-core.md) ends the
+three-surface rule of this record. The standing sentences now carry one wording
+on two surfaces, the portable Claude user-level block and the Codex user-level
+block, and on the carriers and the scaffold made from them. Root `AGENTS.md`
+keeps the first standing sentence and the rules that are its own, and it names
+the two block sources for the rest. The Codex block still names a bounded worker
+where the Claude block names a delegated child.
+
+Two wordings change. The first standing sentence loses its vendor example on
+every surface that carries it. The routing paragraph leaves the root file, which
+now points to the Codex block, where the paragraph is unchanged.
+`StandingRuleSurfacesTests` reads the two user-level sources only.
+
+A session that starts without a user-level block now sees a root file with fewer
+shared sentences. That is the accepted cost of the trim, and a rule missed for
+that reason reopens this choice.

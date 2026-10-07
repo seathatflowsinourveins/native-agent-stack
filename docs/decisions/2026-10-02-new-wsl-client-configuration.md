@@ -1171,3 +1171,24 @@ post-exception trim and unchanged navigation guidance; it supplies no host apply
 
 ```text
 ```
+
+### Amendment 2026-10-07 — instruction-core current instruction inventory
+
+The [instruction-core decision](2026-10-07-instruction-core.md) trims both instruction
+sources, so `new_wsl_client_config.py --write-blocks` rewrote both carriers. The native
+`new_wsl_client_config.py --check --markdown` inventory below supersedes the earlier
+line-count projections. The three tables above are unchanged and no unit is left out.
+That decision also supersedes part of the "Instruction lines" item above: the GPT
+Researcher line leaves both sources, and the Codex messaging lines move to the
+workflow README behind a pointer. The rest of the decided configuration policy and
+the historical inventories remain intact; this amendment supplies no host apply.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 55 of 55 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 72 of 72 lines stay):
+
+```text
+```

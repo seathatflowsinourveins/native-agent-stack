@@ -1,11 +1,5 @@
 [
   {
-    "fixture": "01.txt",
-    "to": "AGENTS.md",
-    "heading": "## Workers, effort and lanes",
-    "bytes": 868
-  },
-  {
     "fixture": "02.txt",
     "to": "docs/decisions/2026-09-29-max-default-effort.md",
     "heading": "## Repository rule relocated verbatim (2026-10-05)",
@@ -64,5 +58,17 @@
     "to": "examples/claude-native/workflows/README.md",
     "heading": "## Native workflow mechanics relocated (2026-10-05)",
     "bytes": 872
+  },
+  {
+    "fixture": "12.txt",
+    "to": "examples/claude-native/workflows/README.md",
+    "heading": "## Native workflow mechanics relocated (2026-10-05)",
+    "bytes": 485
+  },
+  {
+    "fixture": "13.txt",
+    "to": "examples/claude-native/workflows/README.md",
+    "heading": "## Native workflow mechanics relocated (2026-10-05)",
+    "bytes": 319
   }
 ]

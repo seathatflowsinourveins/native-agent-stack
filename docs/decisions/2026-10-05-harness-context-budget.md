@@ -853,3 +853,37 @@ changes here. The top-rule/lanes pin moves from
 `d21bb3bc0a2e68fb362af1d085da3761a08cc5ccec18ebd7ed16dd83d80bb3cd`. The
 [local-time record](2026-10-05-user-facing-local-time.md)'s 2026-10-06
 addendum holds the measurement table and the checks.
+
+## Addendum (2026-10-07): instruction core
+
+The [instruction-core decision](2026-10-07-instruction-core.md) trims the three
+startup sources and lowers both fixed ceilings by the procedure above.
+
+| Client | Scope before | Old ceiling | Scope after | New ceiling |
+| --- | ---: | ---: | ---: | ---: |
+| Claude | 23,896 | 24,458 | 19,471 | 20,445 |
+| Codex | 20,101 | 20,103 | 15,778 | 16,567 |
+
+Each new ceiling is the measured scope plus 5%, rounded upward, and the constants
+change in the same diff. The compact Codex template is 7,418 bytes, below the
+unchanged 8,192-byte bound, and its rendered block is 8,484 bytes.
+
+That decision supersedes the root copies named in "Required startup behavior and
+accepted-record amendments" above: cross-family dispatch and the full routing
+paragraph inline in root `AGENTS.md`, the discovery conditional and S1 on root,
+and the root trading trigger. Both user-level blocks keep those sentences, and
+the trading trigger now sits in `.claude/rules/trading.md` with a root pointer.
+The StructuredOutput restoration, the verbatim RTK block, S2, S3 and the
+8,192-byte bound stand.
+
+Root's routing copy is now a 141-byte pointer. The rollout gate above, as amended
+on 2026-10-06, still required a read-back before that replacement. The command
+center waived that condition for this change on 2026-10-07: the routing text
+itself stays byte-identical in the Codex template, and only the root copy becomes
+a pointer. The measured values above replace the 188-byte pointer and the 24,031
+and 19,389 ceilings that were projected for the replacement.
+
+Passage contract 01 leaves the active contracts, and `01.txt` stays as its
+October 5 snapshot. Contracts 12 and 13 bind the courier recipe and the
+upstream-practice citation sentence to the workflow README's mechanics section.
+No host file changes with this addendum.
