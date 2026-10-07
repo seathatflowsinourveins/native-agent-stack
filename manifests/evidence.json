@@ -4886,8 +4886,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "d88a2891939c8df5979150c1f3b6cab0759df0fef1b3b910189f6a66abee6eea",
-      "bytes": 39985
+      "sha256": "4a26082ea361b31cc164ffe20dc1a288a9933dec770d60b64f41c8f3741a7392",
+      "bytes": 42878
     },
     {
       "path": ".gitignore",
@@ -17839,6 +17839,11 @@
       "path": "docs/decisions/2026-10-07-serena-jcodemunch-native-navigation-wiring.md",
       "sha256": "a53c6d09e4137beeafc3651af99ab1f255f0fc4e2402829132a76646bb9e9228",
       "bytes": 10406
+    },
+    {
+      "path": "docs/decisions/2026-10-07-validate-module-shards.md",
+      "sha256": "ed39b46b1406909d88632c13d80805b077c65bae0bf0bfbf8d60575e8619c6c7",
+      "bytes": 14641
     },
     {
       "path": "docs/direct-results.md",
@@ -51876,6 +51881,11 @@
       "bytes": 60963
     },
     {
+      "path": "evidence/artifacts/validate-module-shards-20261007/preparation.json",
+      "sha256": "dcf7aa0f66b407d6733a8340eb9bb420aec9f8fc0ae3c3de36be3fbfbea1467e",
+      "bytes": 8660
+    },
+    {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
       "sha256": "c6ecc30a169b4af802f7e8497c7ebfc7c9373114bdd8589ef4ee4db102e516c3",
       "bytes": 8384
@@ -55476,6 +55486,16 @@
       "bytes": 15403
     },
     {
+      "path": "scripts/validate_shard_weights.json",
+      "sha256": "34ce9b0bbf2ccb20722c6e45cac027ee086beb588d8c82729269c9cc76db8674",
+      "bytes": 17352
+    },
+    {
+      "path": "scripts/validate_shards.py",
+      "sha256": "7e6c965fc70147e2753c588376aa92fd6400500beee0fb992e8caac69ee04c21",
+      "bytes": 21933
+    },
+    {
       "path": "scripts/verify_nautilus_ci.py",
       "sha256": "e14e3372815747eefa800f3538f30eabfb4fab7025ccc507bb0b946e67d2292f",
       "bytes": 8608
@@ -56281,6 +56301,11 @@
       "bytes": 377687
     },
     {
+      "path": "tests/test_landscape_sweep_skills.py",
+      "sha256": "4f789458553548cae2b40545c83dcd52cc810faa73b28a724cdfc3cd5aa89a9b",
+      "bytes": 184120
+    },
+    {
       "path": "tests/test_lane_packets.py",
       "sha256": "f1e74add4e93c382c46e9df426d40a084fa327ebdbbda6873bb03740a42ce4cf",
       "bytes": 111632
@@ -56567,8 +56592,8 @@
     },
     {
       "path": "tests/test_promotion_gate.py",
-      "sha256": "8dde55b8406a18d6d5b043fe15289cf7660ee001a465a9927e61982d95afebfa",
-      "bytes": 28717
+      "sha256": "1c57740baf68290ed005dde43f3e3e415aa4974ab6df55c539a0953a849b3022",
+      "bytes": 31372
     },
     {
       "path": "tests/test_promotion_gate_codex_review.py",
@@ -56662,8 +56687,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "8cb8f02858dd261aaa24f961784385f39b06a4d311ff08742708cbf0f1fe743d",
-      "bytes": 43323
+      "sha256": "7b3a98932fe40fd8fe13409d1fff2e85ad0d01a8cbdc910f70e52961c1f1a51c",
+      "bytes": 44140
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -56796,6 +56821,11 @@
       "bytes": 37188
     },
     {
+      "path": "tests/test_validate_shards.py",
+      "sha256": "c84bbb61fc4b5c901ced3b076d46818617ff68b9d9051ba2f77ced65ee25c16e",
+      "bytes": 12648
+    },
+    {
       "path": "tests/test_verdict_lane_vendoring.py",
       "sha256": "02465e7ca09a3d4ee72e3855084cc5b54ee223b209bb6169cb9deea1c5d9fdab",
       "bytes": 12669
@@ -56812,8 +56842,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "acbd0d2aaac0dcb2842ec63a609f2a83b48dfc06dfa168d7660e73ad8cb86727",
-      "bytes": 149433
+      "sha256": "bbd35d1e524835d69a4af9cc0f7df4afb08d5a7cbd5373a9446d37df2781fe01",
+      "bytes": 162528
     },
     {
       "path": "tests/test_workflow_policy.py",
