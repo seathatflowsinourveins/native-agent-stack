@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-catalog-native-wiring-contract-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "source_review",
+  "claim": "Finalized-catalog adoption declarations require vendor-native per-client integration and state readback, fresh implicit-use native smokes, and owner-qualified daily organic evidence on the actual invocation channel. This is a declaration contract with local fixtures; it installs, smokes or adopts no tool.",
+  "limitations": [
+    "Declared references and consistency are checked, not the truth of external vendor, state, execution or counter claims.",
+    "Production hook invoke-map and qualified working-day policy/report are not present at the read source pin; unknown/deferred daily state remains non-adopted.",
+    "No universal working-day duration or OIR threshold, telemetry collector, runner or duplicate organic qualifier is introduced.",
+    "Vendor documentation initially supports pinned repository snapshots and same-vendor integration repositories; unsupported unpinned official-site citations remain unresolved rather than adopted.",
+    "Operational client integration, restart-window fixes, fresh-session smokes and daily measurement belong to their designated owners; this lane changes no client configuration or runtime.",
+    "Local state-readback classes remain local; native functional smoke and organic-owner qualification remain distinct. Synthetic/planning evidence cannot qualify completed daily adoption.",
+    "All existing 79 roles stay pending with null census and empty selections; no native readiness figure changes. Independent exact-head review is pending.",
+    "Daily qualification also needs a known canonical native-client emitter source pin. Missing or unmapped client source identity remains non-adopted; this carrier adds no unpinned official-site/version-mapping parser."
+  ],
+  "source_base_commit": "96d0979fa1b7c92d98f0e6d791ae25a5bb047625",
+  "links_prior_records": [
+    {
+      "path": "evidence/receipts/ns2604-terminal-catalog-context-20261007.json",
+      "sha256": "d78f062de04a3c68665c24afa9378b2ab30bb0c3e4170b2d8172d2bb35d280fa",
+      "commit": "96d0979fa1b7c92d98f0e6d791ae25a5bb047625"
+    },
+    {
+      "path": "evidence/receipts/ns2604-finalized-catalog-contract-20261007.json",
+      "sha256": "f6eafe42f2a9a8cc476a981e33064ed0c385536bb3bc58d00feb2d62294e4526",
+      "commit": "fbb202239fb28d84078494216427e1a0722d2b86"
+    }
+  ],
+  "decision_record": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
+  "method_source": {
+    "locator": "coordination:command-center/ITEM-ns2604-coop-20261007T005140Z.md:16-21,33",
+    "sha256": "bbf0ace2829ba9ffb051f53445a1ce8a1ff3eafe16339a0a82d9d2563a109d0e"
+  },
+  "carrier_changes": {
+    "installed_and_smoked": "Existing install_smoke per-client integration, installation, wiring and smoke declarations; native state, vendor docs, actual registration and implicit-use path evidence are resolved separately.",
+    "organic_use": "Existing native organic cells additionally resolve daily_report with qualified day definition, coverage, invoke-map/emitter and original classified counters after both smokes; canonical organic owner loader remains authoritative for protocol consistency."
+  },
+  "under_invocation": "Measured zero is an adoption defect, not exclusion evidence. Absent measurement remains unknown. Instruction text alone cannot supply the full installation/smoke/day chain.",
+  "owner_prospective_sources": {
+    "locator": "coordination:ns2604-coop/notes/dispatch-20261006T1915Z/invoke-rates-overlap-token.md:12,21,24-29",
+    "sha256": "d7d12d5604b5c3d372d6a782968ac342188f979d07f03fc73ba3ee9f46f1e8e4",
+    "status": "plan_not_executed_qualification"
+  },
+  "retained_source_critic_findings": [
+    "vendor registration identity",
+    "original exercised native path and context",
+    "qualified working-day origin/coverage",
+    "local installed-state evidence-class preservation",
+    "invoke-map/emitter and original counter class/report membership",
+    "non-synthetic day qualification",
+    "known client source-pin binding"
+  ],
+  "checks": [
+    {
+      "stage": "baseline_new_carriers",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "tests": 40,
+      "returned_summary": "Ran 40 tests in 0.720s; OK.",
+      "retained_output_sha256": "69d3a97d0e50c8e14e7ccdefc9776f12f2d78f010023e868cef97da60148aa35"
+    },
+    {
+      "stage": "scope_counterfixture_first",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "tests": 50,
+      "failures": 1,
+      "returned_summary": "One expectation mismatch was retained: a changed daily window first conflicted with the original owner definition, before the expected smoke-order check.",
+      "retained_output_sha256": "d7e6b83d5cd3f16b3baf4b5d925c5bf75c14a2e822b2be849a76cda002ee3d23"
+    },
+    {
+      "stage": "integrated_initial_repairs",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog tests.test_foundation_catalog tests.test_catalogs tests.test_validate",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "tests": 191,
+      "returned_summary": "Ran 191 tests in 3.677s; OK.",
+      "retained_output_sha256": "8f6fe622240fe890b4b4bd2072ca964efe97ba4d48233306aaa929e378d56c2f"
+    },
+    {
+      "stage": "final_origin_and_client_pin_repairs",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog tests.test_foundation_catalog tests.test_catalogs tests.test_validate",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "tests": 194,
+      "focused_tests": 60,
+      "returned_summary": "Ran 194 tests in 3.705s; OK.",
+      "retained_output_sha256": "cd21320fdcb1b6601cb7baf8383ed8579c9261a690897b693ee08a6631f88f8e"
+    },
+    {
+      "stage": "publication_integrity_after_registration",
+      "command": "python3 scripts/validate.py",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "returned_summary": "{\"components\": 69, \"hashed_files\": 10370, \"profiles\": 4, \"receipts\": 219, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "retained_output_sha256": "316faea451f26497693d1882aca64f898187c863d0a420ae7fa5667c84cb443d"
+    }
+  ],
+  "qualified_adoption_records_populated": 0,
+  "source_file_sha256": {
+    "scripts/validate_foundation.py": "4c3531b763f126ebd78153651afba5fb44c3b1a44a9d08dc351a7122aebf1f34",
+    "tests/test_finalized_foundation_catalog.py": "85c030accdd8e93c843829c2237921e3451f7dac6686125130650abd5e3a5093",
+    "docs/decisions/2026-10-07-finalized-sota-catalog.md": "2ae97d1d4d8d3aa14b02ac08522a73d2637a1aa2430794eabcc3125445cf3a2a"
+  },
+  "checks_pending": [
+    "independent exact-head wiring-contract read"
+  ],
+  "source_completeness_critic": {
+    "evidence_class": "source_review",
+    "independent_cross_family": false,
+    "final_unresolved_findings": 0,
+    "retained_conditions": [
+      "vendor registration identity",
+      "original exercised native path and context",
+      "qualified working-day origin/coverage",
+      "local installed-state evidence-class preservation",
+      "invoke-map/emitter and original counter class/report membership",
+      "non-synthetic day qualification",
+      "known client source-pin binding"
+    ]
+  }
+}

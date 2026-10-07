@@ -15,12 +15,13 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from scripts.validate import InvalidPublication, validate as validate_publication
 from scripts.validate_catalogs import InvalidCatalog
 from scripts.validate_foundation import (
     FINALIZED_SELECTION, MANIFEST, REPOSITORY_COVERAGE,
-    validate_finalized_selection, validate_foundation,
+    SelectionEvidence, validate_finalized_selection, validate_foundation,
 )
 from tests import test_foundation_catalog as foundation_fixtures
 from tests import test_validate as publication_fixtures
@@ -128,9 +129,15 @@ class FinalizedSelectionTests(unittest.TestCase):
                   "release_date": "2026-10-01", "clean_release": True,
                   "release_ref": self.source_ref("manifests/landscape.json", f"/current_core_releases/{position}"),
                   "candidate_binding": None}, "evidence_classes": ["metadata_only"],
-                  "install_smoke": [{"client": client, "installation": unknown(), "wiring": unknown(), "smoke": unknown()}
+                  "install_smoke": [{"client": client, "integration": {
+                      "status": "unknown", "reason": "Native integration not qualified.", "channel": None, "integration_path": None,
+                      "vendor_ref": None, "readback_refs": [], "provenance_refs": []},
+                      "installation": unknown(), "wiring": unknown(), "smoke": unknown()}
                                     for client in ("claude", "codex")],
-                  "organic": [{"client": client, "arm": arm, "task_scope": None, **unknown()} for client in ("claude", "codex") for arm in ("native", "env")],
+                  "organic": [{"client": client, "arm": arm, "task_scope": None, **unknown(), **({"daily_report": {
+                      "status": "unknown", "reason": "Owner working-day report/policy unavailable.", "policy_ref": None,
+                      "report_ref": None}} if arm == "native" else {})}
+                              for client in ("claude", "codex") for arm in ("native", "env")],
                   "refutations": [{"family": family, "role": role, "status": "unknown", "reason": "No original judgment returned.",
                                    "source_field_ref": None, "judgment_refs": [], "result": None}
                                   for family in ("claude", "gpt6") for role in ("facts", "fit")],
@@ -181,7 +188,7 @@ class FinalizedSelectionTests(unittest.TestCase):
         for component in stack["components"]:
             component["profile"] = "core"
         if "profiles" in stack:
-            stack["profiles"][0]["component_ids"].extend(self.component_ids.values())
+            stack["profiles"][0]["component_ids"].extend(component["id"] for component in self.stack["components"])
         registry = json.loads((fixture.root / "manifests/evidence.json").read_text())
         additional = self.registry()
         registry["receipts"].extend(additional["receipts"])
@@ -248,6 +255,371 @@ class FinalizedSelectionTests(unittest.TestCase):
                            judgment_refs=refs, result=results)
         row["evidence_classes"].append("synthetic")
         self.refresh_refs()
+
+    def external_evidence_ref(self, path, target):
+        artifacts = self.packet["data"].setdefault("artifacts", [])
+        if {"path": path} not in artifacts:
+            artifacts.append({"path": path})
+        return {**self.source_ref(path, ""), "receipt_id": self.packet["id"],
+                "evidence_class": target["evidence_class"], "scope": target["scope"]}
+
+    def wiring_chain(self, *, instruction_path=False):
+        """Source-declared prototype, never real deployment or owner qualification."""
+        row, slot = self.default_row(), self.document["slots"][0]
+        slot["task_scope"] = "One source-retrieval fixture"
+        self.add_refuters()
+        for cid, repo in (("claude-code", "https://github.com/anthropics/claude-code"),
+                         ("codex", "https://github.com/openai/codex")):
+            self.stack["components"].append({"id": cid, "repository": repo, "version": "1.0.0", "source_pin": "e" * 40, "profile": "core",
+                                             "commands": ["fixture-client --help"], "evidence_ids": [self.packet["id"]]})
+            self.stack["profiles"][0]["component_ids"].append(cid)
+            self.packet["component_ids"].append(cid)
+        self.packet["data"]["vendors"] = {}
+        self.packet["data"]["readbacks"] = {}
+        for client in ("claude", "codex"):
+            integration_path = "vendor-instructions" if instruction_path else "vendor-hook-install"
+            vendor = {"kind": "vendor_client_integration", "repository": RESEARCH, "component_pin": "1.0.0",
+                      "source_commit": self.release_commit, "client": client, "client_version": "1.0.0",
+                      "role": slot["role"], "layer_id": slot["layer_id"], "channel": "hook",
+                      "integration_path": integration_path, "registration_surface": "client-native-registration",
+                      "registration_names": ["fixture-native-hook"], "native_operations": ["bounded-source-query"],
+                      "required_provenance": [], "documentation": {"repository": RESEARCH, "commit": self.release_commit,
+                      "path": "README.md", "start_line": 10, "end_line": 12,
+                      "url": RESEARCH + "/blob/" + self.release_commit + "/README.md#L10-L12"}}
+            readback = {"kind": "native_integration_readback", "repository": RESEARCH, "pin": "1.0.0",
+                        "component_ids": row["component_ids"], "evidence_class": "native_proven", "scope": "Names-only native readback",
+                        "client": client, "client_version": "1.0.0", "role": slot["role"], "layer_id": slot["layer_id"],
+                        "channel": "hook", "integration_path": integration_path, "registration_surface": vendor["registration_surface"],
+                        "names": ["fixture-native-hook"], "names_only": True, "completed_at_utc": "2026-10-06T09:00:00Z"}
+            self.packet["data"]["vendors"][client] = vendor
+            self.packet["data"]["readbacks"][client] = readback
+            consumer = next(value for value in row["install_smoke"] if value["client"] == client)
+            consumer["integration"] = {"status": "recorded", "reason": None, "channel": "hook", "integration_path": integration_path,
+                                       "vendor_ref": self.source_ref(self.packet_path, "/data/vendors/" + client),
+                                       "readback_refs": [self.evidence_ref("/data/readbacks/" + client, readback)], "provenance_refs": []}
+            for stage in ("install", "wiring", "smoke"):
+                _, target = self.add_smoke(client=client, stage=stage, evidence_class="native_proven")
+                target.update(client_version="1.0.0", channel="hook", observed_at_utc={
+                    "install": "2026-10-06T08:00:00Z", "wiring": "2026-10-06T08:30:00Z",
+                    "smoke": "2026-10-06T10:00:00Z"}[stage])
+                target["commands"][0]["cmd"] = "fixture native operation"
+                if stage == "smoke":
+                    context = {"kind": "native_session_context", "repository": RESEARCH, "pin": "1.0.0",
+                               "component_ids": row["component_ids"], "evidence_class": "native_proven", "scope": "Fresh task context",
+                               "client": client, "client_version": "1.0.0", "role": slot["role"], "layer_id": slot["layer_id"],
+                               "task_scope": slot["task_scope"], "channel": "hook", "session_digest": ("1" if client == "claude" else "2") * 64,
+                               "launched_at_utc": "2026-10-06T09:30:00Z", "fresh_session": True,
+                               "task_prompt_named_tool": False, "extra_task_harness_named_tool": False,
+                               "prompt_sha256": "3" * 64, "harness_sha256": "4" * 64}
+                    path = f"evidence/artifacts/fresh-context-{client}.json"
+                    self.source_documents[path] = context
+                    target["context_proof_ref"] = self.external_evidence_ref(path, context)
+                    from scripts.saturation_ledger import canonical
+                    execution = {"kind": "native_integration_execution", "repository": RESEARCH, "pin": "1.0.0",
+                                 "component_ids": row["component_ids"], "evidence_class": "native_proven", "scope": "Original native path execution",
+                                 "client": client, "client_version": "1.0.0", "role": slot["role"], "layer_id": slot["layer_id"],
+                                 "task_scope": slot["task_scope"], "channel": "hook", "integration_path": integration_path,
+                                 "registration_name": "fixture-native-hook", "native_operation": "bounded-source-query",
+                                 "session_digest": context["session_digest"], "completed_at_utc": "2026-10-06T09:45:00Z",
+                                 "command_sha256": hashlib.sha256(canonical(target["commands"])).hexdigest(), "output_sha256": "b" * 64}
+                    event_path = f"evidence/artifacts/native-execution-{client}.json"
+                    self.source_documents[event_path] = execution
+                    target["native_execution_ref"] = self.external_evidence_ref(event_path, execution)
+        self.owner_records = []
+        self.packet["data"]["organic_use"] = {"records": []}
+        for client in ("claude", "codex"):
+            index = len(self.owner_records)
+            record = {"component_id": row["component_ids"][0], "component_pin": "1.0.0", "task_scope": slot["task_scope"],
+                      "client": {"id": "claude-code" if client == "claude" else client}, "arm": "native",
+                      "layer_ids": [slot["layer_id"]], "evidence_class": "native_proven", "verdict": "READY"}
+            self.packet["data"]["organic_use"]["records"].append(record)
+            pointer = f"/data/organic_use/records/{index}"
+            self.owner_records.append({**record, "block_ref": self.packet_path + "#" + pointer})
+            cell = next(cell for cell in row["organic"] if cell["client"] == client and cell["arm"] == "native")
+            cell.update(status="recorded", reason=None, task_scope=slot["task_scope"], evidence_refs=[
+                self.evidence_ref(pointer, {**record, "scope": slot["task_scope"]})])
+            policy_path = f"evidence/artifacts/day-policy-{client}.json"
+            counter_path = f"evidence/artifacts/day-counter-{client}.json"
+            report_path = f"evidence/artifacts/day-report-{client}.json"
+            # The fixture owner declares these endpoints. The checker contains
+            # no universal 8h/24h interpretation of 'one working day'.
+            window = {"since": "2026-10-06T13:00:00Z", "until": "2026-10-06T21:00:00Z"}
+            counter_type = "hook_execution_complete" if client == "claude" else "codex_hooks_run_total"
+            common = {"repository": RESEARCH, "component_pin": "1.0.0", "client": client, "client_version": "1.0.0",
+                      "role": slot["role"], "layer_id": slot["layer_id"], "task_scope": slot["task_scope"],
+                      "channel": "hook", "counter_type": counter_type, "window": window}
+            definition_path = f"evidence/artifacts/day-definition-{client}.json"
+            definition = {"kind": "owner_working_day_definition", "owner": "fixture-owner", "period": "one_working_day",
+                          "definition_id": "fixture-booked-day", "time_zone": "America/New_York", "working_date": "2026-10-06",
+                          "local_since": "2026-10-06T09:00:00-04:00", "local_until": "2026-10-06T17:00:00-04:00",
+                          "window": copy.deepcopy(window)}
+            self.source_documents[definition_path] = definition
+            definition_ref = self.source_ref(definition_path, "")
+            qualification_path = f"evidence/artifacts/day-definition-qualification-{client}.json"
+            qualification = {**common, "pin": "1.0.0", "component_ids": row["component_ids"], "scope": "Qualified fixture day definition",
+                             "kind": "working_day_definition_qualification", "owner": "fixture-owner", "result": "accepted",
+                             "evidence_class": "source_review", "definition_ref": definition_ref, "qualified_at_utc": "2026-10-06T12:00:00Z"}
+            self.source_documents[qualification_path] = qualification
+            invoke_map_path = f"evidence/artifacts/invoke-map-{client}.json"
+            emitter_path = f"evidence/artifacts/native-emitter-{client}.json"
+            client_repo = "https://github.com/anthropics/claude-code" if client == "claude" else "https://github.com/openai/codex"
+            self.source_documents[emitter_path] = {"kind": "native_counter_source", "client": client, "client_version": "1.0.0",
+                "channel": "hook", "counter_type": counter_type, "event_kind": "hook_execution", "documentation": {
+                    "repository": client_repo, "commit": "e" * 40, "path": "README.md", "start_line": 20, "end_line": 20,
+                    "url": client_repo + "/blob/" + "e" * 40 + "/README.md#L20"}}
+            self.source_documents[invoke_map_path] = {**{k: v for k, v in common.items() if k != "window"},
+                "kind": "owner_native_invoke_map", "owner": "fixture-owner", "counter_source_ref": self.source_ref(emitter_path, "")}
+            self.source_documents[policy_path] = {**common, "kind": "native_tool_working_day_policy", "owner": "fixture-owner",
+                "period": "one_working_day", "definition_ref": definition_ref,
+                "definition_qualification_ref": self.external_evidence_ref(qualification_path, qualification),
+                "invoke_map_ref": self.source_ref(invoke_map_path, "")}
+            self.source_documents[counter_path] = {**common, "kind": "native_channel_counter", "organic_invocations": 3,
+                                                   "requested": False, "smoke_harness": False,
+                "excluded_smoke_sessions": ["1" * 64, "2" * 64], "component_ids": row["component_ids"], "scope": "Original native counters",
+                "evidence_class": "local_integration", "event_kind": "hook_execution"}
+            policy_ref = self.source_ref(policy_path, "")
+            coverage_path = f"evidence/artifacts/day-coverage-{client}.json"
+            coverage = {**common, "kind": "owner_working_day_coverage", "owner": "fixture-owner", "pin": "1.0.0",
+                        "component_ids": row["component_ids"], "scope": "Original qualified-day coverage", "evidence_class": "local_integration",
+                        "policy_ref": policy_ref, "definition_ref": definition_ref, "observed_until": window["until"]}
+            self.source_documents[coverage_path] = coverage
+            report = {**{key: value for key, value in common.items() if key != "component_pin"},
+                      "kind": "native_tool_daily_invoke_report", "owner": "fixture-owner", "pin": "1.0.0",
+                      "component_ids": row["component_ids"], "evidence_class": "local_integration", "scope": "Source-declared daily native counters",
+                      "generated_at": "2026-10-06T21:01:00Z", "observed_until": "2026-10-06T21:00:00Z",
+                      "policy_ref": policy_ref, "organic_invocations": 3, "directed_smoke_invocations": 2,
+                      "unknown_invocations": 0, "result": "observed", "source_refs": [self.source_ref(counter_path, "")]}
+            report["source_refs"] = [self.external_evidence_ref(counter_path, self.source_documents[counter_path])]
+            report["coverage_ref"] = self.external_evidence_ref(coverage_path, coverage)
+            self.source_documents[report_path] = report
+            cell["daily_report"] = {"status": "recorded", "reason": None, "policy_ref": policy_ref,
+                                    "report_ref": self.external_evidence_ref(report_path, report)}
+        row["evidence_classes"] = ["metadata_only", "synthetic", "native_proven", "local_integration", "source_review"]
+        row["adoption_status"] = "adopted"
+        self.refresh_chain()
+
+    def refresh_chain(self):
+        # Context/policy/counter artifacts are separate from the report holding
+        # their hashes: no self-referential source digest is constructed.
+        for client in ("claude", "codex"):
+            path = f"evidence/artifacts/day-report-{client}.json"
+            if path not in self.source_documents:
+                continue
+            report = self.source_documents[path]
+            policy_path = f"evidence/artifacts/day-policy-{client}.json"
+            policy = self.source_documents[policy_path]
+            definition_path = f"evidence/artifacts/day-definition-{client}.json"
+            qualification_path = f"evidence/artifacts/day-definition-qualification-{client}.json"
+            qualification = self.source_documents[qualification_path]
+            qualification["definition_ref"] = self.source_ref(definition_path, "")
+            policy["definition_ref"] = self.source_ref(definition_path, "")
+            policy["definition_qualification_ref"] = self.external_evidence_ref(qualification_path, qualification)
+            invoke_map_path = f"evidence/artifacts/invoke-map-{client}.json"
+            self.source_documents[invoke_map_path]["counter_source_ref"] = self.source_ref(f"evidence/artifacts/native-emitter-{client}.json", "")
+            policy["invoke_map_ref"] = self.source_ref(invoke_map_path, "")
+            report["policy_ref"] = self.source_ref(f"evidence/artifacts/day-policy-{client}.json", "")
+            counter_path = f"evidence/artifacts/day-counter-{client}.json"
+            report["source_refs"] = [self.external_evidence_ref(counter_path, self.source_documents[counter_path])]
+            coverage_path = f"evidence/artifacts/day-coverage-{client}.json"
+            coverage = self.source_documents[coverage_path]
+            coverage["policy_ref"] = report["policy_ref"]
+            coverage["definition_ref"] = policy["definition_ref"]
+            report["coverage_ref"] = self.external_evidence_ref(coverage_path, coverage)
+            context_path = f"evidence/artifacts/fresh-context-{client}.json"
+            target = self.packet["data"]["proofs"][client + "-smoke"]
+            target["context_proof_ref"] = self.external_evidence_ref(context_path, self.source_documents[context_path])
+            event_path = f"evidence/artifacts/native-execution-{client}.json"
+            target["native_execution_ref"] = self.external_evidence_ref(event_path, self.source_documents[event_path])
+        self.refresh_refs()
+
+    def chain_check(self):
+        with patch.object(SelectionEvidence, "qualified_organic_records", return_value=self.owner_records):
+            return self.check()
+
+    def chain_invalid(self, fragment):
+        with patch.object(SelectionEvidence, "qualified_organic_records", return_value=self.owner_records):
+            self.assert_invalid(fragment)
+
+    def test_adoption_requires_complete_native_chain_with_owner_declared_day(self):
+        self.wiring_chain()
+        self.assertEqual(self.chain_check()["repositories"], 4)
+        self.default_row()["organic"][0]["daily_report"].update(status="unknown", reason="Owner day not complete.", policy_ref=None, report_ref=None)
+        self.chain_invalid("adoption requires both clients")
+
+    def test_vendor_instruction_path_needs_full_native_chain_and_names_only_readback(self):
+        self.wiring_chain(instruction_path=True)
+        self.assertEqual(self.chain_check()["repositories"], 4)
+        self.packet["data"]["readbacks"]["claude"]["names"] = []
+        self.refresh_chain()
+        self.chain_invalid("expected nonempty array")
+
+    def test_missing_vendor_path_and_readback_values_do_not_establish_wiring(self):
+        self.wiring_chain()
+        vendor = self.packet["data"]["vendors"]["claude"]
+        vendor["integration_path"] = "other-native-route"
+        self.refresh_chain()
+        self.chain_invalid("vendor integration pin/path/channel mismatch")
+        vendor["integration_path"] = "vendor-hook-install"
+        self.packet["data"]["readbacks"]["claude"]["names_only"] = False
+        self.refresh_chain()
+        self.chain_invalid("native readback must carry names only")
+
+    def test_stale_tool_pin_or_client_version_cannot_qualify_native_integration(self):
+        self.wiring_chain()
+        vendor = self.packet["data"]["vendors"]["claude"]
+        for key, value, fragment in (("component_pin", "0.9.0", "selected repository/pin mismatch"),
+                                     ("client_version", "0.9.0", "consuming client version mismatch")):
+            original = vendor[key]
+            vendor[key] = value
+            self.refresh_chain()
+            self.chain_invalid(fragment)
+            vendor[key] = original
+
+    def test_reused_or_tool_named_task_context_cannot_supply_fresh_smoke(self):
+        self.wiring_chain()
+        context = self.source_documents["evidence/artifacts/fresh-context-claude.json"]
+        for key, value, fragment in (("fresh_session", False, "fresh consuming-client session"),
+                                     ("task_prompt_named_tool", True, "must not name the tool"),
+                                     ("extra_task_harness_named_tool", True, "must not name the tool")):
+            original = context[key]
+            context[key] = value
+            self.refresh_chain()
+            self.chain_invalid(fragment)
+            context[key] = original
+
+    def test_hook_integration_cannot_use_mcp_only_counter_report(self):
+        self.wiring_chain()
+        counter = self.source_documents["evidence/artifacts/day-counter-claude.json"]
+        counter["channel"] = "mcp"
+        counter["counter_type"] = "mcp_tool_result"
+        self.refresh_chain()
+        self.chain_invalid("raw counter uses wrong native channel")
+
+    def test_zero_unknown_and_short_snapshot_daily_results_cannot_adopt(self):
+        self.wiring_chain()
+        counter = self.source_documents["evidence/artifacts/day-counter-claude.json"]
+        report = self.source_documents["evidence/artifacts/day-report-claude.json"]
+        for count, result in ((0, "defect"), (None, "unknown")):
+            counter["organic_invocations"] = report["organic_invocations"] = count
+            report["result"] = result
+            self.refresh_chain()
+            self.chain_invalid("adoption requires both clients")
+        counter["organic_invocations"] = report["organic_invocations"] = 3
+        report["result"] = "observed"
+        report["window"] = {"since": "2026-10-06T19:00:00Z", "until": "2026-10-06T21:00:00Z"}
+        self.refresh_chain()
+        self.chain_invalid("complete source-declared working-day window")
+
+    def test_report_creation_timestamp_does_not_prove_window_completion(self):
+        self.wiring_chain()
+        report = self.source_documents["evidence/artifacts/day-report-claude.json"]
+        report["observed_until"] = "2026-10-06T20:00:00Z"
+        self.refresh_chain()
+        self.chain_invalid("creation does not establish completion")
+
+    def test_daily_window_before_smoke_and_directed_smoke_counts_reject(self):
+        self.wiring_chain()
+        policy = self.source_documents["evidence/artifacts/day-policy-claude.json"]
+        policy["window"]["since"] = "2026-10-06T09:00:00Z"
+        definition = self.source_documents["evidence/artifacts/day-definition-claude.json"]
+        definition["window"]["since"] = "2026-10-06T09:00:00Z"
+        definition["local_since"] = "2026-10-06T05:00:00-04:00"
+        self.source_documents["evidence/artifacts/day-definition-qualification-claude.json"]["qualified_at_utc"] = "2026-10-06T08:00:00Z"
+        self.refresh_chain()
+        self.chain_invalid("daily window must follow both clients")
+        policy["window"]["since"] = "2026-10-06T13:00:00Z"
+        definition["window"]["since"] = "2026-10-06T13:00:00Z"
+        definition["local_since"] = "2026-10-06T09:00:00-04:00"
+        self.source_documents["evidence/artifacts/day-counter-claude.json"]["requested"] = True
+        self.refresh_chain()
+        self.chain_invalid("cannot masquerade as organic daily use")
+
+    def test_synthetic_fresh_context_and_bool_only_day_claim_cannot_adopt(self):
+        self.wiring_chain()
+        context = self.source_documents["evidence/artifacts/fresh-context-claude.json"]
+        context["evidence_class"] = "synthetic"
+        self.refresh_chain()
+        self.chain_invalid("adoption requires both clients")
+        context["evidence_class"] = "native_proven"
+        policy = self.source_documents["evidence/artifacts/day-policy-claude.json"]
+        del policy["window"]
+        policy["working_day_complete"] = True
+        self.refresh_chain()
+        self.chain_invalid("unknown fields")
+
+    def test_unrelated_registration_names_cannot_prove_vendor_wiring(self):
+        self.wiring_chain()
+        self.packet["data"]["readbacks"]["claude"]["names"] = ["unrelated-hook"]
+        self.refresh_chain()
+        self.chain_invalid("vendor-required registration identities")
+
+    def test_version_only_smoke_cannot_borrow_original_native_path_event(self):
+        self.wiring_chain()
+        self.packet["data"]["proofs"]["claude-smoke"]["commands"][0]["cmd"] = "fixture --version"
+        self.refresh_chain()
+        self.chain_invalid("native path execution proof differs from actual returned smoke")
+
+    def test_relabelled_two_hour_window_cannot_override_original_qualified_day(self):
+        self.wiring_chain()
+        for name in ("day-policy", "day-counter", "day-report"):
+            self.source_documents[f"evidence/artifacts/{name}-claude.json"]["window"] = {
+                "since": "2026-10-06T19:00:00Z", "until": "2026-10-06T21:00:00Z"}
+        self.refresh_chain()
+        self.chain_invalid("original owner's working-day definition")
+
+    def test_mutually_relabelled_mcp_metric_cannot_override_original_invoke_map(self):
+        self.wiring_chain()
+        for name in ("day-policy", "day-counter", "day-report"):
+            self.source_documents[f"evidence/artifacts/{name}-claude.json"]["counter_type"] = "mcp_tool_result"
+        self.refresh_chain()
+        self.chain_invalid("original owner invoke-map")
+
+    def test_synthetic_raw_counters_cannot_qualify_local_daily_report(self):
+        self.wiring_chain()
+        self.source_documents["evidence/artifacts/day-counter-claude.json"]["evidence_class"] = "synthetic"
+        self.refresh_chain()
+        self.chain_invalid("adoption requires both clients")
+
+    def test_local_state_install_wiring_readbacks_keep_class_and_can_prove_state(self):
+        self.wiring_chain()
+        for client in ("claude", "codex"):
+            readback = self.packet["data"]["readbacks"][client]
+            readback["evidence_class"] = "local_integration"
+            carrier = next(value for value in self.default_row()["install_smoke"] if value["client"] == client)
+            carrier["integration"]["readback_refs"][0]["evidence_class"] = "local_integration"
+            for stage, field in (("install", "installation"), ("wiring", "wiring")):
+                self.packet["data"]["proofs"][client + "-" + stage]["evidence_class"] = "local_integration"
+                carrier[field]["evidence_refs"][0]["evidence_class"] = "local_integration"
+        self.refresh_chain()
+        self.assertEqual(self.chain_check()["repositories"], 4)
+
+    def test_smoke_must_follow_original_installation_and_wiring_completion(self):
+        self.wiring_chain()
+        self.packet["data"]["proofs"]["claude-install"]["observed_at_utc"] = "2026-10-06T12:00:00Z"
+        self.refresh_chain()
+        self.chain_invalid("installation/wiring must complete before native readback")
+
+    def test_synthetic_definition_qualification_cannot_qualify_a_native_day(self):
+        self.wiring_chain()
+        self.source_documents["evidence/artifacts/day-definition-qualification-claude.json"]["evidence_class"] = "synthetic"
+        self.refresh_chain()
+        self.chain_invalid("working-day qualification origin cannot be synthetic")
+
+    def test_emitter_full_commit_and_url_must_match_known_client_source_pin(self):
+        self.wiring_chain()
+        doc = self.source_documents["evidence/artifacts/native-emitter-codex.json"]["documentation"]
+        doc["commit"] = "f" * 40
+        doc["url"] = doc["repository"] + "/blob/" + doc["commit"] + "/README.md#L20"
+        self.refresh_chain()
+        self.chain_invalid("documentation commit differs from the canonical client source pin")
+
+    def test_unmapped_client_source_pin_keeps_daily_evidence_nonadopted(self):
+        self.wiring_chain()
+        component = next(component for component in self.stack["components"] if component["id"] == "codex")
+        del component["source_pin"]
+        self.chain_invalid("adoption requires both clients")
+        self.default_row()["adoption_status"] = "recommendation"
+        self.assertEqual(self.chain_check()["repositories"], 4)
 
     def test_all_declared_carrier_fields_are_required_and_typos_reject(self):
         row = self.default_row()

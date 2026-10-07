@@ -8,11 +8,13 @@ This checks consistency of the selection, never the truth of a prose assertion.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import math
 from pathlib import Path
 import re
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 if __package__:
     from .validate_catalogs import (
@@ -304,6 +306,310 @@ class SelectionEvidence:
             self.classes.add("source_review" if origin.get("evidence_level", origin.get("review_level")) == "source_review"
                              else "metadata_only")
 
+    @staticmethod
+    def instant(value, label):
+        """UTC instants, as in skill_usage's inclusive/exclusive report bounds.
+
+        native-agent-stack@96d0979fa1b7c92d98f0e6d791ae25a5bb047625:
+        tools/skill-usage/skill_usage.py:2163-2167,2251-2254.
+        No working-day duration is inferred from these timestamps.
+        """
+        text(value, label)
+        try:
+            result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise InvalidCatalog(f"{label}: invalid UTC timestamp") from error
+        require(result.tzinfo is not None and result.utcoffset() == timezone.utc.utcoffset(result),
+                label, "timestamp must be UTC")
+        return result
+
+    def client_scope(self, target, client, label):
+        object_value(target, label)
+        require(target.get("client") == client and target.get("role") == self.slot["role"]
+                and target.get("layer_id") == self.slot["layer_id"], label,
+                "native integration client/functional scope mismatch")
+        cid = "claude-code" if client == "claude" else "codex"
+        require(cid in self.components, label, "canonical consuming client pin is unavailable")
+        version = text(target.get("client_version"), label + ".client_version")
+        require(self.host.pin_matches(version, self.components[cid].get("version")), label,
+                "native consuming client version mismatch")
+        repo = target.get("repository")
+        require(self.identity(repo, label) == self.repo
+                and (self.host.pin_matches(target.get("component_pin", target.get("pin")), self.pin)
+                     or self.host.pin_matches(target.get("component_pin", target.get("pin")), self.commit)),
+                label, "native integration selected repository/pin mismatch")
+
+    def integration(self, value, label, client):
+        fields(value, {"status", "reason", "channel", "integration_path", "vendor_ref", "readback_refs", "provenance_refs"}, label)
+        status = self.disposition(value, label, observed=True)
+        if status in {"unknown", "deferred"}:
+            require(value["channel"] is None and value["integration_path"] is None and value["vendor_ref"] is None
+                    and value["readback_refs"] == [] and value["provenance_refs"] == [], label,
+                    "unresolved integration must not certify vendor wiring or readback")
+            return False
+        channel, path = text(value["channel"], label), text(value["integration_path"], label)
+        vendor = object_value(self.reference(value["vendor_ref"], label + ".vendor_ref"), label)
+        fields(vendor, {"kind", "repository", "component_pin", "source_commit", "client", "client_version",
+                        "role", "layer_id", "channel", "integration_path", "registration_surface",
+                        "documentation", "registration_names", "native_operations", "required_provenance"}, label + ".vendor")
+        require(vendor["kind"] == "vendor_client_integration", label,
+                "unsupported vendor-doc carrier: retain unknown/deferred rather than claiming native wiring")
+        self.client_scope(vendor, client, label)
+        require(vendor["source_commit"] == self.commit and vendor["channel"] == channel
+                and vendor["integration_path"] == path, label, "vendor integration pin/path/channel mismatch")
+        text(vendor["registration_surface"], label)
+        registration_names = strings(vendor["registration_names"], label + ".registration_names")
+        native_operations = strings(vendor["native_operations"], label + ".native_operations")
+        doc = vendor["documentation"]
+        fields(doc, {"repository", "commit", "path", "start_line", "end_line", "url"}, label + ".documentation")
+        name = self.identity(doc["repository"], label)
+        require(name.split("/")[0] == self.repo.split("/")[0], label, "integration documentation is not vendor-primary")
+        require(bool(SHA.fullmatch(text(doc["commit"], label))), label, "vendor documentation commit must be full")
+        if name == self.repo:
+            require(doc["commit"] == self.commit, label, "vendor documentation selected pin mismatch")
+        relative = text(doc["path"], label)
+        require(not relative.startswith("/") and "\\" not in relative and ":" not in relative
+                and all(part not in {"", ".", ".."} for part in relative.split("/")), label,
+                "vendor documentation needs a portable upstream file locator")
+        require(type(doc["start_line"]) is int and type(doc["end_line"]) is int
+                and 0 < doc["start_line"] <= doc["end_line"], label, "vendor documentation needs exact source lines")
+        suffix = f"#L{doc['start_line']}" + (f"-L{doc['end_line']}" if doc["end_line"] != doc["start_line"] else "")
+        expected = f"{doc['repository']}/blob/{doc['commit']}/{relative}{suffix}"
+        require(doc["url"] == expected, label, "vendor source URL does not bind repository/commit/file/lines")
+        required = strings(vendor["required_provenance"], label, nonempty=False)
+        completed, observed = set(), []
+        for ref in sequence(value["provenance_refs"], label, nonempty=False):
+            proof = self.reference(ref, label, evidence=True)
+            self.client_scope(proof, client, label)
+            require(proof.get("channel") == channel and proof.get("kind") in {"gap_fix", "quiet_window_application"},
+                    label, "gap/window provenance does not bind this native integration")
+            text(proof.get("item_ref"), label)
+            completed.add(proof["kind"])
+        require(set(required) <= completed, label, "required gap-fix/window application evidence is missing")
+        for ref in sequence(value["readback_refs"], label):
+            proof = self.reference(ref, label, evidence=True)
+            fields(proof, {"kind", "repository", "pin", "component_ids", "evidence_class", "scope", "client",
+                           "client_version", "role", "layer_id", "channel", "integration_path",
+                           "registration_surface", "names", "names_only", "completed_at_utc"}, label + ".readback")
+            self.client_scope(proof, client, label)
+            require(proof["kind"] == "native_integration_readback" and proof["names_only"] is True,
+                    label, "native readback must carry names only, never configuration values")
+            require(proof["channel"] == channel and proof["integration_path"] == path
+                    and proof["registration_surface"] == vendor["registration_surface"], label,
+                    "readback differs from vendor-native path/channel/surface")
+            strings(proof["names"], label + ".names")
+            require(set(registration_names) <= set(proof["names"]), label,
+                    "readback does not contain the vendor-required registration identities")
+            observed.append((self.instant(proof["completed_at_utc"], label), ref["evidence_class"]))
+        self.integrations[client] = {"channel": channel, "path": path,
+                                     "completed": max(at for at, _ in observed), "status": status,
+                                     "names": set(registration_names), "operations": set(native_operations)}
+        return status == "recorded" and all(level in {"native_proven", "local_integration"} for _, level in observed)
+
+    def fresh_smoke(self, target, client, label):
+        require(client in self.integrations, label, "fresh native smoke lacks a resolved vendor integration/readback")
+        integration = self.integrations[client]
+        self.client_scope(target, client, label)
+        require(target.get("channel") == integration["channel"], label, "smoke uses the wrong native channel")
+        ref = target.get("context_proof_ref")
+        context = self.reference(ref, label + ".context_proof", evidence=True)
+        fields(context, {"kind", "repository", "pin", "component_ids", "evidence_class", "scope", "client", "client_version",
+                         "role", "layer_id", "task_scope", "channel", "session_digest", "launched_at_utc", "fresh_session",
+                         "task_prompt_named_tool", "extra_task_harness_named_tool", "prompt_sha256", "harness_sha256"}, label + ".context")
+        self.client_scope(context, client, label)
+        require(context["kind"] == "native_session_context" and context["fresh_session"] is True, label,
+                "native smoke requires a fresh consuming-client session")
+        require(context["task_prompt_named_tool"] is False and context["extra_task_harness_named_tool"] is False,
+                label, "native smoke task prompt/extra harness must not name the tool")
+        require(context["channel"] == integration["channel"] and context["task_scope"] == self.slot.get("task_scope"),
+                label, "fresh smoke task/channel scope mismatch")
+        for field in ("session_digest", "prompt_sha256", "harness_sha256"):
+            require(bool(self.HEX64.fullmatch(text(context[field], label))), label, "fresh context needs frozen source hashes")
+        require(context["session_digest"] not in self.smoke_sessions, label, "native smoke session identity was reused")
+        launched = self.instant(context["launched_at_utc"], label)
+        ended = self.instant(target["observed_at_utc"], label)
+        require(integration["completed"] <= launched <= ended, label,
+                "native smoke session predates integration readback or completion")
+        prior = self.operation_completed.get(client, {})
+        require(set(prior) == {"install", "wiring"} and max(prior.values()) <= integration["completed"], label,
+                "installation/wiring must complete before native readback and fresh smoke")
+        event_ref = target.get("native_execution_ref")
+        event = self.reference(event_ref, label + ".native_execution", evidence=True)
+        fields(event, {"kind", "repository", "pin", "component_ids", "evidence_class", "scope", "client", "client_version",
+                       "role", "layer_id", "task_scope", "channel", "integration_path", "registration_name",
+                       "native_operation", "session_digest", "completed_at_utc", "command_sha256", "output_sha256"}, label + ".execution")
+        self.client_scope(event, client, label)
+        require(event["kind"] == "native_integration_execution" and event["channel"] == integration["channel"]
+                and event["integration_path"] == integration["path"] and event["registration_name"] in integration["names"]
+                and event["native_operation"] in integration["operations"], label,
+                "smoke did not exercise a vendor-documented native registration/path/operation")
+        require(event["task_scope"] == context["task_scope"] and event["session_digest"] == context["session_digest"]
+                and launched <= self.instant(event["completed_at_utc"], label) <= ended, label,
+                "native path event does not belong to this fresh smoke context")
+        command_digest = hashlib.sha256(self.saturation.canonical(target["commands"])).hexdigest()
+        require(event["command_sha256"] == command_digest
+                and event["output_sha256"] in {command["output_sha256"] for command in target["commands"]}, label,
+                "native path execution proof differs from actual returned smoke command/output")
+        self.smoke_sessions.add(context["session_digest"])
+        self.smoke_completed[client] = max(ended, self.smoke_completed.get(client, ended))
+        return ref["evidence_class"] == "native_proven" and event_ref["evidence_class"] == "native_proven"
+
+    def qualified_organic_records(self, label):
+        """The canonical owner's validated-record boundary, never a new qualifier."""
+        owner_path = Path(__file__).with_name("organic_use.py")
+        require(owner_path.is_file(), label, "canonical organic owner/validator is unavailable")
+        if __package__:
+            from . import organic_use
+        else:
+            import organic_use
+        require(Path(organic_use.__file__).resolve() == owner_path.resolve(), label, "organic owner source mismatch")
+        return organic_use.load_records(self.validator.root)
+
+    def report_window(self, value, label):
+        fields(value, {"since", "until"}, label)
+        start, end = self.instant(value["since"], label), self.instant(value["until"], label)
+        require(start < end, label, "native report window must be nonempty")
+        return start, end
+
+    def daily_report(self, value, client, label):
+        fields(value, {"status", "reason", "policy_ref", "report_ref"}, label)
+        status = self.disposition(value, label, observed=True)
+        if status in {"unknown", "deferred"}:
+            require(value["policy_ref"] is None and value["report_ref"] is None, label,
+                    "unresolved daily evidence cannot assert a completed working-day report")
+            return False
+        policy = object_value(self.reference(value["policy_ref"], label + ".policy"), label)
+        fields(policy, {"kind", "owner", "repository", "component_pin", "client", "client_version", "role", "layer_id",
+                       "task_scope", "channel", "counter_type", "period", "window", "definition_ref",
+                       "definition_qualification_ref", "invoke_map_ref"}, label + ".policy")
+        require(policy["kind"] == "native_tool_working_day_policy" and policy["period"] == "one_working_day", label,
+                "daily qualification needs the owner's explicit working-day policy")
+        self.client_scope(policy, client, label)
+        text(policy["owner"], label)
+        require(client in self.integrations and policy["channel"] == self.integrations[client]["channel"], label,
+                "daily policy does not match installed native counter channel")
+        require(policy["task_scope"] == self.slot.get("task_scope"), label, "daily policy workload scope mismatch")
+        text(policy["counter_type"], label)
+        start, end = self.report_window(policy["window"], label)
+        definition = object_value(self.reference(policy["definition_ref"], label + ".definition"), label)
+        fields(definition, {"kind", "owner", "period", "definition_id", "time_zone", "working_date", "local_since",
+                           "local_until", "window"}, label + ".definition")
+        require(definition["kind"] == "owner_working_day_definition" and definition["owner"] == policy["owner"]
+                and definition["period"] == "one_working_day" and definition["window"] == policy["window"], label,
+                "policy window differs from the original owner's working-day definition")
+        dated(definition["working_date"], label)
+        text(definition["definition_id"], label)
+        try:
+            zone = ZoneInfo(text(definition["time_zone"], label))
+        except ZoneInfoNotFoundError as error:
+            raise InvalidCatalog(f"{label}: unknown owner working-day time zone") from error
+        require(start.astimezone(zone).isoformat() == definition["local_since"]
+                and end.astimezone(zone).isoformat() == definition["local_until"]
+                and start.astimezone(zone).date().isoformat() == definition["working_date"], label,
+                "working-day UTC bounds differ from original calendar/local-time definition")
+        qualification = self.reference(policy["definition_qualification_ref"], label + ".definition_qualification", evidence=True)
+        require(policy["definition_qualification_ref"]["evidence_class"] in {"source_review", "local_integration", "native_proven"},
+                label, "working-day qualification origin cannot be synthetic, planning or metadata-only evidence")
+        require(qualification.get("kind") == "working_day_definition_qualification" and qualification.get("result") == "accepted"
+                and qualification.get("owner") == policy["owner"] and qualification.get("definition_ref") == policy["definition_ref"],
+                label, "working-day definition has no resolved owner qualification/origin")
+        self.client_scope(qualification, client, label)
+        require(self.instant(qualification.get("qualified_at_utc"), label) <= start, label,
+                "working-day definition was not qualified before measurement")
+        invoke_map = object_value(self.reference(policy["invoke_map_ref"], label + ".invoke_map"), label)
+        fields(invoke_map, {"kind", "owner", "repository", "component_pin", "client", "client_version", "role", "layer_id",
+                           "task_scope", "channel", "counter_type", "counter_source_ref"}, label + ".invoke_map")
+        self.client_scope(invoke_map, client, label)
+        require(invoke_map["kind"] == "owner_native_invoke_map" and invoke_map["owner"] == policy["owner"]
+                and invoke_map["channel"] == policy["channel"] and invoke_map["counter_type"] == policy["counter_type"]
+                and invoke_map["task_scope"] == policy["task_scope"], label,
+                "daily counter identity differs from the original owner invoke-map")
+        emitter = object_value(self.reference(invoke_map["counter_source_ref"], label + ".emitter"), label)
+        fields(emitter, {"kind", "client", "client_version", "channel", "counter_type", "event_kind", "documentation"}, label + ".emitter")
+        require(emitter["kind"] == "native_counter_source" and emitter["client"] == client
+                and emitter["channel"] == invoke_map["channel"] and emitter["counter_type"] == invoke_map["counter_type"], label,
+                "invoke-map metric/channel differs from the pinned native emitter source")
+        require(self.host.pin_matches(emitter["client_version"], self.components["claude-code" if client == "claude" else "codex"]["version"]),
+                label, "native emitter client pin mismatch")
+        text(emitter["event_kind"], label)
+        doc = emitter["documentation"]
+        fields(doc, {"repository", "commit", "path", "start_line", "end_line", "url"}, label + ".emitter.documentation")
+        cid = "claude-code" if client == "claude" else "codex"
+        require(self.host.normalize_repository(doc["repository"]) == self.host.normalize_repository(self.components[cid]["repository"])
+                and bool(SHA.fullmatch(text(doc["commit"], label))), label,
+                "native emitter documentation is not primary pinned client source")
+        client_commit = self.components[cid].get("source_pin")
+        emitter_pinned = isinstance(client_commit, str) and bool(SHA.fullmatch(client_commit))
+        if emitter_pinned:
+            require(doc["commit"] == client_commit, label,
+                    "native emitter documentation commit differs from the canonical client source pin")
+        require(type(doc["start_line"]) is int and type(doc["end_line"]) is int and 0 < doc["start_line"] <= doc["end_line"],
+                label, "native emitter source needs exact lines")
+        expected_url = f"{doc['repository']}/blob/{doc['commit']}/{text(doc['path'], label)}#L{doc['start_line']}"
+        if doc["end_line"] != doc["start_line"]:
+            expected_url += f"-L{doc['end_line']}"
+        require(doc["url"] == expected_url, label, "native emitter URL does not bind its source identity")
+        # Source-declared endpoints define the working day; no 8h/24h cutoff.
+        require(set(self.smoke_completed) == {"claude", "codex"}
+                and start >= max(self.smoke_completed.values()), label,
+                "daily window must follow both clients' fresh native smokes")
+        ref = value["report_ref"]
+        report = self.reference(ref, label + ".report", evidence=True)
+        fields(report, {"kind", "owner", "repository", "pin", "component_ids", "evidence_class", "scope", "client",
+                       "client_version", "role", "layer_id", "task_scope", "channel", "counter_type", "window",
+                       "generated_at", "observed_until", "policy_ref", "organic_invocations", "directed_smoke_invocations",
+                       "unknown_invocations", "result", "source_refs", "coverage_ref"}, label + ".report")
+        self.client_scope(report, client, label)
+        require(report["kind"] == "native_tool_daily_invoke_report" and report["owner"] == policy["owner"], label,
+                "daily report kind/owner mismatch")
+        require(report["policy_ref"] == value["policy_ref"] and report["window"] == policy["window"], label,
+                "daily report is not bound to the complete source-declared working-day window")
+        require(report["channel"] == policy["channel"] and report["counter_type"] == policy["counter_type"]
+                and report["task_scope"] == policy["task_scope"], label, "daily report uses wrong native counter channel/scope")
+        require(self.instant(report["observed_until"], label) >= end
+                and self.instant(report["generated_at"], label) >= self.instant(report["observed_until"], label),
+                label, "report creation does not establish completion of the measured window")
+        coverage = self.reference(report["coverage_ref"], label + ".coverage", evidence=True)
+        self.client_scope(coverage, client, label)
+        require(coverage.get("kind") == "owner_working_day_coverage" and coverage.get("owner") == policy["owner"]
+                and coverage.get("policy_ref") == value["policy_ref"] and coverage.get("definition_ref") == policy["definition_ref"]
+                and coverage.get("window") == policy["window"] and coverage.get("channel") == policy["channel"], label,
+                "daily report lacks original owner coverage for the qualified complete working day")
+        require(self.instant(coverage.get("observed_until"), label) >= end, label, "owner coverage ended before the working day")
+        totals = []
+        sources = set()
+        for source_ref in sequence(report["source_refs"], label):
+            locator = (source_ref.get("path"), source_ref.get("pointer"))
+            require(locator not in sources, label, "daily counter source was counted twice")
+            sources.add(locator)
+            counter = object_value(self.reference(source_ref, label + ".counter", evidence=True), label)
+            fields(counter, {"kind", "repository", "component_pin", "client", "client_version", "role", "layer_id", "task_scope",
+                             "channel", "counter_type", "window", "organic_invocations", "requested", "smoke_harness",
+                             "excluded_smoke_sessions", "component_ids", "evidence_class", "scope", "event_kind"}, label + ".counter")
+            self.client_scope(counter, client, label)
+            require(counter["kind"] == "native_channel_counter" and counter["channel"] == policy["channel"]
+                    and counter["counter_type"] == policy["counter_type"] and counter["window"] == policy["window"]
+                    and counter["task_scope"] == policy["task_scope"] and counter["event_kind"] == emitter["event_kind"], label,
+                    "raw counter uses wrong native channel or time/workload scope")
+            require(counter["requested"] is False and counter["smoke_harness"] is False, label,
+                    "directed smoke/requested invocations cannot masquerade as organic daily use")
+            excluded = strings(counter["excluded_smoke_sessions"], label)
+            require(self.smoke_sessions <= set(excluded), label, "daily counters did not exclude the smoke sessions")
+            count = counter["organic_invocations"]
+            require(count is None or type(count) is int and count >= 0, label, "organic count must be integer or unknown")
+            totals.append(count)
+        measured = all(source["evidence_class"] in {"native_proven", "local_integration"} for source in report["source_refs"])
+        count = report["organic_invocations"]
+        require(count is None or type(count) is int and count >= 0, label, "daily organic count must be integer or unknown")
+        require(count == (None if None in totals else sum(totals)), label, "daily organic total differs from original native counters")
+        for field in ("directed_smoke_invocations", "unknown_invocations"):
+            require(type(report[field]) is int and report[field] >= 0, label, "excluded/unknown counts must stay distinct")
+        expected = "unknown" if count is None else "defect" if count == 0 else "observed"
+        require(report["result"] == expected, label, "zero/unknown daily use is a defect/open item, never exclusion or qualification")
+        return status == "recorded" and count is not None and count > 0 and report["unknown_invocations"] == 0 \
+            and ref["evidence_class"] in {"native_proven", "local_integration"} and measured \
+            and report["coverage_ref"]["evidence_class"] in {"native_proven", "local_integration"} and emitter_pinned
+
     def proof(self, value, label, client, stage):
         fields(value, {"status", "reason", "evidence_refs"}, label)
         status = self.disposition(value, label, observed=True)
@@ -334,12 +640,21 @@ class SelectionEvidence:
                         "native command must retain its output hash")
             require(target["result"] != "pass" or all(c["exit"] == c.get("expected_exit", 0) for c in commands), label,
                     "passed evidence contains a failed command")
-            targets.append((target, ref["evidence_class"]))
-        return status == "recorded" and bool(targets) and all(target["result"] == "pass" and level == "native_proven"
-                                     for target, level in targets)
+            fresh = True
+            if status == "recorded" and stage == "smoke" and ref["evidence_class"] == "native_proven":
+                fresh = self.fresh_smoke(target, client, label)
+            targets.append((target, ref["evidence_class"], fresh))
+            if status == "recorded" and stage in {"install", "wiring"} and ref["evidence_class"] in {"native_proven", "local_integration"}:
+                self.operation_completed.setdefault(client, {})[stage] = self.instant(target["observed_at_utc"], label)
+        allowed = {"native_proven", "local_integration"} if stage in {"install", "wiring"} else {"native_proven"}
+        return status == "recorded" and bool(targets) and all(target["result"] == "pass" and level in allowed and fresh
+                                     for target, level, fresh in targets)
 
     def organic(self, value, label):
-        fields(value, {"client", "arm", "task_scope", "status", "reason", "evidence_refs"}, label)
+        required = {"client", "arm", "task_scope", "status", "reason", "evidence_refs"}
+        fields(value, required | ({"daily_report"} if value.get("arm") == "native" else set()), label)
+        daily = self.daily_report(value["daily_report"], value["client"], label + ".daily_report") \
+            if value["arm"] == "native" else True
         status = self.disposition(value, label, observed=True)
         refs = sequence(value["evidence_refs"], label + ".evidence_refs", nonempty=status in {"recorded", "observed"})
         require(status not in {"unknown", "deferred"} or not refs, label, "unresolved organic evidence needs empty refs")
@@ -360,18 +675,11 @@ class SelectionEvidence:
                 require(target.get("verdict") is None,
                         label, "unqualified observations cannot claim native qualification")
                 continue
-            owner_path = Path(__file__).with_name("organic_use.py")
-            require(owner_path.is_file(), label, "canonical organic owner/validator is unavailable")
-            if __package__:
-                from . import organic_use
-            else:
-                import organic_use
-            require(Path(organic_use.__file__).resolve() == owner_path.resolve(), label, "organic owner source mismatch")
-            records = organic_use.load_records(self.validator.root)
+            records = self.qualified_organic_records(label)
             match = [record for record in records if record.get("block_ref") == ref["path"] + "#" + ref["pointer"]]
             require(len(match) == 1, label, "organic reference is outside the canonical owner's carrier")
             passed = passed or (match[0].get("verdict") == "READY" and ref["evidence_class"] == "native_proven")
-        return status == "recorded" and passed
+        return status == "recorded" and passed and daily
 
     def refutations(self, rows, label):
         required = {(family, role) for family in ("claude", "gpt6") for role in ("facts", "fit")}
@@ -503,6 +811,7 @@ class SelectionEvidence:
         self.row, self.slot = row, slot
         self.repo = self.identity(row["repository"], label)
         self.classes = set()
+        self.integrations, self.smoke_completed, self.smoke_sessions, self.operation_completed = {}, {}, set(), {}
         strings(row["component_ids"], label + ".component_ids", nonempty=False)
         enum(row["adoption_status"], {"recommendation", "adopted"}, label)
         require(row["selection"] == "default" or row["adoption_status"] == "recommendation", label,
@@ -510,10 +819,11 @@ class SelectionEvidence:
         self.source(row["source"], label + ".source")
         clients, operations = set(), []
         for client in sequence(row["install_smoke"], label):
-            fields(client, {"client", "installation", "wiring", "smoke"}, label)
+            fields(client, {"client", "integration", "installation", "wiring", "smoke"}, label)
             name = enum(client["client"], {"claude", "codex"}, label)
             require(name not in clients, label, "duplicate consuming client")
             clients.add(name)
+            operations.append(self.integration(client["integration"], label + ".integration", name))
             operations.extend(self.proof(client[field], label + "." + field, name, stage)
                               for field, stage in (("installation", "install"), ("wiring", "wiring"), ("smoke", "smoke")))
         require(clients == {"claude", "codex"}, label, "both consuming client carriers required")

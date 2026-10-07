@@ -272,3 +272,65 @@ Sources: `native-agent-stack@fbb202239fb28d84078494216427e1a0722d2b86:docs/decis
 [3.7c](https://github.com/tmux/tmux/releases/tag/3.7c).
 The receipt retains sanitized locators and hashes for the CC deployment item,
 the feature check, orchestration observations and owner launcher sources.
+
+## Amendment (2026-10-07): vendor-native wiring before adoption
+
+The catalog's `installed_and_smoked` concept maps to the existing per-client
+`install_smoke` carrier. It now requires the whole integration chain: the
+vendor's documented path at the selected pin; retained, value-free installed
+readback for that path; any required gap correction through its owner; and one
+fresh-session operation per client whose task prompt does not name the tool.
+Vendor-provided routing instructions remain part of native integration;
+additional task instructions cannot force the tested tool into use.
+
+`organic_use` maps to the existing `organic` carrier and its canonical owner
+qualification. It additionally needs the invoke-rate owner's completed daily
+report after installation, wiring and both fresh smokes. The report must match
+the selected component, pin, consumer, functional scope and actual integration
+channel. A hook-based integration needs hook executions; MCP call totals cannot
+supply that evidence. Directed requests, smoke-harness runs and other exclusions
+must stay separate from counted organic invocations.
+
+A version check, visible registration or instruction line alone cannot establish
+adoption. A vendor-documented instruction path is valid when its installed
+readback, implicit-use smoke and daily evidence resolve. A measured zero is an
+adoption defect to investigate, not a default reason to exclude a tool. Missing
+telemetry remains unknown, rather than a measured zero or a completed result.
+
+The dashboard's owner must supply the working-day coverage policy and report.
+The checker binds their measured interval and completion to those source records,
+after both smoke completions; a later report-generation timestamp or an isolated
+completion boolean is insufficient. This catalog adds no universal duration or
+OIR threshold. Until that owner carrier exists, the daily qualification stays
+unknown or deferred and cannot authorize an `adopted` declaration.
+
+The current committed dashboard counts tool-result and MCP event families.
+The future hook counters and daily Dagu report remain owner plans, not executed
+qualification. The overnight 22:40Z–00:42Z snapshot is separate from the required
+completed working-day evidence. Operational wiring, client restart-window
+application, fresh client smokes and daily collection stay with their assigned
+owners; this amendment changes the declaration contract only.
+
+Sources at `native-agent-stack@96d0979fa1b7c92d98f0e6d791ae25a5bb047625`:
+`scripts/validate_foundation.py:307-373,510-571`,
+`scripts/validate_convergence.py:102-105,124-142`,
+`tools/skill-usage/skill_usage.py:2163,2251-2254`,
+`tools/skill-usage/README.md:163,623`, and
+`observability/backends/templates/ecosystem-dashboard.json.example:613,657,701`.
+The CC method is `coordination:command-center/ITEM-ns2604-coop-20261007T005140Z.md:16-21,33`,
+SHA256 `bbf0ace2829ba9ffb051f53445a1ce8a1ff3eafe16339a0a82d9d2563a109d0e`.
+The invoke-rate owner's prospective plan is
+`coordination:ns2604-coop/notes/dispatch-20261006T1915Z/invoke-rates-overlap-token.md:12,21,29`,
+SHA256 `d7d12d5604b5c3d372d6a782968ac342188f979d07f03fc73ba3ee9f46f1e8e4`.
+
+Known integration records bind vendor-required registration identities to the
+names-only readback and bind returned native-path events to the fresh smoke's
+consumer, context and output. State readbacks keep their local integration
+class; they do not become upstream acceptance. Daily qualification resolves
+the owner's original working-day definition, its qualified origin and observed
+coverage, plus the selected invocation map and native emitter. Raw counter
+sources retain their original classes and report membership; synthetic counts
+or a copied channel label cannot qualify adoption. Emitter documentation must
+match a known canonical client source pin. An unresolved version/source mapping
+remains unqualified until the owner supplies a supported pinned source identity;
+the current carrier does not manufacture that mapping from a documentation URL.
