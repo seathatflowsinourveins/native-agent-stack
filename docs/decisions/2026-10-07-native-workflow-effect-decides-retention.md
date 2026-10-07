@@ -11,9 +11,14 @@ made upstream evidence the selector of foundation components and limited local
 evidence to an integration smoke check and organic counters. Applying it on
 7 October showed two things it did not settle.
 
-- Five installed tools stayed at zero organic calls on one or both clients after
-  the vendors' own wiring was in place, and three-run paired checks showed no
-  win when they were called.
+- Three tools had a measured paired outcome, three runs per arm, and none
+  won: Serena forced into view, qmd named in the task on Claude Code, and
+  Headroom on a raw log.
+- Two tools had an organic observation after their vendor wiring was in place:
+  semble was visible and was not chosen in fresh sessions, and jCodeMunch
+  showed no call on either client.
+- One tool had a wiring gap: SocratiCode showed no call, and its vendor's
+  documented route had never been installed.
 - A three-arm check of the whole installed stack on fresh Claude Code sessions
   returned the same answers at higher cost and time, and the advisor model was
   the largest single cost.
@@ -143,13 +148,33 @@ above.
 | semble | code search | called by 1 lane; none in fresh sessions | visible and still not chosen | excluded |
 | jcodemunch | code index | none | not reached | excluded |
 | Headroom | output compression | none | more tokens than context-mode alone in every paired run | excluded |
-| SocratiCode | code search and graph | none as wired; the vendor's documented route was not installed | not reached | excluded |
+| SocratiCode | code search and graph | none as wired; the vendor's documented route was not installed | not reached | not selected (see below) |
 
 Each exclusion is dated 2026-10-07. It is overturned by a new upstream release
 or a vendor-route installation that shows organic use on the client concerned
-and a bounded-check win against the component that now does the job. The
-interim rows get their own check, one component removed at a time on the task
-where it was called most, and one long-session check for the stack.
+and a bounded-check win against the component that now does the job.
+
+SocratiCode's row is a selection ruling under rule 1, not a retention verdict
+under rule 4, because its vendor route was never installed and so rule 4's
+repair step never ran. The code-search job keeps no additional component for
+now: on the find-by-intent task every arm answered fully and the arm without
+any stack tool was the cheapest, so no gap is shown that a second search tool
+would fill. Its registration is removed as an arm of the comparison that the
+6 October decision superseded. The ruling is overturned by a task class on
+which the arm with no additional component fails or costs more than a
+vendor-wired candidate.
+
+Due dates for the interim rows, as rule 5 requires:
+
+| Row | Check | Due |
+| --- | --- | --- |
+| context-mode, codebase-memory-mcp, Serena, qmd on Codex | one component removed at a time, on the task where it was called most | 2026-10-14 |
+| RTK | a paired check on Codex, where it carries the shell traffic | 2026-10-14 |
+| ai-memory | a scored comparison of the memory candidates on a public benchmark harness | 2026-10-21, or a dated re-date in the comparison's own record |
+| the stack as a whole | one long-session check | proposed after the board review of 2026-10-08, dated in its own record |
+
+The monitor of rule 8 is read once a day and at every change of the installed
+stack.
 
 ## What this amends
 
@@ -189,9 +214,11 @@ where it was called most, and one long-session check for the stack.
   (read 2026-10-07): the client's own OpenTelemetry metrics and events for
   usage, cost and tool activity, which rule 8 reads.
 - promptfoo at the installed release: `promptfoo eval --help` lists `--repeat`
-  and a provider given as the path of a custom module; the repository already
-  runs it with a file provider in
-  `blueprints/native-skill-practice/p1/promptfooconfig.yaml`.
+  and a provider given as the path of a custom module. The repository holds one
+  configuration of that form,
+  `blueprints/native-skill-practice/p1/promptfooconfig.yaml`, which calls itself
+  a skeleton and has not been run against a model; it shows the form, not a
+  result.
 - This repository: the 6 October decision named above, and the Harbor result
   recorded in [the token layer default](2026-10-04-new-wsl-token-layer-default.md)
   (36 tasks; no tool reduced whole-task cost), with which the 7 October check
