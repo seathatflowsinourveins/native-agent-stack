@@ -4741,8 +4741,8 @@
     },
     {
       "path": ".github/osv-scanner-frozen-macos.toml",
-      "sha256": "28361ee967cce26b3c636a963b3b25e2f97fe29fd86193928bbc12825c1d40de",
-      "bytes": 4750
+      "sha256": "a00d1e2df72d7aca121ae39380e9c0f761a5d3d32d0392fa598502bdae2a89c6",
+      "bytes": 15625
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
@@ -54121,6 +54121,11 @@
       "bytes": 2891
     },
     {
+      "path": "evidence/receipts/osv-frozen-macos-next-1638-20261007.json",
+      "sha256": "9676ba2c2d7f46d6c5d7afe58579dcadd8954af931ebcee8978191e9f81352b5",
+      "bytes": 19211
+    },
+    {
       "path": "evidence/receipts/osv-frozen-macos-source-map-js-20261005.json",
       "sha256": "ce33fcee0c43a46ea95aba70e4bd0b39e3870a37369e809deee25c0331fbfe9a",
       "bytes": 2442
@@ -56482,8 +56487,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "2d81844b1041b71019c3d0caa529dbbc13b6a86af3c634c0c442c31023e9d760",
-      "bytes": 75161
+      "sha256": "63d6f353511c4900a1cd63e529e7e676b9999a5ab4d81d4a447b1a7bde1769a1",
+      "bytes": 75443
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",
