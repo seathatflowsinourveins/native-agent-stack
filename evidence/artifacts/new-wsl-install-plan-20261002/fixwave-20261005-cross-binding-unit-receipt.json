@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "kind": "ns2604-fixwave-cross-binding-unit-followup",
+  "recorded_at_utc": "2026-10-05T14:42:17Z",
+  "previous_published_revision": "ff9ff041db438f696b47d6f8dfa32a0ddd52e5b5",
+  "north_star_action": "Repeatable foundation review, observation and the lasting local-model owner for research and historical simulation.",
+  "publication": {
+    "draft": true,
+    "lane": "lane:foundation",
+    "registry_last": true,
+    "rebase": "only after713 actually merges"
+  },
+  "cross_review": {
+    "evidence_class": "source_review and synthetic",
+    "prompts": "frozen task prompts preserved",
+    "claude_turn_budget": 48,
+    "native_deadline_seconds_each": 1200,
+    "sequential_observation_seconds": 2400,
+    "kill_grace_seconds": 15,
+    "lock_wait_included": true,
+    "native_executors": "Codex exec review custom target; native Claude headless with shared flock, schema and disallowedTools",
+    "argv": "exact client arrays retained and invoked; explicit review_model/model_reasoning_effort plus native Claude model/effort",
+    "reviewer_binding": "unique native review child linked by parent_thread_id and source.subagent=review; child context model/effort required",
+    "controls": "missing/wrong/ambiguous child, mismatched model/effort, missing context and native init; original delivered-report/source-read controls remain",
+    "gateway_wire_binding": "independent owner observation before qualification; client selection alone does not attest every request",
+    "new_native_review": "not run in this source unit",
+    "previous_attempts": "original streams/failed observation deadlines preserved separately"
+  },
+  "prometheus_render": {
+    "evidence_class": "source_review and synthetic",
+    "source": "native-agent-stack@f946c6d4:observability/backends/configure.py:100,107\u2013110; G4decision103\u2013109",
+    "producer": "existing config publisher; render-only candidate under config_root",
+    "arguments": "plan release, port and feature list",
+    "preservation": "existing digest custody; edited/symlink/operator outputs nonzero needs_owner",
+    "side_effects": "no active-unit change, activation, reload, enable or runtime-data preparation",
+    "native_runtime_flags": "previous missing-feature failure retained; co-op apply and native passing flags remain separate"
+  },
+  "ollama": {
+    "evidence_class": "source_review, synthetic and scoped native health",
+    "unit": {
+      "artifact_alias": "config/ollama.service",
+      "bytes": 845,
+      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
+    },
+    "warmup": {
+      "artifact_alias": "config/ollama-warmup.sh",
+      "bytes": 860,
+      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
+    },
+    "asset_provenance": "user-designated existing owner files; exact supplied hashes, host originals read without editing",
+    "ruling": "D-ollama2026-10-05; task-ns2604-coop-20261005T142343Z point1; supersedes historical local-model decision254\u2013257",
+    "adaptation": "upstream system-unit form adapted to owner-approved user unit; copy_config, native install, daemon-reload and enable --now",
+    "custody": "different or symlinked installed destinations retained nonzero needs_owner",
+    "synthetic_controls": "enabled+active passes; disabled or inactive fails even when server listing stand-in returns0",
+    "host_apply_by_lane": false,
+    "co_op_reported_enable": "2026-10-05T14:28:53Z; private ollama-enable.log; reported evidence kept distinct",
+    "native_service_health": {
+      "command": "bash accept.sh --only local-model-server --stage service_health </dev/null",
+      "wrapper_exit_code": 0,
+      "row_exit_code": 0,
+      "required": "native enabled and active state, then server listing",
+      "log_alias": "ollama-enabled-service-health.log",
+      "bytes": 40,
+      "sha256": "8880af82831af79db393b69c5412969d09237dee6a4612a80d4dc953a816dace"
+    },
+    "not_proved": "model warmup success, residency, GPU inference or future reboot",
+    "superseded_scope": "D-ollama-2 changes current unit/removes row warmup; these unchanged outcomes/hashes refer to earlier bytes at historical_source_revision."
+  },
+  "checks": [
+    {
+      "evidence_class": "local_integration",
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs tests.test_new_wsl_client_config.ObservabilityMigrationRepairTests",
+      "exit_code": 0,
+      "tests": 25,
+      "seconds": 8.297,
+      "log_alias": "cross-unit-ollama-focused-tests.log",
+      "bytes": 124,
+      "sha256": "18d6bff4578998e958258eadbfbd58b0abc14f71c90c835286241ec58904e77c"
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": "python3 -m unittest discover -s tests -p test_new_wsl*.py",
+      "exit_code": 0,
+      "tests": 380,
+      "skipped": 3,
+      "seconds": 121.501,
+      "log_alias": "cross-unit-ollama-full-tests.log",
+      "bytes": 494,
+      "sha256": "11485398e1e8a74b531d5c9cfb427013277357199ed525406590370a21a8cf52"
+    },
+    {
+      "evidence_class": "structural_validation",
+      "command": "python3 -B check_plan.py",
+      "exit_code": 0,
+      "rows": 80,
+      "install_commands": 165,
+      "acceptance_entries": 100,
+      "additional_checks": 2
+    },
+    {
+      "evidence_class": "structural_validation",
+      "command": "new_wsl_client_config.py --check",
+      "exit_code": 0
+    },
+    {
+      "evidence_class": "structural_validation",
+      "command": "bash -n install.sh accept.sh config/ollama-warmup.sh",
+      "exit_code": 0
+    },
+    {
+      "evidence_class": "structural_validation",
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "source_identities": [
+    {
+      "artifact_alias": "install-plan.json",
+      "bytes": 365279,
+      "sha256": "abf55d66c7015925f690fca9f59b07dd13b0d40f8d6d2f51077b4caa44c786ef"
+    },
+    {
+      "artifact_alias": "install.sh",
+      "bytes": 105091,
+      "sha256": "0e798211670bfcfb6769c297cb03ff7c8ed04cf379fa004fd5bc7d6f79ef59aa"
+    },
+    {
+      "artifact_alias": "accept.sh",
+      "bytes": 162414,
+      "sha256": "67e42a929e62510371e8ae419f4f9f99f019a5abbd210a726c48a2dffbc7c0b2"
+    },
+    {
+      "artifact_alias": "check_plan.py",
+      "bytes": 37522,
+      "sha256": "8cece140fb38f8abf10e232887c0659b6b905816a102bc642f5c7460254d6501"
+    },
+    {
+      "artifact_alias": "config/observability_config.py",
+      "bytes": 15049,
+      "sha256": "c344411872e9f13293695d4b769e62a05d01a25f9d49067b71ba426fa3ff7692"
+    },
+    {
+      "artifact_alias": "config/ns2604-prometheus.service.example",
+      "bytes": 852,
+      "sha256": "9581de2c47f23570e619bc61c0863d51842fb2807d67297d358cb30a7a47838d"
+    },
+    {
+      "artifact_alias": "config/ollama.service",
+      "bytes": 845,
+      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
+    },
+    {
+      "artifact_alias": "config/ollama-warmup.sh",
+      "bytes": 860,
+      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
+    }
+  ],
+  "recipe_identities": [
+    {
+      "slot": "cross-family-review",
+      "stage": "after_sign_in",
+      "sha256": "9bd38bca82746ccce3c0ac9df6f1276fee1a3ed1e8adaba138ab2ca9faeead68"
+    },
+    {
+      "slot": "local-model-server",
+      "stage": "service_health",
+      "sha256": "d236cd8f0989a24c2d628863fcfce261ae0915d178a7ca2c24ba52ab2d2b5fd5"
+    },
+    {
+      "slot": "prometheus",
+      "stage": "service_health",
+      "sha256": "a3c6044ac73eaaa953df5b4a55a8d8111756bfd12eff7c43bd5c1ae8ee3718f3"
+    }
+  ],
+  "upstream_sources": [
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/tasks/review.rs#L105",
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/codex_delegate.rs#L108",
+    "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs#L3335",
+    "https://github.com/uutils/coreutils/blob/0.10.0/src/uu/timeout/src/timeout.rs#L280",
+    "https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57",
+    "https://github.com/systemd/systemd/blob/v259.5/man/systemd.service.xml#L459",
+    "https://github.com/util-linux/util-linux/blob/v2.41.3/sys-utils/flock.1.adoc",
+    "https://code.claude.com/docs/en/cli-reference#system-prompt-flags"
+  ],
+  "privacy": "No credentials, private paths, native session IDs, conversations, gateway response payloads or active client configuration published. Private original outputs retained; public aliases/hashes and bounded observations only."
+}

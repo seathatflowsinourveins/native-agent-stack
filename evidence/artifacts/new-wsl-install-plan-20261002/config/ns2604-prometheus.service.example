@@ -1,0 +1,21 @@
+# Render-only candidate; activation and existing user-unit custody remain with the co-op.
+# Reference: native-agent-stack@f946c6d4 observability/backends/configure.py:100,107-110.
+# Governing G4 startup condition: docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md:103-109.
+[Unit]
+Description=Local native stack Prometheus
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+UMask=0077
+NoNewPrivileges=true
+WorkingDirectory=@DATA_ROOT@/prometheus
+ExecStart=@PROMETHEUS_TOOL@ --config.file=@CONFIG_ROOT@/prometheus.yaml --storage.tsdb.path=@DATA_ROOT@/prometheus --storage.tsdb.retention.time=7d --storage.tsdb.retention.size=512MB --web.listen-address=127.0.0.1:@PROMETHEUS_PORT@ --enable-feature=@PROMETHEUS_FEATURES@
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target

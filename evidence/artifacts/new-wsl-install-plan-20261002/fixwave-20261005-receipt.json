@@ -1,0 +1,1233 @@
+{
+  "schema_version": 1,
+  "kind": "ns2604-install-plan-acceptance-defect-repairs",
+  "evidence_class": "local_integration",
+  "recorded_at_utc": "2026-10-05T07:23:04.771802+00:00",
+  "base_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "scope": "The reported foundation install-plan acceptance defects on one existing NativeStack2604 host; no whole-plan qualification.",
+  "north_star_action": "Reliable foundation acceptance before independently qualified broker paper operation.",
+  "decision_record": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+  "current_recipe_identities": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "bytes": 134661,
+      "sha256": "4938af8adbeeaa397f9e6c57ce6092272d41bf49584703b00fc8bcadc55efa37"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "bytes": 102366,
+      "sha256": "433f354a4ecaa06e8674e62089b538c2e23a2ba18b7b8647e3d06c6a2c41378f"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+      "bytes": 7385,
+      "sha256": "b9838625f651e36412a58b1f5035d1b110274c5c025fd3f06c08366315bbc24d"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/inspector-client-probe.sh",
+      "bytes": 2197,
+      "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "bytes": 322580,
+      "sha256": "94fb96f05f8d7d0eddf4dcf8a7a9b448bf03938ad972160fe1fdc991fb7727cc"
+    }
+  ],
+  "recipe_identity_scope": "Current reproducible recipes after duplicate-launcher removal. New affected-stage runs below returned actual native results with tracked files held unchanged. These hashes identify the current source, not retrospectively measured whole-file digests at every earlier execution. Original identities and detailed prior artifacts remain in historical sections. Unchanged stage inputs are compared to 0439b2ac and reused explicitly, without a new provider-run claim.",
+  "validation": {
+    "touched_suites": {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 268,
+      "skipped": 3,
+      "elapsed_seconds": 65.725,
+      "returned_summary": "Ran 268 tests; OK (skipped=3).",
+      "evidence_class": "local_integration",
+      "run": "direct-native.touched-suites.retry1",
+      "environment_contract": "Existing owned lane-cache TMPDIR."
+    },
+    "focused_repairs": {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "tests": 8,
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "scope": "The eight FixwaveAcceptanceRepairs methods ran as part of the 268-test suite; no additional standalone rerun is claimed."
+    },
+    "plan": {
+      "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit_code": 0,
+      "rows": 80,
+      "installed": 57,
+      "measurement_only": 3,
+      "not_installed": 20,
+      "commands": 161,
+      "acceptance_entries": 100,
+      "evidence_class": "structural_validation"
+    },
+    "client_config": {
+      "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+      "exit_code": 0,
+      "evidence_class": "structural_validation"
+    },
+    "shell_syntax": {
+      "files": 3,
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "scope": "Changed accept.sh, install.sh and srt-client-accept.sh; the unchanged Inspector probe syntax was verified in the earlier run."
+    },
+    "repository_integrity_direct_native_followup": {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "run": "direct-native.integrity.retry1",
+      "returned_summary": {
+        "components": 69,
+        "hashed_files": 10096,
+        "profiles": 4,
+        "receipts": 202,
+        "status": "passed"
+      },
+      "scope": "Declared consistency, publication paths and hashes; no execution or adoption claim."
+    }
+  },
+  "host_results": [
+    {
+      "row": "difftastic",
+      "stage": "after_sign_in",
+      "final_run": "difftastic.after_sign_in.direct-native",
+      "exit_code": 0,
+      "clients": [
+        "claude",
+        "codex"
+      ],
+      "claim": "Fresh native clients invoked the supplied diff commands.",
+      "retained_artifacts": [
+        {
+          "locator": "private-direct-native-difftastic-run/claude.jsonl",
+          "bytes": 125830,
+          "sha256": "9e693b1c83203853507cdd1cd796f1d9d4388e43a9132ce83891c3a21b0eac80"
+        },
+        {
+          "locator": "private-direct-native-difftastic-run/codex.jsonl",
+          "bytes": 1361,
+          "sha256": "d967010aa589fb9e6c8eefd9dffb786cd192094e8ee84be2b84aebf6eed6d311"
+        }
+      ]
+    },
+    {
+      "row": "worktrunk",
+      "stage": "after_sign_in",
+      "final_run": "worktrunk.after_sign_in.direct-native",
+      "exit_code": 0,
+      "clients": [
+        "claude",
+        "codex"
+      ],
+      "claim": "Fresh native clients invoked the supplied worktree commands with owned scratch.",
+      "retained_artifacts": [
+        {
+          "locator": "private-direct-native-worktrunk-run/claude.jsonl",
+          "bytes": 172761,
+          "sha256": "69cec3ca53531aa393a7fea5718779284c310813b4fdeb546c76b141eda93862"
+        },
+        {
+          "locator": "private-direct-native-worktrunk-run/codex.jsonl",
+          "bytes": 2682,
+          "sha256": "51da46f8c0c13395b517084ad00c7d5e4f1fb7b29eb920b45a3f8c9a591a6f27"
+        }
+      ]
+    },
+    {
+      "row": "sandbox-runtime-srt",
+      "stage": "after_sign_in",
+      "final_runs": [
+        "sandbox-runtime-srt.after_sign_in.direct-native.claude",
+        "sandbox-runtime-srt.after_sign_in.direct-native.codex"
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "fixture_class": "synthetic",
+      "claim": "Native clients executed the existing SRT positive/negative policy controls; no general sandbox guarantee.",
+      "retained_artifacts": [
+        {
+          "locator": "private-direct-native-srt-claude-run/events.jsonl",
+          "bytes": 162676,
+          "sha256": "da6ae8149ebb3f22fe6bf3e33153c3c20f338c47c342571325a38238279f57ff"
+        },
+        {
+          "locator": "private-direct-native-srt-codex-run/events.jsonl",
+          "bytes": 6283,
+          "sha256": "d0dbaf3da08bb77c51435b7f7adc67eb5833d21aa2a08d878b6f51a82e3b6aeb"
+        }
+      ],
+      "native_completion": [
+        {
+          "client": "claude",
+          "result": [
+            {
+              "type": "result",
+              "subtype": "success",
+              "is_error": false,
+              "num_turns": 3
+            }
+          ]
+        },
+        {
+          "client": "codex",
+          "result": [
+            {
+              "type": "turn.completed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": "mcp-inspector",
+      "stage": "post_install",
+      "final_run": "mcp-inspector.post_install",
+      "exit_code": 0,
+      "upstream_commands": [
+        "npm run pack:verify",
+        "npm run smoke:web:tabs"
+      ],
+      "claim": "The unchanged upstream commands executed successfully within the plan stage, followed by QMD integration.",
+      "limitation": "The existing stage suppresses upstream stdout. Retained wrapper output/exits and independent observations qualify this execution; no complete upstream stdout receipt or test counts are claimed."
+    },
+    {
+      "row": "mcp-inspector",
+      "stage": "after_sign_in",
+      "final_run": "mcp-inspector.after_sign_in.direct-native",
+      "exit_code": 0,
+      "clients": [
+        "claude",
+        "codex"
+      ],
+      "claim": "Foreground frozen recipe, inherited false setting, CLI JSON, Web HTML, unchanged probe hash and stopped listener passed.",
+      "retained_artifacts": [
+        {
+          "locator": "private-direct-native-inspector-run/probe.sh",
+          "bytes": 2197,
+          "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/claude.jsonl",
+          "bytes": 43513,
+          "sha256": "db676985503cb5536bc0cfe259fa0c4b8704425c02175ce0fcd025627ae15b5c"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/codex.jsonl",
+          "bytes": 2297,
+          "sha256": "72aaab53a04c77d76e84258ffe212156a3987b3f04d19f416bdd37f0df11d349"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/claude-tools.json",
+          "bytes": 8420,
+          "sha256": "b80ca85749bbbded237596d54c02a247909ed5a0e4fecc0bea36bc427ec3b0df"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/codex-tools.json",
+          "bytes": 8420,
+          "sha256": "b80ca85749bbbded237596d54c02a247909ed5a0e4fecc0bea36bc427ec3b0df"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/claude-page.html",
+          "bytes": 897,
+          "sha256": "19e077888b8219091d87ea4f11a037900bd9cc229b2f6b67af304d063ba58b0e"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/codex-page.html",
+          "bytes": 897,
+          "sha256": "3e59336e8be32687a01c9703d22bd6acdfe46390ca5b45334b788e4db074da4c"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/claude-env.txt",
+          "bytes": 6,
+          "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+        },
+        {
+          "locator": "private-direct-native-inspector-run/codex-env.txt",
+          "bytes": 6,
+          "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+        }
+      ],
+      "independent_observation": {
+        "probeMatches": true,
+        "claude": {
+          "toolsPresent": true,
+          "html": true,
+          "envFalse": true
+        },
+        "codex": {
+          "toolsPresent": true,
+          "html": true,
+          "envFalse": true
+        },
+        "listener_closed": true
+      }
+    },
+    {
+      "row": "inspect-ai",
+      "stage": "after_sign_in",
+      "final_run": "inspect-ai.after_sign_in",
+      "exit_code": 0,
+      "claim": "One completed scored sample and native success header; absent-model error header and rejection by the positive gate.",
+      "negative_gate_exit_code": 1,
+      "model_accuracy_claimed": false,
+      "provider_binding": null
+    },
+    {
+      "row": "session-analytics",
+      "stage": "install",
+      "final_run": "session-analytics.install",
+      "exit_code": 0,
+      "claim": "Idempotent native installation on a host already using the owned launcher.",
+      "migration_claim": "Known predecessor binary-link migration and foreign-link refusal are synthetic regression evidence, not a newly exercised host migration."
+    },
+    {
+      "row": "session-analytics",
+      "stage": "post_install",
+      "final_run": "session-analytics.post_install",
+      "exit_code": 0
+    },
+    {
+      "row": "cross-family-review",
+      "stage": "after_sign_in",
+      "final_run": "cross-family-review.after_sign_in.direct-native",
+      "exit_code": 0,
+      "claim": "Both native reviews completed; exact frozen-source read and unchanged status/working bytes/index passed.",
+      "claude_result_records": [
+        {
+          "subtype": "success",
+          "is_error": false,
+          "num_turns": 39
+        }
+      ],
+      "requested_gpt_model": "gpt-6.1-sol",
+      "native_claude_model": "claude-opus-5-5",
+      "provider_binding": null,
+      "findings_and_dispositions_qualified": false,
+      "retained_artifacts": [
+        {
+          "locator": "private-direct-native-cross-family-run/gpt-review.jsonl",
+          "bytes": 381833,
+          "sha256": "e6232db455d291d13d324b848e5158927bf795002c48dcd683e234d42b7ba697"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/claude-review.jsonl",
+          "bytes": 1585780,
+          "sha256": "e371474fed637f7edf32a7090fe845cab1bf1e840abd2963e930e2913d0d9500"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/gpt-authored.diff",
+          "bytes": 31164,
+          "sha256": "c9a9de5292c962c77bff54bbfc081db691556fcf4a06cb6e4238b0626647e9c6"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/commits.txt",
+          "bytes": 164,
+          "sha256": "1fe1576eabbacf321a28266e8824d7618753129f10010ee0f2685a53240e0112"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/status-before",
+          "bytes": 593,
+          "sha256": "2a776136bccc418013e8cc5673807c695924b4199f478e152486bebfea63e57c"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/status-after",
+          "bytes": 593,
+          "sha256": "2a776136bccc418013e8cc5673807c695924b4199f478e152486bebfea63e57c"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/worktree-before.diff",
+          "bytes": 73000,
+          "sha256": "4a9cc1ff89929d1c820d58fb54883aac97de10a363f9ad1f2d02a49e67ee39f6"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/worktree-after.diff",
+          "bytes": 73000,
+          "sha256": "4a9cc1ff89929d1c820d58fb54883aac97de10a363f9ad1f2d02a49e67ee39f6"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/index-before.diff",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "locator": "private-direct-native-cross-family-run/index-after.diff",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "row": "token-lane-carriers",
+      "stage": "post_install",
+      "final_run": "token-lane-carriers.post_install",
+      "exit_code": 0,
+      "outcome": "skipped_holdout",
+      "installation_claimed": false
+    }
+  ],
+  "attempts": [
+    {
+      "run": "check-plan.port-final",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/check-plan.port-final.log",
+        "bytes": 202,
+        "sha256": "f01762aa300eee8482139ebbcf40447ed0a7a3238d6d342777ed0c9beb1af1a8"
+      },
+      "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "evidence_class": "structural_validation",
+      "outcome": "passed"
+    },
+    {
+      "run": "client-config-check.final",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/client-config-check.final.log",
+        "bytes": 51415,
+        "sha256": "a00b1e84acee3d631039c59f3425b8a63d3b3cba4a3e91586a58eb59986c2fb3"
+      },
+      "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+      "evidence_class": "structural_validation",
+      "outcome": "passed"
+    },
+    {
+      "run": "client-config-check.port-final",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/client-config-check.port-final.log",
+        "bytes": 51415,
+        "sha256": "a00b1e84acee3d631039c59f3425b8a63d3b3cba4a3e91586a58eb59986c2fb3"
+      },
+      "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+      "evidence_class": "structural_validation",
+      "outcome": "passed"
+    },
+    {
+      "run": "cross-family-review.after_sign_in",
+      "exit_code": 1,
+      "start_utc": "2026-10-05T04:28:31Z",
+      "end_utc": "2026-10-05T04:28:34Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/cross-family-review.after_sign_in.log",
+        "bytes": 40,
+        "sha256": "84b2d8002d6cd27f5d83731452b4aebbc05acd18b591a6b1b8f1184d5570cd66"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only cross-family-review --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "failed",
+      "failed_condition": "Gateway placeholder missing; failed before model review."
+    },
+    {
+      "run": "cross-family-review.after_sign_in.retry1",
+      "exit_code": 1,
+      "start_utc": "2026-10-05T04:29:57Z",
+      "end_utc": "2026-10-05T05:09:08Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/cross-family-review.after_sign_in.retry1.log",
+        "bytes": 174,
+        "sha256": "098b695cfe2d015b027ed9f1ffddae209a8197daa422e93ae2e399c17f95aaae"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only cross-family-review --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "failed",
+      "failed_condition": "Both native reviews completed; the too-narrow Bash-only source oracle rejected the native MCP source read."
+    },
+    {
+      "run": "cross-family-review.after_sign_in.retry2",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T05:17:53Z",
+      "end_utc": "2026-10-05T05:51:42Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/cross-family-review.after_sign_in.retry2.log",
+        "bytes": 296,
+        "sha256": "26caf873271732b5a91b417e1e2da44fb190e2a306b9a0590a7bfc65d9f8ca29"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only cross-family-review --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "difftastic.after_sign_in",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:24:43Z",
+      "end_utc": "2026-10-05T04:26:36Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/difftastic.after_sign_in.log",
+        "bytes": 152,
+        "sha256": "29c3d532a6cd65596f190ef8d8f070cc5ce4347690e263cbbaf15e3f7cf40a11"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only difftastic --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "inspect-ai.after_sign_in",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:23:26Z",
+      "end_utc": "2026-10-05T04:23:42Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/inspect-ai.after_sign_in.log",
+        "bytes": 104,
+        "sha256": "1eae7b2812949be0b225396dbbc743a0d86d93e6524850ec3a30d292296211e2"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only inspect-ai --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "mcp-inspector.after_sign_in",
+      "exit_code": 2,
+      "start_utc": "2026-10-05T04:25:57Z",
+      "end_utc": "2026-10-05T04:35:58Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/mcp-inspector.after_sign_in.log",
+        "bytes": 149,
+        "sha256": "e208d9c36ca46bff8f1fb18c9e81174e5dbfa01d0713d38ec09fe4eee55d2d53"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-inspector --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "failed",
+      "failed_condition": "Underlying stage timed out with exit 124; concurrent editing of accept.sh invalidated the outer wrapper, which returned 2."
+    },
+    {
+      "run": "mcp-inspector.after_sign_in.retry1",
+      "exit_code": 1,
+      "start_utc": "2026-10-05T05:16:26Z",
+      "end_utc": "2026-10-05T05:24:33Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/mcp-inspector.after_sign_in.retry1.log",
+        "bytes": 167,
+        "sha256": "c5ac784d6d68266a9b7a22aa92ae0c7076f039590269d689cb2956087b784c73"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-inspector --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "failed",
+      "failed_condition": "Foreground CLI succeeded; Web failed with EADDRINUSE. LISTEN-only preflight missed an established local socket inside the allocator range."
+    },
+    {
+      "run": "mcp-inspector.after_sign_in.retry2",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T05:55:27Z",
+      "end_utc": "2026-10-05T05:56:52Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/mcp-inspector.after_sign_in.retry2.log",
+        "bytes": 34,
+        "sha256": "f1ada666ca46fba7e7e9bb4cf73642487ba6ff2e72dc84cd8ae83d89de4fa465"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-inspector --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "mcp-inspector.post_install",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:21:40Z",
+      "end_utc": "2026-10-05T04:23:08Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/mcp-inspector.post_install.log",
+        "bytes": 3526,
+        "sha256": "6d8b7e35dd102b2201ca76c9109704abf9fc7f7943cbaf1e750c5a60040c14f5"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-inspector --stage post_install </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "session-analytics.install",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:23:42Z",
+      "end_utc": "2026-10-05T04:23:45Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/session-analytics.install.log",
+        "bytes": 1031,
+        "sha256": "fa541732c461d0aba888431797010179c611462ba6bf90ca7aae65946fec0f3d"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only session-analytics </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "session-analytics.post_install",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:24:24Z",
+      "end_utc": "2026-10-05T04:24:25Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/session-analytics.post_install.log",
+        "bytes": 37,
+        "sha256": "aeda65063c7418abc6e8e47d00b204e39ab0f568f844e8f122efa7c3f940aeff"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only session-analytics --stage post_install </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "srt.claude",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:22:26Z",
+      "end_utc": "2026-10-05T04:24:29Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/srt.claude.log",
+        "bytes": 97,
+        "sha256": "0d82b183508d68a266e6eed0714e0f3a9c5033700bb6932e9b10616cd4a5f1ff"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "fixture_inputs": "Existing private co-op synthetic fixture bindings; SRT_ACCEPT_CLIENT=claude"
+    },
+    {
+      "run": "srt.codex",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T04:25:34Z",
+      "end_utc": "2026-10-05T04:25:57Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/srt.codex.log",
+        "bytes": 96,
+        "sha256": "a3c402e552abbb9b667991e067b967b79815e54aa09ac0df473d766f47cba020"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "fixture_inputs": "Existing private co-op synthetic fixture bindings; SRT_ACCEPT_CLIENT=codex"
+    },
+    {
+      "run": "token-lane-carriers.post_install",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/token-lane-carriers.post_install.log",
+        "bytes": 45,
+        "sha256": "4bb346c0e4bd35985e553c58c84a9c635ad11a85c3d08f2086503ecb3a7c6233"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only token-lane-carriers --stage post_install </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "skipped_holdout"
+    },
+    {
+      "run": "touched-tests.final",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/touched-tests.final.log",
+        "bytes": 381,
+        "sha256": "2f6f5cec7d221cc04c3e00e6179ab520e8564d18999ee82f9b71005bfa175fbe"
+      },
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "evidence_class": "local_integration",
+      "outcome": "passed"
+    },
+    {
+      "run": "touched-tests.port-final",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/touched-tests.port-final.log",
+        "bytes": 381,
+        "sha256": "6021df8d2a2367e88bb7ce9bbacb6dd7a5645702afc8236f5d6a40f9dae34e09"
+      },
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "evidence_class": "local_integration",
+      "outcome": "passed"
+    },
+    {
+      "run": "validate-before-final-host",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/validate-before-final-host.log",
+        "bytes": 162,
+        "sha256": "8c5b19b7f26c22df98f2c6440c9b7f2e5bd2c2a9820b7439b331fd653ea2dc1e"
+      },
+      "command": "python3 scripts/validate.py",
+      "evidence_class": "structural_validation",
+      "outcome": "passed"
+    },
+    {
+      "run": "validate-before-inspector-final",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/logs/validate-before-inspector-final.log",
+        "bytes": 162,
+        "sha256": "8c5b19b7f26c22df98f2c6440c9b7f2e5bd2c2a9820b7439b331fd653ea2dc1e"
+      },
+      "command": "python3 scripts/validate.py",
+      "evidence_class": "structural_validation",
+      "outcome": "passed"
+    },
+    {
+      "run": "worktrunk.after_sign_in",
+      "exit_code": 127,
+      "start_utc": "2026-10-05T04:27:01Z",
+      "end_utc": "2026-10-05T04:30:02Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/worktrunk.after_sign_in.log",
+        "bytes": 242,
+        "sha256": "32e7ed66dc628e815d197290e3c7b3066ac9eaa1f62e93e133c9f97ff758670b"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "failed",
+      "failed_condition": "Functional native client checks completed, but concurrent editing of accept.sh invalidated the wrapper, which returned 127."
+    },
+    {
+      "run": "worktrunk.after_sign_in.retry1",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T05:16:56Z",
+      "end_utc": "2026-10-05T05:19:47Z",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/worktrunk.after_sign_in.retry1.log",
+        "bytes": 150,
+        "sha256": "928c013d3fffc3c5226acbea900a47b3d23efa7ecf6986ede4e1e0bbdfe153d1"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "run": "direct-native.touched-suites.failed-scratch",
+      "exit_code": 1,
+      "start_utc": "2026-10-05T06:23:41.175Z",
+      "end_utc": "2026-10-05T06:24:44.351Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/touched-tests-direct-native.log",
+        "bytes": 7644,
+        "sha256": "421d68ca6b86fea14ef944ad67edf046c7a3a2c81f6da1db525f702862815d29"
+      },
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "evidence_class": "local_integration",
+      "outcome": "failed",
+      "tests": 268,
+      "skipped": 3,
+      "elapsed_seconds": 62.941,
+      "failed_condition": "The supplied lane-cache TMPDIR did not exist; ten fixture tests failed at scratch creation. Python tempfile can fall back from that invalid directory. The invocation was corrected to the existing owned cache tmp; this is not an implementation regression."
+    },
+    {
+      "run": "direct-native.touched-suites.retry1",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:25:19.121Z",
+      "end_utc": "2026-10-05T06:26:24.977Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/touched-tests-direct-native-retry.log",
+        "bytes": 381,
+        "sha256": "106f570299ae4a4514aa055f90ac596018a59ff3615681d927ddcea96e98ae8f"
+      },
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "evidence_class": "local_integration",
+      "outcome": "passed",
+      "tests": 268,
+      "skipped": 3,
+      "elapsed_seconds": 65.725,
+      "environment_contract": "TMPDIR was the existing owned lane-cache tmp directory."
+    },
+    {
+      "run": "difftastic.after_sign_in.direct-native",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:26:49.364Z",
+      "end_utc": "2026-10-05T06:29:03.942Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/direct-native-difftastic.after.log",
+        "bytes": 152,
+        "sha256": "ff71c5bcb1801c741a96bf9365158491282733ea1845039f9507d90633a5849e"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only difftastic --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "environment_contract": "Existing owned lane-cache TMPDIR."
+    },
+    {
+      "run": "worktrunk.after_sign_in.direct-native",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:29:14.267Z",
+      "end_utc": "2026-10-05T06:32:38.154Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/direct-native-worktrunk.after.log",
+        "bytes": 150,
+        "sha256": "b5ea42c56c1e5f4efcc94d154950ab15cc8a2b4435d45c56650e3a5a4886f387"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "environment_contract": "Existing owned lane-cache TMPDIR."
+    },
+    {
+      "run": "sandbox-runtime-srt.after_sign_in.direct-native.claude",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:33:01.672Z",
+      "end_utc": "2026-10-05T06:37:06.125Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/direct-native-srt.claude.after.log",
+        "bytes": 97,
+        "sha256": "0d82b183508d68a266e6eed0714e0f3a9c5033700bb6932e9b10616cd4a5f1ff"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "environment_contract": "Existing owned TMPDIR and original co-op synthetic SRT fixture bindings; SRT_ACCEPT_CLIENT=claude"
+    },
+    {
+      "run": "sandbox-runtime-srt.after_sign_in.direct-native.codex",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:37:15.891Z",
+      "end_utc": "2026-10-05T06:37:40.184Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/direct-native-srt.codex.after.log",
+        "bytes": 96,
+        "sha256": "a3c402e552abbb9b667991e067b967b79815e54aa09ac0df473d766f47cba020"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "environment_contract": "Existing owned TMPDIR and original co-op synthetic SRT fixture bindings; SRT_ACCEPT_CLIENT=codex"
+    },
+    {
+      "run": "mcp-inspector.after_sign_in.direct-native",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:37:53.217Z",
+      "end_utc": "2026-10-05T06:39:11.221Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/direct-native-mcp-inspector.after.log",
+        "bytes": 34,
+        "sha256": "f1ada666ca46fba7e7e9bb4cf73642487ba6ff2e72dc84cd8ae83d89de4fa465"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-inspector --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "environment_contract": "Existing owned lane-cache TMPDIR."
+    },
+    {
+      "run": "cross-family-review.after_sign_in.direct-native",
+      "exit_code": 0,
+      "start_utc": "2026-10-05T06:39:30.610Z",
+      "end_utc": "2026-10-05T07:16:42.587Z",
+      "timing_scope": "Redirected wrapper log creation/final write timestamps; native CLI lifetimes were not separately measured.",
+      "retained_output": {
+        "locator": "private-lane-cache/logs/direct-native-cross-family-review.after.log",
+        "bytes": 296,
+        "sha256": "b485b576685bb35b234c17fa0807370be95213a0fc2cbc6ece01eee6d1ecdc15"
+      },
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only cross-family-review --stage after_sign_in </dev/null",
+      "evidence_class": "native_proven",
+      "outcome": "passed",
+      "environment_contract": "Existing owned lane-cache TMPDIR."
+    },
+    {
+      "run": "direct-native.integrity.unstaged-deletion",
+      "exit_code": 1,
+      "retained_output": {
+        "locator": "private-lane-cache/validate-direct-native-before-final.log",
+        "bytes": 239,
+        "sha256": "13f12711b4fcdeca22abce912d8a64729e293f518bfb8f25df02187994b28d3f"
+      },
+      "command": "python3 scripts/validate.py",
+      "evidence_class": "structural_validation",
+      "outcome": "failed",
+      "failed_condition": "Git publication enumeration still included the deleted helper because its removal was unstaged. The registry entry was already absent; stage the owned deletion before validation."
+    },
+    {
+      "run": "direct-native.integrity.retry1",
+      "exit_code": 0,
+      "retained_output": {
+        "locator": "private-lane-cache/validate-direct-native-staged-deletion.log",
+        "bytes": 162,
+        "sha256": "8c5b19b7f26c22df98f2c6440c9b7f2e5bd2c2a9820b7439b331fd653ea2dc1e"
+      },
+      "command": "python3 scripts/validate.py",
+      "evidence_class": "structural_validation",
+      "outcome": "passed"
+    }
+  ],
+  "other_native_prerequisite": {
+    "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only mcp-inspector </dev/null",
+    "exit_code": 0,
+    "observed_from": "Native tool result retained in the private lane session and mcp-inspector.install.log",
+    "retained_output": {
+      "locator": "private-lane-cache/logs/mcp-inspector.install.log",
+      "bytes": 16863,
+      "sha256": "88351ebcf6ad137e3aa992e44510fe9dca264205a339706a26dd6c0d22aac572"
+    },
+    "claim": "Documented Playwright 1.62.1 Chromium host dependencies installed; independent package presence check succeeded."
+  },
+  "independent_source_observations": [
+    "Installed Claude 2.1.289 help defines --allowedTools as variadic; task precedes the flag.",
+    "Installed Inspect resolver matched the pinned Path.glob implementation; absolute task listing failed while relative listing succeeded.",
+    "Known AgentsView predecessor link is identified by repository revision 3e343ba6; migration fixture covers only plan-owned links.",
+    "Private native Claude transcript had an initial 55-skill attachment including search-first, followed by a two-skill non-initial delta; later reminder did not replace the inventory.",
+    "Inspector main listener's EADDRINUSE handler and cached published startup fragments matched pinned 2.9.0 source.",
+    "Host range was 24145–28240; all-state ss observed an established local socket at 26399. Final 16399 lies outside that range; the probe rejects future range overlap."
+  ],
+  "not_claimed": [
+    "Acceptance of all 80 plan rows or another/new host",
+    "Local regression fixtures as unchanged upstream acceptance",
+    "Complete upstream test stdout or test counts from suppressed plan output",
+    "Real predecessor migration on this already repaired host",
+    "Cross-family findings, dispositions, physical provider/model binding or review quality",
+    "Model accuracy, GPU acceptance, broker paper/live operation, or new sign-in",
+    "48 turns as an upstream recommendation or measured optimum",
+    "Additive provider usage from overlapping native result or child counters",
+    "Generic endpoint conformance when both clients contain frozen literals, command-argument endpoints, plugin config or service liveness"
+  ],
+  "privacy": "Raw native streams, auth output and actual host paths remain private; public locators are symbolic retained-artifact identities.",
+  "historical_recipe_identities": [
+    {
+      "source_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "scope": "Current reproducible recipes. Earlier passing checks are reused for unchanged stage/helper inputs; no retrospectively captured whole-file digest is claimed. Frozen final Inspector and cross-family artifacts below retain their executed recipe or byte-snapshot identities.",
+      "identities": [
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+          "bytes": 133341,
+          "sha256": "b917fd293abff0ef6772ce0ef1491f781bef20210fc92f9f7b45bf0c8b74f213"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+          "bytes": 102421,
+          "sha256": "d60d14d393068ac726fbbc792f1665facfe6256b5105340df5a99f983d79105c"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/fresh-claude-session.sh",
+          "bytes": 831,
+          "sha256": "3304c3cae3493270b2163faa2fe892910d2d240d564ef7f83b67713c387c0e2a"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+          "bytes": 7187,
+          "sha256": "e3fbfdacd4de381de751db7702439387d3a8aacf0a015a87eac57dc7a2ce1dde"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/inspector-client-probe.sh",
+          "bytes": 2197,
+          "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
+        },
+        {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "bytes": 321280,
+          "sha256": "ce026efe47240dc98b71a3a1ba28561f005a198b2a9b7c82cbeab47fb163f0e2"
+        }
+      ]
+    }
+  ],
+  "historical_host_results": [
+    {
+      "source_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "scope": "Prior returned host execution; original detailed artifacts and symbolic locators retained unchanged.",
+      "results": [
+        {
+          "row": "difftastic",
+          "stage": "after_sign_in",
+          "final_run": "difftastic.after_sign_in",
+          "exit_code": 0,
+          "clients": [
+            "claude",
+            "codex"
+          ],
+          "claim": "Fresh native clients invoked the supplied diff commands."
+        },
+        {
+          "row": "worktrunk",
+          "stage": "after_sign_in",
+          "final_run": "worktrunk.after_sign_in.retry1",
+          "exit_code": 0,
+          "clients": [
+            "claude",
+            "codex"
+          ],
+          "claim": "Fresh native clients invoked the supplied worktree commands with owned scratch."
+        },
+        {
+          "row": "sandbox-runtime-srt",
+          "stage": "after_sign_in",
+          "final_runs": [
+            "srt.claude",
+            "srt.codex"
+          ],
+          "exit_codes": [
+            0,
+            0
+          ],
+          "fixture_class": "synthetic",
+          "claim": "Native clients executed the existing SRT positive/negative policy controls; no general sandbox guarantee."
+        },
+        {
+          "row": "mcp-inspector",
+          "stage": "post_install",
+          "final_run": "mcp-inspector.post_install",
+          "exit_code": 0,
+          "upstream_commands": [
+            "npm run pack:verify",
+            "npm run smoke:web:tabs"
+          ],
+          "claim": "The unchanged upstream commands executed successfully within the plan stage, followed by QMD integration.",
+          "limitation": "The existing stage suppresses upstream stdout. Retained wrapper output/exits and independent observations qualify this execution; no complete upstream stdout receipt or test counts are claimed."
+        },
+        {
+          "row": "mcp-inspector",
+          "stage": "after_sign_in",
+          "final_run": "mcp-inspector.after_sign_in.retry2",
+          "exit_code": 0,
+          "clients": [
+            "claude",
+            "codex"
+          ],
+          "claim": "Foreground frozen recipe, inherited false setting, CLI JSON, Web HTML, unchanged probe hash and stopped listener passed.",
+          "retained_artifacts": [
+            {
+              "locator": "private-inspector-final-run/probe.sh",
+              "bytes": 2197,
+              "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
+            },
+            {
+              "locator": "private-inspector-final-run/claude.jsonl",
+              "bytes": 42666,
+              "sha256": "431e9becbb006c1993719fcdd19db4c362ed59b337ecd34d8d861e89f527d69a"
+            },
+            {
+              "locator": "private-inspector-final-run/codex.jsonl",
+              "bytes": 1690,
+              "sha256": "e2b267e32fb5dc143b32c7ded39c23a8af1c04a8d556a96af0b7a17193e1c84a"
+            },
+            {
+              "locator": "private-inspector-final-run/claude-tools.json",
+              "bytes": 8420,
+              "sha256": "b80ca85749bbbded237596d54c02a247909ed5a0e4fecc0bea36bc427ec3b0df"
+            },
+            {
+              "locator": "private-inspector-final-run/codex-tools.json",
+              "bytes": 8420,
+              "sha256": "b80ca85749bbbded237596d54c02a247909ed5a0e4fecc0bea36bc427ec3b0df"
+            },
+            {
+              "locator": "private-inspector-final-run/claude-page.html",
+              "bytes": 897,
+              "sha256": "785a6f7dc8467b3ae70fbc1cb376344333f6b843c12b0bbbd42dccedfd16aa26"
+            },
+            {
+              "locator": "private-inspector-final-run/codex-page.html",
+              "bytes": 897,
+              "sha256": "19f894e17fb7d80d3e211ed4d4c352a66ac495021042d88dfdc424322f82bb18"
+            },
+            {
+              "locator": "private-inspector-final-run/claude-env.txt",
+              "bytes": 6,
+              "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+            },
+            {
+              "locator": "private-inspector-final-run/codex-env.txt",
+              "bytes": 6,
+              "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+            }
+          ]
+        },
+        {
+          "row": "inspect-ai",
+          "stage": "after_sign_in",
+          "final_run": "inspect-ai.after_sign_in",
+          "exit_code": 0,
+          "claim": "One completed scored sample and native success header; absent-model error header and rejection by the positive gate.",
+          "negative_gate_exit_code": 1,
+          "model_accuracy_claimed": false,
+          "provider_binding": null
+        },
+        {
+          "row": "session-analytics",
+          "stage": "install",
+          "final_run": "session-analytics.install",
+          "exit_code": 0,
+          "claim": "Idempotent native installation on a host already using the owned launcher.",
+          "migration_claim": "Known predecessor binary-link migration and foreign-link refusal are synthetic regression evidence, not a newly exercised host migration."
+        },
+        {
+          "row": "session-analytics",
+          "stage": "post_install",
+          "final_run": "session-analytics.post_install",
+          "exit_code": 0
+        },
+        {
+          "row": "cross-family-review",
+          "stage": "after_sign_in",
+          "final_run": "cross-family-review.after_sign_in.retry2",
+          "exit_code": 0,
+          "claim": "Both native reviews completed; exact frozen-source read and unchanged status/working bytes/index passed.",
+          "claude_result_records": [
+            {
+              "subtype": "success",
+              "is_error": false,
+              "num_turns": 30
+            }
+          ],
+          "requested_gpt_model": "gpt-6.1-sol",
+          "native_claude_model": "claude-opus-5-5",
+          "provider_binding": null,
+          "findings_and_dispositions_qualified": false,
+          "retained_artifacts": [
+            {
+              "locator": "private-cross-family-final-run/gpt-review.jsonl",
+              "bytes": 274708,
+              "sha256": "026e8b67fa0ef5f2fbefb990f080bcbdde6c1a33cddd555e286967e867db6359"
+            },
+            {
+              "locator": "private-cross-family-final-run/claude-review.jsonl",
+              "bytes": 1371923,
+              "sha256": "78658674604b28a7768d69e2db8e7a70985f0b54931debff695361bda361c974"
+            },
+            {
+              "locator": "private-cross-family-final-run/gpt-authored.diff",
+              "bytes": 31164,
+              "sha256": "c9a9de5292c962c77bff54bbfc081db691556fcf4a06cb6e4238b0626647e9c6"
+            },
+            {
+              "locator": "private-cross-family-final-run/commits.txt",
+              "bytes": 164,
+              "sha256": "1fe1576eabbacf321a28266e8824d7618753129f10010ee0f2685a53240e0112"
+            },
+            {
+              "locator": "private-cross-family-final-run/status-before",
+              "bytes": 726,
+              "sha256": "895b746594e79fccbbe93be537b5e8e8a708896d8f52f33a33531b8c8677c215"
+            },
+            {
+              "locator": "private-cross-family-final-run/status-after",
+              "bytes": 726,
+              "sha256": "895b746594e79fccbbe93be537b5e8e8a708896d8f52f33a33531b8c8677c215"
+            },
+            {
+              "locator": "private-cross-family-final-run/worktree-before.diff",
+              "bytes": 142306,
+              "sha256": "7a76f6753c047e352aaef00a4e59eabdf289f6340fca976ad1ebe05f7cd56169"
+            },
+            {
+              "locator": "private-cross-family-final-run/worktree-after.diff",
+              "bytes": 142306,
+              "sha256": "7a76f6753c047e352aaef00a4e59eabdf289f6340fca976ad1ebe05f7cd56169"
+            },
+            {
+              "locator": "private-cross-family-final-run/index-before.diff",
+              "bytes": 136660,
+              "sha256": "a7997e0542f14bf9d150b643ca1559b5bb394121b1cdab0d6ded733a3009aec7"
+            },
+            {
+              "locator": "private-cross-family-final-run/index-after.diff",
+              "bytes": 136660,
+              "sha256": "a7997e0542f14bf9d150b643ca1559b5bb394121b1cdab0d6ded733a3009aec7"
+            }
+          ]
+        },
+        {
+          "row": "token-lane-carriers",
+          "stage": "post_install",
+          "final_run": "token-lane-carriers.post_install",
+          "exit_code": 0,
+          "outcome": "skipped_holdout",
+          "installation_claimed": false
+        }
+      ]
+    }
+  ],
+  "historical_validation": [
+    {
+      "source_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "results": {
+        "touched_suites": {
+          "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+          "exit_code": 0,
+          "tests": 268,
+          "skipped": 3,
+          "elapsed_seconds": 67.352,
+          "returned_summary": "Ran 268 tests; OK (skipped=3).",
+          "evidence_class": "local_integration"
+        },
+        "focused_repairs": {
+          "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs",
+          "exit_code": 0,
+          "tests": 8,
+          "evidence_class": "synthetic"
+        },
+        "plan": {
+          "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+          "exit_code": 0,
+          "rows": 80,
+          "installed": 57,
+          "measurement_only": 3,
+          "not_installed": 20,
+          "commands": 161,
+          "acceptance_entries": 100,
+          "evidence_class": "structural_validation"
+        },
+        "client_config": {
+          "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+          "exit_code": 0,
+          "evidence_class": "structural_validation"
+        },
+        "shell_syntax": {
+          "files": 5,
+          "exit_code": 0,
+          "evidence_class": "structural_validation"
+        },
+        "repository_integrity_before_final_host": {
+          "command": "python3 scripts/validate.py",
+          "exit_code": 0,
+          "scope": "Integrity and declared consistency; no provider or GPU execution.",
+          "evidence_class": "structural_validation"
+        }
+      }
+    }
+  ],
+  "reused_stage_inputs": [
+    {
+      "row": "inspect-ai",
+      "stage": "after_sign_in",
+      "inputsUnchanged": true,
+      "stage_command_sha256": "d0b0b70749f1e6ceb10b5f6d1035d9dc7ef4bb6132ddb7568c45389e29ec68b8",
+      "reference_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "evidence_status": "Prior host execution reused for unchanged stage/owner inputs, not a new model run."
+    },
+    {
+      "row": "session-analytics",
+      "stage": "post_install",
+      "inputsUnchanged": true,
+      "stage_command_sha256": "0e2c14da5cfb39eb33cabc58a9aad0e90ccca9c22fff706cf60e81d4ea1baea4",
+      "reference_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "evidence_status": "Prior host execution reused for unchanged stage/owner inputs, not a new model run."
+    },
+    {
+      "row": "token-lane-carriers",
+      "stage": "post_install",
+      "inputsUnchanged": true,
+      "stage_command_sha256": null,
+      "reference_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "evidence_status": "Prior host execution reused for unchanged stage/owner inputs, not a new model run."
+    },
+    {
+      "row": "mcp-inspector",
+      "stage": "post_install",
+      "inputsUnchanged": true,
+      "stage_command_sha256": "32a9de594ab958ffaac4bb87e82fa585c0936d73c5727268bf04b74412f71148",
+      "reference_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "evidence_status": "Prior host execution reused for unchanged stage/owner inputs, not a new model run."
+    },
+    {
+      "row": "session-analytics",
+      "stage": "install",
+      "inputsUnchanged": true,
+      "rowUnchanged": true,
+      "reference_revision": "0439b2aca82aff3889b24edb98bdfd78695a2540",
+      "evidence_status": "Prior host execution reused for unchanged stage/owner inputs, not a new model run."
+    }
+  ],
+  "official_upstream_followup": {
+    "evidence_class": "source_review",
+    "duplicate_removed": "config/fresh-claude-session.sh, installer copy and config-path entry",
+    "replacement": "Five direct native Claude CLI invocations preserve the task-first argument vectors, max-turns 48, identical appended instruction and caller options.",
+    "primary_source": "anthropics/claude-code-action@2988cbe14a98691d372924b88adf410a9c52b221:docs/migration-guide.md:22-26,54-56",
+    "release": "anthropics/claude-code v2.1.289, published 2026-10-03T23:07:17Z; release currency is not a new installation or field-selection claim.",
+    "critic_scope": "No further shipped-feature duplication established in the bounded fixture/probe, alias-migration and endpoint-parity review."
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "kind": "native-acceptance-budget-and-delivery-repair",
+  "evidence_class": "local-integration-and-native-health-failure",
+  "recorded_at_utc": "2026-10-05T13:09:00Z",
+  "previous_published_revision": "351348a15d3840f2095329eaaab138012c3dd3c0",
+  "north_star_action": "Bounded cross-family review and reliable observation for research and historical simulation.",
+  "decision_record": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+  "publication": {
+    "pr": 723,
+    "draft": true,
+    "lane": "lane:foundation",
+    "registry": "Committed last from own baseline; main baseline only after actual713merge."
+  },
+  "claude_budget": {
+    "command": "flock -w 3600 <shared-co-op-lock> <exact native Claude command>",
+    "inline_callers": 11,
+    "srt_helper_callers": 1,
+    "fixture_lock": "Synthetic captures use a private lock and verify native flock is held at stand-in execution.",
+    "gpt_codex_lock": false,
+    "fresh_native_trials_in_this_unit": 0,
+    "native_trial_gate": "After paper window, one heavy step at a time; stop Claude legs upon session-limit evidence and retain its reset metadata."
+  },
+  "cross_review_delivery": {
+    "native_flags": [
+      "--disallowedTools Workflow,Agent",
+      "--json-schema"
+    ],
+    "native_result_field": "structured_output",
+    "report_fields": [
+      "reviewed_head",
+      "verdict",
+      "findings",
+      "summary"
+    ],
+    "controls": [
+      "valid findings",
+      "valid explicit no-findings",
+      "status-only terminal",
+      "malformed structured output",
+      "wrong/missing frozen head",
+      "inconsistent verdict/findings",
+      "invalid locations and boolean line",
+      "empty summary",
+      "native failure/error",
+      "duplicate terminal",
+      "Workflow handoff",
+      "background termination",
+      "incomplete shell execution"
+    ],
+    "qualification": "Delivery proof only. Original immutable source-read and worktree/index snapshot gates remain. Finding correctness and actual model/effort binding remain independently reviewed.",
+    "native_source": {
+      "version": "2.1.289",
+      "public_binary_sha256": "a186b99e4a9c88366cd49df2f7dad56c61fc306ef0140b19ee64b7c42a8d1348",
+      "byte_offsets": [
+        205736331,
+        215938533,
+        226386984
+      ]
+    }
+  },
+  "defect16": {
+    "required_features": [
+      "created-timestamp-zero-ingestion",
+      "promql-extended-range-selectors"
+    ],
+    "unit_render": "Pending actual ns2604 unit-owner source seam Q27; not repaired or hand-edited. Existing backend reference emits ecosystem unit.",
+    "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only prometheus --stage service_health </dev/null",
+    "wrapper_exit_code": 1,
+    "row_exit_code": 1,
+    "native_api_status": "success",
+    "observed_enable_feature": "",
+    "log": {
+      "artifact_alias": "prometheus.feature-guard.log",
+      "bytes": 171,
+      "sha256": "5ab14e38d84edbc6e4cd6ae9a45256aadbb69633c4c17a4fa026df2eeeecb4a4"
+    },
+    "retained_native_json": {
+      "artifact_alias": "prometheus.native-flags.json",
+      "bytes": 2911,
+      "sha256": "7703ced9d4ee0c8c36ee43d1dafeca03a35a127f6f9a51159d8be50e09e1877c"
+    },
+    "claim": "Expected native host failure on missing startup conditions, not successful service acceptance.",
+    "first_sample_accounting": "Feature flags alone are insufficient; exported start timestamps remain separately required."
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_new_wsl*.py",
+      "exit_code": 0,
+      "tests": 377,
+      "skipped": 3,
+      "seconds": 101.079,
+      "evidence_class": "locally-authored-integration-tests",
+      "log": {
+        "artifact_alias": "cross-lock-prometheus-touched-tests.log",
+        "bytes": 491,
+        "sha256": "a6e04426b3fcb3721294bd6488bd6b19ae728b392f439405758aec91aba0001c"
+      }
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_new_wsl_definitive_defaults.py -k FixwaveAcceptanceRepairs",
+      "exit_code": 0,
+      "tests": 17,
+      "scope": "Before adding the separate Prometheus guard; initial local fixture attribute failure was repaired before this passing run."
+    },
+    {
+      "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit_code": 0
+    }
+  ],
+  "current_source_identities": [
+    {
+      "artifact_alias": "accept.sh",
+      "bytes": 157889,
+      "sha256": "c70c92bb2a9572dd06b9bef3625d93ccb8fa4ab9c51ce63315083f576bedd3f4"
+    },
+    {
+      "artifact_alias": "install-plan.json",
+      "bytes": 355778,
+      "sha256": "83d36fa798ccd321a75f6850d6623c1181bff246fbd8ed590f906b1d22af19d6"
+    },
+    {
+      "artifact_alias": "config/srt-client-accept.sh",
+      "bytes": 9036,
+      "sha256": "f31d6f8a4dd2bfc577039a46ca4ef7be0924b161b577ba2871e22c54e3d55fe2"
+    },
+    {
+      "artifact_alias": "cross-review-delivery.schema.json",
+      "bytes": 730,
+      "sha256": "b882429fce8ac63ba10eee6cd17aa8fd6bf6fd0b8e9c4db0339b2fd05568b254"
+    }
+  ],
+  "current_recipe_identities": [
+    {
+      "slot": "mcp-inspector",
+      "stage": "after_sign_in",
+      "sha256": "48db844df9c6714ca0a63a59a631f3e842c509c5d0fc7677ad2c39c4de093bbf"
+    },
+    {
+      "slot": "serena",
+      "stage": "after_sign_in",
+      "sha256": "64aefd6313ffd406186f94590612a2690841bfcc28dc4d7fa328d24af0088121"
+    },
+    {
+      "slot": "mineru",
+      "stage": "after_sign_in",
+      "sha256": "df38fd1fff6af14f0faca91d7ed8a4f4f1dff224fb9a2cf020f3168b1d6a698b"
+    },
+    {
+      "slot": "ccusage",
+      "stage": "after_sign_in",
+      "sha256": "4853a438759d71e090c157d4bfc6172ac5781cd10523a1ddd28e63e35a22729d"
+    },
+    {
+      "slot": "prometheus",
+      "stage": "service_health",
+      "sha256": "a3c6044ac73eaaa953df5b4a55a8d8111756bfd12eff7c43bd5c1ae8ee3718f3"
+    },
+    {
+      "slot": "grafana",
+      "stage": "after_sign_in",
+      "sha256": "e69fedcbe5228fe1455ced76f5ff4faeed7b4c8c21a835ef3f5d9ede29d24920"
+    },
+    {
+      "slot": "promptfoo",
+      "stage": "after_sign_in",
+      "sha256": "f6bbe5d995320a936a3c720be0749d09bfa0b93b5b38627baffac4d1decda22f"
+    },
+    {
+      "slot": "worktrunk",
+      "stage": "after_sign_in",
+      "sha256": "7d2d27875a3bf7496946e2062f8c8e5d9f4518a166d90502f9c2f6d85336d960"
+    },
+    {
+      "slot": "difftastic",
+      "stage": "after_sign_in",
+      "sha256": "99e6143adda58f79c6dacf317bc480d1f1e400b6b3aa8738699bb522ef877d9f"
+    },
+    {
+      "slot": "cross-family-review",
+      "stage": "after_sign_in",
+      "sha256": "89136ea0665411e50abd76075995dd0f257553740c8c89d3f6a17ed662d37a27"
+    },
+    {
+      "slot": "agent-runtime-worker",
+      "stage": "after_sign_in",
+      "sha256": "0fe8da14b946ad115e52596ae85a44624c05e1415e6376b1f6f86562bf0d22c9"
+    },
+    {
+      "slot": "research-harnesses",
+      "stage": "after_sign_in",
+      "sha256": "3a5467900f4d4ff2c2fad38edb560bf98c7559ca683bbc915aaba3326f141c6d"
+    }
+  ],
+  "upstream_sources": [
+    "https://github.com/util-linux/util-linux/blob/v2.41.3/sys-utils/flock.1.adoc",
+    "https://code.claude.com/docs/en/headless#get-structured-output",
+    "https://code.claude.com/docs/en/cli-reference#cli-flags",
+    "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/prometheus/main.go#L270",
+    "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/prometheus/main.go#L314",
+    "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/querying/api.md#L1447"
+  ],
+  "not_claimed": [
+    "new completed cross-family stage",
+    "new completed whole research stage",
+    "fixed ns2604 Prometheus unit",
+    "actual Telegram receiver confirmation",
+    "explicit canonical Claude route",
+    "713merge or main rebase",
+    "upstream acceptance from synthetic tests"
+  ],
+  "privacy": "Sanitized metadata, opaque digests and the selected nonsecret feature field only. No transcripts, credential values or personal host paths.",
+  "metadata_followup": {
+    "changes": [
+      "Prometheus native Python health-check prerequisite declared",
+      "Inspect relative-path workaround note after official0.3.274\u20130.3.276 changelog review"
+    ],
+    "upstream_source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/93f7182cf2ce9be22724b05e499cd1358d7ed41d/CHANGELOG.md#L1",
+    "newer_inspect_releases_executed": false,
+    "upstream_absolute_path_fix_claimed": false,
+    "checks": [
+      {
+        "scope": "Manifest",
+        "exit_code": 0,
+        "tests": 55,
+        "seconds": 0.738,
+        "log": {
+          "artifact_alias": "cross-lock-metadata-manifest-tests.log",
+          "bytes": 154,
+          "sha256": "6a6f13f73db57ebb00355b75bd15a232a6d67f384994f0f93a4387680e11c170"
+        }
+      },
+      {
+        "scope": "FixwaveAcceptanceRepairs",
+        "exit_code": 0,
+        "tests": 18,
+        "seconds": 4.918,
+        "log": {
+          "artifact_alias": "cross-lock-metadata-focused-tests.log",
+          "bytes": 117,
+          "sha256": "cdd6205dfb5901e016a402501b15459b9b22e9ba6e697842e0da845d135c024e"
+        }
+      }
+    ]
+  }
+}

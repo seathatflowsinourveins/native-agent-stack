@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "kind": "acceptance-defect-repair-followup",
+  "evidence_class": "local-integration-and-retained-native-observation",
+  "recorded_at_utc": "2026-10-05T12:47:00Z",
+  "previous_published_revision": "91eb2ed8bf1279b3bdf9d1f38f55afaf32489ee9",
+  "north_star_action": "Repeatable bounded native acceptance and trustworthy observation for US-equities research and historical simulation.",
+  "decision_record": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+  "publication": {
+    "pr": 723,
+    "draft": true,
+    "lane": "lane:foundation",
+    "rebase_gate": "PR713 actually merged; do not rebase its open branch"
+  },
+  "scope": [
+    "shared native instruction data",
+    "research final predicate filename correction",
+    "alert closed-port precondition",
+    "historical observability render custody and nonzero retained outcome"
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_new_wsl*.py",
+      "evidence_class": "locally-authored-integration-tests",
+      "exit_code": 0,
+      "tests": 374,
+      "skipped": 3,
+      "seconds": 105.682,
+      "log": {
+        "artifact_alias": "new-wsl-touched-tests.log",
+        "bytes": 488,
+        "sha256": "51f4f6d0f3f17f9b7c08e0152d1c86f010c8f0b224e9d88608b09ba88b26ad04"
+      }
+    },
+    {
+      "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+      "exit_code": 0
+    },
+    {
+      "command": "bash -n accept.sh install.sh config/srt-client-accept.sh",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "actual alert precondition, then allocated listening-port negative control",
+      "evidence_class": "native-local-integration-control",
+      "exit_code": 0,
+      "closed_fixture": "failed connect plus successful empty ss output",
+      "negative": "real listener rejected",
+      "alert_delivery": "not exercised in this control"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "components": 69,
+      "hashed_files": 10101,
+      "profiles": 4,
+      "receipts": 202,
+      "evidence_class": "local-integrity-before-native-stage-receipt-update",
+      "log": {
+        "artifact_alias": "observability-shared-validate.log",
+        "bytes": 162,
+        "sha256": "ef124954b4089f3fe970b22d25e42d49450e9466247cf54ca0cc95ffd8efe4de"
+      }
+    }
+  ],
+  "historical_render_recognition": {
+    "provenance": "Digest-only observation of the two exact user-designated retired wave-1 files. No configuration values inspected or copied. Historical render inputs are not reconstructed.",
+    "renders": [
+      {
+        "name": "prometheus.yaml",
+        "bytes": 699,
+        "sha256": "1568a5025ee2e6cab6e0a853031e438d7f04ae03a0d700aa5eb6a406b3e89e65"
+      },
+      {
+        "name": "otel.yaml",
+        "bytes": 23472,
+        "sha256": "d928bbb9dbd61a5245933e94c4e371289e8b7bf0013488116c6d76de5c346a1e"
+      }
+    ],
+    "custody": "Operator migration ledger or OTel backup marker overrides a recognized digest; unknown/edited/empty configurations remain retained. A dangling backup is a custody marker. Retained OTel outcomes are nonzero needs_owner.",
+    "synthetic_controls": [
+      "known exact render replaced",
+      "one-byte edit retained",
+      "unknown configuration retained",
+      "empty unknown configuration retained",
+      "operator custody retained",
+      "dangling OTel backup retained",
+      "validator refusal preserves config and unrelated ledger"
+    ]
+  },
+  "research_attempt": {
+    "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only research-harnesses --stage after_sign_in </dev/null",
+    "started_at_utc": "2026-10-05T11:57:08Z",
+    "outer_timeout_seconds": 4800,
+    "exit_code": 1,
+    "source_revision": "91eb2ed8bf1279b3bdf9d1f38f55afaf32489ee9",
+    "failure": "Locally authored final predicate searched for gpt-researcher.sh instead of the supplied gpt_researcher.sh. Original wrapper remains failed; native terminal and both completed gatherer calls are not a whole-stage pass.",
+    "wrapper": {
+      "artifact_alias": "research-harnesses.after-reset.log",
+      "bytes": 5895,
+      "sha256": "26af54577ee7243996349e8525e742f585e2af3666847a40116cfb3904437061"
+    },
+    "claude_stream": {
+      "artifact_alias": "fresh-claude-research.jsonl",
+      "bytes": 443874,
+      "sha256": "dbdde227579045eda10e7fbeaf1028dd300843773096375c9dda05b47ad1407d"
+    },
+    "claude_terminal": {
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 22,
+      "duration_ms": 1027302
+    },
+    "claude_native_usage": {
+      "input_tokens": 36,
+      "cache_creation_input_tokens": 107429,
+      "cache_read_input_tokens": 1166491,
+      "output_tokens": 30006,
+      "service_tier": "standard",
+      "speed": "standard"
+    },
+    "usage_scope": "Count native terminal totals once. Cache fields remain distinct. Thinking tokens and iteration/provider subsets are not added to these totals.",
+    "codex_arm": "not run because the earlier predicate failed",
+    "corrected_full_replay": {
+      "evidence_class": "local-retained-artifact-replay",
+      "exit_code": 0,
+      "new_model_run": false,
+      "whole_stage_acceptance": false
+    },
+    "gpt_fresh_report": {
+      "artifact_alias": "fresh-gpt-researcher-report.md",
+      "bytes": 30477,
+      "sha256": "582f77ad631dbff443efe3c8a113c3a7dd13a4d9a2c6e3123950060bbb71bb53"
+    },
+    "gpt_provider_usage": null,
+    "deer_flow": [
+      {
+        "invocation": "direct",
+        "native_integration_observation": {
+          "native_exit_code": 0,
+          "integration_exit_code": 0,
+          "acceptance_status": "passed",
+          "gatherer_status": "complete",
+          "provider_status": "available",
+          "matched_search_successes": 7,
+          "matched_search_failures": 0,
+          "matched_provider_empty_results": 0,
+          "terminal_end_events": 1,
+          "malformed_event_lines": 0,
+          "final_answer_citations_in_results": 2,
+          "native_end_usage": {
+            "input_tokens": 117780,
+            "output_tokens": 4886,
+            "total_tokens": 122666
+          },
+          "failure_reasons": [],
+          "answer_status": "final_cited"
+        },
+        "artifacts": [
+          {
+            "artifact_alias": "direct-answer.md",
+            "bytes": 842,
+            "sha256": "d49a7d2de2f86d3a99d087b798c4a3544bdf1d5bdfd9fd88a8a573b0bc8cd2c3"
+          },
+          {
+            "artifact_alias": "direct-events.jsonl",
+            "bytes": 571890,
+            "sha256": "89ef78563f5960de344457cf5901be57da3c29554a454b9c1d94533127d1949f"
+          },
+          {
+            "artifact_alias": "direct-cli.stderr",
+            "bytes": 810,
+            "sha256": "804b24db5758b6c13ef7b6a5adfa1a1ba65d3e5308e6e7bbb192bcf0c65c4b6e"
+          },
+          {
+            "artifact_alias": "direct-integration-check.json",
+            "bytes": 532,
+            "sha256": "9ea874aa6b19533071236e189f1e4d8e14c4dc8758c73bc0c5f39e68792e801d"
+          }
+        ],
+        "usage_scope": "Single terminal-end native usage for this invocation; not added to fresh-client usage."
+      },
+      {
+        "invocation": "fresh-claude",
+        "native_integration_observation": {
+          "native_exit_code": 0,
+          "integration_exit_code": 0,
+          "acceptance_status": "passed",
+          "gatherer_status": "complete",
+          "provider_status": "available",
+          "matched_search_successes": 11,
+          "matched_search_failures": 0,
+          "matched_provider_empty_results": 4,
+          "terminal_end_events": 1,
+          "malformed_event_lines": 0,
+          "final_answer_citations_in_results": 2,
+          "native_end_usage": {
+            "input_tokens": 175294,
+            "output_tokens": 8178,
+            "total_tokens": 183472
+          },
+          "failure_reasons": [],
+          "answer_status": "final_cited"
+        },
+        "artifacts": [
+          {
+            "artifact_alias": "fresh-claude-answer.md",
+            "bytes": 796,
+            "sha256": "87b62130ec33516eadec8cfeaa7d27a84842d1470a74bc1f8c9769945639537a"
+          },
+          {
+            "artifact_alias": "fresh-claude-events.jsonl",
+            "bytes": 1035819,
+            "sha256": "60c4351e471a49a6f0cb01322349588eee6443d525ece869c03234e549fca8c1"
+          },
+          {
+            "artifact_alias": "fresh-claude-cli.stderr",
+            "bytes": 514,
+            "sha256": "0e597354dd517b21349237f1225db3e76670b3e852e4351ba234fb32c429b065"
+          },
+          {
+            "artifact_alias": "fresh-claude-integration-check.json",
+            "bytes": 533,
+            "sha256": "fe5ecb657012fb0793c1671625e2e219522b056661cc06d6ff7b37a19c49bde6"
+          }
+        ],
+        "usage_scope": "Single terminal-end native usage for this invocation; not added to fresh-client usage."
+      }
+    ]
+  },
+  "not_claimed": [
+    "new full research stage pass",
+    "Codex research acceptance in the failed attempt",
+    "alert delivery in the closed-port control",
+    "unchanged upstream acceptance from synthetic tests",
+    "reconstructed wave-1 render inputs",
+    "Grafana historical provisioning migration",
+    "command-center route or search-provider decision",
+    "PR713 landed"
+  ],
+  "upstream_sources": [
+    "https://code.claude.com/docs/en/cli-reference#system-prompt-flags",
+    "https://github.com/anthropics/claude-code/releases/tag/v2.1.285",
+    "https://github.com/anthropics/claude-code/releases/tag/v2.1.281",
+    "https://github.com/python/cpython/blob/v3.13.16/Doc/library/socket.rst#L1497",
+    "https://github.com/iproute2/iproute2/blob/v6.19.0/man/man8/ss.8#L497",
+    "https://github.com/python/cpython/blob/v3.13.16/Doc/library/pathlib.rst#L1021",
+    "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/otelcol/command_validate.go#L15",
+    "https://github.com/prometheus/prometheus/blob/v3.15.0/cmd/promtool/main.go#L613"
+  ],
+  "privacy": "Only sanitized numeric outcomes, native terminal counters and artifact digests. No transcripts, credential values or personal host paths.",
+  "current_source_identities": [
+    {
+      "artifact_alias": "accept.sh",
+      "bytes": 152875,
+      "sha256": "489a1a94d20a1982b010e0d29d1b7f7be89aae3149a858999738ea68fd45a5ed"
+    },
+    {
+      "artifact_alias": "install.sh",
+      "bytes": 102652,
+      "sha256": "1ca7ad0a5c643f302868ab221c30078f6fd3ff4768fd13feab62a86ceb53329d"
+    },
+    {
+      "artifact_alias": "config/acceptance-execution-instructions.txt",
+      "bytes": 596,
+      "sha256": "31e847937205f9f076d11e6815698b852b77cdb6bf3263eac14f94943df5bbfd"
+    },
+    {
+      "artifact_alias": "config/srt-client-accept.sh",
+      "bytes": 8900,
+      "sha256": "e4d0c6f8cf5316a5d0216b52e289eec68f8b23eaedd22493c6f719545ceca341"
+    },
+    {
+      "artifact_alias": "config/observability_config.py",
+      "bytes": 12534,
+      "sha256": "ec9693ef434ed0943574e4a03ffc8c95cc3020277d3caf21c50ff7f94648113e"
+    }
+  ],
+  "current_after_sign_in_recipe_identities": [
+    {
+      "slot": "mcp-inspector",
+      "sha256": "468e43271b57c22c6aae1b45aefd299066fa1b88a6e2a55d3574e4418be08368",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "alerting",
+      "sha256": "cb4dcc466d543d5d10743db78e279f7f7a9bde77e6ab20b1015b67e6e12e9945",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "promptfoo",
+      "sha256": "18928c037d9eb765dce57a7dc17ea2060ffdfeef8fc5272c717b49b5d0ce4ddb",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "worktrunk",
+      "sha256": "ee2542f9a3469b07748d4cb5f4c858f627aec72b011aa95751c1d4636f8882a8",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "difftastic",
+      "sha256": "d084a11b2cb8ef57d69d29f01312b35990fee94b3f3705591adf7e7414805709",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "cross-family-review",
+      "sha256": "d4a14b6fe8d7c406cdd81100b9657a29e929fc5e1458fe268990772011614042",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "agent-runtime-worker",
+      "sha256": "36f52992506b28a4cadb867d8a232da451b1a65450f44c81ccb2362fd5524059",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    },
+    {
+      "slot": "research-harnesses",
+      "sha256": "47c1d8088cf1fd3c9de2f4481d096c1b843549257b5b3d3d7e409a18970ee159",
+      "evidence_scope": "Current repaired check data, not the source identity of earlier retained native attempts."
+    }
+  ],
+  "native_stage_reruns": [
+    {
+      "slot": "otel-collector-contrib",
+      "stage": "post_install",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install </dev/null",
+      "wrapper_exit_code": 0,
+      "row_exit_code": 0,
+      "evidence_class": "native-host-post-install",
+      "log": {
+        "artifact_alias": "otel.post-install-repair.log",
+        "bytes": 42,
+        "sha256": "5b705c6ffdf8766ed90bd49545be60f0b85db509aa494ba8079e4b20b1349e83"
+      },
+      "source_scope": "Existing installed host configuration; this does not exercise historical publisher migration."
+    },
+    {
+      "slot": "alerting",
+      "stage": "after_sign_in",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only alerting --stage after_sign_in </dev/null",
+      "wrapper_exit_code": 0,
+      "row_status": "skipped",
+      "needs_user": true,
+      "acceptance": false,
+      "reason": "Default receiver lacks destination; wrapper0 is not acceptance.",
+      "log": {
+        "artifact_alias": "alerting.default-receiver-skipped.log",
+        "bytes": 134,
+        "sha256": "152265dfbf1e70b5ffc96f942141e065d4981fc653eb6c2ab8aedff62041e293"
+      }
+    },
+    {
+      "slot": "alerting",
+      "stage": "after_sign_in",
+      "command": "NATIVE_STACK_ALERT_RECEIVER=telegram bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only alerting --stage after_sign_in </dev/null",
+      "wrapper_exit_code": 1,
+      "row_exit_code": 3,
+      "needs_user": true,
+      "acceptance": false,
+      "receiver": "Existing co-op-selected Telegram pointer, per invocation only. No credential values inspected.",
+      "delivery_receipt": {
+        "rule_fired": true,
+        "rule_resolved": true,
+        "notification_delta": 4.0,
+        "config_sha256": "e141c47d83040eec66e45695d7ea07a99d88b6102a08b2f5d781ec000c15efdd"
+      },
+      "reason": "Fresh native firing/resolution and successful notification counter delta were observed. Native gate requires actual user confirmation of both received notifications; not supplied in this attempt.",
+      "log": {
+        "artifact_alias": "alerting.telegram-closed-port-repair.log",
+        "bytes": 312,
+        "sha256": "822442bead835c69db8751e38476d974901ace9bdac91a9709996576e0910787"
+      }
+    }
+  ]
+}

@@ -1,12 +1,14 @@
 # New WSL install plan
 
+Current structural inventory (2026-10-05): 84 rows, 192 install commands and 113 acceptance entries (including two additional checks). The source includes 66 configuration assets. D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
 Revised to the merged definitive manifest (`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`) and to what the plan did on a real distribution. The inventory has one row per foundation row of that manifest: 84 rows, of which 63 are installed (60 by the default run, two of them interim installs, which wait for the wave-2 acknowledgements: section "Wave 2" below; and three only when named with `--only <slot>`), two are measurement-only (installed only by `--only <slot>`, for the measurement that decides them) and 19 are not installed. [VALIDATION.md](VALIDATION.md) keeps three results apart: the round 1 container run of the first plan (historical), the run of the previous revision in a throwaway distribution, and the clean run of this revision in a fresh throwaway distribution on 2026-10-02 (12:54Z to 13:17Z), recorded in [real-distribution-validation.json](real-distribution-validation.json). Both distribution runs were on one host, in distributions that were removed afterwards. Later on 2026-10-02 the plan's 64-row revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay; the record of that run is private, its public receipt comes with that distribution's acceptance, and this folder records no result of it. `python3 -B check_plan.py` checks that `install-plan.json`, `owners.json`, both scripts, `mise.toml`, `config/` and the manifest agree.
 
 Six of the 70 rows were added after the clean run: five from the layer consensus of 2026-10-02 (`docs/decisions/2026-10-02-new-wsl-layer-consensus.md`) and `statusline` from its wave-2 batch of 2026-10-03, which also turned three rows into interim installs and revised four more. All three results above are about the 64 rows that existed then. The install and acceptance commands of the rows added or revised since (sections "Rows from the layer consensus" and "Wave 2" below) have not run anywhere, on any distribution; those sections say what was checked instead. Ten more rows came from the wave-3 batch of 2026-10-04, the owner's decision, which also turned `ccusage`, `session-analytics` and `context-supply` into owner defaults and widened `code-search` to both arms of its confirmatory (section "Wave 3" below); their commands have not run anywhere either.
 
-On 2026-10-03 two rows that were not installed at the clean run, `local-generation-model` and `embedding-model`, became installable after the local-model measurement settled them in the manifest (`docs/decisions/2026-10-03-new-wsl-local-models.md`). They create their models through the running model server, which the plan does not start, so the default run and the default acceptance skip them and `--only` installs and checks each. As plan rows, their install and acceptance commands have not run anywhere; the section "The two local-model rows" below says what was checked instead.
+On 2026-10-03 two rows that were not installed at the clean run, `local-generation-model` and `embedding-model`, became installable after the local-model measurement settled them in the manifest (`docs/decisions/2026-10-03-new-wsl-local-models.md`). They create their models through the running model server, which the plan did not start when these rows were added, so the model rows remain named-only and their default install/acceptance is skipped and `--only` installs and checks each. As plan rows, their install and acceptance commands have not run anywhere; the section "The two local-model rows" below says what was checked instead.
 
 The target remains a clean Ubuntu 26.04.1 WSL 2 distribution with systemd, one non-root user, passwordless sudo and existing RTX 4090 passthrough.
 
@@ -23,7 +25,7 @@ bash accept.sh --only <slot> --stage after_sign_in
 
 Both scripts refuse root. Installation selects dependencies, isolates owner failures and retains existing operator configuration. No default-shell or Windows-side change is prescribed. `--list` is read-only and prints `slot | owner | route | status` for every row; the status is `planned`, `measurement-only` or `excluded`.
 
-A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Three installed rows are left out of the default run: the two local-model rows, which create their models through the model server that the plan does not start, and MCP protocol conformance, which qualifies explicitly named project transports on demand.
+A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Two installed rows are left out of the default run: the local-model creation rows. The separate local-model-server row now carries the lasting-owner boot-enabled unit described below.
 
 - 60 rows are installed by default, two of them interim installs: ai-memory (`memory-owner`) and semble plus SocratiCode (`code-search`). Context-mode (`context-supply`), ccusage and session analytics are wave-3 owner defaults; Promptfoo is the wave-4 owner default from the additive fix-wave integration.
 - The two local-model rows (`local-generation-model`, `embedding-model`; manifest state `measurement`, returned) are installed only when named. The default run and the default acceptance skip them and print `skipped`. Once the model server answers on 127.0.0.1:21434 and reports version 0.35.0, `bash install.sh --only local-generation-model` (likewise `embedding-model`) installs one, `bash accept.sh --only <slot>` checks its files and `bash accept.sh --only <slot> --stage service_health` checks the created model through the server.
@@ -57,9 +59,9 @@ Docker requires uidmap, dbus-user-session, kernel/rootless prerequisites and its
 
 Upstream Docker and Dagu user setup start their services during installation. Other documented foreground/daemon starts, including Alertmanager's, are in [SOURCES.md](SOURCES.md#service-starts--separate-from-installation); the install does not run them, so those services' health checks fail until they are started (as the real-distribution run showed). Post-install checks do not require them. Dagu's user-bus setup, rootless Docker, sandbox namespaces and Git worktree access were checked on the real distribution (VALIDATION.md).
 
-GPT Researcher runs only through `tools/research/gpt_researcher.sh` (a keyless configuration, an `env -i` scrub, a fail-closed preflight and `research_report` only). DeerFlow's backend is installed with `uv sync --locked` and run embedded; `make config` still writes the `config.yaml` its embedded runs read. Until wave 2 the row ran `make docker-init`, a Compose stack on port 2026 and its `/health/ready` probe; all three are gone (research ruling, changes 9 and 10), and the Compose sources in [SOURCES.md](SOURCES.md) stay as the record of that earlier route.
+GPT Researcher runs only through `tools/research/gpt_researcher.sh` (a keyless configuration, an `env -i` scrub, a fail-closed preflight and `research_report` only). DeerFlow's backend is installed with `uv sync --locked`; foreground research uses its shipped headless JSON CLI with the native 100-step recursion limit and the tagged keyless DDGS adapter. The scrub leaves Jina and Tavily keys empty, and callers select the current public config explicitly. The run retains original JSON events, unqualified returned AI text and an integration receipt requiring a matched substantive search result, linked final citation and terminal usage. Empty DDGS outcomes remain provider-availability evidence and fail acceptance. The measured Tavily adapter is a ready-to-apply proposal requiring a command-center ruling; it does not decide the separate provider-owner measurement or alter GPT Researcher's keyless route. No HTTP stack is started. Historical embedded-client and Compose recipes remain recorded in [SOURCES.md](SOURCES.md).
 
-Native self-updating Claude/Codex installers remain preferred over npm; reviewed releases are not runtime locks. Existing loopback service configuration, supported isolated Python environments and excluded overlaps remain in the JSON and [SOURCES.md](SOURCES.md). No new user unit was invented. No credentials or provider values are filled in.
+Native self-updating Claude/Codex installers remain preferred over npm; reviewed releases are not runtime locks. Existing loopback service configuration, supported isolated Python environments and excluded overlaps remain in the JSON and [SOURCES.md](SOURCES.md). User-unit forms follow the qualified adaptations named below. No credentials or provider values are filled in.
 
 ## This revision
 
@@ -141,10 +143,10 @@ Settled by the preregistered local-model measurement of 2026-10-02 and 2026-10-0
 - **`local-generation-model`** downloads `Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf` from `ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF` at revision `d74895bbe5db4bec1e0024e7cc87d59c02d7631a` and keeps it only when its sha256 is `1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786` (11,771,546,912 bytes), into `$tool_root/ollama-models`. It places the two Modelfiles beside the file and creates `swift-iq3s-s2o` (the library `qwen3.8:27b` model's template, renderer, parser, parameters and licence lines with the Swift file as `FROM`: the measured file, whose `FROM` was an absolute path in the throwaway distribution and is written here relative to the Modelfile) and `swift-iq3s-s2o-64k` (`PARAMETER num_ctx 64000`). `ollama create` copies the file into the server's model store as a layer under its own sha256 (written by the client when a loopback server shares its store, uploaded otherwise), so the row needs about 23.5 GB of disk while the download is kept.
 - **`embedding-model`** pulls `qwen3-embedding:0.6b` (Q8_0), stops unless the server lists it with the pinned library manifest digest `ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d`, and creates `qwen3-embedding-8k` (`PARAMETER num_ctx 8192`). The pull checks each layer against the manifest the registry serves for the tag at that moment; if the library republishes the tag, the digest check stops the row instead of installing another model.
 - **The context belongs to each model, never to the server.** With a server-wide `OLLAMA_CONTEXT_LENGTH=64000` the embedder loaded at its full context (32,768 tokens) and took 5.78 GB in the measurement (A1b). The derived models carry their own `num_ctx`; `config/ollama.env.example` sets only `OLLAMA_HOST`, and nothing in the plan sets a server-wide context.
-- **The measured server's other settings.** The measurement's server, as `steps/M12-reprepare.sh` (lines 11-12, in the private measurement folder) started it after deviation 1 and before S2o's first load, ran with `OLLAMA_NUM_PARALLEL=1` and `OLLAMA_KEEP_ALIVE=-1` and without a server-wide context; no later step script starts it again. The plan sets neither variable. Ollama v0.35.0's default for `OLLAMA_NUM_PARALLEL` is 1 ([envconfig/config.go:277](https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/envconfig/config.go#L277)), the setting by which a loaded model's context memory is multiplied ([docs/faq.mdx:335](https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/faq.mdx#L335)), so the plan's server serves each model with the measured single request slot. Its default keep-alive is five minutes ([envconfig/config.go:130](https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/envconfig/config.go#L130)), not the measured "never unload": on the plan's server an idle model leaves the GPU after five minutes. Whether the destination keeps both models resident belongs to the lifecycle design, with GPU ownership below.
-- **The model server is not started here.** The two rows create their models through the running server, so they install only when named, and `install.sh` stops a row with a message when nothing answers on 127.0.0.1:21434, or when the server that answers reports through `GET /api/version` another version than 0.35.0, the measured one, before anything is downloaded, pulled or created. The server's start is the `local-model-server` row's (SOURCES.md, "Service starts"). Neither row has a service of its own.
+- **The measured server's other settings.** The historical measurement used OLLAMA_NUM_PARALLEL=1 and OLLAMA_KEEP_ALIVE=-1 without a server-wide context. D-ollama-2 (the user's decision at about11:05 AM EDT (15:05Z) on2026-10-05) replaces indefinite boot preload with on-demand loading and native30m idle expiry. The exact owner-approved unit retains OLLAMA_NUM_PARALLEL=1 and OLLAMA_NO_CLOUD=1, with no ExecStartPost warmup. Installed Ollama0.35.0 help reports its built-in5m default;30m is the user-approved override. Organic usage/reload-cost measurements can overturn this choice.
+- **The model creation rows remain named-only.** Their version/readiness guard is unchanged. The local-model-server installer places the exact owner-approved unit, then runs native systemctl --user daemon-reload and enable --now ollama.service. service_health requires enabled/active, one on-demand embedding of Hello world, then exactly one matching canonical embedder entry with positive numeric size_vram==size. This observes residency after the request; cold loading, boot preload and future residency are separate claims. The embedding-model row must already have created the settled model; nothing is pulled. Only the co-op/readiness-runner applies the plan on the shared host. Existing unreferenced host warmup files remain under their owner's custody.
 - **Acceptance.** `post_install` reads files only: for the generation row, the placed Modelfiles hash to the repository's and the created model's manifest names the pinned file's sha256 as a layer; for the embedding row, the library manifest in the server's store hashes to the pinned digest and the derived model's manifest names the library's model layer (`sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439`, read from the registry's manifest at the pinned digest on 2026-10-03). Both read the store at `${OLLAMA_MODELS:-$HOME/.ollama/models}`, which assumes that the server runs as the same user with the same `OLLAMA_MODELS`. `service_health` runs once the server answers: `ollama show` must report the model's own context (and `IQ3_S` for the generation model), then one short generation with thinking off (the measurement ran at effort medium) or one embedding call that must return 1,024 values (the model card's full size; the measurement's records do not state the size of the vectors it received). The `local-model-server` row's `after_sign_in` smoke check is one `/api/embed` call to `qwen3-embedding-8k`, the settled embedder, which must return one vector; it needs the `embedding-model` row installed first and pulls nothing. Until that row has created the model (its manifest in the store above), `accept.sh` prints `skipped` for the stage, which is not a pass, so the after-sign-in checks of step F9, which install no model row, do not fail on it (until 2026-10-03 it ran upstream's example `ollama run embeddinggemma "Hello world"`, which would have pulled EmbeddingGemma, the embedding arm that lost).
-- **GPU ownership is left to the lifecycle design.** One RTX 4090 serves the workstation distribution's model services and the destination's model server. The measured co-residency (the generation model 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU; 21,579 of 24,564 MiB in use while the Windows applications held about 2,600 MiB) was measured under the preregistration's condition N: no WSL process other than the server under test held GPU memory, and the workstation's two model services were stopped first. While another distribution's model services hold GPU memory, that result does not apply. Which distribution's server holds the card, and when, is for the lifecycle design to decide; this plan decides nothing about it and starts no service.
+- **Destination GPU ownership.** D-ollama (2026-10-05), command-center item task-ns2604-coop-20261005T142343Z point1, carries the user's2026-10-03 lasting NativeStack2604 owner ruling and supersedes the historical undecided limitation in [the local-model decision:254–257](../../../docs/decisions/2026-10-03-new-wsl-local-models.md). The upstream [Ollama0.35.0 Linux system unit:57–89](https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57) is the unit-form source; the updated user-unit adaptation retains designated host hash5e8e8bc4. The former94e03d7b unit and2236dc86 warmup hashes are historical, superseded by D-ollama-2. The co-op reports enabling the host unit at10:28:53 AM EDT (14:28:53Z); that report and this lane's independent enabled-state health check remain separate evidence. The cross-distribution listener guard in the exact unit is retained.
 
 Checked for these rows (static, VALIDATION.md, section "The two local-model rows"): `check_plan.py`, now also failing when the default runs of `install.sh` and `accept.sh` disagree about a row in either direction; `bash -n`; `install.sh --list`; the four acceptance programs and the server row's `after_sign_in` check against stand-ins in a committed test (`tests/test_new_wsl_definitive_defaults.py`, class `LocalModelAcceptance`); and `install.sh`'s server guard against stand-ins (class `ModelServerGuard` there). **No command of these two rows has run as a plan row, anywhere.** The measurement created and ran the same models in a throwaway distribution, from the same file and library digest, by its own scripts. The first run of the rows is owed in a throwaway distribution or on the destination once the lifecycle design has settled GPU ownership.
 
@@ -162,7 +164,7 @@ From the wave-2 batch of the layer consensus (`consensus.json`, key `wave2`, wit
 From the wave-3 batch of the layer consensus (`consensus.json`, key `wave3`), the owner's decision of 2026-10-04 under amendment 4 of the manifest's decision rule, relayed by `docs/decisions/2026-10-04-token-full-stack-owner-default.md`. The original wave-3 pins came from `manifests/stack.json` and `adoption/pins-linux-x86_64.json` at `f77a35eb`. After main's PR #693 (2026-10-04) those files pin RTK 0.51.0 and mcporter 0.14.2, and this plan follows them. PR #642 W1 also moved jcodemunch-mcp after `f77a35eb` to 1.108.327, source `6d5ae86c130f96624e2ca2d797fa3b853c210b9d`, and this plan follows that selected pin. Its README was read at 6d5ae86c and the prior 8f7b34ab pin on 2026-10-05; install, version and session-stats anchors 91, 113 and 141 are unchanged (SOURCES.md, the code-index row). Every tool installs under the ecosystem root the client templates name, `${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}`: release archives and npm tarballs through `fetch_verified` against the recorded sha256 (no `gh release download`, so no GitHub sign-in), archives extracted whole into `tools/<tool>-<version>` (bundled licenses kept), npm packages with `npm install --global --prefix tools/<tool>-<version>` from the verified tarball, uv tools with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the root, and each command linked into `${ECO_ROOT}/bin`. Sources are in [SOURCES.md](SOURCES.md), section "Wave 3", and the checks that ran in [VALIDATION.md](VALIDATION.md), section "Wave 3".
 
 - **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the Claude hook is the client configuration's, and the Codex hook is installed and trusted by this row, on the decision of 2026-10-04), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.327, selected in `manifests/stack.json`; [W1 qualification](../../receipts/jcodemunch-1108327-qualification-20261003.json)), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
-- **Owner defaults**: `ccusage` (20.0.26, a read-only meter) and `session-analytics` (agentsview 0.43.0, a local archive only, telemetry and the update check off) now install; `context-supply` keeps its commands and checks and no longer calls `interim_acknowledged`, since its authority is the owner's decision and not amendment 3.
+- **Owner defaults**: `ccusage` (20.0.26, a read-only meter) and `session-analytics` (operational agentsview 0.44.0, a local archive only, telemetry and the update check off) now install; `context-supply` keeps its commands and checks and no longer calls `interim_acknowledged`, since its authority is the owner's decision and not amendment 3.
 - **`code-search`** installs SocratiCode 1.15.0 beside semble (its npm tarball with `--ignore-scripts --before=2026-09-24T12:00:00Z`, into the prefix the client templates run), keeps its gate, and its check reads SocratiCode's version from `package.json`, never by running it. SocratiCode serves nothing until the client configuration names a Qdrant store and an embedding endpoint, which no row installs yet.
 - **The gate** `interim_acknowledged` reads every wave batch and refuses while any of them owes an acknowledgement; an owner batch owes none.
 - **Not run.** None of these commands has run on any distribution. The four release archives and the five npm tarballs were downloaded to a scratch folder and matched their recorded sha256 on 2026-10-04, and the four archive checks passed against the archives' binaries there (VALIDATION.md); that is no installation.
@@ -276,6 +278,14 @@ alone do not certify dashboard readiness. The maintained Prometheus startup
 feature flags for first counter samples are recorded in the G4 decision and
 must be carried by the service owner.
 
+Grafana publishing and all three acceptance stages preflight the three retired
+wave-1 provisioning paths before reading the ledger or writing Grafana assets.
+Any reappearance, including a dangling symlink, returns nonzero `needs_owner`;
+no digest grants permission to migrate or retire it. The current plan helper
+supplies this check, so an older installed helper cannot bypass it. On
+NativeStack2604 the co-op holds the preserved backup until the command-center
+soak permits retirement; see the A30 custody record in the followup receipt.
+
 Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
 the disarmed sink until the selected receiver's private files exist. ntfy.sh was
 the coordinator's delegated pick on 2026-10-04. The user personally configured
@@ -374,13 +384,19 @@ historical; their shared count/header updates belong to the coordinator.
   Post-install acceptance runs unchanged upstream positive/failing smoke
   fixtures and checks actual results, including the failing control's exit 100.
   The echo fixtures qualify evaluator plumbing only. For real acceptance,
-  edit `$config_root/promptfoo-gateway.yaml` to use the two exact GPT/Claude
-  model IDs served by the existing gateway; its loopback default is
-  `http://127.0.0.1:21128/v1`. The keyless default uses a literal placeholder. Supply `GATEWAY_API_KEY`
-  only when the operator enables gateway authentication. An existing configuration is retained. Run the slot's
+  the native `config/promptfoo-gateway.cjs` reads the active plan's
+  `config/gpt-gateway-topology.json`: gateway endpoint, GPT fallback model and
+  effort, and the explicit `promptfoo.claude_model`. A missing canonical route
+  is a plan dependency for the command center to settle. Model IDs and endpoint
+  are not a sign-in task. `apiKeyEnvar: OMNIROUTE_API_KEY` keeps the optional key
+  in its environment store; the keyless loopback setting disables vendor-key
+  fallback. The fresh Codex call forwards that name through a native per-call
+  MCP override, without changing its global config. The retained legacy YAML
+  template is not the acceptance input. Run the slot's
   `after_sign_in` stage: it requires an uncached two-provider evaluation plus
   successful `run_evaluation` results observed in fresh Claude/Codex sessions.
-  Missing route identities or inherited auth are recorded as `needs_user`.
+  CLI and MCP results must identify the exact frozen topology-derived pair.
+  A catalog ID alone does not qualify a model's backing provider or version.
   The plan and `owners.json` now follow the definitive manifest as written.
   The checker rejects a Promptfoo install when the manifest excludes it.
 - **ccusage 20.0.26** keeps PR #684's two install commands and pin. Post-install
@@ -515,7 +531,7 @@ These are planned destination commands; this builder ran no candidate trial.
 | --- | --- | --- |
 | `lm-program-optimization` | DSPy 3.4.0 and its exact GEPA 0.1.4 wheels, verified against PyPI SHA-256 values, in one dedicated uv project. Preserve the resolved `uv.lock` and installed inventory privately. Run the unchanged upstream GEPA and Predict pytest files. | Existing OmniRoute provider readiness for the documented DSPy LM call. Skill-description optimization remains with skill-creator. |
 | `skill-vetting` | SkillSpector CLI from tag commit `c7958a3268d9498644b22edb75d0f051bbc8cbfc`, using upstream `uv tool install` without `[mcp]`. Run its unchanged CLI and native-client adapter tests. Record the actual tool dependency inventory; the upstream project lock does not lock a uv tool. | Native Codex sign-in only for semantic acceptance, with `SKILLSPECTOR_PROVIDER=codex_cli`. Findings remain advisory beside source review and skills.sh audits. |
-| `trajectory-analysis` | Add Scout 0.5.3 and Harbor 0.23.0 to the existing Inspect AI 0.3.273 uv-tool environment, retaining OpenAI 3.24.0. Expose `scout` through uv's `--with-executables-from`. Run unchanged upstream grep and Claude/ATIF import tests. | Set `SCOUT_CLAUDE_SESSION_FILE` to a current session with a known Agent/Task call and `SCOUT_HARBOR_ATIF_FILE` to one existing trial. Consent to private local storage, including upstream same-slug session merging. The native import/scan must finish without errors and detect the Claude positive control. |
+| `trajectory-analysis` | Use a dedicated Scout0.5.3 uv environment with pinned Inspect0.3.273/Harbor0.23.0 ATIF schemas, OpenAI>=2.20,<3 and LiteLLM1.92.0. Preserve separate Inspect/OpenAI3.24 and Harbor owners. Verified release wheels with --no-build. Run unchanged grep/Claude/ATIF tests with Harbor import required. | Set `SCOUT_CLAUDE_SESSION_FILE` to a current session with a known Agent/Task call and `SCOUT_HARBOR_ATIF_FILE` to one existing trial. Consent to private local storage, including upstream same-slug session merging. The native import/scan must finish without errors and detect the Claude positive control. |
 | `mcp-protocol-conformance` | On demand through `npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11`. Verify published SHA-512 integrity and run the unchanged upstream npm check/build/test commands. `list --requirements` is discovery. | Select an HTTP MCP endpoint with `MCP_CONFORMANCE_SERVER_URL` and/or a scenario client with `MCP_CONFORMANCE_CLIENT_COMMAND`. Supply a reviewed `MCP_CONFORMANCE_EXPECTED_FAILURES` YAML only when needed. |
 
 The conformance row requires `--only mcp-protocol-conformance` in both scripts;
@@ -530,7 +546,7 @@ PATH wiring. DSPy runs with
 `uv run --project "${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/tools/dspy-3.4.0" --frozen --no-sync`.
 Skill vetting uses `skillspector scan <artifact> --no-llm --format json --fail-on-findings`
 on demand; a finding never authorizes an install. Scout uses `scout`, exposed
-from the one Inspect AI environment. There is no new client setting, hook or
+from its own Scout environment; Inspect/OpenAI3.24 and the Harbor owner stay separate. There is no new client setting, hook or
 MCP registration for these slots. Tool commands use user scope; `needs.sudo`
 declares the existing wrapper's clean-host apt prerequisite.
 
@@ -604,7 +620,7 @@ execution remains UNRUN; this builder runs repository checks only.
 | Existing owner | Configuration and native acceptance | Remaining input |
 | --- | --- | --- |
 | Promptfoo 0.123.1 | Its Test Agent Skills providers select the host's Claude and Codex executables through `path_to_claude_code_executable` and `codex_path_override`. Native Codex/openai carries Sol/max and its existing login. Post-install also checks both optional SDK dependencies; the existing upstream echo controls and paired skill controls remain. | Native sign-in if absent; the existing gateway A/B template's two exact provider model IDs. |
-| GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 | Both gatherers use OmniRoute `/v1` with keyless search and per-run x-omniroute-session-id headers. On 3.8.51, smart/strategic GPT Researcher and DeerFlow request plain Sol/xhigh; FAST retains its high alias. DeerFlow enables supports_reasoning_effort. Preflight/configuration read-back and fresh successful logged Sol routes are asserted. Default call-list metadata exposes no delivered-effort field, so wire effort remains unasserted; pipeline capture remains an operator decision. A window/model fallback cannot prove attribution or whole-run zero embeddings. Native Codex uses native Sol/max. | Live cited gatherer runs and independent gateway metadata observation remain owed. Delivered wire effort is not certified by this recipe. |
+| GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 | Both gatherers use OmniRoute `/v1` with keyless search and per-run x-omniroute-session-id headers. The historical plain-3.8.51 configuration requested Sol/xhigh for smart/strategic and DeerFlow; FAST requested high through its high suffix. That configuration is superseded: DeerFlow now names cx/gpt-6.1-sol-max, sets supports_reasoning_effort=false and omits reasoning_effort. The flag is plan configuration metadata, not a #744 ruling or delivered-effort proof. Preflight/configuration read-back and fresh successful logged Sol routes are asserted. Default call-list metadata exposes no delivered-effort field, so wire effort remains unasserted; pipeline capture remains an operator decision. A window/model fallback cannot prove attribution or whole-run zero embeddings. Native Codex uses native Sol/max. | Live cited gatherer runs and independent gateway metadata observation remain owed. Delivered wire effort is not certified by this recipe. |
 | OmniRoute 3.8.51 (selected recipe) | The recipe uses the published npm package with its registry SHA512 integrity, upstream doctor/readiness acceptance and a fresh pool/fallback turn. The client-config map renders Sol/xhigh. [The topology record](config/gpt-gateway-topology.json) assigns Sol/max to native Codex until a release includes PR #15167. Historical canary assets remain for historical tests and are not installed by this row. #637 already qualified the stack's 3.8.51 pin; the architecture now cites that existing pin. | Provider sign-in if absent; review a differing existing destination service unit. Start the installed user unit before service-health acceptance. |
 | Harbor 0.23.0 | Verify the published wheel SHA256 and run unchanged upstream ATIF unit tests. Retain the hello-user oracle/nop READY gate. Add [the worker telemetry-contract recipe](config/harbor-worker-telemetry-contract.md), using Harbor's native job runner and trajectory validator. | A maintained, commit-pinned native-verifier task corpus, public Harbor job config and container-reachable provider/Collector inputs. The recipe reports `needs_user` while these are absent. |
 
@@ -643,3 +659,89 @@ Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/recei
 Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.
 
 The staged native acceptance commands remain unrun by this repair. Neither scratch receipt closes the release holds or proves destination service acceptance.
+
+[The coordinator decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md) records all 25 slot repairs, conflict resolutions, canonical Promptfoo owner-batch reconciliation, sources and remaining host gates. The revised merged recipes were UNRUN when this boundary was recorded. Earlier per-row statements are historical; no static integration check certifies the destination.
+
+## Acceptance defect repairs (2026-10-05)
+
+[The repair decision](../../../docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md)
+records the NativeStack2604 failures, upstream sources, retained failed attempts and narrowed controls.
+Fresh Claude sessions use the upstream CLI directly, keep native settings/hooks, and put the task
+before variadic tool flags. The duplicate launcher helper was removed under the official-upstream rule;
+native turn limits, appended instructions and caller options remain in the acceptance commands.
+Inspector's fresh clients execute [the frozen probe](inspector-client-probe.sh); independent native
+completion, hash, artifact and closed-port checks remain required.
+Inspector checks all local TCP states before binding its separate port and rejects a host whose
+ephemeral allocator includes it; cleanup observes the owned process and listener. Worktrunk keeps
+fresh-client cache writes inside its owned run directory. The client-map endpoint parity check, carrier holdout
+description and incremental skill-inventory correction are included. This qualifies the repaired
+stages only; it does not certify all install-plan rows or close independent review disposition gates.
+
+[The sanitized host receipt](fixwave-20261005-receipt.json) records every repaired stage's final
+exit code, retained failed attempts, local checks and independent observations. Earlier passing
+evidence is reused only for unchanged stage inputs. Raw streams and actual host paths stay private.
+
+
+### Follow-up acceptance defects 7, 11 and 12
+
+The worker's default-tmux prerequisite mismatched its already configured subprocess
+backend under Linux Unix-socket blocking. The unchanged upstream subprocess execution
+test passes under both isolated SRT pins; the final foreground fresh-client worker
+stage passes with the block retained. SRT 0.0.78 was already the plan's original pin,
+so this does not demonstrate a version regression.
+
+DeerFlow retains keyless DDGS and uses its shipped headless JSON CLI with an explicit
+100-step bound. Failed runs retain separate native gatherer and empty-search availability
+outcomes; neither availability-only nor partial output qualifies research acceptance.
+The measured Tavily adapter remains a conditional proposal requiring the command
+center's owner ruling. Five older fresh-session recipes explicitly run commands in
+the foreground, wait, and use the upstream per-call background control. Their changed
+invocations need new native qualification; the receipt above remains historical for
+those earlier inputs. Follow-up host results and final validation are recorded
+separately; no whole-plan acceptance or provider-owner selection follows.
+
+### NS2604 follow-up results, 2026-10-05
+
+The [follow-up receipt](fixwave-20261005-followup-receipt.json) records new foreground
+Difftastic, Worktrunk, Inspector and both SRT client stages returning zero, plus the
+worker's independently observed successful jobs under its unchanged socket policy.
+The direct keyless DeerFlow CLI completed with eight substantive searches, two empty
+DDGS responses and linked final citations. Availability and gatherer completion stay
+separate; Tavily remains a conditional proposal.
+
+The overall research stage returned one when its fresh Claude session hit the native
+session limit; its Codex branch did not run. Cross-family review returned outer124
+with the same native limit in its Claude branch, while GPT completed. These failures
+remain open gates and are not replaced by earlier passing evidence. The original
+receipt above retains historical input scopes. Follow-up publication stays draft
+until the required rebase after #713 lands and the command center's cross-family read.
+
+D-ollama-2 local integration:321touched tests passed with3existing skips; native local-model-server post_install, service_health and after_sign_in each returned0. Health loads the embedder on demand before exact positive GPU-residency validation; an independent GET observed size=size_vram=2857191341. The separate unchanged after_sign_in makes its own embedding request. These checks do not establish cold loading, later idle expiry or complete host acceptance. Source and result identities are in the followup receipt; no host unit or warmup was changed by this lane.
+
+## Gate-1 row repairs (2026-10-06)
+
+Inspect, Scout and Harbor resolve in independent uv environments. Scout retains its historical manifest owner identity, requires the Harbor Trajectory import before its unchanged tests, and uses its own interpreter and guarded alias. The hcom smoke selects the first native identity marker. SkillSpector receives a validated model from checked-out canonical topology, reads the native issues field and requires actual successful model-call counters even when the safe report skips inapplicable meta-analysis. DeerFlow metadata follows the landed Sol-max composition; the keyless provider remains unchanged.
+
+MCP conformance preserves all upstream tests and contains their server trees in unprivileged user/PID/network namespaces with only loopback up, because several examples provide no host binding setting. The acceptance-only helper retains raw test stdout and fails on remaining owned processes or listeners; EXIT/INT/TERM cleanup revalidates process ownership. The external on-demand target remains unqualified until its owner supplies an in-namespace native SDK startup command or fixture. Missing target 78 means needs_user, not a protocol pass. See [the decision](../../../docs/decisions/2026-10-06-native-plan-gate1-repairs.md), [sources](SOURCES.md) and the separate gate-1 receipt. Local integration does not constitute full host or provider acceptance.
+
+The after-landing gateway re-apply uses the co-op's explicit [owner-custody runbook](../../../docs/decisions/2026-10-06-native-plan-gate1-repairs.md#after-landing-gateway-custody-on-nativestack2604): retain the previous prefix, preserve approved non-secret asset bytes, stage the landed plan assets, gate pending user-unit reloads, restart and read back. Unknown assets remain needs_owner in ordinary installation. A differing regular omniroute.env.example is retained; a symlink or nonregular example remains needs_owner. The lane makes no host apply, and this recipe is UNRUN until the command center approves the landed head and the co-op owns the transition.
+
+## AgentsView operational pin supersession (2026-10-06)
+
+The session-analytics artifact now selects published v0.44.0 at
+413a87f7bfbd67b2815b1119ac51abc1efbeeaba. The frozen catalog's v0.43.0 owner
+label and earlier G5 receipts preserve historical selection/execution; current
+download, launcher and version gates select v0.44.0. Only symlinks to known
+owned v0.43.0 or v0.44.0 binary/launcher paths may migrate. Foreign symlinks and
+regular aliases remain refused before extraction. Existing data, usage-only
+retention, telemetry/update settings and functional/fresh-session gates remain.
+
+Daily usage reports archived token/cache counts and pricing estimates. Native
+session tool-calls lists named-session outer calls; Task-only calls establish no
+code-mode attribution or savings. Session usage includes descendants unless
+--own-only is selected. Sources and counter boundaries are in SOURCES.md.
+
+This local source preparation serves research and historical-simulation usage
+accounting. It changes no host alias, data, daemon or client configuration.
+Co-op alone applies at the #723 boundary. Historical receipts do not qualify
+this upgrade; current native observations are separately recorded.
