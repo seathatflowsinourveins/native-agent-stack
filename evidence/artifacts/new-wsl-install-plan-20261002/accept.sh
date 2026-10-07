@@ -444,39 +444,34 @@ fi'
 }
 
 embedding-model() {
-  # Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k); https://github.com/QwenLM/Qwen3-Embedding
+  # CURRENT endpoint, not an Ollama model; no cold bootstrap.
+  # Source: https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md#L100; https://github.com/vllm-project/vllm/blob/db9527a46873454610df6dbedf79a36d6bf1a7f6/docs/serving/online_serving/openai_compatible_server.md
+  # Each check uses one physical call line; runtime programs remain unchanged.
   case "$stage" in
     post_install)
-      # Files only: the pinned library manifest and the derived model's layer, in the server's model store.
-      # Store: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/envconfig/config.go#L112
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/manifest/paths.go#L29
-      check embedding-model smoke 'printf '"'"'%s  %s\n'"'"' ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding/0.6b" | sha256sum --check --status && grep -F sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest" >/dev/null'
+      # Source: https://github.com/vllm-project/vllm/blob/db9527a46873454610df6dbedf79a36d6bf1a7f6/docs/serving/online_serving/openai_compatible_server.md
+      check embedding-model 'local integration' 'umask 077; state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/embedding-model"; mkdir -p -m 0700 -- "$state"; run_dir="$(mktemp -d "$state/current.XXXXXXXX")"; if ! curl --fail --silent --show-error --max-time 10 --output "$run_dir/models.json" http://127.0.0.1:28231/v1/models; then printf '"'"'needs_owner: CURRENT Nemotron endpoint is unavailable; no runtime or model was changed.\n'"'"' >&2; exit 1; fi; python3 -c '"'"'exec('"'"'"'"'"'"'"'"'import json, sys\nfrom pathlib import Path\ntry:\n    response = json.loads(Path(sys.argv[1]).read_text())\n    assert isinstance(response, dict)\n    data = response.get("data")\n    assert isinstance(data, list) and len(data) == 1\n    assert isinstance(data[0], dict) and data[0].get("id") == "nvidia/Nemotron-3-Embed-8B-BF16"\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError):\n    raise SystemExit("needs_owner: CURRENT endpoint does not identify the selected Nemotron model; response retained")\nprint("CURRENT Nemotron provider identity passed; no bootstrap performed")\n'"'"'"'"'"'"'"'"')'"'"' "$run_dir/models.json"'
       ;;
     service_health)
-      # The model's own context, then one embedding call of the model card's 1,024 dimensions
-      # (https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/blob/97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3/README.md#L36).
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659
-      check embedding-model smoke 'out="$(OLLAMA_HOST=127.0.0.1:21434 ollama show qwen3-embedding-8k)" && grep -E '"'"'^ +num_ctx +8192 *$'"'"' <<<"$out" >/dev/null && curl -fsS http://127.0.0.1:21434/api/embed -d '"'"'{"model":"qwen3-embedding-8k","input":"Why is the sky blue?"}'"'"' | jq -e '"'"'(.embeddings | length) == 1 and (.embeddings[0] | length) == 1024'"'"' >/dev/null'
+      # Source: https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md#L100
+      check embedding-model 'local integration' 'umask 077; state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/embedding-model"; mkdir -p -m 0700 -- "$state"; run_dir="$(mktemp -d "$state/current.XXXXXXXX")"; if ! curl --fail --silent --show-error --max-time 10 --output "$run_dir/models.json" http://127.0.0.1:28231/v1/models; then printf '"'"'needs_owner: CURRENT Nemotron endpoint is unavailable; no runtime or model was changed.\n'"'"' >&2; exit 1; fi; python3 -c '"'"'exec('"'"'"'"'"'"'"'"'import json, sys\nfrom pathlib import Path\ntry:\n    response = json.loads(Path(sys.argv[1]).read_text())\n    assert isinstance(response, dict)\n    data = response.get("data")\n    assert isinstance(data, list) and len(data) == 1\n    assert isinstance(data[0], dict) and data[0].get("id") == "nvidia/Nemotron-3-Embed-8B-BF16"\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError):\n    raise SystemExit("needs_owner: CURRENT endpoint does not identify the selected Nemotron model; response retained")\nprint("CURRENT Nemotron provider identity passed; no bootstrap performed")\n'"'"'"'"'"'"'"'"')'"'"' "$run_dir/models.json"; if ! curl --fail --silent --show-error --max-time 30 --header '"'"'Content-Type: application/json'"'"' --data-binary '"'"'{"model":"nvidia/Nemotron-3-Embed-8B-BF16","input":["query: current provider integration fixture","passage: current provider integration fixture"]}'"'"' --output "$run_dir/embeddings.json" http://127.0.0.1:28231/v1/embeddings; then printf '"'"'CURRENT embedding API failed; returned artifacts retained.\n'"'"' >&2; exit 1; fi; python3 -c '"'"'exec('"'"'"'"'"'"'"'"'import json, math, sys\nfrom pathlib import Path\ntry:\n    response = json.loads(Path(sys.argv[1]).read_text())\n    assert isinstance(response, dict) and response.get("model") == "nvidia/Nemotron-3-Embed-8B-BF16"\n    data = response.get("data")\n    assert isinstance(data, list) and len(data) == 2\n    norms = []\n    for index, row in enumerate(data):\n        assert isinstance(row, dict) and type(row.get("index")) is int and row["index"] == index\n        embedding = row.get("embedding")\n        assert isinstance(embedding, list) and len(embedding) == 4096\n        assert all(type(value) in (int, float) and math.isfinite(value) for value in embedding)\n        norm = math.hypot(*embedding)\n        assert math.isfinite(norm) and abs(norm - 1.0) <= 0.001\n        norms.append(norm)\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError, OverflowError):\n    raise SystemExit("CURRENT embedding API did not return two finite normalized 4096-dimensional vectors; response retained")\nprint(json.dumps({"evidence_class": "local integration", "model": response["model"], "dimensions": 4096, "vectors": 2, "norms": norms}))\n'"'"'"'"'"'"'"'"')'"'"' "$run_dir/embeddings.json"'
       ;;
     *) skipped embedding-model ;;
   esac
 }
 
 tobi-qmd() {
-  # tobi/qmd; https://github.com/tobi/qmd
+  # CPU lexical CURRENT index; no embedding/download/index creation.
+  # Source: tobi/qmd@v2.8.3 src/store.ts:getDefaultDbPath; src/cli/qmd.ts:search/outputResults.
+  # Each check uses one physical call line; runtime programs remain unchanged.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671
-      check tobi-qmd smoke 'qmd status'
+      # Source: https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671
+      check tobi-qmd smoke 'qmd_db="${XDG_CACHE_HOME:-$HOME/.cache}/qmd/native-agent-stack-catalog-lex.sqlite"; qmd_yaml="${QMD_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/qmd}/native-agent-stack-catalog-lex.yml"; if [[ ! -f "$qmd_db" || -L "$qmd_db" || ! -f "$qmd_yaml" || -L "$qmd_yaml" ]]; then printf '"'"'needs_owner: existing lexical QMD index/config is required; no index is created or embedded.\n'"'"' >&2; exit 1; fi; env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex status'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1021 (doctor: runtime, embedding fingerprints, GPU probe); https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1014 (status)
-      # Needs the interim embedder provisioned and the index embedded (embed -f); the wave-2 retrieval ruling, change 16. UNRUN.
-      check tobi-qmd smoke 'f="$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf"
-printf '\''%s  %s\n'\'' 06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 "$f" | sha256sum --check --status
-grep -qxF "  embed: $f" "$HOME/.config/qmd/native-agent-stack-catalog.yml"
-qmd --index native-agent-stack-catalog status
-qmd --index native-agent-stack-catalog doctor'
+      # Source: https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md
+      check tobi-qmd smoke 'qmd_db="${XDG_CACHE_HOME:-$HOME/.cache}/qmd/native-agent-stack-catalog-lex.sqlite"; qmd_yaml="${QMD_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/qmd}/native-agent-stack-catalog-lex.yml"; if [[ ! -f "$qmd_db" || -L "$qmd_db" || ! -f "$qmd_yaml" || -L "$qmd_yaml" ]]; then printf '"'"'needs_owner: existing lexical QMD index/config is required; no index is created or embedded.\n'"'"' >&2; exit 1; fi; env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex status; umask 077; state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/tobi-qmd"; mkdir -p -m 0700 -- "$state"; run_dir="$(mktemp -d "$state/lexical.XXXXXXXX")"; env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex search '"'"'native harness defaults'"'"' -c foundation-docs --json > "$run_dir/search.json"; python3 -c '"'"'exec('"'"'"'"'"'"'"'"'import json, math, sys\nfrom pathlib import Path\nrows = json.loads(Path(sys.argv[1]).read_text())\nassert isinstance(rows, list) and rows, "lexical search returned no documents"\nassert all(isinstance(row, dict) and isinstance(row.get("file"), str) and row["file"].startswith("qmd://foundation-docs/") for row in rows), "lexical search escaped the requested collection"\nassert any(row["file"].endswith("/harness-defaults.md") and type(row.get("score")) in (int, float) and math.isfinite(row["score"]) for row in rows), "the known harness-defaults document was not returned"\nprint("CPU lexical QMD search returned the known foundation document; response retained")\n'"'"'"'"'"'"'"'"')'"'"' "$run_dir/search.json"'
       ;;
     *) skipped tobi-qmd ;;
   esac
@@ -1224,56 +1219,7 @@ exit 1'
   esac
 }
 
-local-model-server() {
-  # Ollama; https://github.com/ollama/ollama
-  case "$stage" in
-    post_install)
-      # Kind: version only; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2181
-      check local-model-server 'version only' 'OLLAMA_HOST=127.0.0.1:21434 ollama --version'
-      ;;
-    service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1736
-      check local-model-server health 'systemctl --user is-enabled ollama.service
-systemctl --user is-active ollama.service
-curl -fsS --connect-timeout 5 --max-time 120 http://127.0.0.1:21434/api/embed -d '\''{"model":"qwen3-embedding-8k","input":"Hello world"}'\'' | jq -e '\''.model == "qwen3-embedding-8k" and (.embeddings | type == "array" and length == 1) and (.embeddings[0] | type == "array" and length > 0 and all(.[]; type == "number"))'\'' >/dev/null
-curl -fsS --connect-timeout 5 --max-time 30 http://127.0.0.1:21434/api/ps | jq -e '\''.models | select(type == "array") | map(select(.name == "qwen3-embedding-8k:latest" and .model == "qwen3-embedding-8k:latest")) | length == 1 and (.[0] | (.size | type == "number" and . > 0) and (.size_vram | type == "number") and .size_vram == .size)'\'' >/dev/null'
-      ;;
-    after_sign_in)
-      # The embedding-model row, which installs only when named, creates the model this check calls. Until that model's
-      # manifest is in the store its post_install check reads, this check prints skipped, which is not a pass (README.md).
-      if [[ ! -e "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest" ]]; then
-        printf 'local-model-server: qwen3-embedding-8k is not in the model store; install the embedding-model row first (README.md, "The two local-model rows").\n' >&2
-        skipped local-model-server
-        return
-      fi
-      # One embedding call to the settled embedder, which the embedding-model row creates. /api/embed answers 404 for a
-      # missing model (GetModel's not-found error, routes.go:981-984 and :3226-3227) and its handler pulls nothing:
-      # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L981-L984
-      # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L3226-L3227
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659
-      check local-model-server smoke 'curl -fsS http://127.0.0.1:21434/api/embed -d '"'"'{"model":"qwen3-embedding-8k","input":"Hello world"}'"'"' | jq -e '"'"'(.embeddings | length) == 1'"'"' >/dev/null'
-      ;;
-    *) skipped local-model-server ;;
-  esac
-}
 
-local-generation-model() {
-  # Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k); https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF
-  case "$stage" in
-    post_install)
-      # Files only: the placed Modelfiles are the repository's, and the created model names the pinned file as its layer,
-      # whose digest is the file's own sha256. Store: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/envconfig/config.go#L112
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/create.go#L905
-      check local-generation-model smoke 'printf '"'"'%s  %s\n'"'"' f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e "$tool_root/ollama-models/swift-iq3s-s2o.Modelfile" 6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e "$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile" | sha256sum --check --status && grep -F sha256:1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786 "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/swift-iq3s-s2o-64k/latest" >/dev/null'
-      ;;
-    service_health)
-      # The model's own context and quantization, then one short generation with thinking off (not the measured effort).
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L48
-      check local-generation-model smoke 'out="$(OLLAMA_HOST=127.0.0.1:21434 ollama show swift-iq3s-s2o-64k)" && grep -E '"'"'^ +num_ctx +64000 *$'"'"' <<<"$out" >/dev/null && grep -E '"'"'^ +quantization +IQ3_S *$'"'"' <<<"$out" >/dev/null && curl -fsS http://127.0.0.1:21434/api/generate -d '"'"'{"model":"swift-iq3s-s2o-64k","prompt":"Reply with the word ready.","stream":false,"think":false,"options":{"num_predict":32}}'"'"' | jq -e '"'"'.done == true and (.response | length > 0)'"'"' >/dev/null'
-      ;;
-    *) skipped local-generation-model ;;
-  esac
-}
 
 inspect-ai() {
   # G5 plan repair 2026-10-04; upstream operations with local artifact assertions.
@@ -2793,7 +2739,7 @@ if [[ -z "$only" || "$only" == sandbox-runtime-srt ]]; then sandbox-runtime-srt;
 if [[ -z "$only" || "$only" == serena ]]; then serena; fi
 if [[ -z "$only" || "$only" == structural-search ]]; then structural-search; fi
 # Planned. The two model rows install only with --only (their models are created through the running model server).
-if [[ "$only" == embedding-model ]]; then embedding-model; elif [[ -z "$only" ]]; then skipped embedding-model; fi
+if [[ -z "$only" || "$only" == embedding-model ]]; then embedding-model; fi
 if [[ -z "$only" || "$only" == tobi-qmd ]]; then tobi-qmd; fi
 if [[ -z "$only" || "$only" == mineru ]]; then mineru; fi
 if [[ -z "$only" || "$only" == memory-owner ]]; then memory-owner; fi
@@ -2817,8 +2763,6 @@ if [[ -z "$only" || "$only" == otel-collector-contrib ]]; then otel-collector-co
 if [[ -z "$only" || "$only" == prometheus ]]; then prometheus; fi
 if [[ "$only" == loki ]]; then loki; elif [[ -z "$only" ]]; then skipped loki; fi
 if [[ "$only" == grafana ]]; then grafana; elif [[ -z "$only" ]]; then skipped grafana; fi
-if [[ -z "$only" || "$only" == local-model-server ]]; then local-model-server; fi
-if [[ "$only" == local-generation-model ]]; then local-generation-model; elif [[ -z "$only" ]]; then skipped local-generation-model; fi
 if [[ -z "$only" || "$only" == alerting ]]; then alerting; fi
 if [[ -z "$only" || "$only" == inspect-ai ]]; then inspect-ai; fi
 if [[ -z "$only" || "$only" == harbor-containerized-agent-e2e-runner ]]; then harbor-containerized-agent-e2e-runner; fi
@@ -2845,7 +2789,7 @@ if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; f
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
 # Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
-for slot in 'research-skill' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'reranker-model' 'trafilatura' 'web-search-provider' 'phoenix' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'chezmoi'; do
+for slot in research-skill isolation-container-boundary claude-plugins-official-code-intelligence-lsp-pl reranker-model trafilatura web-search-provider phoenix local-model-server local-generation-model attest dependabot codeql-sarif gpu-container-runtime trufflehog credential-custody claude-code-action agent-structural-diff chezmoi; do
   if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
 done
 if [[ -z "$only" || "$only" == lm-program-optimization ]]; then lm-program-optimization; fi

@@ -206,22 +206,6 @@ interim_acknowledged() {
     return 1
   fi
 }
-model_server_answers() {
-  # Planned. The two model rows create their models through the running model server; this plan starts no service (README.md).
-  if ! OLLAMA_HOST=127.0.0.1:21434 ollama ls >/dev/null 2>&1; then
-    printf 'The model server does not answer on 127.0.0.1:21434: start it (README.md, "The two local-model rows"), then run this row again.\n' >&2
-    return 1
-  fi
-  # Planned. Both rows install what was measured on Ollama 0.35.0, so nothing is pulled or created unless the server that
-  # answers reports that version; GET /api/version answers the running server's own version (server/routes.go:2023).
-  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1824
-  local version
-  version="$(curl -fsS http://127.0.0.1:21434/api/version | jq -r '.version')" || version=''
-  if [[ "$version" != 0.35.0 ]]; then
-    printf 'The model server on 127.0.0.1:21434 reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "${version:-unknown}" >&2
-    return 1
-  fi
-}
 export -f ensure_venv checkout_tag fetch_verified link_grafana docker_repository apt_release_version \
   docker_engine_packages docker_compose_package
 
@@ -349,17 +333,10 @@ structural-search() {
 }
 
 embedding-model() {
-  # Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192) | model-server | planned
-  refresh_path || return "$?"
-  model_server_answers || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L85
-  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama pull qwen3-embedding:0.6b' || return "$?"
-  # Planned. The pin: the library manifest's digest as the server reports it (server/model_list.go:64).
-  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1351
-  run_command 'curl -fsS http://127.0.0.1:21434/api/tags | jq -e '"'"'.models[] | select(.name == "qwen3-embedding:0.6b") | .digest == "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"'"'"' >/dev/null' || return "$?"
-  # Planned. The context belongs to the model, never to the server (models/qwen3-embedding-8k.Modelfile).
-  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2422
-  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama create qwen3-embedding-8k -f "$plan_dir/models/qwen3-embedding-8k.Modelfile"' || return "$?"
+  # CURRENT provider: no runtime/bootstrap/model change.
+  # Source: https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md#L100; https://github.com/vllm-project/vllm/blob/db9527a46873454610df6dbedf79a36d6bf1a7f6/docs/serving/online_serving/openai_compatible_server.md
+  # One physical call line follows the maintained native Python -c/shlex command contract.
+  run_command 'umask 077; state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/embedding-model"; mkdir -p -m 0700 -- "$state"; run_dir="$(mktemp -d "$state/current.XXXXXXXX")"; if ! curl --fail --silent --show-error --max-time 10 --output "$run_dir/models.json" http://127.0.0.1:28231/v1/models; then printf '"'"'needs_owner: CURRENT Nemotron endpoint is unavailable; no runtime or model was changed.\n'"'"' >&2; exit 1; fi; python3 -c '"'"'exec('"'"'"'"'"'"'"'"'import json, sys\nfrom pathlib import Path\ntry:\n    response = json.loads(Path(sys.argv[1]).read_text())\n    assert isinstance(response, dict)\n    data = response.get("data")\n    assert isinstance(data, list) and len(data) == 1\n    assert isinstance(data[0], dict) and data[0].get("id") == "nvidia/Nemotron-3-Embed-8B-BF16"\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError):\n    raise SystemExit("needs_owner: CURRENT endpoint does not identify the selected Nemotron model; response retained")\nprint("CURRENT Nemotron provider identity passed; no bootstrap performed")\n'"'"'"'"'"'"'"'"')'"'"' "$run_dir/models.json"' || return "$?"
 }
 
 tobi-qmd() {
@@ -715,36 +692,7 @@ grafana() {
   run_command 'NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}" python3 "$config_root/observability_config.py" grafana --config-root "$config_root" --source-root "$plan_dir/config"' || return "$?"
 }
 
-local-model-server() {
-  # Ollama | mise | planned
-  # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ollama.toml#L1
-  run_command 'mise use -g ollama@0.35.0' || return "$?"
-  refresh_path || return "$?"
-  copy_config 'ollama.env.example' || return "$?"
-  # D-ollama: lasting GPU owner; local-model decision254–257; upstream0.35.0 linux.mdx:57–89; D-ollama-2 native30m/on-demand unit.
-  copy_config 'ollama.service' || return "$?"
-  # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57 (user-unit adaptation; D-ollama).
-  run_command 'ollama_unit_path="$HOME/.config/systemd/user/ollama.service"; if [[ -L "$ollama_unit_path" ]] || { [[ -e "$ollama_unit_path" ]] && ! cmp -s -- "$config_root/ollama.service" "$ollama_unit_path"; }; then   printf '\''needs_owner: retained differing Ollama unit.\n'\'' >&2;   exit 3; fi; install -d -m 0700 -- "$HOME/.config/systemd/user" && install -m 0600 -- "$config_root/ollama.service" "$ollama_unit_path"' || return "$?"
-  # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L88 (native user-unit startup adaptation).
-  run_command 'systemctl --user daemon-reload && systemctl --user enable --now ollama.service' || return "$?"
-}
 
-local-generation-model() {
-  # Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000) | model-server | planned
-  refresh_path || return "$?"
-  model_server_answers || return "$?"
-  # Planned. The file at the pinned revision and its sha256 (the Hugging Face file page lists both).
-  # Source: https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/blob/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf
-  run_command 'fetch_verified '"'"'https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf'"'"' '"'"'1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786'"'"' "$tool_root/ollama-models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf"' || return "$?"
-  # Planned. A Modelfile's GGUF path is absolute or relative to the Modelfile, so both Modelfiles go beside the file.
-  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L126
-  run_command 'install -m 0644 -t "$tool_root/ollama-models" "$plan_dir/models/swift-iq3s-s2o.Modelfile" "$plan_dir/models/swift-iq3s-s2o-64k.Modelfile"' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2422
-  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o -f "$tool_root/ollama-models/swift-iq3s-s2o.Modelfile"' || return "$?"
-  # Planned. The context belongs to the model, never to the server (models/swift-iq3s-s2o-64k.Modelfile).
-  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L146
-  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o-64k -f "$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile"' || return "$?"
-}
 
 inspect-ai() {
   # Source: https://pypi.org/pypi/inspect-ai/0.3.273/json
@@ -1059,7 +1007,7 @@ if $list; then
   printf '%s\n' 'claude-plugins-official-code-intelligence-lsp-pl | Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | none | excluded'
   printf '%s\n' 'structural-search | ast-grep | mise | planned'
   printf '%s\n' 'code-search | semble 0.6.1 + SocratiCode 1.15.0 | uv-tool | planned'
-  printf '%s\n' 'embedding-model | Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192) | model-server | planned'
+  printf '%s\n' 'embedding-model | nvidia/Nemotron-3-Embed-8B-BF16 (shared text endpoint, 4096 dimensions, query: / passage: prefixes) | model-server | planned'
   printf '%s\n' 'reranker-model | Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever | none | excluded'
   printf '%s\n' 'tobi-qmd | tobi/qmd | npm-global | planned'
   printf '%s\n' 'mineru | MinerU | uv-tool | planned'
@@ -1085,9 +1033,9 @@ if $list; then
   printf '%s\n' 'loki | Loki | release-binary | measurement-only'
   printf '%s\n' 'grafana | Grafana | release-binary | measurement-only'
   printf '%s\n' 'phoenix | Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer'\''s requirement has no trace-store job; no blind GPT sample picked it | none | excluded'
-  printf '%s\n' 'local-model-server | Ollama | mise | planned'
+  printf '%s\n' 'local-model-server | Not installed: retired; no general local-generation consumer | none | excluded'
   printf '%s\n' 'alerting | Alertmanager | release-binary | planned'
-  printf '%s\n' 'local-generation-model | Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000) | model-server | planned'
+  printf '%s\n' 'local-generation-model | Not installed: retired; no general local-generation consumer | none | excluded'
   printf '%s\n' 'session-analytics | agentsview 0.43.0 (local archive only) | release-binary | planned'
   printf '%s\n' 'inspect-ai | Inspect AI | uv-tool | planned'
   printf '%s\n' 'harbor-containerized-agent-e2e-runner | Harbor (containerized agent E2E runner) | uv-tool | planned'
@@ -1138,9 +1086,9 @@ esac
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'agent-messaging' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'memory-owner' 'context-supply' 'statusline' 'ccusage' 'command-output' 'output-compression' 'code-index' 'code-graph' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'trace-viewer' 'session-analytics' 'otel-collector-contrib' 'prometheus' 'local-model-server' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
-for slot in 'mcp-inspector' 'loki' 'grafana' 'local-generation-model' 'embedding-model'; do named "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'agent-messaging' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'agent-messaging' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'memory-owner' 'context-supply' 'statusline' 'ccusage' 'command-output' 'output-compression' 'code-index' 'code-graph' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'trace-viewer' 'session-analytics' 'otel-collector-contrib' 'prometheus' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses' 'embedding-model'; do selected "$slot" && needs_execution=true; done
+for slot in 'mcp-inspector' 'loki' 'grafana'; do named "$slot" && needs_execution=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'agent-messaging' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses' 'embedding-model'; do selected "$slot" && needs_runtime=true; done
 for slot in 'mcp-inspector'; do named "$slot" && needs_runtime=true; done
 for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose'; do selected "$slot" && needs_docker=true; done
 
@@ -1251,11 +1199,8 @@ if selected 'prometheus'; then run_slot 'prometheus'; fi
 if selected 'alerting'; then run_slot 'alerting'; fi
 measured_slot 'loki'
 measured_slot 'grafana'
-if selected 'local-model-server'; then run_slot 'local-model-server'; fi
-# Planned. The two model rows create their models through the running model server, which this plan does not start: the
-# default run skips them, and --only installs one once the server answers (README.md, "The two local-model rows").
-if named 'local-generation-model'; then run_slot 'local-generation-model'; elif selected 'local-generation-model'; then printf '%s | install | skipped\n' 'local-generation-model'; fi
-if named 'embedding-model'; then run_slot 'embedding-model'; elif selected 'embedding-model'; then printf '%s | install | skipped\n' 'embedding-model'; fi
+# CURRENT embedding provider is verified without a runtime/model bootstrap; general local generation is retired.
+if selected 'embedding-model'; then run_slot 'embedding-model'; fi
 if selected 'dagu'; then run_slot 'dagu'; fi
 if selected 'gpt-gateway'; then run_slot 'gpt-gateway'; fi
 if selected 'research-harnesses'; then run_slot 'research-harnesses'; fi

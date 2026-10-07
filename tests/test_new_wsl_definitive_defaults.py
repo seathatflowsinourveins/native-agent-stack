@@ -2117,253 +2117,145 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
 
 
 class LocalModelAcceptance(unittest.TestCase):
-    """The install plan's checks of the two local-model rows, run against stand-ins.
+    """Run the actual CURRENT-provider commands against independent HTTP fixtures.
 
-    The programs that accept.sh runs for local-generation-model and embedding-model, and the local-model-server row's
-    after_sign_in smoke check (one embedding call to the settled embedder), are run as accept.sh runs them
-    (bash -euo pipefail -c), with a scratch HOME and model store and with stub ollama and curl programs that print canned
-    answers. The expected state passes, and each planted condition fails it. The fixtures are our own: no model server
-    answers and no model runs. The embedder's library manifest is not published (the registry's copy carries its build
-    path), so its case writes a stand-in manifest and puts that file's digest in place of the pinned one, after checking
-    that the program names the pinned digest once.
-
-    The files checks run `sha256sum --check --status`. Where this host's sha256sum rejects those options (the probe
-    sha256sum_checks_like_gnu from tests/test_adoption_bootstrap.py: macOS's /sbin/sha256sum prints its usage and
-    exits 1), a scratch sha256sum runs `shasum -a 256` in its place, as that module's run_install_pin does. A failed
-    case's message carries the program's exit code, stdout and stderr.
-
-    accept.sh itself runs the server row's after_sign_in stage once, with a scratch HOME and the stub curl: until the
-    embedding-model row's model is in the store it prints skipped (step F9 runs that stage without any model row).
+    NVIDIA@d1f2f257 README:100-129 defines 4096/L2/query/passage;
+    vLLM@db9527a docs/serving/online_serving/openai_compatible_server.md
+    defines the native HTTP API. These are synthetic integration controls.
     """
 
-    PINNED_LIBRARY = "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
-    SWIFT_FILE = "1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786"
-    EMBEDDER_LAYER = "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439"
+    MODEL = "nvidia/Nemotron-3-Embed-8B-BF16"
 
-    @classmethod
-    def setUpClass(cls):
-        for tool in ("bash", "jq") if sha256sum_checks_like_gnu() else ("bash", "jq", "shasum"):
-            if shutil.which(tool) is None:
-                raise unittest.SkipTest(f"{tool} is needed to run the acceptance programs")
-        rows = {r["slot"]: r for r in load(PLAN / "install-plan.json")["owners"]}
-        cls.generation = rows["local-generation-model"]["acceptance"]
-        cls.embedding = rows["embedding-model"]["acceptance"]
-        cls.server = rows["local-model-server"]["acceptance"]
+    def row(self):
+        return next(row for row in json.loads((PLAN / "install-plan.json").read_text())["owners"]
+                    if row["slot"] == "embedding-model")
 
-    @staticmethod
-    def table(num_ctx, quantization):
-        """The two rows of `ollama show` that the checks read, padded as its table pads them."""
-        return (f"  Model\n    quantization        {quantization}     \n\n"
-                f"  Parameters\n    temperature          1        \n    num_ctx              {num_ctx}    \n\n")
+    def models(self):
+        return {"data": [{"id": self.MODEL}]}
 
-    @staticmethod
-    def store(scratch, model, tag, text):
-        path = scratch / "home/.ollama/models/manifests/registry.ollama.ai/library" / model / tag
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+    def vectors(self):
+        vector = [1.0] + [0.0] * 4095
+        return {"model": self.MODEL, "data": [
+            {"index": 0, "embedding": list(vector)},
+            {"index": 1, "embedding": list(vector)},
+        ]}
 
-    def run_program(self, program, scratch, show="", reply=""):
-        """The finished process of `program`, run as accept.sh runs it with the stubs first on PATH."""
+    def run_program(self, scratch, command, models, vectors=None, curl_exit=0):
         stub = scratch / "bin"
-        stub.mkdir(exist_ok=True)
-        (stub / "show.txt").write_text(show, encoding="utf-8")
-        (stub / "reply.json").write_text(reply, encoding="utf-8")
-        for name, canned in (("ollama", "show.txt"), ("curl", "reply.json")):
-            (stub / name).write_text(f'#!/bin/sh\ncat "$STUB_DIR/{canned}"\n', encoding="utf-8")
-            (stub / name).chmod(0o755)
-        if not sha256sum_checks_like_gnu():
-            (stub / "sha256sum").write_text('#!/bin/sh\nexec shasum -a 256 "$@"\n', encoding="utf-8")
-            (stub / "sha256sum").chmod(0o755)
-        env = {key: value for key, value in os.environ.items() if key not in ("OLLAMA_MODELS", "BASH_ENV", "ENV")}
-        env.update(HOME=str(scratch / "home"), tool_root=str(scratch / "tools"), STUB_DIR=str(stub),
+        stub.mkdir()
+        (scratch / "models.json").write_text(json.dumps(models))
+        (scratch / "vectors.json").write_text(json.dumps(vectors or self.vectors()))
+        curl = stub / "curl"
+        curl.write_text("#!/usr/bin/env python3\n" + r'''
+import json, os, sys
+from pathlib import Path
+args = sys.argv[1:]
+root = Path(os.environ["MODEL_FIXTURE"])
+url = args[-1]
+body = args[args.index("--data-binary") + 1] if "--data-binary" in args else None
+with (root / "calls.jsonl").open("a") as out:
+    out.write(json.dumps({"url": url, "body": body}) + "\n")
+if int(os.environ["CURL_FIXTURE_EXIT"]):
+    sys.exit(int(os.environ["CURL_FIXTURE_EXIT"]))
+assert url in ("http://127.0.0.1:28231/v1/models", "http://127.0.0.1:28231/v1/embeddings")
+destination = Path(args[args.index("--output") + 1])
+destination.write_bytes((root / ("models.json" if url.endswith("/models") else "vectors.json")).read_bytes())
+''')
+        curl.chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
+        env.update(MODEL_FIXTURE=str(scratch), CURL_FIXTURE_EXIT=str(curl_exit),
+                   XDG_STATE_HOME=str(scratch / "state"), HOME=str(scratch / "home"),
                    PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
-        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
-                              timeout=60)
-
-    @staticmethod
-    def outcome(name, result):
-        """A case's assertion message: its name, and the program's exit code, stdout and stderr."""
-        return f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", command], env=env,
+                              capture_output=True, text=True, timeout=60)
 
     def test_the_programs_are_the_ones_accept_sh_runs(self):
-        checker = load_source(PLAN / "check_plan.py", "check_plan")
-        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
-        for slot, acceptance in (("local-generation-model", self.generation), ("embedding-model", self.embedding)):
-            self.assertEqual(checker.checks_of(functions[slot]),
-                             [(stage, slot, "smoke", acceptance[stage]["command"]) for stage in ("post_install", "service_health")])
-        self.assertIn(("after_sign_in", "local-model-server", "smoke", self.server["after_sign_in"]["command"]),
-                      checker.checks_of(functions["local-model-server"]))
+        checker = load_source(PLAN / "check_plan.py", "current_model_checker")
+        row = self.row()
+        install = checker.functions((PLAN / "install.sh").read_text())
+        accept = checker.functions((PLAN / "accept.sh").read_text())
+        self.assertEqual(checker.run_commands("embedding-model", install, set()), row["commands"])
+        self.assertEqual(row["commands"], [row["acceptance"]["post_install"]["command"]])
+        native_checks = {stage: program for stage, slot, kind, program in checker.checks_of(accept["embedding-model"])}
+        for stage in ("post_install", "service_health"):
+            self.assertEqual(row["acceptance"][stage]["command"], native_checks[stage])
 
-    def test_the_generation_files_check(self):
-        cases = {"the expected state": (None, 0), "another 64k Modelfile": ("modelfile", 1),
-                 "another model layer": ("layer", 1), "no created model": ("missing", 1)}
-        for name, (change, want) in cases.items():
+    def test_current_identity_positive_and_mismatch_or_unavailable_controls(self):
+        cases = [
+            ("selected", self.models(), 0, 0),
+            ("other model", {"data": [{"id": "retired/Qwen"}]}, 0, 1),
+            ("empty registry", {"data": []}, 0, 1),
+            ("ambiguous registry", {"data": [{"id": self.MODEL}, {"id": "other"}]}, 0, 1),
+            ("missing registry", {"error": "unavailable"}, 0, 1),
+            ("failed transport", self.models(), 7, 1),
+        ]
+        for name, reply, exit_code, expected in cases:
             with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
-                scratch = Path(scratch)
-                models = scratch / "tools/ollama-models"
-                models.mkdir(parents=True)
-                for modelfile in ("swift-iq3s-s2o.Modelfile", "swift-iq3s-s2o-64k.Modelfile"):
-                    shutil.copy(PLAN / "models" / modelfile, models / modelfile)
-                if change == "modelfile":
-                    (models / "swift-iq3s-s2o-64k.Modelfile").write_text("FROM swift-iq3s-s2o\nPARAMETER num_ctx 65536\n")
-                if change != "missing":
-                    layer = "0" * 64 if change == "layer" else self.SWIFT_FILE
-                    self.store(scratch, "swift-iq3s-s2o-64k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
-                result = self.run_program(self.generation["post_install"]["command"], scratch)
-                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+                result = self.run_program(Path(scratch), self.row()["commands"][0], reply, curl_exit=exit_code)
+                self.assertEqual(result.returncode, expected, result.stderr)
+                if expected:
+                    self.assertIn("needs_owner:", result.stderr)
 
-    def test_the_embedding_files_check(self):
-        program = self.embedding["post_install"]["command"]
-        self.assertEqual(program.count(self.PINNED_LIBRARY), 1)
-        library = '{"schemaVersion":2,"stand-in":true}'
-        program = program.replace(self.PINNED_LIBRARY, hashlib.sha256(library.encode()).hexdigest())
-        cases = {"the expected state": (None, 0), "another library manifest": ("library", 1),
-                 "another derived layer": ("layer", 1)}
-        for name, (change, want) in cases.items():
+    def test_actual_http_health_requires_identity_indices_dimensions_finiteness_and_normalization(self):
+        cases = {"selected": self.vectors()}
+        wrong = self.vectors(); wrong["model"] = "other"; cases["wrong model"] = wrong
+        wrong = self.vectors(); wrong["data"][1]["index"] = 0; cases["duplicate index"] = wrong
+        wrong = self.vectors(); wrong["data"][0]["embedding"].pop(); cases["wrong dimensions"] = wrong
+        wrong = self.vectors(); wrong["data"][0]["embedding"][0] = float("nan"); cases["nonfinite"] = wrong
+        wrong = self.vectors(); wrong["data"][0]["embedding"] = [True] + [False] * 4095; cases["bool vector"] = wrong
+        wrong = self.vectors(); wrong["data"][0]["embedding"] = [0.0] * 4096; cases["zero vector"] = wrong
+        wrong = self.vectors(); wrong["data"][0]["embedding"][0] = 2.0; cases["unnormalized"] = wrong
+        for name, reply in cases.items():
             with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
-                scratch = Path(scratch)
-                self.store(scratch, "qwen3-embedding", "0.6b", library + ("\n" if change == "library" else ""))
-                layer = "1" * 64 if change == "layer" else self.EMBEDDER_LAYER
-                self.store(scratch, "qwen3-embedding-8k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
-                result = self.run_program(program, scratch)
-                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
-
-    def test_the_service_checks(self):
-        answer = json.dumps({"model": "swift-iq3s-s2o-64k", "response": "ready", "done": True})
-        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
-        generation, embedding = self.generation["service_health"]["command"], self.embedding["service_health"]["command"]
-        cases = {
-            "generation: the expected state": (generation, self.table(64000, "IQ3_S"), answer, 0),
-            "generation: another context": (generation, self.table(65536, "IQ3_S"), answer, 1),
-            "generation: another quantization": (generation, self.table(64000, "Q4_K_M"), answer, 1),
-            "generation: an empty answer": (generation, self.table(64000, "IQ3_S"), json.dumps({"response": "", "done": True}), 1),
-            "embedding: the expected state": (embedding, self.table(8192, "Q8_0"), vector, 0),
-            "embedding: the server-wide context": (embedding, self.table(64000, "Q8_0"), vector, 1),
-            "embedding: 512 dimensions": (embedding, self.table(8192, "Q8_0"), json.dumps({"embeddings": [[0.01] * 512]}), 1),
-        }
-        for name, (program, show, reply, want) in cases.items():
-            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
-                scratch = Path(scratch)
-                (scratch / "home").mkdir()
-                result = self.run_program(program, scratch, show, reply)
-                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
-
-    def test_the_server_smoke_check(self):
-        """The server row's after_sign_in check embeds with the settled embedder and runs or pulls no other model."""
-        program = self.server["after_sign_in"]["command"]
-        self.assertEqual(re.findall(r'"model":"([^"]*)"', program), ["qwen3-embedding-8k"])
-        for absent in ("ollama run", "ollama pull", "embeddinggemma"):
-            self.assertNotIn(absent, program)
-        cases = {
-            "one vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]}), 0),
-            "no vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), 1),
-            # the answer handleScheduleError gives a missing model (server/routes.go:3226-3227 at v0.35.0)
-            "an error answer": (json.dumps({"error": 'model "qwen3-embedding-8k" not found, try pulling it first'}), 1),
-        }
-        for name, (reply, want) in cases.items():
-            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
-                scratch = Path(scratch)
-                (scratch / "home").mkdir()
-                result = self.run_program(program, scratch, reply=reply)
-                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
-
-    def run_accept(self, scratch, reply):
-        """The finished `accept.sh --only local-model-server --stage after_sign_in`, with a scratch HOME and the stub curl."""
-        stub = scratch / "bin"
-        stub.mkdir(exist_ok=True)
-        (stub / "reply.json").write_text(reply, encoding="utf-8")
-        (stub / "curl").write_text('#!/bin/sh\ncat "$STUB_DIR/reply.json"\n', encoding="utf-8")
-        (stub / "curl").chmod(0o755)
-        dropped = ("OLLAMA_MODELS", "BASH_ENV", "ENV", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "MISE_SHIMS_DIR", "MISE_DATA_DIR")
-        env = {key: value for key, value in os.environ.items() if key not in dropped}
-        env.update(HOME=str(scratch / "home"), STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
-        return subprocess.run(["bash", str(PLAN / "accept.sh"), "--only", "local-model-server", "--stage", "after_sign_in"],
-                              env=env, capture_output=True, text=True, timeout=60)
-
-    def test_the_server_smoke_check_waits_for_the_embedding_row(self):
-        """Until the embedding-model row has created qwen3-embedding-8k, accept.sh prints skipped for the stage, not a failure.
-
-        Step F9 runs the server row's after_sign_in check without installing a model row (each installs only when named).
-        Once the derived model's manifest is in the store that the embedding row's post_install check reads, the check runs.
-        """
-        if hasattr(os, "geteuid") and os.geteuid() == 0:
-            self.skipTest("accept.sh refuses to run as root")
-        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
-        cases = {
-            "no embedder in the store": (False, vector, "skipped", 0),
-            "the embedder, one vector": (True, vector, "0", 0),
-            "the embedder, no vector": (True, json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), "1", 1),
-        }
-        for name, (created, reply, printed, status) in cases.items():
-            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
-                scratch = Path(scratch)
-                (scratch / "home").mkdir()
-                if created:
-                    self.store(scratch, "qwen3-embedding-8k", "latest",
-                               json.dumps({"layers": [{"digest": "sha256:" + self.EMBEDDER_LAYER}]}))
-                result = self.run_accept(scratch, reply)
-                self.assertEqual((result.stdout, result.returncode),
-                                 (f"local-model-server | after_sign_in | {printed}\n", status), self.outcome(name, result))
-                if not created:
-                    self.assertIn("install the embedding-model row first", result.stderr, self.outcome(name, result))
+                path = Path(scratch)
+                result = self.run_program(path, self.row()["acceptance"]["service_health"]["command"],
+                                          self.models(), reply)
+                self.assertEqual(result.returncode, 0 if name == "selected" else 1, result.stderr)
+                calls = [json.loads(line) for line in (path / "calls.jsonl").read_text().splitlines()]
+                self.assertEqual([item["url"] for item in calls],
+                                 ["http://127.0.0.1:28231/v1/models", "http://127.0.0.1:28231/v1/embeddings"])
+                payload = json.loads(calls[1]["body"])
+                self.assertEqual(payload["model"], self.MODEL)
+                self.assertEqual(payload["input"], ["query: current provider integration fixture",
+                                                   "passage: current provider integration fixture"])
+                outputs = list((path / "state/new-wsl-native-stack/acceptance/embedding-model").glob("current.*/*.json"))
+                self.assertEqual(len(outputs), 2)
+                self.assertTrue(all(item.stat().st_mode & 0o777 == 0o600 for item in outputs))
 
 
 class ModelServerGuard(unittest.TestCase):
-    """install.sh's guard before either local-model row downloads, pulls or creates anything, run against stand-ins.
+    """Retirement means no executable server/model path; history remains immutable."""
 
-    Both rows install what was measured on Ollama 0.35.0, so model_server_answers requires that the server answers
-    `ollama ls` and that GET /api/version reports 0.35.0 (docs/api.md:1821-1843 and server/routes.go:2023 at v0.35.0).
-    The function, read from install.sh as check_plan.py reads it, runs under bash -euo pipefail with stub ollama and curl
-    programs first on PATH. The fixtures are our own: no model server answers.
-    """
+    def test_retired_rows_have_no_executable_install_or_acceptance(self):
+        import tomllib
+        rows = {row["slot"]: row for row in json.loads((PLAN / "install-plan.json").read_text())["owners"]}
+        checker = load_source(PLAN / "check_plan.py", "retired_model_checker")
+        for filename in ("install.sh", "accept.sh"):
+            functions = checker.functions((PLAN / filename).read_text())
+            self.assertNotIn("local-model-server", functions)
+            self.assertNotIn("local-generation-model", functions)
+            self.assertNotIn("model_server_answers", functions)
+        for slot in ("local-model-server", "local-generation-model"):
+            row = rows[slot]
+            self.assertFalse(row["installed"])
+            self.assertEqual(row["route"], "none")
+            self.assertEqual(row["commands"], [])
+            self.assertEqual(row["acceptance"], {})
+            self.assertEqual(row["config_paths"], [])
+            self.assertIsNone(row["service"])
+            self.assertFalse(any(row["needs"].values()))
+            self.assertEqual(row["retired_by"], "2026-10-06-retrieval-first-local-models")
+        self.assertNotIn("ollama", tomllib.loads((PLAN / "mise.toml").read_text())["tools"])
 
-    @classmethod
-    def setUpClass(cls):
-        for tool in ("bash", "jq"):
-            if shutil.which(tool) is None:
-                raise unittest.SkipTest(f"{tool} is needed to run the guard")
-        checker = load_source(PLAN / "check_plan.py", "check_plan")
-        install = checker.functions((PLAN / "install.sh").read_text(encoding="utf-8"))
-        cls.guard = install["model_server_answers"]
-        cls.rows = {slot: install[slot] for slot in ("local-generation-model", "embedding-model")}
-
-    def run_guard(self, scratch, listed, reply, curl_exit=0):
-        """The finished guard, with a stub `ollama` whose `ls` succeeds when `listed` and a stub `curl` that prints `reply`."""
-        stub = scratch / "bin"
-        stub.mkdir()
-        (stub / "reply.json").write_text(reply, encoding="utf-8")
-        (stub / "ollama").write_text(f"#!/bin/sh\nexit {0 if listed else 1}\n", encoding="utf-8")
-        (stub / "curl").write_text(f'#!/bin/sh\n[ {curl_exit} -eq 0 ] || exit {curl_exit}\ncat "$STUB_DIR/reply.json"\n',
-                                   encoding="utf-8")
-        for name in ("ollama", "curl"):
-            (stub / name).chmod(0o755)
-        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
-        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
-        program = f"model_server_answers() {{\n{self.guard}\n}}\nmodel_server_answers"
-        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
-                              timeout=60)
-
-    def test_both_rows_run_the_guard_before_any_command(self):
-        for slot, body in self.rows.items():
-            lines = [line.strip() for line in body.splitlines() if line.strip() and not line.strip().startswith("#")]
-            with self.subTest(slot=slot):
-                self.assertEqual(lines[:2], ['refresh_path || return "$?"', 'model_server_answers || return "$?"'])
-
-    def test_the_server_must_answer_and_report_the_measured_version(self):
-        cases = {
-            "0.35.0": (True, json.dumps({"version": "0.35.0"}), 0, 0),
-            "another version": (True, json.dumps({"version": "0.36.0"}), 0, 1),
-            "an answer without a version": (True, json.dumps({"error": "not found"}), 0, 1),
-            "the version request fails": (True, "", 7, 1),
-            "no server answers": (False, json.dumps({"version": "0.35.0"}), 0, 1),
-        }
-        for name, (listed, reply, curl_exit, want) in cases.items():
-            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
-                result = self.run_guard(Path(scratch), listed, reply, curl_exit)
-                message = f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
-                self.assertEqual(result.returncode, want, message)
-                if name == "another version":
-                    self.assertIn("reports version 0.36.0, not 0.35.0", result.stderr, message)
+    def test_historical_unit_is_preserved_and_never_copied(self):
+        self.assertEqual(hashlib.sha256((PLAN / "config/ollama.service").read_bytes()).hexdigest(),
+                         "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db")
+        rows = {row["slot"]: row for row in json.loads((PLAN / "install-plan.json").read_text())["owners"]}
+        self.assertEqual(set(rows["local-model-server"]["historical_config_assets"]),
+                         {"ollama.env.example", "ollama.service"})
+        installer = (PLAN / "install.sh").read_text()
+        for asset in ("ollama.env.example", "ollama.service"):
+            self.assertNotIn(f"copy_config '{asset}'", installer)
 
 
 class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
@@ -3595,129 +3487,85 @@ exec(sys.stdin.read())
                     self.assertIn("independent owner observation", bound["gateway_wire_model_effort"])
                     self.assertEqual(bound["observation_deadline_seconds"]["sequential_total"], 2400)
 
-    def test_ollama_health_loads_once_before_exact_positive_gpu_residency(self):
-        command = self.row("local-model-server")["acceptance"]["service_health"]["command"]
-        canonical = "qwen3-embedding-8k:latest"
-        healthy_model = {"name": canonical, "model": canonical, "size": 4096, "size_vram": 4096}
-        cases = ("valid", "disabled", "inactive", "embed_http_error", "empty_vector", "wrong_embedder",
-                 "ps_http_error", "missing_model", "other_model_gpu", "wrong_tag", "name_model_mismatch",
-                 "cpu", "partial_gpu", "zero_sizes", "missing_sizes", "string_sizes", "duplicate")
-        for case in cases:
-            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                trace = root / "trace.jsonl"
-                vector = {"model": "qwen3-embedding-8k", "embeddings": [[0.1, 0.2]]}
-                models = [dict(healthy_model)]
-                if case == "empty_vector":
-                    vector["embeddings"] = [[]]
-                elif case == "wrong_embedder":
-                    vector["model"] = "another-embedder"
-                elif case in ("missing_model", "other_model_gpu"):
-                    models = [] if case == "missing_model" else [dict(healthy_model, name="another:latest", model="another:latest")]
-                elif case == "wrong_tag":
-                    models[0].update(name="qwen3-embedding-8k:old", model="qwen3-embedding-8k:old")
-                elif case == "name_model_mismatch":
-                    models[0]["model"] = "another:latest"
-                elif case == "cpu":
-                    models[0]["size_vram"] = 0
-                elif case == "partial_gpu":
-                    models[0]["size_vram"] = 2048
-                elif case == "zero_sizes":
-                    models[0].update(size=0, size_vram=0)
-                elif case == "missing_sizes":
-                    models[0].pop("size")
-                    models[0].pop("size_vram")
-                elif case == "string_sizes":
-                    models[0].update(size="4096", size_vram="4096")
-                elif case == "duplicate":
-                    models.append(dict(healthy_model))
-                (root / "embed.json").write_text(json.dumps(vector))
-                (root / "ps.json").write_text(json.dumps({"models": models}))
-                systemctl = root / "systemctl"
-                systemctl.write_text("#!/usr/bin/env python3\nimport os,sys,pathlib,json\n"
-                                     "assert sys.argv[1]=='--user' and sys.argv[3]=='ollama.service'\n"
-                                     "kind=sys.argv[2]\n"
-                                     "with open(os.environ['FIXTURE_TRACE'],'a') as f: f.write(json.dumps(kind)+'\\n')\n"
-                                     "sys.exit(1 if (kind=='is-enabled' and os.environ['FIXTURE_CASE']=='disabled') or "
-                                     "(kind=='is-active' and os.environ['FIXTURE_CASE']=='inactive') else 0)\n")
-                systemctl.chmod(0o700)
-                curl = root / "curl"
-                curl.write_text("#!/usr/bin/env python3\nimport os,sys,pathlib,json\n"
-                                "args=sys.argv[1:]; endpoint=next(x for x in args if x.startswith('http://'))\n"
-                                "assert endpoint.startswith('http://127.0.0.1:21434/api/')\n"
-                                "operation=endpoint.rsplit('/',1)[1]\n"
-                                "with open(os.environ['FIXTURE_TRACE'],'a') as f: f.write(json.dumps(operation)+'\\n')\n"
-                                "if operation=='embed':\n"
-                                "    assert json.loads(args[args.index('-d')+1])=={'model':'qwen3-embedding-8k','input':'Hello world'}\n"
-                                "elif operation=='ps': assert '-d' not in args\n"
-                                "else: raise AssertionError(operation)\n"
-                                "if os.environ['FIXTURE_CASE']==operation+'_http_error': sys.exit(22)\n"
-                                "print((pathlib.Path(os.environ['FIXTURE_ROOT'])/(operation+'.json')).read_text())\n")
-                curl.chmod(0o700)
-                env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
-                env.update({"PATH": str(root) + os.pathsep + os.environ["PATH"],
-                            "FIXTURE_TRACE": str(trace), "FIXTURE_ROOT": str(root), "FIXTURE_CASE": case})
-                checked = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
-                                         env=env, capture_output=True, text=True, timeout=20)
-                self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
-                actual = [json.loads(line) for line in trace.read_text().splitlines()]
-                expected = ["is-enabled"] if case == "disabled" else ["is-enabled", "is-active"]
-                if case not in ("disabled", "inactive"):
-                    expected.append("embed")
-                    if case not in ("embed_http_error", "empty_vector", "wrong_embedder"):
-                        expected.append("ps")
-                self.assertEqual(actual, expected)
+    def test_retired_rows_cannot_reintroduce_commands_or_prerequisites(self):
+        # Use the same unchanged-copy checker; assert its independent retirement
+        # gate, even when the source-only plan awaits #810's settlement metadata.
+        fixture = InterimPlanChecks()
+        for slot, key, value in (
+            ("local-model-server", "commands", ["ollama serve"]),
+            ("local-generation-model", "acceptance", {"post_install": {"kind": "smoke", "command": "ollama run retired"}}),
+            ("local-model-server", "installed", True),
+        ):
+            def change(rows, slot=slot, key=key, value=value):
+                rows[slot][key] = value
+            with self.subTest(slot=slot, field=key):
+                code, output = fixture.run_check(change_rows=change)
+                self.assertNotEqual(code, 0)
+                self.assertIn(f"[{slot}] retired slot must have no installation", output)
 
-    def test_ollama_unit_placement_preserves_unrelated_warmup_and_foreign_units(self):
-        row = self.row("local-model-server")
-        command = row["commands"][1]
-        self.assertFalse((PLAN / "config/ollama-warmup.sh").exists())
-        self.assertNotIn("ollama-warmup.sh", json.dumps(row))
-        expected = (PLAN / "config/ollama.service").read_bytes()
-        self.assertEqual(hashlib.sha256(expected).hexdigest(),
-                         "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db")
-        self.assertNotIn(b"ExecStartPost=", expected)
-        for case in ("absent", "same", "different", "directory", "live_symlink", "dangling_symlink"):
-            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                fixture_home = root / "home"
-                unit = fixture_home / ".config/systemd/user/ollama.service"
-                unit.parent.mkdir(parents=True)
-                config = root / "config"
-                config.mkdir()
-                (config / "ollama.service").write_bytes(expected)
-                old_warmup = fixture_home / ".local/share/new-wsl-native-stack/bin/ollama-warmup.sh"
-                old_warmup.parent.mkdir(parents=True)
-                old_warmup.write_bytes(b"unreferenced host-owned warmup bytes\n")
-                if case == "same":
-                    unit.write_bytes(expected)
-                elif case == "different":
-                    unit.write_bytes(b"operator unit\n")
-                elif case == "directory":
-                    unit.mkdir()
-                    (unit / "preserved").write_bytes(b"operator directory bytes\n")
-                elif case.endswith("symlink"):
-                    target = root / "operator-unit"
-                    if case == "live_symlink":
-                        target.write_bytes(b"operator target bytes\n")
-                    unit.symlink_to(target)
-                info = unit.lstat() if case != "absent" else None
-                env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
-                env.update({"HOME": str(fixture_home), "config_root": str(config)})
-                checked = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
-                                         env=env, capture_output=True, text=True, timeout=20)
-                passed = case in ("absent", "same")
-                self.assertEqual(checked.returncode == 0, passed, checked.stderr)
-                if passed:
-                    self.assertEqual(unit.read_bytes(), expected)
+    def test_historical_ollama_unit_is_rejected_as_an_install_consumer(self):
+        fixture = InterimPlanChecks()
+        def change(text):
+            return text.replace("embedding-model() {", "embedding-model() {\n  copy_config 'ollama.service'", 1)
+        code, output = fixture.run_check(change_install=change)
+        self.assertNotEqual(code, 0)
+        self.assertIn("retired Ollama assets must never be installed", output)
+
+    def test_current_qmd_lexical_stage_requires_existing_index_and_known_document(self):
+        row = self.row("tobi-qmd")
+        command = row["acceptance"]["after_sign_in"]["command"]
+        cases = [
+            ("known", [{"file": "qmd://foundation-docs/harness-defaults.md", "score": 0.5}], True, 0),
+            ("empty", [], True, 1),
+            ("different document", [{"file": "qmd://foundation-docs/other.md", "score": 0.5}], True, 1),
+            ("wrong collection", [{"file": "qmd://other/harness-defaults.md", "score": 0.5}], True, 1),
+            ("boolean score", [{"file": "qmd://foundation-docs/harness-defaults.md", "score": True}], True, 1),
+            ("missing index", [], False, 1),
+        ]
+        for name, results, existing, expected in cases:
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                cache, config, stub = root / "cache", root / "config", root / "bin"
+                stub.mkdir()
+                if existing:
+                    (cache / "qmd").mkdir(parents=True)
+                    (config / "qmd").mkdir(parents=True)
+                    (cache / "qmd/native-agent-stack-catalog-lex.sqlite").write_bytes(b"regenerable fixture")
+                    (config / "qmd/native-agent-stack-catalog-lex.yml").write_text("collections: {}\n")
+                (root / "reply.json").write_text(json.dumps(results))
+                qmd = stub / "qmd"
+                qmd.write_text("#!/usr/bin/env python3\n" + r'''
+import json, os, sys
+from pathlib import Path
+root = Path(os.environ["QMD_FIXTURE"])
+args = sys.argv[1:]
+assert args[:2] == ["--index", "native-agent-stack-catalog-lex"]
+assert os.environ.get("QMD_FORCE_CPU") == "1" and "INDEX_PATH" not in os.environ
+assert args[2] in ("status", "search"), "no embed/update/pull is permitted"
+with (root / "calls.jsonl").open("a") as out:
+    out.write(json.dumps(args) + "\n")
+if args[2] == "search":
+    assert args[args.index("-c") + 1] == "foundation-docs" and "--json" in args
+    print((root / "reply.json").read_text())
+else:
+    print("fixture lexical status")
+''')
+                qmd.chmod(0o755)
+                env = {key: value for key, value in os.environ.items()
+                       if key not in ("BASH_ENV", "ENV", "QMD_CONFIG_DIR")}
+                env.update(QMD_FIXTURE=str(root), XDG_CACHE_HOME=str(cache), XDG_CONFIG_HOME=str(config),
+                           XDG_STATE_HOME=str(root / "state"), HOME=str(root / "home"),
+                           INDEX_PATH="MUST_BE_REMOVED", PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command], env=env,
+                                        capture_output=True, text=True, timeout=60)
+                self.assertEqual(result.returncode, expected, result.stderr)
+                if existing:
+                    calls = [json.loads(line) for line in (root / "calls.jsonl").read_text().splitlines()]
+                    self.assertEqual([args[2] for args in calls], ["status", "search"])
                 else:
-                    self.assertIn("needs_owner:", checked.stderr)
-                    self.assertEqual(unit.lstat().st_ino, info.st_ino)
-                    if case == "different": self.assertEqual(unit.read_bytes(), b"operator unit\n")
-                    elif case == "directory": self.assertEqual((unit / "preserved").read_bytes(), b"operator directory bytes\n")
-                    elif case == "live_symlink": self.assertEqual(target.read_bytes(), b"operator target bytes\n")
-                    else: self.assertFalse(target.exists())
-                self.assertEqual(old_warmup.read_bytes(), b"unreferenced host-owned warmup bytes\n")
+                    self.assertFalse((root / "calls.jsonl").exists())
+                    self.assertFalse((cache / "qmd").exists())
+                    self.assertIn("needs_owner:", result.stderr)
 
     def test_prometheus_health_requires_exact_plan_startup_features(self):
         row = self.row("prometheus")

@@ -192,8 +192,8 @@
   {
    "layer": "semantic-rag",
    "slot": "embedding-model",
-   "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
-   "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+   "owner": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text endpoint, 4096 dimensions, query: / passage: prefixes)",
+   "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
    "installed": true,
    "note": "settled by the local-model measurement of 2026-10-02 and 2026-10-03; the pin is the Ollama library manifest digest, in install-plan.json; repository metadata was not read for this row"
   },
@@ -426,9 +426,9 @@
   {
    "layer": "observation-inference",
    "slot": "local-model-server",
-   "owner": "Ollama",
-   "repository": "https://github.com/ollama/ollama",
-   "installed": true,
+   "owner": "Not installed: retired; no general local-generation consumer",
+   "repository": "",
+   "installed": false,
    "note": "",
    "tag_name": "v0.35.0",
    "published_at": "2026-09-28T21:23:22Z",
@@ -450,9 +450,9 @@
   {
    "layer": "observation-inference",
    "slot": "local-generation-model",
-   "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
-   "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
-   "installed": true,
+   "owner": "Not installed: retired; no general local-generation consumer",
+   "repository": "",
+   "installed": false,
    "note": "settled by the local-model measurement of 2026-10-02; the pins are the Hugging Face revision and the file's sha256, in install-plan.json; repository metadata was not read for this row"
   },
   {

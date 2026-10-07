@@ -172,7 +172,7 @@
         "docker": false,
         "gpu": false,
         "node": true,
-        "python": false
+        "python": true
       },
       "version_pinned": true,
       "install_source": {
@@ -1167,15 +1167,13 @@
     {
       "layer": "semantic-rag",
       "slot": "embedding-model",
-      "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
-      "repository": "https://github.com/QwenLM/Qwen3-Embedding",
-      "release": "qwen3-embedding:0.6b, library manifest sha256 ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+      "owner": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text endpoint, 4096 dimensions, query: / passage: prefixes)",
+      "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+      "release": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
       "installed": true,
       "route": "model-server",
       "commands": [
-        "OLLAMA_HOST=127.0.0.1:21434 ollama pull qwen3-embedding:0.6b",
-        "curl -fsS http://127.0.0.1:21434/api/tags | jq -e '.models[] | select(.name == \"qwen3-embedding:0.6b\") | .digest == \"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d\"' >/dev/null",
-        "OLLAMA_HOST=127.0.0.1:21434 ollama create qwen3-embedding-8k -f \"$plan_dir/models/qwen3-embedding-8k.Modelfile\""
+        "umask 077; state=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/embedding-model\"; mkdir -p -m 0700 -- \"$state\"; run_dir=\"$(mktemp -d \"$state/current.XXXXXXXX\")\"; if ! curl --fail --silent --show-error --max-time 10 --output \"$run_dir/models.json\" http://127.0.0.1:28231/v1/models; then printf 'needs_owner: CURRENT Nemotron endpoint is unavailable; no runtime or model was changed.\\n' >&2; exit 1; fi; python3 -c 'exec('\"'\"'import json, sys\\nfrom pathlib import Path\\ntry:\\n    response = json.loads(Path(sys.argv[1]).read_text())\\n    assert isinstance(response, dict)\\n    data = response.get(\"data\")\\n    assert isinstance(data, list) and len(data) == 1\\n    assert isinstance(data[0], dict) and data[0].get(\"id\") == \"nvidia/Nemotron-3-Embed-8B-BF16\"\\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError):\\n    raise SystemExit(\"needs_owner: CURRENT endpoint does not identify the selected Nemotron model; response retained\")\\nprint(\"CURRENT Nemotron provider identity passed; no bootstrap performed\")\\n'\"'\"')' \"$run_dir/models.json\""
       ],
       "needs": {
         "sudo": false,
@@ -1183,34 +1181,44 @@
         "docker": false,
         "gpu": true,
         "node": false,
-        "python": false
+        "python": true
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L85",
-        "line": 85
+        "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md#L404",
+        "line": 404
       },
-      "service": null,
+      "service": {
+        "form": "CURRENT owner-managed shared vLLM HTTP embedding endpoint; no runtime/bootstrap change in this row",
+        "port": 28231,
+        "port_setting": "existing loopback endpoint http://127.0.0.1:28231/v1",
+        "unit": "vllm-embed.service"
+      },
       "acceptance": {
         "post_install": {
-          "command": "printf '%s  %s\\n' ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding/0.6b\" | sha256sum --check --status && grep -F sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest\" >/dev/null",
-          "kind": "smoke",
+          "command": "umask 077; state=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/embedding-model\"; mkdir -p -m 0700 -- \"$state\"; run_dir=\"$(mktemp -d \"$state/current.XXXXXXXX\")\"; if ! curl --fail --silent --show-error --max-time 10 --output \"$run_dir/models.json\" http://127.0.0.1:28231/v1/models; then printf 'needs_owner: CURRENT Nemotron endpoint is unavailable; no runtime or model was changed.\\n' >&2; exit 1; fi; python3 -c 'exec('\"'\"'import json, sys\\nfrom pathlib import Path\\ntry:\\n    response = json.loads(Path(sys.argv[1]).read_text())\\n    assert isinstance(response, dict)\\n    data = response.get(\"data\")\\n    assert isinstance(data, list) and len(data) == 1\\n    assert isinstance(data[0], dict) and data[0].get(\"id\") == \"nvidia/Nemotron-3-Embed-8B-BF16\"\\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError):\\n    raise SystemExit(\"needs_owner: CURRENT endpoint does not identify the selected Nemotron model; response retained\")\\nprint(\"CURRENT Nemotron provider identity passed; no bootstrap performed\")\\n'\"'\"')' \"$run_dir/models.json\"",
+          "kind": "local integration",
           "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/manifest/paths.go#L29",
-            "line": 29
+            "url": "https://github.com/vllm-project/vllm/blob/db9527a46873454610df6dbedf79a36d6bf1a7f6/docs/serving/online_serving/openai_compatible_server.md",
+            "line": 1
           }
         },
         "service_health": {
-          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show qwen3-embedding-8k)\" && grep -E '^ +num_ctx +8192 *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Why is the sky blue?\"}' | jq -e '(.embeddings | length) == 1 and (.embeddings[0] | length) == 1024' >/dev/null",
-          "kind": "smoke",
+          "command": "umask 077; state=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/embedding-model\"; mkdir -p -m 0700 -- \"$state\"; run_dir=\"$(mktemp -d \"$state/current.XXXXXXXX\")\"; if ! curl --fail --silent --show-error --max-time 10 --output \"$run_dir/models.json\" http://127.0.0.1:28231/v1/models; then printf 'needs_owner: CURRENT Nemotron endpoint is unavailable; no runtime or model was changed.\\n' >&2; exit 1; fi; python3 -c 'exec('\"'\"'import json, sys\\nfrom pathlib import Path\\ntry:\\n    response = json.loads(Path(sys.argv[1]).read_text())\\n    assert isinstance(response, dict)\\n    data = response.get(\"data\")\\n    assert isinstance(data, list) and len(data) == 1\\n    assert isinstance(data[0], dict) and data[0].get(\"id\") == \"nvidia/Nemotron-3-Embed-8B-BF16\"\\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError):\\n    raise SystemExit(\"needs_owner: CURRENT endpoint does not identify the selected Nemotron model; response retained\")\\nprint(\"CURRENT Nemotron provider identity passed; no bootstrap performed\")\\n'\"'\"')' \"$run_dir/models.json\"; if ! curl --fail --silent --show-error --max-time 30 --header 'Content-Type: application/json' --data-binary '{\"model\":\"nvidia/Nemotron-3-Embed-8B-BF16\",\"input\":[\"query: current provider integration fixture\",\"passage: current provider integration fixture\"]}' --output \"$run_dir/embeddings.json\" http://127.0.0.1:28231/v1/embeddings; then printf 'CURRENT embedding API failed; returned artifacts retained.\\n' >&2; exit 1; fi; python3 -c 'exec('\"'\"'import json, math, sys\\nfrom pathlib import Path\\ntry:\\n    response = json.loads(Path(sys.argv[1]).read_text())\\n    assert isinstance(response, dict) and response.get(\"model\") == \"nvidia/Nemotron-3-Embed-8B-BF16\"\\n    data = response.get(\"data\")\\n    assert isinstance(data, list) and len(data) == 2\\n    norms = []\\n    for index, row in enumerate(data):\\n        assert isinstance(row, dict) and type(row.get(\"index\")) is int and row[\"index\"] == index\\n        embedding = row.get(\"embedding\")\\n        assert isinstance(embedding, list) and len(embedding) == 4096\\n        assert all(type(value) in (int, float) and math.isfinite(value) for value in embedding)\\n        norm = math.hypot(*embedding)\\n        assert math.isfinite(norm) and abs(norm - 1.0) <= 0.001\\n        norms.append(norm)\\nexcept (AssertionError, OSError, ValueError, TypeError, KeyError, OverflowError):\\n    raise SystemExit(\"CURRENT embedding API did not return two finite normalized 4096-dimensional vectors; response retained\")\\nprint(json.dumps({\"evidence_class\": \"local integration\", \"model\": response[\"model\"], \"dimensions\": 4096, \"vectors\": 2, \"norms\": norms}))\\n'\"'\"')' \"$run_dir/embeddings.json\"",
+          "kind": "local integration",
           "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
-            "line": 1659
+            "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md#L100",
+            "line": 100
           }
         }
       },
       "config_paths": [],
-      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 and 2026-10-03 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the Ollama library model qwen3-embedding:0.6b (Q8_0), pinned by its manifest digest (registry.ollama.ai served that digest on 2026-10-03), and a derived model qwen3-embedding-8k that carries num_ctx 8192 as its own parameter (models/qwen3-embedding-8k.Modelfile, byte-identical to the measured one). No server-wide context is set: with OLLAMA_CONTEXT_LENGTH=64000 the embedder took 5.78 GB. ollama pull checks every layer it downloads against the manifest's digest (server/images.go:1082); the second command stops the row unless the server reports the pinned manifest digest (server/model_list.go:64). The model is created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only embedding-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the pull. The post-install check reads files only (the library manifest's sha256 and the derived model's model layer, in the server's store under ${OLLAMA_MODELS:-$HOME/.ollama/models}, envconfig/config.go:112). The service check shows num_ctx 8192 and makes one embedding call of 1,024 dimensions (the model card, Qwen/Qwen3-Embedding-0.6B at 97b0c614 README.md:36). The derived model's digest that the measurement recorded (e3c32ffa36019b43b729c6da039b463bd28890b14135e76013bb0c1255766d83) is for comparison, not a check. No reranker is installed (reranker-model). Not run on any distribution as a plan row."
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 and 2026-10-03 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the Ollama library model qwen3-embedding:0.6b (Q8_0), pinned by its manifest digest (registry.ollama.ai served that digest on 2026-10-03), and a derived model qwen3-embedding-8k that carries num_ctx 8192 as its own parameter (models/qwen3-embedding-8k.Modelfile, byte-identical to the measured one). No server-wide context is set: with OLLAMA_CONTEXT_LENGTH=64000 the embedder took 5.78 GB. ollama pull checks every layer it downloads against the manifest's digest (server/images.go:1082); the second command stops the row unless the server reports the pinned manifest digest (server/model_list.go:64). The model is created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only embedding-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the pull. The post-install check reads files only (the library manifest's sha256 and the derived model's model layer, in the server's store under ${OLLAMA_MODELS:-$HOME/.ollama/models}, envconfig/config.go:112). The service check shows num_ctx 8192 and makes one embedding call of 1,024 dimensions (the model card, Qwen/Qwen3-Embedding-0.6B at 97b0c614 README.md:36). The derived model's digest that the measurement recorded (e3c32ffa36019b43b729c6da039b463bd28890b14135e76013bb0c1255766d83) is for comparison, not a check. No reranker is installed (reranker-model). Not run on any distribution as a plan row. CURRENT replacement (2026-10-06 final ruling): preserve the already-owned vLLM endpoint on 28231 and selected Nemotron8B revision d1f2f25730bbd775b99b29185134bc86653bf2d1. The install branch is a current-provider identity preflight only: absent or wrong provider is nonzero needs_owner; it does not install a runtime, fetch weights, publish/restart a unit or switch any model. A fresh portable bootstrap remains unqualified and needs owner adoption; this does not return a skipped/success placeholder. Native models and embeddings responses are retained privately; two query:/passage: inputs must produce finite L2-normalized 4096-d vectors with matching indices and model. API identity/shape does not verify the deployed weight revision or vLLM version. Source: native-agent-stack@db9301440f0e363f17a1bad8c7d065bdb2861def:docs/decisions/2026-10-06-retrieval-first-local-models.md:27-33; NVIDIA card@d1f2f25730bbd775b99b29185134bc86653bf2d1:README.md:100-129,404; vllm-project/vllm@db9527a46873454610df6dbedf79a36d6bf1a7f6:docs/serving/online_serving/openai_compatible_server.md. CURRENT vLLM0.31.0 is the separate owner serving record, not a qualification inferred from the card example that pins0.25.0.",
+      "historical_selection": {
+        "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+        "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+        "release": "qwen3-embedding:0.6b, library manifest sha256 ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
+      }
     },
     {
       "layer": "semantic-rag",
@@ -1251,7 +1259,7 @@
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": true,
+        "gpu": false,
         "node": true,
         "python": false
       },
@@ -1263,7 +1271,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "qmd status",
+          "command": "qmd_db=\"${XDG_CACHE_HOME:-$HOME/.cache}/qmd/native-agent-stack-catalog-lex.sqlite\"; qmd_yaml=\"${QMD_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/qmd}/native-agent-stack-catalog-lex.yml\"; if [[ ! -f \"$qmd_db\" || -L \"$qmd_db\" || ! -f \"$qmd_yaml\" || -L \"$qmd_yaml\" ]]; then printf 'needs_owner: existing lexical QMD index/config is required; no index is created or embedded.\\n' >&2; exit 1; fi; env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex status",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671",
@@ -1271,20 +1279,20 @@
           }
         },
         "after_sign_in": {
-          "command": "f=\"$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf\"\nprintf '%s  %s\\n' 06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"$f\" | sha256sum --check --status\ngrep -qxF \"  embed: $f\" \"$HOME/.config/qmd/native-agent-stack-catalog.yml\"\nqmd --index native-agent-stack-catalog status\nqmd --index native-agent-stack-catalog doctor",
+          "command": "qmd_db=\"${XDG_CACHE_HOME:-$HOME/.cache}/qmd/native-agent-stack-catalog-lex.sqlite\"; qmd_yaml=\"${QMD_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/qmd}/native-agent-stack-catalog-lex.yml\"; if [[ ! -f \"$qmd_db\" || -L \"$qmd_db\" || ! -f \"$qmd_yaml\" || -L \"$qmd_yaml\" ]]; then printf 'needs_owner: existing lexical QMD index/config is required; no index is created or embedded.\\n' >&2; exit 1; fi; env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex status; umask 077; state=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/tobi-qmd\"; mkdir -p -m 0700 -- \"$state\"; run_dir=\"$(mktemp -d \"$state/lexical.XXXXXXXX\")\"; env -u INDEX_PATH QMD_FORCE_CPU=1 qmd --index native-agent-stack-catalog-lex search 'native harness defaults' -c foundation-docs --json > \"$run_dir/search.json\"; python3 -c 'exec('\"'\"'import json, math, sys\\nfrom pathlib import Path\\nrows = json.loads(Path(sys.argv[1]).read_text())\\nassert isinstance(rows, list) and rows, \"lexical search returned no documents\"\\nassert all(isinstance(row, dict) and isinstance(row.get(\"file\"), str) and row[\"file\"].startswith(\"qmd://foundation-docs/\") for row in rows), \"lexical search escaped the requested collection\"\\nassert any(row[\"file\"].endswith(\"/harness-defaults.md\") and type(row.get(\"score\")) in (int, float) and math.isfinite(row[\"score\"]) for row in rows), \"the known harness-defaults document was not returned\"\\nprint(\"CPU lexical QMD search returned the known foundation document; response retained\")\\n'\"'\"')' \"$run_dir/search.json\"",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1021",
-            "line": 1021
+            "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md",
+            "line": 1
           }
         }
       },
       "config_paths": [
-        "$HOME/.config/qmd/native-agent-stack-catalog.yml",
-        "$HOME/.cache/qmd/",
-        "$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf"
+        "${QMD_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/qmd}/native-agent-stack-catalog-lex.yml",
+        "${XDG_CACHE_HOME:-$HOME/.cache}/qmd/native-agent-stack-catalog-lex.sqlite",
+        "$HOME/.cache/qmd/"
       ],
-      "notes": "Planned. Upstream first global npm route; Node >=22; status verifies grammars. Wave-2 retrieval ruling, change 16: needs.gpu reads true, because QMD runs node-llama-cpp with GPU auto: it uses the GPU when there is one and tries a CPU load only when GPU initialization fails, while a failure to create its first embedding context throws (src/llm.ts at facd35e, read by both families); concurrent fit beside the model server is the fit gate's, not this row's. config_paths name the index configuration, the cache and the interim embedder (Qwen3-Embedding-0.6B-Q8_0, sha256 06507c7b..., models.embed by absolute path). The after_sign_in check needs that embedder provisioned and the index embedded (embed -f in the GPU window, synthesis phase 3), as Ollama's check needs its model route; it is the live proof's host part (file hash, the configuration's embed line, status and doctor), and the client parts (each client's MCP query and get) stay with the live proof. UNRUN."
+      "notes": "Planned. Upstream first global npm route; Node >=22; status verifies grammars. Wave-2 retrieval ruling, change 16: needs.gpu reads true, because QMD runs node-llama-cpp with GPU auto: it uses the GPU when there is one and tries a CPU load only when GPU initialization fails, while a failure to create its first embedding context throws (src/llm.ts at facd35e, read by both families); concurrent fit beside the model server is the fit gate's, not this row's. config_paths name the index configuration, the cache and the interim embedder (Qwen3-Embedding-0.6B-Q8_0, sha256 06507c7b..., models.embed by absolute path). The after_sign_in check needs that embedder provisioned and the index embedded (embed -f in the GPU window, synthesis phase 3), as Ollama's check needs its model route; it is the live proof's host part (file hash, the configuration's embed line, status and doctor), and the client parts (each client's MCP query and get) stay with the live proof. UNRUN. Final 2026-10-06 QMD embed disposition: no new embedder or vector build. Native CPU lexical status and a nonempty foundation-docs search returning harness-defaults replace the unconditional Qwen0.6 hash/embed/vector doctor prerequisite. Fail before native calls if the existing named lexical SQLite/config is missing; never create an index, pull or embed here. Rerank a02f48bb4f057028298c21fa033da2b30d7742d5 and query expansion7816de0b72572c6c860ca1eddf97ba9e7fb8cc65 remain their upstream in-process named roles. The old Qwen0.6 vector lane is interim until cutover and a named exception only after an actual failed SocratiCode smoke; the plan does not make it unconditional. INDEX_PATH is removed per invocation. Source: native-agent-stack@db9301440f0e363f17a1bad8c7d065bdb2861def:docs/decisions/2026-10-06-retrieval-first-local-models.md:27-33,58-61; tobi/qmd@v2.8.3:src/store.ts getDefaultDbPath and src/cli/qmd.ts search/outputResults; installed2.8.3 dist/store.js:508-524,dist/cli/qmd.js:2136-2165,2405-2433,dist/collections.js:58-70."
     },
     {
       "layer": "document-retrieval",
@@ -2361,7 +2369,7 @@
         "$config_root/observability_config.py",
         "$config_root/ns2604-prometheus.service.example"
       ],
-      "notes": "Planned. Documented release-binary route plus published checksum; script transport glue follows cited source. A27 extends the existing config publisher with a render-only ns2604-prometheus.service candidate adapted from maintained observability/backends/configure.py:100,107–110. The plan release, loopback port and service.enable_features feed its arguments. Candidate publication uses the existing source-digest ledger: edited, symlinked and operator-custody outputs remain unchanged with nonzero needs_owner. It writes only under config_root; no active systemd unit is changed, no service is started/reloaded/enabled and no competing unit set is installed. The shared-host plan-apply owner retains activation and existing unit custody. G4 requires both features; service_health retains native status/flags and rejects either missing feature. Source rendering, local fixture controls and actual running flags remain separate evidence. Readiness alone does not prove this startup condition.",
+      "notes": "Planned. Documented release-binary route plus published checksum; script transport glue follows cited source. A27 extends the existing config publisher with a render-only ns2604-prometheus.service candidate adapted from maintained observability/backends/configure.py:100,107\u2013110. The plan release, loopback port and service.enable_features feed its arguments. Candidate publication uses the existing source-digest ledger: edited, symlinked and operator-custody outputs remain unchanged with nonzero needs_owner. It writes only under config_root; no active systemd unit is changed, no service is started/reloaded/enabled and no competing unit set is installed. The shared-host plan-apply owner retains activation and existing unit custody. G4 requires both features; service_health retains native status/flags and rejects either missing feature. Source rendering, local fixture controls and actual running flags remain separate evidence. Readiness alone does not prove this startup condition.",
       "release_asset": {
         "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
         "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0"
@@ -2561,67 +2569,26 @@
     {
       "layer": "observation-inference",
       "slot": "local-model-server",
-      "owner": "Ollama",
-      "repository": "https://github.com/ollama/ollama",
+      "owner": "Not installed: retired; no general local-generation consumer",
+      "repository": "",
       "release": "v0.35.0",
-      "installed": true,
-      "route": "mise",
-      "commands": [
-        "mise use -g ollama@0.35.0",
-        "ollama_unit_path=\"$HOME/.config/systemd/user/ollama.service\"; if [[ -L \"$ollama_unit_path\" ]] || { [[ -e \"$ollama_unit_path\" ]] && ! cmp -s -- \"$config_root/ollama.service\" \"$ollama_unit_path\"; }; then   printf 'needs_owner: retained differing Ollama unit.\\n' >&2;   exit 3; fi; install -d -m 0700 -- \"$HOME/.config/systemd/user\" && install -m 0600 -- \"$config_root/ollama.service\" \"$ollama_unit_path\"",
-        "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
-      ],
+      "installed": false,
+      "route": "none",
+      "commands": [],
       "needs": {
         "sudo": false,
-        "systemd_user_unit": true,
+        "systemd_user_unit": false,
         "docker": false,
-        "gpu": true,
+        "gpu": false,
         "node": false,
-        "python": true
+        "python": false
       },
-      "version_pinned": true,
-      "install_source": {
-        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ollama.toml#L1",
-        "line": 1
-      },
-      "service": {
-        "form": "Ollama upstream system-unit form adapted to the user unit; lasting destination GPU owner",
-        "port": 21434,
-        "port_setting": "OLLAMA_HOST=127.0.0.1:21434 (ollama v0.35.0 docs/faq.mdx:185)",
-        "unit": "ollama.service"
-      },
-      "acceptance": {
-        "post_install": {
-          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama --version",
-          "kind": "version only",
-          "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2181",
-            "line": 2181
-          }
-        },
-        "service_health": {
-          "command": "systemctl --user is-enabled ollama.service\nsystemctl --user is-active ollama.service\ncurl -fsS --connect-timeout 5 --max-time 120 http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '.model == \"qwen3-embedding-8k\" and (.embeddings | type == \"array\" and length == 1) and (.embeddings[0] | type == \"array\" and length > 0 and all(.[]; type == \"number\"))' >/dev/null\ncurl -fsS --connect-timeout 5 --max-time 30 http://127.0.0.1:21434/api/ps | jq -e '.models | select(type == \"array\") | map(select(.name == \"qwen3-embedding-8k:latest\" and .model == \"qwen3-embedding-8k:latest\")) | length == 1 and (.[0] | (.size | type == \"number\" and . > 0) and (.size_vram | type == \"number\") and .size_vram == .size)' >/dev/null",
-          "kind": "health",
-          "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1736",
-            "line": 1736
-          }
-        },
-        "after_sign_in": {
-          "command": "curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1' >/dev/null",
-          "kind": "smoke",
-          "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
-            "line": 1659
-          }
-        }
-      },
-      "config_paths": [
-        "$config_root/ollama.env.example",
-        "$config_root/ollama.service"
-      ],
-      "notes": "Ollama0.35.0 retains the user-approved lasting NativeStack2604 GPU-owner ruling (D-ollama, 2026-10-05, command-center item task-ns2604-coop-20261005T142343Z point1; local-model decision254–257). D-ollama-2 describes the user's about15:05Z decision: no organic workflow calls since13:58Z, about19GiB pinned VRAM with Windows about0.45GiB free, cold-load about11s for27B/3.2s for the embedder. Use on-demand loading and native30m idle expiry; organic calls/reload-cost measurement can overturn it. Installed ollama serve --help at0.35.0 reports built-in5m; envconfig/config.go:126–143 documents env override and infinite negative values. Adopt exact new user-unit bytes SHA2565e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db, with no ExecStartPost or warmup row asset. Upstream docs/linux.mdx:57–89 supplies the adapted unit form. Retain differing/symlinked unit custody with nonzero needs_owner, then native daemon-reload/enable --now by the sole co-op plan writer. service_health requires enabled/active, one on-demand /api/embed, then exactly one canonical embedder /api/ps entry with positive numeric size_vram==size; no preloaded-state requirement, no keep_alive:-1 request. after_sign_in remains the unchanged embed smoke and model-store prerequisite. All figures are reported decision inputs, not remeasured here; unit header's about15:08Z timestamp remains exact. Sources: ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84:docs/api.md:1659–1704,1736–1771; server/routes.go:2422–2440; types/model/name.go:230–247. No host config apply by this lane.",
-      "mise_tool": "ollama",
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Ollama0.35.0 retains the user-approved lasting NativeStack2604 GPU-owner ruling (D-ollama, 2026-10-05, command-center item task-ns2604-coop-20261005T142343Z point1; local-model decision254\u2013257). D-ollama-2 describes the user's about15:05Z decision: no organic workflow calls since13:58Z, about19GiB pinned VRAM with Windows about0.45GiB free, cold-load about11s for27B/3.2s for the embedder. Use on-demand loading and native30m idle expiry; organic calls/reload-cost measurement can overturn it. Installed ollama serve --help at0.35.0 reports built-in5m; envconfig/config.go:126\u2013143 documents env override and infinite negative values. Adopt exact new user-unit bytes SHA2565e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db, with no ExecStartPost or warmup row asset. Upstream docs/linux.mdx:57\u201389 supplies the adapted unit form. Retain differing/symlinked unit custody with nonzero needs_owner, then native daemon-reload/enable --now by the sole co-op plan writer. service_health requires enabled/active, one on-demand /api/embed, then exactly one canonical embedder /api/ps entry with positive numeric size_vram==size; no preloaded-state requirement, no keep_alive:-1 request. after_sign_in remains the unchanged embed smoke and model-store prerequisite. All figures are reported decision inputs, not remeasured here; unit header's about15:08Z timestamp remains exact. Sources: ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84:docs/api.md:1659\u20131704,1736\u20131771; server/routes.go:2422\u20132440; types/model/name.go:230\u2013247. No host config apply by this lane. Retired operational selection by the final 2026-10-06 owner ruling: no resident or on-demand general generation pick, and no Ollama installation, activation or model creation. Earlier selections and returned receipts remain historical. This plan change deletes no host bytes or service. Source: native-agent-stack@db9301440f0e363f17a1bad8c7d065bdb2861def:docs/decisions/2026-10-06-retrieval-first-local-models.md:27-33; canonical local-models-rulings-wf_96bbdf83-4f5.json syn.final local generation.",
       "supporting_sources": [
         {
           "url": "https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57",
@@ -2638,6 +2605,16 @@
         {
           "url": "https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#is-active%20PATTERN%E2%80%A6"
         }
+      ],
+      "historical_selection": {
+        "owner": "Ollama",
+        "repository": "https://github.com/ollama/ollama",
+        "release": "v0.35.0"
+      },
+      "retired_by": "2026-10-06-retrieval-first-local-models",
+      "historical_config_assets": [
+        "ollama.env.example",
+        "ollama.service"
       ]
     },
     {
@@ -2762,51 +2739,32 @@
     {
       "layer": "observation-inference",
       "slot": "local-generation-model",
-      "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
-      "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+      "owner": "Not installed: retired; no general local-generation consumer",
+      "repository": "",
       "release": "d74895bbe5db4bec1e0024e7cc87d59c02d7631a",
-      "installed": true,
-      "route": "model-server",
-      "commands": [
-        "fetch_verified 'https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf' '1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786' \"$tool_root/ollama-models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf\"",
-        "install -m 0644 -t \"$tool_root/ollama-models\" \"$plan_dir/models/swift-iq3s-s2o.Modelfile\" \"$plan_dir/models/swift-iq3s-s2o-64k.Modelfile\"",
-        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o -f \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\"",
-        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o-64k -f \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\""
-      ],
+      "installed": false,
+      "route": "none",
+      "commands": [],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": true,
+        "gpu": false,
         "node": false,
         "python": false
       },
-      "version_pinned": true,
-      "install_source": {
-        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L120",
-        "line": 120
-      },
+      "version_pinned": false,
+      "install_source": null,
       "service": null,
-      "acceptance": {
-        "post_install": {
-          "command": "printf '%s  %s\\n' f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\" 6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\" | sha256sum --check --status && grep -F sha256:1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/swift-iq3s-s2o-64k/latest\" >/dev/null",
-          "kind": "smoke",
-          "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/create.go#L905",
-            "line": 905
-          }
-        },
-        "service_health": {
-          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show swift-iq3s-s2o-64k)\" && grep -E '^ +num_ctx +64000 *$' <<<\"$out\" >/dev/null && grep -E '^ +quantization +IQ3_S *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/generate -d '{\"model\":\"swift-iq3s-s2o-64k\",\"prompt\":\"Reply with the word ready.\",\"stream\":false,\"think\":false,\"options\":{\"num_predict\":32}}' | jq -e '.done == true and (.response | length > 0)' >/dev/null",
-          "kind": "smoke",
-          "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L48",
-            "line": 48
-          }
-        }
-      },
+      "acceptance": {},
       "config_paths": [],
-      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the IQ3_S file of the pinned Hugging Face revision (11,771,546,912 bytes; the publisher's repository is not gated), imported into Ollama 0.35.0 with the library qwen3.8:27b model's Modelfile lines (models/swift-iq3s-s2o.Modelfile: the measured file, sha256 8911245e..., with its FROM line, an absolute path in the throwaway distribution, written relative to the Modelfile as docs/modelfile.mdx:126 allows), and a derived model that carries the context of 64,000 as its own parameter (models/swift-iq3s-s2o-64k.Modelfile, byte-identical to the measured one). No server-wide context is set. fetch_verified and the placement of the two Modelfiles beside the file are plan glue; ollama create (cmd/cmd.go:2422) copies the file into the server's model store, written by the client when a loopback server shares its store and uploaded otherwise (cmd/cmd.go:385 and :523), and the server keeps it as the model layer under its own sha256 (server/create.go:905), so the row needs about 23.5 GB of disk while the downloaded file is kept. The models are created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only local-generation-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the download. The post-install check reads files only: the placed Modelfiles are the repository's, and the created model's manifest names the pinned file as a layer. The service check shows num_ctx 64000 and quantization IQ3_S and runs one short generation with thinking off, which is not the measured effort (medium). The manifest digests that the measurement recorded (swift-iq3s-s2o eaedf746b10251265e653fae1052c98f3edc7b196f089f1508d8d0fa8820f68c, swift-iq3s-s2o-64k 8b39735c4f973d2192171c5b800a2bbb25cf053a59e5d7d2edcaa9830198cb11) are for comparison, not a check. One RTX 4090 serves the workstation's model services and this server: the measured co-residency (the generation model 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU) held with no other WSL process holding GPU memory, so which distribution's server holds the card is for the lifecycle design to decide; nothing here decides it. Not run on any distribution as a plan row."
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the IQ3_S file of the pinned Hugging Face revision (11,771,546,912 bytes; the publisher's repository is not gated), imported into Ollama 0.35.0 with the library qwen3.8:27b model's Modelfile lines (models/swift-iq3s-s2o.Modelfile: the measured file, sha256 8911245e..., with its FROM line, an absolute path in the throwaway distribution, written relative to the Modelfile as docs/modelfile.mdx:126 allows), and a derived model that carries the context of 64,000 as its own parameter (models/swift-iq3s-s2o-64k.Modelfile, byte-identical to the measured one). No server-wide context is set. fetch_verified and the placement of the two Modelfiles beside the file are plan glue; ollama create (cmd/cmd.go:2422) copies the file into the server's model store, written by the client when a loopback server shares its store and uploaded otherwise (cmd/cmd.go:385 and :523), and the server keeps it as the model layer under its own sha256 (server/create.go:905), so the row needs about 23.5 GB of disk while the downloaded file is kept. The models are created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only local-generation-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the download. The post-install check reads files only: the placed Modelfiles are the repository's, and the created model's manifest names the pinned file as a layer. The service check shows num_ctx 64000 and quantization IQ3_S and runs one short generation with thinking off, which is not the measured effort (medium). The manifest digests that the measurement recorded (swift-iq3s-s2o eaedf746b10251265e653fae1052c98f3edc7b196f089f1508d8d0fa8820f68c, swift-iq3s-s2o-64k 8b39735c4f973d2192171c5b800a2bbb25cf053a59e5d7d2edcaa9830198cb11) are for comparison, not a check. One RTX 4090 serves the workstation's model services and this server: the measured co-residency (the generation model 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU) held with no other WSL process holding GPU memory, so which distribution's server holds the card is for the lifecycle design to decide; nothing here decides it. Not run on any distribution as a plan row. Retired operational selection by the final 2026-10-06 owner ruling: no resident or on-demand general generation pick, and no Ollama installation, activation or model creation. Earlier selections and returned receipts remain historical. This plan change deletes no host bytes or service. Source: native-agent-stack@db9301440f0e363f17a1bad8c7d065bdb2861def:docs/decisions/2026-10-06-retrieval-first-local-models.md:27-33; canonical local-models-rulings-wf_96bbdf83-4f5.json syn.final local generation.",
+      "historical_selection": {
+        "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+        "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+        "release": "d74895bbe5db4bec1e0024e7cc87d59c02d7631a"
+      },
+      "retired_by": "2026-10-06-retrieval-first-local-models"
     },
     {
       "layer": "observation-inference",
@@ -2925,7 +2883,7 @@
         "$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl",
         "$tool_root/inspect-ai-0.3.273"
       ],
-      "notes": "G5 repair 2026-10-04, following the Opus adjudication: retain Inspect AI 0.3.273 at 9e44f1b77ed7c912bf58baf30db8560937e7ce53 and explicitly install its optional OpenAI provider SDK into the same uv tool environment with --with openai==3.24.0 (latest non-yanked release on 2026-10-04; satisfies providers.py:382 minimum 3.1.0). The pinned source supplies unchanged examples/theory_of_mind.py. Keep the post-install version check; after_sign_in runs one scored sample through openai-api/omniroute/cx/gpt-6.1-sol at the existing loopback gateway, then an absent-model control through the same route. The keyless loopback uses a non-secret placeholder; an operator-enabled gateway key must instead arrive as OMNIROUTE_API_KEY through the credential runner, never a file read here. Inspect's own log dump --header-only must report success and nonempty scores, and the same positive gate must reject the control error log. Retain both native logs and actual control CLI/gate exits privately. This proves execution and scoring, not model accuracy. Fresh native-client shell invocation is recommended, not a READY gate for this unwired CLI. No evaluation has run in this builder job. Correction: the earlier direct zipfile traceback was unsupported compression, not missing header.json. Repair 2026-10-05: this row exclusively owns the complete inspect-ai tool environment, including Scout 0.5.3, Harbor 0.23.0 and upstream pytest dependencies; running it last preserves Scout. Named trajectory-analysis dispatches this owner first. Repair 2026-10-05: change into the pinned checkout and pass examples/theory_of_mind.py relatively; _eval/list.py:66 applies Path.glob to the supplied pattern on Python 3.13. The observed0.3.273/Python3.13 absolute-example NotImplementedError is avoided by running the existing relative example from its checkout. Official0.3.274–0.3.276 entries were reviewed at0.3.276/93f7182cf2ce9be22724b05e499cd1358d7ed41d; no absolute-path fix is listed there. Those releases were not re-executed, so changelog review is not fix qualification or an upgrade recommendation. J-713 dependency repair: verified published Inspect0.3.273 wheel in its own uv environment with OpenAI3.24.0, no Scout/Harbor additions. --no-build forbids source compilation; --reinstall replaces requested owned environment extras. Relative example and positive/absent-model gates unchanged. Sources UKGovernmentBEIS/inspect_ai@9e44f1b77ed7c912bf58baf30db8560937e7ce53:requirements.txt:12; astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/tools.md:38,177; PyPI Inspect wheel SHA2568a8594237e3281bcb02b9be7638757f8693b78cbdef76eab348f6cdc6c6996f1. J-713 correction (2026-10-06): install the verified published Inspect wheel with --no-build and OpenAI 3.24.0 in the inspect-ai uv environment; Harbor and Scout resolve separately. Sources: inspect_ai@9e44f1b77ed7c912bf58baf30db8560937e7ce53:requirements.txt:12; uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/tools.md:38. Relative scored task and all positive/negative log gates stay unchanged.",
+      "notes": "G5 repair 2026-10-04, following the Opus adjudication: retain Inspect AI 0.3.273 at 9e44f1b77ed7c912bf58baf30db8560937e7ce53 and explicitly install its optional OpenAI provider SDK into the same uv tool environment with --with openai==3.24.0 (latest non-yanked release on 2026-10-04; satisfies providers.py:382 minimum 3.1.0). The pinned source supplies unchanged examples/theory_of_mind.py. Keep the post-install version check; after_sign_in runs one scored sample through openai-api/omniroute/cx/gpt-6.1-sol at the existing loopback gateway, then an absent-model control through the same route. The keyless loopback uses a non-secret placeholder; an operator-enabled gateway key must instead arrive as OMNIROUTE_API_KEY through the credential runner, never a file read here. Inspect's own log dump --header-only must report success and nonempty scores, and the same positive gate must reject the control error log. Retain both native logs and actual control CLI/gate exits privately. This proves execution and scoring, not model accuracy. Fresh native-client shell invocation is recommended, not a READY gate for this unwired CLI. No evaluation has run in this builder job. Correction: the earlier direct zipfile traceback was unsupported compression, not missing header.json. Repair 2026-10-05: this row exclusively owns the complete inspect-ai tool environment, including Scout 0.5.3, Harbor 0.23.0 and upstream pytest dependencies; running it last preserves Scout. Named trajectory-analysis dispatches this owner first. Repair 2026-10-05: change into the pinned checkout and pass examples/theory_of_mind.py relatively; _eval/list.py:66 applies Path.glob to the supplied pattern on Python 3.13. The observed0.3.273/Python3.13 absolute-example NotImplementedError is avoided by running the existing relative example from its checkout. Official0.3.274\u20130.3.276 entries were reviewed at0.3.276/93f7182cf2ce9be22724b05e499cd1358d7ed41d; no absolute-path fix is listed there. Those releases were not re-executed, so changelog review is not fix qualification or an upgrade recommendation. J-713 dependency repair: verified published Inspect0.3.273 wheel in its own uv environment with OpenAI3.24.0, no Scout/Harbor additions. --no-build forbids source compilation; --reinstall replaces requested owned environment extras. Relative example and positive/absent-model gates unchanged. Sources UKGovernmentBEIS/inspect_ai@9e44f1b77ed7c912bf58baf30db8560937e7ce53:requirements.txt:12; astral-sh/uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/tools.md:38,177; PyPI Inspect wheel SHA2568a8594237e3281bcb02b9be7638757f8693b78cbdef76eab348f6cdc6c6996f1. J-713 correction (2026-10-06): install the verified published Inspect wheel with --no-build and OpenAI 3.24.0 in the inspect-ai uv environment; Harbor and Scout resolve separately. Sources: inspect_ai@9e44f1b77ed7c912bf58baf30db8560937e7ce53:requirements.txt:12; uv@70fe1196a546e49148a73b1c592b2f74c33af80e:docs/concepts/tools.md:38. Relative scored task and all positive/negative log gates stay unchanged.",
       "source_checkout": {
         "tag": "0.3.273",
         "commit": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",

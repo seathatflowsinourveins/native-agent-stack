@@ -586,35 +586,35 @@ def main():
         if r["route"] == "mise" and not r.get("mise_tool"):
             bad("mise", f"row {r['slot']} has route mise but names no mise_tool")
 
-    # D-ollama: owner-approved native user-unit adaptation; no host apply here.
-    # Source: Ollama v0.35.0 docs/linux.mdx:57-89; D-ollama-2 on-demand/30m owner ruling.
-    ollama = by_slot.get("local-model-server", {})
-    if not ollama.get("needs", {}).get("systemd_user_unit"):
-        bad("local-model-server", "lasting GPU owner requires its user-unit prerequisite")
-    native_enable = "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
-    if native_enable not in ollama.get("commands", []):
-        bad("local-model-server", "missing native daemon-reload and boot enable/start command")
-    health = (ollama.get("acceptance", {}).get("service_health") or {}).get("command") or ""
-    if "systemctl --user is-enabled ollama.service" not in health.splitlines():
-        bad("local-model-server", "service_health must require boot-enabled ollama.service")
-    if (health.splitlines()[:2] != ["systemctl --user is-enabled ollama.service",
-                                    "systemctl --user is-active ollama.service"]
-            or health.count("/api/embed") != 1 or health.count("/api/ps") != 1
-            or health.index("/api/embed") > health.index("/api/ps")
-            or '.size_vram == .size' not in health
-            or 'qwen3-embedding-8k:latest' not in health):
-        bad("local-model-server", "service_health must load the embedder on demand before its positive GPU-residency gate")
-    if any("ollama-warmup.sh" in value for value in ollama.get("commands", []) + ollama.get("config_paths", [])):
-        bad("local-model-server", "D-ollama-2 removes the warmup asset and all installer references")
-    assets = {
-        "ollama.service": "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db",
-    }
-    for name, expected in assets.items():
-        path = plan_dir / "config" / name
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
-            bad("local-model-server", f"{name} differs from its designated owner-approved bytes")
-        if f"copy_config '{name}'" not in install_funcs.get("local-model-server", ""):
-            bad("local-model-server", f"install function must place {name} through copy_config")
+    # Retrieval-first retirement is an executable exclusion contract.
+    # Source: native-agent-stack@db930144:
+    # docs/decisions/2026-10-06-retrieval-first-local-models.md:27-33,58-61,115-118.
+    # The CURRENT embedding provider remains; no general generation/server is installed.
+    historical_local_model_configs = {"ollama.env.example", "ollama.service"}
+    for slot in ("local-model-server", "local-generation-model"):
+        retired = by_slot.get(slot, {})
+        if (retired.get("installed") is not False or retired.get("route") != "none"
+                or retired.get("commands") != [] or retired.get("acceptance") != {}
+                or retired.get("service") is not None or retired.get("config_paths") != []
+                or any(retired.get("needs", {}).values())
+                or retired.get("retired_by") != "2026-10-06-retrieval-first-local-models"):
+            bad(slot, "retired slot must have no installation, prerequisites, service, config or acceptance")
+    server_history = by_slot.get("local-model-server", {}).get("historical_config_assets", [])
+    if set(server_history) != historical_local_model_configs:
+        bad("local-model-server", "retained Ollama assets must be declared only as the exact historical pair")
+    if "ollama" in tools:
+        bad("local-model-server", "retired Ollama must not be installed implicitly through mise")
+    for row in selected + measured:
+        for command in row.get("commands", []):
+            if re.search(r"\bollama\s+(pull|create|serve)\b|systemctl[^\n]*ollama\.service", command):
+                bad(row["slot"], "selected commands must not reintroduce retired Ollama or its models")
+    # Preserve the previously reviewed unit bytes as history, never as an install target.
+    # Source: native-agent-stack@979291de:
+    # evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.service:1, owner SHA retained.
+    old_unit = plan_dir / "config/ollama.service"
+    if not old_unit.is_file() or hashlib.sha256(old_unit.read_bytes()).hexdigest() != \
+            "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db":
+        bad("local-model-server", "historical owner-approved Ollama unit bytes changed")
 
     # G4: these are plan contracts, not a claim that a host or a notification receiver passed.
     # Source: OTel v0.162.0 otelcol/command_validate.go:15; Grafana v13.2.3 query-editor/_index.md:47;
@@ -675,7 +675,9 @@ def main():
         }
         if historical_gateway_configs & copied:
             bad("gpt-gateway", "selected prebuilt release must not install historical canary assets")
-    for name in sorted(config - copied - historical_gateway_configs):
+    if historical_local_model_configs & copied:
+        bad("local-model-server", "retired Ollama assets must never be installed from historical config")
+    for name in sorted(config - copied - historical_gateway_configs - historical_local_model_configs):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
