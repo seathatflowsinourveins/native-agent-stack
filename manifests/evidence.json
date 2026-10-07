@@ -17322,6 +17322,11 @@
       "bytes": 129176
     },
     {
+      "path": "docs/decisions/2026-10-05-native-token-context-owner-contracts.md",
+      "sha256": "9460bb167ec3d3283f97dd501d9e4191f98567002e62296ef77aab3c23bc3d37",
+      "bytes": 17526
+    },
+    {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
       "sha256": "44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d",
       "bytes": 30081
@@ -17355,6 +17360,16 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-codex-token-census-routing-proposals.md",
+      "sha256": "3ee5fe58fa4f1af69d55df70362854076d33a67cafeee194d3e1af89c235e54e",
+      "bytes": 5193
+    },
+    {
+      "path": "docs/decisions/2026-10-06-native-rtk-evidence-and-permission-parity.md",
+      "sha256": "dcab5ab9de907148d9479c36cef2e47852ec7100d836b14bf09fe3d8ee457af6",
+      "bytes": 5979
     },
     {
       "path": "docs/decisions/2026-10-06-token-tools-upstream-install.md",
@@ -17650,6 +17665,21 @@
       "path": "docs/promptfoo-upstream-retrieval.md",
       "sha256": "af73fafcc415e7917ed254b18ec38b5207c34592d7291c4a383c052ba38d5f72",
       "bytes": 5247
+    },
+    {
+      "path": "docs/proposals/2026-10-06-codex-token-routing.md",
+      "sha256": "177e4f740263ae3bac8359a138887ec21a4bb2026be62421be246306e2238d5d",
+      "bytes": 9237
+    },
+    {
+      "path": "docs/proposals/2026-10-06-codex-token-routing.patch",
+      "sha256": "f6d7acfed6e9838127e64af81c30bf1231de261f5a5e1b963152f55a017de17d",
+      "bytes": 1916
+    },
+    {
+      "path": "docs/proposals/2026-10-06-native-rtk-hook-observability-and-env-parity.md",
+      "sha256": "88bbb6c9873c20e1ffc751a1cd1c821a4376ecd15c9b0be7d0b700b089dac964",
+      "bytes": 16943
     },
     {
       "path": "docs/research-task-acceptance.md",
