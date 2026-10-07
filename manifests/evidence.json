@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "98e7d77e803d35554f3f6ff4748157f5a1d4716d0a11951649f309509682b157",
-      "bytes": 4927
+      "sha256": "f5f990bb4cfede3af2ed5847ac862600131eecd37a288680fca02355df523a4c",
+      "bytes": 5515
     },
     {
       "path": "adoption/paired/README.md",
@@ -17123,8 +17123,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "0ea86f8b6ed5cd6c8ee7afff7706e62d7c79ee15cd400df1d2a297f4014cee0d",
-      "bytes": 135729
+      "sha256": "a793793186cdff8880f94c23ae69188c1303c51cccc07d35309f22fd406c47e1",
+      "bytes": 155899
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17372,6 +17372,11 @@
       "bytes": 19473
     },
     {
+      "path": "docs/decisions/2026-10-07-codex-profile-environment-content-fold.md",
+      "sha256": "e5f48231364038b3d974684ed5cab470679650c0cb1b81b1f460f981fcac04b3",
+      "bytes": 4475
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -17503,8 +17508,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "26ec355b96aa6bc91fba8fd4f1ff33d84b13ce7865c4eb3108d98ead4dfa534c",
-      "bytes": 225647
+      "sha256": "e4fad41c36dd21c87152e2164f0bdb3118df6b7e7a872c342a375383742fb7f5",
+      "bytes": 230335
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18937,6 +18942,21 @@
       "bytes": 14536
     },
     {
+      "path": "evidence/artifacts/codex-profile-drift-check-20261005/receipt.json",
+      "sha256": "1bac7eb84eec5b3be8fc93e5761f588f71bc08ae3ea5b376cd1afca52d3a8f0f",
+      "bytes": 8686
+    },
+    {
+      "path": "evidence/artifacts/codex-profile-env-fold-20261007/receipt.json",
+      "sha256": "1584e09bf3c2e7d1948537afd4bb238d4d81952c637180c10114cfb62c204386",
+      "bytes": 5002
+    },
+    {
+      "path": "evidence/artifacts/codex-profile-env-fold-20261007/source-bytes.json",
+      "sha256": "c11df2181718ebffa007ed17c5e10313b8923fca58d350082925c1276c694897",
+      "bytes": 26017
+    },
+    {
       "path": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json",
       "sha256": "76dff0d9fcac36c10cf9a86e6a63915794aca4b6465f5ea83e69554a75a38464",
       "bytes": 6940
@@ -18960,6 +18980,16 @@
       "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/snapshots_enum_all.py.txt",
       "sha256": "7c6dd6b3fd74250472e28d3818e5ce11cd85e47d6589e3d1dd3ee748050afb09",
       "bytes": 3165
+    },
+    {
+      "path": "evidence/artifacts/codex-token-parity-20261005/README.md",
+      "sha256": "0f076fdd425e6434810ac7604a5eac99638d77997c8f833e9c84ccb4888d5092",
+      "bytes": 3049
+    },
+    {
+      "path": "evidence/artifacts/codex-token-parity-20261005/receipt.json",
+      "sha256": "556b1e8cc4aa62cd1445b2c9c06d237c7245813e12f88724d2a84665c65170f7",
+      "bytes": 8948
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",
@@ -33755,6 +33785,336 @@
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
       "sha256": "c51d516dd0ff1e3438d2a9371b089e647c621c749a723e488b57190b4034d5c5",
       "bytes": 22807
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/README.md",
+      "sha256": "0b4c4f766ca4e0b11aedaf1ab91252ff3377aa5f56a9b0f1ca55857dd00b9f04",
+      "bytes": 5919
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/experiment.json",
+      "sha256": "b82732190154042ec51e8b3d0ce324cc94bd8b6353501d96a44c99b1e40b3f98",
+      "bytes": 18546
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/citation-caveman.json",
+      "sha256": "1037b037805f8ab166e7ee4829a256d9e6d8ae90d083187232fc3dea6b772626",
+      "bytes": 5181
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/citation-raw.json",
+      "sha256": "df052c452f03b4514c32f0fc14a60d2fa1120ddefbe89088b1421998c6e914bb",
+      "bytes": 5173
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/citation-rtk.json",
+      "sha256": "9e7d3abd194f8d684a9f570439c3dcf2810d7263045daf8c01fcabc4636d8d3e",
+      "bytes": 5177
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/diff-caveman.json",
+      "sha256": "bb3cfd65b086749c4bb4df3a4393f8aa5ef4c488bbb6c71770416880f3bd1655",
+      "bytes": 5108
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/diff-raw.json",
+      "sha256": "5ce4bd6890c8ea09dc41568d1e1413bb0e65340808284851ffb2831375f78c1b",
+      "bytes": 5100
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/diff-rtk.json",
+      "sha256": "cc71be83cf82dbe71dbec4f2290a140950ce67ab929e3fb8c214e4f817ef52a6",
+      "bytes": 5104
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/gate-caveman.json",
+      "sha256": "a26d72908eaa3dc6e25a173b0c102021fd136a3508ef064c77e39531eaf5b59a",
+      "bytes": 5108
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/gate-raw.json",
+      "sha256": "13001ec1694320c969431caafc2204f743aa582a3b79a366cd51013b6535136a",
+      "bytes": 5100
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/gate-rtk.json",
+      "sha256": "0e0e2f3e7e6d19e72f4946b0390f1641bb6350e3d76204bccd732e502ece1b92",
+      "bytes": 5104
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/instruction-caveman.json",
+      "sha256": "1ebcc2fcf21cf929b6fd98aba4a5618975f5d45882970f187b0c9eb0c444ff00",
+      "bytes": 5110
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/instruction-raw.json",
+      "sha256": "64bb6cac057ca0199e0dee31b94c88e73f25938b45b94618012355bbb658de27",
+      "bytes": 5102
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/instruction-rtk.json",
+      "sha256": "3047d46f13f126387608789846f751ec7a885ce32a7726a7632ef0daaecacbd1",
+      "bytes": 5106
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/json-caveman.json",
+      "sha256": "3d7c5dc397fc96ddb292ad46cea5d69ae1d3481af87d52b2b8ffcbb62782877b",
+      "bytes": 5177
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/json-raw.json",
+      "sha256": "506488aabde8b5081457e73c1af42df9f8a3813bbc52f08b0f1592b03ab1de33",
+      "bytes": 5169
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/json-rtk.json",
+      "sha256": "c7f960ab9ca61c804168bb8002b256912dd8b37671106e73ca7bb71a90b5cdcd",
+      "bytes": 5173
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/log-caveman.json",
+      "sha256": "f028392661eebe9c59945bb5b69e074ce7ed7efa88c8492e9ffa27cc8637058f",
+      "bytes": 5067
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/log-raw.json",
+      "sha256": "d2ce2071add7a5c165b86bb86a639b8bd0937e95b5034abdfc4dd31dfd14f6e6",
+      "bytes": 5059
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/log-rtk.json",
+      "sha256": "031bd19b5bc66f5857c75b993b7e0ed4c261f9f280aa747ce75d4dfb0c92880b",
+      "bytes": 5063
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/revision-caveman.json",
+      "sha256": "c67109a2562f5e2a16ae88c9471f0589e3991ed1e4f204688daed719342c7dcd",
+      "bytes": 5152
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/revision-raw.json",
+      "sha256": "8f0a98bd0f72da8ace1344ed04adc3f6021b77c9bcba916c8bfa75331248a4f6",
+      "bytes": 5144
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/revision-rtk.json",
+      "sha256": "3e0cd751f95d074ecd8fee9e6a8ea06103371452764e14be82646eafbc3c57ed",
+      "bytes": 5148
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/semantic-caveman.json",
+      "sha256": "6231c069e33d788eb703560aca6eb6878b9520ad39020a2dc1626ecb0562607a",
+      "bytes": 5171
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/semantic-raw.json",
+      "sha256": "5db7090452d1906666b61537c684e65394a67be1ba80d050d96edb760f3c66b6",
+      "bytes": 5163
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/semantic-rtk.json",
+      "sha256": "c7f1261717a5aff48695ff1c90330b26057f634f776483057fb57f51d0875009",
+      "bytes": 5167
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/freeze.json",
+      "sha256": "5d2d9215cb3d078d3789a41c7e0d1b06e297b07028da27dbb33ff5980510e595",
+      "bytes": 1017
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/pilot-calls.json",
+      "sha256": "2b0bdc1a387a205c55de0faaeddc96b4e3eb8866c5c0d1c00d2981b1115baa91",
+      "bytes": 36674
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/plan.json",
+      "sha256": "d2f2cb3319592d55a9501fab1c802783da3997d4392daeb0a03575affaba38c0",
+      "bytes": 3413
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/preview-metrics.json",
+      "sha256": "33d4cb05351b929ee7957922da7f1cc9a3728266f47d68665b8f6d28ef2b3f2c",
+      "bytes": 14162
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/promptfoo.json",
+      "sha256": "4cee95c1ca56a270d9a0d29de6915134369c37092592029d68a08fffae2fd1b8",
+      "bytes": 111072
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/calls.json",
+      "sha256": "beaf60a36253875af114a32c06932d0fe742d4316e62d588e1fe62b7a1b98def",
+      "bytes": 36945
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-caveman.json",
+      "sha256": "c914c8208371883b30f5bcb1bbf49adbd995e92ec9cd0bb317b6b27d0ed2fcd0",
+      "bytes": 5659
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-raw.json",
+      "sha256": "cf455a71c6e9fa4973fe90fbd0478a46c20d768d8b9b0a6d28f37d9859901410",
+      "bytes": 5651
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-rtk.json",
+      "sha256": "617bfb842d15520e8a0a7eb2a9582d316956f13e992501fa67027ea3fb172f2c",
+      "bytes": 5655
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-caveman.json",
+      "sha256": "bb3cfd65b086749c4bb4df3a4393f8aa5ef4c488bbb6c71770416880f3bd1655",
+      "bytes": 5108
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-raw.json",
+      "sha256": "5ce4bd6890c8ea09dc41568d1e1413bb0e65340808284851ffb2831375f78c1b",
+      "bytes": 5100
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-rtk.json",
+      "sha256": "cc71be83cf82dbe71dbec4f2290a140950ce67ab929e3fb8c214e4f817ef52a6",
+      "bytes": 5104
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-caveman.json",
+      "sha256": "30d8f6b2ded60465131cf3a86479040a0093af39e64d5ce2c72288ffafd7ed65",
+      "bytes": 5660
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-raw.json",
+      "sha256": "b4dfb3dc08e2883a5dd53205db26d18b68736e8f50f467b7162ea3ebf857a393",
+      "bytes": 5652
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-rtk.json",
+      "sha256": "454126d72e88a4df04351f4a3e7a2b838043e4c982d1457eeb7b86d8e57ff69c",
+      "bytes": 5656
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-caveman.json",
+      "sha256": "6e48553d48331d805ffd48c32421e15358d2298c50705c391b0ef9a5ea04cd8f",
+      "bytes": 5662
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-raw.json",
+      "sha256": "4e84ce0fbf11e9805ce047f33ff8469036df92b3dca8dfc2ceb141b117037a79",
+      "bytes": 5654
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-rtk.json",
+      "sha256": "7e5b715aca4e8d5a4809fbf14930df23f3ae8be19b38498c3a5d0169baa5bd77",
+      "bytes": 5658
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-caveman.json",
+      "sha256": "1dd97b6c7cfafb5b3fd2a9c57295add9f70dd4d7ee1a531c0c0ca705b871982b",
+      "bytes": 5103
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-raw.json",
+      "sha256": "8108a177b599c0771e5b0a2c7441f9603968668da158d409c328c50c4fb4634f",
+      "bytes": 5095
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-rtk.json",
+      "sha256": "33b79b2c874ddf785e16ead1f796e2ab9e4b0260eef2292f92fcb24a71052adf",
+      "bytes": 5099
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-caveman.json",
+      "sha256": "f028392661eebe9c59945bb5b69e074ce7ed7efa88c8492e9ffa27cc8637058f",
+      "bytes": 5067
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-raw.json",
+      "sha256": "d2ce2071add7a5c165b86bb86a639b8bd0937e95b5034abdfc4dd31dfd14f6e6",
+      "bytes": 5059
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-rtk.json",
+      "sha256": "031bd19b5bc66f5857c75b993b7e0ed4c261f9f280aa747ce75d4dfb0c92880b",
+      "bytes": 5063
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-caveman.json",
+      "sha256": "c67109a2562f5e2a16ae88c9471f0589e3991ed1e4f204688daed719342c7dcd",
+      "bytes": 5152
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-raw.json",
+      "sha256": "8f0a98bd0f72da8ace1344ed04adc3f6021b77c9bcba916c8bfa75331248a4f6",
+      "bytes": 5144
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-rtk.json",
+      "sha256": "3e0cd751f95d074ecd8fee9e6a8ea06103371452764e14be82646eafbc3c57ed",
+      "bytes": 5148
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-caveman.json",
+      "sha256": "aa73b97b984bce4998ed126867d0e856532872494a0a19aa4dd830a88947636c",
+      "bytes": 5649
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-raw.json",
+      "sha256": "1bf02693f4bfeb32dc37c0cca445917ef36e6737065208e88ae1f27c66fecb25",
+      "bytes": 5641
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-rtk.json",
+      "sha256": "4c6b00015557b14111d4fd270bb143ece5b6533673ed5cc68f1f91442c57ea40",
+      "bytes": 5645
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/freeze.json",
+      "sha256": "a3cec1a999bef3657b026991cb219fba3e1cb339b91acb9c1f93a1656466698d",
+      "bytes": 937
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/plan.json",
+      "sha256": "54a48aad3c15298d58d06de148e4023d3a1205776c6cc095d6461fecc1df25b6",
+      "bytes": 3449
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/preview-metrics.json",
+      "sha256": "ae49f26a5f805e8c801513a7e4f49417ba205800707e2bbbcc22eaaf5d2b6e39",
+      "bytes": 15410
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/promptfoo.json",
+      "sha256": "0b596a115a7ef7941ecc8094154250c5680b3bca80be052b57b5606c825f5c7d",
+      "bytes": 127583
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/receipt.json",
+      "sha256": "16bc710317b371cc61a1442453af1a489419cee3d422d3130fbedbf6f8fd9f1e",
+      "bytes": 6533
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/calls.json",
+      "sha256": "a41e70cddd159c8c4c4cb21cbf6581452bf5bcdd42b36cad03f8376074553b8d",
+      "bytes": 47313
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/freeze.json",
+      "sha256": "f059ababd41653bc9ec145042646039d80835fe6c783ec77e60d9b4e980a9af4",
+      "bytes": 6301
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/plan.json",
+      "sha256": "0b1cacddcb97e94a8adc8e0ee1cb686b42889ee6482c8efc8883cd70298de312",
+      "bytes": 4174
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/preview-metrics.json",
+      "sha256": "c2432532cb2c9d7c0f6fa01e695f612482945b827e5eceeba463a44df193c996",
+      "bytes": 27346
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/promptfoo.json",
+      "sha256": "cf5c556a784fa56fed6af38693c917a0d46fddf8ff39964db57eca03a6158feb",
+      "bytes": 23407
     },
     {
       "path": "evidence/artifacts/gh-upstream-qualification-20261002/qualification.json",
@@ -55173,8 +55533,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "a5c26d2b99ed0b4477bce66fbe3ab2c2b1baa7617fa9c945272ed7bd21787a2a",
-      "bytes": 310454
+      "sha256": "81f5cb825e800bf97215e83aeacaf48c81fcb62fc8c9f6e3edb4dd726fcd0ecd",
+      "bytes": 324693
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -55653,8 +56013,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "d1d7dc71b3bd6cc3227a970347f950ef64e192cd12a0ccb4d71aa80daa71ba2a",
-      "bytes": 172184
+      "sha256": "b854d6ed6df8428c0c1d7de61abb75fe2226ab0321ae4193a98058bc68017b04",
+      "bytes": 177258
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -56234,6 +56594,7 @@
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
     "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json",
     "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json",
-    "evidence/artifacts/sota-finalization-20260930/convergence.json"
+    "evidence/artifacts/sota-finalization-20260930/convergence.json",
+    "evidence/artifacts/gateway-token-feature-evaluation-20261005/experiment.json"
   ]
 }
