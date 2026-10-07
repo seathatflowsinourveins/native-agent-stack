@@ -53247,6 +53247,11 @@
       "bytes": 30178
     },
     {
+      "path": "evidence/receipts/worker-gateway-v2-diagnostics-20261007.json",
+      "sha256": "e7712f8bd8515869197cbf06a74160d1d0034573d0ac09b9a586b69ec04d740f",
+      "bytes": 1999
+    },
+    {
       "path": "evidence/receipts/worktrunk-list.json",
       "sha256": "ba277663d33930ff5e65623525a86686c2b108fb0346bc4593c43b01570ebb6c",
       "bytes": 547
@@ -53628,8 +53633,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "82afaca801673d140f72e5c7b7c98f584e73268695c157e6d6b0db87cd2afd60",
-      "bytes": 42795
+      "sha256": "98d77d14e92a565d98939d3c8ca4603f16dd2bb56ce25a08d3e23817f94573d2",
+      "bytes": 43240
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
@@ -54928,8 +54933,8 @@
     },
     {
       "path": "tests/test_gateway_worker_defaults.py",
-      "sha256": "14ee42cef4242cfa6bdea874a8e3c9050a9621e7f147257d26e7419e3b09ac9e",
-      "bytes": 30290
+      "sha256": "c70355efe9d7629b82455c44f0cd92e0a0422e4519a289ac9c782e78549250a8",
+      "bytes": 31520
     },
     {
       "path": "tests/test_gitleaks_config.py",
