@@ -16473,8 +16473,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "74b65f1acb6712c431c8b0e7d5c5261efdff75e51a3952f9558db326526c1c6f",
-      "bytes": 15681
+      "sha256": "8c2187a3c721fac2441d60df8fb5a9d902b1beaf93cb9e2891464300b7b826b0",
+      "bytes": 16186
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -16495,6 +16495,11 @@
       "path": "catalogs/foundation/manifest.json",
       "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
       "bytes": 29964
+    },
+    {
+      "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+      "sha256": "39bfffa1aaa476e1986d9d86a17b6f78b32e0daa626569a4a0a062ad4f481811",
+      "bytes": 28907
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -16833,8 +16838,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "15bcf02837853bad02026d7ff31395fa71e51a8be659e47cc4c6832620b81fe9",
-      "bytes": 758875
+      "sha256": "a518e665434de59659414ff03ddb26abf744656809ac5d82222dcb7b5a306a6e",
+      "bytes": 765056
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17670,6 +17675,11 @@
       "path": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
       "sha256": "396ad0e762f863854c36db4d971730ec21ce26c9462892428898aea8aa8c200a",
       "bytes": 16404
+    },
+    {
+      "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+      "sha256": "e0643296a061ca8f368af2e1b9a9f1e25bada2af96991d54ef41f43016594680",
+      "bytes": 11070
     },
     {
       "path": "docs/direct-results.md",
@@ -37330,6 +37340,11 @@
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/upstream-release-observation.json",
       "sha256": "d7a07aff13bad911dec59bc2a3c47f6dea57be792f30bbad45183b61bb6ada98",
       "bytes": 4187
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-stacks-20261007/review.json",
+      "sha256": "d398c747d4c36e6df97b798568ae1a183a50728ce44fcdb3227fe9719f9e4575",
+      "bytes": 25364
     },
     {
       "path": "evidence/artifacts/memory-stack-20260925/README.md",
