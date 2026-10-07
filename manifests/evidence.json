@@ -17737,8 +17737,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "de47afd8a928d2c9acdd74cb63c78a24b6b56975ce9af249d428f6ee74161c43",
-      "bytes": 231037
+      "sha256": "ec2968ae16966f7f170672c033ed3b3df75f2d08a2e5890f09ad61922888a1a3",
+      "bytes": 231840
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -38639,6 +38639,11 @@
       "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
       "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2",
       "bytes": 2466
+    },
+    {
+      "path": "evidence/artifacts/native-startup-snapshots-20261006/receipt.json",
+      "sha256": "2a086ec9362f1d1a0de393ed9f7886fd5afafd61804b177700d1067098ab46c5",
+      "bytes": 3846
     },
     {
       "path": "evidence/artifacts/native-terminal-profiles-20260920/native-processes.txt",
