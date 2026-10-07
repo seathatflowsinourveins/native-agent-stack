@@ -16,13 +16,17 @@ Work from the root of the worktree that holds the change
 (`git rev-parse --show-toplevel`). Run the checks one at a time at `nice -n 19`
 so they yield to other work on the host.
 
+Prefix Python checks with `PYTHONDONTWRITEBYTECODE=1` as well as `-B` so
+child Python processes inherit the bytecode-write prohibition. See the
+[Python 3.13 environment-variable documentation](https://docs.python.org/3.13/using/cmdline.html#envvar-PYTHONDONTWRITEBYTECODE).
+
 ## Checks
 
 1. Repository validator for the covered change. `AGENTS.md:21` requires it
    for evidence and manifests; this skill also runs it for code changes:
 
    ```sh
-   nice -n 19 python3 -B scripts/validate.py
+   PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -B scripts/validate.py
    ```
 
 2. Convergence record, when the change adds a new convergence claim
@@ -32,7 +36,7 @@ so they yield to other work on the host.
    change carries:
 
    ```sh
-   nice -n 19 python3 -B scripts/validate_convergence.py <scoped-record-path>
+   PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -B scripts/validate_convergence.py <scoped-record-path>
    ```
 
    The check is offline consistency of what the record declares, not proof
@@ -45,7 +49,7 @@ so they yield to other work on the host.
    exists:
 
    ```sh
-   nice -n 19 python3 -B -m unittest <test-module-or-class> [...]
+   PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -B -m unittest <test-module-or-class> [...]
    ```
 
    When no existing test covers a touched path, report the gap instead of
@@ -73,8 +77,8 @@ Then list each check not run and why.
 
 ```text
 verify at <short HEAD> in <worktree root>
-nice -n 19 python3 -B scripts/validate.py -> exit 0
-nice -n 19 python3 -B -m unittest <module> -> exit 1: FAIL <test id>: <first error line>
+PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -B scripts/validate.py -> exit 0
+PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -B -m unittest <module> -> exit 1: FAIL <test id>: <first error line>
 not run: validate_convergence.py (no new convergence claim)
 ```
 
