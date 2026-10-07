@@ -284,3 +284,14 @@ The models, effort, role abilities, sandbox inheritance and seven RTK exceptions
 | --- | --- |
 | `stack-researcher.toml` | `9578c60c279d1e319935ba2ab25e4157176446a1a7011df94a6a81c51e0ad3d3` |
 | `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |
+
+## 2026-10-07: canonical graph key and approved four-byte trim bindings
+
+This current binding supersedes the earlier carrier hash inventory; no new role or installer is needed.
+
+SERVER-KEY142046Z and RENAME-PR150457Z bind current registration names to `codebase-memory-mcp`, preserving every main registration and package owner. Q26 item144733Z separately approves removing the redundant four-byte ` too` after the explicit git-C example. The native `codex_roles.f4_block()` supplies only the updated local exception fragment; role models, effort, sandbox inheritance, descriptions and outer instructions remain. No new role or installer is needed. Earlier bindings are historical snapshots and remain unchanged. These current source hashes are structural evidence, not new role/model execution or a host apply.
+
+| File | SHA-256 |
+| --- | --- |
+| `stack-researcher.toml` | `55966d512c0c1d05782c1a8b4eb48c2ee49996949bd3dbcb973e00a41b8dd227` |
+| `stack-verifier.toml` | `8b5c4e50299ef9af7839842b9ba23d98c19d1f8ab2c5e1090a550b83d3791946` |

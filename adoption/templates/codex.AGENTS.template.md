@@ -39,7 +39,7 @@ When you tell the user a time, give it first in the host's local time zone (read
 RTK prefix/output/exit exceptions:
 rtk 0.51.0 needs `--shell` for positional expansion; explicit `rtk` prefix bypasses exclusions. For the forms below use native commands or `rtk proxy <command>`:
 - A skill's `SKILL.md`: read it with plain `sed -n '1,400p' <path>` (no `rtk` prefix, not `cat`/`head`/`tail`) so Codex counts the load as `codex.skill.injected`.
-- `git show REV:path` (any; `git -C DIR show REV:path` too): ~8 KiB cap.
+- `git show REV:path` (any; `git -C DIR show REV:path`): ~8 KiB cap.
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 - `git branch`: may mark other-worktree branches remote-only.
 - `git log` full: silent 10-commit cap; no merges.

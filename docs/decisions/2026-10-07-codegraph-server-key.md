@@ -41,3 +41,7 @@ assertions remain unchanged. Its dependent copies use the repository's native
 fragment renderer. Source qualification is distinct from a host edit, live MCP
 call or provider acceptance; the host instruction edit remains the command
 center's operation.
+
+## Q26 source projection
+
+After the separate approved trim and native dependent-copy rendering, measurements are 8,076 compact bytes, 9,142 rendered bytes and 20,101 aggregate startup bytes. The ceiling remains20,103. All ten role copies preserve every non-developer field and all developer text outside the native F4 fragment. These are native repository source comparisons; no host file or live client was changed.
