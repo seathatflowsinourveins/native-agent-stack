@@ -714,7 +714,7 @@
           "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
           "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
           "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
-          "pin_source": "manifests/stack.json:2099",
+          "pin_source": "manifests/stack.json:2088",
           "install": {"command": "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
           "acceptance": {"command": "an embeddings request to the vLLM service with the recipe's request body; the receipt records identical embeddings and identical top-10 code-index results after the switch to vLLM 0.30.0", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
           "upstream_currency": {"latest_release": "model revision c0c9fea9 (last modified 2026-08-27) is the current head of the model repository", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"}

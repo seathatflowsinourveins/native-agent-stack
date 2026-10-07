@@ -190,8 +190,8 @@
   {
    "key": "claude:env:CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-runtime-sdk/tests/test_worker.py:73 names it",
-   "source": "examples/claude-runtime-sdk/tests/test_worker.py:73",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-runtime-sdk/tests/test_worker.py:75 names it",
+   "source": "examples/claude-runtime-sdk/tests/test_worker.py:75",
    "carrier": null,
    "value": null,
    "scope": null,

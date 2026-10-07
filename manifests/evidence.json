@@ -4997,8 +4997,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "d41ec5c475b60f24a4bea8fe1ffa9de9fc19e0203b6cc7a5fcdb5d4422e97724",
-      "bytes": 68923
+      "sha256": "fb74faedb9c52bc375a33a119e80a8433ecddfdc9a82a9d5261521ef1795bd80",
+      "bytes": 69213
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5111,6 +5111,11 @@
       "bytes": 20038
     },
     {
+      "path": "adoption/mcp/claude-user.json",
+      "sha256": "ba633108732e65149dfa1439bac5594a6306ebf6c20284acc357150c1852d0b8",
+      "bytes": 7805
+    },
+    {
       "path": "adoption/new-wsl-profile.json",
       "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
       "bytes": 260542
@@ -5197,13 +5202,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "1f3b29db1d2585b548a8595dd25b7ab3c7a2ff33af7e9f9a2ba750c3b0452174",
-      "bytes": 30164
+      "sha256": "6ef7140eab6ca92485aeda946362fec655385a22b651a6f34e026961688e8ed5",
+      "bytes": 30359
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "d7f026a3480e71374f25c33a92d3b0c4b30c1717846f74d0c3038872ad6d5870",
-      "bytes": 65911
+      "sha256": "a840ee74dfd23efb640bc19d00a4d0b75781a2b9fe01c37039a7216e0b0243f1",
+      "bytes": 66120
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -5267,7 +5272,7 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
+      "sha256": "22c63a470891feb957e595fea65b7c02592df108e1bc567f1297783fb27985ba",
       "bytes": 19129
     },
     {
@@ -5291,6 +5296,11 @@
       "bytes": 2953
     },
     {
+      "path": "adoption/templates/systemd/mineru.service",
+      "sha256": "f1d5722d8e8049b78ffa5f5f71208d95e53cd9bfe2251ac0588e47d549c5e51e",
+      "bytes": 2316
+    },
+    {
       "path": "adoption/templates/systemd/omniroute-fw.service",
       "sha256": "a81772106fd2ed2be213679c683f002f1ac0b0b3a27ac68093508aa2ebb0aef5",
       "bytes": 5935
@@ -5302,8 +5312,8 @@
     },
     {
       "path": "adoption/templates/systemd/stack-currency.service",
-      "sha256": "4d42e82fecc6ab262091c4205844e17424dc87e208588f64593e7c95f78e35a0",
-      "bytes": 3959
+      "sha256": "8f18dbeb150cb9eff24994472c8d8b4f5a0c4ff6b8ea23349dda593f7497137f",
+      "bytes": 4862
     },
     {
       "path": "adoption/templates/systemd/token-report-refresh.service",
@@ -10333,7 +10343,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/config/mcp.template.json",
-      "sha256": "7e452b37fa45c7d3cd653a7e43bc99ccc07168b2bd7bbdf1ca1467b1309a6a53",
+      "sha256": "a2f84832924afd5846ead63e96d187ce6269f0dafda4df3407685371b79f9609",
       "bytes": 3059
     },
     {
@@ -16532,8 +16542,18 @@
       "bytes": 105311
     },
     {
+      "path": "catalogs/foundation/model-currency.json",
+      "sha256": "8fd235096256010af2704c9c68e4c15d2d2dd7e83dce6331bbad528b27526e60",
+      "bytes": 34044
+    },
+    {
+      "path": "catalogs/foundation/model-currency.schema.json",
+      "sha256": "d7d830f80078db3ba33409a5fde55fe8fc2af45bb7ae5418ca19ea1cc4a231e1",
+      "bytes": 9709
+    },
+    {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "3e7ed13abe936888be7d77bd48dc286870a3474790e957440fd4799a057d9ba1",
+      "sha256": "a812b3c556005b9b1f42b482f28c4ab98bf787d4e040e3553408eb8117577a0e",
       "bytes": 326276
     },
     {
@@ -16558,7 +16578,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "6919a459b1bae8eda280d5d15bad8e4c55b14715e582c425fee347f0f34e8f6b",
+      "sha256": "ce6441dbbe6b455d685b8a705de959d1fa6ad3b3258a362f2aca61f16591bbc4",
       "bytes": 159863
     },
     {
@@ -17737,6 +17757,11 @@
       "bytes": 11070
     },
     {
+      "path": "docs/decisions/2026-10-07-model-currency-enforcement.md",
+      "sha256": "b1454ff36b35030f12ad7d853386bf8b0e92b52f7e509251870ab10c75e05335",
+      "bytes": 18041
+    },
+    {
       "path": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
       "sha256": "101b0547f548c16ef4c7b964a3742c01cdba57350375fa846f6beba5939145c5",
       "bytes": 6595
@@ -17937,6 +17962,11 @@
       "bytes": 8539
     },
     {
+      "path": "docs/model-currency.md",
+      "sha256": "6ff91f2c3d3f883214c60ef348db703cd10dc485c4da3247ffd018edebfc2811",
+      "bytes": 9451
+    },
+    {
       "path": "docs/native-dashboard-data.md",
       "sha256": "3f190f7532d8bfdfbad85b6aa119adc60f763cda45361f237cbbe6f5a1c30f8e",
       "bytes": 19574
@@ -18008,12 +18038,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "758b36948d8699748fd46898c2faa8110e21c510049acda09ed724c6da5ea31d",
+      "sha256": "a42c89153ce6b91da53699342caa75217e3efacdda565c0ce6648f2298345467",
       "bytes": 692584
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "9e6ba859ad493710f1ac881f7692040f0230d89bfef402c82d0957d01098d130",
+      "sha256": "a1a0cb17fb9df414c02577d04fd3f120f7ee59447bc89ace44bf2f662180d19c",
       "bytes": 368585
     },
     {
@@ -37537,6 +37567,41 @@
       "bytes": 12897
     },
     {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/checks.json",
+      "sha256": "2d789eb233000fac56764b7eb6fb2696e46ec617b4d0cd025e009e573e81cbd8",
+      "bytes": 7741
+    },
+    {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/ci826-repair.json",
+      "sha256": "035866d6f52c26d7d0ea73cb67b41ac034f39f0352350efd7b5ff0849dec83d6",
+      "bytes": 6373
+    },
+    {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/fill-checks.json",
+      "sha256": "875a1727b7c50f8a03506b01157f26af2f30fb05306e5c18b369d1e025f7232c",
+      "bytes": 6374
+    },
+    {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/fill-source-review.json",
+      "sha256": "a2311337948337fc03393a27463ed11b2624904ffc4224336685d966e3bdef7e",
+      "bytes": 28346
+    },
+    {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/handbook-projection-landing-prep-20261007T113834Z.json",
+      "sha256": "d519f4c77d0c86bc50012830ac642568f9801c86fd97b35f38c07f7879308f41",
+      "bytes": 1563
+    },
+    {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/handbook-projection.json",
+      "sha256": "1175705fe0bde64181217733f384f64036b1f648664abe5913ca75c9a57d336e",
+      "bytes": 2212
+    },
+    {
+      "path": "evidence/artifacts/model-currency-enforcement-20261007/j826-checks.json",
+      "sha256": "e187cd3bfdda7c765cea796e4ba76693c3279745afe7892a23a6963cffbd94f8",
+      "bytes": 6392
+    },
+    {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
       "bytes": 10460
@@ -54173,8 +54238,8 @@
     },
     {
       "path": "examples/ai-memory-config.toml.example",
-      "sha256": "e2bf451070061ab0deb7d116e1f5920cc60bcd56df674c56a94df7dbc05b99b6",
-      "bytes": 578
+      "sha256": "9dd95c64691f1f2933ca07a009ba9ed715484c6be43b336f9f2c8c177ee701ec",
+      "bytes": 884
     },
     {
       "path": "examples/ai-memory-project.toml.example",
@@ -54313,8 +54378,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/README.md",
-      "sha256": "abb5622dd2fa9dd6a3c4c0c36aab6170bc9df694a7e006ec434a2f58212ff885",
-      "bytes": 10259
+      "sha256": "818c0db76cd709aee8788e007eae6826028d4a7d0ca7337d0a4ad2c3a4f8dc80",
+      "bytes": 11259
     },
     {
       "path": "examples/claude-runtime-sdk/tests/check_controls.py",
@@ -54323,8 +54388,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/tests/test_worker.py",
-      "sha256": "282de47c359375d6fcfbb756ff30c4a52dcf6756236b4e532124f64043685990",
-      "bytes": 18987
+      "sha256": "b0f64cf0022c3a070e5e5e971541c3f3054297bb06e67cc81d344900b2ab4b80",
+      "bytes": 19535
     },
     {
       "path": "examples/claude-runtime-sdk/verification.md",
@@ -54333,8 +54398,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/worker.py",
-      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155",
-      "bytes": 19889
+      "sha256": "5e66c0bed0aea3d6aee3d927d141beb50ebc809866087f2a878a749ed009c234",
+      "bytes": 19873
     },
     {
       "path": "examples/claude-runtime-sdk/worker.py.lock",
@@ -54668,8 +54733,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "cbc65770d505fcc1253aa270db6d9930d884c9b22abeb34de450405b670c21a3",
-      "bytes": 106396
+      "sha256": "d587d733155218b2d9bf4337caa7b71e7c9950ec27e276b42112c26af302ee9f",
+      "bytes": 127581
     },
     {
       "path": "observability/README.md",
@@ -54977,6 +55042,11 @@
       "bytes": 39979
     },
     {
+      "path": "recipes/mineru-local-service.md",
+      "sha256": "13a54d2aaa80ee6b8cd3b093ed2853527b4fdf336e7e1e7704d8a43c91ff0b33",
+      "bytes": 8412
+    },
+    {
       "path": "recipes/native-upgrades-20260921.md",
       "sha256": "6fe32c4ad23d7dfb56794fdae88e9a57334d9b7e0ec8c44a9c3286d604605859",
       "bytes": 6586
@@ -55043,8 +55113,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "b948678e659f6eb653395aedad38990b8db40a476cabaa855e608521a62acf2e",
-      "bytes": 52517
+      "sha256": "531456ba6379750c9282bdfc4277b53d7170c8e16e57eb778740bab023d793b6",
+      "bytes": 70854
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -55138,8 +55208,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
-      "bytes": 26751
+      "sha256": "9086d7c9dd5abcf2fe0a67c090de7287a74851edb1a5486ca3c1e93b954df0d2",
+      "bytes": 37667
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -55982,6 +56052,21 @@
       "bytes": 55929
     },
     {
+      "path": "tests/test_mineru_user_unit.py",
+      "sha256": "d00e8dd98871c0d1bd5cb971e2915c946f9dd10b1b35dcb984ab4d2fbc5ce5d0",
+      "bytes": 5451
+    },
+    {
+      "path": "tests/test_model_currency.py",
+      "sha256": "4de783b440bebd4d6cbf1d536284751c622eebd9fb17ac73b3395a0919bf70bb",
+      "bytes": 16599
+    },
+    {
+      "path": "tests/test_model_currency_propose.py",
+      "sha256": "8695d7b69652cef3eca20369eac5c4dd1de60ec1f91f78353dcaa7fdf0a2efc6",
+      "bytes": 17767
+    },
+    {
       "path": "tests/test_mover_coverage_asof.py",
       "sha256": "16e0096068470fe720b0f3cf714f614224daf1aa6d708871af928dacf99613d3",
       "bytes": 59843
@@ -56083,8 +56168,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "7a151c05cccf4a0b0f96ae27302497be6035850fbe0272c35a3438a58d5ab0b9",
-      "bytes": 104637
+      "sha256": "ab5a13761315dfc0d01cc683e152f3e32d6f996ce2b016535396692cb0adba9b",
+      "bytes": 104689
     },
     {
       "path": "tests/test_new_wsl_profile.py",
