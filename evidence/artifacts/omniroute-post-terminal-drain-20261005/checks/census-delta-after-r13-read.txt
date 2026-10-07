@@ -1,4 +1,4 @@
-# The complete diff of the window census between the head that the read r13 read (ec4b489d9; superseded/window-census-r20.py.txt, sha256 385e6dddb4fdd3195a4864f2488861609ee3c2b09d49a697225d0551403ffd2e) and this head (scripts/window-census.py.txt, sha256 90d5ceeb09fddfe67699dc4f1c60fc1b844c1f5a7b63c6d45f3f2dc9b57a88c5), as `diff -u` with one line of context. Nothing else of the census differs.
+# The complete diff of the window census between the head that the read r13 read (ec4b489d9; superseded/window-census-r20.py.txt, sha256 385e6dddb4fdd3195a4864f2488861609ee3c2b09d49a697225d0551403ffd2e) and this head (scripts/window-census.py.txt, sha256 2ec9a6498e1ae8c8c57007be7a62ee7b161e9df7777331144701a3a5a1e73cbd), as `diff -u` with one line of context. Nothing else of the census differs.
 # The causes: the command center's GPT read of ec4b489d9 (P1: every inbound request line since the serving process's start needs its own call row of its path, whatever its lead over the duration clock, and the journal must reach the start: the former residual J22e is INCONCLUSIVE; P2: a run on a fixture root or on shimmed host programs says `scope=canary-fixture` or `scope=trial-fixture`, never the accepting `scope=canary`), the listener's own startup lines that the coverage rule needs, and the labels of the untested boundary. The controls are J36-J39, X6 and X7 (J22e and J22f changed). Since the push of 115b885ba the same diff also holds the changes that answer 5f's read r14 (J38j, J46a-J47k): their own diff is checks/census-delta-after-r14-read.txt.
 
 --- superseded/window-census-r20.py.txt
@@ -438,7 +438,7 @@
 +                "(the command center's ruling J757-R17-FIX)")
 +    else:
 +        return ""
-+    if grammar.fullmatch(line) and (kind != "IDENTITY" or len(IDENTITY_COUNTER.findall(line)) == 1):   # an IDENTITY line may name pending_total once (a value such as running_prefix=pending_total=7 would otherwise hide a second reading)
++    if grammar.fullmatch(line) and (kind != "IDENTITY" or (len(IDENTITY_COUNTER.findall(line)) == 1 and not activity_values(line))):   # an IDENTITY line may name pending_total once (a value such as running_prefix=pending_total=7 would otherwise hide a second reading) and carries no activity field at all (its \S+ values could hide one: running_prefix=workers=2; 5f's bounded delta check r19)
 +        return ""
 +    return (f"the {kind} line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fail-closed): {stripped[:140]!r} "
 +            "(the command center's ruling J757-R17-FIX)")

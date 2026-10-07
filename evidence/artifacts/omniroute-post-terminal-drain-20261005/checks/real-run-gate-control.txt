@@ -6,7 +6,7 @@
 #     (the reviewer's reproduction G9a printed `REAL-RUN-GATE clean` and exited 0 with ACCEPT_TEST_N_TWO_PRE=1 exported). Raw output of the three runs follows; the control writes the home directory as $HOME itself.
 
 ## (1) gate = none (the state at 4624137)
-# real-run-gate-control: run 2026-10-07T19:47:37Z; wrapper run-acceptance-20261006.sh git blob edefc1db6d6756dbb81811a4dc37abb2ccb35ea1 sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d; gate under test: none (the state before the gate)
+# real-run-gate-control: run 2026-10-07T21:55:39Z; wrapper run-acceptance-20261006.sh git blob edefc1db6d6756dbb81811a4dc37abb2ccb35ea1 sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d; gate under test: none (the state before the gate)
 == Part 1: the frozen wrapper's own lines from FROZEN_LIVE= through N_TWO_PRE=, evaluated per kind
    lines 27-60 of the wrapper, sha256 ffe5889f594fd3035ed00ac78efedb45d191ba064272e69a564f123ac52ec306
    kind=precontrol env=none: PRE=1 N_TWO_PRE=4 N_TWO=8 N_RACE=6 EXPECT=observe
@@ -55,10 +55,10 @@
    G9c the listing command lists the real environment (no ACCEPT_TEST_ name in it) and then exits 3: exit=0 (required 1, printing "could not be enumerated", never printing "REAL-RUN-GATE clean") -> NOT AS REQUIRED
    G9d a pass-through listing command first on PATH (positive control for G9a-G9c): exit=0 (required 0, printing "REAL-RUN-GATE clean") -> NOT AS REQUIRED
 gate cases not as required: 30
-scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate-control-gPfUqm
+scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate-control-VEnaE7
 
 ## (2) gate = scripts/real-run-gate.sh.txt
-# real-run-gate-control: run 2026-10-07T19:47:38Z; wrapper run-acceptance-20261006.sh git blob edefc1db6d6756dbb81811a4dc37abb2ccb35ea1 sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d; gate under test: real-run-gate-20261006.sh git blob dfdeff3518ccd957dcdf2cc83215635649f01e37 sha256 7d963114f9a1e2a4e7c4174b9a1dcda1eb66e650a96b61989e57faea1a307e71
+# real-run-gate-control: run 2026-10-07T21:55:40Z; wrapper run-acceptance-20261006.sh git blob edefc1db6d6756dbb81811a4dc37abb2ccb35ea1 sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d; gate under test: real-run-gate-20261006.sh git blob dfdeff3518ccd957dcdf2cc83215635649f01e37 sha256 7d963114f9a1e2a4e7c4174b9a1dcda1eb66e650a96b61989e57faea1a307e71
 == Part 1: the frozen wrapper's own lines from FROZEN_LIVE= through N_TWO_PRE=, evaluated per kind
    lines 27-60 of the wrapper, sha256 ffe5889f594fd3035ed00ac78efedb45d191ba064272e69a564f123ac52ec306
    kind=precontrol env=none: PRE=1 N_TWO_PRE=4 N_TWO=8 N_RACE=6 EXPECT=observe
@@ -137,10 +137,10 @@ scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate
    G9d a pass-through listing command first on PATH (positive control for G9a-G9c): exit=0 (required 0, printing "REAL-RUN-GATE clean") -> as required
       | REAL-RUN-GATE clean: no ACCEPT_TEST_ variable in the environment, and run-acceptance-20261006.sh has the expected sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
 gate cases not as required: 0
-scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate-control-h1Gdvr
+scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate-control-5ipeeO
 
 ## (3) gate = the gate as the read r13 read it (ec4b489d9)
-# real-run-gate-control: run 2026-10-07T19:47:38Z; wrapper run-acceptance-20261006.sh git blob edefc1db6d6756dbb81811a4dc37abb2ccb35ea1 sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d; gate under test: real-run-gate-before-20261006.sh git blob acd7f84b694ff96aace24eadfd720b38f7c5157c sha256 e2a0520e535c8dd0df92ffbe68f1328c13b770b64db4a3211107fc4a3498789b
+# real-run-gate-control: run 2026-10-07T21:55:40Z; wrapper run-acceptance-20261006.sh git blob edefc1db6d6756dbb81811a4dc37abb2ccb35ea1 sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d; gate under test: real-run-gate-before-20261006.sh git blob acd7f84b694ff96aace24eadfd720b38f7c5157c sha256 e2a0520e535c8dd0df92ffbe68f1328c13b770b64db4a3211107fc4a3498789b
 == Part 1: the frozen wrapper's own lines from FROZEN_LIVE= through N_TWO_PRE=, evaluated per kind
    lines 27-60 of the wrapper, sha256 ffe5889f594fd3035ed00ac78efedb45d191ba064272e69a564f123ac52ec306
    kind=precontrol env=none: PRE=1 N_TWO_PRE=4 N_TWO=8 N_RACE=6 EXPECT=observe
@@ -219,4 +219,4 @@ scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate
    G9d a pass-through listing command first on PATH (positive control for G9a-G9c): exit=0 (required 0, printing "REAL-RUN-GATE clean") -> as required
       | REAL-RUN-GATE clean: no ACCEPT_TEST_ variable in the environment, and run-acceptance-20261006.sh has the expected sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
 gate cases not as required: 3
-scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate-control-VxZpzi
+scratch directory (remove with rm -rf after reading): $HOME/.cache/real-run-gate-control-xQlSAY

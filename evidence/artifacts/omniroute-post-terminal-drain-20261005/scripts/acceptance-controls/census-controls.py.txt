@@ -27,6 +27,8 @@ Added after 5f's delta check r17 of e5c8a7fd and the command center's ruling J75
 every world that PASSes on r29 PASSed on r28, r27 and r26): G17r-G17y, G18a-G18l; the expectations of G17i and G17m change from PASS to INCONCLUSIVE (r28 read those lines by name).
 Added after the command center's RULING-757-R19 (5f's FINAL delta check r18 of 6b5e929e found one P1: the IDENTITY line's pending_total is the same counter that INFO reads before and after the observation, and the census r29 kept only MainPID and ExecMainStartTimestamp from the IDENTITY line, so `IDENTITY pending_total=0` followed by `INFO 1 1 False` PASSed;
 the census r30 keeps the IDENTITY counter, requires the native IDENTITY line when it carries one, reconciles the three readings, and needs exactly one INFO line at canary scope; every world that PASSes on r30 PASSed on r29): G19a-G19n. The guard writer of the fixtures now writes the guard's own quiet INFO line by default (see write_guard).
+Added after 5f's bounded delta check r19 of 9db475cf4 (ONE P1 inside the diff of RULING-757-R19; the command center's RULING-757-R20: one condition and four controls): the non-space values of the guard's native IDENTITY line could hide an activity field, `running_prefix=workers=2`, which r29 refused as a line that carries
+an activity field and r30 accepted at scope=canary; the census r31 refuses an IDENTITY line that carries any activity field; every world that PASSes on r31 PASSed on r29): G20a-G20d.
 Exit status 0 when every scenario behaved as expected."""
 import argparse
 import math
@@ -779,6 +781,19 @@ def main():
     SHORT_ID = "   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok"   # the identity line of the earlier fixtures: no counter
     scenario("G19m", "RULING-757-R19 made fail-closed, canary scope: an IDENTITY line that gives no pending_total (the short line of the earlier fixtures; a receipt could omit the counter that the gate reconciles with the INFO readings): INCONCLUSIVE", mutate=canary_g(identity_line=SHORT_ID), extra=CANARY, want=2, must=["gives no native pending_total", "scope=canary"])
     scenario("G19n", "trial scope: the same short IDENTITY line (no pending_total): PASS (the requirement is the canary gate's; a trial is not canary acceptance)", mutate=g(identity_line=SHORT_ID), want=0, must=["CENSUS-RESULT PASS", "scope=trial"])
+    # ---- round 31 (RULING-757-R20 after 5f's bounded delta check r19 of 9db475cf4, one P1 inside the diff of RULING-757-R19): the non-space values of the guard's native IDENTITY line must not hide an activity field (r29 refused such a line as a line that carries an activity field; r30 let the native pattern accept it)
+    quiet0 = info17.format(b=0, a=0, c=False)
+    RP = "running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167"
+    HID = "IDENTITY line of the idle receipt " + GR
+
+    def hidden(embedded):   # the native IDENTITY line (pending_total=0) whose running_prefix value is replaced by text that carries one activity field
+        line = ident19.format(p=0)
+        assert RP in line, RP
+        return line.replace(RP, "running_prefix=" + embedded)
+    scenario("G20a", "RULING-757-R20, 5f's r19 P1, canary scope: `running_prefix=workers=2` inside the native IDENTITY line of an otherwise clean four-arm receipt (the line fully matches the non-space value of the pattern; r29 refused it as a line that carries an activity field, r30 PASSed it): INCONCLUSIVE", mutate=canary_g(identity_line=hidden("workers=2"), info=quiet0), extra=CANARY, want=2, must=[HID, "scope=canary"])
+    scenario("G20b", "canary scope: `running_prefix=connections_active=1` inside the native IDENTITY line of an otherwise clean four-arm receipt: INCONCLUSIVE", mutate=canary_g(identity_line=hidden("connections_active=1"), info=quiet0), extra=CANARY, want=2, must=[HID, "scope=canary"])
+    scenario("G20c", "canary scope: `running_prefix=active_so_far=2` inside the native IDENTITY line of an otherwise clean four-arm receipt: INCONCLUSIVE", mutate=canary_g(identity_line=hidden("active_so_far=2"), info=quiet0), extra=CANARY, want=2, must=[HID, "scope=canary"])
+    scenario("G20d", "canary scope: `running_prefix=last_call_log_age_s=0` inside the native IDENTITY line of an otherwise clean four-arm receipt: INCONCLUSIVE", mutate=canary_g(identity_line=hidden("last_call_log_age_s=0"), info=quiet0), extra=CANARY, want=2, must=[HID, "scope=canary"])
     scenario("G5", "a guard version 4 receipt (GUARD-RESULT, no IDLE-RESULT)", mutate=g(version="4", mode="full"), want=2, must=["not from guard version 5", "not an --idle-only receipt", "0 IDLE-RESULT line(s)"])
     scenario("G6", "a full-mode guard 5 receipt (mode=full) is not an idle-only receipt", mutate=g(mode="full"), want=2, must=["not an --idle-only receipt"])
     scenario("G7", "--diagnostic with an otherwise perfect world: measured and printed, never PASS", diagnostic=True, want=2, must=["PASS is not possible", "foreign=0", "orphans=0", "statuses={'unique': 6}"])
