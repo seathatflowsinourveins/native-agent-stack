@@ -4647,6 +4647,26 @@
         "Host re-apply and one smoke per row/client remain the co-op's work after landing. Earlier failed native attempts and observed values are unchanged."
       ],
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261006-verdict-rebase-receipt.json"
+    },
+    {
+      "id": "monitoring-binary-pins-20261006",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "mcp-grafana",
+        "agentsview"
+      ],
+      "claim": "The official mcp-grafana 2.0.1 archive passed both checksum comparisons before extraction; version and owned link read back on 2026-10-06. AgentsView 0.44.0 operational mirrors follow the previously recorded native upgrade.",
+      "evidence_class": "local_integration",
+      "limitations": [
+        "Binary installation and metadata read-back only; no Grafana MCP client call or whole-component qualification.",
+        "All three pre-paper and both post-render failed attempts remain retained. The final four touched modules pass201 tests with3existing skips; this is local integration, not native component acceptance.",
+        "Frozen AgentsView 0.43.0 evidence remains historical and the CODE-MODE attribution gap remains open.",
+        "The CC-only template does not apply live client configuration. No promptfoo A/B gates these pins.",
+        "Remote native-token CI failed two controls before its fixtures due to a stale0.43.0 harness pin; the new-head0.44.0 retry is recorded separately.",
+        "Step13 waits2026-10-07 after13:45Z and Harbor wiring; GitHub datasource additionally waits the user-created App.",
+        "PR723 has merged; its AgentsView operational mirrors are landed. This pin PR retains historical G5/B2 evidence classes and does not rerun native client acceptance."
+      ],
+      "path": "evidence/artifacts/monitoring-binary-pins-20261006/receipt.json"
     }
   ],
   "files": [
@@ -5082,13 +5102,18 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "16d9708777667b29a4c25b363fca5644b94ab7932d0735c7323ac48188f7eaec",
-      "bytes": 20038
+      "sha256": "cadae13628d89a5b32e55021e1823150a9f057e6b577728c4dd50e533075221f",
+      "bytes": 20093
+    },
+    {
+      "path": "adoption/mcp/claude-cc.json",
+      "sha256": "bb5ae77af81415bf784d2c72101618b2e011ecce1164ff721fa4fb4163d7da1a",
+      "bytes": 491
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
-      "bytes": 260542
+      "sha256": "aa7d09df31b638e3ac8b63827ea104502f89de5b6f732a7845cdeeb1433d10ef",
+      "bytes": 266870
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -16558,8 +16583,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
-      "bytes": 479154
+      "sha256": "45c004ac0deca399d36abe3a6a3c3d23f1e3c39df4199b49d8a165847aa39b58",
+      "bytes": 480373
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -16618,8 +16643,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "e5987d047e09f2f16ed9592cba1f7d2a7a350a6428f2904b9e481298a5f9ab5e",
-      "bytes": 286532
+      "sha256": "00c2b1fcadb7a43ccf4e052e06902d64c899a75ff0f5b65f7ef0d572a59b2c05",
+      "bytes": 288348
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16833,8 +16858,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "15bcf02837853bad02026d7ff31395fa71e51a8be659e47cc4c6832620b81fe9",
-      "bytes": 758875
+      "sha256": "6dc6dc51148c29b20014df88b61c984d748f878b23b40be0101e34d6e3c78b1f",
+      "bytes": 759492
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -16888,7 +16913,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "6c63c214d8784920231b55099cfaf50aa05e2cce4fd249c34f102ad1b7271fe2",
+      "sha256": "adfa8e33ded56919f1d993b3bfc99d84da5665800591559c7b9a15b47b237822",
       "bytes": 3215
     },
     {
@@ -17655,6 +17680,11 @@
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
+    },
+    {
+      "path": "docs/decisions/2026-10-06-monitoring-native-binary-pins.md",
+      "sha256": "33e21da21e38ec68d784ce9dd79ebcee1fcd263de78115b5a2ac223fbc4ed109",
+      "bytes": 6025
     },
     {
       "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
@@ -37457,6 +37487,11 @@
       "bytes": 12897
     },
     {
+      "path": "evidence/artifacts/monitoring-binary-pins-20261006/receipt.json",
+      "sha256": "2994ecb44dcedc35c63c348d6c5e53f077770eb1bd05fbefa26c580392da83e2",
+      "bytes": 10126
+    },
+    {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
       "bytes": 10460
@@ -40563,8 +40598,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "fe7ae08164bea16e31e913d983fb3ec7aa6e3ad36f3f917597c9966f7f0a73ef",
-      "bytes": 480637
+      "sha256": "3a98acb192b7111d7086d68392f07ca6e098f562f5437736a37c75f3d5728cff",
+      "bytes": 480954
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54348,8 +54383,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "cbc65770d505fcc1253aa270db6d9930d884c9b22abeb34de450405b670c21a3",
-      "bytes": 106396
+      "sha256": "04f3dfde4ff897795624a10b6b0151ee47131a8713b692b3743dfebdd47de4f3",
+      "bytes": 107333
     },
     {
       "path": "observability/README.md",
@@ -54358,8 +54393,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
-      "bytes": 25778
+      "sha256": "04c2b6309b3a93c06d2553966ac2fb6b1019204ee6c7af4e399b4d43c25e4b1e",
+      "bytes": 26786
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -54763,8 +54798,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "95d45da579b1035c4cfa54f330f1ab179b949bbdb49555dd82c5163d2367300a",
-      "bytes": 117733
+      "sha256": "9fb2698ee4a3761dfc7f641de528b35ff995ee636e8cbbd4c61338d91136739e",
+      "bytes": 117902
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -55738,8 +55773,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "b759c7cf154f96661bbedd0dfd29cbc241a8c05a06866db6278ded963d7a0021",
-      "bytes": 308693
+      "sha256": "6937e06e7a0cd33625a491120b53dbfdbcf970ac1cac26a64ce87c4c2d2e1735",
+      "bytes": 309021
     },
     {
       "path": "tests/test_new_wsl_handbook.py",

@@ -61,7 +61,9 @@ PINS = {"rtk": "0.51.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1",
         "ccusage": "20.0.26", "codebase-memory-mcp": "0.11.0", "headroom": "0.37.0",
         "jcodemunch-mcp": "1.108.327", "context-mode": "1.0.169",
         "serena": f"2.0.0.dev0 @ {SERENA_COMMIT}", "ai-memory": "2.4.1", "context-hub": "0.1.4",
-        "agentsview": "0.43.0"}
+        "agentsview": "0.44.0"}
+# AgentsView operational release: kenn-io/agentsview@413a87f7bfbd67b2815b1119ac51abc1efbeeaba
+# https://github.com/kenn-io/agentsview/releases/tag/v0.44.0 (2026-09-21).
 # The Linux adoption pins, checked against PINS for every tool they list (version, and Serena's
 # commit), and against a downloaded release archive whose URL they record (its sha256).
 ADOPTION_PINS = "adoption/pins-linux-x86_64.json"

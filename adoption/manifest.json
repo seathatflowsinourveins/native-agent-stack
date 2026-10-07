@@ -187,7 +187,8 @@
     "toon": "recipes/README.md",
     "vllm": "recipes/README.md",
     "worktrunk": "recipes/README.md",
-    "zizmor": "blueprints/convergence-practice/ci-security/README.md"
+    "zizmor": "blueprints/convergence-practice/ci-security/README.md",
+    "mcp-grafana": "observability/backends/README.md"
   },
   "profiles": [
     {

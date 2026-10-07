@@ -1630,7 +1630,7 @@
       "repository": "https://github.com/kenn-io/agentsview",
       "layer_id": "observation-inference",
       "owner_layer_id": "observation-inference",
-      "pin": "0.43.0",
+      "pin": "0.44.0",
       "component_id": "agentsview",
       "source_selection_layer": "observation-inference",
       "source_selection_name": "agentsview",
@@ -1642,31 +1642,31 @@
       "default_install": true,
       "blocking_gaps": [],
       "artifact": {
-        "name": "agentsview_0.43.0_linux_amd64.tar.gz",
-        "url": "https://github.com/kenn-io/agentsview/releases/download/v0.43.0/agentsview_0.43.0_linux_amd64.tar.gz"
+        "name": "agentsview_0.44.0_linux_amd64.tar.gz",
+        "url": "https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9",
-        "source": "https://api.github.com/repos/kenn-io/agentsview/releases/tags/v0.43.0",
+        "value": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+        "source": "https://api.github.com/repos/kenn-io/agentsview/releases/tags/v0.44.0",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "gh release download v0.43.0 --repo kenn-io/agentsview --pattern agentsview_0.43.0_linux_amd64.tar.gz --dir \"$STACK_HOME/downloads/agentsview-0.43.0\" && tar -xf \"$STACK_HOME/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz\" -C \"$PREFIX\"",
-        "source": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L25",
+        "command": "gh release download v0.44.0 --repo kenn-io/agentsview --pattern agentsview_0.44.0_linux_amd64.tar.gz --dir \"$STACK_HOME/downloads/agentsview-0.44.0\" && tar -xf \"$STACK_HOME/downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz\" -C \"$PREFIX\"",
+        "source": "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142-L160",
         "execution_status": "UNRUN",
-        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. The asset is the one gh release view v0.43.0 --json assets lists for Linux x86_64 (docs/token-efficiency-stack.json). A local archive only: telemetry and the update check off, no hosted or remote sync.",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. The asset is the one gh release view v0.44.0 --json assets lists for Linux x86_64. The v0.44.0 release installer extracts and installs this published binary; no rebuild. A local archive only: telemetry and the update check off, no hosted or remote sync. The destination upgrade of 2026-10-06 ran ahead of this profile pin; that native host operation does not execute this portable recipe.",
         "prerequisites": [
           "tar."
         ]
       },
       "acceptance": {
-        "command": "AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview session list",
-        "source": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L48",
+        "command": "AGENTSVIEW_NO_DAEMON=1 AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview session list",
+        "source": "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/README.md",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
-        "scope": "Upstream's session listing from the local archive, with telemetry off (README line 695) and the update check off (docs/token-efficiency-stack.json); a blank archive is not evidence of zero usage.",
+        "scope": "Upstream's session listing from the local archive, with AGENTSVIEW_NO_DAEMON=1, telemetry off and the update check off; a blank archive is not evidence of zero usage. The direct selector is upstream-owned at internal/config/config.go:2136-2146; this check starts no daemon and must not migrate a shared archive.",
         "prerequisites": [
           "An owned AGENTSVIEW_DATA_DIR and a prior agentsview sync."
         ]
@@ -1678,12 +1678,81 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L25"
+        "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142-L160",
+        "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2136-L2146"
       ],
       "release": {
-        "tag": "v0.43.0",
-        "source": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
-        "published_at": "2026-09-14T13:22:53Z"
+        "tag": "v0.44.0",
+        "source": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+        "published_at": "2026-09-21T13:56:12Z",
+        "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "mcp-grafana",
+      "repository": "https://github.com/grafana/mcp-grafana",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "2.0.1",
+      "component_id": "mcp-grafana",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "mcp-grafana",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 25,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "mcp-grafana_Linux_x86_64.tar.gz",
+        "url": "https://github.com/grafana/mcp-grafana/releases/download/v2.0.1/mcp-grafana_Linux_x86_64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "4535c841ecf1926dd470e711c27ce16449655e9962c4f6b738890dacfe9b2a19",
+        "source": "https://github.com/grafana/mcp-grafana/releases/download/v2.0.1/mcp-grafana_2.0.1_checksums.txt",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "mkdir -p \"$STACK_HOME/downloads/mcp-grafana-2.0.1\" \"$ECO_ROOT/tools/mcp-grafana-2.0.1\" \"$ECO_ROOT/bin\" && gh release download v2.0.1 --repo grafana/mcp-grafana --pattern mcp-grafana_Linux_x86_64.tar.gz --pattern mcp-grafana_2.0.1_checksums.txt --dir \"$STACK_HOME/downloads/mcp-grafana-2.0.1\" && (cd \"$STACK_HOME/downloads/mcp-grafana-2.0.1\" && sha256sum --ignore-missing -c mcp-grafana_2.0.1_checksums.txt && printf '%s\\n' '4535c841ecf1926dd470e711c27ce16449655e9962c4f6b738890dacfe9b2a19  mcp-grafana_Linux_x86_64.tar.gz' | sha256sum -c -) && tar -xzf \"$STACK_HOME/downloads/mcp-grafana-2.0.1/mcp-grafana_Linux_x86_64.tar.gz\" -C \"$ECO_ROOT/tools/mcp-grafana-2.0.1\" && ln -sfn \"$ECO_ROOT/tools/mcp-grafana-2.0.1/mcp-grafana\" \"$ECO_ROOT/bin/mcp-grafana\"",
+        "source": "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L731",
+        "execution_status": "UNRUN",
+        "scope": "Use Grafana's published Linux x86_64 release binary and check both the upstream checksum list and the pinned artifact digest before extraction. Place the command on PATH through the owned ecosystem link. The destination install of 2026-10-06 ran ahead of this pin PR, under monitoring plan step 2; both SHA256 comparisons returned OK before extraction. This portable recipe remains unrun here. The reviewed v2.0.1 release asset list contains no signature or attestation; neither is verified by these checksum comparisons.",
+        "prerequisites": [
+          "gh with at least 500 remaining GitHub core requests; tar and sha256sum.",
+          "An owned ecosystem tools directory and a vacant or owned mcp-grafana bin link."
+        ]
+      },
+      "acceptance": {
+        "command": "npx --yes @modelcontextprotocol/inspector@2.9.0 --cli --config \"$CC_MCP_CONFIG\" --server grafana --method tools/call --tool-name list_datasources --tool-args-json '{}' --format json",
+        "source": "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L56-L59",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "After the command center renders its own CC-only MCP configuration and applies the wiring, invoke Grafana's real list_datasources tool through native MCP tools/call with an empty argument object. Inspector 2.9.0's documented config selection and JSON tool-call flags are at docs/cli-smoke-testing.md:65-75,145-176. The CLI must exit zero with a returned tool result, not isError:true. This smoke is UNRUN and adds no global registration. --version remains installation read-back metadata only. No promptfoo A/B or local evaluation gates the monitoring deployment.",
+        "prerequisites": [
+          "The verified v2.0.1 release archive is installed.",
+          "The CC alone renders adoption/mcp/claude-cc.json; CC_MCP_CONFIG names that rendered CC-only file and Grafana is ready on 127.0.0.1:21301.",
+          "The pinned MCP Inspector 2.9.0 native CLI is available with Node >=22.19.0."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Monitoring plan step 3, command-center item task-ns2604-coop-20261006T190639Z, adds the observation-inference binary pin for north-star R&D monitoring. The command center alone renders and applies adoption/mcp/claude-cc.json to its own Claude session; no user-scope or Codex registration is added. This profile records source review and a portable recipe, not a new host acceptance or organic usage count.",
+      "evidence_refs": [
+        "adoption/mcp/claude-cc.json",
+        "https://github.com/grafana/mcp-grafana/releases/tag/v2.0.1",
+        "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/docs/cli-smoke-testing.md#L65-L75",
+        "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/docs/cli-smoke-testing.md#L145-L176",
+        "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L426",
+        "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L1087-L1104"
+      ],
+      "release": {
+        "tag": "v2.0.1",
+        "source": "https://github.com/grafana/mcp-grafana/releases/tag/v2.0.1",
+        "published_at": "2026-10-06T10:34:12Z",
+        "commit": "c8fe90320a03e213ee6ce0a033e7492f1082aca6"
       },
       "source_pin_kind": "release_or_artifact_version"
     },

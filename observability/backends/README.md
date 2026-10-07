@@ -404,3 +404,17 @@ The WSL workstation's post-merge rollout is recorded in
 It was applied surgically, keeping the host's shifted loopback ports, and the
 rule read back empty with nothing registered. Silence 87eabf8a was then
 expired early.
+
+### NativeStack2604 CC-only Grafana MCP
+
+The operational binary pin is mcp-grafana 2.0.1, installed from Grafana’s
+verified release archive before its metadata PR. The native version and owned
+link read-back establish binary placement; they do not establish MCP registration.
+Use adoption/mcp/claude-cc.json only for the command center’s scoped client.
+The template enables read-only search/datasource/Prometheus/Loki/alert/dashboard
+navigation and disables usage statistics. It adds no global user registration.
+After the CC renders its config, one native list_datasources call is the smoke;
+it remains UNRUN until that call returns. No promptfoo A/B gates this pin.
+Sources: [Grafana v2.0.1](https://github.com/grafana/mcp-grafana/releases/tag/v2.0.1),
+[pinned binary install](https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L731)
+and [read-only mode](https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L426).

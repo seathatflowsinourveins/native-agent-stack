@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "grafana": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/mcp-grafana",
+      "args": [
+        "--disable-write",
+        "--enabled-tools=search,datasource,prometheus,loki,alerting,dashboard,navigation",
+        "--usage-stats=disabled"
+      ],
+      "env": {
+        "GRAFANA_URL": "http://127.0.0.1:21301",
+        "GRAFANA_USAGE_STATS": "disabled",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": ""
+      }
+    }
+  }
+}

@@ -64,8 +64,8 @@
     },
     {
       "id": "agentsview",
-      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
-      "version": "0.43.0",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+      "version": "0.44.0",
       "license": "MIT",
       "profile": "supporting",
       "role": "Scoped historical Codex/Claude transcript lexical search",
@@ -84,10 +84,10 @@
         "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
       ],
-      "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "freshness": "Operational0.44.0 release; historical0.43.0 evidence stays historical.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
     },
     {
@@ -1985,6 +1985,27 @@
         "https://nautilustrader.io/docs/latest/getting_started/installation/"
       ],
       "freshness": "Exact requested release candidate in isolated native prefix; upstream synthetic and later AAPL diagnostic replays accepted within their receipts. Frozen SPY parity and native Nautilus broker acceptance remain open; separate Alpaca paper evidence does not qualify the Nautilus adapter."
+    },
+    {
+      "id": "mcp-grafana",
+      "repository": "https://github.com/grafana/mcp-grafana",
+      "version": "2.0.1",
+      "license": "Apache-2.0",
+      "profile": "observability",
+      "role": "CC-only read-only Grafana MCP surface; no global user registration",
+      "commands": [
+        "mcp-grafana --version"
+      ],
+      "evidence_ids": [
+        "monitoring-binary-pins-20261006"
+      ],
+      "upstream_sources": [
+        "https://github.com/grafana/mcp-grafana/releases/tag/v2.0.1",
+        "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L731"
+      ],
+      "source_pin": "c8fe90320a03e213ee6ce0a033e7492f1082aca6",
+      "freshness": "Verified official archive installed ahead of pin PR on2026-10-06; binary read-back only.",
+      "command_scope": "Native binary metadata and CC-only template; real client calls separate."
     }
   ],
   "profiles": [
@@ -2078,7 +2099,8 @@
         "loki",
         "grafana",
         "alertmanager",
-        "ntfy"
+        "ntfy",
+        "mcp-grafana"
       ]
     }
   ],
