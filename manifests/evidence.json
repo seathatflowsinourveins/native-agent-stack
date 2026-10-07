@@ -16508,8 +16508,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "8c2187a3c721fac2441d60df8fb5a9d902b1beaf93cb9e2891464300b7b826b0",
-      "bytes": 16186
+      "sha256": "cdbd873798f3e200a38911733a4f81c0ac046164c4bb7e16ba858125414f15c3",
+      "bytes": 16480
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -16533,8 +16533,8 @@
     },
     {
       "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
-      "sha256": "39bfffa1aaa476e1986d9d86a17b6f78b32e0daa626569a4a0a062ad4f481811",
-      "bytes": 28907
+      "sha256": "8d60aadbd96f07a4c29edf8e8a9f905fb1c7d547f9fa42db44c781776c13bfc2",
+      "bytes": 30772
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -17753,8 +17753,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
-      "sha256": "e0643296a061ca8f368af2e1b9a9f1e25bada2af96991d54ef41f43016594680",
-      "bytes": 11070
+      "sha256": "76f4ac9178774e12219bb90307b95648bc06d958cef68f4680f82d65c952ca10",
+      "bytes": 19991
     },
     {
       "path": "docs/decisions/2026-10-07-model-currency-enforcement.md",
@@ -37435,6 +37435,16 @@
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/upstream-release-observation.json",
       "sha256": "d7a07aff13bad911dec59bc2a3c47f6dea57be792f30bbad45183b61bb6ada98",
       "bytes": 4187
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-stacks-20261007-followup/README.md",
+      "sha256": "8e2598d214cd98ad336d077f641b7839e677d80875675c5eb189fef04def80ae",
+      "bytes": 2297
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-stacks-20261007-followup/source-qualification.json",
+      "sha256": "3955876bdb3f1ac5e1d1d717dd11a7043ee125b92423dac75ff1d03461fe49a9",
+      "bytes": 6940
     },
     {
       "path": "evidence/artifacts/memory-rag-stacks-20261007/review.json",
