@@ -81,6 +81,15 @@ def operative_matchers(text: str) -> list:
     return [re.sub(r"\s+", "", m.group(1).replace("\\|", "|")) for m in re.finditer(re.escape(OPERATIVE) + r"\s*`([^`]+)`", text)]
 
 
+def current_matcher_section(text: str) -> str:
+    """Read the latest dated matcher amendment while preserving the historical text."""
+    sections = re.split(r"(?m)^## (?:Amendment|Addendum) \(\d{4}-\d{2}-\d{2}\):[^\n]*\n", text)
+    for section in reversed(sections[1:]):
+        if OPERATIVE in section:
+            return section
+    return text
+
+
 def matcher_problems(text: str, matcher: str) -> list:
     """What is wrong with the matcher a document states: the operative one (marked) must be exactly the overlay's, and no other quoted matcher (a pipe list of known types, or a phrase-anchored quote) may differ."""
     problems = []
@@ -653,11 +662,26 @@ class ScanReaderTests(unittest.TestCase):
 
 class DocumentationTests(unittest.TestCase):
     def test_every_matcher_the_recipe_and_the_decision_record_quote_is_the_overlays(self):
-        # The operative matcher of each document carries a marker and must be exactly the overlay's; every other quoted matcher (a pipe list of known types outside HTML comments, or a phrase-anchored quote) must equal
-        # it too, so a stale operative copy cannot hide behind a correct one kept in a comment or a history paragraph. A history paragraph names an older list without the quoted pipe form.
+        # Current recommendations must match the overlay. Dated matcher amendments
+        # supersede their historical section; strict checks still apply within the
+        # selected current section and to recipes without such an amendment.
         matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
         for name, path in (("recipe", RECIPE), ("decision record", ROOT / "docs/decisions/2026-09-28-terminal-experience.md")):
-            self.assertEqual(matcher_problems(path.read_text(encoding="utf-8"), matcher), [], f"the {name} states a matcher that is not the overlay's")
+            self.assertEqual(matcher_problems(current_matcher_section(path.read_text(encoding="utf-8")), matcher), [], f"the {name} states a matcher that is not the overlay's")
+
+    def test_a_dated_amendment_preserves_history_and_checks_the_current_matcher(self):
+        good, old = "permission_prompt|auth_success", "permission_prompt"
+        history = f"Original decision: matcher {OPERATIVE}`{old}`.\n"
+        amendment = f"\n## Amendment (2026-10-06): alert source\nmatcher {OPERATIVE}`{good}`.\n"
+        text = history + amendment
+        self.assertTrue(text.startswith(history))
+        self.assertEqual(matcher_problems(current_matcher_section(text), good), [])
+        self.assertNotEqual(matcher_problems(current_matcher_section(history + amendment.replace(good, old)), good), [])
+
+    def test_an_undated_note_cannot_hide_an_inconsistent_matcher(self):
+        good = "permission_prompt|auth_success"
+        text = f"matcher {OPERATIVE}`permission_prompt`.\n\n## Amendment: alert source\nmatcher {OPERATIVE}`{good}`."
+        self.assertNotEqual(matcher_problems(current_matcher_section(text), good), [])
 
     def test_a_wrong_operative_matcher_is_found_whatever_its_markup(self):
         matcher = "idle_prompt|permission_prompt|auth_success"

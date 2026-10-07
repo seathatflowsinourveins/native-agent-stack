@@ -1,10 +1,11 @@
 # Decision: Windows Terminal tab titles, needed-only alerts and colour depth for the native clients (2026-09-28)
 
-**Decided by:** the user's approved policy of 2026-09-28: give each native-client
-tab a distinct title, use maintained upstream terminal practices, and reserve a
-quiet audible alert for an escalation or decision requiring the user. Research
-informs the defaults for persistence, dashboards and notifications; phone push
-was deferred. The user approved the plan before this record.
+**Decided by:** the user's direction of 2026-09-28 in this session, verbatim: "make sure each one shown their title,each tab
+with sota convergenced practice,bell should NOT ring all the time, only with real speacial reasons when esclated and the
+sound should not too large"; "optimize with the best practice you deem the best" (asked whether to keep testing by hand);
+"with current best sota practice" (persistence and dashboard); "also with latest sota practice,only show notification for
+real needed choose action etc per user waiting,otherwise there are too much noise" (toasts); "Not now" (phone push); and
+the approval of the plan that preceded this record.
 
 **Scope:** one workstation (WSL2 distro `NativeStack`, Windows Terminal 1.24.11911.0, Claude Code 2.1.284, Codex 0.157.1).
 Runtime settings changed on the host only; the settings template and `AGENTS.md` are unchanged. The change also registers
@@ -61,14 +62,9 @@ point here.
    sound; Windows Ding is -40.9 (peak -22.7), 16 dB quieter; ding.wav is -50.0 (0.4 s) if that is still too loud. A check
    in the host repository refuses, on the Claude and Codex profiles, any `bellSound` that is not exactly a measured quiet file directly in `C:\Windows\Media` (a subdirectory or a `..` path is refused; since 2026-09-30, after a cross-family review, and where that folder is readable from WSL the file must exist) and refuses
    `audible` on the static ones.
-3. **Alerts only when a decision is pending — CURRENT SOURCE RECOMMENDATION (2026-10-06).**
-   The recommended `~/.claude/settings.json` sets `preferredNotifChannel` to
-   `notifications_disabled` (hooks still run) and one `Notification` hook, matcher <!-- operative-matcher -->`auth_storage_failure|permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification`, command `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'` (the hooks reference's construction, so no control
-   byte sits in the settings string). **Live application of this expanded matcher is PENDING CC action**;
-   [Q55](2026-10-06-auth-storage-failure-notification.md) adds the source-only
-   `auth_storage_failure` classification. Earlier dated host observations below
-   retain their original scope and do not establish application of this expansion.
-   The dialog types wait about 6 s for the user first; `agent_needs_input` fires when a background
+3. **Alerts only when a decision is pending.** `~/.claude/settings.json`: `preferredNotifChannel` is
+   `notifications_disabled` (hooks still run) and one `Notification` hook, matcher <!-- operative-matcher -->`permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification`, command `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'` (the hooks reference's construction, so no control
+   byte sits in the settings string). The dialog types wait about 6 s for the user first; `agent_needs_input` fires when a background
    session starts waiting while agent view is open (its documented 6 s applies to an agent-team setup question); the
    quota types fire when the quota event occurs; `worker_permission_prompt` fires from the team inbox poller; `push_notification` was added on 2026-09-29 (see the last update). `idle_prompt` (the finished-and-waiting
    ping) is excluded on purpose, which also silences a question asked in prose and then left waiting; add it to the
@@ -644,3 +640,13 @@ The workstation's own fragment, which declares a `guid` for each profile, gained
 ### Evidence class
 
 Source review of upstream at named tags and of documentation pages read on 2026-10-02; native `gh api` commands for the release facts and the two toast signals (their returned values are quoted above); and one host's observations (the installed client versions, and the read-back of Windows Terminal's files after the workstation's reload). The claims came from four read-only research passes, and each one written here was reopened at its source or recomputed from the raw files before it was written (the installed Codex version is the exception: it is the research's own `codex --version` output). The test changes are structural validation of the example's JSON, with synthetic in-memory copies as negative controls; they check the files, not Windows Terminal, Claude Code or Codex. No measured comparison was made, and no client session was started for this update.
+
+## Amendment (2026-10-06): authentication-storage failure source recommendation
+
+This amendment extends the current recommendation; the original decided text and dated host observations above remain unchanged. The approved policy gives each native-client tab a distinct title and reserves a quiet audible alert for an escalation or decision requiring the user. Routine completion stays quiet. Phone push remains deferred.
+
+[Q55](2026-10-06-auth-storage-failure-notification.md) classifies the installed client's new `auth_storage_failure` type as RING because a credential-storage or sign-in failure that needs the user is an escalation. The observed host gate used Claude Code 2.1.291 and returned that single unknown type; it did not establish an actual authentication failure. The new immutable scan records 18 types, nine RING and nine QUIET. Earlier 2.1.285/17-type observations retain their original dates and scope.
+
+**CURRENT SOURCE RECOMMENDATION:** one Notification hook with matcher <!-- operative-matcher -->`auth_storage_failure|permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification`, with `preferredNotifChannel=notifications_disabled`. **Live application of this expanded matcher is PENDING CC action.** The historical matcher quoted above records its earlier context; it does not prove this expansion was applied. The maintained [recipe](../../recipes/claude-native-profile.md) carries this current recommendation.
+
+Sources: [installed-client gate and scanner before the addition@0d5e6506](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/tests/test_windows_terminal_defaults.py#L166-L176), [notification decision table@0d5e6506](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/evidence/artifacts/notification-types-20260929/notification_types_scan.py#L20-L38), Q55's exact returned evidence and new scan receipt, and the repository's [historical-record overlay convention](../landscape-domain-notes.md#historical-wording-that-must-not-become-current-instructions). The code-span above is the amendment's current source projection. No live client configuration, bell emission, credential read or sign-in is performed by this amendment.
