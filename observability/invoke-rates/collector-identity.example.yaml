@@ -1,0 +1,26 @@
+# Follower of ACKed #775: supported Contrib v0.162.0 multi-config overlay.
+# Native hook_name is a lifecycle event, never a script/repository identity.
+processors:
+  transform/hook_event_alias:
+    error_mode: propagate
+    metric_statements:
+      - context: datapoint
+        statements:
+          - set(attributes["event"], attributes["hook_name"]) where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["hook_name"] != nil
+  transform/invoke_actor:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - set(attributes["actor"], "main_or_subagent") where resource.attributes["service.name"] == "claude-code" and (attributes["event.name"] == "skill_activated" or attributes["event.name"] == "hook_execution_start" or attributes["event.name"] == "hook_execution_complete")
+          - set(attributes["actor"], "workflow") where resource.attributes["service.name"] == "claude-code" and (attributes["event.name"] == "skill_activated" or attributes["event.name"] == "hook_execution_start" or attributes["event.name"] == "hook_execution_complete") and attributes["workflow.run_id"] != nil
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/tool_names, transform/privacy, transform/invoke_actor, batch]
+      exporters: [otlphttp/loki, file/events]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, groupbyattrs/session, transform/privacy, transform/hook_event_alias, delta_to_cumulative, batch]
+      exporters: [prometheus]
