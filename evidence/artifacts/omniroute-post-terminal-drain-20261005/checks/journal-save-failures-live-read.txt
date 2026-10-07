@@ -3,7 +3,7 @@
 
 ## R1 the protocol's earlier pipeline, journalctl FAILS (a --since that does not parse: the real tool exits 1)
 # command: journalctl --user -u omniroute.service --since 'not-a-date' -o cat --no-pager | grep -c 'Failed to save call log'
-# run 2026-10-07T15:46:02Z (date -u)
+# run 2026-10-07T17:17:21Z (date -u)
 stdout: 0
 exit status: 1
 stderr (first 200 bytes): Failed to parse timestamp: not-a-date
@@ -11,7 +11,7 @@ reading: the pipeline prints 0 with grep's status 1 (the status that a count of 
 
 ## R2 the earlier pipeline, a unit that does not exist, a valid --since (the real journalctl exits 0 with nothing on stdout and stderr)
 # command: journalctl --user -u nosuch.service --since '2026-10-07 05:00:00 UTC' -o cat --no-pager | grep -c 'Failed to save call log'
-# run 2026-10-07T15:46:02Z (date -u)
+# run 2026-10-07T17:17:21Z (date -u)
 stdout: 0
 exit status: 1
 stderr (first 200 bytes): (empty)
@@ -19,7 +19,7 @@ reading: the same 0 and the same status although nothing was read
 
 ## R3 the scan, the live unit, the default SINCE (ExecMainStartTimestamp)
 # command: bash scripts/journal-save-failures.sh.txt
-# run 2026-10-07T15:46:02Z (date -u)
+# run 2026-10-07T17:17:21Z (date -u)
 stdout: journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since Tue 2026-10-06 09:51:19 EDT -o cat --no-pager | grep -c 'Failed to save call log')
 exit status: 0
 stderr (first 200 bytes): (empty)
@@ -27,7 +27,7 @@ reading: a real read of the live unit's journal since its start: the count line 
 
 ## R4 the scan, a unit that does not exist, an explicit valid SINCE
 # command: bash scripts/journal-save-failures.sh.txt nosuch.service '2026-10-07 05:00:00 UTC'
-# run 2026-10-07T15:46:03Z (date -u)
+# run 2026-10-07T17:17:21Z (date -u)
 stdout: JOURNAL-UNAVAILABLE exit=0 (journalctl exited 0 and printed nothing since 2026-10-07 05:00:00 UTC: a unit that does not exist, a start in the future or an unread journal reads the same, and the gateway's journal is never empty since its start): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
 exit status: 2
 stderr (first 200 bytes): (empty)
@@ -35,7 +35,7 @@ reading: JOURNAL-UNAVAILABLE with exit 2 (journalctl exited 0 and printed nothin
 
 ## R5 the scan, an unparsable SINCE
 # command: bash scripts/journal-save-failures.sh.txt omniroute.service 'not-a-date'
-# run 2026-10-07T15:46:03Z (date -u)
+# run 2026-10-07T17:17:21Z (date -u)
 stdout: JOURNAL-UNAVAILABLE exit=1 (no start timestamp: the SINCE argument gave a value that is not a date: date: invalid date ‘not-a-date’): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
 exit status: 2
 stderr (first 200 bytes): (empty)
@@ -43,7 +43,7 @@ reading: JOURNAL-UNAVAILABLE with exit 2 before journalctl runs (date -d refuses
 
 ## R6 the scan, a unit that does not exist, the default SINCE
 # command: bash scripts/journal-save-failures.sh.txt nosuch.service
-# run 2026-10-07T15:46:03Z (date -u)
+# run 2026-10-07T17:17:21Z (date -u)
 stdout: JOURNAL-UNAVAILABLE exit=0 (no start timestamp: systemctl --user show nosuch.service -p ExecMainStartTimestamp --value gave an empty value): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
 exit status: 2
 stderr (first 200 bytes): (empty)

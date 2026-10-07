@@ -23,6 +23,8 @@ Added after the independent review of round 25 (no P0, P1 or P2; eight P3): J48a
 Added after 5f's FULL read r15 of 1004174e3 and the command center's ruling J757-R15-FIX (the census r27 adds ONE refusal: every world that PASSes on r27 PASSed on r26): G17a-G17e (the idle receipt's INFO line: the gateway's pending-request counter changing during the idle observation is INCONCLUSIVE, an unchanged counter, also the unpatched build's stale one, is not).
 Added after 5f's delta check r16 of 51e446dd (r16-P2-1: the census r28 reads the activity-bearing fields of the INFO and the sample lines BY NAME, in any order, and refuses a repeated, missing, unreadable or contradictory field: every world that PASSes on r28 PASSed on r27): G17e (an unreadable counter is INCONCLUSIVE now) and G17f-G17q (a line with only the flag, with only the totals, reordered, incomplete,
 contradictory, with a repeated field; an INFO line with an active connection; sample lines with an active connection and with a recent row; an INFO line without activity fields and a real-format clean receipt PASS).
+Added after 5f's delta check r17 of e5c8a7fd and the command center's ruling J757-R17-FIX (r16-P2-1 narrowed to two gaps; the census r29 is FAIL-CLOSED: the activity-bearing INFO and sample lines are parsed against the guard's exact line grammar, an empty value and a second counter summary are refused, every activity field is matched on its own;
+every world that PASSes on r29 PASSed on r28, r27 and r26): G17r-G17y, G18a-G18l; the expectations of G17i and G17m change from PASS to INCONCLUSIVE (r28 read those lines by name).
 Exit status 0 when every scenario behaved as expected."""
 import argparse
 import math
@@ -201,9 +203,9 @@ def default_spec(name):
 
 
 def write_guard(path, g):
-    L = [f"GUARD version={g['version']} mode={g['mode']} script_sha256={GUARD_SHA} start={utc(g['start'])} port={g.get('port', 20128)} unit={g.get('unit', 'omniroute.service')} clean_for={g.get('clean_for', 30.0)} interval=5.0 tolerate_units={g.get('tolerated', "['omniroute-fw.service']")}",
-         *([] if g.get("no_identity") else ["   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok"]),
-         "CHECK nothing in flight for 30 s (7 samples): " + ("ok (0 idle and 0 tolerated connection(s))" if g["clean"] else "FAIL ['an active connection']")]
+    L = [f"GUARD version={g['version']} mode={g['mode']} script_sha256={GUARD_SHA} start={utc(g['start'])} port={g.get('port', 20128)} unit={g.get('unit', 'omniroute.service')} clean_for={g.get('clean_for', 30.0)} interval=5.0 tolerate_units={g.get('tolerated', "['omniroute-fw.service']")}{g.get('guard_tail', '')}",
+         *([] if g.get("no_identity") else ["   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok" + g.get("identity_tail", "")]),
+         "CHECK nothing in flight for 30 s (7 samples): " + ("ok (0 idle and 0 tolerated connection(s))" if g["clean"] else "FAIL ['an active connection']") + g.get("check_tail", "")]
     if g.get("info"):   # round 27: the guard's informational INFO line (printed before the result line), only when a scenario sets it
         L.append(g["info"])
     if g["result"]:
@@ -712,16 +714,40 @@ def main():
     scenario("G17f", "5f's r16 probe: an INFO line with ONLY `pending_changed=True` (r27 ignored it and PASSed): INCONCLUSIVE", mutate=g(info="INFO pending_changed=True"), want=2, must=[FA, "the pending-request counter is incomplete", "pending_changed=True"])
     scenario("G17g", "5f's r16 probe: an INFO line with ONLY the two totals, unequal (no flag; r27 PASSed): INCONCLUSIVE", mutate=g(info="INFO pending_total_before=0 pending_total_after=1"), want=2, must=[FA, "the totals differ (0 and 1)", "pending_changed missing"])
     scenario("G17h", "5f's r16 probe: the three fields reordered, the flag True (r27 PASSed): INCONCLUSIVE", mutate=g(info="INFO pending_total_before=0 pending_changed=True pending_total_after=1"), want=2, must=[FA, "pending_changed=True"])
-    scenario("G17i", "the three fields reordered, unchanged (5 and 5, False): PASS (the fields are read by name)", mutate=g(info="INFO pending_changed=False pending_total_after=5 pending_total_before=5"), want=0, must=["CENSUS-RESULT PASS", "pending_changed=False"])
+    GR = "does not match the guard's line grammar exactly"
+    scenario("G17i", "the three fields reordered, unchanged (5 and 5, False): INCONCLUSIVE since r29 (the line is not the guard's INFO line; r28 read the fields by name and PASSed it)", mutate=g(info="INFO pending_changed=False pending_total_after=5 pending_total_before=5"), want=2, must=[GR])
     scenario("G17j", "an INCOMPLETE counter: equal totals and no flag: INCONCLUSIVE (the receipt does not show that the counter was complete)", mutate=g(info="INFO pending_total_before=3 pending_total_after=3"), want=2, must=[FA, "pending_changed missing"])
     scenario("G17k", "a CONTRADICTORY counter: equal totals and pending_changed=True: INCONCLUSIVE", mutate=g(info="INFO pending_total_before=3 pending_total_after=3 pending_changed=True"), want=2, must=[FA, "pending_changed=True"])
     scenario("G17l", "a CLEAN receipt whose INFO line reports an active client connection (connections_active=1; the guard would have failed its check): INCONCLUSIVE", mutate=g(info="INFO connections_seen=1 connections_tolerated=0 connections_active=1 connections_idle=0"), want=2, must=[FA, "connections_active=1"])
-    scenario("G17m", "an INFO line without any activity-bearing field (`INFO hindsight_processes=9`): PASS (nothing to read)", mutate=g(info="INFO hindsight_processes=9"), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("G17m", "an INFO line without any activity-bearing field (`INFO hindsight_processes=9`): INCONCLUSIVE since r29 (an INFO line must be the guard's INFO line exactly; r28 PASSed it)", mutate=g(info="INFO hindsight_processes=9"), want=2, must=[GR])
     scenario("G17n", "a REPEATED field (`pending_changed=False ... pending_changed=True`): INCONCLUSIVE (the line is ambiguous)", mutate=g(info="INFO pending_total_before=1 pending_total_after=1 pending_changed=False pending_changed=True"), want=2, must=[FA, "repeated field(s) pending_changed"])
     scenario("G17o", "a CLEAN receipt with a sample line that shows an active connection (active_so_far=1): INCONCLUSIVE", mutate=g(info=sample17.format(n=2, c=1, a=1, w=0, age=1700)), want=2, must=[FA, "active_so_far=1"])
     scenario("G17p", "a CLEAN receipt with a sample line that shows a call_logs row younger than 120 s (last_call_log_age_s=7): INCONCLUSIVE", mutate=g(info=sample17.format(n=3, c=0, a=0, w=0, age=7)), want=2, must=[FA, "last_call_log_age_s=7"])
     scenario("G17q", "a real-format clean receipt (three sample lines with no connection, no other lane and rows older than 120 s, then the full INFO line): PASS", mutate=g(info="\n".join([sample17.format(n=1, c=0, a=0, w=0, age=1681), sample17.format(n=2, c=0, a=0, w=0, age=1686), sample17.format(n=3, c=0, a=0, w=0, age="none"), info17.format(b=92, a=92, c=False)])), want=0,
              must=["CENSUS-RESULT PASS", "pending_changed=False"])
+    # ---- round 29: 5f's r17 regressions and the fail-closed grammar (ruling J757-R17-FIX)
+    full17 = info17.format(b=0, a=0, c=False)   # the guard's INFO line, quiet and complete
+    NG = "is neither the guard's INFO line nor one of its sample lines"
+    scenario("G17r", "5f's r17 (a): an INFO line whose unrelated field has an EMPTY value swallowed the next assignment (`hindsight_processes= pending_changed=True`; r28 PASSed): INCONCLUSIVE", mutate=g(info="INFO hindsight_processes= pending_changed=True"), want=2, must=[FA, "pending_changed=True", GR])
+    scenario("G17s", "5f's r17 (a): the same with an active connection (`hindsight_processes= connections_active=1`; r28 PASSed): INCONCLUSIVE", mutate=g(info="INFO hindsight_processes= connections_active=1"), want=2, must=[FA, "connections_active=1", GR])
+    scenario("G17t", "5f's r17 (a): an EMPTY pending_changed (`INFO pending_changed=`, counted as absent by r28): INCONCLUSIVE (an empty activity value is invalid evidence)", mutate=g(info="INFO pending_changed="), want=2, must=[FA, "pending_changed= is neither True nor False", GR])
+    scenario("G17u", "5f's r17 (a): an EMPTY connections_active (`INFO connections_active=`, counted as absent by r28): INCONCLUSIVE", mutate=g(info="INFO connections_active="), want=2, must=[FA, "connections_active= is not a readable number", GR])
+    scenario("G17v", "5f's r17 (b): two complete, contradictory counter summaries (0 0 False, then 1 1 False; each line is quiet on its own, r28 PASSed): INCONCLUSIVE", mutate=g(info="\n".join([info17.format(b=0, a=0, c=False), info17.format(b=1, a=1, c=False)])), want=2, must=["more than one pending-request counter summary"])
+    scenario("G17w", "two IDENTICAL complete counter summaries (5 5 False twice): INCONCLUSIVE (the guard prints one; a concatenated receipt is not reconciled)", mutate=g(info="\n".join([info17.format(b=5, a=5, c=False), info17.format(b=5, a=5, c=False)])), want=2, must=["more than one pending-request counter summary"])
+    scenario("G17x", "a key written in quotes (JSON style) with an active connection (`INFO {\"connections_active\": 2}`; r28 did not read it): INCONCLUSIVE", mutate=g(info='INFO {"connections_active": 2}'), want=2, must=[FA, "connections_active=2", GR])
+    scenario("G17y", "an EMPTY unrelated value beside no activity field (`INFO hindsight_processes= unrelated_remote_records=0`): INCONCLUSIVE since r29 (not the guard's INFO line; r28 PASSed it)", mutate=g(info="INFO hindsight_processes= unrelated_remote_records=0"), want=2, must=[GR])
+    scenario("G18a", "the guard's INFO line without its last field (hindsight_processes): INCONCLUSIVE (every field once; r28 PASSed it)", mutate=g(info=full17.rsplit(" hindsight_processes=", 1)[0]), want=2, must=[GR])
+    scenario("G18b", "the guard's INFO line with an unknown field appended (`extra=1`): INCONCLUSIVE (fail-closed; r28 PASSed it)", mutate=g(info=full17 + " extra=1"), want=2, must=[GR])
+    scenario("G18c", "the guard's INFO line with a value of the wrong shape (`connections_seen=x`): INCONCLUSIVE", mutate=g(info=full17.replace("connections_seen=0", "connections_seen=x")), want=2, must=[GR])
+    scenario("G18d", "a sample line without its last field (last_call_log_age_s): INCONCLUSIVE (r28 PASSed it)", mutate=g(info=sample17.format(n=1, c=0, a=0, w=0, age=1681).rsplit(" last_call_log_age_s=", 1)[0]), want=2, must=[GR])
+    scenario("G18e", "a sample line with an unknown field appended (`extra=1`): INCONCLUSIVE (r28 PASSed it)", mutate=g(info=sample17.format(n=1, c=0, a=0, w=0, age=1681) + " extra=1"), want=2, must=[GR])
+    scenario("G18f", "an activity field on the IDENTITY line (`pending_changed=True`; the old code left the line after its first read and never scanned it, r28 PASSed): INCONCLUSIVE", mutate=g(identity_tail=" pending_changed=True"), want=2, must=[NG])
+    scenario("G18g", "an activity field on the CHECK line (`workers=2`): INCONCLUSIVE", mutate=g(check_tail=" workers=2"), want=2, must=[NG])
+    scenario("G18h", "garbage before a complete, quiet INFO line (`x INFO ...`): INCONCLUSIVE (the line is not the guard's INFO line; r28 PASSed it)", mutate=g(info="x " + full17), want=2, must=[NG])
+    scenario("G18i", "the complete, quiet INFO line with a lowercase prefix (`info ...`): INCONCLUSIVE (r28 PASSed it)", mutate=g(info="info" + full17[4:]), want=2, must=[GR])
+    scenario("G18j", "the complete, quiet INFO line with one leading space: INCONCLUSIVE (exactly the guard's line; r28 PASSed it)", mutate=g(info=" " + full17), want=2, must=[GR])
+    scenario("G18k", "the complete, quiet INFO line with one trailing space: INCONCLUSIVE (exactly the guard's line; r28 PASSed it)", mutate=g(info=full17 + " "), want=2, must=[GR])
+    scenario("G18l", "an activity field on the GUARD line (`workers=0`, quiet but not in the guard's grammar; the old code left the line after its first read, r28 PASSed): INCONCLUSIVE", mutate=g(guard_tail=" workers=0"), want=2, must=[NG])
     scenario("G5", "a guard version 4 receipt (GUARD-RESULT, no IDLE-RESULT)", mutate=g(version="4", mode="full"), want=2, must=["not from guard version 5", "not an --idle-only receipt", "0 IDLE-RESULT line(s)"])
     scenario("G6", "a full-mode guard 5 receipt (mode=full) is not an idle-only receipt", mutate=g(mode="full"), want=2, must=["not an --idle-only receipt"])
     scenario("G7", "--diagnostic with an otherwise perfect world: measured and printed, never PASS", diagnostic=True, want=2, must=["PASS is not possible", "foreign=0", "orphans=0", "statuses={'unique': 6}"])
