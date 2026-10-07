@@ -462,3 +462,44 @@ bytes. The service and timer templates are unchanged from reviewed f2cab814.
 This follows the existing repository render/install split in
 `install.sh:722-725` and `observability/grand-dashboard/install.py:25-29`;
 it neither installs nor activates a host unit.
+
+## Amendment (2026-10-07): existing native writer test contracts
+
+Mechanical review M1 requires a declaration of existing-test changes even
+when main's original tests pass. This records the comparison of main003804f2
+with the reviewed27c8a4de, not a new test run or a change to any observed result.
+The kind5 runtime binding below is proposed for the command center's by-name
+disposition before replay; this amendment grants no approval itself.
+
+| Existing member | Kind | Actual change and preserved contract |
+| --- | --- | --- |
+| tests.test_observability_writer_identity.NativeCollectorTests (class eligibility) | 5: runtime binding adaptation, pending CC | Main's canonical versioned executable path and explicit OTELCOL_TEST_BIN override remain. If that canonical path is absent and no override is set, add the native install-plan destination ~/.local/bin/otelcol-contrib. Require its --version output to match the unchanged manifest pin before running; main checked presence only. This changes eligible producers/skips and therefore is declared as binding adaptation, not AST identity. |
+| tests.test_observability_writer_identity.NativeCollectorTests.setUp | 2a: synthetic fixture grew | Only the new test_export_guard_removes_run_keys_from_unfiltered_otlp selects the isolated guard pipeline. Existing methods keep their prior pipeline; metric_processors exposes it for the new assertion. |
+| tests.test_observability_writer_identity.NativeCollectorTests.post | 2a: synthetic fixture grew | Add optional scope_attributes=None for the new scope-provenance fixture. Existing callers emit the same scope name and payload shape when the optional value is absent. |
+| tests.test_observability_writer_identity.NativeCollectorTests.test_sessions_and_processes_are_separate_writers_and_collapsed_streams_add_up | 1: assertion inventory extended | Add exactly-two-Claude-points and absent-agent_name assertions. Input generation, waits and scraping are unchanged. All five prior assertions remain AST-identical. Given two points and the required distinct session-a/session-b totals, additive collection equals main's dictionary for every passing result. |
+
+The five prior assertions at main487,490,493,497,499 correspond to
+current581,584,587,591,593: Claude60/14; Codex2000/4000; startup phases4/4;
+no delta-to-cumulative error samples; and groupbyattrs/session incoming-item
+telemetry present. None is relaxed or reversed. Main contains no three-stream
+assertion: the earlier3-to2 expectation was introduced within this PR, not a
+change to main's existing assertion. New test additions require no existing
+contract declaration; this table explicitly covers the changed existing
+members and shared class eligibility. No kind3 or kind4 is proposed.
+
+Source locators: tests/test_observability_writer_identity.py at main003804f2
+versus current27c8a4de: runtime selection36-40 versus36-51; class decorator407
+versus463; setUp410 versus466; post450 versus511; additional assertions576-577.
+The class binding affects its three existing native tests: the session/process
+test above, test_lane_name_becomes_a_label_and_a_malformed_one_is_dropped, and
+test_prometheus_scrape_drops_codex_buckets_and_counts_a_new_series_from_zero.
+All source and fixture changes are disclosed; passing main alone does not
+dispose of the binding question.
+
+M2 is an environment-dependent baseline, not a changed test contract:
+LinuxPlatformDependencyTests passes28 tests in the co-op's environment, while
+this lane's main run fails in setUpClass because npm resolves to a version
+manager shim invalid under empty HOME. Its private
+baseline-final-summary-failures.log retains that returned error. Keep the
+runnable class selector in the baseline ID file; hosted setup's real node/npm
+executables and this host's shim selection are different environments.
