@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "id": "monitoring-binary-pins-20261006",
+  "date": "2026-10-06",
+  "kind": "native_cli_e2e",
+  "evidence_class": "local_integration",
+  "scope": "Official release installation/checksum/version/link only; not Grafana MCP client acceptance.",
+  "claim": "The official mcp-grafana 2.0.1 archive passed both checksum comparisons before extraction; version and owned link read back on 2026-10-06. AgentsView 0.44.0 operational mirrors follow the previously recorded native upgrade.",
+  "component_ids": [
+    "mcp-grafana",
+    "agentsview"
+  ],
+  "install_ahead_of_pin": true,
+  "vendor_checksum_documents": {
+    "mcp_grafana": {
+      "url": "https://github.com/grafana/mcp-grafana/releases/download/v2.0.1/mcp-grafana_2.0.1_checksums.txt",
+      "sha256": "791e1820c62268eb7a8ca89ed4b1e8cbe7bf1710ee402dac220fec5126544e15"
+    },
+    "agentsview": {
+      "url": "https://github.com/kenn-io/agentsview/releases/download/v0.44.0/SHA256SUMS",
+      "sha256": "83e253573ccb014c88f437264f934d69f022e42b315d4ef79df9463543567043"
+    },
+    "scope": "Hashes of retained vendor checksum documents from the earlier downloads; no new archive download, signature verification or native client smoke."
+  },
+  "source": {
+    "repository": "grafana/mcp-grafana",
+    "tag": "v2.0.1",
+    "commit": "c8fe90320a03e213ee6ce0a033e7492f1082aca6",
+    "published_at": "2026-10-06T10:34:12Z",
+    "archive_sha256": "4535c841ecf1926dd470e711c27ce16449655e9962c4f6b738890dacfe9b2a19"
+  },
+  "native_readback": {
+    "start_utc": "2026-10-06T19:31:41Z",
+    "end_utc": "2026-10-06T19:31:44Z",
+    "nice": 19,
+    "exit": 0,
+    "published_checksum_check": "mcp-grafana_Linux_x86_64.tar.gz: OK",
+    "pinned_checksum_check": "mcp-grafana_Linux_x86_64.tar.gz: OK",
+    "version": "2.0.1",
+    "link_target": "${ECO_ROOT}/tools/mcp-grafana-2.0.1/mcp-grafana"
+  },
+  "signature_attestation": "Release assets contain no downloadable signature/attestation. Artifact-attestation lookup404; no broad absence/verification claim. SHA checks establish neither.",
+  "agentsview_source": "kenn-io/agentsview@413a87f7bfbd67b2815b1119ac51abc1efbeeaba; Linux037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3; previous native B2 upgrade and operational mirrors from946158c1. Historical G5 tests are not a new0.44 upstream suite.",
+  "local_checks": {
+    "j807b_rebase_20261007": {
+      "first_validate_exit": 1,
+      "first_validate_cause": "Regenerated trading index/manifest still had main's file digests; catalog_decisions writes them without registering them.",
+      "base": "79619936926576576e5d011eec19e3790e55f457",
+      "prior_head": "dcec14e6102bd6557362b30a478dd39d05a2bcf5",
+      "observed_utc": "2026-10-07T08:08:08Z",
+      "command": "AGENTSVIEW_NO_DAEMON=1 nice -n19 ionice -c3 python3 -m unittest tests.test_new_wsl_profile tests.test_foundation_stack_pins tests.test_new_wsl_definitive_defaults tests.test_landscape",
+      "tests": 245,
+      "skipped": 3,
+      "exit": 0,
+      "elapsed_seconds": 27.633,
+      "check_plan_exit": 0,
+      "catalog_render_exit": 0,
+      "component_matrix_exit": 0,
+      "grand_list_exit": 0,
+      "evidence_class": "local_integration",
+      "claim": "Rebased source checks only. Main registry copied, own files/receipt re-registered; all existing main receipts/convergence records and upstream observations preserved. No new host apply or native acceptance."
+    },
+    "post_render_validate_20261007": {
+      "command": "nice -n 19 ionice -c3 python3 scripts/validate.py",
+      "failed_attempt_retained": {"exit": 1, "cause": "Own receipt limitations projection in manifests/evidence.json was stale."},
+      "retry_exit": 0,
+      "observed_utc": "2026-10-07T07:40:11Z",
+      "evidence_class": "local_integration",
+      "claim": "Repository integrity only; no upstream or native client acceptance."
+    },
+    "evidence_class": "local_integration",
+    "test_attempts_before_paper_window": [
+      {
+        "tests": 106,
+        "failures": 23,
+        "skipped": 3,
+        "exit": 1
+      },
+      {
+        "tests": 106,
+        "failures": 1,
+        "skipped": 3,
+        "exit": 1
+      },
+      {
+        "tests": 106,
+        "failures": 1,
+        "skipped": 3,
+        "exit": 1
+      }
+    ],
+    "last_failure": "Generated decision-index lacked the new component_record join.",
+    "light_render": {
+      "command": "nice -n 19 python3 scripts/catalog_decisions.py --write",
+      "date": "2026-10-06",
+      "exit": 0,
+      "repositories": 876,
+      "component_records": 70,
+      "claim": "Maintained metadata render only; no upstream test or native execution rerun."
+    },
+    "post_render_tests": {
+      "observed_utc": "2026-10-07T07:26:02Z",
+      "command": "AGENTSVIEW_NO_DAEMON=1 nice -n 19 ionice -c3 python3 -m unittest tests.test_new_wsl_profile tests.test_foundation_stack_pins tests.test_new_wsl_definitive_defaults tests.test_landscape",
+      "tests": 201,
+      "skipped": 3,
+      "failures": 0,
+      "exit": 0,
+      "elapsed_seconds": 10.156,
+      "evidence_class": "local_integration",
+      "claim": "Repository integration only; no upstream test, native MCP/client smoke, provider or host re-apply."
+    },
+    "remote_failure_retained": {
+      "head": "5257647dc26829c45b7ff722be95d05b76256322",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37536102777",
+      "tests": 52,
+      "failures": 2,
+      "cause": "Native token CI PINS still required AgentsView0.43.0, so its manifest preflight stopped before the mocked exception/interrupt fixtures.",
+      "repair": "Align the operational harness pin to the same verified0.44.0 release; all fixture and assertion strength remains unchanged.",
+      "rerun": "PENDING remote CI on the new head; no local test run during the paper window."
+    },
+    "review_followup": {
+      "decision": "J807 and J807b: shared lane classification, vendor release/checksum-document references, source rebase and hot files last.",
+      "base": "67c6b6f94b456a3a7b5d28bb1fa34625a808d316",
+      "light_render": "Repeated once after the required source rebase; maintained catalog_decisions.py --write, nice19, exit0; no local test or model execution."
+    },
+    "remote_integrity_failure_retained": {
+      "head": "7512d3c9c6230596a374b1fecdea795f068cc8f8",
+      "job": 112519774447,
+      "errors": [
+        "component mcp-grafana: profile membership mismatch",
+        "receipt monitoring-binary-pins-20261006: payload id differs from manifest",
+        "receipt monitoring-binary-pins-20261006: payload claim differs from manifest",
+        "receipt monitoring-binary-pins-20261006: payload limitations differs from manifest"
+      ]
+    },
+    "validate_py": {
+      "command": "nice -n 19 python3 scripts/validate.py",
+      "observed_utc": "2026-10-06T22:20:12Z",
+      "exit": 0,
+      "components": 70,
+      "hashed_files": 10360,
+      "profiles": 4,
+      "receipts": 215,
+      "scope": "J807c authorizes the light validator now; integrity/scope only, no live provider or GPU execution."
+    },
+    "post_render_prior_status": "PENDING after 2026-10-07T00:10Z; draft published with remote CI under A58.",
+    "post_render_failed_attempts_20261007": [
+      {
+        "tests": 106,
+        "skipped": 3,
+        "exit": 1,
+        "failures": 1,
+        "elapsed_seconds": 8.407,
+        "cause": "Public explorer lacked a current role explanation for selected mcp-grafana."
+      },
+      {
+        "tests": 106,
+        "skipped": 3,
+        "exit": 1,
+        "failures": 1,
+        "elapsed_seconds": 8.11,
+        "cause": "Current selected-component projection lacked mcp-grafana and retained prior AgentsView selected fields."
+      }
+    ],
+    "selection_projection_followup": {
+      "date": "2026-10-07",
+      "source_base": "d406cc8c62bc5805bc1f6c14e802b7f942e61252",
+      "claim": "Dated current-role candidate and selection projection only; all historical69 component API observations/top-level snapshot fields, stars, dates, summaries and recorded verdicts unchanged. Original AgentsView selection retained; new MCP row has zero API checks."
+    }
+  },
+  "limitations": [
+    "Binary installation and metadata read-back only; no Grafana MCP client call or whole-component qualification.",
+    "All three pre-paper and both post-render failed attempts remain retained. The final four touched modules pass201 tests with3existing skips; this is local integration, not native component acceptance.",
+    "Frozen AgentsView 0.43.0 evidence remains historical and the CODE-MODE attribution gap remains open.",
+    "The CC-only template does not apply live client configuration. No promptfoo A/B gates these pins.",
+    "Remote native-token CI failed two controls before its fixtures due to a stale0.43.0 harness pin; the new-head0.44.0 retry is recorded separately.",
+    "Step13 waits2026-10-07 after13:45Z and Harbor wiring; GitHub datasource additionally waits the user-created App.",
+    "PR723 has merged; its AgentsView operational mirrors are landed. This pin PR retains historical G5/B2 evidence classes and does not rerun native client acceptance."
+  ],
+  "limitations_prior_to_20261007_followup": [
+    "Binary installation and metadata read-back only; no Grafana MCP client call or whole-component qualification.",
+    "Three pre-paper local test attempts failed; the maintained catalog render establishes metadata consistency only. Touched local tests remain pending; J807c authorizes the light validator now.",
+    "Frozen AgentsView 0.43.0 evidence remains historical and the CODE-MODE attribution gap remains open.",
+    "The CC-only template does not apply live client configuration. No promptfoo A/B gates these pins.",
+    "Remote native-token CI failed two controls before its fixtures due to a stale0.43.0 harness pin; the new-head0.44.0 retry is recorded separately.",
+    "Step13 waits2026-10-07 after13:45Z and Harbor wiring; GitHub datasource additionally waits the user-created App.",
+    "Held#723 reconciles duplicate AgentsView operational mirrors after its required rebase."
+  ]
+}

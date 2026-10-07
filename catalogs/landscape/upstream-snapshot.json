@@ -197,9 +197,9 @@
     {
       "component_id": "agentsview",
       "repository": "https://github.com/kenn-io/agentsview",
-      "selected_repository_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
-      "selected_version": "0.43.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+      "selected_version": "0.44.0",
+      "selected_source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
       "checks": [
         {
           "endpoint": "repos/kenn-io/agentsview",
@@ -250,7 +250,17 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/kenn-io/agentsview",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "newer_stable_release_review_pending",
+      "selection_projection_addendum": {
+        "date": "2026-10-07",
+        "prior_selection": {
+          "selected_repository_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+          "selected_version": "0.43.0",
+          "selected_source_pin": null
+        },
+        "source": "docs/decisions/2026-10-06-monitoring-native-binary-pins.md",
+        "claim": "Current selection projection only; all historical API checks, observed release/source values, comparison labels and dates unchanged. Retained adoption recommendation, release relationship and pin-kind describe the prior 0.43.0 selection, not a new 0.44.0 comparison."
+      }
     },
     {
       "component_id": "ai-memory",
@@ -5400,6 +5410,20 @@
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/nautechsystems/nautilus_trader",
       "release_relationship": "selected_development_or_prerelease_channel"
+    },
+    {
+      "component_id": "mcp-grafana",
+      "repository": "https://github.com/grafana/mcp-grafana",
+      "selected_repository_url": "https://github.com/grafana/mcp-grafana",
+      "selected_version": "2.0.1",
+      "selected_source_pin": "c8fe90320a03e213ee6ce0a033e7492f1082aca6",
+      "checks": [],
+      "status": "selection_metadata_unrun",
+      "selection_projection_addendum": {
+        "date": "2026-10-07",
+        "source": "evidence/artifacts/monitoring-binary-pins-20261006/receipt.json",
+        "claim": "Pinned release/receipt projection; no new public-API metadata query, freshness sweep or native client call."
+      }
     }
   ],
   "stars": {
@@ -6720,5 +6744,13 @@
     "Full upstream API bodies are not retained, so output hashes identify the observed bodies but cannot reconstruct them.",
     "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
     "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head. Snapshot status and release relationships describe dated upstream metadata, not release-gate or host acceptance."
-  ]
+  ],
+  "selection_metadata_addendum": {
+    "date": "2026-10-07",
+    "current_selected_components": 70,
+    "new_upstream_checks": 0,
+    "historical_summary_unchanged": true,
+    "source": "docs/decisions/2026-10-06-monitoring-native-binary-pins.md",
+    "claim": "The original summary, checked_at, scope, source base, methodology, stars and API observations remain historical; current selection projection only, with zero new API checks or native observations."
+  }
 }

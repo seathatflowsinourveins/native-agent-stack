@@ -4330,6 +4330,19 @@
           "evidence_refs": [
             "evidence/receipts/native-gpu-patch-20260920.json"
           ]
+        },
+        {
+          "name": "Grafana MCP, command-center read-only interface (2026-10-07 addendum)",
+          "repository": "https://github.com/grafana/mcp-grafana",
+          "disposition": "selected",
+          "rationale": "Dated operational-role addendum: the command center selects upstream mcp-grafana 2.0.1 as its separate read-only observation interface on the 2604 Grafana endpoint. It complements Grafana's existing observation role; it does not replace the recorded layer verdict or install a user-scope default. Retained checksum/version/link read-back establishes binary placement only. The native list_datasources call remains UNRUN in this pin receipt, with no universal-superiority, provider or new host acceptance claim.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/decisions/2026-10-06-monitoring-native-binary-pins.md",
+            "evidence/artifacts/monitoring-binary-pins-20261006/receipt.json",
+            "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L426",
+            "https://github.com/grafana/mcp-grafana/blob/c8fe90320a03e213ee6ce0a033e7492f1082aca6/README.md#L731"
+          ]
         }
       ],
       "verdict_status": "recorded",

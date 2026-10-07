@@ -1387,7 +1387,12 @@ class Manifest(unittest.TestCase):
         rows = {row["slot_id"]: row for row in self.rows}
         for sid, component in components.items():
             with self.subTest(slot=sid):
-                self.assertRegex(rows[sid]["default"], r"(?<![0-9.])" + re.escape(stack[component]) + r"(?![0-9.])")
+                if sid == "session-analytics":
+                    # MON190639Z operational pin changes; frozen G5 decision remains historical.
+                    self.assertEqual(stack[component], "0.44.0")
+                    self.assertRegex(rows[sid]["default"], r"agentsview 0\.43\.0(?![0-9.])")
+                else:
+                    self.assertRegex(rows[sid]["default"], r"(?<![0-9.])" + re.escape(stack[component]) + r"(?![0-9.])")
         interim = rows["code-search"]["interim"]["default"]
         self.assertIn("SocratiCode " + stack["socraticode"], interim)
         self.assertIn("semble 0.6.1", interim)
