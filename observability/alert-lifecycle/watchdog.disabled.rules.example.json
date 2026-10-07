@@ -1,0 +1,21 @@
+{
+  "groups": [
+    {
+      "name": "deadman-optional",
+      "rules": [
+        {
+          "alert": "Watchdog",
+          "expr": "vector(1)",
+          "labels": {
+            "severity": "none",
+            "host": "NativeStack2604"
+          },
+          "annotations": {
+            "summary": "External heartbeat for the alerting path",
+            "description": "Load this rule only with the CC-configured independent deadman receiver. Its absence must be detected externally."
+          }
+        }
+      ]
+    }
+  ]
+}

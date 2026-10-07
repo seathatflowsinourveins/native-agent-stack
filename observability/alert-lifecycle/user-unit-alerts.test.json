@@ -1,0 +1,1043 @@
+{
+  "rule_files": [
+    "user-unit-alerts.rules.json"
+  ],
+  "evaluation_interval": "15s",
+  "group_eval_order": [
+    "ns2604-user-unit-alert-lifecycle"
+  ],
+  "tests": [
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: fresh active is quiet; fresh inactive without Result is UNKNOWN-firing",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"stack.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper.service\",failure_class=\"PaperLaneUnitFailed\",severity=\"critical\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"stack.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"paper.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper.service\"}",
+          "eval_time": "6m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: failed unit fires after 30s and remains firing beyond 6m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"ns2604-F09-DRILL.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"ns2604-F09-DRILL.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "15s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "ns2604-F09-DRILL.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit ns2604-F09-DRILL.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "ns2604-F09-DRILL.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit ns2604-F09-DRILL.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: fresh active recovery resolves only after 30s hold",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"active-recovery.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"active-recovery.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x3 0x76"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"active-recovery.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x4 1x76"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "active-recovery.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit active-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "60s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "active-recovery.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit active-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "75s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "active-recovery.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit active-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "90s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: inactive cannot resolve paper alert; only later fresh active plus hold resolves",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-recovery.service\",failure_class=\"PaperLaneUnitFailed\",severity=\"critical\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"paper-recovery.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x3 0x76"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"paper-recovery.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x4 1x7 0x69"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"paper-recovery.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x12 1x68"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "90s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "165s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "180s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "195s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "210s",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-recovery.service\"}",
+          "eval_time": "165s",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: exporter outage over 10m cannot resolve even with healthy-looking raw values",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"outage.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x3 0x76"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"outage.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x3 _x77"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"outage.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x4 1x76"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "outage.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit outage.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "2m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "outage.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit outage.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "outage.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit outage.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"outage.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: old cached active timestamp while HTTP up becomes unknown-firing",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cached.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"cached.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1 _x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "45s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "75s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "90s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "cached.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit cached.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "cached.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit cached.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_fresh_state{unit=\"cached.service\"}",
+          "eval_time": "60s",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: missing registered unit while exporter up remains unknown-firing",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"missing.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "15s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "missing.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit missing.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "missing.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit missing.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: stale marker for failed unit cannot resolve",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"stale.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"stale.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x3 stale _x76"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "stale.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit stale.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "2m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "stale.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit stale.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "stale.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit stale.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: old failed and new healthy cache overlap delays recovery conservatively",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"overlap.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"overlap.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x2 _x78"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"overlap.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x3 1x77"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "overlap.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit overlap.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "75s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "overlap.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit overlap.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "90s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "overlap.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit overlap.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "105s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "overlap.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit overlap.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "120s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"overlap.service\"}",
+          "eval_time": "75s",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: pending condition cancelled by fresh active before 30s",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"pending.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"pending.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1 0x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"pending.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_ 1x79"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "15s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "2m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: zero valued active gauge is not recovery and does not survive fresh filter",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"zero.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"zero.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "0x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "zero.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit zero.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "zero.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit zero.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_fresh_state{unit=\"zero.service\"}",
+          "eval_time": "30s",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: future healthy sample cannot resolve before its timestamp; negative-age filter rejects explicit future lookup",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"future.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"future.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x4 1x76"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "future.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit future.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "45s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "future.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit future.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "60s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "future.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit future.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "90s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "time() - timestamp(ns2604_user_unit_state{unit=\"future.service\"} @ 60) >= 0",
+          "eval_time": "30s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_fresh_state{unit=\"future.service\"}",
+          "eval_time": "30s",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: unregistered failed units do not invent alerts",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"unregistered.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "6m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitFailed",
+          "exp_alerts": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC CONFIGURATION EXPECTATION: silent stop to fresh inactive without success remains attention beyond 6m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"silent-stop.service\",failure_class=\"StackUnitFailed\",severity=\"warning\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"silent-stop.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x3 0x76"
+        },
+        {
+          "series": "ns2604_user_unit_state{host=\"fixture-host\",unit=\"silent-stop.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x4 1x76"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "45s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "75s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "90s",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "silent-stop.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit silent-stop.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "silent-stop.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit silent-stop.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "StackUnitFailed",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "silent-stop.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit silent-stop.service needs attention",
+                "description": "Failed or no fresh active state observed; inactive does not prove successful completion, and exporter, bus, missing unit, or stale state may be unknown. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"silent-stop.service\"}",
+          "eval_time": "6m",
+          "exp_samples": []
+        }
+      ]
+    }
+  ]
+}

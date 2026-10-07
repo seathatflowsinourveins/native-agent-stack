@@ -1,0 +1,11 @@
+{
+  "host": "NativeStack2604",
+  "listen": "127.0.0.1:21890",
+  "units": [
+    {
+      "name": "ns2604-F09-DRILL.service",
+      "failure_class": "PaperLaneUnitFailed",
+      "severity": "critical"
+    }
+  ]
+}

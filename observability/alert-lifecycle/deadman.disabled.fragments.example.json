@@ -1,0 +1,34 @@
+{
+  "route_fragment": {
+    "matchers": [
+      "alertname=\"Watchdog\""
+    ],
+    "receiver": "external-deadman",
+    "group_wait": "0s",
+    "group_interval": "1m",
+    "repeat_interval": "1m"
+  },
+  "receiver_fragment": {
+    "name": "external-deadman",
+    "webhook_configs": [
+      {
+        "url_file": "private/external-deadman-url",
+        "send_resolved": false
+      }
+    ]
+  },
+  "inhibit_rules_fragment": [
+    {
+      "source_matchers": [
+        "alertname=\"AlertmanagerFailedToSendAlerts\"",
+        "integration=\"telegram\""
+      ],
+      "target_matchers": [
+        "alertname=\"Watchdog\""
+      ],
+      "equal": [
+        "host"
+      ]
+    }
+  ]
+}
