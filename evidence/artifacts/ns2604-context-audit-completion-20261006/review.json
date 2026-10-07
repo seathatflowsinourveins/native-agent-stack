@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_surface_source_audit_completion",
+  "recorded_at_utc": "2026-10-06T22:55:30Z",
+  "evidence_class": "source_review",
+  "source_items_reviewed": 9,
+  "source_items_pending": 0,
+  "prior_partial_record": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/23d4366e26910ae43783518bd6807625a9e5e409/evidence/artifacts/ns2604-context-audit-20261006/review.json",
+  "historical_observations_preserved": true,
+  "instruction_files_changed": false,
+  "client_configuration_changed": false,
+  "reviewed_rows": [
+    {
+      "key": "claude:setting:idleCompaction",
+      "disposition": "declined",
+      "reason": "Leave the native rollout/default alone; true cannot force rollout and false is an opt-out, so no override is justified.",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/23d4366e26910ae43783518bd6807625a9e5e409/evidence/artifacts/ns2604-context-audit-20261006/review.json#L113",
+      "carrier": null,
+      "value": null,
+      "scope": "native setting; no override",
+      "overturn": "A measured idle-compaction problem or changed vendor guidance justifies a supported explicit override.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:env:CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS",
+      "disposition": "declined",
+      "reason": "Do not set globally; opt in only for a consumer needing native SDK/print stream-json session-state events.",
+      "source": "https://code.claude.com/docs/en/env-vars",
+      "carrier": null,
+      "value": null,
+      "scope": "environment",
+      "overturn": "A named SDK or print/stream-json consumer demonstrates a need for these native events.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:env:CLAUDE_CODE_GZIP_REQUEST_BODIES",
+      "disposition": "declined",
+      "reason": "Leave the tri-state unset; preserve native body-size/rollout and proxy, mTLS and custom-CA transport decisions.",
+      "source": "https://code.claude.com/docs/en/env-vars",
+      "carrier": null,
+      "value": null,
+      "scope": "environment",
+      "overturn": "A measured transport incompatibility or documented supported need warrants a scoped override.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:env:NODE_EXTRA_CA_CERTS",
+      "disposition": "declined",
+      "reason": "Do not set globally without an evidenced additional-CA requirement; use the vendor's scoped trust configuration when needed.",
+      "source": "https://code.claude.com/docs/en/network-config#ca-certificate-store",
+      "carrier": null,
+      "value": null,
+      "scope": "environment",
+      "overturn": "The intended endpoint demonstrates a trust requirement addressed by a supported additional CA file.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:doc:memory",
+      "disposition": "enabled",
+      "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+      "source": "https://code.claude.com/docs/en/memory",
+      "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
+      "value": {
+        "sha256": "b4e76ef1a2356fe39d5b5a70368a884e4128f1fc77a70e3556af9d4f84940562"
+      },
+      "scope": "startup-instructions",
+      "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:doc:skills",
+      "disposition": "enabled",
+      "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+      "source": "https://code.claude.com/docs/en/skills",
+      "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
+      "value": {
+        "sha256": "cf869f4c734b4094b0eaacb308b79447c9ebd5587ec30e186fc54441e8b11147"
+      },
+      "scope": "startup-instructions",
+      "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "codex:doc:agents-md",
+      "disposition": "enabled",
+      "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+      "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
+      "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
+      "value": {
+        "sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e"
+      },
+      "scope": "startup-instructions",
+      "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "rust-v0.160.1"
+    },
+    {
+      "key": "codex:feature:guardian_conversation_history_tools",
+      "disposition": "declined",
+      "reason": "Under-development Guardian history retrieval requires Apps and is native-off in 0.160.1; no host adoption need demonstrated.",
+      "source": "https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/features/src/lib.rs#L1686",
+      "carrier": null,
+      "value": false,
+      "scope": "native feature; no override",
+      "overturn": "A supported upstream release and concrete host need are qualified through unchanged upstream Guardian history scenarios.",
+      "reviewed_utc": "2026-10-06T22:55:30Z",
+      "version": "rust-v0.160.1"
+    },
+    {
+      "key": "codex:feature:guardian_root_handoff_context",
+      "disposition": "declined",
+      "reason": "Under-development worker Guardian evidence windowing is native-off in 0.160.1; no host adoption need demonstrated.",
+      "source": "https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/features/src/lib.rs#L1668",
+      "carrier": null,
+      "value": false,
+      "scope": "native feature; no override",
+      "overturn": "A supported upstream release and concrete host need are qualified through unchanged upstream Guardian root-handoff scenarios.",
+      "reviewed_utc": "2026-10-06T22:55:30Z",
+      "version": "rust-v0.160.1"
+    }
+  ],
+  "installed_claude": {
+    "version": "2.1.292",
+    "sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3",
+    "size_bytes": 251456696,
+    "byte_windows": {
+      "idleCompaction": [
+        204363765,
+        204364112
+      ],
+      "session_state": [
+        211378711,
+        211379043
+      ],
+      "gzip": [
+        209401780,
+        209402680
+      ],
+      "extra_ca": [
+        22640884,
+        22641291
+      ],
+      "agent_effort": [
+        219360906,
+        219361376
+      ],
+      "unc_command_guard": [
+        226115318,
+        226115813
+      ],
+      "print_wait": [
+        237277954,
+        237278784
+      ]
+    },
+    "native_artifact_integrity_with_publisher": "not asserted",
+    "unc_fix_behavior_acceptance": "unrun; tagged changelog supports release fix, excerpt is a command-path guard"
+  },
+  "installed_codex": {
+    "version": "0.160.1",
+    "features": [
+      {
+        "name": "guardian_conversation_history_tools",
+        "stage": "under development",
+        "enabled": false
+      },
+      {
+        "name": "guardian_root_handoff_context",
+        "stage": "under development",
+        "enabled": false
+      }
+    ],
+    "source_at_tag": "Verified official rust-v0.160.1/d27764b82f7118f674371e6d6e76271d9d606edb through pinned Semble retrieval and original reads: features/src/lib.rs:1666-1670,1684-1688; both UnderDevelopment/default false. Runtime tests were not executed."
+  },
+  "fresh_bindings": {
+    "installed_claude_artifact_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3",
+    "artifact_hash_matches_retained_source_review": true,
+    "artifact_hash_exit_code": 0,
+    "official_codex_markdown_bytes": 9149,
+    "official_codex_markdown_sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e",
+    "official_codex_markdown_matches_retained_body": true,
+    "codex_features_exit_code": 0,
+    "codex_features_output": "currency-context-audit-c5-codex-features-20261006.txt",
+    "codex_features_returned_lines": [
+      "guardian_conversation_history_tools      under development  false",
+      "guardian_root_handoff_context            under development  false"
+    ]
+  },
+  "document_comparison": {
+    "exact_reviewed_previous_bodies": "not found in checked current worktree/default cache/related durable archive; no previous semantic delta invented",
+    "codex_related_archive_normalized_main_text_sha256": "f085351db069428d0c006643fce7c6f32b4aefe64819bae447e58cabe7ec3b18",
+    "codex_markup_only_relative_to_related_archive": true,
+    "not_proven_against_reviewed_hash": "af22c038b1e5ce2fdf28cacdc996c2790232e13cb90a39f7d325d352256e412c"
+  },
+  "guardian_source_review": {
+    "repository": "openai/codex",
+    "tag": "rust-v0.160.1",
+    "commit": "d27764b82f7118f674371e6d6e76271d9d606edb",
+    "installed_readback": "Both exact features: under development, false; native Codex CLI0.160.1, exit0.",
+    "release_notes": {
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.1",
+      "published_at": "2026-10-05T18:29:37Z",
+      "scope": "Windows remote stdio MCP environment fix; no guardian claim from absence in release notes"
+    },
+    "retrieval": "Semble on exact official sparse tag checkout followed by original source reads",
+    "history": {
+      "definition": "codex-rs/features/src/lib.rs:1684-1688",
+      "history_prompt_guard": "codex-rs/core/src/guardian/reviewer_config.rs:48-62",
+      "purpose": "Retrieve the owner's prior messages including restrictions/revocations; also requires Apps.",
+      "source": "codex-rs/core/src/context/guardian_conversation_history.rs:29-38",
+      "unchanged_scenario_source": "codex-rs/core/tests/suite/scenarios_guardian_conversation_history_tests.rs:98-215"
+    },
+    "root_handoff": {
+      "definition": "codex-rs/features/src/lib.rs:1666-1670",
+      "purpose": "Limit worker Guardian root evidence to preceding root communication windows.",
+      "purpose_source": "codex-rs/features/src/lib.rs:333-334",
+      "unchanged_scenario_source": "codex-rs/core/tests/suite/guardian_root_handoff.rs:67,180-208,256-276",
+      "limitation": "Runtime gate tracing extends beyond this sparse checkout; only declaration and test specification are asserted."
+    },
+    "source_tests_executed": false,
+    "native_behavior_or_token_savings_claim": false,
+    "independent_critic": "No material source-review gap for these two; keep separate stable parent-compaction feature outside these dispositions."
+  },
+  "watch_before": {
+    "exit_code": 0,
+    "unreviewed": 9,
+    "scope": "unchanged main e28d0eec dispositions",
+    "version_claude": "2.1.292",
+    "version_codex": "rust-v0.160.1"
+  },
+  "retained_usage_failures": [
+    {
+      "exit_code": 2,
+      "condition": "Default long worktree path: no runnable details command fits the 160-character summary; failed before fetch."
+    },
+    {
+      "exit_code": 2,
+      "condition": "Same long worktree with supported shorter state-dir still exceeds summary limit; failed before fetch."
+    }
+  ],
+  "recovery": {
+    "source": "Installed Worktrunk --config-set/--no-hooks support and upstream_surface_watch.py documented defaults",
+    "scope": "A short owned worktree path for this unit; one-invocation override, no saved settings change",
+    "watch_exit_code": 0
+  },
+  "watch_after_catalog_candidate": {
+    "evidence_class": "local_integration",
+    "exit_code": 0,
+    "observed_at_utc": "2026-10-06T23:08:10Z",
+    "base_commit": "e28d0eec112527ac02659ac23753533b8ed39a73",
+    "command": "nice -n 19 ionice -c3 python3 scripts/upstream_surface_watch.py --network --dry-run --json",
+    "unreviewed": [],
+    "documents": [
+      {
+        "key": "claude:doc:memory",
+        "source": "https://code.claude.com/docs/en/memory",
+        "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
+        "expected_sha256": "b4e76ef1a2356fe39d5b5a70368a884e4128f1fc77a70e3556af9d4f84940562",
+        "observed_sha256": "b4e76ef1a2356fe39d5b5a70368a884e4128f1fc77a70e3556af9d4f84940562",
+        "changed": false
+      },
+      {
+        "key": "claude:doc:skills",
+        "source": "https://code.claude.com/docs/en/skills",
+        "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
+        "expected_sha256": "cf869f4c734b4094b0eaacb308b79447c9ebd5587ec30e186fc54441e8b11147",
+        "observed_sha256": "cf869f4c734b4094b0eaacb308b79447c9ebd5587ec30e186fc54441e8b11147",
+        "changed": false
+      },
+      {
+        "key": "codex:doc:agents-md",
+        "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
+        "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
+        "expected_sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e",
+        "observed_sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e",
+        "changed": false
+      }
+    ],
+    "coverage_mode": "network",
+    "from_cache": [],
+    "kinds_not_observed": {},
+    "observed_counts": {
+      "claude:setting": {
+        "observed": 184,
+        "baseline": 183,
+        "new": 1,
+        "removed": 0
+      },
+      "claude:hook": {
+        "observed": 33,
+        "baseline": 33,
+        "new": 0,
+        "removed": 0
+      },
+      "claude:env": {
+        "observed": 410,
+        "baseline": 407,
+        "new": 3,
+        "removed": 0
+      },
+      "claude:mod": {
+        "observed": 6,
+        "baseline": 6,
+        "new": 0,
+        "removed": 0
+      },
+      "codex:config": {
+        "observed": 1034,
+        "baseline": 1034,
+        "new": 0,
+        "removed": 0
+      },
+      "codex:feature": {
+        "observed": 154,
+        "baseline": 152,
+        "new": 2,
+        "removed": 0
+      }
+    },
+    "reported_summary": "surface watch: 0 unreviewed of 6 new; details: native upstream_surface_watch.py --dry-run --network",
+    "watched_versions": {
+      "claude": "2.1.292",
+      "codex": "rust-v0.160.1",
+      "claude_agent_sdk": "0.3.292"
+    },
+    "raw_custody": "Private coordinator state; exact JSON/stderr retained separately from this sanitized record",
+    "claim_boundary": "Zero unreviewed for the catalog candidate and these fetched surfaces, not deployed main/client settings or native runtime acceptance."
+  },
+  "raw_watch_artifacts": {
+    "before_sha256": "5464e1623f65f1b8746760b140c75c369520eb433d8be61af793c41dd5439be5",
+    "after_sha256": "652a29724c8b6bade837e7b1067cd5edf53e330e188a1449872e20499953b2a5",
+    "custody": "Private durable coordinator state; public record retains sanitized observations"
+  },
+  "retained_test_failure": {
+    "exit_code": 1,
+    "tests_run": 114,
+    "errors": 75,
+    "skipped": 6,
+    "cause": "Watch fixture constructor lacked the new official Markdown URL in its synthetic DOCUMENTS mapping.",
+    "stderr_sha256": "2a9de1adf53e7311b011fcebf8f8dcc4713a14da4d837a5d9387d9e540f2cd07",
+    "correction": "Update the existing fixture URL and expected document carrier; synthetic body and source-watch implementation unchanged."
+  },
+  "local_tests_after_fixture_amendment": {
+    "evidence_class": "local_integration",
+    "command": "nice -n 19 ionice -c3 python3 -m unittest discover -s tests -p test_upstream_surface_watch.py",
+    "exit_code": 0,
+    "tests_run": 114,
+    "skipped": 6,
+    "skip_scope": "Optional cached upstream-input checks; no fabricated upstream acceptance",
+    "implementation_changed": false,
+    "fixture_changes": "Official Markdown URL and completion carrier only; identical synthetic body"
+  },
+  "limits": [
+    "Source/schema review does not establish live behavior, token savings or native Guardian acceptance.",
+    "Upstream Guardian scenario source was read; no scenario or new model call was run.",
+    "Previous reviewed document bytes were unavailable; no historical semantic delta is invented.",
+    "Current Markdown source/digest was independently refetched before changing the watched Codex document route.",
+    "Actual zero-unreviewed requires the final native watch observation, separate from source-items-pending zero."
+  ]
+}
