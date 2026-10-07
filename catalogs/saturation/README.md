@@ -200,3 +200,29 @@ usage record) and `4a4c8a2` (the seed's base).
 **Consequence:** no seed layer counts as clean, and every layer is due. The loop's end-to-end
 acceptance is the first scoped manual sweep appended with `--append` with retained votes. Until
 then, only this seed exists.
+
+## Additive requirement binding, version 2
+
+The [binding decision](../../docs/decisions/2026-10-07-saturation-requirement-binding-v2.md)
+adds a text-and-identity snapshot without changing historical records.
+`--scope` retains its existing `requirement_sha256` map and adds
+`requirement_bindings`, keyed by catalog/layer. Each snapshot contains
+`binding_version: 2`, `identity: {catalog, layer_id}`, exact `requirement_text`,
+`requirement_hash` and `legacy_hash`. The new hash covers the version, identity
+and text using the existing canonical JSON/SHA256 implementation; the legacy
+digest and the skills lifecycle/requirement/overturn formula remain unchanged.
+
+A future sweep must retain its snapshot in the original discovery/source before
+evaluation. `--append` copies a supplied snapshot only when that retained source
+agrees; it does not manufacture a binding from current text for an older run.
+When present, the snapshot also enters the frozen v2 field digest. Both original
+and expanded source digests are verified. With no snapshot, the old formula and
+legacy record verification remain compatible.
+
+The report distinguishes current and recorded bindings and labels legacy or
+mixed counts without treating them as text-bound qualification. It changes no
+closure or readiness gate. The live sweep producers still need their owner's
+compatible propagation before new runs can claim this binding; no production
+sweep is qualified by this schema change alone.
+
+Source seams: `native-agent-stack@bed695bef593aa5a846611bb6cb4cf8ee2286760:scripts/saturation_ledger.py:122-132,524-531,575-580,1139-1162,1341-1346,1626-1708`.

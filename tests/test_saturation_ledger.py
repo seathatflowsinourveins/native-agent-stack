@@ -282,6 +282,11 @@ def register(root: Path, *extra: str) -> None:
 
 
 def build_fixture(root: Path) -> None:
+    write(root, "catalogs/landscape/foundation.json", {"layers": [
+        {"catalog": "foundation", "layer_id": "alpha", "requirement": "Exact alpha requirement"},
+        {"catalog": "foundation", "layer_id": "gamma", "requirement": "Exact gamma requirement"}]})
+    write(root, "catalogs/landscape/us-equities.json", {"layers": [
+        {"catalog": "us-equities", "layer_id": "beta", "requirement": "Exact beta requirement"}]})
     write(root, sl.RESEARCH_STATE, {"schema_version": 1, "layers": [
         {"catalog": "foundation", "layer_id": "alpha", "status": "comparison_required",
          "next_action": "compare alpha", "decision_ref": "catalogs/landscape/foundation.json"},
@@ -407,6 +412,141 @@ class FixtureCase(unittest.TestCase):
     def assertErrorMatches(self, ledger, pattern):
         errors = sl.check_ledger(self.root, ledger)
         self.assertTrue(any(re.search(pattern, error) for error in errors), errors)
+
+
+class RequirementBindingMigrationTests(FixtureCase):
+    """Additive snapshots; historical byte chains remain legacy-compatible."""
+
+    def capture_binding(self, sweep_id="fx-1"):
+        scope = sl.scope_hashes(self.root)
+        relative = paths(sweep_id)[2]
+        returned = json.loads((self.root / relative).read_text())
+        for item in returned["discovery"].values():
+            item["requirement_binding"] = copy.deepcopy(scope["requirement_bindings"][f"{item['catalog']}/{item['layer_id']}"])
+        write(self.root, relative, returned)
+        register(self.root)
+        return scope
+
+    def test_text_and_identity_are_distinct_even_when_legacy_hash_collides(self):
+        a = sl.requirement_binding("foundation", "alpha", "Exact requirement A", REQ)
+        b = sl.requirement_binding("foundation", "alpha", "Exact requirement B", REQ)
+        c = sl.requirement_binding("foundation", "gamma", "Exact requirement A", REQ)
+        self.assertEqual({a["legacy_hash"], b["legacy_hash"], c["legacy_hash"]}, {REQ})
+        self.assertEqual(len({a["requirement_hash"], b["requirement_hash"], c["requirement_hash"]}), 3)
+        self.assertNotEqual(a["requirement_hash"], sl.requirement_binding("foundation", "alpha", "Exact requirement A\n", REQ)["requirement_hash"])
+
+    def test_scope_exposes_actual_text_and_preserves_legacy_api_digests(self):
+        rows = sl.research_rows(self.root)
+        scope = sl.scope_hashes(self.root)
+        for key, row in rows.items():
+            name = "/".join(key)
+            self.assertEqual(scope["requirement_sha256"][name], sl.requirement_sha256(row))
+            snapshot = scope["requirement_bindings"][name]
+            self.assertEqual(snapshot["legacy_hash"], scope["requirement_sha256"][name])
+            self.assertIn("Exact", snapshot["requirement_text"])
+            self.assertNotEqual(snapshot["requirement_text"], row["next_action"])
+
+    def test_missing_or_duplicate_actual_catalog_requirement_rejects(self):
+        path = "catalogs/landscape/foundation.json"
+        document = json.loads((self.root / path).read_text())
+        document["layers"].pop(0)
+        write(self.root, path, document)
+        with self.assertRaisesRegex(sl.LedgerError, "actual landscape requirement is missing"):
+            sl.scope_hashes(self.root)
+        build_fixture(self.root)
+        document = json.loads((self.root / path).read_text())
+        document["layers"].append(copy.deepcopy(document["layers"][0]))
+        write(self.root, path, document)
+        with self.assertRaisesRegex(sl.LedgerError, "duplicate requirement layer"):
+            sl.scope_hashes(self.root)
+
+    def test_catalog_filename_supplies_omitted_identity_but_conflicts_reject(self):
+        path = "catalogs/landscape/foundation.json"
+        document = json.loads((self.root / path).read_text())
+        for row in document["layers"]:
+            del row["catalog"]
+        write(self.root, path, document)
+        self.assertEqual(sl.scope_hashes(self.root)["requirement_bindings"]["foundation/alpha"]["identity"],
+                         {"catalog": "foundation", "layer_id": "alpha"})
+        document["layers"][0]["catalog"] = "us-equities"
+        write(self.root, path, document)
+        with self.assertRaisesRegex(sl.LedgerError, "malformed catalog/layer"):
+            sl.scope_hashes(self.root)
+
+    def test_captured_strong_snapshot_survives_later_text_edit_without_rewrite(self):
+        frozen = self.capture_binding()
+        path = "catalogs/landscape/foundation.json"
+        document = json.loads((self.root / path).read_text())
+        document["layers"][0]["requirement"] = "Changed text after the sweep froze its actual input"
+        write(self.root, path, document)
+        ledger = self.appended(result())
+        captured = ledger["sweeps"][0]["layers"][0]
+        self.assertEqual(captured["requirement_binding"], frozen["requirement_bindings"]["foundation/alpha"])
+        self.assertEqual(captured["requirement_sha256"], captured["requirement_binding"]["legacy_hash"])
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        report = sl.build_report(self.root, ledger)
+        row = next(row for row in report["layers"] if row["layer_id"] == "alpha")
+        self.assertFalse(row["requirement_binding"]["current_matches_recorded"])
+        self.assertFalse(row["requirement_binding"]["text_bound_saturation_candidate"])
+        self.assertEqual(row["requirement_binding"]["recorded"], captured["requirement_binding"])
+
+    def test_old_append_does_not_retrofit_todays_binding(self):
+        ledger = self.appended(result())
+        self.assertTrue(all("requirement_binding" not in row for row in ledger["sweeps"][0]["layers"]))
+        report = sl.build_report(self.root, ledger)
+        self.assertTrue(all(row["requirement_binding"]["recorded_scope"] == "legacy_only" for row in report["layers"]))
+        self.assertTrue(all(not row["requirement_binding"]["text_bound_saturation_candidate"] for row in report["layers"]))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+
+    def test_caller_cannot_supply_unrecorded_current_binding(self):
+        value = result()
+        value["layers"][0]["requirement_binding"] = sl.scope_hashes(self.root)["requirement_bindings"]["foundation/alpha"]
+        with self.assertRaisesRegex(sl.LedgerError, "must match explicit retained frozen discovery"):
+            sl.append(self.root, self.ledger(), value)
+
+    def test_tampered_snapshot_text_identity_hash_and_legacy_alias_reject(self):
+        self.capture_binding()
+        ledger = self.appended(result())
+        cases = (("requirement_text", "Changed captured text", "requirement_hash"),
+                 ("identity", {"catalog": "foundation", "layer_id": "gamma"}, "identity differs"),
+                 ("requirement_hash", "f" * 64, "requirement_hash"),
+                 ("legacy_hash", "f" * 64, "legacy_hash"),
+                 ("binding_version", True, "binding_version"))
+        for key, value, fragment in cases:
+            with self.subTest(field=key):
+                changed = copy.deepcopy(ledger)
+                changed["sweeps"][0]["layers"][0]["requirement_binding"][key] = value
+                self.assertErrorMatches(sl_rechain(changed), fragment)
+
+    def test_rehashed_snapshot_cannot_disagree_with_original_discovery(self):
+        self.capture_binding()
+        ledger = self.appended(result())
+        row = ledger["sweeps"][0]["layers"][0]
+        row["requirement_binding"] = sl.requirement_binding("foundation", "alpha", "Different text, internally valid hash", row["requirement_sha256"])
+        self.assertErrorMatches(sl_rechain(ledger), "requirement_binding differs from retained frozen discovery")
+
+    def test_v2_field_hash_is_exactly_legacy_when_absent_and_binds_snapshot_when_present(self):
+        field = {"contract_version": 2, "catalog": "foundation", "layer_id": "alpha",
+                 "requirement_sha256": REQ, "platform_profiles_sha256": PLAT,
+                 "eligible_field": [{"candidate_key": "foundation/alpha/o-repo", "repository": "https://github.com/o/repo"}]}
+        old = {key: field[key] for key in ("contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
+        old["members"] = [{"candidate_key": "foundation/alpha/o-repo", "repository": "https://github.com/o/repo"}]
+        legacy_digest = hashlib.sha256(sl.canonical(old)).hexdigest()
+        self.assertEqual(sl.v2_field_sha256(field), legacy_digest)
+        field["requirement_binding"] = sl.requirement_binding("foundation", "alpha", "Original text", REQ)
+        first = sl.v2_field_sha256(field)
+        self.assertNotEqual(first, legacy_digest)
+        field["requirement_binding"] = sl.requirement_binding("foundation", "alpha", "Changed text", REQ)
+        self.assertNotEqual(first, sl.v2_field_sha256(field))
+
+    def test_every_checked_in_historical_record_keeps_original_bytes_and_validates(self):
+        path = ROOT / sl.LEDGER
+        original = path.read_bytes()
+        historical = json.loads(original)
+        self.assertEqual(sl.check_ledger(ROOT, historical), [])
+        self.assertTrue(all("requirement_binding" not in row for sweep in historical["sweeps"] for row in sweep["layers"]))
+        self.assertEqual(path.read_bytes(), original)
+        self.assertEqual(sl.record_sha256(historical["sweeps"][-1]), historical["head_sha256"])
 
 
 class IntegrityTests(FixtureCase):

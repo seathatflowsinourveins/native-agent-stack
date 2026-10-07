@@ -24,6 +24,18 @@
   "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
   "path": {"type": "string", "minLength": 1, "pattern": "^[^/\\\\]"},
   "repo": {"type": "string", "minLength": 1},
+  "requirement_binding": {
+   "type": "object", "additionalProperties": false,
+   "required": ["binding_version", "identity", "requirement_text", "requirement_hash", "legacy_hash"],
+   "properties": {
+    "binding_version": {"const": 2},
+    "identity": {"type": "object", "additionalProperties": false, "required": ["catalog", "layer_id"],
+                 "properties": {"catalog": {"enum": ["foundation", "us-equities", "skills"]}, "layer_id": {"type": "string", "minLength": 1}}},
+    "requirement_text": {"type": "string", "minLength": 1},
+    "requirement_hash": {"$ref": "#/$defs/sha256", "description": "SHA256 of canonical {binding_version:2, identity, requirement_text}; captured text is not normalized."},
+    "legacy_hash": {"$ref": "#/$defs/sha256", "description": "Original requirement_sha256 digest; historical fields and records remain unchanged."}
+   }
+  },
   "vote": {
    "type": "object",
    "additionalProperties": false,
@@ -79,6 +91,7 @@
     "catalog": {"enum": ["foundation", "us-equities", "skills"]},
     "layer_id": {"type": "string", "minLength": 1},
     "requirement_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical {next_action, decision_ref} of the layer's research-state row at append time."},
+    "requirement_binding": {"$ref": "#/$defs/requirement_binding", "description": "Optional versioned text/identity scope, copied only from matching retained frozen discovery; never retrofitted from today's catalog text."},
     "platform_profiles_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical adoption/manifest.json#/platform_profiles at append time."},
     "votes": {"enum": ["retained", "not_retained", "not_returned"]},
     "votes_note": {"type": "string", "minLength": 1},
