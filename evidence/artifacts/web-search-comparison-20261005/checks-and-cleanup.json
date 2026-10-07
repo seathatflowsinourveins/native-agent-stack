@@ -1,0 +1,665 @@
+{
+  "offline_controls": [
+    {
+      "basename": "controls.json",
+      "raw_export_sha256": "a49d987e58d2fb9529f7694ed9f09e3433d31a5682ff87a1eb54ccf4caf53879",
+      "bytes": 70032,
+      "native_metadata": {
+        "promptfooVersion": "0.123.1",
+        "nodeVersion": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64",
+        "exportedAt": "2026-10-05T12:25:13.675Z",
+        "evaluationCreatedAt": "2026-10-05T12:25:13.558Z"
+      },
+      "native_grading_exit_code": 100,
+      "cells": [
+        {
+          "description": "correct native SearXNG list",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        },
+        {
+          "description": "correct native DDGS object",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        },
+        {
+          "description": "empty list",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        },
+        {
+          "description": "native error",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "malformed JSON",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "HTML challenge",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "invalid URL protocol",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "valid unrelated result",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        },
+        {
+          "description": "host-prefix impostor",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        },
+        {
+          "description": "duplicate primary hit counted once",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        },
+        {
+          "description": "primary outside five violates contract",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "primary at rank five",
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": false,
+          "native_failure_reason": 2
+        }
+      ],
+      "interpretation": "Failed preliminary array-oracle integration attempt, retained; fixed before all live calls."
+    },
+    {
+      "basename": "controls-corrected.json",
+      "raw_export_sha256": "261390a7b972b66abaafa8c83d19503c76d9cc7093be2aa159e63dd7eb2b6a0c",
+      "bytes": 96660,
+      "native_metadata": {
+        "promptfooVersion": "0.123.1",
+        "nodeVersion": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64",
+        "exportedAt": "2026-10-05T12:30:17.253Z",
+        "evaluationCreatedAt": "2026-10-05T12:30:17.123Z"
+      },
+      "native_grading_exit_code": 100,
+      "cells": [
+        {
+          "description": "correct native SearXNG list",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "correct native DDGS object",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "empty list",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "native error",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "malformed JSON",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "HTML challenge",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "invalid URL protocol",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "valid unrelated result",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "host-prefix impostor",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "duplicate primary hit counted once",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "primary outside five violates contract",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "primary at rank five",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "blank title and snippet",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        }
+      ],
+      "interpretation": "Preliminary13-case control corrected array expansion; zero weights erased named MRR/distinctness scores, retained and fixed before all live calls."
+    },
+    {
+      "basename": "controls-final.json",
+      "raw_export_sha256": "794f7c09ae84660280ba377630c194ae675c5f5f1a97268dd381d120f16afb07",
+      "bytes": 95256,
+      "native_metadata": {
+        "promptfooVersion": "0.123.1",
+        "nodeVersion": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64",
+        "exportedAt": "2026-10-05T12:32:01.021Z",
+        "evaluationCreatedAt": "2026-10-05T12:32:00.893Z"
+      },
+      "native_grading_exit_code": 100,
+      "cells": [
+        {
+          "description": "correct native SearXNG list",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 1,
+            "unique_fraction": 1
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "correct native DDGS object",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 1,
+            "unique_fraction": 1
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "empty list",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "native error",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "malformed JSON",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "HTML challenge",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "invalid URL protocol",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "valid unrelated result",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 1
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "host-prefix impostor",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 1
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "duplicate primary hit counted once",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 1,
+            "unique_fraction": 0.5
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "primary outside five violates contract",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        },
+        {
+          "description": "primary at rank five",
+          "native_success": true,
+          "native_named_scores": {
+            "contract": 1,
+            "usable": 1,
+            "primary_hit_at_5": 1,
+            "primary_mrr_at_5": 0.2,
+            "unique_fraction": 1
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 0
+        },
+        {
+          "description": "blank title and snippet",
+          "native_success": false,
+          "native_named_scores": {
+            "contract": 0,
+            "usable": 0,
+            "primary_hit_at_5": 0,
+            "primary_mrr_at_5": 0,
+            "unique_fraction": 0
+          },
+          "native_provider_error": false,
+          "native_failure_reason": 1
+        }
+      ],
+      "interpretation": "Final positive-weight13-case control:4expected passing,9expected failing; rank5 MRR.2, duplicate distinctness.5. Does not enter live search denominator."
+    },
+    {
+      "basename": "provider-error-control.json",
+      "raw_export_sha256": "e940d8b30369ffdd7694b4da33fda1dc3b09ed24c5b4757e3880203b4af0d894",
+      "bytes": 6475,
+      "native_metadata": {
+        "promptfooVersion": "0.123.1",
+        "nodeVersion": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64",
+        "exportedAt": "2026-10-05T12:30:57.995Z",
+        "evaluationCreatedAt": "2026-10-05T12:30:57.470Z"
+      },
+      "native_grading_exit_code": 100,
+      "cells": [
+        {
+          "description": null,
+          "native_success": false,
+          "native_named_scores": {},
+          "native_provider_error": true,
+          "native_failure_reason": 2
+        }
+      ],
+      "interpretation": "One native provider-error control, no search/network call; native error short-circuits graders and leaves namedScores empty, zero quality credit rule."
+    }
+  ],
+  "native_container_log": {
+    "basename": "searxng-container.log",
+    "sha256": "5950742f44df46273d1908ec3716b96b7111da460908bca743b14694daa4faf2",
+    "bytes": 35311,
+    "lines": 175,
+    "diagnostic_header_counts": {
+      "ERROR": 70,
+      "WARNING": 96
+    },
+    "diagnostics": {
+      "errors": {
+        "explicit_timeouts": {
+          "total": 33,
+          "searxng_duckduckgo_engine": 31,
+          "google_cse": 1,
+          "wikidata": 1
+        },
+        "late_result_container_add_unresponsive_engine_after_close": 33,
+        "engine_registration_failure": 2,
+        "forwarded_header": 1,
+        "result_filter_attribute_error": 1
+      },
+      "warnings": {
+        "searxng_duckduckgo_engine_captcha": 42,
+        "engine_rate_limit": {
+          "total": 13,
+          "brave": 7,
+          "google_cse": 6
+        },
+        "other_error_context": 33,
+        "brave_network": 7,
+        "missing_bot_detection_config": 1
+      }
+    },
+    "interpretation": "Counts are emitted log records, may duplicate underlying conditions and are not query outcomes or per-query causal proof. DuckDuckGo labels here belong to the SearXNG engine, not the separate DDGS(auto) baseline. Normalized tool results omit engine diagnostics."
+  },
+  "schema_version": 1,
+  "scope": "Synthetic local integration controls and native deployment/cleanup observations, separate from the180 live native search cells and published upstream CI. No upstream runtime acceptance, model run or savings claim.",
+  "sources": [
+    {
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/configuration/reference.md#L65",
+      "scope": "Native precomputed providerOutput controls"
+    },
+    {
+      "url": "https://github.com/searxng/searxng/blob/d48c4b555421e824342c51d68482dd0898e54d0f/docs/admin/installation-docker.rst#L173",
+      "scope": "Supported published container deployment"
+    },
+    {
+      "url": "https://docs.docker.com/engine/security/rootless/",
+      "scope": "Existing rootless namespace, no host root privileges"
+    },
+    {
+      "url": "https://docs.docker.com/reference/cli/docker/container/run/",
+      "scope": "Installed Docker29.8.2 help also verified entrypoint,user,pull,network options"
+    }
+  ],
+  "control_evidence_class": "synthetic_fixture_scored_by_native_harness",
+  "cleanup": {
+    "evidence_class": "native_operation_observation",
+    "recording_scope": "Bounded sanitized projection of actual tool-return observations; inconclusive probes are preserved separately and not absence proof.",
+    "commands": [
+      {
+        "command": "docker logs <owned-trial> > <private-native-log>",
+        "exit_code": 0,
+        "returned_stdout": ""
+      },
+      {
+        "command": "docker stop --time 10 <owned-trial>",
+        "exit_code": 0,
+        "returned_stdout": "Flag --time has been deprecated, use --timeout instead\n<owned-trial>\n",
+        "note": "Original service used --rm, so stop removes the container."
+      },
+      {
+        "command": "docker ps --all --filter name=<owned-trial> --format '{{.Names}}'",
+        "exit_code": 0,
+        "returned_stdout": ""
+      },
+      {
+        "command": "rm -rf -- <owned-trial-config> <owned-trial-data>",
+        "exit_code": 1,
+        "returned_stderr": "rm: cannot remove '<owned-trial-config>/settings.yml': Permission denied\n",
+        "note": "Mapped container UID100976 owns config/settings; no credential contents were read."
+      },
+      {
+        "command": "docker run --rm --pull never --network none --user 0 --entrypoint /bin/rm --mount type=bind,source=<owned-trial-config>,target=/owned-config searxng/searxng@sha256:76b0bf285aca014c7191fc4d9234c4bfb358624ac33d8883833d496c059ec072 -f /owned-config/settings.yml",
+        "exit_code": 0,
+        "returned_stdout": "",
+        "note": "Existing rootless namespace and cached unchanged image; no host root, image pull/build or search service started."
+      },
+      {
+        "command": "rmdir -- <owned-trial-config>",
+        "exit_code": 0,
+        "returned_stdout": ""
+      }
+    ],
+    "observations": {
+      "named_service_container_absent": true,
+      "owned_config_directory_absent": true,
+      "owned_data_directory_absent": true,
+      "image_cache_removal": false,
+      "image_cache_scope": "Shared cache retained; no running deployment/state remains."
+    },
+    "inconclusive_checks": [
+      {
+        "attempt": "Shell curl loopback health request",
+        "returned_exit_code": 0,
+        "meaning": "context-mode hook redirected the request, so no native HTTP observation occurred."
+      },
+      {
+        "attempt": "urllib loopback health request",
+        "result": "Timed out; not absence proof."
+      },
+      {
+        "attempt": "Direct socket loopback request in context-mode subprocess",
+        "result": "Timed out; not absence proof."
+      }
+    ],
+    "independent_observation": {
+      "observed_at": "2026-10-05T14:02:44.907060Z",
+      "evidence_class": "independent_observation_of_native_operation",
+      "command": "docker ps --all --filter name=<owned-trial> --format '{{.Names}}'",
+      "exit_code": 0,
+      "returned_stdout": "",
+      "returned_stderr": "",
+      "owned_config_lstat": "absent",
+      "owned_data_lstat": "absent",
+      "scope": "One bounded read-only local observation, no daemon/environment/config contents, endpoint probes, trials or writes."
+    }
+  },
+  "raw_retention": {
+    "location": "Private lane cache; ignored worktree copy of selected noncredential native exports for scoped context-mode processing.",
+    "copy_integrity": "Independent original/private-copy/public-projection hash comparison passes all9 native exports and180cells.",
+    "publication": "Full output/title/snippets are not republished; native output and export hash byte scopes are defined in every batch receipt."
+  }
+}

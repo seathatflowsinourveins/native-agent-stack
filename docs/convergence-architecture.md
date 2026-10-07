@@ -14,6 +14,11 @@ to evaluate a proposed change. Source pins live in
 [the stack manifest](../manifests/stack.json); evidence classes and publication
 limits live in [the evidence guide](evidence.md).
 
+The [October 5 upstream practice review](decisions/2026-10-05-convergence-practice-upstream-review.md)
+records current practice/runtime pins, maintained alternatives and the conditions for
+changing them. Source surveys, installation defaults and executed merit comparisons
+have distinct evidence bars; the pending V2 runner is governed by U11 revision 5.
+
 For the current macOS/workstation operating selection and the immediate North
 Star R&D starting boundary, use the [October 2 two-host architecture decision](decisions/2026-10-02-two-host-north-star-architecture.md).
 It separates native clients, SDK/gateway workers and the optional Pi runtime,

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_harness_local_verification",
+  "as_of_utc": "2026-10-07T02:38:00Z",
+  "evidence_classes": [
+    "source_review",
+    "synthetic",
+    "local_integration"
+  ],
+  "claims_not_established": [
+    "upstream test-suite acceptance",
+    "native model or gateway acceptance",
+    "candidate adoption",
+    "project-configuration precedence"
+  ],
+  "sources": [
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "sha256": "d642c7b94f77a8ffc4fe5bcfe2acccbf466aeede3a9b5fa5c2c7be15b73e9b97"
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/convert.py",
+      "sha256": "fe315e68fb16437bf31d45b47660c607d886e689721f1f0ce089b8341d06da86"
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/slot_requirements.py",
+      "sha256": "b57ce7f372254d0fd6d9a8e0dd37fd529b7776968b7853a2d1afa36e9e7d458d"
+    }
+  ],
+  "upstream": [
+    {
+      "repository": "openai/codex",
+      "pin": "rust-v0.160.1",
+      "path": "codex-rs/exec/src/lib.rs",
+      "lines": "191-193,2252-2275,2288-2290"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/developer-commands"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "754e8026b26ee9087e9366345127c31988991db0",
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "line": 1112
+    }
+  ],
+  "observations": {
+    "installed_cli": {
+      "version": "0.160.1",
+      "version_help_source_review": true
+    },
+    "real_input_pack": {
+      "layers": 32,
+      "requirements": 12,
+      "largest_discovery_prompt_bytes": 169926,
+      "model_calls": 0
+    },
+    "pre_stdin_full_tests": {
+      "exit_code": 0,
+      "tests": 452,
+      "skipped": 15,
+      "elapsed_seconds": 141.883
+    },
+    "stdin_full_tests": {
+      "command": "python3 -m unittest tests.test_landscape_sweep_harness tests.test_landscape_sweep_slot_inputs tests.test_codex_worker_lane -q",
+      "exit_code": 0,
+      "tests": 460,
+      "skipped": 15,
+      "elapsed_seconds": 146.506
+    },
+    "changed_source_gitleaks": {
+      "version": "8.30.1",
+      "exit_code": 0,
+      "scanned_bytes": 1002189
+    },
+    "source_critic": {
+      "verdict": "ACCEPT",
+      "scope": "E1/A14/slot projection and A17 delta; exact-source fallback where graph coverage is excluded or stale"
+    }
+  },
+  "preservation": {
+    "historical_records": "unchanged",
+    "raw_prompt_hash": "unchanged",
+    "delivered_normalization": "UTF-8 universal newline followed by LF-only rstrip",
+    "prior_failed_test_phase": "retained privately:445 tests,1 stale expectation,15 skips; focused repair4tests pass",
+    "new_transport_receipt": "future spawns only; private stdin/argv archived with attempts"
+  },
+  "folds": [
+    {
+      "original": 718,
+      "files": 40,
+      "identical": 36,
+      "merged": [
+        "docs/harness-defaults.md",
+        "tests/test_landscape_sweep_harness.py",
+        "tools/sota-convergence/landscape-sweep/README.md",
+        "tools/sota-convergence/landscape-sweep/build_inputs.py"
+      ]
+    },
+    {
+      "original": 763,
+      "files": 1,
+      "identical": 1
+    },
+    {
+      "original": 764,
+      "files": 2,
+      "identical": 2
+    },
+    {
+      "original": 766,
+      "files": 1,
+      "identical": 1
+    }
+  ],
+  "pending": [
+    "coordinator delta read before the native observation-inference transport job",
+    "canonical gateway source and host-record predecessors",
+    "candidate and merged-code project-precedence receipts",
+    "other-lane acknowledgment carried by its own owner"
+  ],
+  "usage": {
+    "provider_usage": null,
+    "cost": null
+  }
+}

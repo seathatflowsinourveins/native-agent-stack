@@ -84,6 +84,7 @@ sys.path.insert(0, str(HERE))
 from sweep_common import (  # noqa: E402
     MANIFEST_SECTION, REPO_ROOT, canon, ledger_module, load_json, sha256_bytes, slug, work_dir, write_json,
 )
+from slot_requirements import load_slot_requirements  # noqa: E402
 
 CATALOG_FILES = (("foundation", "foundation.json"), ("us-equities", "us-equities.json"))
 REPOSITORY = "repository"  # --modality's repository modality (build_args.REPOSITORY_MODALITY)
@@ -586,7 +587,7 @@ def pinned_requirements(requirement: str, runtime_target: dict) -> list[dict]:
             or slug(engine.get("repository")) != "nautechsystems/nautilus_trader"):
         return []
     pins = (("NautilusTrader", "user_pinned_destination", "https://github.com/nautechsystems/nautilus_trader"),
-            ("IBKR", "user_pinned_broker", None), ("Alpaca", "user_pinned_separate_adapter", "https://github.com/alpacahq/alpaca-py"),
+            ("IBKR", "user_pinned_broker", None), ("Alpaca", "user_pinned_separate_adapter", None),
             ("LEAN", "fixture_oracle", "https://github.com/quantconnect/lean"))
     return [{"name": name, "role": role, "repository": repository, "source_ref": "blueprints/us-equities/AGENTS.md#trading-north-star"}
             for name, role, repository in pins if re.search(rf"\b{re.escape(name)}\b", requirement or "", re.I)]
@@ -758,7 +759,8 @@ def freeze_upstream_facts(inputs: list, pull=False) -> dict:
 
 def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshness: dict, baseline: dict | None,
                         ledger: dict, seeds=None, absent=None, followups=None, contract_version=1,
-                        record_sources=None, runtime_target=None, platform_requirements=None) -> list[dict]:
+                        record_sources=None, runtime_target=None, platform_requirements=None,
+                        slot_requirements=None) -> list[dict]:
     """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope.
     ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
     refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted.
@@ -771,6 +773,7 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
         raise ValueError("V2 requires readable neutral platform requirements bound to the frozen scope")
     followups = followups or {}
     record_sources = record_sources or {}
+    slot_requirements = slot_requirements or {}
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
     previous = previous_by_layer(last_completed(ledger, REPOSITORY),
                                  lambda entry: refutation_absence_observation(entry, absent)["refuted_by_absence"] is True)
@@ -824,6 +827,9 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                                       "sweeps": history.get((catalog, layer_id), [])},
                 "current_dispositions": dispositions.get((catalog, layer_id), []),
                 "current_dispositions_note": CURRENT_DISPOSITIONS_NOTE,
+                "slot_requirements": copy.deepcopy(slot_requirements.get((catalog, layer_id), [])),
+                "slot_requirements_note": "Source-bound requirement annotations on existing parent layers; "
+                                          "no new layer, component selection, adoption or legacy scope-hash change.",
                 "known_repositories": sorted(known),
                 "seeded_candidates": list(seeds.get(layer_id, [])),
             })
@@ -1063,7 +1069,10 @@ def main(argv=None) -> int:
             record_sources=field_record_sources(repo, catalogs, ledger) if args.contract_version == 2 else None,
             runtime_target=load_json(repo / "catalogs/us-equities/runtime-target.json")
                            if args.contract_version == 2 and (repo / "catalogs/us-equities/runtime-target.json").is_file()
-                            else None, platform_requirements=platform_requirements)
+                            else None, platform_requirements=platform_requirements,
+            slot_requirements=load_slot_requirements(repo, {
+                (catalog, layer["layer_id"]) for catalog, document in catalogs.items()
+                for layer in document["layers"]}))
         if args.contract_version == 2:
             upstream_facts = freeze_upstream_facts(inputs, pull=args.pull_upstream_facts)
     except (ValueError, OSError, KeyError) as error:

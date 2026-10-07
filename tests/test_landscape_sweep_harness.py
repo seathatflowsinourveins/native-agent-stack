@@ -21,12 +21,14 @@ import os
 import re
 import shlex
 import shutil
+import socket
 import stat
 import signal
 import subprocess
 import sys
 import tempfile
 import time
+import types
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -92,6 +94,22 @@ LIMIT_TEXT = ("You’ve hit your usage limit. Visit https://chatgpt.com/codex/se
 # codex-rs/protocol/src/error.rs at rust-v0.157.1): the text of the ten jobs that ended so on 2026-09-29
 # (gpt6-job-outcomes.json), with a fixture id.
 RETRY_429_TEXT = "exceeded retry limit, last status: 429 Too Many Requests, request id: req_fixture0001"
+GATEWAY_ENV_VARIABLES = ("OPENAI_BASE_URL", "OPENAI_API_BASE", "WORKER_BASE_URL", "ANTHROPIC_BASE_URL")
+FIXTURE_GATEWAY = "http://127.0.0.1:20128/v1"
+FIXTURE_GATEWAY_REASON = "unit test fixture"
+
+
+def clear_gateway_environment(case):
+    """Keep fixture results independent of a developer host's gateway environment (GW-route T21)."""
+    patcher = mock.patch.dict(os.environ)
+    patcher.start()
+    case.addCleanup(patcher.stop)
+    for name in GATEWAY_ENV_VARIABLES:
+        os.environ.pop(name, None)
+
+
+def fixture_gateway_args(endpoint=FIXTURE_GATEWAY):
+    return ("--omniroute-base-url", endpoint, "--unrecorded-gateway-reason", FIXTURE_GATEWAY_REASON)
 
 
 def load(name):
@@ -1128,6 +1146,8 @@ urllib.request.urlopen = urlopen
         catalog["layers"][0]["candidates"] = [
             {"name": "NautilusTrader", "repository": "https://github.com/nautechsystems/nautilus_trader",
              "disposition": "selected"},
+            {"name": "alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py",
+             "disposition": "not_adopted"},
             {"name": "LEAN", "repository": "https://github.com/QuantConnect/Lean", "disposition": "not_adopted"}]
         write_json(path, catalog)
         write_json(self.repo / "catalogs/us-equities/runtime-target.json", {
@@ -1146,6 +1166,12 @@ urllib.request.urlopen = urlopen
             "preserve the fixed LEAN oracle and reconcile numeric accounting."))
         self.assertEqual({pin["name"] for pin in screen["pinned_requirements"]},
                          {"NautilusTrader", "IBKR", "Alpaca", "LEAN"})
+        self.assertEqual({pin["name"]: pin["repository"] for pin in screen["pinned_requirements"]}, {
+            "NautilusTrader": "https://github.com/nautechsystems/nautilus_trader",
+            "IBKR": None, "Alpaca": None, "LEAN": "https://github.com/quantconnect/lean",
+        })
+        self.assertIn("https://github.com/alpacahq/alpaca-py",
+                      {candidate["repository"] for candidate in screen["candidates"]})
         self.assertEqual(screen["acceptance_gates"][0]["id"], "broker-state-failures")
         self.assertIn("durable", screen["acceptance_gates"][0]["requirement"])
         for signal in ("EXECUTED_ONLY_MARKER", "executed_evidence_ref", "incumbent-receipt.json",
@@ -1222,7 +1248,8 @@ class BuildArgsTests(unittest.TestCase):
         probe = (ROOT / "scripts" / "codex_quota.py").read_bytes()
         self.assertEqual((work / "codex_quota.py").read_bytes(), probe)
         staged = json.loads((work / "staged.json").read_text())
-        self.assertEqual(staged["codex"], {"model": "gpt-6-astra", "effort": "max", "slots": 3})  # no quota gate
+        self.assertEqual(staged["codex"], {"model": "gpt-6-astra", "effort": "max", "slots": 3,
+                                          "apps": False})  # no quota gate; explicit future-job feature binding
         self.assertEqual(staged["harness"]["quota_probe"], {"path": "scripts/codex_quota.py",
                                                             "sha256": hashlib.sha256(probe).hexdigest()})
         self.assertEqual(staged["prompts_sha256"], summary["prompts_sha256"])
@@ -1293,7 +1320,7 @@ class BuildArgsTests(unittest.TestCase):
 # --------------------------------------------------------------------------- the GPT-6 runner
 
 FAKE_CODEX = """#!{python}
-import json, os, sys, time
+import base64, json, os, sys, time
 if sys.argv[1:] == ["--version"]:
     print("codex-cli 0.0.0-fixture")
     sys.exit(0)
@@ -1318,8 +1345,10 @@ if config.get("attempts"):
         out.write(str(attempt + 1))
     config.update(config["attempts"][min(attempt, len(config["attempts"]) - 1)])
 stdin, null = os.fstat(0), os.stat(os.devnull)
+stdin_bytes = sys.stdin.buffer.read()
 record = {{"argv": sys.argv[1:], "cwd": os.getcwd(), "stdin_devnull": (stdin.st_ino, stdin.st_dev) == (null.st_ino, null.st_dev),
-          "stdin_read": sys.stdin.read(), "rust_log": os.environ.get("RUST_LOG"),
+          "stdin_read": stdin_bytes.decode("utf-8"), "stdin_b64": base64.b64encode(stdin_bytes).decode("ascii"),
+          "rust_log": os.environ.get("RUST_LOG"),
           "codex_home": os.environ.get("CODEX_HOME"), "api_key_present": bool(os.environ.get("OMNIROUTE_API_KEY"))}}
 if config.get("stubborn"):
     import subprocess
@@ -1389,6 +1418,9 @@ TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase
 
 
 class OmniRouteFallbackBuildTests(unittest.TestCase):
+    def setUp(self):
+        clear_gateway_environment(self)
+
     def test_fallback_is_opt_in_and_restaging_keeps_frozen_prompts(self):
         work = stage_work(self)
         first = build(work)
@@ -1397,7 +1429,8 @@ class OmniRouteFallbackBuildTests(unittest.TestCase):
         frozen = {name: (work / name).read_bytes() for name in
                   ("prompts_sha256.txt", "templates.json", "args.json", "sweep.embedded.js")}
         (work / "gpt6" / "earlier-job").mkdir()
-        fallback = build(work, "--force", "--gpt6-fallback", "omniroute", "--fallback-codex-host", "127.0.0.1:20128")
+        fallback = build(work, "--force", "--gpt6-fallback", "omniroute", "--fallback-codex-host", "127.0.0.1:20128",
+                         "--unrecorded-gateway-reason", FIXTURE_GATEWAY_REASON)
         self.assertEqual(fallback.returncode, 0, fallback.stderr)
         settings = codex_job.settings(work)
         self.assertEqual(settings["fallback"], {"provider": "omniroute", "base_url": "http://127.0.0.1:20128/v1"})
@@ -1408,7 +1441,7 @@ class OmniRouteFallbackBuildTests(unittest.TestCase):
         profile = temp_dir(self) / "stack-worker.config.toml"
         profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
         gateway = build(work, "--force", "--gpt6-provider", "omniroute", "--codex-host", "example",
-                        "--stack-worker-profile", profile)
+                        "--stack-worker-profile", profile, *fixture_gateway_args())
         self.assertEqual(gateway.returncode, 0, gateway.stderr)
         self.assertNotIn("fallback", json.loads((work / "staged.json").read_text())["codex"])
         for name, original in frozen.items():
@@ -1432,7 +1465,9 @@ class OmniRouteFallbackBuildTests(unittest.TestCase):
         for model in ("gpt-daybreak-blue-latest", "codex-auto-review", "gpt-5.5", "gpt-6.1-sol-custom"):
             with self.subTest(model=model):
                 work = stage_work(self)
-                done = build(work, "--gpt6-fallback", "omniroute", "--gpt6-model", model)
+                done = build(work, "--gpt6-fallback", "omniroute", "--gpt6-model", model,
+                             "--fallback-codex-host", "127.0.0.1:20128",
+                             "--unrecorded-gateway-reason", FIXTURE_GATEWAY_REASON)
                 self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
                 self.assertIn("reasoning alias", done.stderr)
                 self.assertFalse((work / "staged.json").exists())
@@ -1443,12 +1478,17 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
     """--gpt6-provider omniroute stages a lane-local CODEX_HOME: the provider block, the rendered token MCP servers
     and the stack-worker profile, and nothing of the host's interactive trust state."""
 
+    def setUp(self):
+        clear_gateway_environment(self)
+
     def stage_lane(self, *extra):
         work = stage_work(self)
         profile = temp_dir(self) / "stack-worker.config.toml"
         profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        gateway_args = (("--unrecorded-gateway-reason", FIXTURE_GATEWAY_REASON)
+                        if "--omniroute-base-url" in extra else fixture_gateway_args())
         return work, profile, build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
-                                    "--stack-worker-profile", profile, *extra)
+                                    "--stack-worker-profile", profile, *gateway_args, *extra)
 
     def test_lane_home_carries_provider_mcp_servers_and_profile(self):
         work, profile, done = self.stage_lane()
@@ -1624,7 +1664,8 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         env = {**os.environ, "HOME": str(home)}
         common = [sys.executable, HARNESS / "build_args.py", "--work-dir", work, "--sweep-id", "landscape-sweep-20261026",
                   "--date", "2026-10-26"]
-        done = run([*common, "--gpt6-provider", "omniroute", "--codex-host", "example", "--stack-worker-profile", profile],
+        done = run([*common, "--gpt6-provider", "omniroute", "--codex-host", "example", "--stack-worker-profile", profile,
+                    *fixture_gateway_args()],
                    env=env)
         return home, work, done, lambda: run(common, env=env)
 
@@ -1680,12 +1721,12 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
 
     def test_lane_refuses_quota_gate_missing_host_and_remote_gateways(self):
         for extra, needle in ((("--quota-stop-percent", "90"), "--quota-stop-percent"),
-                              (("--omniroute-base-url", "http://10.0.0.5:20128/v1"), "loopback")):
+                              (("--omniroute-base-url", "http://10.0.0.5:20128/v1"), "not a gateway endpoint")):
             _, _, done = self.stage_lane(*extra)
             self.assertEqual(done.returncode, 2, done.stdout)
             self.assertIn(needle, done.stderr)
         work = stage_work(self)
-        done = build(work, "--gpt6-provider", "omniroute")
+        done = build(work, "--gpt6-provider", "omniroute", *fixture_gateway_args())
         self.assertEqual(done.returncode, 2, done.stdout)
         self.assertIn("--codex-host", done.stderr)
 
@@ -1695,7 +1736,8 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         work = stage_work(self)
         profile = temp_dir(self) / "stack-worker.config.toml"
         profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
-        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", private, "--stack-worker-profile", profile)
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", private, "--stack-worker-profile", profile,
+                     *fixture_gateway_args())
         self.assertEqual(done.returncode, 0, done.stderr)
         config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
         self.assertIn("[mcp_servers.context-mode]", config)
@@ -1703,7 +1745,7 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         codex = json.loads((work / "staged.json").read_text())["codex"]
         self.assertEqual(codex["lane_home"]["host"], "privatehost")
         missing = build(stage_work(self), "--gpt6-provider", "omniroute", "--codex-host", str(private) + ".gone.json",
-                        "--stack-worker-profile", profile)
+                        "--stack-worker-profile", profile, *fixture_gateway_args())
         self.assertEqual(missing.returncode, 2)
         self.assertIn("does not exist", missing.stderr)
 
@@ -1744,7 +1786,7 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         profile = temp_dir(self) / "stack-worker.config.toml"
         profile.write_text(STACK_WORKER_FIXTURE + tail, encoding="utf-8")
         return work, build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
-                           "--stack-worker-profile", profile)
+                           "--stack-worker-profile", profile, *fixture_gateway_args())
 
     def test_profile_overlay_for_a_rendered_server_stages(self):
         # Codex merges the profile over config.toml, so a partial table may tune a server the lane config defines.
@@ -1767,13 +1809,13 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
     def test_shipped_profile_overlays_only_rendered_servers(self):
         # The repository's own stack-worker profile, staged for the example host, must load under Codex.
         work = stage_work(self)
-        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example")
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example", *fixture_gateway_args())
         self.assertEqual(done.returncode, 0, done.stderr)
 
     def test_missing_profile_names_the_flag(self):
         work = stage_work(self)
         done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
-                     "--stack-worker-profile", temp_dir(self) / "absent.config.toml")
+                     "--stack-worker-profile", temp_dir(self) / "absent.config.toml", *fixture_gateway_args())
         self.assertEqual(done.returncode, 2, done.stdout)
         self.assertIn("pass --stack-worker-profile", done.stderr)
 
@@ -1818,10 +1860,221 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual(codex_job.settings(work)["codex_home"], None)
 
 
+class GatewayRoutingTests(unittest.TestCase):
+    """GW-route E1c's synthetic guards: no model, TCP probe or child process in refusal/check cases.
+
+    The fixture record is under a patched passwd home, with a controlled host and installation identity. It is
+    deliberately not the developer host's record. Upstream precedence is a separate native acceptance cell.
+    """
+
+    def setUp(self):
+        clear_gateway_environment(self)
+        self.work = stage_work(self, layers=("alpha",))
+        self.record_home = temp_dir(self)
+        self.prompt = self.record_home / "prompt.txt"
+        self.prompt.write_text("Reply in JSON.\n", encoding="utf-8")
+        self.schema = HARNESS / "schemas" / "probe.json"
+
+    @contextlib.contextmanager
+    def fixture_record(self, endpoint="http://127.0.0.1:21128/v1"):
+        write_json(self.record_home / codex_job.HOST_GATEWAY_RECORD, {
+            "schema": codex_job.HOST_GATEWAY_SCHEMA, "host": "gateway-fixture-host",
+            "endpoint": endpoint, "machine_id_sha256": "c" * 64})
+        with mock.patch("pwd.getpwuid", return_value=types.SimpleNamespace(pw_dir=str(self.record_home))), \
+                mock.patch.object(codex_job.socket, "gethostname", return_value="gateway-fixture-host"), \
+                mock.patch.object(codex_job, "installation_id", return_value="c" * 64), \
+                mock.patch.object(build_args, "installation_id", return_value="c" * 64):
+            yield
+
+    def stage_settings(self, *, provider="omniroute", endpoint="http://127.0.0.1:21128/v1",
+                       home_endpoint=None, profile_endpoint=None, gateway=None, overrides=None):
+        settings = {"model": "gpt-6-astra"}
+        if provider == "omniroute":
+            home = self.work / "codex-home"
+            home.mkdir(exist_ok=True)
+            (home / "config.toml").write_text(
+                '[model_providers.omniroute]\nname = "OmniRoute"\n'
+                f'base_url = "{home_endpoint or endpoint}"\n', encoding="utf-8")
+            (home / "stack-worker.config.toml").write_text(
+                STACK_WORKER_FIXTURE + (f'\n[model_providers.omniroute]\nbase_url = "{profile_endpoint}"\n'
+                                        if profile_endpoint else ""), encoding="utf-8")
+            settings.update(provider="omniroute", model="cx/gpt-6-astra", codex_home="codex-home",
+                            profile="stack-worker", api_key_env="OMNIROUTE_API_KEY", base_url=endpoint)
+        else:
+            settings["fallback"] = {"provider": "omniroute", "base_url": endpoint}
+        if gateway is not None:
+            settings["gateway"] = gateway
+        if overrides is not None:
+            settings["config_overrides"] = overrides
+        write_json(self.work / "staged.json", {"codex": settings})
+
+    def assert_refused_without_spawn(self):
+        commands = (("gateway-check", str(self.work)),
+                    ("--work-dir", str(self.work), "start", "refused", str(self.prompt), str(self.schema)),
+                    ("--work-dir", str(self.work), "run", "refused"))
+        with self.fixture_record(), \
+                mock.patch.object(codex_job.subprocess, "Popen", side_effect=AssertionError("a guard spawned")) as spawn, \
+                mock.patch.object(codex_job, "probe_gateway", side_effect=AssertionError("a guard probed")) as probe:
+            for argv in commands:
+                with self.subTest(argv=argv), contextlib.redirect_stderr(io.StringIO()) as error:
+                    self.assertEqual(codex_job.main(list(argv)), 2)
+                    self.assertIn("gateway refused:", error.getvalue())
+            spawn.assert_not_called()
+            probe.assert_not_called()
+
+    def test_native_only_staging_reads_no_record_and_carries_no_gateway(self):
+        argv = ["--work-dir", str(self.work), "--sweep-id", "landscape-sweep-20261026", "--date", "2026-10-26",
+                "--no-stars"]
+        with mock.patch.object(build_args, "recorded_gateway", side_effect=AssertionError("native read a record")), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(build_args.main(argv), 0)
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.assertNotIn("gateway", staged)
+        with mock.patch.object(codex_job, "recorded_gateway", side_effect=AssertionError("native read a record")), \
+                mock.patch.object(codex_job.subprocess, "Popen") as spawn, \
+                mock.patch.object(codex_job, "probe_gateway") as probe, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(codex_job.main(["gateway-check", str(self.work)]), 0)
+            self.assertEqual(json.loads(output.getvalue()), {"gateway": None, "provider": "native"})
+            spawn.assert_not_called()
+            probe.assert_not_called()
+
+    def test_staged_old_fallback_without_unrecorded_source_refuses_all_entry_points(self):
+        self.stage_settings(provider="native", endpoint=FIXTURE_GATEWAY)
+        self.assert_refused_without_spawn()
+
+    def test_a_reason_under_host_record_source_cannot_bypass_the_record(self):
+        self.stage_settings(provider="native", endpoint=FIXTURE_GATEWAY, gateway={
+            "endpoint": FIXTURE_GATEWAY, "source": "host-record", "reason": FIXTURE_GATEWAY_REASON})
+        self.assert_refused_without_spawn()
+
+    def test_lane_home_with_another_port_refuses_all_entry_points(self):
+        self.stage_settings(home_endpoint=FIXTURE_GATEWAY)
+        self.assert_refused_without_spawn()
+
+    def test_lane_profile_with_another_port_refuses_all_entry_points(self):
+        self.stage_settings(profile_endpoint=FIXTURE_GATEWAY)
+        self.assert_refused_without_spawn()
+
+    def test_a_staged_endpoint_override_refuses_all_entry_points(self):
+        self.stage_settings(overrides=['model_providers.omniroute.base_url="http://127.0.0.1:20128/v1"'])
+        self.assert_refused_without_spawn()
+
+    def test_omniroute_flag_abbreviation_is_refused_before_staging(self):
+        done = build(self.work, "--gpt6-provider", "omniroute", "--omniroute-base", FIXTURE_GATEWAY)
+        self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+        self.assertIn("unrecognized arguments", done.stderr)
+        self.assertFalse((self.work / "staged.json").exists())
+
+    def test_a_conflicting_environment_refuses_before_staging(self):
+        argv = ["--work-dir", str(self.work), "--sweep-id", "landscape-sweep-20261026", "--date", "2026-10-26",
+                "--gpt6-provider", "omniroute", "--codex-host", "example"]
+        with self.fixture_record(), mock.patch.dict(os.environ, {"OPENAI_BASE_URL": "http://localhost:20128/v1"}), \
+                contextlib.redirect_stderr(io.StringIO()) as error:
+            self.assertEqual(build_args.main(argv), 2)
+        self.assertIn("OPENAI_BASE_URL", error.getvalue())
+        self.assertFalse((self.work / "staged.json").exists())
+        self.assertFalse((self.work / "codex-home").exists())
+
+    def test_primary_argv_pins_the_resolved_endpoint_while_native_has_no_endpoint_pin(self):
+        self.stage_settings()
+        with self.fixture_record():
+            lane = codex_job.settings(self.work)
+        argv = codex_job.codex_argv("codex", self.work / "job", lane["model"], "prompt", lane)
+        overrides = [argv[i + 1] for i, value in enumerate(argv[:-1]) if value == "-c"]
+        pin = "model_providers.omniroute.base_url=" + json.dumps(lane["gateway"]["endpoint"])
+        self.assertIn(pin, overrides)
+        self.assertEqual(lane["gateway"], {"endpoint": "http://127.0.0.1:21128/v1", "source": "host-record",
+                                         "reason": None})
+        native = codex_job.codex_argv("codex", self.work / "native", "gpt-6-astra", "prompt")
+        self.assertFalse(any("model_providers.omniroute" in argument for argument in native))
+
+
+class AppsInvocationBindingTests(unittest.TestCase):
+    """A14's future invocation/input binding; historical missing fields keep their original semantics."""
+
+    def setUp(self):
+        clear_gateway_environment(self)
+        self.work = temp_dir(self)
+
+    def test_every_future_route_disables_apps(self):
+        lanes = (None, {"codex_home": self.work / "codex-home", "profile": "stack-worker",
+                        "base_url": FIXTURE_GATEWAY},
+                 {"transport_only": True, "base_url": FIXTURE_GATEWAY})
+        for lane in lanes:
+            with self.subTest(lane=lane):
+                argv = codex_job.codex_argv("codex", self.work / "job", "gpt-6-astra", "prompt", lane)
+                self.assertEqual([argv[i + 1] for i, value in enumerate(argv[:-1]) if value == "--disable"], ["apps"])
+
+    def test_apps_false_is_bound_and_missing_historical_apps_is_not_equated(self):
+        current = codex_job.job_inputs(b"prompt", b"schema", "gpt-6-astra")
+        self.assertIs(current["apps"], False)
+        original = {key: value for key, value in current.items() if key != "apps"}
+        historical = copy.deepcopy(original)
+        self.assertFalse(codex_job.same_inputs(historical, current))
+        self.assertEqual(historical, original)
+        self.assertNotIn("apps", historical)
+        self.assertFalse(codex_job.same_inputs({**historical, "apps": True}, current))
+        self.assertTrue(codex_job.same_inputs(copy.deepcopy(current), current))
+
+
+class GatewayInputBindingTests(unittest.TestCase):
+    """Primary gateway identity is an input, separate from the native fallback's retained route check."""
+
+    def setUp(self):
+        clear_gateway_environment(self)
+        self.gateway = {"endpoint": "http://127.0.0.1:21128/v1", "source": "host-record", "reason": None}
+
+    def binding(self, gateway):
+        return codex_job.job_inputs(b"fixture prompt", b"fixture schema", "cx/gpt-6-astra", "omniroute",
+                                    gateway=gateway)
+
+    def test_identical_resolved_primary_gateway_tuples_can_reuse(self):
+        first = self.binding(self.gateway)
+        repeated = self.binding(copy.deepcopy(self.gateway))
+        self.assertEqual(first["gateway"], self.gateway)
+        self.assertTrue(codex_job.same_inputs(first, repeated))
+        self.assertIs(first["apps"], False)
+        self.gateway["endpoint"] = "http://127.0.0.1:21129/v1"
+        self.assertEqual(first["gateway"]["endpoint"], "http://127.0.0.1:21128/v1")
+
+    def test_endpoint_source_or_reason_changes_make_distinct_primary_bindings(self):
+        first = self.binding(self.gateway)
+        changed = ({**self.gateway, "endpoint": "http://127.0.0.1:21129/v1"},
+                   {**self.gateway, "source": "unrecorded", "reason": FIXTURE_GATEWAY_REASON},
+                   {"endpoint": self.gateway["endpoint"], "source": "unrecorded", "reason": "another fixture"})
+        for gateway in changed:
+            with self.subTest(gateway=gateway):
+                self.assertFalse(codex_job.same_inputs(first, self.binding(gateway)))
+        unrecorded = self.binding(changed[1])
+        self.assertFalse(codex_job.same_inputs(unrecorded, self.binding(changed[2])))
+
+    def test_missing_historical_gateway_is_unknown_and_never_normalized(self):
+        current = self.binding(self.gateway)
+        historical = {key: copy.deepcopy(value) for key, value in current.items() if key != "gateway"}
+        retained = copy.deepcopy(historical)
+        self.assertFalse(codex_job.same_inputs(historical, current))
+        self.assertEqual(historical, retained)
+        self.assertNotIn("gateway", historical)
+        self.assertIs(historical["apps"], False)
+
+    def test_native_inputs_remain_gateway_free_even_when_a_fallback_is_configured(self):
+        pure_native = codex_job.job_inputs(b"fixture prompt", b"fixture schema", "gpt-6-astra")
+        native_with_fallback = codex_job.job_inputs(b"fixture prompt", b"fixture schema", "gpt-6-astra",
+                                                   gateway=self.gateway)
+        self.assertNotIn("gateway", pure_native)
+        self.assertNotIn("gateway", native_with_fallback)
+        self.assertTrue(codex_job.same_inputs(pure_native, native_with_fallback))
+        self.assertIs(pure_native["apps"], False)
+
+
 class RunnerCase(unittest.TestCase):
     def setUp(self):
+        clear_gateway_environment(self)
         self.work = temp_dir(self)
         self.bin = temp_dir(self)
+        if getattr(self, "GATEWAY_FIXTURE", False):
+            self.gateway_endpoint = self.gateway_listener()
         codex = self.bin / "codex"
         codex.write_text(FAKE_CODEX.format(python=sys.executable), encoding="utf-8")
         codex.chmod(0o755)
@@ -1835,8 +2088,27 @@ class RunnerCase(unittest.TestCase):
         self.env.pop("SWEEP_WORK_DIR", None)
 
     def settings(self, codex_settings):
+        codex_settings = dict(codex_settings)
+        if codex_settings.get("provider") == "omniroute" or codex_settings.get("fallback"):
+            endpoint = codex_settings.get("base_url") or self.gateway_endpoint
+            if codex_settings.get("fallback"):
+                fallback = dict(codex_settings["fallback"])
+                endpoint = fallback.get("base_url") or self.gateway_endpoint
+                codex_settings["fallback"] = {**fallback, "base_url": endpoint}
+            else:
+                codex_settings["base_url"] = endpoint
+            codex_settings["gateway"] = {"endpoint": endpoint, "source": "unrecorded",
+                                         "reason": FIXTURE_GATEWAY_REASON}
         write_json(self.work / "staged.json", {"codex": {"wait_poll_s": 0.05, "slot_poll_s": 0.05, "timeout_s": 30,
                                                          **codex_settings}})
+
+    def gateway_listener(self):
+        """A model-free TCP preflight fixture on a free port; never contact a shared host gateway."""
+        listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.addCleanup(listener.close)
+        listener.bind(("127.0.0.1", 0))
+        listener.listen(128)
+        return f"http://127.0.0.1:{listener.getsockname()[1]}/v1"
 
     def fake(self, **config):
         config.setdefault("record", str(self.bin / "record.json"))
@@ -1865,6 +2137,14 @@ class RunnerCase(unittest.TestCase):
 
     def record(self):
         return json.loads((self.bin / "record.json").read_text())
+
+    def expected_prompt_transport(self):
+        delivered = self.prompt.read_text(encoding="utf-8").rstrip("\n").encode("utf-8")
+        return {"kind": "stdin", "delivered_bytes": len(delivered),
+                "delivered_sha256": hashlib.sha256(delivered).hexdigest()}
+
+    def native_transport_route(self):
+        return {"provider": "native", "prompt_transport": self.expected_prompt_transport()}
 
     def diagnose(self, name, completed):
         """What a failed start, wait or result left behind: the command's own output and the runner's files."""
@@ -1968,6 +2248,8 @@ class OmniRouteLaneRunnerTests(RunnerCase):
     """A gateway lane runs Codex with CODEX_HOME set to the staged lane-local home, -p stack-worker and no
     --ignore-user-config, and never starts without its key variable."""
 
+    GATEWAY_FIXTURE = True
+
     def test_primary_gateway_429_stops_with_the_pool_reason(self):
         self.lane()
         staged = json.loads((self.work / "staged.json").read_text())
@@ -2009,15 +2291,112 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
         self.assertEqual(self.record()["argv"], [
-            "exec", "-p", "stack-worker",
+            "exec", "-p", "stack-worker", "-c",
+            f"model_providers.omniroute.base_url={json.dumps(self.gateway_endpoint)}", "--disable", "apps",
             "--skip-git-repo-check", "-s", "read-only",
             "-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
-            "Reply in JSON."])
+            "-"])
+        self.assertEqual(self.record()["stdin_read"], "Reply in JSON.")
         self.assertEqual(self.record()["codex_home"], str(self.work / "codex-home"))
         self.assertTrue(self.record()["api_key_present"])
         self.assertEqual((result["status"], result["exit"], result["model"]), ("done", 0, "cx/gpt-6-astra"))
         self.assertEqual(json.loads((directory / "inputs.json").read_text())["provider"], "omniroute")
+
+    def test_primary_gateway_change_reruns_while_an_identical_resolved_tuple_reuses(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "api_key_placeholder": "local-loopback"})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        log = self.bin / "primary-runs.log"
+        first = self.job("primary-route", last=LAST, log=str(log), events=[COMPLETED])
+        directory = self.work / "gpt6" / "primary-route"
+        retained = {name: (directory / name).read_bytes() for name in
+                    ("inputs.json", "argv.json", "prompt.txt", "schema.json")}
+        original_gateway = {"endpoint": self.gateway_endpoint, "source": "unrecorded",
+                            "reason": FIXTURE_GATEWAY_REASON}
+        self.assertEqual(first["inputs"]["gateway"], original_gateway)
+        reused = self.call("start", "primary-route", self.prompt, self.schema)
+        self.assertEqual((reused.returncode, reused.stdout.strip()), (0, "already done: primary-route"))
+        self.assertEqual(log.read_text().count("start"), 1)
+
+        replacement_gateway = self.gateway_listener()
+        self.settings({**staged, "api_key_placeholder": "local-loopback", "base_url": replacement_gateway})
+        self.fake(last={**LAST, "latest_release": "b2"}, log=str(log), events=[COMPLETED])
+        started = self.call("start", "primary-route", self.prompt, self.schema)
+        self.assertEqual(started.returncode, 0, started.stdout + started.stderr)
+        self.assertIn("inputs changed", started.stdout)
+        self.assertNotIn("already done", started.stdout)
+        self.assertTrue(self.call("wait", "primary-route", "20").stdout.startswith("done exit=0"))
+        second = json.loads(self.call("result", "primary-route").stdout)
+        self.assertEqual(second["inputs"]["gateway"], {"endpoint": replacement_gateway, "source": "unrecorded",
+                                                       "reason": FIXTURE_GATEWAY_REASON})
+        self.assertEqual(second["attempts"][0]["inputs"], first["inputs"])
+        self.assertEqual(json.loads(second["output_text"])["latest_release"], "b2")
+        self.assertEqual(log.read_text().count("start"), 2)
+        kept = directory / "attempts" / "1"
+        for name, original in retained.items():
+            self.assertEqual((kept / name).read_bytes(), original, name)
+        self.assertEqual(self.call("start", "primary-route", self.prompt, self.schema).stdout.strip(),
+                         "already done: primary-route")
+
+    def test_primary_historical_missing_gateway_binding_is_retained_and_rerun(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "api_key_placeholder": "local-loopback"})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        directory = self.work / "gpt6" / "primary-historical"
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        # A legacy fixture records the provider and apps setting but no resolved gateway tuple.
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "cx/gpt-6-astra", "omniroute"))
+        retained = (directory / "inputs.json").read_bytes()
+        write_json(directory / "last.json", LAST)
+        (directory / "events.jsonl").write_text(json.dumps(COMPLETED) + "\n", encoding="utf-8")
+        (directory / "exit").write_text("0\n", encoding="utf-8")
+        (directory / "done").touch()
+        self.fake(last={**LAST, "latest_release": "b2"}, events=[COMPLETED])
+        started = self.call("start", "primary-historical", self.prompt, self.schema)
+        self.assertEqual(started.returncode, 0, started.stdout + started.stderr)
+        self.assertIn("inputs changed", started.stdout)
+        self.assertNotIn("already done", started.stdout)
+        self.assertTrue(self.call("wait", "primary-historical", "20").stdout.startswith("done exit=0"))
+        result = json.loads(self.call("result", "primary-historical").stdout)
+        kept = directory / "attempts" / "1"
+        self.assertEqual((kept / "inputs.json").read_bytes(), retained)
+        self.assertNotIn("gateway", result["attempts"][0]["inputs"])
+        self.assertIs(result["attempts"][0]["inputs"]["apps"], False)
+        self.assertFalse((kept / "argv.json").exists())
+        self.assertEqual(result["inputs"]["gateway"]["endpoint"], self.gateway_endpoint)
+        self.assertEqual(json.loads(result["output_text"])["latest_release"], "b2")
+
+    def test_primary_gateway_changed_between_binding_and_detached_launch_is_refused(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "api_key_placeholder": "local-loopback"})
+        replacement_gateway = self.gateway_listener()
+        launches = []
+
+        def launch(argv, **kwargs):
+            launches.append(argv)
+            self.assertEqual(len(launches), 1, "a model process launched after the gateway input changed")
+            self.settings({**staged, "api_key_placeholder": "local-loopback", "base_url": replacement_gateway})
+            inherited = os.dup(kwargs["pass_fds"][0])
+            with mock.patch.dict(os.environ, {**kwargs["env"], "SWEEP_JOB_LOCK_FD": str(inherited)}):
+                self.assertEqual(codex_job.run(self.work, "primary-race"), 2)
+            return mock.Mock()
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch), \
+                mock.patch.object(codex_job, "probe_gateway", side_effect=AssertionError("mismatched inputs probed")):
+            self.assertEqual(codex_job.start(self.work, "primary-race", str(self.prompt), str(self.schema)), 0)
+        self.assertEqual(len(launches), 1)
+        result = codex_job.result(self.work, "primary-race")
+        self.assertEqual((result["exit"], result["failure"]["kind"]), (2, "inputs_changed"))
+        self.assertEqual(result["inputs"]["gateway"]["endpoint"], self.gateway_endpoint)
+        self.assertFalse((self.bin / "record.json").exists())
 
     def test_lane_overrides_profile_effort_and_web_search_from_staged_settings(self):
         self.lane()
@@ -2124,27 +2503,33 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         self.assertNotIn("self-hop", started.stderr)
         self.assertFalse((self.work / "gpt6" / "gpt6-refused").exists())
 
-    def test_staged_headers_need_tomllib_and_header_less_lanes_do_not(self):
-        # Without tomllib (Python 3.9 and 3.10, as macOS's /usr/bin/python3 3.9) the lane home's header table cannot
-        # be read back, so a lane with staged headers is refused; a header-less lane still runs there.
+    def test_gateway_homes_need_tomllib_and_native_lanes_do_not(self):
+        # The historical header-only check permitted a header-less gateway home below Python 3.11. GW-route D7
+        # now scans every TOML home for endpoint overrides, so every gateway home refuses without tomllib;
+        # native-only lanes still require no TOML parser.
         self.lane()
         base = {"provider": "omniroute", "codex_home": "codex-home", "profile": "stack-worker",
                 "api_key_env": "OMNIROUTE_API_KEY", "model": "cx/gpt-6-astra"}
         with mock.patch.dict(sys.modules, {"tomllib": None}):  # a None entry makes the import raise ImportError
             self.settings({**base, "http_headers": {"x-omniroute-compression": "allow-lossy"}})
-            with self.assertRaisesRegex(codex_job.UsageError, r"Python 3\.11"):
+            with self.assertRaisesRegex(codex_job.GatewayRefused, r"3\.11"):
                 codex_job.settings(self.work)
             self.settings(base)
+            with self.assertRaisesRegex(codex_job.GatewayRefused, r"3\.11"):
+                codex_job.settings(self.work)
+            self.settings({})
             self.assertEqual(codex_job.settings(self.work)["http_headers"], {})
 
 
 class OmniRouteFallbackRunnerTests(RunnerCase):
     """Synthetic native errors and no-model app-server probes through fake codex on PATH."""
 
+    GATEWAY_FIXTURE = True
+
     def setUp(self):
         super().setUp()
         self.settings({"model": "gpt-6.1-sol", "timeout_s": 400, "fallback": {
-            "provider": "omniroute", "base_url": "http://127.0.0.1:20128/v1"}})
+            "provider": "omniroute", "base_url": self.gateway_endpoint}})
         self.env.pop("OMNIROUTE_API_KEY", None)
         self.native_home = self.bin / "native-home"
         self.native_home.mkdir()
@@ -2234,7 +2619,7 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
                     {"exit": 0, "events": [COMPLETED], "last": LAST}])
                 self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (code, False, False))
                 self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
-                self.assertIsNone(result["route"])
+                self.assertEqual(result["route"], self.native_transport_route())
                 self.assertFalse((self.work / "LIMIT-native").exists())
 
     def test_changed_or_disabled_fallback_does_not_reuse_gateway_success(self):
@@ -2252,16 +2637,17 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
             {"exit": 0, "events": [COMPLETED], "last": LAST}])
         original_route = result["route"]
         staged = json.loads((self.work / "staged.json").read_text())["codex"]
-        self.settings({**staged, "fallback": {"provider": "omniroute", "base_url": "http://127.0.0.1:20129/v1"}})
+        replacement_gateway = self.gateway_listener()
+        self.settings({**staged, "fallback": {"provider": "omniroute", "base_url": replacement_gateway}})
         result = rerun(quota={"result": {**quota_answer(99), "ordinaryUsageAllowed": False}})
-        self.assertEqual(result["route"]["base_url"], "http://127.0.0.1:20129/v1")
+        self.assertEqual(result["route"]["base_url"], replacement_gateway)
         self.assertEqual(result["attempts"][-1]["route"], original_route)
         self.settings({**staged, "fallback": None})
         result = rerun()
         self.assertEqual(result["exit"], 0)
         self.assertEqual(result["model"], "gpt-6.1-sol")
-        self.assertIsNone(result["route"])
-        self.assertEqual(result["attempts"][-1]["route"]["base_url"], "http://127.0.0.1:20129/v1")
+        self.assertEqual(result["route"], self.native_transport_route())
+        self.assertEqual(result["attempts"][-1]["route"]["base_url"], replacement_gateway)
 
     def test_recovery_probe_helper_and_parent_share_the_remaining_deadline(self):
         self.native_marker()
@@ -2340,7 +2726,7 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         self.assertTrue(result["limit"])
         self.assertEqual([attempt["failure"]["kind"] for attempt in result["attempts"]], ["capacity"])
         self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
-        self.assertIsNone(result["route"])
+        self.assertEqual(result["route"], self.native_transport_route())
 
     def test_failed_gateway_launch_has_no_route_receipt(self):
         self.fake(attempts=[{"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]}])
@@ -2374,15 +2760,15 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         self.assertEqual(result["model"], "cx/gpt-6.1-sol-max")
         self.assertEqual(result["route"], {"provider": "omniroute", "fallback_from": "native", "reason": LIMIT_TEXT,
                          "native_model": "gpt-6.1-sol", "gateway_model": "cx/gpt-6.1-sol-max", "native_attempt": 1,
-                         "base_url": "http://127.0.0.1:20128/v1", "gateway_effort": "max",
-                         "search_backend": "omniroute:/alpha/search"})
+                         "base_url": self.gateway_endpoint, "gateway_effort": "max",
+                         "search_backend": "omniroute:/alpha/search", "prompt_transport": self.expected_prompt_transport()})
         self.assertEqual(result["attempts"][0]["exit"], 3)
-        self.assertIsNone(result["attempts"][0]["route"])
+        self.assertEqual(result["attempts"][0]["route"], self.native_transport_route())
         self.assertEqual((kept / "events.jsonl").read_text(), "".join(json.dumps(e) + "\n" for e in native_events))
         self.assertEqual((kept / "stderr.txt").read_text(), "ERROR: " + LIMIT_TEXT + "\n")
         self.assertEqual((kept / "model").read_text(), "gpt-6.1-sol\n")
         self.assertFalse((kept / "done").exists(), "the held job must not advertise completion between routes")
-        for name in ("prompt.txt", "schema.json", "inputs.json", "slot"):
+        for name in ("prompt.txt", "schema.json", "inputs.json", "slot", "stdin.txt"):
             self.assertEqual((kept / name).read_bytes(), (directory / name).read_bytes(), name)
         marker = json.loads((self.work / "LIMIT-native").read_text())
         self.assertEqual(marker["reason"], LIMIT_TEXT)
@@ -2392,8 +2778,9 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         for record in (native, gateway):
             self.assertEqual(record["cwd"], str(self.work / "empty"))
             self.assertEqual(record["codex_home"], str(self.native_home))
-            self.assertTrue(record["stdin_devnull"])
-            self.assertEqual(record["argv"][-1], self.prompt.read_text().rstrip("\n"))
+            self.assertFalse(record["stdin_devnull"])
+            self.assertEqual(record["argv"][-1], "-")
+            self.assertEqual(record["stdin_read"], self.prompt.read_text().rstrip("\n"))
             self.assertIn("--ignore-user-config", record["argv"])
             self.assertNotIn("-p", record["argv"])
             self.assertIn('model_reasoning_effort="max"', record["argv"])
@@ -2404,7 +2791,7 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
                        "features.shell_snapshot=false", 'shell_environment_policy.filters.OMNIROUTE_API_KEY="exclude"'):
             self.assertIn(config, configs)
         block = next(c for c in configs if c.startswith("model_providers.omniroute="))
-        for value in ('base_url = "http://127.0.0.1:20128/v1"', 'env_key = "OMNIROUTE_API_KEY"',
+        for value in (f'base_url = "{self.gateway_endpoint}"', 'env_key = "OMNIROUTE_API_KEY"',
                       'wire_api = "responses"', "requires_openai_auth = false", "supports_standalone_web_search = true"):
             self.assertIn(value, block)
         again = self.call("start", "gpt6-fallback", self.prompt, self.schema)
@@ -2441,6 +2828,14 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         for number in (1, 2):
             self.assertEqual((directory / "attempts" / str(number) / "inputs.json").read_bytes(),
                              (directory / "inputs.json").read_bytes())
+        for attempt in (directory / "attempts" / "1", directory / "attempts" / "2", directory):
+            inputs = json.loads((attempt / "inputs.json").read_text())
+            self.assertIs(inputs["apps"], False)
+            argv = json.loads((attempt / "argv.json").read_text())
+            self.assertEqual([argv[i + 1] for i, value in enumerate(argv[:-1]) if value == "--disable"], ["apps"])
+            self.assertEqual(argv[-1], "-")
+            self.assertEqual((attempt / "stdin.txt").read_bytes(), b"Reply in JSON.")
+            self.assertEqual(stat.S_IMODE((attempt / "stdin.txt").stat().st_mode), 0o600)
 
     def test_native_attempt_consumes_the_shared_deadline_before_gateway_launch(self):
         staged = json.loads((self.work / "staged.json").read_text())
@@ -2469,7 +2864,7 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         self.assertEqual(result["attempts"], [])
         self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
         self.assertEqual(result["model"], "gpt-6.1-sol")
-        self.assertIsNone(result["route"], "no gateway route may be reported without a gateway launch")
+        self.assertEqual(result["route"], self.native_transport_route())
 
     def test_gateway_idle_retry_preserves_the_route(self):
         staged = json.loads((self.work / "staged.json").read_text())
@@ -2501,7 +2896,8 @@ class OmniRouteFallbackRunnerTests(RunnerCase):
         probes = self.bin / "probes.log"
         result = self.job("gpt6-recovered", last=LAST, events=[COMPLETED],
                           quota={"log": str(probes), "result": quota_answer(4)})
-        self.assertEqual((result["exit"], result["model"], result["route"]), (0, "gpt-6.1-sol", None))
+        self.assertEqual((result["exit"], result["model"]), (0, "gpt-6.1-sol"))
+        self.assertEqual(result["route"], self.native_transport_route())
         self.assertEqual(probes.read_text(), "probe\n")
         self.assertFalse((self.work / "LIMIT-native").exists())
         self.assertNotIn('model_provider="omniroute"', self.record()["argv"])
@@ -2633,10 +3029,10 @@ class RunnerTests(RunnerCase):
     def test_refusal_paths_write_terminal_failure_receipts(self):
         bad_schema = self.bin / "bad-schema.json"
         bad_schema.write_text("not JSON")
-        large_prompt = self.bin / "large.txt"
-        large_prompt.write_text("x" * (codex_job.MAX_PROMPT_BYTES + 1))
+        empty_prompt = self.bin / "empty.txt"
+        empty_prompt.write_bytes(b"\n\n")
         for name, prompt, schema in (("bad-schema", self.prompt, bad_schema),
-                                     ("large-prompt", large_prompt, self.schema)):
+                                     ("empty-prompt", empty_prompt, self.schema)):
             with self.subTest(name=name):
                 self.assertEqual(self.call("start", name, prompt, schema).returncode, 2)
                 directory = self.work / "gpt6" / name
@@ -2782,13 +3178,13 @@ class RunnerTests(RunnerCase):
         result = self.job("gpt6-probe", last=LAST, events=[{"type": "thread.started", "thread_id": "fixture"}, COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
         self.assertEqual(self.record()["argv"], [
-            "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
+            "exec", "--ignore-user-config", "--disable", "apps", "--skip-git-repo-check", "-s", "read-only",
             "-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
-            "Reply in JSON."])  # the prompt without its trailing newline, as "$(cat prompt.txt)" gave it
+            "-"])
         self.assertEqual(self.record()["cwd"], str(self.work / "empty"))
-        self.assertTrue(self.record()["stdin_devnull"])
-        self.assertEqual(self.record()["stdin_read"], "")
+        self.assertFalse(self.record()["stdin_devnull"])
+        self.assertEqual(self.record()["stdin_read"], "Reply in JSON.")
         self.assertEqual((result["status"], result["exit"], result["limit"]), ("done", 0, False))
         self.assertEqual(json.loads(result["output_text"]), LAST)
         self.assertNotIn("\n", result["output_text"])  # compact: fewer tokens for the wrapper agent to copy
@@ -2796,6 +3192,112 @@ class RunnerTests(RunnerCase):
         self.assertEqual((result["model"], result["effort"], result["codex_version"]),
                          ("gpt-6-astra", "max", "codex-cli 0.0.0-fixture"))
         self.assertFalse((self.work / "LIMIT").exists())
+
+    def test_stdin_preserves_previous_utf8_payload_and_raw_prompt_identity(self):
+        # The old argv path read text with universal-newline decoding, then removed only final '\n' characters.
+        # Keep spaces and tabs at the tail; the raw file, including CRLF and final newlines, still owns the binding.
+        raw = "résearch λ\r\nvalue \t \r\n\r\n".encode("utf-8")
+        expected = "résearch λ\nvalue \t ".encode("utf-8")
+        self.prompt.write_bytes(raw)
+        result = self.job("stdin-unicode", last=LAST, events=[COMPLETED])
+        directory = self.work / "gpt6" / "stdin-unicode"
+        recorded = self.record()
+        delivered = base64.b64decode(recorded["stdin_b64"], validate=True)
+        self.assertEqual(delivered, expected)
+        self.assertEqual(recorded["argv"][-1], "-")
+        self.assertFalse(recorded["stdin_devnull"])
+        self.assertNotIn(expected.decode("utf-8"), recorded["argv"])
+        self.assertEqual((directory / "prompt.txt").read_bytes(), raw)
+        self.assertEqual(result["inputs"]["prompt_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertNotEqual(result["inputs"]["prompt_sha256"], hashlib.sha256(delivered).hexdigest())
+        self.assertIs(result["inputs"]["apps"], False)
+        self.assertEqual(result["route"], {"provider": "native", "prompt_transport": {
+            "kind": "stdin", "delivered_bytes": len(expected), "delivered_sha256": hashlib.sha256(expected).hexdigest()}})
+        self.assertEqual((directory / "stdin.txt").read_bytes(), expected)
+        self.assertEqual(stat.S_IMODE((directory / "stdin.txt").stat().st_mode), 0o600)
+        self.assertEqual(self.call("start", "stdin-unicode", self.prompt, self.schema).stdout.strip(),
+                         "already done: stdin-unicode")
+
+    def test_complete_large_prompt_uses_stdin_without_an_argv_size_refusal(self):
+        # 169,926 UTF-8 bytes exceed both the former 120,000 guard and Linux's 131,072-byte single-argv limit.
+        # This is a synthetic transport fixture, not a claim about any model's accepted context window.
+        raw = ("λ" * 84_963).encode("utf-8")
+        self.assertEqual(len(raw), 169_926)
+        self.prompt.write_bytes(raw)
+        result = self.job("stdin-large", last=LAST, events=[COMPLETED])
+        directory = self.work / "gpt6" / "stdin-large"
+        recorded = self.record()
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual(base64.b64decode(recorded["stdin_b64"], validate=True), raw)
+        self.assertEqual(recorded["argv"][-1], "-")
+        self.assertLess(max(len(argument.encode("utf-8")) for argument in recorded["argv"]), 4096)
+        self.assertEqual((directory / "prompt.txt").read_bytes(), raw)
+        self.assertEqual(result["inputs"]["prompt_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertIsNone(result["failure"])
+        self.assertEqual(result["route"], {"provider": "native", "prompt_transport": {
+            "kind": "stdin", "delivered_bytes": 169_926, "delivered_sha256": hashlib.sha256(raw).hexdigest()}})
+        self.assertEqual((directory / "stdin.txt").read_bytes(), raw)
+
+    def test_non_model_children_keep_devnull_stdin(self):
+        version_return = types.SimpleNamespace(returncode=0, stdout="codex-cli fixture\n", stderr="")
+        with mock.patch.object(codex_job.subprocess, "run", return_value=version_return) as version:
+            self.assertEqual(codex_job.codex_version("codex"), "codex-cli fixture")
+        self.assertIs(version.call_args.kwargs["stdin"], subprocess.DEVNULL)
+
+        directory = self.bound_job("quota-stdin")
+        quota_return = types.SimpleNamespace(returncode=0, stdout='{"gate": {"reasons": []}}\n', stderr="")
+        with mock.patch.object(codex_job, "quota_script", return_value=self.bin / "quota.py"), \
+                mock.patch.object(codex_job.subprocess, "run", return_value=quota_return) as quota:
+            self.assertIsNone(codex_job.quota_gate(self.work, directory, codex_job.settings(self.work)))
+        self.assertIs(quota.call_args.kwargs["stdin"], subprocess.DEVNULL)
+
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(codex_job.subprocess, "Popen") as supervisor:
+            self.assertEqual(codex_job.start(self.work, "supervisor-stdin", str(self.prompt), str(self.schema)), 0)
+        self.assertIs(supervisor.call_args.kwargs["stdin"], subprocess.DEVNULL)
+
+    def test_failed_model_launch_closes_stdin_and_retains_raw_binding(self):
+        directory = self.bound_job("stdin-launch-refused")
+        retained = {name: (directory / name).read_bytes() for name in ("prompt.txt", "schema.json", "inputs.json")}
+        handles = []
+
+        def refuse(argv, **kwargs):
+            self.assertEqual(argv[-1], "-")
+            handles.append(kwargs["stdin"])
+            self.assertFalse(handles[-1].closed)
+            self.assertEqual(handles[-1].read(), b"Reply in JSON.")
+            raise OSError("fixture model launch refused")
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job, "codex_version", return_value="codex-cli fixture"), \
+                mock.patch.object(codex_job.subprocess, "Popen", side_effect=refuse):
+            self.assertEqual(codex_job.run(self.work, "stdin-launch-refused"), 2)
+        self.assertEqual(len(handles), 1)
+        self.assertTrue(handles[0].closed)
+        for name, original in retained.items():
+            self.assertEqual((directory / name).read_bytes(), original, name)
+        result = codex_job.result(self.work, "stdin-launch-refused")
+        self.assertIsNone(result["route"], "a refused model launch has no delivered transport receipt")
+        self.assertEqual(result["failure"]["kind"], "refused")
+
+    def test_exception_after_model_launch_stops_the_owned_process_and_closes_stdin(self):
+        self.settings({"kill_grace_s": 0.25})
+        self.bound_job("stdin-interrupted")
+        process = mock.Mock(pid=987654)
+        handles = []
+
+        def launch(argv, **kwargs):
+            handles.append(kwargs["stdin"])
+            return process
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job, "codex_version", return_value="codex-cli fixture"), \
+                mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch), \
+                mock.patch.object(codex_job, "wait_process", side_effect=OSError("fixture interrupted wait")), \
+                mock.patch.object(codex_job, "stop_group") as stop:
+            self.assertEqual(codex_job.run(self.work, "stdin-interrupted"), 2)
+        stop.assert_called_once_with(process, 0.25)
+        self.assertEqual(len(handles), 1)
+        self.assertTrue(handles[0].closed)
 
     def test_model_and_usage_across_turns(self):
         self.settings({"model": "gpt-6-sol"})
@@ -2919,6 +3421,32 @@ class RunnerTests(RunnerCase):
         self.assertIn("started gpt6-fit-alpha", self.call("start", "gpt6-fit-alpha", self.prompt, self.schema).stdout)
         self.assertTrue(self.call("wait", "gpt6-fit-alpha", "20").stdout.startswith("done exit=0"))
         self.assertEqual(log.read_text().count("start"), 3)
+
+    def test_historical_missing_apps_binding_is_archived_unchanged_and_rerun(self):
+        directory = self.bound_job("historical-apps")
+        historical = json.loads((directory / "inputs.json").read_text())
+        historical.pop("apps")
+        write_json(directory / "inputs.json", historical)
+        retained = (directory / "inputs.json").read_bytes()
+        # Construct an otherwise successful historical fixture whose apps setting was never recorded.
+        write_json(directory / "last.json", LAST)
+        (directory / "events.jsonl").write_text(json.dumps(COMPLETED) + "\n", encoding="utf-8")
+        (directory / "exit").write_text("0\n", encoding="utf-8")
+        (directory / "done").touch()
+        self.fake(last=LAST, events=[COMPLETED])
+        started = self.call("start", "historical-apps", self.prompt, self.schema)
+        self.assertEqual(started.returncode, 0, started.stdout + started.stderr)
+        self.assertIn("inputs changed", started.stdout)
+        self.assertNotIn("already done", started.stdout)
+        self.assertTrue(self.call("wait", "historical-apps", "20").stdout.startswith("done exit=0"))
+        result = json.loads(self.call("result", "historical-apps").stdout)
+        kept = directory / "attempts" / "1"
+        self.assertEqual((kept / "inputs.json").read_bytes(), retained)
+        self.assertNotIn("apps", result["attempts"][0]["inputs"])
+        self.assertFalse((kept / "argv.json").exists())
+        self.assertIs(result["inputs"]["apps"], False)
+        self.assertIn("--disable", self.record()["argv"])
+        self.assertEqual(self.record()["argv"][self.record()["argv"].index("--disable") + 1], "apps")
 
     def test_a_running_job_is_not_started_twice(self):
         self.fake(last=LAST, sleep=2, events=[COMPLETED])
@@ -3252,6 +3780,12 @@ class RecoveryRunnerTests(RunnerCase):
         self.assertEqual((kept / "inputs.json").read_bytes(), (kept.parent.parent / "inputs.json").read_bytes())
         self.assertEqual((result["attempts"][0]["exit"], result["attempts"][0]["usage"]), (1, None))
         self.assertEqual(json.loads(result["output_text"]), LAST)
+        for attempt in (kept, kept.parent.parent):
+            self.assertIs(json.loads((attempt / "inputs.json").read_text())["apps"], False)
+            argv = json.loads((attempt / "argv.json").read_text())
+            self.assertEqual([argv[i + 1] for i, value in enumerate(argv[:-1]) if value == "--disable"], ["apps"])
+            self.assertEqual(argv[-1], "-")
+            self.assertEqual((attempt / "stdin.txt").read_bytes(), b"Reply in JSON.")
 
     def test_capacity_retry_budget_and_backoff_cap(self):
         result = self.job("capacity", attempts=[{"exit": 1, "events": self.capacity_events()}])
@@ -3509,6 +4043,45 @@ class ShellTests(RunnerCase):
 
 
 class ConvertTests(unittest.TestCase):
+    def converted_transport_route(self, route):
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["fit_gpt6"]["model"] = route.get("gateway_model") or (
+            "cx/gpt-6-astra" if route["provider"] == "omniroute" else "gpt-6-astra")
+        write_codex_files(work, res)
+        write_json(work / "gpt6/gpt6-fit-alpha/route.json", route)
+        out = self.convert(res, work=work)
+        self.assertEqual(out["returns"]["raw"]["alpha"]["first"]["gpt6_routes"], {"fit": route})
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["fit"]["gpt6"]["route"], route)
+        return out
+
+    def test_native_stdin_transport_receipt_is_retained_without_a_failover_limitation(self):
+        route = {"provider": "native",
+                 "prompt_transport": {"kind": "stdin", "delivered_bytes": 14, "delivered_sha256": "c" * 64}}
+        out = self.converted_transport_route(route)
+        limitations = out["lanes"]["lanes"][0]["result"]["limits"]
+        self.assertFalse(any("native-to-OmniRoute failover" in text for text in limitations))
+        self.assertFalse(any("/alpha/search" in text for text in limitations))
+
+    def test_primary_gateway_stdin_receipt_is_retained_without_a_failover_limitation(self):
+        route = {"provider": "omniroute",
+                 "prompt_transport": {"kind": "stdin", "delivered_bytes": 14, "delivered_sha256": "c" * 64}}
+        out = self.converted_transport_route(route)
+        limitations = out["lanes"]["lanes"][0]["result"]["limits"]
+        self.assertFalse(any("native-to-OmniRoute failover" in text for text in limitations))
+        self.assertFalse(any("/alpha/search" in text for text in limitations))
+
+    def test_actual_native_to_gateway_stdin_failover_keeps_its_limitation_and_raw_receipt(self):
+        route = {"provider": "omniroute", "fallback_from": "native", "reason": "native usage limit",
+                 "native_model": "gpt-6-astra", "gateway_model": "cx/gpt-6-astra-max",
+                 "native_attempt": 1, "base_url": "http://127.0.0.1:21128/v1", "gateway_effort": "max",
+                 "search_backend": "omniroute:/alpha/search",
+                 "prompt_transport": {"kind": "stdin", "delivered_bytes": 14, "delivered_sha256": "c" * 64}}
+        out = self.converted_transport_route(route)
+        limitations = out["lanes"]["lanes"][0]["result"]["limits"]
+        self.assertTrue(any("native-to-OmniRoute failover" in text for text in limitations))
+        self.assertTrue(any("/alpha/search" in text for text in limitations))
+
     def test_route_provenance_survives_the_wrappers_fixed_field_copy(self):
         work = temp_dir(self)
         res = healthy_result()

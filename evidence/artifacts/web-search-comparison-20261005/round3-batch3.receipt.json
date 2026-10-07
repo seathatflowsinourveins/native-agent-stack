@@ -1,0 +1,2318 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_execution_projection",
+  "projection_scope": "Compact projection of actual native promptfoo cells. URLs, fields-valid booleans, native grades, counters and timing retained; full output/title/snippets and host-config paths are not republished. Exact private native export retained for independent observation. Native CLI grading exit is shared, not a per-provider process exit. Native cell and evaluation identifiers are published only as SHA256 of their exact UTF-8 strings; literal identifiers remain private.",
+  "native_export": {
+    "basename": "round3-batch3.json",
+    "sha256": "b61aabf58b5d13c6637db9e857582f3795098936b87ee3abd5933a71e099de3d",
+    "bytes": 170268,
+    "metadata": {
+      "promptfooVersion": "0.123.1",
+      "nodeVersion": "v24.21.0",
+      "platform": "linux",
+      "arch": "x64",
+      "exportedAt": "2026-10-05T13:51:20.817Z",
+      "evaluationCreatedAt": "2026-10-05T13:47:55.750Z"
+    },
+    "exit_code": 100,
+    "evaluation_id_sha256": "1465d4c184fd88d6d3a7f42c0328e3d806b287ec021e0e8fba31587846da4354"
+  },
+  "hash_byte_scopes": {
+    "native_export": "Exact native JSON file bytes before sanitization.",
+    "native_output": "For a returned string, its exact decoded string encoded as UTF-8; a non-string output is sorted-key compact JSON encoded as UTF-8, absent output is null. Neither is the escaped JSON field or the URL projection.",
+    "native_identifiers": "SHA256 of the exact native identifier string encoded as UTF-8."
+  },
+  "round": 3,
+  "batch": 3,
+  "query_ids": [
+    "q21",
+    "q22",
+    "q23",
+    "q24",
+    "q25",
+    "q26",
+    "q27",
+    "q28",
+    "q29",
+    "q30"
+  ],
+  "observed_provider_order": [
+    "ddgs-auto",
+    "searxng"
+  ],
+  "observed_evaluate_options": {
+    "maxConcurrency": 1,
+    "cache": false,
+    "delay": 1000
+  },
+  "native_stats": {
+    "successes": 2,
+    "failures": 18,
+    "errors": 0,
+    "durationMs": 204750,
+    "evaluationDurationMs": 204750
+  },
+  "cells": [
+    {
+      "query_id": "q21",
+      "arm": "ddgs-auto",
+      "native_test_index": 0,
+      "native_prompt_index": 0,
+      "latency_ms": 2159,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4a5f83888f6492c80ca7f69eb7d5a8dc5d3e0540af0a3a8ab9f9927c3b52406d",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://colab.research.google.com/github/Alg2338/inspect_ai/blob/colab/inspect_ai_tutorial_2_statistics.ipynb",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://inspect.aisi.org.uk/?lang=en-US",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://aipromptshub.co/tutorial/build-llm-red-team-suite-2026",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://dev.to/aifrontierpost/stop-vibe-checking-your-model-write-real-evals-with-inspectai-the-uk-ai-safety-institutes-1bgh",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://github.com/ceferra/agent-trace-dataset",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "702c50f818111103eaaf5c98d665d4d09ffd25dd2f0aea36d99ef7182b50ced6"
+    },
+    {
+      "query_id": "q21",
+      "arm": "searxng",
+      "native_test_index": 0,
+      "native_prompt_index": 1,
+      "latency_ms": 4115,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "971cc1e7244d2024320ca107fbdf8c17001752073f0a4c722f36da749ce36833"
+    },
+    {
+      "query_id": "q22",
+      "arm": "ddgs-auto",
+      "native_test_index": 1,
+      "native_prompt_index": 0,
+      "latency_ms": 1479,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f3561707407cc511568c82d94ced06e7a43f0c45443ab65f4cad1ffa6eb9d1b",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://latestllm.com/articles/rolloutcentric-ai-agent-evaluation-harbor-terminalbench-openthoughtsagent-explai-mrzbndhg",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://daily.ifeeling.app/en/rollouts-as-the-core-primitive-for-agent-evaluation-and-training/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://github.com/Ltbltbltbltb/harbor-scaffold",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://huggingface.co/datasets/namanvats/harbor-goose-openhands-benchmark",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://hellogithub.com/en/repository/harbor-framework/harbor",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "2f93493a57b158172ef5327e0f7deb05e0f0b34d3e41d72d31cf1f924aca52be"
+    },
+    {
+      "query_id": "q22",
+      "arm": "searxng",
+      "native_test_index": 1,
+      "native_prompt_index": 1,
+      "latency_ms": 410,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "a9894bcfb8bff11d910c91994cf3e58f8977e101bb2be575f41bbd766d41b5bc"
+    },
+    {
+      "query_id": "q23",
+      "arm": "ddgs-auto",
+      "native_test_index": 2,
+      "native_prompt_index": 0,
+      "latency_ms": 31441,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "1d88ddf5a2d9abf1ce1c85c843744095ea898c1f469baf15b38258901c8c1b60",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://github.com/langchain-ai/open_deep_research",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://rywalker.com/research/open-deep-research",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=agGiWUpxkhg",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://uuithub.com/langchain-ai/open_deep_research",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://landscape.jimmysong.io/projects/open-deep-research/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "69c3b882efb8402fa0c3adf24cd579dbe7688cfc71d03c264e42634535fb5315"
+    },
+    {
+      "query_id": "q23",
+      "arm": "searxng",
+      "native_test_index": 2,
+      "native_prompt_index": 1,
+      "latency_ms": 3039,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "42c19e46aaa6102cde85580fcc754ff42a8292923d49f6270c55fd5efcfb0235"
+    },
+    {
+      "query_id": "q24",
+      "arm": "ddgs-auto",
+      "native_test_index": 3,
+      "native_prompt_index": 0,
+      "latency_ms": 31049,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "a52e10a82543dc097c4f93bf45cc2bab723aa946b95b91979f9762358703236f",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://storm.genie.stanford.edu/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://github.com/stanford-oval/storm",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://mikareyes.com/ai/stanford-storm-research-method",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=pRbzdxGA7xA",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.theai.tw/en/tools/storm",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "192671742f90424bdb38e30993e472e9b841b3a459faa60a1bea7599f22f3c14"
+    },
+    {
+      "query_id": "q24",
+      "arm": "searxng",
+      "native_test_index": 3,
+      "native_prompt_index": 1,
+      "latency_ms": 3036,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "f2b51b261e71454fd6db5b8b7850b3e8f19ad0699f2df78fc4984a2557a15344"
+    },
+    {
+      "query_id": "q25",
+      "arm": "ddgs-auto",
+      "native_test_index": 4,
+      "native_prompt_index": 0,
+      "latency_ms": 1160,
+      "native_success": true,
+      "native_failure_reason": 0,
+      "native_combined_score": 1,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 1,
+        "primary_mrr_at_5": 1,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": null,
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "9daa3149181a536c6231e0ce773cfbeb8496918ece86a76bf6863ad32b7f28cf",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://pypi.org/project/ddgs/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://grokipedia.com/page/ddgs_Python_library",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://openapps.pro/packages/ddgs",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.x-cmd.com/install/duckduckgo_search/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://tessl.io/registry/tessl/pypi-duckduckgo-search/8.1.0",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": true,
+        "score": 1,
+        "reason": "All assertions passed",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 1,
+          "primary_mrr_at_5": 1,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "9c1db8887739dabd1cddbfb3d42c5994668afd7c6ee5e0b5f93b43453142b6dc"
+    },
+    {
+      "query_id": "q25",
+      "arm": "searxng",
+      "native_test_index": 4,
+      "native_prompt_index": 1,
+      "latency_ms": 507,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "2ecd6fe0462403141edb9010c3ad6f7e6bc8ef97ea789933d45d569745d5c5f3"
+    },
+    {
+      "query_id": "q26",
+      "arm": "ddgs-auto",
+      "native_test_index": 5,
+      "native_prompt_index": 0,
+      "latency_ms": 31502,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "14570560a0dd5ad1ff024d77120e66e89cc2389274018edff4fad6a10f2f71fd",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://github.com/actions/reusable-workflows",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.itjtv.net/en/actions/reference/workflows-and-actions/reusing-workflow-configurations",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://kaluga-ds51.ru/p/https/docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.linkedin.com/pulse/reusing-workflows-github-actions-guilherme-moura-neezf",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://dev.to/rodri-oliveira-dev/how-i-organized-security-policies-reusable-workflows-net-maintenance-and-ai-agent-governance-4jgg",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "927d50ff58ef8b6e2b4d7afe53b7f50398959093c05571b86a3ff7b9a66d5dd4"
+    },
+    {
+      "query_id": "q26",
+      "arm": "searxng",
+      "native_test_index": 5,
+      "native_prompt_index": 1,
+      "latency_ms": 3033,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "dbf20f966325df13f2830648476aff5e9aec81776e5c0eb080ed39923b421a53"
+    },
+    {
+      "query_id": "q27",
+      "arm": "ddgs-auto",
+      "native_test_index": 6,
+      "native_prompt_index": 0,
+      "latency_ms": 678,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "b64e5e1d4258923fed65bd657694b38b68eb8a96f667072c83734fa77a9eac42",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://github.blog/changelog/2026-09-10-control-github-actions-cache-access-with-cache-mode/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://github.com/actions/cache",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manage-caches",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.zaydzarrouk.com/blog/platform-engineering/github-actions-cache-mode/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "b25441bd0e8c15b66d9b649a73edd94bb6db00bbf8dcc84068822eca68959e4b"
+    },
+    {
+      "query_id": "q27",
+      "arm": "searxng",
+      "native_test_index": 6,
+      "native_prompt_index": 1,
+      "latency_ms": 688,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "7741ce60cba670f28aba6b61d4671ab73b65ab1c65c9066644b7d783f376c49d"
+    },
+    {
+      "query_id": "q28",
+      "arm": "ddgs-auto",
+      "native_test_index": 7,
+      "native_prompt_index": 0,
+      "latency_ms": 31383,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "9b6fadec42bdd70d4f3a9acfcdd82a3fd1a36f5ac45fd6e7ebc73eb23295b021",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/run/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://labs.iximiuz.com/challenges/docker-101-container-publish-port-on-localhost",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://localtonet.com/blog/set-up-devdocs-docker-localtonet",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://medium.com/@akhshyganesh/docker-vs-your-firewall-the-silent-port-sneak-6e4bad366a5e",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://heisiwu.net/get-started/docker-concepts/running-containers/publishing-ports/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "ade64f50b4672b33e7f539f0b45c686b46123344c38287980258d9118ea2d5b6"
+    },
+    {
+      "query_id": "q28",
+      "arm": "searxng",
+      "native_test_index": 7,
+      "native_prompt_index": 1,
+      "latency_ms": 3035,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "6208905a5030428d02d2f62ba09b82eda6e1f3700b21f26c54d7962f00160dce"
+    },
+    {
+      "query_id": "q29",
+      "arm": "ddgs-auto",
+      "native_test_index": 8,
+      "native_prompt_index": 0,
+      "latency_ms": 31357,
+      "native_success": true,
+      "native_failure_reason": 0,
+      "native_combined_score": 0.9,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 1,
+        "primary_mrr_at_5": 0.5,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": null,
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "7813269acddec9d3b8fdcb04f25f36be51218c8558e56e7a06ce4ec786f1d093",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://rocm.docs.amd.com/en/latest/install/rocm.html",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://docs.astral.sh/uv/guides/tools/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/issues/12708",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://pydevtools.com/handbook/how-to/how-to-change-the-python-version-of-a-uv-project/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/issues/17734",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": true,
+        "score": 0.9,
+        "reason": "All assertions passed",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 1,
+          "primary_mrr_at_5": 0.5,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0.5,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "46c7200788edddd81d0ab238e194b33bd88e9b01d129c6be33f39fb23ad3a38f"
+    },
+    {
+      "query_id": "q29",
+      "arm": "searxng",
+      "native_test_index": 8,
+      "native_prompt_index": 1,
+      "latency_ms": 3037,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "b2c7001df68f9c10203ed1ca5a7dd2c5abf39d81146f68b6746228a70859af22"
+    },
+    {
+      "query_id": "q30",
+      "arm": "ddgs-auto",
+      "native_test_index": 9,
+      "native_prompt_index": 0,
+      "latency_ms": 1092,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.6,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 1,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 1
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Preregistered primary URL hit within top five",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "1d321dd232b692fbb094c0fb805598f43ed286ef7e7bd699b265fa0fccad45d8",
+      "native_output_shape": "results-object",
+      "native_returned_result_count": 5,
+      "returned_results_projection": [
+        {
+          "url": "https://signoz.io/docs/opentelemetry-collection-agents/opentelemetry-collector/configuration/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://odigos.io/blog/getting-started-with-opentelemetry",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://www.udemy.com/course/opentelemetry-foundations/",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://oneuptime.com/blog/post/2026-02-17-how-to-set-up-opentelemetry-collector-as-a-gateway-for-multi-service-telemetry-on-gcp/view",
+          "title_nonempty": true,
+          "text_nonempty": true
+        },
+        {
+          "url": "https://notes.kodekloud.com/docs/Prep-Course-OpenTelemetry-Certified-Associate-OTCA-Certification/OTel-Collector-Foundations/Demo-OTel-Collector-Docker-Installation/page",
+          "title_nonempty": true,
+          "text_nonempty": true
+        }
+      ],
+      "native_grading": {
+        "pass": false,
+        "score": 0.6,
+        "reason": "Preregistered primary URL hit within top five",
+        "named_scores": {
+          "contract": 1,
+          "usable": 1,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 1
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": true,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "1b8a37702bfb2416488ce58221ce60aa57be460ddda7a12e4f5e3e3daf7ead24"
+    },
+    {
+      "query_id": "q30",
+      "arm": "searxng",
+      "native_test_index": 9,
+      "native_prompt_index": 1,
+      "latency_ms": 322,
+      "native_success": false,
+      "native_failure_reason": 1,
+      "native_combined_score": 0.2,
+      "native_named_scores": {
+        "contract": 1,
+        "usable": 0,
+        "primary_hit_at_5": 0,
+        "primary_mrr_at_5": 0,
+        "unique_fraction": 0
+      },
+      "native_response_cached": false,
+      "native_provider_error": null,
+      "native_output_error": null,
+      "native_result_error": "Distinct URL fraction; duplicate hits never add credit",
+      "native_output_present": true,
+      "native_output_type": "str",
+      "native_output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "native_output_shape": "list",
+      "native_returned_result_count": 0,
+      "returned_results_projection": [],
+      "native_grading": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "Distinct URL fraction; duplicate hits never add credit",
+        "named_scores": {
+          "contract": 1,
+          "usable": 0,
+          "primary_hit_at_5": 0,
+          "primary_mrr_at_5": 0,
+          "unique_fraction": 0
+        },
+        "components": [
+          {
+            "pass": true,
+            "score": 1,
+            "reason": "Native top-five JSON contract",
+            "metric": "contract"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Nonempty usable native search results",
+            "metric": "usable"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Preregistered primary URL hit within top five",
+            "metric": "primary_hit_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Reciprocal first primary rank within top five",
+            "metric": "primary_mrr_at_5"
+          },
+          {
+            "pass": false,
+            "score": 0,
+            "reason": "Distinct URL fraction; duplicate hits never add credit",
+            "metric": "unique_fraction"
+          }
+        ]
+      },
+      "native_token_usage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "native_cell_id_sha256": "70ec726b122b9e76d08ee67e8f772bce1a7abd73d6a7b8b586e90cc19ba6ab63"
+    }
+  ],
+  "usage_scope": "Native promptfoo token counters are preserved only as returned framework counters. Search-provider tokens, internal engine retries and whole-task model usage remain unknown; these counters support no savings claim."
+}

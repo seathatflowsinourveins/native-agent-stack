@@ -29,6 +29,12 @@ The existing runner stays on version 1. `build_args.py` refuses V2-marked inputs
 inputs, full-field screens, replicated judgments and expanded field hash before V2 can run.
 `sweep.js` and `make_prompt.py` still use the V1 shared input and proposal projection.
 
+The controlling requirements for the future runner are now
+[U11 revision 5](../../../docs/decisions/2026-10-01-u11-merit-neutral-selection.md#revision-5-2026-10-01).
+The revision 4 citation above identifies the historical source-preparation contract,
+not the complete activation contract. The [October 5 practice review](../../../docs/decisions/2026-10-05-convergence-practice-upstream-review.md#v2-runner-suggestion-and-activation-conditions)
+records the remaining screens, provenance, accounting and measurement conditions.
+
 Prepare source inputs with the existing frozen scope and manifest arguments, adding:
 
 ```sh
@@ -169,7 +175,7 @@ They are synthetic/local integration checks, not unchanged upstream model accept
 
 ### Part 2 review queue
 
-Notes 4–11 from the [PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180)
+Notes 4–10 from the [PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180)
 remain open for part 2. This repair does not qualify the future V2 runner.
 
 4. Reconcile the historical receipt's source revisions, unretained 1,135-count script and earlier
@@ -187,9 +193,10 @@ remain open for part 2. This repair does not qualify the future V2 runner.
    replace the fact-word pattern with deterministic API evidence before launch.
 10. Treat an expected missing GitHub latest release as an observation instead of a whole-source
     failure, using the maintained `github_freshness.py` missing-response policy.
-11. Reconcile the inferred `alpacahq/alpaca-py` pin with the user's separate Alpaca adapter-path
-    requirement; the user has not pinned that repository. Preserve the acknowledged trading
-    acceptance summaries and exact section hashes while resolving this input policy.
+11. Resolved by the [October 5 projection repair](../../../docs/decisions/2026-10-05-convergence-practice-upstream-review.md):
+    the separate Alpaca adapter-path requirement carries no repository pin. `alpacahq/alpaca-py`
+    remains an eligible comparison candidate. The acknowledged trading acceptance summaries and
+    exact section hashes are preserved; this source correction does not qualify the V2 runner.
 
 ## Files
 
@@ -290,17 +297,36 @@ Each worker reports the skills it used in `skills_used`, and `returns.json` tota
 `build_args.py` refuses to stage a run when the templates name a skill that `adoption/skills/manifest.json` does not
 pin as kept or trial. The same check also refuses a pinned skill that the templates name but `TEMPLATE_SKILLS` omits.
 
-The GPT-6 lanes run with `--ignore-user-config`, so per-skill `enabled = false` entries in a host's Codex
+Native GPT-6 lanes run with `--ignore-user-config`, so per-skill `enabled = false` entries in a host's Codex
 `config.toml` do not apply there. Which skills Codex lists inside the lane is untested; `skills_used` records what
 each worker says it used.
 
 ### GPT-6 through OmniRoute (`--gpt6-provider omniroute`)
 
-With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 lane runs through the local OmniRoute gateway. OmniRoute pools the operator's accounts. The lane gets its own Codex home, so the host's interactive config never applies.
+Run the model-free tripwire before staging an OmniRoute lane:
+
+```sh
+python3 "$H/build_args.py" --gateway-check &&
+python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
+  --gpt6-provider omniroute --codex-host <HOST>
+```
+
+The gateway comes from this host's record written by `tools/omniroute/host_gateway.py write`; there is no built-in
+port. An explicit endpoint must equal that record unless the run also supplies `--unrecorded-gateway-reason TEXT`.
+`OPENAI_BASE_URL` is checked too. Staging records `codex.gateway` as `{endpoint, source, reason}`, starts no client
+and makes no TCP probe. The executor resolves that record again before start and in the detached runner, checks
+every `*config.toml` in the lane home, and makes a bounded three-second TCP connection before each gateway Codex
+spawn. `python3 "$W/codex_job.py" gateway-check "$W"` resolves the staged route without a probe or a spawn.
+A native-only run reads no gateway record and its executor reports `{"gateway": null, "provider": "native"}`.
+
+Each work directory runs its own copy of the runner (`build_args.py`'s `RUNTIME`), so a directory staged before
+this change keeps the old runner; re-stage into a new directory, never re-run the old copy.
+
+OmniRoute pools the operator's accounts. The lane gets its own Codex home, so the host's interactive config never applies.
 
 `build_args.py` writes `<work-dir>/codex-home/` with three files:
 - `config.toml`:
-  - the provider block: `model = "cx/gpt-6-astra"`, `model_provider = "omniroute"`, `model_reasoning_effort = "max"`, and `[model_providers.omniroute]` with a loopback `base_url` ending in `/v1`, `env_key = "OMNIROUTE_API_KEY"`, `requires_openai_auth = false` and `wire_api = "responses"`, plus a static `http_headers` table only when `--omniroute-header` is given (see [the framework instance](#staging-on-the-framework-instance-20129)). The fields follow the [Codex config reference](https://developers.openai.com/codex/config-reference).
+  - the provider block: `model = "cx/gpt-6-astra"`, `model_provider = "omniroute"`, `model_reasoning_effort = "max"`, and `[model_providers.omniroute]` with the resolved loopback `base_url` ending in `/v1`, `env_key = "OMNIROUTE_API_KEY"`, `requires_openai_auth = false` and `wire_api = "responses"`, plus a static `http_headers` table only when `--omniroute-header` is given (see [a deliberately unrecorded chained route](#staging-a-deliberately-unrecorded-chained-route)). The fields follow the [Codex config reference](https://developers.openai.com/codex/config-reference).
   - the `[mcp_servers.*]` tables of `adoption/templates/codex.config.template.toml`. The checkout's own `tools/adoption/render_config.py` renders them for `adoption/hosts/<HOST>.json`: serena, ai-memory, socraticode, headroom, codebase-memory, qmd and context-mode.
 - `stack-worker.config.toml`: the Codex worker profile (`--stack-worker-profile`, default `adoption/templates/codex.stack-worker.config.toml`), copied verbatim.
 - `AGENTS.md`: the host's Codex user instructions, the managed block of `adoption/templates/codex.AGENTS.template.md` read through `tools/adoption/apply_codex_lane.py`'s `agents_block()`: the top rule, rtk-ai/rtk v0.50.0's `hooks/rtk-awareness-full.md` verbatim, and the RTK exactness exceptions. Codex reads `$CODEX_HOME/AGENTS.md` as global instructions, so without it the lane's model got neither the top rule nor RTK's instructions, which the native lane's workers get from `~/.codex/AGENTS.md`. `staged.json` records its `agents_sha256`.
@@ -328,17 +354,62 @@ What the lane config also sets:
 What the lane does not carry or allow:
 - Project and hook trust are left out, because they describe the host's interactive client.
 - `supports_websockets` stays unset. OmniRoute forwards the Codex client version only on its HTTP `/v1/responses` path.
-- `--omniroute-base-url` must point at loopback.
+- `--omniroute-base-url` uses the contract's canonical `http://127.0.0.1:<port>/v1` spelling and must agree with the
+  host record, or carry the explicit non-blank unrecorded reason. Gateway variables are compared by port across
+  loopback spellings; an environment variable cannot silently choose another port.
 
 Isolation limits:
 - `CODEX_HOME` replaces the user-config location, but a trusted `.codex/config.toml` in the working directory and the system config still layer in.
-- The runner works in `<work-dir>/empty`. It holds only `.claude/settings.json`, which context-mode reads and Codex does not, so no Codex project layer applies there. A host system config (`/etc/codex/config.toml`) would apply, so keep it absent on sweep hosts.
+- The runner works in `<work-dir>/empty`. Its stager writes `.claude/settings.json`, which context-mode reads and
+  Codex does not. A separately present or ancestral `.codex/config.toml` and a system configuration can still
+  layer in. The primary route therefore pins `model_providers.omniroute.base_url` with a dotted `-c` value.
+  Precedence over a loaded project layer remains unverified until the real-CLI fixture case T17p passes at the
+  exact reviewed head, with a control that removes the pin and proves the second endpoint was loaded.
 
 How the runner uses it:
-- `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`. Staged effort and search settings override these defaults and the profile.
+- `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config`, adds `-p stack-worker`, and pins the
+  resolved endpoint with `-c model_providers.omniroute.base_url=<TOML string>`. Staged effort and search settings
+  override the defaults and the profile. Every future research invocation passes `--disable apps`, including
+  native, primary gateway and fallback attempts ([Codex CLI reference](https://learn.chatgpt.com/docs/cli-reference),
+  verified by installed `openai/codex rust-v0.160.1` `codex exec --help`: it equals `-c features.apps=false`).
 - The key comes from `$OMNIROUTE_API_KEY` in the harness's environment. For a keyless loopback gateway, upstream's non-interactive setup with no login or API key, the staged placeholder `local-loopback` fills an unset variable; Codex's `env_key` only needs the variable to exist. `--omniroute-require-key` stages no placeholder, so a job without the variable ends with exit 6 before codex starts.
 - `--quota-stop-percent` is refused with this provider: the quota probe reads the native login, not the gateway's pool.
 - A job's `inputs.json` records the provider, so a gateway run never reuses a native job's result. It also records any provider headers, so a job finished under other headers is rerun, not reused.
+
+The input binding now includes `apps: false`; a historical input without that field is preserved and cannot count
+as equivalent to this setting. The actual attempted Codex argv is retained privately in `argv.json` (mode 0600),
+and `ATTEMPT_FILES` moves it unchanged with each archived failure or retry. The current argv contains paths and
+configuration; the prompt lives in private `prompt.txt` and `stdin.txt`. Publish none of those raw files. This update
+changes only future staging and invocations, not active workflows or their frozen flags.
+The prompt's read-only `gh api --cache 120s` and context-mode `ctx_fetch_and_index` routes are **UNVERIFIED** for an
+isolated job until its own tool readback and source-fetch smoke pass. No GitHub app connector is required; a missing
+or refused source route stays unknown.
+
+Prompt transport uses the upstream `codex exec … -` stdin path, supported by installed Codex 0.160.1's help and
+[the pinned reader](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/exec/src/lib.rs#L2252-L2290).
+Linux's `MAX_ARG_STRLEN` (`/usr/include/linux/binfmts.h`: 32 pages) limits a single argument, not model content.
+The runner therefore applies no replacement byte cap. It retains the empty-prompt refusal and sends the complete
+previously delivered payload: a UTF-8 universal-newline read, stripping only trailing LF characters, then UTF-8
+encoding. Spaces and tabs remain. The raw prompt hash in `inputs.json` and all historical bytes stay unchanged.
+
+Each actual attempt reads its own mode-0600 `stdin.txt` through a file descriptor handed to
+[Python's supported `Popen` stdin interface](https://docs.python.org/3.9/library/subprocess.html#subprocess.Popen).
+The file starts at offset zero for every retry and exposes EOF; no pipe writer can block the existing watchdog.
+The detached runner, version query and model-free quota helper keep stdin at `/dev/null`. The existing deadline,
+idle timeout and process-group cleanup still bound each Codex attempt, and an exception after spawn stops its group
+before unwinding. `ATTEMPT_FILES` archives the private stdin payload unchanged with the attempt.
+After an actual spawn, `route.json` carries its provider and
+`prompt_transport: {kind: "stdin", delivered_bytes, delivered_sha256}`. Only an actual fallback adds `fallback_from`
+and the existing fallback fields; native and primary-gateway stdin delivery does not imply provider failover.
+
+Gateway acceptance remains separate from source inspection and hermetic integration checks. T17c must prove a
+scanned-home conflict exits 2 with zero spawns and zero requests. T17p must use the real Codex CLI and two fixture
+listeners, place the conflicting project config in both `<work-dir>/empty` and `<work-dir>`, and remove the CLI pin
+in its control to establish that each project layer was loaded. A refusal alone does not prove precedence.
+Keep two passing T17p receipts: one at the final reviewed candidate head before merge and another on the merged
+code, each naming its head and Codex version, with `skipped=0`. An endpoint-pin failure requires a repair and a new
+candidate-head receipt. This harness merges only after the host-record writer and its host proof; follow-up adapters
+that edit the same recipe or worker-lane tests merge afterward and re-read their anchors.
 
 Before a full run through the gateway, run the lane's parity check on the staged home, and do not claim a gateway result as max quality until it passes. The check covers:
 - max effort reaching the upstream model, shown in the gateway's request log and the rollout's `turn_context`;
@@ -350,15 +421,16 @@ Before a full run through the gateway, run the lane's parity check on the staged
 
 #### Automatic native-to-OmniRoute failover (`--gpt6-fallback omniroute`)
 
-Stage a native lane with an explicit fallback to the keyless loopback gateway:
+Stage a native lane with an explicit fallback selection to this host's recorded keyless loopback gateway:
 
 ```sh
+python3 "$H/build_args.py" --gateway-check &&
 python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
-  --gpt6-fallback omniroute --fallback-codex-host 127.0.0.1:20128
+  --gpt6-fallback omniroute
 ```
 
 The fallback is off unless `staged.json` carries `codex.fallback`. The host flag names the gateway's loopback
-address and port (default `127.0.0.1:20128`). The stager requires a native primary provider and a bare native model
+address and port; without it the host's record supplies the endpoint. The stager requires a native primary provider and a bare native model
 name whose requested effort has a reasoning alias in the pinned gateway. It records the fallback provider and
 base URL without creating a lane home. Restaging changes no frozen
 templates, `prompts_sha256.txt`, workflow arguments or embedded script when only provider/fallback flags change.
@@ -411,14 +483,18 @@ The [failover decision](../../../docs/decisions/2026-10-03-gpt-lane-omniroute-fa
 synthetic checks. Native upstream provider failover or a measured parity failure of this gateway route overturns
 the choice.
 
-#### Staging on the framework instance (20129)
+#### Staging a deliberately unrecorded chained route
 
-The default gateway stays 20128: `--omniroute-base-url` defaults to `http://127.0.0.1:20128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 20128 through its `sharedgw` node:
+The default gateway is this host's recorded endpoint, the model is `cx/gpt-6-astra`, and no provider headers are
+sent. To qualify a different chained endpoint, set `CHAINED_GATEWAY` to its canonical loopback `/v1` URL and name
+why this run deliberately departs from the record. This is a run-scoped exception, not a new host default:
 
 ```sh
-python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces \
+python3 "$H/build_args.py" --gateway-check --omniroute-base-url "$CHAINED_GATEWAY" \
+  --unrecorded-gateway-reason 'chained-route qualification' &&
+python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces \
   --gpt6-provider omniroute --codex-host <HOST> \
-  --omniroute-base-url http://127.0.0.1:20129/v1 \
+  --omniroute-base-url "$CHAINED_GATEWAY" --unrecorded-gateway-reason 'chained-route qualification' \
   --gpt6-model sharedgw/gpt-6-astra-max \
   --omniroute-header x-omniroute-compression=allow-lossy
 ```
@@ -451,7 +527,9 @@ The header option:
 - Only OmniRoute 3.8.51's per-request switches are accepted, lowercased and each once: `x-omniroute-compression` (`open-sse/handlers/chatCore/headers.ts:35-46`), `x-omniroute-no-cache` (`src/lib/semanticCache.ts:483-486` and `501-504`), `x-omniroute-no-memory` (`headers.ts:18-33`) and `x-omniroute-strip-reasoning` (`headers.ts:48-65`). Values are 1-128 printable ASCII characters without `"` or `\`.
 - Other `x-omniroute-*` headers can carry a secret under a name with no credential word, such as `x-omniroute-self-hop` (`open-sse/utils/selfHop.ts:1-12`) and `x-omniroute-video-bridge-broker` (`src/lib/guardrails/videoBridgeBrokerAuth.ts:7-19`). So the names are listed rather than filtered by word.
 - The values are recorded in `staged.json` (`codex.http_headers`) and in each job's `inputs.json`. The runner refuses to start when the lane home's `http_headers` differs from `codex.http_headers`.
-- Both read-backs parse `config.toml` with `tomllib` (Python 3.11+). Staging already requires it. Without it, the runner refuses a lane with staged headers; a header-less lane still runs on Python 3.9, such as macOS's `/usr/bin/python3`.
+- Both read-backs parse `config.toml` with `tomllib` (Python 3.11+). Staging already requires it. The shared
+  gateway-home scan also requires it, so the runner refuses every gateway home on an older Python. Native-only
+  lanes retain Python 3.9 support without reading a host gateway record or importing `tomllib`.
 
 What `allow-lossy` does (read from the installed OmniRoute 3.8.51 source, not measured):
 

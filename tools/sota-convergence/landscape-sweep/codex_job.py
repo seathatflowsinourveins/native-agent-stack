@@ -12,9 +12,9 @@
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
 this, in the empty directory <work-dir>/empty, bounded to 4000 s by default (exit 124 on timeout):
 
-  codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra \
+  codex exec --ignore-user-config --disable apps --skip-git-repo-check -s read-only -m gpt-6-astra \
     -c model_reasoning_effort="max" -c web_search="live" \
-    --output-schema <job>/schema.json -o <job>/last.json --json "<prompt>" </dev/null
+    --output-schema <job>/schema.json -o <job>/last.json --json - < <job>/stdin.txt
 
 The native command uses Codex's built-in OpenAI provider. staged.json codex.effort and
 codex.web_search override the shown defaults; supported values follow the pinned 0.159.2 model catalog and
@@ -28,15 +28,16 @@ profile layered over it), so the command becomes `codex exec -p stack-worker --s
 operator's environment. For a keyless loopback gateway, codex.api_key_placeholder ("local-loopback") fills an
 unset variable, because Codex's env_key only needs it to exist. Without either, a job ends with exit 6 before codex
 starts. The quota gate reads the native login only, so it is refused for a gateway lane. A lane staged on a chained
-OmniRoute instance, such as the framework instance at http://127.0.0.1:20129/v1, names its model with a node alias in
+OmniRoute instance names its model with a node alias in
 front (`-m sharedgw/gpt-6-astra-max`), and its static provider headers (codex.http_headers, OmniRoute's per-request
 switches only, for example x-omniroute-compression = allow-lossy; build_args.py --omniroute-header) sit in the lane
 home's [model_providers.omniroute] http_headers. The runner refuses to start when that table differs from
 codex.http_headers, and records the headers in each job's inputs.json. The comparison needs tomllib (Python 3.11+):
-older interpreters refuse a lane with staged headers and skip it for a header-less lane.
+older interpreters refuse every gateway lane with a home to scan; native-only lanes retain Python 3.9 support.
 
---ignore-user-config keeps the host's Codex config out of the native lane, the sandbox is read-only, stdin is /dev/null
-(background `codex exec` otherwise waits on stdin), and the default effort stays max. A lane may stage ultra;
+--ignore-user-config keeps the host's Codex config out of the native lane, the sandbox is read-only, and the actual
+Codex attempt receives an EOF-bounded private stdin file. Every other child keeps stdin at /dev/null, so a detached
+runner or model-free helper cannot wait on the caller's terminal. The default effort stays max. A lane may stage ultra;
 the lane stager chooses per the current GPT worker standard. Blind or isolated review lanes must stay at max,
 because ultra auto-delegates in multi-agent v2 (openai/codex rust-v0.159.2,
 codex-rs/core/src/session/multi_agents.rs:77-103). Ultra resolves to the catalog's multi_agent_reasoning_effort,
@@ -102,7 +103,17 @@ claiming complete delegated usage. Exec only forwards primary-thread token updat
 codex-rs/exec/src/lib.rs:1636-1638; event_processor_with_jsonl_output.rs:509-511,533-535).
 
 A job is bound to its inputs: <job>/inputs.json holds the sha256 of its prompt and schema, the model, the effort and
-request_effort and the web search mode (an absent mode means live for older records). Success requires exit 0, a turn.completed event
+request_effort and the web search mode (an absent mode means live for older records). It also binds apps=false:
+--disable apps applies to every future attempt, independent of the caller's config. An older
+input with no apps field is not equivalent and is archived unchanged before a rerun. Each attempt's exact argv is
+kept privately in argv.json (mode 0600), alongside its returned events and archived with them. The raw prompt stays
+in prompt.txt; stdin.txt (mode 0600) holds the same UTF-8 bytes the former argv path delivered after universal-newline
+reading and stripping only trailing LF characters. route.json records this prompt transport and its delivered
+byte count and hash after actual spawn. The raw bound prompt hash and earlier artifacts remain unchanged.
+A primary OmniRoute job also binds the resolved gateway's endpoint, source and reason; a historical record without
+that tuple cannot be reused for a new primary gateway run. Native inputs omit the tuple, including transport-only
+fallback inputs whose separate route receipt remains checked before reuse.
+Success requires exit 0, a turn.completed event
 and a non-empty -o output file. Exit 0 without that evidence becomes exit 126, failure kind incomplete. A successful
 attempt for the same inputs is not rerun ("already done"). Any other earlier
 attempt (failed, refused, or done for different inputs, as after a Workflow resume regenerated the prompt) is moved
@@ -121,21 +132,288 @@ into the lane. Standard library only; Linux and macOS (Python 3.9+).
 
 from __future__ import annotations
 
+import argparse
 import errno
 import fcntl
 import hashlib
+import ipaddress
+import io
 import json
 import math
 import os
+import pathlib
 import random
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import time
+import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
+
+# --- host-gateway contract v2 (identical in every holder; tests/test_host_gateway_contract.py) ---
+# needs (stdlib, Python >= 3.9): argparse, hashlib, ipaddress, json, os, pathlib, socket, sys, urllib.parse;
+# tomllib (3.11+) and pwd are imported lazily, inside the functions that need them
+HOST_GATEWAY_SCHEMA = "native-agent-stack/host-gateway/v1"
+HOST_GATEWAY_RECORD = ".config/agent-stack-host/gateway.json"  # under the passwd home; never $HOME or XDG
+HOST_GATEWAY_WRITER = "tools/omniroute/host_gateway.py write"
+HOST_GATEWAY_OVERRIDE = "--unrecorded-gateway-reason"
+LOOPBACK_NO_PROXY = ("127.0.0.1", "localhost", "::1")
+ENDPOINT_OVERRIDE_KEYS = frozenset({"openai_base_url", "chatgpt_base_url", "model_provider", "model_providers",
+                                    "profile", "profiles"})  # Codex's own endpoint denylist
+CODEX_ENDPOINT_KEYS = ("base_url", "openai_base_url", "chatgpt_base_url")  # a loopback value under these is a route
+_RECORD_WHERE = f"the passwd home's {HOST_GATEWAY_RECORD} (not $HOME)"
+_OVERRIDE_FIX = f"pass the gateway flag together with {HOST_GATEWAY_OVERRIDE} TEXT"
+
+
+class GatewayRefused(ValueError):
+    """No endpoint may be used; the message says what was checked and what to run."""
+
+
+def gateway_endpoint(value):
+    """The one shape contract: exactly http://127.0.0.1:<port>/v1 (a trailing slash is dropped)."""
+    if isinstance(value, str) and "${" in value:
+        raise GatewayRefused(f"{value!r} is an unexpanded variable; set it, or leave it empty for this host's record")
+    try:
+        parts = urllib.parse.urlsplit(value.strip())
+        port = parts.port
+        ok = (parts.scheme == "http" and port is not None and port > 0 and parts.netloc == f"127.0.0.1:{port}"
+              and not parts.query and not parts.fragment and parts.path.rstrip("/") == "/v1")
+    except (AttributeError, TypeError, ValueError):
+        ok = False
+    if not ok:
+        raise GatewayRefused(f"{value!r} is not a gateway endpoint; write it as http://127.0.0.1:<port>/v1")
+    return f"http://127.0.0.1:{port}/v1"
+
+
+def loopback_port(value):
+    """The port of an http(s) URL whose host is any loopback or unspecified spelling; otherwise None."""
+    try:
+        parts = urllib.parse.urlsplit(value.strip())
+        port, host = parts.port, (parts.hostname or "").rstrip(".")
+        if parts.scheme not in ("http", "https") or port is None or not host:
+            return None
+        if host == "localhost" or host.endswith(".localhost"):
+            return port
+        try:
+            address = ipaddress.ip_address(host)
+        except ValueError:
+            address = ipaddress.ip_address(socket.inet_aton(host))  # short IPv4 forms such as 127.1
+        address = getattr(address, "ipv4_mapped", None) or address
+        return port if address.is_loopback or address.is_unspecified else None
+    except (AttributeError, OSError, TypeError, ValueError):
+        return None
+
+
+def installation_id():
+    """sha256 of this installation's /etc/machine-id (machine-id(5): 32 lowercase hex digits). There is no default."""
+    try:
+        text = pathlib.Path("/etc/machine-id").read_text(encoding="ascii").strip()
+    except (OSError, UnicodeDecodeError) as error:
+        raise GatewayRefused(f"/etc/machine-id cannot be read here ({type(error).__name__}), so no host gateway "
+                             f"record can be bound to this installation; {_OVERRIDE_FIX}") from None
+    if len(text) != 32 or text.strip("0123456789abcdef") or not text.strip("0"):
+        raise GatewayRefused(f"/etc/machine-id is not a 32-digit lowercase hex id; {_OVERRIDE_FIX}")
+    return hashlib.sha256(text.encode("ascii")).hexdigest()
+
+
+def recorded_gateway():
+    """This host's own gateway, as its writer recorded it. There is no default."""
+    try:
+        import pwd
+    except ImportError:
+        raise GatewayRefused(f"this platform has no passwd database and so no host gateway record; "
+                             f"{_OVERRIDE_FIX}") from None
+    try:
+        home = pathlib.Path(pwd.getpwuid(os.getuid()).pw_dir)
+    except KeyError:
+        raise GatewayRefused("this uid has no passwd entry in this context (a user namespace or container); "
+                             f"{_OVERRIDE_FIX}") from None
+    try:
+        text = (home / HOST_GATEWAY_RECORD).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        try:
+            visible = home.is_dir()
+        except OSError:
+            visible = False
+        if not visible:
+            raise GatewayRefused("the passwd home is not visible in this context (a sandbox); run outside it, "
+                                 f"or {_OVERRIDE_FIX}") from None
+        raise GatewayRefused(f"no host gateway record at {_RECORD_WHERE}. If this host runs a gateway: python3 "
+                             f"<checkout>/{HOST_GATEWAY_WRITER} --port <PORT> --unit <UNIT>. If it has none: "
+                             f"{_OVERRIDE_FIX}") from None
+    except OSError as error:
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} exists but cannot be read here "
+                             f"({error.strerror}); run outside the sandbox, or {_OVERRIDE_FIX}") from None
+    try:
+        record = json.loads(text)
+        host, endpoint, machine = record["host"], record["endpoint"], record["machine_id_sha256"]
+        if (record.get("schema") != HOST_GATEWAY_SCHEMA or not isinstance(host, str) or not isinstance(endpoint, str)
+                or not isinstance(machine, str) or len(machine) != 64 or machine.strip("0123456789abcdef")):
+            raise ValueError  # a missing, null, empty or malformed machine_id_sha256 is malformed
+    except (AttributeError, KeyError, TypeError, ValueError):
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} is malformed or has another schema; "
+                             f"rewrite it: python3 <checkout>/{HOST_GATEWAY_WRITER} --replace --port <PORT>") from None
+    if host != socket.gethostname():
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} was written under another host name; "
+                             f"if this host runs a gateway: python3 <checkout>/{HOST_GATEWAY_WRITER} --replace "
+                             "--port <PORT>")
+    if machine != installation_id():  # installation_id() refuses when this installation's machine id cannot be read
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} was written by another installation "
+                             f"(the machine id differs); python3 <checkout>/{HOST_GATEWAY_WRITER} --replace "
+                             "--port <PORT>")
+    try:
+        return gateway_endpoint(endpoint)
+    except GatewayRefused:
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} names an endpoint outside the "
+                             "contract") from None
+
+
+def resolve_gateway(explicit, reason, variables):
+    """The rule. Returns {endpoint, source, reason} or raises GatewayRefused."""
+    explicit = explicit if isinstance(explicit, str) and explicit.strip() else None  # empty means no flag
+    if explicit is not None:
+        explicit = gateway_endpoint(explicit)
+    if reason is not None:
+        if explicit is None or not reason.strip():
+            raise GatewayRefused(f"{HOST_GATEWAY_OVERRIDE} needs an explicit gateway and a non-blank reason")
+        return {"endpoint": explicit, "source": "unrecorded", "reason": reason.strip()}
+    recorded = recorded_gateway()
+    if explicit is not None and explicit != recorded:
+        raise GatewayRefused(f"{explicit} is not this host's recorded gateway ({recorded}); to use it "
+                             f"deliberately add {HOST_GATEWAY_OVERRIDE} TEXT")
+    port = urllib.parse.urlsplit(recorded).port
+    for name in variables:
+        found = loopback_port(os.environ.get(name) or "")
+        if found is not None and found != port:
+            raise GatewayRefused(f"{name} names a loopback gateway on port {found}, not this host's recorded "
+                                 f"gateway ({recorded}); unset it (env -u {name} ...), or pass the gateway "
+                                 f"explicitly with {HOST_GATEWAY_OVERRIDE} TEXT")
+    return {"endpoint": recorded, "source": "host-record", "reason": None}
+
+
+def _toml():
+    try:
+        import tomllib
+    except ImportError:
+        raise GatewayRefused("this Python has no tomllib (3.11+), so the endpoint check cannot run; use Python "
+                             "3.11 or later for a gateway run") from None
+    return tomllib
+
+
+def refuse_endpoint_overrides(overrides):
+    """A generic Codex -c value may not choose or redefine a provider endpoint; only the gateway flag may."""
+    if not overrides:
+        return
+    tomllib = _toml()
+    for override in overrides:
+        try:
+            keys = set(tomllib.loads(override)) & ENDPOINT_OVERRIDE_KEYS
+        except (TypeError, tomllib.TOMLDecodeError):
+            raise GatewayRefused(f"{override!r} is not a KEY=TOML override") from None
+        if keys:
+            raise GatewayRefused(f"{override!r} sets {', '.join(sorted(keys))}; an endpoint is chosen only by "
+                                 "the gateway flag and this host's record")
+
+
+def home_endpoint_ports(home):
+    """(file:key, port) for each loopback endpoint that a Codex home's *config.toml files name."""
+    paths = sorted(pathlib.Path(home).glob("*config.toml"))
+    if not paths:
+        return []
+    tomllib, found = _toml(), []
+    for path in paths:
+        try:
+            data = tomllib.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
+            raise GatewayRefused(f"{path.name} in the Codex home cannot be read or parsed "
+                                 f"({type(error).__name__}); fix it before a gateway run") from None
+        stack = [((), data)]
+        while stack:
+            keys, node = stack.pop()
+            if isinstance(node, dict):
+                stack.extend(((*keys, key), value) for key, value in node.items())
+            elif isinstance(node, str) and keys and keys[-1] in CODEX_ENDPOINT_KEYS:
+                port = loopback_port(node)
+                if port is not None:
+                    found.append((path.name + ":" + ".".join(keys), port))
+    return found
+
+
+def refuse_home_endpoints(home, gateway, variables=()):
+    """C1 for the Codex-home channel: a home may name no loopback endpoint but the run's gateway."""
+    found = home_endpoint_ports(home)
+    if not found:
+        return  # no loopback route in the home: no record is read
+    gateway = gateway or resolve_gateway(None, None, variables)
+    port = urllib.parse.urlsplit(gateway["endpoint"]).port
+    for where, other in found:
+        if other != port:
+            raise GatewayRefused(f"the Codex home names a loopback gateway on port {other} ({where}), not "
+                                 f"{gateway['endpoint']}; use a Codex home that names this run's gateway or none")
+
+
+def probe_gateway(endpoint, timeout=3.0):
+    """A bounded TCP connect before any side effect: on mirrored WSL an unbound loopback port hangs."""
+    try:
+        socket.create_connection(("127.0.0.1", urllib.parse.urlsplit(endpoint).port), timeout=timeout).close()
+    except OSError as error:
+        raise GatewayRefused(f"gateway {endpoint} did not accept a TCP connection within {timeout:g} s "
+                             f"({type(error).__name__}); start this host's gateway unit, then run python3 "
+                             "<checkout>/tools/omniroute/host_gateway.py check") from None
+
+
+def child_env(env):
+    """A child's environment with loopback exempt from every proxy (NO_PROXY and no_proxy)."""
+    env = dict(env)
+    for name in ("NO_PROXY", "no_proxy"):
+        entries = [item.strip() for item in (env.get(name) or "").split(",") if item.strip()]
+        env[name] = ",".join(entries + [host for host in LOOPBACK_NO_PROXY if host not in entries])
+    return env
+
+
+def gateway_check(argv, flags, variables, overrides=(), homes=()):
+    """--gateway-check, called at module top before any SDK import: resolve, print one JSON line, exit 0 or 2.
+    flags maps each gateway flag of the holder to a function that returns a /v1 URL from the flag's value;
+    overrides names its generic Codex -c flags and homes its Codex-home flags, which are checked too."""
+    names = ("--gateway-check", HOST_GATEWAY_OVERRIDE, *flags, *overrides, *homes)
+    pre = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+    pre.add_argument("--gateway-check", action="store_true")
+    pre.add_argument(HOST_GATEWAY_OVERRIDE, dest="reason")
+    for index, flag in enumerate(flags):
+        pre.add_argument(flag, dest=f"gateway_{index}")
+    for index, flag in enumerate(overrides):
+        pre.add_argument(flag, dest=f"override_{index}", action="append", default=[])
+    for index, flag in enumerate(homes):
+        pre.add_argument(flag, dest=f"home_{index}")
+    known, rest = pre.parse_known_args(argv)
+    if not known.gateway_check:
+        return
+    try:
+        for item in rest:
+            name = item.split("=", 1)[0]
+            if name.startswith("--") and any(full != name and full.startswith(name) for full in names):
+                raise GatewayRefused(f"{name} is an abbreviation; spell the option in full")
+        values = [getattr(known, f"gateway_{index}") for index in range(len(flags))]
+        given = [convert(value) for convert, value in zip(flags.values(), values) if value and value.strip()]
+        results = [resolve_gateway(value, known.reason, variables) for value in given]
+        result = results[0] if results else resolve_gateway(None, known.reason, variables)
+        refuse_endpoint_overrides([item for index in range(len(overrides))
+                                   for item in getattr(known, f"override_{index}")])
+        for index in range(len(homes)):
+            if getattr(known, f"home_{index}"):
+                refuse_home_endpoints(getattr(known, f"home_{index}"), result, variables)
+    except GatewayRefused as error:
+        print(f"gateway refused: {error}", file=sys.stderr)
+        raise SystemExit(2)
+    print(json.dumps({"gateway": result}, sort_keys=True))
+    raise SystemExit(0)
+# --- end host-gateway contract v2 ---
+
+GATEWAY_VARIABLES = ("OPENAI_BASE_URL",)
 
 HERE = Path(__file__).resolve().parent
 STAGED = "staged.json"
@@ -192,8 +470,9 @@ RETRY_LIMIT_429 = re.compile(r"exceeded retry limit, last status: 429\b", re.IGN
 LIMIT_PATTERNS = (("usage", LIMIT_PHRASE), ("http_429", RETRY_LIMIT_429))
 # Codex's own error lines: "ERROR: ...", "Error: ..." (eprintln) or a tracing record "<timestamp> ERROR <target>: ...".
 STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
-# The prompt is one argv string, as in the 2026-09-26 runner; Linux caps one argument at 131072 bytes.
-MAX_PROMPT_BYTES = 120_000
+# Prompts use the upstream '-' stdin path: openai/codex@rust-v0.160.1,
+# codex-rs/exec/src/lib.rs:191-193,2252-2275,2288-2290. Linux's MAX_ARG_STRLEN
+# (/usr/include/linux/binfmts.h, 32 pages) limits argv transport, not model content.
 JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 # Kept equal to build_args.MODEL_NAME: at most one provider segment, e.g. "cx/gpt-6-astra" or the framework
 # instance's "sharedgw/gpt-6-astra-max". Codex strips one namespace for metadata lookup, and only one of letters,
@@ -207,7 +486,6 @@ OMNIROUTE_REQUEST_HEADERS = ("x-omniroute-compression", "x-omniroute-no-cache", 
                              "x-omniroute-strip-reasoning")
 HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
 PROVIDERS = ("native", "omniroute")
-LOOPBACK_V1_URL = re.compile(r"http://(?:127\.0\.0\.1|localhost):([0-9]{1,5})/v1")
 FALLBACK_KEY_ENV = "OMNIROUTE_API_KEY"
 FALLBACK_SEARCH_BACKEND = "omniroute:/alpha/search"
 # HouMinXi/OmniRoute@0585aba5589d5a1f49243a13a8db249558e7c9e3,
@@ -220,7 +498,7 @@ PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
 ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
                  "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log", "quota.json",
-                 "failure.json", "route.json")
+                 "failure.json", "route.json", "argv.json", "stdin.txt")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
 EXIT_NO_KEY = 6  # a gateway lane whose API key variable is unset in the runner's environment
 EXIT_IDLE = 125
@@ -278,6 +556,12 @@ def settings(base: Path) -> dict:
     staged = {}
     if (base / STAGED).is_file():
         staged = (json.loads((base / STAGED).read_text(encoding="utf-8")) or {}).get("codex") or {}
+    overrides = staged.get("config_overrides", [])
+    if not isinstance(overrides, list) or not all(isinstance(value, str) for value in overrides):
+        raise GatewayRefused("codex.config_overrides must be a list of KEY=TOML strings")
+    refuse_endpoint_overrides(overrides)
+    if staged.get("apps", False) is not False:
+        raise UsageError("codex.apps must be false: this research lane does not use app connectors")
     defaults = dict(DEFAULTS)
     if staged.get("effort") == "ultra":
         defaults.update(idle_timeout_s=ULTRA_IDLE_TIMEOUT_S, timeout_s=ULTRA_TIMEOUT_S)
@@ -338,12 +622,28 @@ def settings(base: Path) -> dict:
         if out["provider"] != "native" or "/" in out["model"]:
             raise UsageError("codex.fallback needs the native provider and a model without a provider segment")
         fallback_model(out["model"], out["request_effort"])
-        url = fallback.get("base_url")
-        match = LOOPBACK_V1_URL.fullmatch(url) if isinstance(url, str) else None
-        if match is None or not 1 <= int(match[1]) <= 65535:
-            raise UsageError("codex.fallback.base_url must be a loopback http URL ending in /v1 with port 1-65535")
-        out["fallback"] = {"provider": "omniroute", "base_url": url}
+        out["gateway"] = staged_gateway(staged, fallback.get("base_url"))
+        out["fallback"] = {"provider": "omniroute", "base_url": out["gateway"]["endpoint"]}
+    out["apps"] = False
     return out
+
+
+def staged_gateway(staged: dict, endpoint) -> dict:
+    """Validate the carried endpoint anew; only a named staged exception supplies an override reason."""
+    metadata = staged.get("gateway")
+    reason = None
+    if metadata is not None:
+        if not isinstance(metadata, dict) or metadata.get("source") not in ("host-record", "unrecorded"):
+            raise GatewayRefused("codex.gateway must identify host-record or unrecorded provenance")
+        if gateway_endpoint(metadata.get("endpoint")) != gateway_endpoint(endpoint):
+            raise GatewayRefused("codex.gateway.endpoint differs from the staged provider endpoint; restage")
+        if metadata["source"] == "unrecorded":
+            reason = metadata.get("reason")
+            if not isinstance(reason, str) or not reason.strip():
+                raise GatewayRefused("codex.gateway with source unrecorded needs a non-blank reason")
+        elif metadata.get("reason") is not None:
+            raise GatewayRefused("codex.gateway with source host-record must carry a null reason")
+    return resolve_gateway(endpoint, reason, GATEWAY_VARIABLES)
 
 
 def lane_settings(base: Path, staged: dict) -> dict:
@@ -368,16 +668,18 @@ def lane_settings(base: Path, staged: dict) -> dict:
                              "'\"' or '\\' and without a space at either end; restage with build_args.py")
     headers = dict(sorted((headers or {}).items()))
     lane = {"provider": provider, "codex_home": None, "profile": None, "api_key_env": None,
-            "api_key_placeholder": None, "http_headers": headers}
+            "api_key_placeholder": None, "http_headers": headers, "gateway": None}
     if provider == "native":
         if headers:
             raise UsageError("codex.http_headers needs a gateway provider: the native lane has no provider block")
         return lane
+    gateway = staged_gateway(staged, staged.get("base_url"))
     home = staged.get("codex_home")
     if not isinstance(home, str) or not home or Path(home).is_absolute() or ".." in Path(home).parts:
         raise UsageError("codex.codex_home must name a directory inside the work directory")
     if not (base / home / "config.toml").is_file():
         raise UsageError(f"codex.codex_home {home!r} holds no config.toml; restage with build_args.py")
+    refuse_home_endpoints(base / home, gateway, GATEWAY_VARIABLES)
     profile = staged.get("profile")
     if profile is not None and not (isinstance(profile, str) and PROFILE_NAME.fullmatch(profile)):
         raise UsageError(f"codex.profile {profile!r} is not a profile name")
@@ -397,7 +699,8 @@ def lane_settings(base: Path, staged: dict) -> dict:
         raise UsageError(f"the lane home config.toml does not carry the staged provider headers (codex.http_headers "
                          f"{sorted(headers)}, model_providers.{provider}.http_headers "
                          f"{sorted(carried) if isinstance(carried, dict) else carried!r}); restage with build_args.py")
-    lane.update(codex_home=base / home, profile=profile, api_key_env=key, api_key_placeholder=placeholder)
+    lane.update(codex_home=base / home, profile=profile, api_key_env=key, api_key_placeholder=placeholder,
+                base_url=gateway["endpoint"], gateway=gateway)
     return lane
 
 
@@ -431,9 +734,15 @@ def read(path: Path) -> str | None:
         return None
 
 
-def write_atomic(path: Path, text: str) -> None:
+def write_atomic(path: Path, text: str, *, private: bool = False) -> None:
     temporary = path.with_name(f".{path.name}.tmp")
-    temporary.write_text(text, encoding="utf-8")
+    if private:
+        descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as output:
+            os.fchmod(output.fileno(), 0o600)
+            output.write(text)
+    else:
+        temporary.write_text(text, encoding="utf-8")
     os.replace(temporary, path)
 
 
@@ -592,7 +901,7 @@ def codex_env(lane: dict | None = None) -> dict:
             env["CODEX_HOME"] = str(lane["codex_home"])
         if not (env.get(lane["api_key_env"]) or "").strip() and lane.get("api_key_placeholder"):
             env[lane["api_key_env"]] = lane["api_key_placeholder"]  # keyless loopback gateway; a real key wins
-    return env
+    return child_env(env)
 
 
 def sha256_hex(data: bytes) -> str:
@@ -647,13 +956,19 @@ def usage_status(directory: Path, usage: dict | None) -> str:
 
 def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native",
                http_headers: dict | None = None, effort: str = DEFAULT_EFFORT,
-               web_search: str = DEFAULT_WEB_SEARCH) -> dict:
+               web_search: str = DEFAULT_WEB_SEARCH, gateway: dict | None = None) -> dict:
     inputs = {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
-              "effort": effort, "request_effort": request_effort(model, effort)}
+              "effort": effort, "request_effort": request_effort(model, effort), "apps": False}
     if web_search != DEFAULT_WEB_SEARCH:  # old records used live implicitly; preserve valid same-input reuse
         inputs["web_search"] = web_search
     if provider != "native":  # a gateway run never reuses a native job's result, or the other way round
         inputs["provider"] = provider
+    if provider == "omniroute" and gateway is not None:
+        # E1's host-gateway contract v2 resolves this endpoint/source/reason tuple.
+        # codex_argv sends its endpoint as a dotted -c provider override (openai/codex
+        # rust-v0.160.1 `codex exec --help`), making it part of the invocation identity.
+        # Older records without it stay unchanged and cannot match a new primary run.
+        inputs["gateway"] = {field: gateway[field] for field in ("endpoint", "source", "reason")}
     if http_headers:  # other provider headers (another compression plan, say) make another run
         inputs["http_headers"] = dict(sorted(http_headers.items()))
     return inputs
@@ -665,6 +980,16 @@ def read_json(path: Path):
         return json.loads(text) if text is not None else None
     except ValueError:
         return None
+
+
+def prompt_stdin_bytes(raw_prompt: bytes) -> bytes:
+    """Preserve the former Path.read_text(utf-8).rstrip('\n') delivery, not the raw-file representation.
+
+    TextIOWrapper uses the same UTF-8/universal-newline read as Path.read_text.
+    Codex's stdin path returns its input untrimmed (rust-v0.160.1 exec/src/lib.rs:2275),
+    so this holder must retain its existing LF-only stripping before delivery."""
+    with io.TextIOWrapper(io.BytesIO(raw_prompt), encoding="utf-8") as source:
+        return source.read().rstrip("\n").encode("utf-8")
 
 
 def archive_attempt(directory: Path, *, keep_runner_log: bool = False) -> int | None:
@@ -690,6 +1015,9 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict 
         # The lane-local CODEX_HOME is the whole configuration, so --ignore-user-config (which drops
         # $CODEX_HOME/config.toml) must not be passed; the profile layers <profile>.config.toml over it (profile-v2).
         head = [codex, "exec", *(["-p", lane["profile"]] if lane.get("profile") else [])]
+        # This holder's endpoint pin outranks other configuration only if T17p's
+        # real-CLI, project-layer control passes at the reviewed head.
+        head.extend(["-c", f'model_providers.omniroute.base_url={json.dumps(lane["base_url"])}'])
     else:
         head = [codex, "exec", "--ignore-user-config"]
     if lane is not None and lane.get("transport_only"):
@@ -704,9 +1032,11 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict 
     # Keep the built-in provider defaults (rust-v0.159.2, codex-rs/model-provider-info/src/lib.rs:492-510).
     # Codex rides out an outage shorter than idle_timeout_s; a longer one is stopped by the watchdog and
     # retried once, budget permitting (codex-rs/core/src/responses_retry.rs:71-96). Error notices are not progress.
-    return [*head, "--skip-git-repo-check", "-s", "read-only",
+    # Installed openai/codex rust-v0.160.1 `codex exec --help`: --disable apps
+    # is equivalent to -c features.apps=false, even with --ignore-user-config.
+    return [*head, "--disable", "apps", "--skip-git-repo-check", "-s", "read-only",
             "-m", model, "-c", f'model_reasoning_effort="{effort}"', "-c", f'web_search="{web_search}"',
-            "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
+            "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", "-"]
 
 
 def retire(directory: Path) -> None:
@@ -726,6 +1056,8 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
     schema_bytes = Path(schema_file).read_bytes()
     try:
         config = settings(base)  # initial invalid staging is refused before state changes
+    except GatewayRefused:
+        raise  # route refusals preserve every existing attempt and spawn nothing
     except (UsageError, ValueError, TypeError, OSError) as error:
         if (directory / "inputs.json").exists() and not running(directory):
             lock_fd = open_lock(directory / "job.lock")
@@ -744,7 +1076,7 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
             return EXIT_REFUSED
         raise
     inputs = job_inputs(prompt_bytes, schema_bytes, config["model"], config["provider"], config["http_headers"],
-                        config["effort"], config["web_search"])
+                        config["effort"], config["web_search"], gateway=config["gateway"])
     if (directory / "done").exists() and exit_code(directory) == 0:
         matches = same_inputs(read_json(directory / "inputs.json"), inputs)
         route = read_json(directory / "route.json") or {}
@@ -788,9 +1120,8 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
             json.loads(schema_bytes)
         except ValueError:
             problem = (EXIT_REFUSED, f"schema {schema_file} is not JSON")
-        if problem is None and len(prompt_bytes) > MAX_PROMPT_BYTES:
-            problem = (EXIT_REFUSED, f"prompt is {len(prompt_bytes)} bytes; one argument holds at most "
-                                     f"{MAX_PROMPT_BYTES}")
+        if problem is None and not prompt_stdin_bytes(prompt_bytes):
+            problem = (EXIT_REFUSED, "prompt is empty after its existing UTF-8 and LF-only normalization")
         if problem is None and shutil.which("codex") is None:
             problem = (EXIT_NO_CODEX, "codex is not on PATH")
         if problem is not None:
@@ -1049,16 +1380,23 @@ def wait_process(process: subprocess.Popen, directory: Path, config: dict, deadl
 def run(base: Path, job: str) -> int:
     directory = job_dir(base, job)
     lock_fd = int(os.environ.get("SWEEP_JOB_LOCK_FD", "-1"))
+    config_error = None
+    try:
+        config = settings(base)
+    except GatewayRefused:
+        if lock_fd >= 0:
+            os.close(lock_fd)
+        raise  # check a hand-run or detached job before creating any lock or receipt
+    except (UsageError, ValueError, TypeError, OSError) as error:
+        config_error = error
     if lock_fd < 0:  # started by hand, not by `start`
         lock_fd = open_lock(directory / "job.lock")
         if not try_lock(lock_fd):
             os.close(lock_fd)
             print(f"already running: {job}")
             return 0
-    try:
-        config = settings(base)
-    except (UsageError, ValueError, TypeError, OSError) as error:
-        write_atomic(directory / "stderr.txt", "staged settings changed after input binding: " + str(error) + "\n")
+    if config_error is not None:
+        write_atomic(directory / "stderr.txt", "staged settings changed after input binding: " + str(config_error) + "\n")
         finish(directory, EXIT_REFUSED, "inputs_changed")
         os.close(lock_fd)
         return EXIT_REFUSED
@@ -1084,14 +1422,24 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
                      + (f" ({reason})" if reason else "") + "\n")
         finish(directory, EXIT_LIMIT, "limit")
         return EXIT_LIMIT
+    prompt_bytes = (directory / "prompt.txt").read_bytes()
+    schema_bytes = (directory / "schema.json").read_bytes()
     bound = read_json(directory / "inputs.json")
     if bound is not None and not same_inputs(bound, job_inputs(
-            (directory / "prompt.txt").read_bytes(), (directory / "schema.json").read_bytes(),
-            config["model"], config["provider"], config["http_headers"], config["effort"], config["web_search"])):
+            prompt_bytes, schema_bytes,
+            config["model"], config["provider"], config["http_headers"], config["effort"], config["web_search"],
+            gateway=config["gateway"])):
         # start and the detached runner read staged.json separately; never execute under another input identity.
         write_atomic(directory / "stderr.txt", "staged settings changed after input binding; start the job again\n")
         finish(directory, EXIT_REFUSED, "inputs_changed")
         return EXIT_REFUSED
+    prompt_bytes_delivered = prompt_stdin_bytes(prompt_bytes)
+    if not prompt_bytes_delivered:
+        write_atomic(directory / "stderr.txt", "prompt is empty after its existing UTF-8 and LF-only normalization\n")
+        finish(directory, EXIT_REFUSED, "refused")
+        return EXIT_REFUSED
+    prompt_transport = {"kind": "stdin", "delivered_bytes": len(prompt_bytes_delivered),
+                        "delivered_sha256": sha256_hex(prompt_bytes_delivered)}
     write_atomic(directory / "model", config["model"] + "\n")
     deadline = time.monotonic() + config["timeout_s"]  # includes version, every probe, attempts and backoff
     codex = shutil.which("codex")
@@ -1108,8 +1456,7 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
     version = codex_version(codex)
     if version:
         write_atomic(directory / "codex_version", version + "\n")
-    # Bash's "$(cat prompt.txt)" in the 2026-09-26 runner dropped trailing newlines; keep that exact prompt.
-    prompt = (directory / "prompt.txt").read_text(encoding="utf-8").rstrip("\n")
+    prompt = prompt_bytes_delivered.decode("utf-8")  # same delivered text as the former argv path
     (base / "empty").mkdir(exist_ok=True)
     saved = {name: (directory / name).read_bytes() for name in ("prompt.txt", "schema.json", "inputs.json")
              if (directory / name).exists()}
@@ -1174,20 +1521,40 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
                 (directory / name).write_bytes(data)
             attempt_config["route"]["native_attempt"] = number
             native_failure = None
-        with open(directory / "events.jsonl", "wb") as output, open(directory / "stderr.txt", "wb") as errors:
-            process = subprocess.Popen(codex_argv(codex, directory, attempt_config["model"], prompt, lane, version,
-                                                 config["effort"], config["web_search"]),
-                                       cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=output, stderr=errors,
+        # No HTTP or model request is made by this bounded connect. Native-only
+        # attempts do not probe an unused fallback; each actual gateway spawn does.
+        if attempt_config["provider"] == "omniroute":
+            probe_gateway(attempt_config["gateway"]["endpoint"])
+        argv = codex_argv(codex, directory, attempt_config["model"], prompt, lane, version,
+                          config["effort"], config["web_search"])
+        # Paths and arguments stay private. The prompt travels on stdin, never argv.
+        write_atomic(directory / "argv.json", json.dumps(argv, ensure_ascii=False) + "\n", private=True)
+        write_atomic(directory / "stdin.txt", prompt, private=True)
+        # A prepared file avoids a blocking pipe writer and exposes EOF immediately.
+        # Popen accepts a file object (Python subprocess docs); the existing watchdog
+        # can observe and cancel the child from its first moment, including a reader failure.
+        with open(directory / "events.jsonl", "wb") as output, open(directory / "stderr.txt", "wb") as errors, \
+                open(directory / "stdin.txt", "rb") as source:
+            process = subprocess.Popen(argv,
+                                       cwd=str(base / "empty"), stdin=source, stdout=output, stderr=errors,
                                        pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))
-            write_atomic(directory / "started", utc_now() + "\n")
-            write_atomic(directory / "slot", f"{slot}\n")
-            write_atomic(directory / "model", attempt_config["model"] + "\n")
-            if version:
-                write_atomic(directory / "codex_version", version + "\n")
-            if attempt_config.get("route") is not None:
-                write_atomic(directory / "route.json", json.dumps(attempt_config["route"], sort_keys=True) + "\n")
-                gateway_started = True
-            code, failure = wait_process(process, directory, config, deadline)
+            try:
+                write_atomic(directory / "started", utc_now() + "\n")
+                write_atomic(directory / "slot", f"{slot}\n")
+                write_atomic(directory / "model", attempt_config["model"] + "\n")
+                if version:
+                    write_atomic(directory / "codex_version", version + "\n")
+                route = {"provider": attempt_config["provider"], **(attempt_config.get("route") or {}),
+                         "prompt_transport": prompt_transport}
+                write_atomic(directory / "route.json", json.dumps(route, sort_keys=True) + "\n")
+                if attempt_config.get("route") is not None:
+                    gateway_started = True
+                code, failure = wait_process(process, directory, config, deadline)
+            except BaseException:
+                # Metadata/reader/watchdog failure after spawn must not orphan the
+                # child or let its inherited semaphore descriptors escape cleanup.
+                stop_group(process, config["kill_grace_s"])
+                raise
         kind = limit_kind(directory, attempt_config["provider"])
         incomplete = completion_error(directory) if code == 0 else None
         if kind is not None and config["fallback"] is not None and attempt_config["provider"] == "native":
@@ -1349,13 +1716,24 @@ def main(argv: list[str] | None = None) -> int:
     elif argv and argv[0].startswith("--work-dir="):
         explicit, argv = argv[0].split("=", 1)[1], argv[1:]
     command, rest = (argv[0], argv[1:]) if argv else ("", [])
-    arity = {"start": (3, 3), "wait": (1, 2), "result": (1, 1), "run": (1, 1)}
+    arity = {"start": (3, 3), "wait": (1, 2), "result": (1, 1), "run": (1, 1), "gateway-check": (0, 1)}
     if command not in arity or not arity[command][0] <= len(rest) <= arity[command][1]:
         print("usage: codex_call.sh [--work-dir DIR] start <job-id> <prompt-file> <schema-file> | "
-              "wait <job-id> [seconds] | result <job-id>", file=sys.stderr)
+              "wait <job-id> [seconds] | result <job-id> | gateway-check <work-dir>", file=sys.stderr)
         return EXIT_REFUSED
     try:
+        if command == "gateway-check" and rest:
+            if explicit is not None:
+                raise UsageError("gateway-check names its work directory only once")
+            explicit = rest[0]
         base = resolve_work_dir(explicit)
+        if command == "gateway-check":
+            config = settings(base)
+            output = {"gateway": config["gateway"]}
+            if config["gateway"] is None:
+                output["provider"] = "native"
+            print(json.dumps(output, sort_keys=True))
+            return 0  # resolution only: no probe, directory write or subprocess
         if command == "start":
             return start(base, *rest)
         if command == "run":
@@ -1364,6 +1742,9 @@ def main(argv: list[str] | None = None) -> int:
             return wait(base, rest[0], float(rest[1]) if len(rest) > 1 else 540.0)
         print(json.dumps(result(base, rest[0])))
         return 0
+    except GatewayRefused as error:
+        print(f"gateway refused: {error}", file=sys.stderr)
+        return EXIT_REFUSED
     except (UsageError, ValueError, TypeError, OSError) as error:
         print(f"codex_call.sh: {error}", file=sys.stderr)
         return EXIT_REFUSED

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Compose one GPT-6 prompt from the run's frozen templates (the text the Claude workers get, with the layer input
-embedded because Codex runs read-only in an empty directory and cannot read the work dir).
+embedded so Codex runs read-only in an empty directory without depending on work-dir access).
 
   make_prompt.py [--work-dir DIR] discover <layer-input.json> [proposals.json|-] [followup.json]
   make_prompt.py [--work-dir DIR] fit      <layer-input.json> <proposals.json>
@@ -33,8 +33,14 @@ RUNTIME_PLACEHOLDERS = {
     "critic": {"SUMMARY"},
     "followup": {"CRITIC_REASON", "DIRECTIONS", "ALREADY"},
 }
-TAIL = ("\nYou have web search; you cannot run shell commands or gh here, so use the GitHub web pages and API URLs "
-        "through search/fetch.")
+TAIL = ("\nUse only tools exposed in this isolated job. App connectors are disabled (--disable apps); do not depend "
+        "on codex_apps or a GitHub connector. The gh/context-mode source routes are UNVERIFIED here until an "
+        "isolated tool readback and source-fetch smoke establish them; an interactive host's tools do not prove "
+        "this job has them. If shell and gh are exposed, use read-only gh api --cache 120s for official GitHub "
+        "sources, check gh api rate_limit before batch work, and pause non-essential API calls below 500 remaining. "
+        "If context-mode is exposed, use ctx_fetch_and_index for documentation and scoped ctx_search for retrieval. "
+        "Otherwise use available web search/fetch on primary pages and API URLs. Record missing or refused source "
+        "access as unknown; do not turn an unavailable route into a capability-absence or release-absence claim.")
 
 
 def fill(template: str, values: dict) -> str:

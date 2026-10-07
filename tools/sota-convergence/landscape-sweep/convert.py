@@ -679,7 +679,11 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     route_limits = (["GPT-6 transport-only native-to-OmniRoute failover is recorded per job in raw gpt6_routes; "
                      "bound native inputs stay unchanged. Gateway standalone web search uses OmniRoute's /alpha/search "
                      "backend; native search recall and outbound max-effort parity are unqualified."]
-                    if any(r.get("gpt6_routes") for layer in returns["raw"].values() for r in layer.values()) else [])
+                    # A17 stdin receipts also exist for native and primary gateway jobs.
+                    # Presence is not evidence that native-to-gateway failover occurred.
+                    if any(route.get("fallback_from") == "native" and route.get("provider") == "omniroute"
+                           for layer in returns["raw"].values() for r in layer.values()
+                           for route in (r.get("gpt6_routes") or {}).values() if isinstance(route, dict)) else [])
     lanes = {"lanes": [{"lane": lane, "result": {"layers": lane_layers, "calls": calls_total,
                                                  "limits": [*method_limits(models, gpt6_model_text, skills_run),
                                                             *route_limits, *limits]},

@@ -1,0 +1,38 @@
+description: Frozen keyless search comparison 2026-10-05; ruling 12
+prompts:
+  - '{{query}}'
+providers:
+  - id: file://provider.py
+    label: ddgs-auto
+    config:
+      arm: ddgs-auto
+      workers: 1
+      timeout: 60000
+  - id: file://provider.py
+    label: searxng
+    config:
+      arm: searxng
+      workers: 1
+      timeout: 60000
+tests: file://queries.yaml
+defaultTest:
+  assert:
+    - type: javascript
+      value: file://assertions.cjs:contract
+      metric: contract
+    - type: javascript
+      value: file://assertions.cjs:usable
+      metric: usable
+    - type: javascript
+      value: file://assertions.cjs:primaryHit
+      metric: primary_hit_at_5
+    - type: javascript
+      value: file://assertions.cjs:primaryMrr
+      metric: primary_mrr_at_5
+    - type: javascript
+      value: file://assertions.cjs:unique
+      metric: unique_fraction
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+  delay: 1000

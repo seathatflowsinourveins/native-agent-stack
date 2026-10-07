@@ -700,7 +700,7 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(staged["features"], profile["features"])
         self.assertEqual(staged.get("shell_environment_policy"), profile["shell_environment_policy"])
         self.assertEqual(build_args.OMNIROUTE_KEY_ENV, provider["env_key"])
-        self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
+        self.assertFalse(hasattr(build_args, "OMNIROUTE_DEFAULT_URL"))
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])
 
 

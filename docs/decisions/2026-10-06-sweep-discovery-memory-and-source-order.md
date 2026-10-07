@@ -113,3 +113,83 @@ the unchanged nine history regressions retain their earlier passing evidence.
 The [final verification carrier](../../evidence/artifacts/sweep-harness-discovery-20261006/verification-final.json)
 extends the earlier observed phase without rewriting its source hashes or
 results. The same source-review and synthetic-evidence limits apply.
+
+## Addendum (2026-10-07): retained requirements, lessons and content folds
+
+The current carrier also preserves the earlier convergence-practice review,
+research-skill input pack, web-search observations and the cooperation,
+credential-storage and lane lessons. Their original decision and evidence bytes
+are retained; this publication supplies no new model run or runtime acceptance.
+The seven discovery defects enter the anti-pattern log as additional rows, with
+the existing log kept intact and related earlier corrections linked.
+
+The twelve requirements in the retained October 2
+[slot carrier](../../evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/slots.json)
+are now source-bound annotations on existing landscape parents. The projection
+reuses `default_slot_inventory` and `read_manifest_sources` from
+`native-agent-stack@8b844d37:scripts/build_new_wsl_handbook.py:443-490`.
+Seven requirement IDs match native inventory IDs directly. Five new annotations
+bridge requirement IDs to explicit job declarations in the retained
+[native manifest](../../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json),
+at lines 1220-1234, 2539-2553, 2611-2625, 3210-3250 and 3433-3447.
+The secret-scanning requirement keeps both distinct job references under the
+same parent; no selected component, installation state or outcome chooses the
+parent. Missing, ambiguous or contradictory identities refuse projection.
+
+Each annotation retains the requirement text, source bytes' SHA-256, JSON pointer,
+native parent provenance and any explicit job crosswalk. It creates no new layer
+ID and changes no historical carrier or legacy ledger requirement hash. The
+separate owner of versioned semantic binding controls that migration. A changed
+source declaration or demonstrated parent mismatch overturns this mapping;
+the offline controls check preservation and refusal, rather than merit or
+candidate adoption. Future sweep seeds cover all twelve requirements.
+
+Two completeness-critic claims are corrected alongside their originals. The
+vendor pass's first hosting round had no survivor, while its completed follow-up
+retained two hosting assessments. The claim that the V1 harness cannot represent
+model-hub repositories is refuted by its existing URL schema, native Hub source
+review path and two retained vendor-pass model proposals with their own returned
+votes. These source corrections do not rewrite the original critic or outcomes;
+model-slot and currency coverage remains a discovery requirement.
+
+## Addendum (2026-10-07): host-bound gateway and upstream stdin transport
+
+The existing harness now resolves its optional gateway against the host record
+through the shared reviewed resolver block. Native-only staging reads no gateway
+record. Primary and fallback gateway holders validate their staged endpoint and
+lane-home configuration before spawning; the primary route also pins its endpoint
+on the native command line. Deliberate alternatives retain an explicit reason.
+The two copied resolver blocks bind to SHA-256
+`e63090a57a5a58078fd019428fccdba75ffddbf5a1decc52d893e4848dbf4af3`.
+Merge still requires the canonical resolver source and host-record predecessors,
+plus the separately recorded real-client project-precedence controls.
+
+Every future invocation explicitly disables apps, following installed Codex CLI
+0.160.1's `--disable` flag and the official
+[command reference](https://learn.chatgpt.com/docs/developer-commands).
+Logical input identity records `apps: false`; primary gateway inputs additionally
+bind the resolved endpoint, source and reason. Historical missing fields remain
+unknown and unequal, with earlier attempts retained. A fresh native source-route
+readback and smoke is still required before declaring shell/GitHub/context-mode
+routes available inside an isolated job.
+
+The real 32-layer input check found a complete discovery prompt of 169,926 bytes.
+The old 120,000-byte refusal protected one argv string, rather than defining a
+model context budget. The supported upstream alternative is `codex exec -`:
+`openai/codex@rust-v0.160.1:codex-rs/exec/src/lib.rs:191-193,2252-2275,2288-2290`
+reads stdin completely and returns its nonempty buffer without trimming.
+The installed help and the exact tagged source were independently reread.
+
+The runner therefore feeds the same previous UTF-8/universal-newline/LF-only
+normalized bytes through stdin, using a private per-attempt file so deadline and
+cancellation handling stays active. Raw prompt bytes and logical hashes stay
+unchanged. Future transport receipts record delivered-byte count and SHA-256;
+other subprocesses retain null stdin. The converter retains each receipt while
+assigning failover limitations only to an actual native-to-gateway fallback.
+No historical observation is edited, no input is clipped and no new content cap
+is asserted without a source. A changed upstream stdin contract or a failed
+byte-equivalence/control test overturns this transport choice.
+
+The synthetic and source checks do not establish model or gateway acceptance.
+Publication receives a delta read before the separate native full-input job;
+project-precedence qualification and the later merged-code check remain distinct.

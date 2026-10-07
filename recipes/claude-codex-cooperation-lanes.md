@@ -61,6 +61,47 @@ codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort="max" -c web_se
   The clean tag still caps `gpt-6.1-sol` at `xhigh`; its deployed `max` support
   belongs to the #15167 carry ([foundation stack](../docs/foundation-stack.md)).
 
+**Measurement fixtures (Codex 0.160.0 source review).** A fresh exec thread sends
+`cwd`. The app-server can persist trusted project state when all of these hold:
+the request supplies `cwd`, the active project has no trust level, the
+configuration is not projectless, and the effective permission profile passes
+the project-trust check. `Disabled` and `External` profiles pass that check; a
+`Managed` profile must permit writing that directory. The trust setter applies
+a blocking configuration edit. Sources: `openai/codex` at
+`a956835d020762cb2b570053af06f643a11c0ecc`,
+[`thread_processor.rs` L1350-1378](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/request_processors/thread_processor.rs#L1350-L1378),
+[`config/mod.rs` L2412-2424](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L2412-L2424),
+and [`exec/src/lib.rs` L1369-1382](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/lib.rs#L1369-L1382).
+
+Use an owned non-git directory with `--skip-git-repo-check` for measurement
+fixtures. That flag bypasses only exec's Git-presence guard
+([`exec/src/lib.rs` L975-982](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/lib.rs#L975-L982));
+neither the flag nor a non-git directory establishes the app-server's
+`is_projectless()` result. At this pin, projectlessness requires discovery to
+run, with `cwd` supplied and project configuration not ignored, and find no
+project-root marker (default `.git`), no Git checkout root and no project
+configuration layers. Sources: [discovery guard](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/loader/mod.rs#L336-L337),
+[classification](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/loader/mod.rs#L408-L410),
+[`is_projectless()`](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/state.rs#L319-L323),
+and [default marker](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/project_root_markers.rs#L5).
+Do not manually alter native trust settings to make a fixture pass; record any
+configuration effects separately from its returned result. These source-reviewed
+conditions do not qualify a new fixture run.
+
+**Classify gateway failures from the semantic error.** At OmniRoute source pin
+`c1e30b7676975feb298b49eff6ff58923c04b89e`, the terminal-status classifier checks
+credit-exhaustion conditions first (returning `credits_exhausted`), then
+recognized nonterminal error classes, including
+`MODEL_NOT_FOUND`, before the banned and authentication-expiry paths. Other
+`401` errors can reach `expired`, subject to recoverable cookie-authentication
+and bounded ambiguous-authentication checks. Read the resolved model and
+classified provider error together with the returned status, and preserve the
+failed attempt. These are source-reviewed classifier conditions, not live
+provider acceptance. Source: `diegosouzapw/OmniRoute` at that pin,
+[`authTerminalStatus.ts` L8-115](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/sse/services/authTerminalStatus.ts#L8-L115),
+the [credit-exhaustion signals](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/accountFallback.ts#L234-L269),
+and their [helper entry point](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/accountFallback.ts#L486-L488).
+
 ## Lane B: live-session coordination
 
 Same-host Claude peers are discovered with `ListAgents` or
