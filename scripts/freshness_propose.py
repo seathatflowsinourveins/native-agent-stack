@@ -9,7 +9,7 @@ This module never selects, evaluates, or writes to a catalog file:
 ``catalogs/sota-convergence/*``, ``catalogs/landscape/*.json``,
 ``manifests/stack.json`` and ``layer-verdicts*`` stay owned by the separate
 SOTA-convergence lane review (see ``recipes/sota-convergence-practice.md``).
-It only ever adds files under ``evidence/artifacts/`` and
+The artifact mode only ever adds files under ``evidence/artifacts/`` and
 ``evidence/receipts/``, and updates ``manifests/evidence.json``'s
 registration and receipt list. It is invoked from two places in
 ``.github/workflows/catalog-freshness.yml``: ``build_drift_report()`` from
@@ -18,6 +18,12 @@ the drift-vs-unfetched rule live in exactly one place, not duplicated
 between YAML and Python), and ``main()``/``apply()`` from the ``propose``
 job. See ``docs/decisions/2026-09-23-bot-pr-dispatch.md`` for why the
 ``propose`` job exists and its fix history.
+
+The separate ``--model-currency`` mode checks primary model/package release
+lines and writes dated review proposals only to private state. It never calls
+``apply()``, registers evidence, publishes a PR, downloads weights, or changes
+a model selection. ``--offline`` and ``--dry-run`` provide offline/no-write
+paths; this check belongs to the daily timer, never session startup.
 
 Every read/write here looks up a file by its ``path`` (or a receipt by its
 ``id``) rather than assuming a fixed position in ``manifests/evidence.json``'s
@@ -31,12 +37,18 @@ order ``files[]``/``receipts[]`` entries are kept in.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
-from datetime import datetime, timezone
+import uuid
+from datetime import date, datetime, timezone
+from functools import cache
 from pathlib import Path, PurePosixPath
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 try:
     from .host_receipts import register_file
@@ -944,15 +956,297 @@ def drifted_component_ids(drift_md_text: str) -> list[str]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
-    parser.add_argument("--artifact-dir", type=Path, required=True,
+    parser.add_argument("--artifact-dir", type=Path,
                          help="Directory holding the downloaded catalog-freshness artifact "
                               "(drift.md and manifest-*.json).")
-    parser.add_argument("--run-url", required=True,
+    parser.add_argument("--run-url",
                          help="The catalog-freshness run's own URL, recorded in the receipt's claim.")
     parser.add_argument("--checked-at-utc", default=None,
                          help="ISO-8601 UTC timestamp; defaults to now. Also fixes the date stamp used "
                               "in the receipt id and evidence directory name.")
+    parser.add_argument("--model-currency", action="store_true",
+                        help="Check primary model/package lines and write private review proposals only.")
+    parser.add_argument("--model-inventory", type=Path,
+                        help="Model inventory (default: catalogs/foundation/model-currency.json).")
+    parser.add_argument("--state-dir", type=Path,
+                        help="Private proposal directory (default: XDG_STATE_HOME/native-agent-stack/model-currency).")
+    parser.add_argument("--offline", action="store_true",
+                        help="Model mode only: report unknown upstreams without network or child commands.")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Model mode only: print the review report without writing any files.")
     return parser
+
+
+def _model_currency_problems(document: dict, today: date) -> list[str]:
+    """Use the existing validator's schema, while allowing stale rows to be reported."""
+    try:
+        if __package__:
+            from .validate import model_currency_problems
+        else:
+            from validate import model_currency_problems
+    except ImportError as exc:
+        raise FreshnessProposeError("model-currency requires scripts.validate.model_currency_problems") from exc
+    return model_currency_problems(document, today=today, enforce_age=False)
+
+
+@cache
+def _model_release_policy():
+    """Reuse the maintained published-release ordering, including alpha/beta/rc.
+
+    github_freshness.py:109-135 derives this bounded policy from
+    pypa/packaging@26.0:src/packaging/version.py. Unsupported version forms stay
+    unclassified; a different or republished lower version is never called newer.
+    """
+    path = Path(__file__).resolve().parents[1] / "tools/sota-convergence/github_freshness.py"
+    spec = importlib.util.spec_from_file_location("model_release_currency", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _model_release_version(text: str):
+    return _model_release_policy().release_version(text)
+
+
+def _model_source_date(value) -> str:
+    if not isinstance(value, str):
+        raise ModelSourceError("primary source lacks a release timestamp")
+    try:
+        return date.fromisoformat(value[:10]).isoformat()
+    except ValueError as exc:
+        raise ModelSourceError("primary source has an invalid release timestamp") from exc
+
+
+class ModelSourceError(ValueError):
+    """A read-only source check failed; never include raw command diagnostics."""
+
+    def __init__(self, reason: str, exit_code: int | None = None):
+        super().__init__(reason)
+        self.exit_code = exit_code
+
+
+def _model_run_json(argv: list[str]) -> dict:
+    try:
+        run = subprocess.run(argv, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30)
+    except subprocess.TimeoutExpired as exc:
+        raise ModelSourceError("source command timed out") from exc
+    except OSError as exc:
+        raise ModelSourceError("source command unavailable") from exc
+    if run.returncode:
+        raise ModelSourceError("source command failed", run.returncode)
+    try:
+        document = json.loads(run.stdout)
+    except json.JSONDecodeError as exc:
+        raise ModelSourceError("source command did not return JSON", run.returncode) from exc
+    if not isinstance(document, dict):
+        raise ModelSourceError("source command did not return an object", run.returncode)
+    return document
+
+
+def _model_pypi_json(package: str) -> dict:
+    # PyPI's own project JSON API, not a scraped release page:
+    # https://docs.pypi.org/api/json/#get-a-project
+    request = Request(f"https://pypi.org/pypi/{package}/json",
+                      headers={"User-Agent": "native-agent-stack-model-currency/1"})
+    try:
+        with urlopen(request, timeout=30) as response:
+            return json.load(response)
+    except (OSError, ValueError) as exc:
+        raise ModelSourceError("PyPI JSON unavailable") from exc
+
+
+class ModelReleaseReader:
+    """Read each declared line once through its maintained primary interface.
+
+    HF CLI source: huggingface/huggingface_hub@bd4a7603 (v2.1.1),
+    src/huggingface_hub/cli/models.py:223-237; utils/_headers.py:147-151
+    checks the implicit-token guard before reading any token store. Metadata
+    timestamps are retained as repository observations, never release dates.
+    GitHub's releases/latest endpoint excludes drafts/prereleases; unsupported
+    vendor pages require source review rather than an invented HTML parser.
+    """
+
+    def __init__(self, *, offline: bool = False, run_json=None, pypi_json=None):
+        self.offline = offline
+        self.run_json = run_json or _model_run_json
+        self.pypi_json = pypi_json or _model_pypi_json
+        self.remaining = None
+        self.reads: dict[str, dict] = {}
+
+    def __call__(self, line: dict) -> dict:
+        key = json.dumps(line, sort_keys=True)
+        if key in self.reads:
+            return dict(self.reads[key])
+        try:
+            result = self.read(line)
+        except ModelSourceError as exc:
+            result = {"status": "unknown", "reason": str(exc), "exit_code": exc.exit_code}
+        except (AttributeError, KeyError, TypeError, ValueError):
+            result = {"status": "unknown", "reason": "primary source has an invalid metadata shape"}
+        self.reads[key] = result
+        return dict(result)
+
+    def read(self, line: dict) -> dict:
+        if self.offline:
+            raise ModelSourceError("offline: primary source not checked")
+        kind = line["kind"]
+        if kind == "huggingface":
+            repository, ref = line["repository"], line["ref"]
+            value = self.run_json([
+                "env", "HF_HUB_DISABLE_IMPLICIT_TOKEN=1", "HF_HUB_DISABLE_TELEMETRY=1",
+                "hf", "models", "info", repository, "--revision", ref,
+                "--expand", "sha,createdAt,lastModified", "--format", "json",
+            ])
+            sha = value.get("sha")
+            if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{40}", sha):
+                raise ModelSourceError("Hub metadata lacks an exact revision")
+            return {"status": "observed", "value": sha, "source": f"https://huggingface.co/{repository}/tree/{sha}",
+                    "evidence_kind": "repository_revision", "release_date": None,
+                    "repository_created_at": value.get("created_at"),
+                    "repository_last_modified": value.get("last_modified"), "exit_code": 0}
+        if kind == "github_release":
+            if self.remaining is None:
+                # This endpoint costs no core request; avoid a cached budget.
+                limits = self.run_json(["gh", "api", "rate_limit"])
+                self.remaining = limits.get("resources", {}).get("core", {}).get("remaining")
+                if not isinstance(self.remaining, int) or isinstance(self.remaining, bool):
+                    raise ModelSourceError("GitHub core budget unknown")
+            if self.remaining < 500:
+                raise ModelSourceError("GitHub core budget below 500; release check deferred")
+            self.remaining -= 1
+            value = self.run_json(["gh", "api", "--cache", "120s", f"repos/{line['repository']}/releases/latest"])
+            tag, published = value.get("tag_name"), value.get("published_at")
+            if (not isinstance(tag, str) or not published or value.get("draft") or value.get("prerelease")):
+                raise ModelSourceError("GitHub has no usable published full release")
+            return {"status": "observed", "value": tag, "release_date": _model_source_date(published),
+                    "source": f"https://github.com/{line['repository']}/releases/tag/{quote(tag, safe='')}",
+                    "evidence_kind": "published_release", "exit_code": 0}
+        if kind == "pypi":
+            value = self.pypi_json(line["package"])
+            version = value.get("info", {}).get("version")
+            uploads = [entry.get("upload_time_iso_8601") for entry in value.get("urls", [])
+                       if not entry.get("yanked") and entry.get("upload_time_iso_8601")]
+            if not version or not uploads:
+                raise ModelSourceError("PyPI has no non-yanked latest release artifacts")
+            return {"status": "observed", "value": version, "release_date": _model_source_date(min(uploads)),
+                    "source": f"https://pypi.org/project/{line['package']}/{quote(version, safe='')}/",
+                    "evidence_kind": "published_release", "date_basis": "earliest non-yanked artifact upload"}
+        raise ModelSourceError("vendor page requires source review; no maintained release adapter")
+
+
+def collect_model_currency(root: Path, inventory: Path, *, checked_at_utc: str | None = None,
+                           offline: bool = False, reader=None) -> dict:
+    """Build a review report; metadata observations never certify new weights."""
+    stamp = checked_at_utc or utc_now()
+    try:
+        when = datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").date()
+        document = json.loads(inventory.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+    except (ValueError, OSError) as exc:
+        raise FreshnessProposeError("model inventory or UTC check timestamp is invalid") from exc
+    problems = _model_currency_problems(document, when)
+    if problems:
+        raise FreshnessProposeError("invalid model inventory: " + "; ".join(problems))
+    source_reader = reader or ModelReleaseReader(offline=offline)
+    observations, proposals, landscape = [], [], []
+    packages = {row["id"]: row for row in document["packages"]}
+    for row_kind in ("package", "model"):
+        for row in document[row_kind + "s"]:
+            current = row.get("latest_version") if row_kind == "package" else row["revision"]
+            line = row.get("release_line")
+            if line is None:
+                package = packages[row["package"]["id"]]
+                line = package["release_line"]
+                current = row["package"]["version"]
+            observed = source_reader(line)
+            record = {"kind": row_kind, "id": row["id"], "current": current,
+                      "recorded_release_date": row["release_date"], "recorded_source": row["release_source"],
+                      "recorded_checked_at": row["checked_at"], "checked_at": when.isoformat(),
+                      "release_line": line, **observed}
+            if row_kind == "model":
+                record["model_id"], record["revision"] = row["model_id"], row["revision"]
+            if "package" in row:
+                package = packages[row["package"]["id"]]
+                record["package"] = {"id": package["id"], "version": row["package"]["version"],
+                                     "source": package["release_source"], "checked_at": package["checked_at"]}
+            proposal_count = len(proposals)
+            if observed["status"] == "unknown":
+                proposals.append({"action": "source_review", "kind": row_kind, "id": row["id"],
+                                  "reason": observed["reason"]})
+            elif observed["value"] != current:
+                action = "review_revision_candidate" if observed["evidence_kind"] == "repository_revision" else "review_release_difference"
+                if action == "review_release_difference":
+                    previous, candidate = _model_release_version(current), _model_release_version(observed["value"])
+                    record["newer"] = None if previous is None or candidate is None else candidate > previous
+                    if record["newer"]:
+                        action = "review_newer_release"
+                proposals.append({"action": action, "kind": row_kind, "id": row["id"], "current": current,
+                                  "candidate": observed["value"], "source": observed["source"],
+                                  "release_date": observed["release_date"], "checked_at": when.isoformat()})
+            if "package" in record and len(proposals) > proposal_count:
+                proposals[-1]["package"] = record["package"]
+            observations.append(record)
+    policy = document["policy"]
+    for row in document["models"]:
+        effective = packages[row["package"]["id"]] if row["status"] == "package_bound" else row
+        release_age = (when - date.fromisoformat(effective["release_date"])).days
+        check = row.get("landscape_check")
+        check_age = (when - date.fromisoformat(check["date"])).days if check else None
+        needs_check = release_age > policy["max_release_age_days"]
+        refresh = needs_check and (check_age is None or check_age >= policy["max_landscape_age_days"] - policy["refresh_lead_days"])
+        expired = needs_check and (check_age is None or check_age > policy["max_landscape_age_days"])
+        landscape.append({"id": row["id"], "effective_release_date": effective["release_date"],
+                          "release_age_days": release_age, "landscape_age_days": check_age,
+                          "refresh_due": refresh, "expired": expired})
+        if refresh:
+            proposals.append({"action": "refresh_landscape", "kind": "model", "id": row["id"],
+                              "landscape_age_days": check_age, "expired": expired,
+                              "effective_release_date": effective["release_date"],
+                              "source": effective["release_source"], "checked_at": effective["checked_at"],
+                              "reason": "refresh two days before the seven-day landscape evidence expires"})
+            if row["status"] == "package_bound":
+                proposals[-1]["package"] = {"id": effective["id"], "version": row["package"]["version"],
+                                           "source": effective["release_source"], "checked_at": effective["checked_at"]}
+    if document["inventory_status"] == "pending":
+        proposals.append({"action": "complete_inventory", "reason": "model inventory pending; coverage is not established"})
+    return {"schema_version": 1, "kind": "model_currency_review", "generated_at": stamp,
+            "inventory_status": document["inventory_status"], "review_required": bool(proposals),
+            "observations": observations, "landscape": landscape, "proposals": proposals,
+            "coverage": {"packages": len(packages), "models": len(document["models"]),
+                         "unknown": sum(row["status"] == "unknown" for row in observations)},
+            "scope": "primary-source metadata review only; no acceptance, selection, installation or publication"}
+
+
+def model_currency_state_dir() -> Path:
+    configured = os.environ.get("XDG_STATE_HOME") or ""
+    state = Path(configured) if os.path.isabs(configured) else Path.home() / ".local/state"
+    return state / "native-agent-stack/model-currency"
+
+
+def write_model_currency_review(root: Path, directory: Path, report: dict) -> list[str]:
+    """Append mode-0600 dated proposals outside every Git checkout; never rewrite history."""
+    target = directory.resolve()
+    if target == root or root in target.parents or any((p / ".git").exists() for p in (target, *target.parents)):
+        raise FreshnessProposeError("model proposals must be written to private state outside Git checkouts")
+    if not report["review_required"]:
+        return []
+    target.mkdir(mode=0o700, parents=True, exist_ok=True)
+    basename = "review-" + report["generated_at"].replace("-", "").replace(":", "") + "-" + uuid.uuid4().hex[:8]
+    text = ["# Model currency review", "", f"Observed: {report['generated_at']}", "", report["scope"], "",
+            "These are review proposals, including unknown checks; they do not change a selected model.", ""]
+    for proposal in report["proposals"]:
+        text.append("- " + md_cell(proposal.get("id", "inventory")) + ": " + md_cell(proposal["action"]))
+    text.extend(["", "The companion JSON retains current pins, candidate identities, sources and unknown conditions."])
+    payloads = {"json": json.dumps(report, indent=2, sort_keys=True) + "\n", "md": "\n".join(text) + "\n"}
+    written = []
+    for extension, payload in payloads.items():
+        path = target / f"{basename}.{extension}"
+        handle = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(handle, "w", encoding="utf-8") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        written.append(str(path))
+    return written
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -961,8 +1255,23 @@ def main(argv: list[str] | None = None) -> int:
     subprocess tests) rely on that single-document contract. Any diagnostic
     output from a called subprocess (see rebuild_explorer()) is captured, not
     inherited, so it can never land on this process's stdout."""
-    args = build_parser().parse_args(argv)
-    result = apply(args.root.resolve(), args.artifact_dir.resolve(), args.run_url, args.checked_at_utc)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    root = args.root.resolve()
+    if args.model_currency:
+        if args.artifact_dir is not None or args.run_url is not None:
+            parser.error("--model-currency cannot be combined with --artifact-dir or --run-url")
+        model_inventory = args.model_inventory or Path("catalogs/foundation/model-currency.json")
+        inventory = model_inventory if model_inventory.is_absolute() else root / model_inventory
+        result = collect_model_currency(root, inventory, checked_at_utc=args.checked_at_utc, offline=args.offline)
+        result["proposal_paths"] = [] if args.dry_run else write_model_currency_review(
+            root, args.state_dir or model_currency_state_dir(), result)
+    else:
+        if args.offline or args.dry_run or args.state_dir is not None or args.model_inventory is not None:
+            parser.error("--offline, --dry-run, --state-dir and --model-inventory require --model-currency")
+        if args.artifact_dir is None or args.run_url is None:
+            parser.error("--artifact-dir and --run-url are required unless --model-currency is selected")
+        result = apply(root, args.artifact_dir.resolve(), args.run_url, args.checked_at_utc)
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
