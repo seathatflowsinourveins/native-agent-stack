@@ -135,3 +135,21 @@ an observed recognition workload, or an independent model-quality result.
 - Each model repository/revision and kept-artifact SHA256 is listed in the
   [documentary receipt](../../evidence/receipts/ns2604-local-models-rulings-20261006.json).
 - `seathatflowsinourveins/native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a`: `docs/lanes.md:25,96-128`, `docs/acceptance-evidence-policy.md:26-33`, and `evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py:97-101`.
+
+## Amendment (2026-10-07): later MiniLM adjudication provenance
+
+The [new documentary receipt](../../evidence/receipts/ns2604-minilm-cleanup-adjudication-20261007.json)
+links the command center's explicit Gate 3 PASS and tier-1 rollback retirement
+at the recorded source locator `ITEM-ns2604-coop-20261006T235312Z.md:12`,
+SHA256 `921574d68310a01c30d4acee732500dd4c15c09cb46f44aae920cade66d65f4b`.
+The actual ledger entry is a `status` record addressed to the co-op, not a new
+execution direction to this lane. Both that ruling and the deletion ledger row
+are dated 2026-10-06T23:53:12Z; the owner manifest's completion remains
+23:52:52Z. No earlier separate ruling time is inferred.
+
+The earlier preparation-only HOLD, the 23:47:19Z steered synthetic native
+integration result and its false strict canary-text control remain unchanged.
+The additional source resolves the previously missing adjudication locator;
+it does not rewrite those recorded observations or repeat a model/host operation.
+The ruling is CC adjudication and the deletion is an owner-reported operation,
+not this lane's filesystem census or model acceptance.

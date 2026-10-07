@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-minilm-cleanup-adjudication-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "claim": "Later source record supplies the command center's MiniLM Gate3 PASS and retirement of tier-1 rollback, linking the earlier HOLD, integration rerun and owner-reported deletion without changing their observations. No new lane filesystem census, cleanup, model execution or qualification.",
+  "limitations": [
+    "The ruling is command-center adjudication, the deletion an owner-reported operation; neither is a new native/model acceptance by this lane.",
+    "The earlier packet, rerun and deletion timestamps/classes remain unchanged. The ledger records the ruling and deletion at23:53:12Z, while the manifest records completion23:52:52Z; no earlier separate ruling time is inferred.",
+    "The source envelope and actual ledger row have kind=status and receiver ns2604-coop. This lane uses them only as documentary evidence, not as a receiver-directed execution authorization.",
+    "The rerun remains steered synthetic native cross-client integration; its false strict canary-text control and non-failure-gate metric stay recorded."
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "source_review",
+  "links_prior_receipt": {
+    "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+    "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5",
+    "json_pointer": "/retirement_and_cleanup_dispositions/13"
+  },
+  "ruling_source": {
+    "locator": "coordination:command-center/ITEM-ns2604-coop-20261006T235312Z.md:12",
+    "sha256": "921574d68310a01c30d4acee732500dd4c15c09cb46f44aae920cade66d65f4b",
+    "issuer": "wsl-architecture-design",
+    "receiver": "ns2604-coop",
+    "kind": "status",
+    "ledger_id": "status-ns2604-coop-20261006T235312Z",
+    "ledger_recorded_at_utc": "2026-10-06T23:53:12Z",
+    "decision": "Gate3 PASS; the tier-1 rollback is retired.",
+    "scope": "AIMEM-C2X rerun after option(a) configuration; explicit owner ruling, not inferred from deletion."
+  },
+  "deletion_source": {
+    "locator": "coordination:e2e-truth-20261006/deletions/deletion-manifest-minilm-20261006T235252Z.json",
+    "sha256": "0070add553649e97bd6a59b27ac00592773398ffaaa3559f48fe40dc75cad7e7",
+    "ledger_id": "deletion-minilm-20261006T235252Z",
+    "ledger_kind": "deletion",
+    "ledger_recorded_at_utc": "2026-10-06T23:53:12Z",
+    "completed_at_utc": "2026-10-06T23:52:52Z",
+    "owner_reported_deleted_files": 3,
+    "owner_reported_bytes": 91335235,
+    "owner_reported_holders": 0
+  },
+  "prior_source_records": [
+    {
+      "role": "preparation_only",
+      "locator": "coordination:ns2604-coop/memory-slot-20261006/minilm-deletion-packet-20261006.json",
+      "sha256": "35ba27cac37c26cab22480544b4effb5c8dcde8a9a10fad1058a29f8c585c8a4",
+      "recorded_at_utc": "2026-10-06T22:48:04.646063Z"
+    },
+    {
+      "role": "steered_synthetic_native_integration_rerun",
+      "locator": "coordination:ns2604-coop/memory-slot-20261006/gate3-c2x-consolidation-rerun1-20261006/receipt.json",
+      "sha256": "772f222f0107cffcc48b3b328b527bcfb4a65101d027d11006c2dc87959d32ed",
+      "recorded_at_utc": "2026-10-06T23:47:19.571631Z"
+    }
+  ],
+  "operations_by_this_record": 0
+}
