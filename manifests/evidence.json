@@ -41278,8 +41278,8 @@
     },
     {
       "path": "evidence/artifacts/ns2604-gateway-evidence-relabel-20261007/README.md",
-      "sha256": "5d082369bcebb8b54ad16eb44169a32e7e5450c4afa53c5c65639ba6faaebef8",
-      "bytes": 2536
+      "sha256": "1323912a18fa87ab13a5121e0c44acc19593d5f7db5b1473ace925fe1b97a571",
+      "bytes": 3291
     },
     {
       "path": "evidence/artifacts/ns2604-gateway-evidence-relabel-20261007/e1-grafana-sdk-1-old-gateway-inferred.json",
@@ -41435,6 +41435,11 @@
       "path": "evidence/artifacts/ns2604-gateway-evidence-relabel-20261007/e5-b12-attempt-endpoint-unknown.json",
       "sha256": "4fc0d03ebeada335538e299226b82cd7be020078d970e7f6974cfc760ca3b471",
       "bytes": 1461
+    },
+    {
+      "path": "evidence/artifacts/ns2604-gateway-evidence-relabel-20261007/schema-addendum-A19-20261007.md",
+      "sha256": "15977627eae5c107e90ae6e5073fc63574f779d466a1a2075222e8cf04fa9124",
+      "bytes": 2269
     },
     {
       "path": "evidence/artifacts/ns2604-pin-decision-20261006/selection.json",
