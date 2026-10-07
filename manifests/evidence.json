@@ -54078,8 +54078,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "407c96a0462e0d1a10b42a7f1ed6bbc03e5da937f9bf23f51d3788898d9886ee",
-      "bytes": 132221
+      "sha256": "4fb68a7e452eb6b8050041789fb904d4bc1b383d88392202886ca9aa08d96615",
+      "bytes": 132219
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
