@@ -13,6 +13,13 @@ All listeners bind to `127.0.0.1`; Alertmanager cluster gossip is disabled.
 | Alertmanager | 0.34.1 | `http://127.0.0.1:19093` | Silences and notification history, 72-hour retention |
 | ntfy | 2.28.0 | `http://127.0.0.1:18080` | SQLite notification cache, 72-hour retention |
 
+These are the workstation profile's ports. NativeStack2604 (2026-10-06) runs its
+own backends from its install plan (`evidence/artifacts/new-wsl-install-plan-20261002/`):
+Prometheus 21090, Loki 21300, Grafana 13.2.3 on 21301 with anonymous Viewer and no
+sign-in, Alertmanager 21093 with a Telegram receiver, and no ntfy. Its Grafana gets
+`ecosystem-native` and the other ported dashboards from that plan's `grafana` row;
+see [native dashboard access](../../docs/native-dashboards.md#nativestack2604-equivalents-2026-10-06).
+
 [pins.json](pins.json) contains exact archive URLs, publisher SHA256 checksums,
 source tag commits, and licenses. Grafana's OSS archive checksum is published on
 its version-specific download page. Its packaged build commit and source tag
@@ -161,7 +168,10 @@ Content sanitization and metadata allowlists belong at the Collector boundary;
 the separate Collector profile defines that policy.
 
 Grafana provisions three data sources and dashboard UID `ecosystem-native`:
-`http://127.0.0.1:13000/d/ecosystem-native`. Panels show exported token counters,
+`http://127.0.0.1:13000/d/ecosystem-native` (NativeStack2604:
+`http://127.0.0.1:21301/d/ecosystem-native`, the same panels with the datasource
+UIDs `ns2604-*` and metric names without `ecosystem_`, because that host's
+collector sets no exporter namespace). Panels show exported token counters,
 scrape health, active alerts, Collector rejection/failure counters, and sanitized
 logs. Codex uses `ecosystem_codex_turn_token_usage_sum` grouped by `token_type`;
 Claude uses `ecosystem_claude_code_token_usage_tokens_total` grouped by `type`.

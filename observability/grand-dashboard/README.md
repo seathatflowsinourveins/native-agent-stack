@@ -1,6 +1,10 @@
 # Grand research dashboard
 
 Open [the local dashboard](http://127.0.0.1:13000/d/research-grand?refresh=30s).
+On NativeStack2604 (2026-10-06) the same dashboard is
+[http://127.0.0.1:21301/d/research-grand?refresh=30s](http://127.0.0.1:21301/d/research-grand?refresh=30s),
+provisioned by the install plan's `grafana` row once it has run; see
+[NativeStack2604](#nativestack2604) below.
 It combines live native service health and exported usage with recorded research
 lanes, acceptance gates, worker checkpoints, repository decisions and experiment
 outcomes. The header links the existing telemetry dashboard, workflow evidence and
@@ -49,6 +53,34 @@ No provider login, workflow start or operator-UI authentication is performed by
 this adapter. Query failures replace prior successful observations with an
 explicit unavailable state.
 
+`progress.py --dagu-dag <name>` (repeatable, up to four) reads other DAGs instead
+of `research-pair`, each with its own summary row and up to ten runs; one DAG that
+fails reads as unavailable without hiding the others. With more than one DAG the
+entity IDs carry the DAG name. `progress.py --loki-url` sets the push endpoint,
+which must be `http://127.0.0.1:<port>/loki/api/v1/push` (default port 13100), and
+`render.py --dagu-dag` names the same DAGs in the workflow table.
+
+## NativeStack2604
+
+NativeStack2604's install plan renders this dashboard for its own Grafana (21301,
+anonymous Viewer) instead of using `install.py`: `observability/ns2604_dashboards.py`
+writes it, with `ecosystem-native` and `native-foundation-data`, into the plan's
+`config/` with the datasource UIDs `ns2604-prometheus` and `ns2604-loki` and
+metric names without the workstation collector's `ecosystem_` namespace. The plan's
+`grafana` row provisions them in an Ecosystem folder and installs the emitter as
+`ns2604-research-progress.service` and `.timer`, which run `progress.py` every 30
+seconds against Loki on 21300 for the DAGs `restic-backup`, `restic-restore-check`
+and `tz-currency-check`. The emitter reads Dagu history with
+`dagu history <dag> --format json` (Dagu 2.18.2), so the Dagu UI keeps its own
+login and nothing in Dagu changes. Apply, read-back and rollback commands are in
+the plan's [README](../../evidence/artifacts/new-wsl-install-plan-20261002/README.md).
+
+Manual NativeStack2604 calls to `progress.py` must pass
+`--loki-url http://127.0.0.1:21300/loki/api/v1/push`. Its default uses port
+13100, which can reach the other WSL distribution through the shared network
+namespace. The installed NativeStack2604 service already passes the explicit
+21300 address.
+
 ## What freshness means
 
 [state.json](state.json) is a coordinator checkpoint. Its timestamp describes
@@ -77,9 +109,11 @@ No environment, credentials, account balances, user prompts, raw memory content,
 or provider transcripts are read. Evidence paths must stay within the repository.
 Only service and record kind are ingestion labels; entity/state fields are
 parsed at query time. A generation cap prevents a growing catalog from silently
-flooding telemetry. The generation limit is 128 entities, including the native
-history summary and up to ten runs. Oversized and duplicate inventories fail
-before publication; no records are silently truncated. Changing the selected
+flooding telemetry. The generation limit is 192 entities, including each
+configured DAG's history summary and up to ten runs. It was 128 until 2026-10-06,
+when the catalog alone produced 117 rows and NativeStack2604 needed three DAG
+histories (four at most: 117 + 4 x 11 = 161). Oversized and duplicate inventories
+fail before publication; no records are silently truncated. Changing the selected
 catalog scope requires review.
 
 ## Native acceptance and limits

@@ -1,6 +1,7 @@
-# grafana/grafana@v13.2.3:docs/sources/administration/provisioning/index.md:324.
+# grafana/grafana@v13.2.3:docs/sources/administration/provisioning/index.md:324 and 337-368 (one entry per provider).
 apiVersion: 1
 providers:
+  # token-layer.json and lanes.json (UID cc-lanes) share the planned Token efficiency provider.
   - name: nativestack2604-token-layer
     orgId: 1
     folder: Token efficiency
@@ -10,3 +11,14 @@ providers:
     updateIntervalSeconds: 30
     options:
       path: @DASHBOARD_PATH_JSON@
+  # research-grand (with Dagu run history), ecosystem-native and native-foundation-data, rendered for this host
+  # by observability/ns2604_dashboards.py: datasource UIDs ns2604-*, metric names without the ecosystem_ prefix.
+  - name: nativestack2604-ecosystem
+    orgId: 1
+    folder: Ecosystem
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: @ECOSYSTEM_DASHBOARD_PATH_JSON@

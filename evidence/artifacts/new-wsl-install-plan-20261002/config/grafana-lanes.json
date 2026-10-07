@@ -1,0 +1,1657 @@
+{
+  "uid": "cc-lanes",
+  "title": "Lanes",
+  "schemaVersion": 39,
+  "version": 11,
+  "links": [
+    {
+      "type": "link",
+      "title": "Memory, RAG and token-saving results",
+      "url": "/d/native-foundation-data",
+      "targetBlank": false
+    }
+  ],
+  "editable": false,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "tags": [
+    "native",
+    "lanes"
+  ],
+  "description": "Native exported counters and local service health. Token panels are native-client telemetry, not estimates of savings. Cache/reasoning subsets must not be added again. Synthetic acceptance alerts are explicitly labeled. Raw prompt/tool bodies are omitted upstream by the collector.",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Observation contract",
+      "type": "text",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 9
+      },
+      "description": "",
+      "targets": [],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Native result records, hcom status and request usage for **1 h / 24 h**. Identity is Codex conversation ID or Claude session ID. The hcom table maps registered roots; child identities stay separate until their native parent mapping is qualified. Missing identity, exposure, export or status freshness is **UNKNOWN**. A zero inventory row means no result record was visible; it proves organic non-use only after exposure and full-window coverage are qualified. Outer code-mode wrappers are tool rows, and are not additional MCP calls. Started user turns are not completed turns. Claude Skill calls and Codex read-command observations are separate contracts. Input, output and cache counters remain separate; provider/cache totals are not summed. [Token layer](/d/token-layer) \u00b7 [Native telemetry](/d/ecosystem-native)"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Latest recorded hcom status and root-name lookup",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Recorded status JSON from hcom list; registry roots missing from hcom remain unknown. The latest complete JSON row per identity supplies every field, including null age/unread. Observation time and native status age are separate. Inspect observation time: an old active record is historical, not live liveness. Automatic freshness masking remains open.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json",
+          "queryType": "range",
+          "legendFormat": "Status",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "Line",
+            "format": "json",
+            "replace": true,
+            "keepTime": true
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "identity": {
+                "operation": "groupby"
+              },
+              "Time": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "lane": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "name": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "client": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "status": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "status_context": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "status_age_seconds": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "unread_count": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "observed_unix": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Per-session started turns and tool result records",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Started turns and result rows only; completed-turn counts require native completion evidence. Use the hcom root-name lookup above. Descendants remain separate rows.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.user_prompt\" | label_format identity=conversation_id  [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex started user turns",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (identity) (count_over_time({service_name=\"claude-code\"} | event_name=\"user_prompt\" | label_format identity=session_id  [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude started user turns",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id  [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex tool results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "sum by (identity) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format identity=session_id  [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude tool results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Per-session shells, RTK prefix share and Claude skills",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 9
+      },
+      "description": "exec_command only; write_stdin is not another command. RTK prefix is not hook firing/rewrite. A classified denominator with no RTK-first results gives 0%; no classified denominator stays UNKNOWN. Claude RTK-first and Codex SKILL.md read counts remain unknown in this live stream; the native-record baseline keeps those separate, rather than inferring them from MCP calls.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex shell results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=\"true\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex RTK-first results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "100 * ((sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=\"true\" [${window}]))) or on (identity) (0 * ((sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=~\"true|false\" [${window}]))) > 0))) / ((sum by (identity) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | tool_name=\"exec_command\" | shell_rtk=~\"true|false\" [${window}]))) > 0)",
+          "queryType": "instant",
+          "legendFormat": "Codex RTK prefix % of classified shells",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "sum by (identity) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format identity=session_id | tool_name=\"Bash\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude Bash results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "E",
+          "expr": "sum by (identity) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format identity=session_id | tool_name=\"Skill\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude Skill results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Per-session native tools",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Each native named result row; no static JavaScript or code-carrier references are counted.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (identity,tool_namespace,tool_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id  [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (identity,tool_name) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format identity=session_id  [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Per-session MCP server and tool results",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native MCP names, including plugin aliases, retained verbatim. Failed results remain results.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (identity,mcp_server_name,mcp_tool_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | label_format identity=conversation_id | mcp_server_name!=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex MCP",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (identity,mcp_server_name,mcp_tool_name) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format identity=session_id | mcp_server_name!=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude MCP",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Codex request usage by native conversation",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 54,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native response.completed request counters; cache is a subset of input. Not an organic savings claim.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (identity) (sum_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.sse_event\" | label_format identity=conversation_id | event_kind=\"response.completed\" | unwrap input_token_count | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Input",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (identity) (sum_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.sse_event\" | label_format identity=conversation_id | event_kind=\"response.completed\" | unwrap output_token_count | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Output",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "sum by (identity) (sum_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.sse_event\" | label_format identity=conversation_id | event_kind=\"response.completed\" | unwrap cached_token_count | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Cached input",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Claude request usage by native session",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 63,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native API request accounting. Do not add cache categories to another inclusive token total.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (identity) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | label_format identity=session_id  | unwrap input_tokens | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Input",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (identity) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | label_format identity=session_id  | unwrap output_tokens | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Output",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "sum by (identity) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | label_format identity=session_id  | unwrap cache_read_tokens | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Cache read",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "sum by (identity) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | label_format identity=session_id  | unwrap cache_creation_tokens | __error__=\"\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Cache creation",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Native API errors and rate limits",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native error records only. Missing rate-limit headroom is UNKNOWN; client status-line configuration is owned by the command center.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (status_code,error_type) (count_over_time({service_name=\"claude-code\"} | event_name=\"api_error\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude errors",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (tool_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | success=\"false\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex failed tool results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Native hook results by source and hook name",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 81,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native source and hook attributes retained by collector step 6. A hook row proves RTK only when its identity names RTK; a plural hooks counter alone does not.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (source,hook_name,hook_event,status) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=~\"codex.hook.*\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex hooks \u2014 event coverage unqualified",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (hook_name,hook_event,num_blocking) (count_over_time({service_name=\"claude-code\"} | event_name=\"hook_execution_complete\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude hook completions",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "MCP connections and compaction",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 90,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Connection transitions and compactions are not tool invocations. Names require collector step 6 read-back; absent metadata stays unknown.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (server_name,status,transport_type) (count_over_time({service_name=\"claude-code\"} | event_name=\"mcp_server_connection\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude MCP connections",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (trigger) (count_over_time({service_name=\"claude-code\"} | event_name=\"compaction\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude compaction",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Backends up",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 99,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Prometheus scrape health; this is not coverage of every user unit.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up",
+          "queryType": "instant",
+          "legendFormat": "Value",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Gateway health \u2014 waits on collector step 6",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 108,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Only the model-free health route is probed. Native http_url label observed on existing targets. Gateway settings and database routes are excluded.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "httpcheck_status{http_url=\"http://127.0.0.1:21128/api/health\",http_status_class=\"2xx\"}",
+          "queryType": "instant",
+          "legendFormat": "Value",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Collector streams against limit",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 117,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Watch the 8,000 review threshold against the configured 10,000 stream limit.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max_over_time(otelcol_deltatocumulative_streams_tracked[1h])",
+          "queryType": "instant",
+          "legendFormat": "Value",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Codex tokens \u2014 lower bound until step 7 read-back",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 126,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (ecosystem_lane,token_type) (increase(codex_turn_token_usage_sum[${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Value",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Host CPU \u2014 collector observed sample",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 135,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native hostmetrics sample; no GPU or clock-offset coverage is implied.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "system_cpu_load_average_1m",
+          "queryType": "instant",
+          "legendFormat": "Value",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "title": "Host memory \u2014 collector observed sample",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 144,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native hostmetrics sample. Unit health, clock and GPU collectors remain separately owned gates.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "system_memory_usage_bytes",
+          "queryType": "instant",
+          "legendFormat": "Value",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "Pending monitoring sources",
+      "type": "text",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 153,
+        "w": 24,
+        "h": 9
+      },
+      "description": "",
+      "targets": [],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**UNKNOWN / pending:** effective per-role tool exposure and exact organic prompt exclusions; Claude RTK rewrites and Codex skill loads; GitHub newest-complete snapshot (step 12, github-ci-finalize); unit failures (alerting PR and lm-qmd); GPU exporter (vllm-embed owner); clock offset; storage size-retention COUNT and oldest-sample AGE (CC read-back owner; deferred during paper, pending deployed Prometheus flag/effective-limit evidence and restart qualification); SDK task attribution and gateway optional OTLP span sink (CC environment and restart). OmniRoute v3.8.51 already ships an optional GenAI OTLP trace sink; no claim that it lacks export until v3.9. A newly wired zero-call tool remains unmeasured until exposure and a complete 24 h organic window are qualified."
+      }
+    },
+    {
+      "id": 19,
+      "title": "MCP inventory: zero visible result records",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 162,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Dated tool-name exposure inventory for this Codex session, not all clients/lanes. Refresh at tools-wave MCP read-back. Zero is informational until full-window coverage and exposure are qualified. Plugin aliases appear as separate observed rows.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (mcp_server_name,mcp_tool_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"codex.tool_result|tool_result\" | mcp_server_name!=\"\" [${window}])) or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_auto_improve\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_briefing\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_consolidate\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_delete_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_explore\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_feedback\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_forget_sweep\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_handoff_accept\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_handoff_begin\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_handoff_cancel\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_handoff_list\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_install_self_routing\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_lint\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_message_cancel\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_message_list\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_message_pop\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_message_send\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_query\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_read_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_read_session_observations\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_recent\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_status\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"ai-memory\",\"\",\"\"),\"mcp_tool_name\",\"memory_write_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"click\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"close_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"drag\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"emulate\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"evaluate_script\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"fill\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"fill_form\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"get_console_message\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"get_css_styles\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"get_network_request\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"handle_dialog\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"hover\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"lighthouse_audit\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"list_console_messages\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"list_network_requests\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"list_pages\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"navigate_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"new_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"performance_analyze_insight\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"performance_start_trace\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"performance_stop_trace\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"press_key\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"resize_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"select_page\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"take_heapsnapshot\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"take_screenshot\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"take_snapshot\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"type_text\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"upload_file\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"chrome-devtools\",\"\",\"\"),\"mcp_tool_name\",\"wait_for\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"check_index_coverage\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"compare_graphs\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"delete_project\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"detect_changes\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"get_architecture\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"get_code_snippet\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"get_file_outline\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"get_graph_schema\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"index_repository\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"index_status\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"ingest_traces\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"list_projects\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"manage_adr\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"query_graph\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"search_code\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"search_graph\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"codebase-memory-mcp\",\"\",\"\"),\"mcp_tool_name\",\"trace_path\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_batch_execute\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_doctor\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_execute\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_execute_file\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_fetch_and_index\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_index\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_insight\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_purge\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_search\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_stats\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"context-mode\",\"\",\"\"),\"mcp_tool_name\",\"ctx_upgrade\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"headroom\",\"\",\"\"),\"mcp_tool_name\",\"headroom_compress\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"headroom\",\"\",\"\"),\"mcp_tool_name\",\"headroom_retrieve\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"headroom\",\"\",\"\"),\"mcp_tool_name\",\"headroom_stats\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"jcodemunch\",\"\",\"\"),\"mcp_tool_name\",\"announce_model\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"jcodemunch\",\"\",\"\"),\"mcp_tool_name\",\"jcodemunch_guide\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"jcodemunch\",\"\",\"\"),\"mcp_tool_name\",\"menu\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"jcodemunch\",\"\",\"\"),\"mcp_tool_name\",\"order\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"jcodemunch\",\"\",\"\"),\"mcp_tool_name\",\"route\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"jcodemunch\",\"\",\"\"),\"mcp_tool_name\",\"set_tool_tier\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"compare_providers\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"generate_dataset\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"generate_test_cases\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"get_evaluation_details\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"list_evaluations\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"list_logs\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"read_logs\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"redteam_generate\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"redteam_run\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"run_assertion\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"run_evaluation\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"share_evaluation\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"test_provider\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"promptfoo\",\"\",\"\"),\"mcp_tool_name\",\"validate_promptfoo_config\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"qmd\",\"\",\"\"),\"mcp_tool_name\",\"get\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"qmd\",\"\",\"\"),\"mcp_tool_name\",\"multi_get\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"qmd\",\"\",\"\"),\"mcp_tool_name\",\"query\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"qmd\",\"\",\"\"),\"mcp_tool_name\",\"status\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"semble\",\"\",\"\"),\"mcp_tool_name\",\"find_related\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"semble\",\"\",\"\"),\"mcp_tool_name\",\"search\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"activate_project\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"delete_memory\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"edit_memory\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"find_declaration\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"find_implementations\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"find_referencing_symbols\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"find_symbol\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"get_current_config\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"get_diagnostics_for_file\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"get_symbols_overview\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"initial_instructions\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"insert_after_symbol\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"insert_before_symbol\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"list_memories\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"onboarding\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"open_dashboard\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"read_memory\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"rename_memory\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"rename_symbol\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"replace_in_files\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"replace_symbol_body\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"safe_delete_symbol\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"search_for_pattern\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"serena\",\"\",\"\"),\"mcp_tool_name\",\"write_memory\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_about\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_context\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_context_index\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_context_remove\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_context_search\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_flow\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_build\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_circular\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_query\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_remove\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_stats\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_status\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_graph_visualize\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_health\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_impact\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_index\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_list_projects\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_prune\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_remove\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_search\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_status\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_stop\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_symbol\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_symbols\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_update\",\"\",\"\") or label_replace(label_replace(vector(0),\"mcp_server_name\",\"socraticode\",\"\",\"\"),\"mcp_tool_name\",\"codebase_watch\",\"\",\"\")",
+          "queryType": "instant",
+          "legendFormat": "Visible results or inventory zero",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Clock: latest native state and signed offset",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 171,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native clock-offset-check rows. Latest state/availability use a 3m UI freshness contract for the verified 60s timer; earlier curves are historical. OK/WARN/CRIT come from the printed state, not offset classification. Native defaults: WARN bound >0.050s or reference age >1200s, plus reference/leap/trigger reasons; CRIT |offset| >0.100s. Equality alone does not cross a native threshold. The 50ms line applies to error bound, not signed offset. A failed row still shows CRIT while offset availability shows No data. Missing/stale current rows show No data; the -1 UI marker is not a native sample. Threshold environment overrides and full native render/export acceptance remain separate.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_s | __error__=\"\" [3m]) by (service_name)) and on(service_name) (last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_present | __error__=\"\" [3m]) by (service_name) == 1)",
+          "queryType": "range",
+          "legendFormat": "Offset history (s)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap bound_s | __error__=\"\" [3m]) by (service_name)) and on(service_name) (last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_present | __error__=\"\" [3m]) by (service_name) == 1)",
+          "queryType": "range",
+          "legendFormat": "Error-bound history (s)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "last_over_time({service_name=\"clock-offset-check\"} | unwrap state_code | __error__=\"\" [3m]) by (service_name)",
+          "queryType": "range",
+          "legendFormat": "Native state history",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap state_code | __error__=\"\" [3m]) by (service_name)) or (label_replace(vector(-1),\"service_name\",\"clock-offset-check\",\"\",\"\"))",
+          "queryType": "instant",
+          "legendFormat": "Latest native state (3m)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "E",
+          "expr": "(last_over_time({service_name=\"clock-offset-check\"} | unwrap offset_present | __error__=\"\" [3m]) by (service_name)) or (label_replace(vector(-1),\"service_name\",\"clock-offset-check\",\"\",\"\"))",
+          "queryType": "instant",
+          "legendFormat": "Latest offset availability (3m)",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No data",
+          "unit": "s",
+          "decimals": 6,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "lineWidth": 2,
+            "axisPlacement": "left"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Offset history (s)"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error-bound history (s)"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Native state history"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Native state history"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 3
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "0": {
+                        "text": "OK",
+                        "color": "green"
+                      },
+                      "1": {
+                        "text": "WARN",
+                        "color": "yellow"
+                      },
+                      "2": {
+                        "text": "CRIT",
+                        "color": "red"
+                      },
+                      "3": {
+                        "text": "UNKNOWN",
+                        "color": "gray"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Native state"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "stepAfter"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest native state (3m)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "0": {
+                        "text": "OK",
+                        "color": "green"
+                      },
+                      "1": {
+                        "text": "WARN",
+                        "color": "yellow"
+                      },
+                      "2": {
+                        "text": "CRIT",
+                        "color": "red"
+                      },
+                      "3": {
+                        "text": "UNKNOWN",
+                        "color": "gray"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest offset availability (3m)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "0": {
+                        "text": "No data",
+                        "color": "gray"
+                      },
+                      "1": {
+                        "text": "Sample available",
+                        "color": "green"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Offset history (s)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": -0.1
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.thresholdsStyle",
+                "value": {
+                  "mode": "dashed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error-bound history (s)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "yellow"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.05
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.thresholdsStyle",
+                "value": {
+                  "mode": "dashed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "window",
+        "label": "Count window",
+        "type": "custom",
+        "query": "1h,24h",
+        "current": {
+          "text": "1h",
+          "value": "1h"
+        },
+        "options": [
+          {
+            "text": "1h",
+            "value": "1h",
+            "selected": true
+          },
+          {
+            "text": "24h",
+            "value": "24h",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  }
+}

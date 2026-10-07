@@ -48,7 +48,38 @@ def savings_series():
             + ' == on(entity_id) ' + newest('entity_id, observed_unix', 'observed_unix') + ')')
 
 
-def dashboard():
+HEADER = (
+    '# Native foundation\n'
+    'Real command observations and existing service data on this PC. '
+    'Source dates and failed observations remain visible.\n\n'
+    '[Memory UI](http://127.0.0.1:49374/web/w/agent-lab/agent-lab) · '
+    '[Qdrant collections](http://127.0.0.1:16333/dashboard#/collections) · '
+    '[Code graph snapshot](http://127.0.0.1:17500/socraticode-graph.html) · '
+    '[Full token report](http://127.0.0.1:17500/token-savings.html) · '
+    '[Session archive](http://127.0.0.1:17384/)\n\n'
+    '[Selected RAG model](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) · '
+    '[Upstream MTEB model dashboard](https://leaderboard.mteb.org/models/nvidia/Nemotron-3-Embed-1B-BF16) · '
+    '[Model qualification](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/hf-memory-model-qualification.md)\n\n'
+    '[Dagu run history](http://127.0.0.1:18525/dag-runs) · '
+    '[Notifications](http://127.0.0.1:18080/ecosystem-alerts) · '
+    '[Promptfoo local fixture](http://127.0.0.1:17500/promptfoo.html) · '
+    '[Gateway usage](http://127.0.0.1:20128/dashboard/analytics) · '
+    '[Native telemetry](/d/ecosystem-native) · [Research](/d/research-grand) · '
+    '[Upstream commands and evidence](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/native-dashboard-data.md)\n\n'
+    'Memory browser search is global FTS5; project-scoped semantic recall uses MCP. '
+    'Expand System in the read-only wiki to see session pages. '
+    'Dagu defaults to Today; select Last 30 days for retained runs. '
+    'The code graph is an explicitly refreshed snapshot. '
+    '[Memory and RAG practice](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-rag-native-practice.md)\n\n'
+    '**Accounting:** native savings are estimates. Project counts can be subsets of global counts. '
+    'Provider usage and cache reads are separate; never add these into one savings total. '
+    'The catalog records prior acceptance, not new execution of every component.'
+)
+
+
+def dashboard(header=HEADER, omit=()):
+    """The workstation dashboard by default. Another host passes its own header links and omits the
+    panels whose source it does not run (for example Qdrant or vLLM); omitted ids leave no gap."""
     panels = []
     shift = [0]  # height of rows inserted above the panels added after them
 
@@ -64,33 +95,7 @@ def dashboard():
         panels.append(item)
 
     add(1, 'Native foundation · useful views', 'text', 0, 0, 24, 7,
-        options={'mode': 'markdown', 'content': (
-            '# Native foundation\n'
-            'Real command observations and existing service data on this PC. '
-            'Source dates and failed observations remain visible.\n\n'
-            '[Memory UI](http://127.0.0.1:49374/web/w/agent-lab/agent-lab) · '
-            '[Qdrant collections](http://127.0.0.1:16333/dashboard#/collections) · '
-            '[Code graph snapshot](http://127.0.0.1:17500/socraticode-graph.html) · '
-            '[Full token report](http://127.0.0.1:17500/token-savings.html) · '
-            '[Session archive](http://127.0.0.1:17384/)\n\n'
-            '[Selected RAG model](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) · '
-            '[Upstream MTEB model dashboard](https://leaderboard.mteb.org/models/nvidia/Nemotron-3-Embed-1B-BF16) · '
-            '[Model qualification](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/hf-memory-model-qualification.md)\n\n'
-            '[Dagu run history](http://127.0.0.1:18525/dag-runs) · '
-            '[Notifications](http://127.0.0.1:18080/ecosystem-alerts) · '
-            '[Promptfoo local fixture](http://127.0.0.1:17500/promptfoo.html) · '
-            '[Gateway usage](http://127.0.0.1:20128/dashboard/analytics) · '
-            '[Native telemetry](/d/ecosystem-native) · [Research](/d/research-grand) · '
-            '[Upstream commands and evidence](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/native-dashboard-data.md)\n\n'
-            'Memory browser search is global FTS5; project-scoped semantic recall uses MCP. '
-            'Expand System in the read-only wiki to see session pages. '
-            'Dagu defaults to Today; select Last 30 days for retained runs. '
-            'The code graph is an explicitly refreshed snapshot. '
-            '[Memory and RAG practice](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-rag-native-practice.md)\n\n'
-            '**Accounting:** native savings are estimates. Project counts can be subsets of global counts. '
-            'Provider usage and cache reads are separate; never add these into one savings total. '
-            'The catalog records prior acceptance, not new execution of every component.'
-        )})
+        options={'mode': 'markdown', 'content': header})
     add(2, 'Observation delivery time', 'stat', 0, 7, 8, 4,
         '1000 * max(last_over_time({service_name="agent-stack-native-data",record_kind="snapshot"}'
         ' | json | unwrap observed_unix | __error__="" [30m]))',
@@ -226,6 +231,11 @@ def dashboard():
                     'appear with a session and leave five minutes after it ends (the Prometheus exporter\'s '
                     'default metric_expiration), so a raw sum follows series lifetimes, not token use. '
                     + WRITER_IDENTITY)
+    if omit:
+        panels = [p for p in panels if p['id'] not in set(omit)]
+        # Widen the delivery-time stat over a stat row whose neighbours were omitted (ids 3 and 4).
+        if {3, 4} <= set(omit):
+            next(p for p in panels if p['id'] == 2)['gridPos']['w'] = 24
     return dict(uid='native-foundation-data', title='Native foundation · memory, retrieval and savings',
                 schemaVersion=39, version=5, editable=False, preload=True, timezone='browser', refresh='30s',
                 time={'from': 'now-6h', 'to': 'now'}, tags=['ecosystem', 'native', 'memory', 'tokens'],

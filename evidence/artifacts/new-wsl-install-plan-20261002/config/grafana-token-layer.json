@@ -180,7 +180,7 @@
     },
     {
       "id": 6,
-      "title": "GPT tokens (Codex, shared writer)",
+      "title": "GPT tokens (Codex, shared writer) \u2014 lower bound until step 7 read-back",
       "type": "stat",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -208,7 +208,8 @@
           "noValue": "No observation"
         },
         "overrides": []
-      }
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 7,
@@ -506,7 +507,8 @@
     },
     {
       "id": 16,
-      "title": "Bash calls per hour: RTK vs raw",
+      "title": "Claude Bash result events per hour by RTK prefix",
+      "description": "Counts retained Claude Bash tool-result log records by the exported RTK-prefix marker. Explicit prefixes and hook rewrites are not distinguished; this is not a total rewrite counter. Missing records do not establish zero use.",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-loki"
@@ -669,7 +671,7 @@
     },
     {
       "id": 21,
-      "title": "GPT token counters per hour by model (shared writer)",
+      "title": "GPT token counters per hour by model (shared writer) \u2014 lower bound until step 7 read-back",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -697,11 +699,12 @@
           "noValue": "No observation"
         },
         "overrides": []
-      }
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 22,
-      "title": "GPT token types per hour (shared writer; not additive)",
+      "title": "GPT token types per hour (shared writer; not additive) \u2014 lower bound until step 7 read-back",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -729,7 +732,8 @@
           "noValue": "No observation"
         },
         "overrides": []
-      }
+      },
+      "description": "Lower bound until deployed created-timestamp-zero-ingestion and a newly born single-turn counter reconciliation pass. NativeStack2604 has no proposed anchored-query flag. Prometheus edge extrapolation can overcount; it does not prove complete first samples. Input/cache and output/reasoning subsets are not additive. Never add this total to Loki request usage."
     },
     {
       "id": 23,
@@ -893,7 +897,8 @@
     },
     {
       "id": 28,
-      "title": "GPT-lane MCP calls per hour by server",
+      "title": "GPT MCP result records per hour by namespace",
+      "description": "Counts exported codex.tool_result log records with the retained MCP classification. This is not the complete or deduplicated rollout census; missing exports remain unobserved.",
       "type": "timeseries",
       "datasource": {
         "uid": "ns2604-loki"
@@ -951,6 +956,264 @@
       "fieldConfig": {
         "defaults": {
           "noValue": "No observation"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 30,
+      "title": "GPT MCP result records by namespace (range)",
+      "description": "Counts retained exported MCP tool-result log records in the selected range. This is log coverage, not the deduplicated rollout census or complete tool use. Missing data remains unobserved.",
+      "type": "bargauge",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 112,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, tool_namespace) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | tool_family=\"mcp\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No observation \u00b7 coverage unverified"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 31,
+      "title": "GPT exec_command result records by RTK prefix",
+      "description": "One retained exec_command result log record per observation; shell_rtk classifies the exported request arguments. Explicit RTK prefixes and hook rewrites are not distinguished. Nested script commands and total RTK rewrites are not measured.",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 120,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, shell_rtk) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | tool_namespace=\"functions\" | tool_name=\"exec_command\" | shell_rtk=~\"true|false\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true,
+          "legendFormat": "{{service_name}} \u00b7 RTK prefix={{shell_rtk}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No observation \u00b7 coverage unverified"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 32,
+      "title": "Hook-named diagnostic log records (partial)",
+      "description": "Counts retained log records carrying hook_name. The qualified log producer is an after_agent failure warning; normal command hooks emit spans and hook completions emit a metric. This panel is partial diagnostic coverage, not hook firings. Requires the reviewed Collector attribute retention.",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 128,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, hook_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | hook_name != \"\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true,
+          "legendFormat": "{{service_name}} \u00b7 {{hook_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No observation \u00b7 coverage unverified"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 33,
+      "title": "GPT approval-decision records by native source",
+      "description": "Counts retained codex.tool_decision log records with their native approval source: AutomatedReviewer, Config or User. This source does not identify RTK or a hook. Source-less decisions are excluded; requires the reviewed Collector attribute retention.",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 120,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name, source) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_decision\" | source != \"\" [1h]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "interval": "1m",
+          "instant": false,
+          "range": true,
+          "legendFormat": "{{service_name}} \u00b7 {{source}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No observation \u00b7 coverage unverified"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 34,
+      "title": "Native hook completion counter increase",
+      "description": "Prometheus increase of Codex's native codex.hooks.run counter over the selected range, including failed, blocked and stopped runs. hook_name is a lifecycle label, not the RTK or ai-memory processor identity. Missing lifecycle labels display as unknown until the reviewed Collector metric retention is applied. This is a scrape-based estimate; first positive samples and missing exports can undercount.",
+      "type": "bargauge",
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 128,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (hook_name, status) (label_replace(increase(codex_hooks_run_total[$__range]), \"hook_name\", \"unknown\", \"hook_name\", \"^$\"))",
+          "datasource": {
+            "uid": "ns2604-prometheus"
+          },
+          "legendFormat": "{{hook_name}} \u00b7 {{status}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "noValue": "No observation \u00b7 metric coverage unverified"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 35,
+      "title": "Event and counter coverage",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 144,
+        "w": 24,
+        "h": 6
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "These panels keep **exported log records**, **native counter increases** and the **deduplicated rollout census** separate. Missing data is not zero use.\n\n**MCP:** result records describe the exported stream. **RTK:** a request-prefix marker cannot prove a hook rewrite. **Codex hooks:** diagnostic log records are partial; the native completion metric supplies the counter estimate, with lifecycle/status labels after Collector retention is applied. **Claude hooks:** sum the native numeric outcomes because one completion log covers multiple matching commands. Lifecycle labels do not identify each RTK or ai-memory processor.\n\n**Confirmed RTK rewrite totals and per-processor hook firings remain unmeasured here.** Approval-decision source is Config, User or AutomatedReviewer. Do not sum these panels into tool usage, token savings or the historical census."
+      }
+    },
+    {
+      "id": 36,
+      "title": "Claude native hook outcomes (range)",
+      "description": "Sums the native hook_execution_complete fields num_success, num_blocking, num_non_blocking_error and num_cancelled. One completion log covers all matching hook commands, so its record count is not the command count. hook_event is the lifecycle; raw matcher and script identities are not exposed. Requires native hook event export and the reviewed numeric-field retention; absent observations do not mean zero firings.",
+      "type": "bargauge",
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 136,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (hook_event) (sum_over_time({service_name=\"claude-code\"} | event_name=\"hook_execution_complete\" | unwrap num_success | __error__=\"\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "{{hook_event}} \u00b7 successful",
+          "instant": true,
+          "range": false
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (hook_event) (sum_over_time({service_name=\"claude-code\"} | event_name=\"hook_execution_complete\" | unwrap num_blocking | __error__=\"\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "{{hook_event}} \u00b7 blocking",
+          "instant": true,
+          "range": false
+        },
+        {
+          "refId": "C",
+          "expr": "sum by (hook_event) (sum_over_time({service_name=\"claude-code\"} | event_name=\"hook_execution_complete\" | unwrap num_non_blocking_error | __error__=\"\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "{{hook_event}} \u00b7 non-blocking error",
+          "instant": true,
+          "range": false
+        },
+        {
+          "refId": "D",
+          "expr": "sum by (hook_event) (sum_over_time({service_name=\"claude-code\"} | event_name=\"hook_execution_complete\" | unwrap num_cancelled | __error__=\"\" [$__range]))",
+          "datasource": {
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "{{hook_event}} \u00b7 cancelled",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No observation \u00b7 hook event coverage unverified"
         },
         "overrides": []
       }

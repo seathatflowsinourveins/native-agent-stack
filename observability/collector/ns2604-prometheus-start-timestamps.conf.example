@@ -1,0 +1,8 @@
+# SUPERSEDED on 2026-10-07 by the rendered unit with both features; DO NOT APPLY: this ExecStart would drop promql-extended-range-selectors.
+# Proposed drop-in for ns2604-prometheus.service; never installed by this PR.
+# Prometheus v3.15.0 --enable-feature=created-timestamp-zero-ingestion.
+# Native ExecStart read-back 2026-10-06: no feature flag; preserve every other arg.
+# CC applies after review, backup and ACK, then qualifies a newly born series.
+[Service]
+# ExecStart=
+# ExecStart=%h/.local/bin/prometheus --config.file=%h/.config/new-wsl-native-stack/prometheus.yaml --storage.tsdb.path=%h/.local/share/new-wsl-native-stack/observability/prometheus --storage.tsdb.retention.time=7d --storage.tsdb.retention.size=512MB --web.listen-address=127.0.0.1:21090 --web.enable-otlp-receiver --enable-feature=created-timestamp-zero-ingestion

@@ -3,10 +3,14 @@
 
 Keeps every host-specific part (receivers, ports, http_check targets, exporters, extensions, logs pipelines) and
 takes from the repository only: processors.groupbyattrs/session, processors.transform/privacy.metric_statements,
-processors.delta_to_cumulative (replacing the deprecated deltatocumulative alias) and the metrics pipeline's
+processors.transform/metric_export_privacy when the profile uses it, processors.delta_to_cumulative
+(replacing the deprecated deltatocumulative alias) and the metrics pipeline's
 processor list. Verifies the result before returning or writing it: original statements, group settings,
 processor settings and pipeline order must survive, apart from the delta processor's supported alias rename.
 Refuses unsupported host customizations rather than silently replacing them with the repository profile.
+
+Source: opentelemetry-collector-contrib v0.162.0 processor/transformprocessor/README.md
+(ordered metric statements), and the Collector's service.pipelines.metrics.processors order.
 """
 import argparse
 import copy
@@ -15,7 +19,8 @@ from pathlib import Path
 
 import yaml
 
-OWNED_PROCESSORS = ('groupbyattrs/session', 'delta_to_cumulative', 'deltatocumulative')
+METRIC_EXPORT_GUARD = 'transform/metric_export_privacy'
+OWNED_PROCESSORS = ('groupbyattrs/session', 'delta_to_cumulative', 'deltatocumulative', METRIC_EXPORT_GUARD)
 
 
 def merge(host, repo):
@@ -25,6 +30,10 @@ def merge(host, repo):
         processors.pop(name, None)
     processors['groupbyattrs/session'] = copy.deepcopy(repo['processors']['groupbyattrs/session'])
     processors['delta_to_cumulative'] = copy.deepcopy(repo['processors']['delta_to_cumulative'])
+    if METRIC_EXPORT_GUARD in repo['service']['pipelines']['metrics']['processors']:
+        if METRIC_EXPORT_GUARD not in repo['processors']:
+            raise ValueError(f'refusing: processors.{METRIC_EXPORT_GUARD}: profile guard definition is missing')
+        processors[METRIC_EXPORT_GUARD] = copy.deepcopy(repo['processors'][METRIC_EXPORT_GUARD])
     processors['transform/privacy']['metric_statements'] = copy.deepcopy(
         repo['processors']['transform/privacy']['metric_statements'])
     out['service']['pipelines']['metrics']['processors'] = list(repo['service']['pipelines']['metrics']['processors'])
@@ -53,18 +62,23 @@ def is_subsequence(original, merged):
 
 
 def verify_merge(host, repo, merged):
-    """Collector v0.161.0 runs pipeline processors and transform statements in configuration order."""
+    """Collector/Contrib v0.162.0 runs pipeline processors and transform statements in configuration order."""
     def refuse(path):
         raise ValueError(f'refusing: {path}: the merge would lose host settings/order or add unintended processing')
 
     if strip_owned(merged) != strip_owned(host):
         refuse('collector settings outside the owned metrics processing')
-    for name in ('groupbyattrs/session', 'delta_to_cumulative'):
+    profile_order = repo['service']['pipelines']['metrics']['processors']
+    required_processors = ('groupbyattrs/session', 'delta_to_cumulative')
+    if METRIC_EXPORT_GUARD in profile_order:
+        required_processors += (METRIC_EXPORT_GUARD,)
+    for name in required_processors:
         if merged['processors'][name] != repo['processors'][name]:
             refuse(f'processors.{name}')
     for name in OWNED_PROCESSORS:
         canonical = 'delta_to_cumulative' if name == 'deltatocumulative' else name
-        if name in host['processors'] and host['processors'][name] != merged['processors'][canonical]:
+        if name in host['processors'] and (canonical not in merged['processors']
+                                          or host['processors'][name] != merged['processors'][canonical]):
             refuse(f'processors.{name}')
 
     original_groups = host['processors']['transform/privacy'].get('metric_statements', [])
@@ -92,8 +106,18 @@ def verify_merge(host, repo, merged):
         if 'transform/privacy' not in expected_order:
             refuse('service.pipelines.metrics.processors')
         expected_order.insert(expected_order.index('transform/privacy'), 'groupbyattrs/session')
+    if METRIC_EXPORT_GUARD in profile_order:
+        # This is the sole additional processor the committed profile may insert. Conversion must see
+        # already-scrubbed stream identities, and existing host order must not be silently rearranged.
+        if (profile_order.count(METRIC_EXPORT_GUARD) != 1 or 'delta_to_cumulative' not in profile_order
+                or profile_order.index(METRIC_EXPORT_GUARD) + 1 != profile_order.index('delta_to_cumulative')):
+            refuse('service.pipelines.metrics.processors')
+        if METRIC_EXPORT_GUARD not in expected_order:
+            if 'delta_to_cumulative' not in expected_order:
+                refuse('service.pipelines.metrics.processors')
+            expected_order.insert(expected_order.index('delta_to_cumulative'), METRIC_EXPORT_GUARD)
     merged_order = merged['service']['pipelines']['metrics']['processors']
-    if merged_order != expected_order or merged_order != repo['service']['pipelines']['metrics']['processors']:
+    if merged_order != expected_order or merged_order != profile_order:
         refuse('service.pipelines.metrics.processors')
     for name, pipeline in merged['service']['pipelines'].items():
         # Removing the deprecated alias must not leave another, otherwise unchanged pipeline dangling.

@@ -42,7 +42,113 @@ receivers:
     targets:
       - endpoint: http://127.0.0.1:21333/health/status
         timeout: 5s
+      # 2026-10-06: selected native HTTP health routes; metrics exposure is a separate service-owner qualification.
+      # OmniRoute 3.8.51 unauthenticated liveness: diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e
+      # src/app/api/health/route.ts:3-17. Dagu v2.18.2 health, the installer's own probe:
+      # dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4 scripts/installer.sh:1987-1989. The initial metrics
+      # probe reported 401; a repair-time unauthenticated GET returned 200 (body discarded), so no current login
+      # requirement is inferred from the access-log path list. Ollama v0.35.0:
+      # ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84 server/routes.go:2022-2023. agentsview, an
+      # on-demand daemon (observed only, no alert rule): kenn-io/agentsview (pin: manifests/stack.json, agentsview)
+      # internal/server/huma_routes_health.go:19-23. A refused connection records httpcheck.error and status 0 without
+      # a scrape error (receiver/httpcheckreceiver/scraper.go:407-451 at v0.162.0).
+      - endpoint: http://127.0.0.1:21128/api/health
+        timeout: 5s
+      - endpoint: http://127.0.0.1:21080/api/v1/health
+        timeout: 5s
+      - endpoint: http://127.0.0.1:21434/api/version
+        timeout: 5s
+      - endpoint: http://127.0.0.1:21808/api/ping
+        timeout: 5s
+  # clock-offset-check (a user oneshot every minute, and clock-change-check on a clock step or zone change) writes one
+  # line per run to the journal: "OK|WARN|CRIT <UTC time> ...". Match SYSLOG_IDENTIFIER, never the unit: journald loses
+  # _SYSTEMD_USER_UNIT on short-lived runs (45 of 121 lines this boot on 2026-10-06; command-center correction #8).
+  # opentelemetry-collector-contrib v0.162.0 receiver/journaldreceiver/README.md:36-60,184-201 and
+  # pkg/stanza/operator/input/journald/config_linux.go:90-153,194-205: start_at beginning passes --no-tail, so the
+  # cursor kept in file_storage resumes after a same-boot restart (start_at end passes --lines=0, which
+  # skips the lines logged while the Collector was down). systemd/systemd v259 src/journal/journalctl.c:1014-1017
+  # makes --follow select the current boot unless --merge is set: the first start reads that boot's earlier lines;
+  # merge: true would replay retained boots, and old-boot lines after a saved cursor are skipped after a reboot.
+  journald/clock_offset_check:
+    matches:
+      - SYSLOG_IDENTIFIER: clock-offset-check
+    priority: info
+    start_at: beginning
+    storage: file_storage
+  # Upstream v0.162.0 receiver/otlpjsonfilereceiver/README.md. Source-only until Harbor writes OTLP JSON.
+  otlp_json_file/harbor:
+    include: ["${env:NS2604_OBSERVABILITY_DATA}/harbor-otel/*.jsonl"]
+    start_at: beginning
 processors:
+  # #408 no-run-label contract; opentelemetry-collector-contrib v0.162.0
+  # processor/transformprocessor/README.md and pkg/ottl/ottlfuncs/func_delete_matching_keys.go.
+  # Applied to every exported metric route before conversion/batching; writer identity and values stay intact.
+  transform/metric_export_privacy:
+    error_mode: propagate
+    metric_statements:
+      - context: resource
+        statements:
+          - delete_matching_keys(attributes, "^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")
+      - context: scope
+        statements:
+          - delete_matching_keys(attributes, "^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")
+      - context: datapoint
+        statements:
+          - delete_matching_keys(attributes, "^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")
+  # Level and reason of a clock-offset-check line, from the script's fixed vocabulary; an optional <0-7> syslog prefix
+  # is tolerated. Error lines name chronyd_not_observe_only, chronyc_failed, chronyc_malformed or chronyc_empty; every
+  # other line is a sample. The count connector keeps only level/reason dimensions; bounded numeric sample fields
+  # also reach Loki as structured metadata. Native checker defaults: bound > 0.050 s is WARN, |offset| > 0.100 s
+  # is CRIT, reference age > 1200 s is WARN. Preserve its printed state: other native reasons can produce WARN.
+  # opentelemetry-collector-contrib v0.162.0 pkg/ottl/ottlfuncs: ExtractPatterns, merge_maps, Double, Int, set, keep_keys.
+  # Native checker source SHA-256 f36a950f8f113f99064d0e824cc3c4228a6ef579444c17d4786955ca697bc03b.
+  transform/clock_offset_check:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(attributes, [])
+          - 'set(attributes["level"], "other")'
+          - 'set(attributes["level"], "ok") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?OK ")'
+          - 'set(attributes["level"], "warn") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?WARN ")'
+          - 'set(attributes["level"], "crit") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT ")'
+          - 'set(attributes["reason"], "sample")'
+          - 'set(attributes["reason"], "chronyd_not_observe_only") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyd_not_observe_only ")'
+          - 'set(attributes["reason"], "chronyc_failed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_failed ")'
+          - 'set(attributes["reason"], "chronyc_malformed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_malformed ")'
+          - 'set(attributes["reason"], "chronyc_empty") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_empty ")'
+          # State/presence are derived bounded log attributes, not new Prometheus gauges. Failed native rows
+          # retain their CRIT state and offset_present=0; no zero offset substitutes for a missing sample.
+          - 'set(attributes["state_code"], 3)'
+          - 'set(attributes["state_code"], 0) where attributes["level"] == "ok"'
+          - 'set(attributes["state_code"], 1) where attributes["level"] == "warn"'
+          - 'set(attributes["state_code"], 2) where attributes["level"] == "crit"'
+          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )offset_s=(?P<offset_s>[-+][0-9]+[.][0-9]{6})(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
+          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )bound_s=(?P<bound_s>[-+]?[0-9]+[.][0-9]{6})(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
+          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )ref_age_s=(?P<ref_age_s>-?[0-9]+)(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
+          - 'set(attributes["offset_s"], Double(attributes["offset_s"])) where attributes["offset_s"] != nil'
+          - 'set(attributes["bound_s"], Double(attributes["bound_s"])) where attributes["bound_s"] != nil'
+          - 'set(attributes["ref_age_s"], Int(attributes["ref_age_s"])) where attributes["ref_age_s"] != nil'
+          - 'set(attributes["offset_present"], 0)'
+          - 'set(attributes["offset_present"], 1) where attributes["offset_s"] != nil'
+  # Journal MESSAGE and metadata may contain reference addresses, process fields and raw error text. This
+  # separate processor must complete before either exporter receives a clock row. A privacy error drops the
+  # payload (v0.162.0 processor/transformprocessor/README.md, error_mode propagate). No raw journal body leaves.
+  transform/clock_export_privacy:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(resource.attributes, [])
+          - set(resource.attributes["service.name"], "clock-offset-check")
+          - set(resource.schema_url, "")
+          - keep_keys(instrumentation_scope.attributes, [])
+          - set(instrumentation_scope.name, "clock-offset-check")
+          - set(instrumentation_scope.version, "")
+          - set(instrumentation_scope.schema_url, "")
+          - keep_keys(attributes, ["level", "reason", "state_code", "offset_present", "offset_s", "bound_s", "ref_age_s"])
+          - set(body, attributes["level"])
+          - set(severity_text, attributes["level"])
   memory_limiter:
     check_interval: 1s
     limit_mib: 256
@@ -91,7 +197,7 @@ processors:
           - attributes["event.name"] == "ecosystem.sdk_receipt"
         statements:
           # SDK receipts carry none of these names, nor a Codex call id; the shared allowlist must not let a receipt file add them.
-          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id|call_id)$")
+          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id|call_id|source|hook_name|hook\\.event_name|hook_event|hook_source|num_hooks|num_success|num_blocking|num_non_blocking_error|num_cancelled|total_duration_ms|tool_source|server_name|transport_type|error_code|trigger|pre_tokens|post_tokens)$")
       - context: log
         statements:
           # First-party Codex desktop clients are named "Codex <App>" (codex-rs login default_client.rs
@@ -207,7 +313,7 @@ processors:
           - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "env", "ecosystem.task.id", "ecosystem.client.scope", "ecosystem.lane"])
       - context: scope
         statements:
-          - keep_keys(attributes, [])
+          - 'keep_keys(attributes, [])'
       - context: log
         statements:
           - set(resource.schema_url, "")
@@ -227,7 +333,41 @@ processors:
           # Loki stores these as structured metadata; only service.name is indexed by the backend template.
           # Codex size fields (tool_result.rs:64,74-76) are retained when supplied; lengths are trace-only upstream.
           # Codex call_id (shape-checked in transform/tool_names) pairs codex.tool_decision with codex.tool_result.
-          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "usage_scope", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "tool_use_id", "call_id", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "cost_usd", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "arguments_length", "output_length", "output_line_count", "output_truncated", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id"])
+          # Native decision source vocabularies: Claude monitoring-usage#tool-decision-event and Codex
+          # d27764b otel/src/lib.rs:48-54 (Display retains AutomatedReviewer/Config/User casing).
+          - delete_key(attributes, "source") where attributes["source"] != nil and not IsString(attributes["source"])
+          - delete_key(attributes, "hook_event") where attributes["hook_event"] != nil and not IsString(attributes["hook_event"])
+          - delete_key(attributes, "hook.event_name") where attributes["hook.event_name"] != nil and not IsString(attributes["hook.event_name"])
+          - delete_key(attributes, "hook_name") where attributes["hook_name"] != nil and not IsString(attributes["hook_name"])
+          - delete_key(attributes, "hook_source") where attributes["hook_source"] != nil and not IsString(attributes["hook_source"])
+          - delete_key(attributes, "source") where attributes["source"] != nil and not IsMatch(attributes["source"], "^(config|hook|user_permanent|user_temporary|user_abort|user_reject|AutomatedReviewer|Config|User)$")
+          # Claude hook_name includes arbitrary matcher text. Retain the closed lifecycle identity instead;
+          # Codex's only legacy notify hook name is fixed (hooks/src/legacy_notify.rs:45-48).
+          - delete_key(attributes, "hook_event") where attributes["hook_event"] != nil and not IsMatch(attributes["hook_event"], "^(SessionStart|Setup|InstructionsLoaded|UserPromptSubmit|UserPromptExpansion|MessageDisplay|PreToolUse|PermissionRequest|PostToolUse|PostToolUseFailure|PostToolBatch|PermissionDenied|Notification|SubagentStart|SubagentStop|TaskCreated|TaskCompleted|Stop|StopFailure|TeammateIdle|ConfigChange|CwdChanged|DirectoryAdded|FileChanged|WorktreeCreate|WorktreeRemove|PreCompact|PostCompact|PreModelSwitch|PostModelSwitch|SessionEnd|Elicitation|ElicitationResult|Interrupt)$")
+          - delete_key(attributes, "hook.event_name") where attributes["hook.event_name"] != nil and not IsMatch(attributes["hook.event_name"], "^(SessionStart|Setup|InstructionsLoaded|UserPromptSubmit|UserPromptExpansion|MessageDisplay|PreToolUse|PermissionRequest|PostToolUse|PostToolUseFailure|PostToolBatch|PermissionDenied|Notification|SubagentStart|SubagentStop|TaskCreated|TaskCompleted|Stop|StopFailure|TeammateIdle|ConfigChange|CwdChanged|DirectoryAdded|FileChanged|WorktreeCreate|WorktreeRemove|PreCompact|PostCompact|PreModelSwitch|PostModelSwitch|SessionEnd|Elicitation|ElicitationResult|Interrupt)$")
+          - set(attributes["hook_name"], attributes["hook_event"]) where attributes["hook_event"] != nil
+          - set(attributes["hook_name"], attributes["hook.event_name"]) where attributes["hook.event_name"] != nil and attributes["hook_event"] == nil
+          - delete_key(attributes, "hook_name") where attributes["hook_name"] != nil and not IsMatch(attributes["hook_name"], "^(SessionStart|Setup|InstructionsLoaded|UserPromptSubmit|UserPromptExpansion|MessageDisplay|PreToolUse|PermissionRequest|PostToolUse|PostToolUseFailure|PostToolBatch|PermissionDenied|Notification|SubagentStart|SubagentStop|TaskCreated|TaskCompleted|Stop|StopFailure|TeammateIdle|ConfigChange|CwdChanged|DirectoryAdded|FileChanged|WorktreeCreate|WorktreeRemove|PreCompact|PostCompact|PreModelSwitch|PostModelSwitch|SessionEnd|Elicitation|ElicitationResult|Interrupt|legacy_notify)$")
+          - delete_key(attributes, "hook_source") where attributes["hook_source"] != nil and not IsMatch(attributes["hook_source"], "^(userSettings|projectSettings|localSettings|flagSettings|policySettings|pluginHook|merged)$")
+          # Native Claude aggregate hook-event counts; do not retain arbitrary text in numeric fields.
+          - delete_key(attributes, "num_hooks") where attributes["num_hooks"] != nil and not IsInt(attributes["num_hooks"])
+          - delete_key(attributes, "num_success") where attributes["num_success"] != nil and not IsInt(attributes["num_success"])
+          - delete_key(attributes, "num_blocking") where attributes["num_blocking"] != nil and not IsInt(attributes["num_blocking"])
+          - delete_key(attributes, "num_non_blocking_error") where attributes["num_non_blocking_error"] != nil and not IsInt(attributes["num_non_blocking_error"])
+          - delete_key(attributes, "num_cancelled") where attributes["num_cancelled"] != nil and not IsInt(attributes["num_cancelled"])
+          - delete_key(attributes, "total_duration_ms") where attributes["total_duration_ms"] != nil and not (IsInt(attributes["total_duration_ms"]) or IsDouble(attributes["total_duration_ms"]))
+          # Installed Codex 0.160.1 (d27764b82f7118f674371e6d6e76271d9d606edb): events/session_telemetry.rs:1166-1191
+          # emits optional source for tool decisions; core/src/hook_runtime.rs:653-657 logs legacy failure hook_name.
+          # hook.event_name is a command-runner trace-span field (hooks/src/engine/command_runner.rs:199-211), retained
+          # only if a log producer supplies it. No hook firing or RTK rewrite count is inferred from these fields.
+          - delete_key(attributes, "tool_source") where attributes["tool_source"] != nil and not IsMatch(attributes["tool_source"], "^(builtin|mcp)$")
+          - delete_key(attributes, "transport_type") where attributes["transport_type"] != nil and not IsMatch(attributes["transport_type"], "^(stdio|sse|http|streamable-http)$")
+          - delete_key(attributes, "trigger") where attributes["trigger"] != nil and not IsMatch(attributes["trigger"], "^(auto|manual|automatic|user|token_limit|context_limit)$")
+          - set(attributes["server_name"], "other") where attributes["server_name"] != nil and (not IsMatch(attributes["server_name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["server_name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["error_code"], "other") where attributes["error_code"] != nil and (not IsMatch(attributes["error_code"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["error_code"], "[A-Za-z0-9]{24}"))
+          - delete_key(attributes, "pre_tokens") where attributes["pre_tokens"] != nil and not IsInt(attributes["pre_tokens"])
+          - delete_key(attributes, "post_tokens") where attributes["post_tokens"] != nil and not IsInt(attributes["post_tokens"])
+          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "usage_scope", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "tool_use_id", "call_id", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "cost_usd", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "arguments_length", "output_length", "output_line_count", "output_truncated", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id", "source", "hook_name", "hook.event_name", "hook_event", "hook_source", "num_hooks", "num_success", "num_blocking", "num_non_blocking_error", "num_cancelled", "total_duration_ms", "tool_source", "server_name", "transport_type", "error_code", "trigger", "pre_tokens", "post_tokens"])
     metric_statements:
       - context: resource
         statements:
@@ -242,12 +382,40 @@ processors:
       - context: scope
         statements:
           - keep_keys(attributes, [])
+      - context: datapoint
+        statements:
+          # Typed native hook dimensions stay bounded before aggregation; no command/path identity is retained.
+          - delete_key(attributes, "hook_name") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["hook_name"] != nil and not IsString(attributes["hook_name"])
+          - delete_key(attributes, "hook_name") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["hook_name"] != nil and not IsMatch(attributes["hook_name"], "^(PreToolUse|PermissionRequest|PostToolUse|PreCompact|PostCompact|SessionStart|SessionEnd|UserPromptSubmit|SubagentStart|SubagentStop|Stop|Interrupt)$")
+          - delete_key(attributes, "source") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["source"] != nil and not IsString(attributes["source"])
+          - delete_key(attributes, "source") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["source"] != nil and not IsMatch(attributes["source"], "^(system|user|project|mdm|session_flags|plugin|cloud_requirements|cloud_managed_config|legacy_managed_config_file|legacy_managed_config_mdm|unknown)$")
+          - delete_key(attributes, "status") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["status"] != nil and not IsString(attributes["status"])
+          - delete_key(attributes, "status") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["status"] != nil and not IsMatch(attributes["status"], "^(running|completed|failed|blocked|stopped)$")
+          - delete_key(attributes, "handler_type") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["handler_type"] != nil and not IsString(attributes["handler_type"])
+          - delete_key(attributes, "handler_type") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["handler_type"] != nil and not IsMatch(attributes["handler_type"], "^(command|mcp_tool|prompt|agent)$")
+          - delete_key(attributes, "execution_mode") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["execution_mode"] != nil and not IsString(attributes["execution_mode"])
+          - delete_key(attributes, "execution_mode") where (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms") and attributes["execution_mode"] != nil and not IsMatch(attributes["execution_mode"], "^(sync|async)$")
+      - context: datapoint
+        statements:
+          # Native identifier dimensions are sanitized before any stream aggregation.
+          - set(attributes["server"], "other") where attributes["server"] != nil and (not IsMatch(attributes["server"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["server"], "[A-Za-z0-9]{24}"))
+          - set(attributes["skill"], "other") where attributes["skill"] != nil and (not IsMatch(attributes["skill"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["skill"], "[A-Za-z0-9]{24}"))
+          - set(attributes["skill.name"], "other") where attributes["skill.name"] != nil and (not IsMatch(attributes["skill.name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["skill.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["mcp_server.name"], "other") where attributes["mcp_server.name"] != nil and (not IsMatch(attributes["mcp_server.name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["mcp_server.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["mcp_tool.name"], "other") where attributes["mcp_tool.name"] != nil and (not IsMatch(attributes["mcp_tool.name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["mcp_tool.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["plugin_id"], "other") where attributes["plugin_id"] != nil and (not IsMatch(attributes["plugin_id"], "^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$") or IsMatch(attributes["plugin_id"], "[A-Za-z0-9]{24}"))
+          - set(attributes["plugin.name"], "other") where attributes["plugin.name"] != nil and (not IsMatch(attributes["plugin.name"], "^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$") or IsMatch(attributes["plugin.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["agent.name"], "custom") where attributes["agent.name"] != nil and not ContainsValue(["general-purpose", "Explore", "Plan", "claude", "statusline-setup", "claude-code-guide", "workflow-subagent", "custom"], attributes["agent.name"])
+          - delete_key(attributes, "invoke_type") where attributes["invoke_type"] != nil and not IsMatch(attributes["invoke_type"], "^(explicit|implicit)$")
       - context: metric
         statements:
           # Dropping an attribute that splits one writer's streams (agent.name, skill.name, mcp_server.name, decision,
           # phase, ...) must add those streams together; keep_keys alone leaves same-identity duplicates that
           # overwrite each other (cumulative) or are dropped as out of order (delta). Same allowlist as below.
-          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"]) where metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "server", "skill", "invoke_type", "plugin_id"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
+          # Exact native plural names (otel/src/metrics/names.rs:61-62) and closed typed dimensions
+          # (core/src/hook_runtime.rs:985-1029). Preserve them before aggregation as well as below.
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms")
       - context: datapoint
         statements:
           - set(resource.schema_url, "")
@@ -257,9 +425,33 @@ processors:
           - set(metric.description, "")
           - keep_keys(metric.metadata, [])
           - set(exemplars, nil) where metric.type != METRIC_DATA_TYPE_SUMMARY
-          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"])
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "server", "skill", "invoke_type", "plugin_id"]) where metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id"]) where metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms"
           - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
           - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
+  # Upstream v0.162.0 processor/transformprocessor: spans are converted, never stored raw.
+  transform/span_privacy:
+    error_mode: silent
+    trace_statements:
+      - context: resource
+        statements:
+          - delete_key(attributes, "ecosystem.lane") where attributes["ecosystem.lane"] != nil and not IsMatch(attributes["ecosystem.lane"], "^[a-z][a-z0-9_-]{0,31}$")
+          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "ecosystem.lane", "ecosystem.client.scope"])
+      - context: span
+        statements:
+          - delete_key(attributes, "gen_ai.prompt")
+          - delete_key(attributes, "gen_ai.completion")
+          - delete_key(attributes, "gen_ai.input.messages")
+          - delete_key(attributes, "gen_ai.output.messages")
+          - delete_key(attributes, "gen_ai.system_instructions")
+          - delete_key(attributes, "gen_ai.tool.call.arguments")
+          - delete_key(attributes, "gen_ai.tool.call.result")
+          - delete_key(attributes, "input.value")
+          - delete_key(attributes, "output.value")
+          - delete_key(attributes, "llm.input_messages")
+          - delete_key(attributes, "llm.output_messages")
+          - set(attributes["gen_ai.tool.name"], "other") where attributes["gen_ai.tool.name"] != nil and (not IsMatch(attributes["gen_ai.tool.name"], "^[A-Za-z0-9][A-Za-z0-9_.:/@-]{0,127}$") or IsMatch(attributes["gen_ai.tool.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["gen_ai.request.model"], "other") where attributes["gen_ai.request.model"] != nil and (not IsMatch(attributes["gen_ai.request.model"], "^[A-Za-z0-9][A-Za-z0-9_.:/@-]{0,127}$") or IsMatch(attributes["gen_ai.request.model"], "[A-Za-z0-9]{24}"))
   delta_to_cumulative:
     max_stale: 1h
     max_streams: 10000
@@ -291,6 +483,67 @@ exporters:
       max_megabytes: 10
       max_backups: 3
     flush_interval: 1s
+connectors:
+  # Upstream v0.162.0 connector/{spanmetricsconnector,signaltometricsconnector}/README.md.
+  # OmniRoute v3.8.51 open-sse/services/routing/otel.ts emits gen_ai usage attributes;
+  # this accepts its supported OTLP route without changing its unit environment.
+  span_metrics:
+    dimensions: [{name: gen_ai.tool.name}, {name: gen_ai.request.model}]
+    # Span names may contain producer text; the connector exports only bounded dimensions.
+    exclude_dimensions: [span.name]
+    metrics_expiration: 30m
+  signal_to_metrics:
+    spans:
+      - name: gen_ai.usage.input_tokens
+        conditions:
+          - attributes["gen_ai.usage.input_tokens"] != nil
+        include_resource_attributes:
+          - {key: service.name, optional: true}
+          - {key: ecosystem.lane, optional: true}
+        sum:
+          value: Int(attributes["gen_ai.usage.input_tokens"])
+          monotonic: true
+      - name: gen_ai.usage.output_tokens
+        conditions:
+          - attributes["gen_ai.usage.output_tokens"] != nil
+        include_resource_attributes:
+          - {key: service.name, optional: true}
+          - {key: ecosystem.lane, optional: true}
+        sum:
+          value: Int(attributes["gen_ai.usage.output_tokens"])
+          monotonic: true
+      - name: llm.token_count.prompt
+        conditions:
+          - attributes["llm.token_count.prompt"] != nil
+        include_resource_attributes:
+          - {key: service.name, optional: true}
+          - {key: ecosystem.lane, optional: true}
+        sum:
+          value: Int(attributes["llm.token_count.prompt"])
+          monotonic: true
+      - name: llm.token_count.completion
+        conditions:
+          - attributes["llm.token_count.completion"] != nil
+        include_resource_attributes:
+          - {key: service.name, optional: true}
+          - {key: ecosystem.lane, optional: true}
+        sum:
+          value: Int(attributes["llm.token_count.completion"])
+          monotonic: true
+  # opentelemetry-collector-contrib v0.162.0 connector/countconnector/README.md:66-123; counter.go:130-146 emits a
+  # monotonic delta Sum per attribute set, only once a line of that kind arrives. The exporter's metric_expiration
+  # (default 5m, exporter/prometheusexporter/README.md:29) drops a series five minutes after its last line;
+  # prometheus-alerts.yaml (group nativestack2604-clock) counts both increments and newly born series.
+  # Exported as clock_offset_check_lines_total{level, reason}.
+  count/clock_offset_check:
+    logs:
+      clock_offset_check.lines:
+        description: Journal lines logged by clock-offset-check, by level and reason.
+        attributes:
+          - key: level
+            default_value: other
+          - key: reason
+            default_value: sample
 extensions:
   file_storage:
     directory: ${env:NS2604_OBSERVABILITY_DATA}/otelcol/queue
@@ -318,17 +571,35 @@ service:
       exporters: [otlphttp/loki, file/events]
     metrics:
       receivers: [otlp]
-      processors: [memory_limiter, groupbyattrs/session, transform/privacy, delta_to_cumulative, batch]
+      processors: [memory_limiter, groupbyattrs/session, transform/privacy, transform/metric_export_privacy, delta_to_cumulative, batch]
       exporters: [prometheus]
     metrics/health:
       receivers: [http_check/ecosystem]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, transform/metric_export_privacy, batch]
       exporters: [prometheus]
     logs/sdk_receipts:
       receivers: [file_log/sdk_receipts]
       processors: [memory_limiter, transform/sdk_receipt, transform/tool_names, transform/privacy, batch]
       exporters: [otlphttp/loki, file/events]
+    traces:
+      receivers: [otlp, otlp_json_file/harbor]
+      processors: [memory_limiter, transform/span_privacy, batch]
+      exporters: [span_metrics, signal_to_metrics]
+    metrics/spans:
+      receivers: [span_metrics, signal_to_metrics]
+      processors: [memory_limiter, transform/metric_export_privacy, delta_to_cumulative, batch]
+      exporters: [prometheus]
     metrics/host:
       receivers: [host_metrics]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, transform/metric_export_privacy, batch]
+      exporters: [prometheus]
+    # Only sanitized clock rows reach Loki. service.name becomes the service_name index label; bounded log
+    # attributes remain structured metadata (grafana/loki v3.7.8 docs/sources/shared/otel.md). Counts stay parallel.
+    logs/clock_offset_check:
+      receivers: [journald/clock_offset_check]
+      processors: [memory_limiter, transform/clock_offset_check, transform/clock_export_privacy, batch]
+      exporters: [count/clock_offset_check, otlphttp/loki]
+    metrics/clock_offset_check:
+      receivers: [count/clock_offset_check]
+      processors: [memory_limiter, transform/metric_export_privacy, delta_to_cumulative, batch]
       exporters: [prometheus]

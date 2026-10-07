@@ -27,7 +27,7 @@ returns from the local [full report](http://127.0.0.1:17500/token-savings.html#n
 | Code relationships | [upstream graph export](http://127.0.0.1:17500/socraticode-graph.html) | Files/Symbols navigation in an explicit snapshot; search, layout, impact and PNG controls are available but not functionally qualified here |
 | Vector storage | [Qdrant collections](http://127.0.0.1:16333/dashboard#/collections) | Select the configured project collection; inspect points, configuration and native maintenance tabs |
 | Local Markdown | scoped QMD CLI | BM25 retrieval of the selected documentation collection; zero vectors is intentional in this separate lane |
-| Operating status | [foundation Grafana](http://127.0.0.1:13000/d/native-foundation-data) | Local integration panels over native metadata, including memory embedding coverage and provider modes |
+| Operating status | [foundation Grafana](http://127.0.0.1:13000/d/native-foundation-data) (NativeStack2604, 2026-10-06: [21301](http://127.0.0.1:21301/d/native-foundation-data), whose memory tables wait for a native-data collector on that host) | Local integration panels over native metadata, including memory embedding coverage and provider modes |
 
 The [rendered dashboard review](dashboard-rendered-acceptance.md) supplies later
 screenshots, native command comparisons, a refreshed graph and remaining gaps.

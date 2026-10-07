@@ -286,6 +286,96 @@ supplies this check, so an older installed helper cannot bypass it. On
 NativeStack2604 the co-op holds the preserved backup until the command-center
 soak permits retirement; see the A30 custody record in the followup receipt.
 
+**Observation front door (2026-10-06).** The `grafana` row also provisions, in an
+Ecosystem folder, the workstation's `research-grand`, `ecosystem-native` and
+`native-foundation-data` dashboards. `observability/ns2604_dashboards.py` renders
+them into `config/` with this host's datasource UIDs and metric names (this
+collector's Prometheus exporter sets no `namespace`, so there is no `ecosystem_`
+prefix; opentelemetry-collector-contrib v0.162.0 `exporter/prometheusexporter/README.md:27`);
+rerun it after changing a workstation renderer, and the tests compare the
+committed copies with a fresh render. The row installs and starts the research
+emitter, `ns2604-research-progress.timer`: every 30 seconds `progress.py` reads
+the Dagu DAGs `restic-backup`, `restic-restore-check` and `tz-currency-check`
+through `dagu history <dag> --format json` and pushes changed rows, or a
+ten-minute heartbeat, to Loki on 21300. That shows Dagu run history in Grafana
+with no Dagu login; Dagu's own authentication is unchanged. `grafana.ini` turns
+the news feed off (Grafana v13.2.3 `conf/defaults.ini:1994-1996` turns it on).
+The foundation dashboard's savings, memory and coverage tables wait for a
+native-data collector on this host, which is not part of this row.
+
+Apply from the long-lived main checkout once it contains the merged change;
+keep that checkout in place because the emitter unit records its absolute path.
+While the timer is enabled, retain a revision compatible with the installed
+emitter; do not move that checkout to a revision that removes or incompatibly
+changes the emitter entry point. Disable the timer before withdrawing it.
+Run the commands below from that checkout's install-plan directory. Restart
+Grafana, which reads provider files and `grafana.ini` when it starts, then wait
+for its health endpoint before acceptance:
+
+```sh
+bash install.sh --only grafana
+systemctl --user restart ns2604-grafana.service
+timeout 90 bash -c 'until curl -fsS http://127.0.0.1:21301/api/health >/dev/null; do sleep 2; done'
+systemctl --user start ns2604-research-progress.service
+bash accept.sh --only grafana --stage post_install
+bash accept.sh --only grafana --stage service_health
+```
+
+Read back: `/api/search` lists the four dashboards, `/d/research-grand` opens
+with no sign-in and its "Native workflow history" table lists the three DAGs.
+Service acceptance checks a nonzero oneshot exit timestamp and independently
+reads all three DAGs without `--cache` (no Loki push), rejecting failed native
+history reads. An empty native history window is valid and remains distinct
+from an unavailable read. Also verify that
+`/api/frontend/settings` reports `newsFeedEnabled: false`, and
+`/api/v1/dags` on Dagu (21080) still answers 401. Roll back with
+`systemctl --user disable --now ns2604-research-progress.timer`, removal of the two
+units from `~/.config/systemd/user` and `systemctl --user daemon-reload`, then
+`bash install.sh --only grafana` from a checkout of the previous revision, which
+re-renders `grafana.ini` and the one-provider file, and a Grafana restart. The
+previous revision's installer repeats its package-install steps, including
+`sudo apt-get update` and installation when that revision uses apt. Keep those
+steps outside the paper windows (6:35–9:45 AM EDT / 10:35–13:45Z, and
+3:50–8:10 PM EDT / 19:50–00:10Z). After the restart, remove the generated
+`$config_root/ecosystem-grafana-dashboards/` directory, the three dashboard
+template copies and two research-unit template copies in `$config_root/`, the
+two research-unit files in `$config_root/systemd/` (remove that directory only
+if empty), and the observation data folder's `grand-dashboard/` cache. Retain
+any empty Grafana Ecosystem folder because
+anonymous Viewer has no folder-deletion path. Preserve unrelated configuration
+and data. On start
+Grafana deletes the dashboards of a provider that is no longer configured (Grafana
+v13.2.3 `pkg/services/provisioning/dashboards/dashboard.go:127-141`); removing
+only a dashboard file would not, because the provider sets `disableDeletion: true`.
+The Ecosystem provider reads a sibling folder of `grafana-dashboards/` because
+the file reader walks its path recursively (`file_reader.go:181`).
+
+Lanes has a separate file-based rollback within the retained Token efficiency
+provider. Restore the previous `$config_root/grafana-dashboards/lanes.json` to
+roll back its contents. To withdraw `cc-lanes`, remove only that file, temporarily
+set `disableDeletion: false` for `nativestack2604-token-layer`, and restart
+`ns2604-grafana.service` in the permitted slot. Verify the anonymous
+`/api/dashboards/uid/cc-lanes` returns 404, then restore `disableDeletion: true`
+and restart/read back the provider configuration. Keep `token-layer.json`, the
+provider, unrelated dashboards and the private registry. The shipped anonymous
+Viewer configuration supplies no administrator UI deletion path.
+
+Remaining `13000` references are retained source/observation fields, not the
+NativeStack2604 dashboard URL. At the reviewed source head `d55a5927`, their
+complete disposition is:
+
+| Source | Disposition |
+| --- | --- |
+| `docs/token-efficiency-stack.json:7225` | Retained authoring/workstation Grafana health-command form on 13000, with the row's dated result. |
+| `docs/token-efficiency-stack.json:7226` | Second retained workstation health-command form on 13000; current NativeStack2604 directions use 21301 with the quiet-output flags. |
+| `blueprints/token-native-focus/saturation-audit.json:3588` | Dated documented recipe command, explicitly not current-host recertification. |
+| `observability/grand-dashboard/passwordless.json:9` | Historical configured listener in the 2026-09-19 receipt. |
+| `observability/grand-dashboard/passwordless.json:48` | Historical native socket-observation command (`ss`) in that receipt. |
+| `observability/grand-dashboard/passwordless.json:50` | Historical listener result paired with the line-48 command. |
+
+The NativeStack2604 renderer and provider use 21301; these retained records do
+not configure that listener or supersede this host's read-back.
+
 Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
 the disarmed sink until the selected receiver's private files exist. ntfy.sh was
 the coordinator's delegated pick on 2026-10-04. The user personally configured

@@ -675,16 +675,43 @@ def main():
         }
         if historical_gateway_configs & copied:
             bad("gpt-gateway", "selected prebuilt release must not install historical canary assets")
-    for name in sorted(config - copied - historical_gateway_configs):
+    # The native Grafana transport consumes its literal GRAFANA_FILES source operands.
+    # This is supported rendering, rather than a filename mentioned in an unrelated command.
+    grafana_transport = 'python3 "$config_root/observability_config.py" grafana --config-root "$config_root" --source-root "$plan_dir/config"'
+    if any(grafana_transport in command for command in grafana.get("commands", [])):
+        import ast
+        renderer = ast.parse((plan_dir / "config/observability_config.py").read_text())
+        rendered_assets = next((ast.literal_eval(node.value) for node in renderer.body
+                                if isinstance(node, ast.Assign) and any(
+                                    isinstance(target, ast.Name) and target.id == "GRAFANA_FILES"
+                                    for target in node.targets)), ())
+        if ("grafana-lanes.json", "grafana-dashboards/lanes.json") in rendered_assets:
+            copied.add("grafana-lanes.json")
+        else:
+            bad("observability", "grafana: the Lanes source must render to grafana-dashboards/lanes.json")
+    # Empty public roster is an operator-populated example, never an install operand.
+    operator_examples = set()
+    if "lanes-registry.json" in config:
+        if json.loads((plan_dir / "config/lanes-registry.json").read_text()) != {"canonical_roots": []}:
+            bad("observability", "lanes-registry.json must remain an empty operator-populated example")
+        elif "lanes-registry.json" in copied:
+            bad("observability", "installation must not overwrite the operator's private lane registry")
+        else:
+            operator_examples.add("lanes-registry.json")
+    for name in sorted(config - copied - historical_gateway_configs - operator_examples):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
     # promtool input-series labels are references, rather than additional listening sockets.
     observability_references = {
-        "otel.yaml": {21300},
+        "otel.yaml": {21300, 21128, 21080, 21434, 21808},
         "prometheus.yaml": {21090, 21093, 21888, 21889},
         "grafana-datasources.yaml": {21090, 21300, 21093},
         "prometheus-alerts.test.yaml": {21090, 21997},
+        # The ported foundation dashboard links this host's UIs; the research emitter pushes to Loki.
+        "grafana-native-foundation-data.json": {9749, 21080, 21090, 21093, 21128, 29374},
+        "grafana-lanes.json": {21128},
+        "ns2604-research-progress.service": {21300},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:

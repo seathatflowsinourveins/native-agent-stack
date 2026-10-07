@@ -711,8 +711,18 @@ grafana() {
   copy_config 'grafana-datasources.yaml' || return "$?"
   copy_config 'grafana-dashboards.yaml' || return "$?"
   copy_config 'grafana-token-layer.json' || return "$?"
+  # The workstation's research, telemetry and foundation dashboards, rendered for this host by observability/ns2604_dashboards.py,
+  # and the research dashboard's emitter units (observability/grand-dashboard/install.py adapted).
+  copy_config 'grafana-research-grand.json' || return "$?"
+  copy_config 'grafana-ecosystem-native.json' || return "$?"
+  copy_config 'grafana-native-foundation-data.json' || return "$?"
+  copy_config 'ns2604-research-progress.service' || return "$?"
+  copy_config 'ns2604-research-progress.timer' || return "$?"
   # Native configuration format. Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/administration/provisioning/index.md#L324
   run_command 'NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}" python3 "$config_root/observability_config.py" grafana --config-root "$config_root" --source-root "$plan_dir/config"' || return "$?"
+  # The research dashboard's Dagu-history emitter: install the rendered user units and start the timer.
+  # Source: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
+  run_command 'units="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user" && install -d -m 0700 -- "$units" && install -m 0600 -- "$config_root/systemd/ns2604-research-progress.service" "$config_root/systemd/ns2604-research-progress.timer" "$units/" && systemctl --user daemon-reload && systemctl --user enable --now ns2604-research-progress.timer' || return "$?"
 }
 
 local-model-server() {

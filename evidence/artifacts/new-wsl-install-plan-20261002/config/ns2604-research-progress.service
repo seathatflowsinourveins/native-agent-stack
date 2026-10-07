@@ -1,0 +1,18 @@
+# Destination adaptation of the unit that observability/grand-dashboard/install.py writes (this repository), for
+# NativeStack2604: Loki on 21300, the Dagu home and binary of the plan's user-scope Dagu install
+# (dagucloud/dagu v2.18.2 scripts/installer.sh:657-675: $HOME/.local/bin and $HOME/.dagu), and the DAGs that
+# observability/ns2604_dashboards.py names. observability_config.py grafana fills in the repository checkout (the
+# one the plan ran from; keep it in place) and the observability data root. The emitter reads Dagu history through the native CLI
+# (`dagu history <dag> --format json`), so it needs no Dagu login and changes no Dagu setting.
+# Source: https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
+[Unit]
+Description=NativeStack2604: publish research progress and Dagu run history to local Loki
+After=ns2604-loki.service
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+TimeoutStartSec=60
+ExecStart=/usr/bin/python3 @REPO_ROOT@/observability/grand-dashboard/progress.py --repo @REPO_ROOT@ --cache @DATA_ROOT@/grand-dashboard/progress-cache.json --loki-url http://127.0.0.1:21300/loki/api/v1/push --dagu-bin %h/.local/bin/dagu --dagu-home %h/.dagu --dagu-dag restic-backup --dagu-dag restic-restore-check --dagu-dag tz-currency-check
+ExecStart=/usr/bin/python3 @REPO_ROOT@/observability/grand-dashboard/hcom_status.py --hcom-bin %h/.local/bin/hcom --name gore --registry @DATA_ROOT@/grand-dashboard/lanes-registry.json --loki-url http://127.0.0.1:21300/loki/api/v1/push --push

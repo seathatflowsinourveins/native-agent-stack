@@ -416,3 +416,17 @@ The builder's recorded runs predate the commit. The coordinator re-ran the accep
 | `promtool check rules observability/backends/templates/ecosystem-prometheus-rules.yml.example` | 0 | SUCCESS: 26 rules found |
 | `python3 scripts/validate.py` | 0 | passed (10,094 hashed files, 202 receipts) |
 
+## Amendment (2026-10-07): maintained batch-timeout locator
+
+This corrects the citation in the earlier paragraph at line142, whose words
+are "1s batch timeout"; the original paragraph and its recorded values remain
+unchanged.
+
+PR #775 moved the Collector processor definitions. The earlier unpinned
+collector.yaml:269-270/#L269 citation is superseded as a current locator by
+the maintained named setting
+[`processors.batch.timeout`](../../observability/collector/collector.yaml).
+On the replayed475127d4-based tree its definition is at lines455-456 and
+remains1s. This corrects the reference; the earlier recorded30s collection,
+1s batch and15s scrape/evaluation values and their original text are retained.
+This is neither a new cadence selection nor a host-configuration observation.
