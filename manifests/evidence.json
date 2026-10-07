@@ -4508,6 +4508,23 @@
         "Organic observations and four facts/fit/family scopes are separate pending owner records; named smokes supply none."
       ],
       "path": "evidence/receipts/ns2604-finalized-catalog-structure-20261006.json"
+    },
+    {
+      "id": "ns2604-finalized-catalog-contract-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Typed finalized-catalog declarations join canonical repository/component, selected-release and registered evidence scopes, preserving unresolved observations and historical pins. The pending projection selects no repository; local fixtures and structural checks are not adoption evidence.",
+      "limitations": [
+        "Validation checks declared consistency and registered references, not the truth of external source or execution claims.",
+        "The 78 proposed roles and null census remain byte-unchanged; no default, installation, organic result or readiness aggregate is populated.",
+        "Canonical organic qualification remains deferred until its owner carrier/validator is available; observed records cannot authorize adoption.",
+        "The completeness critic is a same-family source review, not independent cross-family acceptance; exact-head review and command-center ACK remain required.",
+        "All checks here are local structural or synthetic checks; no vendor upstream test, model/GPU acceptance, host configuration or broker operation is claimed."
+      ],
+      "path": "evidence/receipts/ns2604-finalized-catalog-contract-20261007.json"
     }
   ],
   "files": [
@@ -17484,8 +17501,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
-      "sha256": "773a824cc313c6db1aeabc1a064de2bbf930af913ab23a1bce56fdb9b880b5ad",
-      "bytes": 9097
+      "sha256": "5fb99a258467e25e07cfb60574309f7eddc59141863ed1202fb65861f8fd9ae1",
+      "bytes": 16311
     },
     {
       "path": "docs/direct-results.md",
@@ -53108,6 +53125,11 @@
       "bytes": 22000
     },
     {
+      "path": "evidence/receipts/ns2604-finalized-catalog-contract-20261007.json",
+      "sha256": "f6eafe42f2a9a8cc476a981e33064ed0c385536bb3bc58d00feb2d62294e4526",
+      "bytes": 7015
+    },
+    {
       "path": "evidence/receipts/ns2604-finalized-catalog-structure-20261006.json",
       "sha256": "4171f7cdff94c04d3e89a438ac1430b21fb53e95d63af1aea165638c0b58b52d",
       "bytes": 5675
@@ -54429,8 +54451,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "f09bad50fcfccc599168cca7701a4ed9376e929abd7c47b5dcb6d788c0e1809b",
-      "bytes": 20734
+      "sha256": "0b4a7513c12671e5f7a887c2b15b7fdd6862dbbf87c1665499508a7fb427b8c4",
+      "bytes": 56482
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -55029,8 +55051,8 @@
     },
     {
       "path": "tests/test_finalized_foundation_catalog.py",
-      "sha256": "ea215039157c2523b5ab5df4cf029ad08be6c935e1e20e7050f7c4e571948e2c",
-      "bytes": 15696
+      "sha256": "2cc182400bb4a53aebf96c123302d4cd2ff8220216fe41b4f88d022e825d1d4e",
+      "bytes": 48031
     },
     {
       "path": "tests/test_financial_data.py",
