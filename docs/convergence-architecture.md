@@ -1,5 +1,7 @@
 # Convergence architecture for native engineering work
 
+For foundation-component selection and readiness, apply the [2026-10-06 upstream-evidence rule](decisions/2026-10-06-upstream-evidence-over-local-evaluation.md); the application engineering and research checks below retain their stated scope.
+
 Start with one engineering outcome and the evidence needed to accept it. This
 guide connects research, implementation, native Codex/Claude workers, validation
 and recovery. It applies to an ordinary software repository before adding a

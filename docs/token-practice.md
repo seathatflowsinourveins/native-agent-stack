@@ -1,5 +1,7 @@
 # Token practice and measured native results
 
+Foundation-component selection and readiness follow the [2026-10-06 upstream-evidence rule](decisions/2026-10-06-upstream-evidence-over-local-evaluation.md); upstream evidence selects components and native counters record organic use, while accounting boundaries and the evidence needed to claim savings below remain.
+
 For a new PC or a separate local ledger, use the [portable upstream counter collector](../tools/token-report/README.md). It produces local JSON/HTML reports, retains failed refreshes and never adds overlapping lifetime snapshots.
 
 Updated September 21, 2026. The [current full-stack convergence](full-stack-convergence.md)

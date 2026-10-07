@@ -92,13 +92,17 @@ source, execution engine or broker. It adds source-review recommendations to
 the catalog without changing deployment selections, `manifests/stack.json`,
 host receipts, services, native authentication or model routes.
 
-It does not settle or reopen independently owned memory/code-search trials,
-consume sealed evidence, or claim the separate final-catalog synthesis is
-complete. The dated [repository-quality rule](2026-10-04-repository-quality-rule.md)
-and its scoped exceptions retain their own authority. This source-review unit
-does not queue an experiment or claim blind cross-family convergence.
+Component selection follows the [October 6 upstream-evidence rule](2026-10-06-upstream-evidence-over-local-evaluation.md),
+integrated in canonical commit `79619936926576576e5d011eec19e3790e55f457`.
+That rule supersedes the older foundation-selection exceptions and local
+comparison gates. Published upstream quality determines these recommendations;
+installation, client wiring smoke checks and organic-use evidence establish
+their separate deployment status. Historical trial artifacts retain their
+original results and scope. This review does not change installed selections,
+consume sealed evidence, queue an experiment, claim blind cross-family
+convergence or finalize the separately owned catalog synthesis.
 
-The completeness critic identified these remaining specification gaps:
+The completeness critic identified these remaining specifications and evidence limits:
 
 1. Embedding, sparse-retrieval, reranking and generation model selections and
    exact revisions.
@@ -106,8 +110,9 @@ The completeness critic identified these remaining specification gaps:
    digests.
 3. Representative ingest/retrieve/rerank/generate/cite/evaluate/remember
    lifecycle, permission propagation, recovery, latency and complete cost.
-4. Independent matched comparative evaluation; the reviewed vendor benchmarks
-   use different data, configurations and metrics.
+4. The reviewed vendor benchmarks use different data, configurations and
+   metrics; no matched complete-application comparison was performed. This is
+   an evidence limit, not a prerequisite for these component recommendations.
 
 Those are next-sweep inputs, not tasks or installations authorized by this
 catalog entry. No local upstream suite or model benchmark was run for this

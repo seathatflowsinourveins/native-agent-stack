@@ -3,6 +3,11 @@
   "kind": "memory_rag_upstream_quality_review",
   "checked_at": "2026-10-07",
   "catalog_base_commit": "e712bae606e8d27f010af8e3c13ded6b7a7c207a",
+  "publication_policy": {
+    "source": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+    "commit": "79619936926576576e5d011eec19e3790e55f457",
+    "effect": "Upstream evidence selects foundation components. Installation, client wiring and organic-use evidence remain separate; the unrun comparative evaluations recorded below are evidence limits, not selection gates. This review changes no installed selection or historical trial artifact."
+  },
   "evidence_class": "source_review",
   "method": [
     "Authenticated read-only GitHub discovery found 366 starred repositories; 56 matched memory/retrieval-related names, descriptions or topics.",
@@ -458,7 +463,7 @@
       "Independent matched comparative evaluation; vendor benchmark methodologies differ."
     ],
     "next_landscape_sweep_inputs": [
-      "Evaluate model-layer choices on the intended corpus using maintained upstream harnesses when separately scoped.",
+      "Review model-layer releases, relevant published results and supported integrations; reserve corpus-level evaluation for separately scoped application behavior.",
       "Assess permission propagation and citation provenance across the complete document pipeline.",
       "Revisit changed release/CI evidence without treating later fixes as erasing the retained failure snapshots."
     ]

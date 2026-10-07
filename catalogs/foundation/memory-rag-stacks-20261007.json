@@ -3,6 +3,8 @@
   "kind": "memory_rag_source_stack_recommendations",
   "checked_at": "2026-10-07",
   "baseline_commit": "e712bae606e8d27f010af8e3c13ded6b7a7c207a",
+  "selection_policy": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+  "selection_policy_commit": "79619936926576576e5d011eec19e3790e55f457",
   "decision_record": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
   "evidence": "evidence/artifacts/memory-rag-stacks-20261007/review.json",
   "scope": "Final upstream-quality architectural recommendations by use case from the user's starred repositories and three explicitly identified additions. This bounded review supports research and engineering infrastructure; it does not qualify strategy, market data, execution or brokers.",
@@ -12,10 +14,10 @@
     "universal_sota_claim": false,
     "complete_stack_verified": false,
     "automatic_install_or_promotion": false,
-    "adoption_effect": "None. Existing deployment selections, manifests/stack.json pins, historical evidence and independently owned blind trials remain unchanged.",
+    "adoption_effect": "None. Existing deployed selections and manifests/stack.json pins are unchanged. Historical trial artifacts are preserved; foundation component-selection gates follow the October 6 upstream-evidence policy.",
     "catalog_synthesis_effect": "Additive dated input; does not finalize the separate 79-slot catalog consolidation or replace any owner's result.",
     "release_policy": "Observed upstream releases and reviewed default/develop branch commits are distinct. These records are not deployment lockfiles or accepted release artifacts.",
-    "source_review_policy": "Architecture selection is based on cited upstream engineering quality. Runtime qualification and representative comparative performance remain separate; no experiment is queued by this record."
+    "source_review_policy": "Architecture selection follows the October 6 upstream-evidence policy. Installation, client wiring smoke checks and organic-use evidence remain separate. Unrun local head-to-head comparisons do not gate these source recommendations; no experiment is queued by this record."
   },
   "stacks": [
     {
@@ -166,7 +168,7 @@
       "source_commit": "9269b88417ed263e5a8350f2e416ca2b322756b1",
       "observed_release": "v0.10.2",
       "recommendation": "Preferred general agent-memory architecture.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/0"
       ],
@@ -187,7 +189,7 @@
       "source_commit": "4d4f6f7d123d221195fb64775c796c4de1f81c3b",
       "observed_release": "v2.134.0",
       "recommendation": "Preferred structured document ingestion component for the modular stack.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/1"
       ],
@@ -208,7 +210,7 @@
       "source_commit": "234fc68f9c7bb7c156a5495f89b72d7aa27a907e",
       "observed_release": "v3.3.0",
       "recommendation": "Preferred explicit retrieval/pipeline orchestration for the modular stack.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/2"
       ],
@@ -228,7 +230,7 @@
       "source_commit": "016542aa5deb6c66380bb137badf73d54f742bde",
       "observed_release": "v1.19.2",
       "recommendation": "Preferred hybrid document-retrieval store for the modular stack.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/3"
       ],
@@ -248,7 +250,7 @@
       "source_commit": "f217a863ea3cbfcef7f9ab8217c543049bdff095",
       "observed_release": "2.2.92",
       "recommendation": "Preferred tracing/evaluation component, limited to explicitly tested metric integrations.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/4"
       ],
@@ -269,7 +271,7 @@
       "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
       "observed_release": "v2.6.0",
       "recommendation": "Preferred cross-client coding-continuity component on upstream engineering merits.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/5"
       ],
@@ -287,7 +289,7 @@
       "source_commit": "e71f23ecf40e473a3e0a49cff1ffebcccead384d",
       "observed_release": "v0.11.0",
       "recommendation": "Preferred lightweight structural code-context complement.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/6"
       ],
@@ -305,7 +307,7 @@
       "source_commit": "1e829bf7ddf1e34c4cc6713227f00422cee791cc",
       "observed_release": "v1.16.0",
       "recommendation": "Optional semantic code-context component when a distinct need justifies its infrastructure.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/7"
       ],
@@ -323,7 +325,7 @@
       "source_commit": "c93420c49a6b14c3d446bdb156d96811908fd90a",
       "observed_release": "ts-v3.3.1",
       "recommendation": "Preferred application personalization memory API/SDK.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/8"
       ],
@@ -343,7 +345,7 @@
       "source_commit": "cc72ecb0af18ade5d58f84d107af7cd59a88c39f",
       "observed_release": "v1.0.0-rc1",
       "recommendation": "Preferred packaged document-RAG capability; established and RC release lines need distinct qualification.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/9"
       ],
@@ -362,7 +364,7 @@
       "source_commit": "68dd959648704e0000b7bb070a699355bac11733",
       "observed_release": "v4.8.4",
       "recommendation": "Preferred packaged connected-workplace knowledge application.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/10"
       ],
@@ -382,7 +384,7 @@
       "observed_release": "v0.2.21",
       "recommendation": "Specialist for long text-document reasoning retrieval, not a general multimodal replacement.",
       "source_note": "The separate PageIndex-OSS-Benchmark repository-root locator is mutable; its reviewed revision was not retained.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/11"
       ],
@@ -400,7 +402,7 @@
       "source_commit": "8664e8b318a3ed651fe62dfcfddfb1f1d633d5be",
       "observed_release": "v1.4.2",
       "recommendation": "Specialist multimodal framework when image/table/equation retrieval is required.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/12"
       ],
@@ -418,7 +420,7 @@
       "source_commit": "87de989c5a18dc1f9fe2710cd60dbc48f1324527",
       "observed_release": "v0.4.23",
       "recommendation": "Alternative unified inspectable memory/knowledge/skills architecture.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/13"
       ],
@@ -436,7 +438,7 @@
       "source_commit": "b32d8afc59e1064d9291b9828a8a147be9cc8bab",
       "observed_release": "v1.6.2",
       "recommendation": "Specialist for explicit graph/ontology requirements.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/14"
       ],
@@ -454,7 +456,7 @@
       "source_commit": "007a1a7fe8646a03d8652eb0712400cc6f0fcca3",
       "observed_release": "v0.9.30",
       "recommendation": "Credible coding-memory challenger; retrieval-only metrics do not establish an end-to-end lead.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/15"
       ],
@@ -471,7 +473,7 @@
       "source_commit": "d439d1e6d01e2680d79fe3f5de5a336722cec779",
       "observed_release": "v3.10.0",
       "recommendation": "Credible local raw-memory retrieval challenger; tuned recall is not general QA superiority.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/16"
       ],
@@ -488,7 +490,7 @@
       "source_commit": "3535ff700da85134d1867e5eac1b649e8735e3af",
       "observed_release": "server-v0.0.8",
       "recommendation": "Product/integration alternative; public-source core parity remains unestablished.",
-      "scope": "Upstream architecture recommendation only; deployment selection, pins and blind trials are unchanged.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
       "evidence_refs": [
         "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/17"
       ],

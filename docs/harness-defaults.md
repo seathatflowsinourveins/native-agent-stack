@@ -1,5 +1,7 @@
 # Native harness defaults
 
+Foundation-component selection and readiness follow the [2026-10-06 upstream-evidence rule](decisions/2026-10-06-upstream-evidence-over-local-evaluation.md); local evaluation campaigns no longer select components or gate their readiness, while application checks, paper gates, CI and independent review retain their scope.
+
 Use native Codex and Claude as the general engineering harnesses. This policy applies to ordinary projects, research workers and harness maintenance; the trading architecture adds its own domain requirements. The [foundation catalog](../catalogs/foundation/README.md) is the maintained layer map. The [trading catalog](../catalogs/us-equities/README.md) records the separate IBKR, NautilusTrader and Alpaca destination. Neither catalog is a startup prompt or a universal ranking.
 
 ## Core rule

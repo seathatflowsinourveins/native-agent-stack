@@ -16498,8 +16498,8 @@
     },
     {
       "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
-      "sha256": "1e9bce94262eba4ad1f5148d448d41de2e116a1dba5e1e10963fe3d96bdca0ea",
-      "bytes": 28108
+      "sha256": "39bfffa1aaa476e1986d9d86a17b6f78b32e0daa626569a4a0a062ad4f481811",
+      "bytes": 28907
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -16533,7 +16533,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "34bfd46db3fb29d0a138f89b4045787a3f67a017c96bdfd001424c5f6de7a55d",
+      "sha256": "82fae20369f6c5219cf6111c22c8daea74068ac35cee210cc611e5efa7aa0d88",
       "bytes": 158923
     },
     {
@@ -17008,8 +17008,8 @@
     },
     {
       "path": "docs/acceptance-evidence-policy.md",
-      "sha256": "38ddfb80673ae86cad110a65a9cc938bb974d65a34bb9638b7a0f96d3e2ef508",
-      "bytes": 5820
+      "sha256": "1a7ce4aa3e05986f72d417f76ee7ae4f34dadee922156dc379ea26e3f625cce1",
+      "bytes": 6112
     },
     {
       "path": "docs/activation.md",
@@ -17103,8 +17103,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "1888656a0c4afcd630cb9fc861b05818de653e438bdb4780eaa91206380b401b",
-      "bytes": 15725
+      "sha256": "4bd71670734119bae382402efe7ca1180b0812e5c3c32f766e5d2c19fed5d57a",
+      "bytes": 15969
     },
     {
       "path": "docs/convergence-audit.md",
@@ -17588,8 +17588,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
-      "sha256": "9f1ddd367361a6f9c88b78d18e4f230b80935e966c9d1e3e91aacd578024c38e",
-      "bytes": 55486
+      "sha256": "b0d7fcee643cd6b29b37dc48025d8006c564c4657c1225e5d9df379265bfaa0f",
+      "bytes": 56929
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
@@ -17672,9 +17672,14 @@
       "bytes": 3898
     },
     {
+      "path": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+      "sha256": "396ad0e762f863854c36db4d971730ec21ce26c9462892428898aea8aa8c200a",
+      "bytes": 16404
+    },
+    {
       "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
-      "sha256": "4f2010fa516373142e95afea40e4a033e5176b1c75be4e17697c1ee27d69934a",
-      "bytes": 10624
+      "sha256": "e0643296a061ca8f368af2e1b9a9f1e25bada2af96991d54ef41f43016594680",
+      "bytes": 11070
     },
     {
       "path": "docs/direct-results.md",
@@ -17808,8 +17813,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "822f9ed7114c7017cfebc409e432498b8423c426023eef22dbc4b644c89fc9b4",
-      "bytes": 247278
+      "sha256": "d956ab78563864e8cc2513d391fe133bc9ef5cc88fb561f94c79adf4bec5abd1",
+      "bytes": 247602
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18053,8 +18058,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "9ce6b2d1710076871e97012ca084e29ec0ea919e1755a45733c7c6361638af49",
-      "bytes": 40805
+      "sha256": "9a70d0c313587f11cfc52a748b5106c521fce8970a34c2543322467f425a3e16",
+      "bytes": 41124
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -37338,8 +37343,8 @@
     },
     {
       "path": "evidence/artifacts/memory-rag-stacks-20261007/review.json",
-      "sha256": "1e83d642eb1b5cd95a722f4437a4ba86a93e28d932403aabdfa6d71f7601c84d",
-      "bytes": 24842
+      "sha256": "d398c747d4c36e6df97b798568ae1a183a50728ce44fcdb3227fe9719f9e4575",
+      "bytes": 25364
     },
     {
       "path": "evidence/artifacts/memory-stack-20260925/README.md",
