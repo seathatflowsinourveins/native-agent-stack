@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "id": "codex-organic-oracle-controls-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Pinned Codex prototype plus explicit supplied-record control classification; meaningful fixtures cover directed/smoke/first/named-turn exclusions and scoped native-ID/window/dedup cases. No native organic counts, readiness or adoption result.",
+  "limitations": [
+    "Fixture and source consistency only, not upstream acceptance, actual native use, a working-day report or final organic protocol qualification.",
+    "Control references and completeness remain producer declarations; actual owner sources and retained native context must be verified before reporting organic counts.",
+    "Unsupported native call formats and missing provenance/IDs/time remain unknown; known non-call variants are separate.",
+    "Skill-read attempts remain attempts; per-tool attribution may overlap and must not be summed as unique calls.",
+    "Claude's actual provenance, independent cross-family observation and command-center review remain pending. Original prototype/old fixture bindings are retained."
+  ],
+  "source_files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/organic-counter-20261007/upstream-contract.json"
+    },
+    {
+      "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json"
+    }
+  ],
+  "prior_snapshot": {
+    "source_commit": "7d20f02732f85ede3521f324efd4a11c5d250413",
+    "manifest_path": "tools/invocation-monitoring/codex-counter-prototype-manifest.json",
+    "counter_sha256": "d44d5ea4dcb9cf3c69f606fc25aba847084d593597025f853d76d67528d46eec",
+    "test_sha256": "519e9f54bc9e0c901aae97865abbb62c9516a0537337c968068a484f91e5ac5a",
+    "scope": "Original unchanged prototype and three baseline fixtures; snapshot is historical after this implementation."
+  },
+  "checks": [
+    {
+      "id": "prototype-baseline",
+      "evidence_class": "synthetic",
+      "exit_code": 0,
+      "tests": 3,
+      "duration_seconds": 0.007,
+      "output_sha256": "27c4a39d34ece4cbc66cc59cb0870c7abe4cc0a5f009205bdd0ea06a93f8b3ac"
+    },
+    {
+      "id": "initial-controls",
+      "evidence_class": "synthetic",
+      "exit_code": 1,
+      "tests": 23,
+      "duration_seconds": 3.508,
+      "failures": 1,
+      "failed_condition": "ToolSearch unsupported record lost unknown status.",
+      "output_sha256": "89759c9a395eb319840c31f957a90940709ce3a5074886b32adfdea8fb836d67"
+    },
+    {
+      "id": "first-controls-repair",
+      "evidence_class": "synthetic",
+      "exit_code": 0,
+      "tests": 29,
+      "duration_seconds": 4.434,
+      "output_sha256": "cae1e116a5bd390eb929721cc0fc8ea6e2a8d91cb21116f6218e06e9024b1fc0"
+    },
+    {
+      "id": "source-counterexamples-before-guard",
+      "evidence_class": "synthetic",
+      "exit_code": 1,
+      "tests": 32,
+      "duration_seconds": 5.585,
+      "failing_subcases": 9,
+      "failed_conditions": [
+        "Original request timestamp beyond upper window bound.",
+        "Same-owner split-file response/completion alias double count.",
+        "Seven unsupported completion variants disappearing into known zero."
+      ],
+      "output_sha256": "e69ee2d3f9c329d885f0be02e98ccdb53ba71ed01133676d5eea19c1da95ea12"
+    },
+    {
+      "id": "final-focused-controls",
+      "evidence_class": "synthetic",
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 TMPDIR=<owned-external-cache> nice -n 19 ionice -c3 python3 -m unittest discover -s tools/invocation-monitoring -p test_codex_counter.py -v",
+      "exit_code": 0,
+      "tests": 34,
+      "duration_seconds": 5.804,
+      "output_sha256": "6c1b026e1485a912e0431c39b67a9dc608e74c1f433ce48eb77487ed507718e2"
+    }
+  ],
+  "review": {
+    "same_family_source_critic": {
+      "status": "completed",
+      "scoped_remaining_findings": 0,
+      "evidence_class": "source_review",
+      "checked": [
+        "Owner-global original identity/result joining across retained streams.",
+        "Original model-call bounds and inverted chronology.",
+        "Unsupported completed native kinds unknown.",
+        "RFC6901 escape syntax.",
+        "Three baseline fixture bodies unchanged."
+      ]
+    },
+    "independent_cross_family": "pending",
+    "command_center": "pending"
+  },
+  "native_counts": null,
+  "organic_verdict": null,
+  "adoption_status": "not_established",
+  "synthesis_status": "pending_source",
+  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "pin": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "tag": "rust-v0.160.1",
+      "path": "codex-rs/protocol/src/models.rs",
+      "lines": "1061-1155"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "a40a083172af588f4b97646db87dfc8ef3c0b60e",
+      "path": "tools/skill-usage/skill_usage.py",
+      "lines": "1314-1655"
+    }
+  ]
+}

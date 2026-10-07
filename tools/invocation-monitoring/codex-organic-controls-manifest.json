@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "codex-organic-controls-source-20261007",
+  "kind": "source_snapshot",
+  "evidence_class": "source_review",
+  "control_schema": "codex-organic-control-input/1",
+  "result_schema": "codex-organic-controls/1",
+  "status": "fixture_controls_verified_native_measurement_pending",
+  "files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40"
+    }
+  ],
+  "prior_snapshot": {
+    "source_commit": "7d20f02732f85ede3521f324efd4a11c5d250413",
+    "manifest_path": "tools/invocation-monitoring/codex-counter-prototype-manifest.json",
+    "counter_sha256": "d44d5ea4dcb9cf3c69f606fc25aba847084d593597025f853d76d67528d46eec",
+    "test_sha256": "519e9f54bc9e0c901aae97865abbb62c9516a0537337c968068a484f91e5ac5a",
+    "scope": "Original unchanged prototype and three baseline fixtures; snapshot is historical after this implementation."
+  },
+  "controls": [
+    "Explicit requested/smoke flags and producer provenance; absence is unknown.",
+    "First native turns from complete owner history, plus relaunch masks, across tool classes.",
+    "Complete per-tool named-turn masks, late context, referenced context and parent/root attribution.",
+    "Full original streams joined per native owner before maintained native ledger, identity/window/dedup and masks.",
+    "Original response aliases and outcomes across split sources; missing ID/time/unsupported native call forms remain unknown."
+  ],
+  "reference_boundary": "CanonicalRef shape declarations are not external hash resolution or original-context truth proof. Actual publication counts need the matching owner-controlled native evidence.",
+  "historical_fixture_binding": {
+    "code_sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
+    "test_sha256": "1c88c483bf50c4b12658aa43fec806060c557dda1215178c3e2dff1feb75a86e",
+    "applies_to_current_code": false,
+    "scope": "Original artifact and its result remain historical; neither was rewritten."
+  },
+  "native_measurement": {
+    "counts": null,
+    "qualification": null,
+    "claude_scope": "Not implemented by this Codex code unit; equivalent Claude provenance remains separate."
+  },
+  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md"
+}

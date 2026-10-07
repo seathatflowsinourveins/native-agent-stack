@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "codex01601-organic-oracle-source-contract-20261007",
+  "evidence_class": "source_review",
+  "source_repository": "https://github.com/openai/codex",
+  "source_tag": "rust-v0.160.1",
+  "source_commit": "d27764b82f7118f674371e6d6e76271d9d606edb",
+  "release": {
+    "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.1",
+    "published_at": "2026-10-05T18:29:37Z",
+    "prerelease": false,
+    "draft": false
+  },
+  "installed_observation": {
+    "command": "codex --version",
+    "exit_code": 0,
+    "output": "codex-cli 0.160.1",
+    "class": "local_integration",
+    "scope": "Version only; no tool invocation or organic measurement."
+  },
+  "sources": [
+    {
+      "path": "codex-rs/protocol/src/models.rs",
+      "blob_sha": "318a4faa3df0d840fedcfecbea4cba4ca81096d3",
+      "lines": "1061-1155",
+      "facts": [
+        "FunctionCall has required call_id, optional response-item id and namespace, and arguments as a JSON string.",
+        "CustomToolCall has required call_id/name/input and optional id/namespace.",
+        "FunctionCallOutput has optional call_id/id/name/namespace; its wire output supports text or structured content.",
+        "LocalShellCall preserves legacy id and optional call_id; missing both cannot establish identity.",
+        "ToolSearchCall has optional id/call_id and its own native variant; unsupported normalization remains unknown rather than zero."
+      ]
+    },
+    {
+      "path": "codex-rs/protocol/src/protocol.rs",
+      "blob_sha": "abc4e90847636bfe51e6275ede528a13616c8573",
+      "lines": "1408,1417,1948-1960,2179-2184,2667-2737,3301-3307",
+      "facts": [
+        "ItemCompleted binds thread_id,turn_id,item and optional timing.",
+        "TurnStarted binds turn_id and optional root turn; turn context can retain optional turn/root IDs.",
+        "MCP begin/end expose call_id and defaulted turn strings; an empty turn is unresolved."
+      ]
+    },
+    {
+      "path": "codex-rs/protocol/src/items.rs",
+      "lines": "42-78",
+      "facts": [
+        "Native tagged TurnItem includes command,MCP,dynamic,collaboration,web,image,extension andfile-change variants.",
+        "Known non-call messages/plans/reasoning/compaction may be ignored; unsupported invocation variants must remain unknown rather than disappear into a zero."
+      ],
+      "blob_sha": "0ba13300f894192b3629ae026b976f476d4a90db"
+    },
+    {
+      "path": "codex-rs/history/src/lib.rs",
+      "blob_sha": "090ca9178216f64b4f2815eedc716d6cc45da582",
+      "lines": "51-90,199-247,346-355",
+      "facts": [
+        "ResponseItemEnvelope keeps the native item and separate optional harness metadata.",
+        "RolloutLine contains timestamp, optional ordinal and a flattened item.",
+        "Optional retained-source metadata can support context provenance; it is not user authorization and is never assumed present or complete."
+      ]
+    },
+    {
+      "path": "codex-rs/history/src/rollout_payload.rs",
+      "blob_sha": "d740430a190e5a67c7b06333d95d96e89a0bbdb7",
+      "lines": "30-68",
+      "facts": [
+        "Snake-case tagged wire items keep payload for session_meta,response_item,turn_context,event_msg.",
+        "Response-item metadata is separate and optional; the payload remains the actual ResponseItem."
+      ]
+    },
+    {
+      "path": "codex-rs/rollout/src/recorder.rs",
+      "blob_sha": "cd05f6149b3d0ff97addf43ec243b7452a9de343",
+      "lines": "2061-2092",
+      "facts": [
+        "The native writer emits UTC timestamps, optional ordinals and flattened serialized items followed by a newline."
+      ]
+    }
+  ],
+  "limitations": [
+    "Primary source review, not execution, parser acceptance or native organic observation.",
+    "No original client transcript, state database, native IDs, credentials or active configuration read.",
+    "Earlier guessed core/src/rollout/recorder.rs and core/src/rollout directory returned404; scoped directory discovery located the separate rollout/history crates. The404 was not treated as capability absence.",
+    "Control fixtures and actual retained native provenance remain separate evidence classes."
+  ]
+}
