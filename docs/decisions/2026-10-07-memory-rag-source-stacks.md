@@ -123,3 +123,106 @@ compatibility gap, independent matched result, or simpler architecture meeting
 the same requirements changes the evidence. Preserve this dated record when
 superseding it. Recommendations, observed upstream quality and runtime
 qualification remain separate fields.
+
+
+## Amendment (2026-10-07): proposed status and source provenance
+
+**Status:** proposed source-review recommendation record; not an accepted host
+memory-owner decision.
+
+The current title and interpretation are **Memory and RAG: proposed source-review
+architecture recommendations**. The preceding decided text and original
+[review observations](../../evidence/artifacts/memory-rag-stacks-20261007/review.json)
+are preserved. This dated amendment qualifies how their recommendation wording,
+including "final," "use," and "wins," is consumed; it does not turn the recorded
+observations into new runtime results.
+
+**Recommendation:** consider the five architectures as proposed stacks for their
+named workloads. These are proposed architectures from a completed bounded
+source review. Their source-review rationale and hypothetical component roles
+are captured in the [current catalog](../../catalogs/foundation/memory-rag-stacks-20261007.json),
+with `recommendation_status = proposed_source_review`. This record supplies
+inputs to MEMORY-SCREEN. It preselects no memory-h2h winner, replaces no
+independently owned measurement, and selects no memory owner for this host.
+
+The [October 6 upstream-evidence rule](2026-10-06-upstream-evidence-over-local-evaluation.md)
+at `79619936926576576e5d011eec19e3790e55f457` remains the original review's
+accurate policy citation. The later, separately directed memory screen and
+head-to-head consume this source-review input; this amendment does not assert
+that the superseded general selection gates are current. It queues or resumes
+no experiment and changes no installed selection. The five proposed workload
+profiles and all 18 repository identities, conditional dispositions and inspected
+pins remain. A separately owned memory-h2h result is an explicit possible
+reason to overturn a proposal, alongside the original upstream regression,
+compatibility, independent matched-result and simpler-architecture conditions.
+That comparison and any host-owner decision belong to their own records.
+
+### Review-scoped execution states and test actor
+
+The [new qualification record](../../evidence/artifacts/memory-rag-stacks-20261007-followup/source-qualification.json)
+separately records `installation = not_performed_in_this_review`,
+`client_smoke = not_performed_in_this_review`, and
+`organic_use = not_observed_in_this_review`. These describe this bounded source
+review, not whether a component was exercised in another unit.
+
+The original references to tested stores, SDK checks and "directly tested"
+evaluation integrations refer to the upstream CI observed by the original
+review at its named revisions. In particular, Opik is proposed for traces,
+datasets and upstream-tested evaluation integrations; none was executed in this
+review. Its recorded failing integrations remain limitations. Installation,
+native-client smoke, organic observation and complete-stack execution remain
+unperformed here. A schema, reference or hash check is structural validation,
+not runtime acceptance; whole-task provider usage and net token savings remain
+unknown.
+
+### Newly dated PageIndex benchmark source check
+
+The earlier separate benchmark revision remains unrecovered in the explicitly
+checked retained materials. Its historical mutable locator and recorded
+observations are unchanged; no revision is backfilled into the old review.
+A new primary check on 2026-10-07 read
+[VectifyAI/PageIndex-OSS-Benchmark@ad4c0b92970a6f4801f09ff2e647389e8f5874fa:README.md](https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L6-L15)
+at 2026-10-07T12:10:27Z. The checked README is 4,448 bytes, sha256
+`2e8ec68a46b5b5f44e12d8cc1b214e888a71c9fc134c3483902fcb15c755d187`.
+The maintainer describes 62 questions over 34 PDFs, scoped to running-text facts,
+excluding charts, tables, figures, counting and arithmetic, and excluding
+documents the local indexing path refuses. These are newly inspected vendor
+scope and ingest-selection claims, not independently validated dataset contents,
+a new run or a ranking. The pinned README's inventory also
+[lists the question and PDF counts](https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L22-L23).
+
+This source observation does not establish what the original review inspected.
+A release tag for the benchmark was not checked, and compatibility with the
+separately pinned PageIndex implementation at
+`6d23caf416858f2ca136840305d1f479a86f6ef7` remains unverified. No comparative
+superiority, current-model performance, installation or native-client capture
+claim follows from this check.
+
+### Direct inspected component pins
+
+These immutable file locators make the original 18 component pins directly
+available from the decision record. They are source-review pins, not accepted
+deployment locks or a claim that the listed workflows passed at those revisions.
+The original review retains its release-versus-branch distinction, observed CI
+failures and methodological limits.
+
+| Repository | Original inspected commit | Immutable source locator |
+| --- | --- | --- |
+| vectorize-io/hindsight | `9269b88417ed263e5a8350f2e416ca2b322756b1` | [.github/workflows/test.yml](https://github.com/vectorize-io/hindsight/blob/9269b88417ed263e5a8350f2e416ca2b322756b1/.github/workflows/test.yml) |
+| docling-project/docling | `4d4f6f7d123d221195fb64775c796c4de1f81c3b` | [.github/workflows/checks.yml](https://github.com/docling-project/docling/blob/4d4f6f7d123d221195fb64775c796c4de1f81c3b/.github/workflows/checks.yml) |
+| deepset-ai/haystack | `234fc68f9c7bb7c156a5495f89b72d7aa27a907e` | [.github/workflows/tests.yml](https://github.com/deepset-ai/haystack/blob/234fc68f9c7bb7c156a5495f89b72d7aa27a907e/.github/workflows/tests.yml) |
+| qdrant/qdrant | `016542aa5deb6c66380bb137badf73d54f742bde` | [.github/workflows/integration-tests.yml](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/.github/workflows/integration-tests.yml) |
+| comet-ml/opik | `f217a863ea3cbfcef7f9ab8217c543049bdff095` | [.github/workflows/lib-haystack-tests.yml](https://github.com/comet-ml/opik/blob/f217a863ea3cbfcef7f9ab8217c543049bdff095/.github/workflows/lib-haystack-tests.yml) |
+| akitaonrails/ai-memory | `89bd8ded3c1ab8b769cf99417d038ed0364403c8` | [docs/ARCHITECTURE.md](https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/docs/ARCHITECTURE.md) |
+| DeusData/codebase-memory-mcp | `e71f23ecf40e473a3e0a49cff1ffebcccead384d` | [.github/workflows/_test.yml](https://github.com/DeusData/codebase-memory-mcp/blob/e71f23ecf40e473a3e0a49cff1ffebcccead384d/.github/workflows/_test.yml) |
+| giancarloerra/SocratiCode | `1e829bf7ddf1e34c4cc6713227f00422cee791cc` | [.github/workflows/ci.yml](https://github.com/giancarloerra/SocratiCode/blob/1e829bf7ddf1e34c4cc6713227f00422cee791cc/.github/workflows/ci.yml) |
+| mem0ai/mem0 | `c93420c49a6b14c3d446bdb156d96811908fd90a` | [README.md](https://github.com/mem0ai/mem0/blob/c93420c49a6b14c3d446bdb156d96811908fd90a/README.md) |
+| infiniflow/ragflow | `cc72ecb0af18ade5d58f84d107af7cd59a88c39f` | [.github/workflows/sep-tests.yml](https://github.com/infiniflow/ragflow/blob/cc72ecb0af18ade5d58f84d107af7cd59a88c39f/.github/workflows/sep-tests.yml) |
+| onyx-dot-app/onyx | `68dd959648704e0000b7bb070a699355bac11733` | [README.md](https://github.com/onyx-dot-app/onyx/blob/68dd959648704e0000b7bb070a699355bac11733/README.md) |
+| VectifyAI/PageIndex | `6d23caf416858f2ca136840305d1f479a86f6ef7` | [.github/workflows/tests.yml](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/.github/workflows/tests.yml) |
+| HKUDS/RAG-Anything | `8664e8b318a3ed651fe62dfcfddfb1f1d633d5be` | [.github/workflows/test.yaml](https://github.com/HKUDS/RAG-Anything/blob/8664e8b318a3ed651fe62dfcfddfb1f1d633d5be/.github/workflows/test.yaml) |
+| volcengine/OpenViking | `87de989c5a18dc1f9fe2710cd60dbc48f1324527` | [README.md](https://github.com/volcengine/OpenViking/blob/87de989c5a18dc1f9fe2710cd60dbc48f1324527/README.md) |
+| topoteretes/cognee | `b32d8afc59e1064d9291b9828a8a147be9cc8bab` | [README.md](https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/README.md) |
+| rohitg00/agentmemory | `007a1a7fe8646a03d8652eb0712400cc6f0fcca3` | [benchmark/LONGMEMEVAL.md](https://github.com/rohitg00/agentmemory/blob/007a1a7fe8646a03d8652eb0712400cc6f0fcca3/benchmark/LONGMEMEVAL.md) |
+| MemPalace/mempalace | `d439d1e6d01e2680d79fe3f5de5a336722cec779` | [benchmarks/BENCHMARKS.md](https://github.com/MemPalace/mempalace/blob/d439d1e6d01e2680d79fe3f5de5a336722cec779/benchmarks/BENCHMARKS.md) |
+| supermemoryai/supermemory | `3535ff700da85134d1867e5eac1b649e8735e3af` | [apps/mcp/src/server/client/index.ts](https://github.com/supermemoryai/supermemory/blob/3535ff700da85134d1867e5eac1b649e8735e3af/apps/mcp/src/server/client/index.ts) |

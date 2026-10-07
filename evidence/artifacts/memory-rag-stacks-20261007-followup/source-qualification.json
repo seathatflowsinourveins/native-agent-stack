@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "kind": "memory_rag_source_review_qualification",
+  "checked_at": "2026-10-07T12:25:57.234878Z",
+  "evidence_class": "source_review",
+  "status": "proposed_source_review",
+  "prior_record": {
+    "catalog": "catalogs/foundation/memory-rag-stacks-20261007.json",
+    "decision": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+    "historical_review": "evidence/artifacts/memory-rag-stacks-20261007/review.json",
+    "historical_review_sha256": "d398c747d4c36e6df97b798568ae1a183a50728ce44fcdb3227fe9719f9e4575",
+    "historical_review_bytes": 25364,
+    "historical_observations": "unchanged; this new record qualifies their consumption"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "P2",
+      "resolution": "The five architectures, their roles and all eighteen repository recommendations are proposed source-review inputs to MEMORY-SCREEN. They preselect no memory-h2h winner, replace no independently owned measurement and select no host memory owner."
+    },
+    {
+      "id": "F2",
+      "severity": "P2",
+      "resolution": "The earlier separate benchmark revision remains unrecovered in the checked retained materials. The source check below is newly dated and pinned, not a retroactive attribution. The decision amendment links all eighteen original inspected component pins directly."
+    },
+    {
+      "id": "F3",
+      "severity": "P3",
+      "resolution": "Review-scoped installation and native-client smoke were not performed; organic use was not observed. Opik's tested-integration wording refers to the upstream CI observed by the original review, not to host execution."
+    }
+  ],
+  "review_scoped_states": {
+    "installation": "not_performed_in_this_review",
+    "client_smoke": "not_performed_in_this_review",
+    "organic_use": "not_observed_in_this_review",
+    "complete_stack_execution": "not_performed_in_this_review",
+    "new_model_or_benchmark_run": "not_performed_in_this_review",
+    "provider_usage": null,
+    "net_token_savings": null
+  },
+  "policy_boundary": {
+    "original_policy": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+    "original_policy_commit": "79619936926576576e5d011eec19e3790e55f457",
+    "current_consumption": "The separately directed memory screen and head-to-head consume this bounded source input. This record authorizes, queues and resumes no experiment.",
+    "historical_preservation": "The original review and decided text remain unchanged. The dated decision amendment and current catalog carry this qualification."
+  },
+  "pageindex_benchmark": {
+    "source_check_actor": "memory-h2h; primary source inspection, no dataset or model run",
+    "source_check_state": "NEW_DATED_PRIMARY_SOURCE_REVIEW_NOT_HISTORICAL_PIN_RECOVERY",
+    "source_check_observed_at": "2026-10-07T12:12:22Z",
+    "repository": "VectifyAI/PageIndex-OSS-Benchmark",
+    "historical_revision_recovered": false,
+    "historical_revision_limit": "Not recovered in the explicitly checked retained materials; this is not a claim that every private source location was searched.",
+    "commit": "ad4c0b92970a6f4801f09ff2e647389e8f5874fa",
+    "commit_api": "https://api.github.com/repos/VectifyAI/PageIndex-OSS-Benchmark/commits/HEAD",
+    "commit_read_at": "2026-10-07T12:09:51Z",
+    "commit_api_exit_code": 0,
+    "readme": {
+      "path": "README.md",
+      "immutable_url": "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md",
+      "api": "https://api.github.com/repos/VectifyAI/PageIndex-OSS-Benchmark/contents/README.md?ref=ad4c0b92970a6f4801f09ff2e647389e8f5874fa",
+      "read_at": "2026-10-07T12:10:27Z",
+      "api_exit_code": 0,
+      "git_blob": "8b8dfe4da5d7146e3747ec7ae015a9b0257dde07",
+      "bytes": 4448,
+      "sha256": "2e8ec68a46b5b5f44e12d8cc1b214e888a71c9fc134c3483902fcb15c755d187"
+    },
+    "claims": [
+      {
+        "claim": "The maintainer says the bounded set contains 62 questions over 34 PDFs.",
+        "source": "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L6",
+        "classification": "vendor_published_dataset_description_not_independent_data_validation"
+      },
+      {
+        "claim": "The maintainer limits questions to running-text facts, excluding charts, tables, figures, counting and arithmetic.",
+        "source": "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L8",
+        "classification": "vendor_published_scope"
+      },
+      {
+        "claim": "The maintainer says documents were checked for indexing under flash and refused documents were excluded.",
+        "source": "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L13-L14",
+        "classification": "vendor_published_ingest_selection"
+      },
+      {
+        "claim": "The README file inventory lists 34 source PDFs and 62 questions with reference answers and provenance.",
+        "source": "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L22-L23",
+        "classification": "vendor_published_inventory"
+      }
+    ],
+    "maturity": {
+      "current_ref": "HEAD observed via the repository's own GitHub commit API",
+      "release_tag": "unverified_not_queried",
+      "core_pageindex_version_compatibility": "unverified; PageIndex's own v0.2.21 pin does not prove this separate benchmark ran against that version"
+    },
+    "limits": [
+      "The newly checked README describes the maintainer's 62-question/34-PDF text-only set and exclusion rules; dataset contents and successful ingestion were not independently validated.",
+      "The PageIndex implementation pin is separate from the benchmark pin. Compatibility with PageIndex v0.2.21 is unverified.",
+      "No ranking, comparative superiority, current-model performance, installation, native-client capture or adoption is inferred.",
+      "Today's source observation cannot recover what the earlier review inspected, even when the observed commit predates that review."
+    ],
+    "primary_read_accounting": {
+      "cached_commit_reads": 1,
+      "pinned_readme_reads": 1,
+      "dataset_downloads": 0,
+      "model_runs": 0,
+      "benchmark_runs": 0
+    }
+  },
+  "followup_operations": {
+    "installs": 0,
+    "client_changes": 0,
+    "store_changes": 0,
+    "new_runtime_tests": 0
+  },
+  "completeness": {
+    "component_identities": 18,
+    "component_source_pins": "unchanged in the catalog; direct immutable locators in the dated decision amendment",
+    "architecture_profiles": 5,
+    "complete_composition_verified": false,
+    "unresolved": "Current model identities, matched complete-application quality, package/image locks, full lifecycle, cost and native integration remain outside this source-only qualification."
+  }
+}

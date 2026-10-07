@@ -7,11 +7,15 @@ read its scoped capability decision in [decisions.json](decisions.json). A defau
 is a selected way to do a task, not permission to install or activate every tool.
 
 The [October 7 memory/RAG architecture recommendations](../../docs/decisions/2026-10-07-memory-rag-source-stacks.md)
-give five final upstream-quality stacks by workload, with an
+give five proposed source-review architectures by workload, with an
 [18-repository source review](../../evidence/artifacts/memory-rag-stacks-20261007/review.json)
 and [machine-readable recommendations](memory-rag-stacks-20261007.json).
-They distinguish recommended architectures from deployment qualification and
-preserve current selections, historical evidence and independently owned trials.
+The [dated qualification](../../evidence/artifacts/memory-rag-stacks-20261007-followup/README.md)
+makes their scope explicit: they supply inputs to MEMORY-SCREEN, preselect no
+memory-h2h winner and select no memory owner for this host. Installation and
+client smoke were not performed, and organic use was not observed, by that review.
+Current selections, historical evidence and independently owned trials remain
+separate from these proposals.
 
 The [October 2 two-host architecture decision](../../docs/decisions/2026-10-02-two-host-north-star-architecture.md)
 reconciles the macOS/workstation roles, current native Sol policy, SDK/gateway
