@@ -15,6 +15,10 @@ from __future__ import annotations
 import argparse
 import copy
 import hashlib
+import ipaddress
+import pathlib
+import socket
+import urllib.parse
 import importlib.metadata
 import json
 import math
@@ -26,6 +30,273 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import urlsplit
+
+# --- host-gateway contract v2 (identical in every holder; tests/test_host_gateway_contract.py) ---
+# needs (stdlib, Python >= 3.9): argparse, hashlib, ipaddress, json, os, pathlib, socket, sys, urllib.parse;
+# tomllib (3.11+) and pwd are imported lazily, inside the functions that need them
+HOST_GATEWAY_SCHEMA = "native-agent-stack/host-gateway/v1"
+HOST_GATEWAY_RECORD = ".config/agent-stack-host/gateway.json"  # under the passwd home; never $HOME or XDG
+HOST_GATEWAY_WRITER = "tools/omniroute/host_gateway.py write"
+HOST_GATEWAY_OVERRIDE = "--unrecorded-gateway-reason"
+LOOPBACK_NO_PROXY = ("127.0.0.1", "localhost", "::1")
+ENDPOINT_OVERRIDE_KEYS = frozenset({"openai_base_url", "chatgpt_base_url", "model_provider", "model_providers",
+                                    "profile", "profiles"})  # Codex's own endpoint denylist
+CODEX_ENDPOINT_KEYS = ("base_url", "openai_base_url", "chatgpt_base_url")  # a loopback value under these is a route
+_RECORD_WHERE = f"the passwd home's {HOST_GATEWAY_RECORD} (not $HOME)"
+_OVERRIDE_FIX = f"pass the gateway flag together with {HOST_GATEWAY_OVERRIDE} TEXT"
+
+
+class GatewayRefused(ValueError):
+    """No endpoint may be used; the message says what was checked and what to run."""
+
+
+def gateway_endpoint(value):
+    """The one shape contract: exactly http://127.0.0.1:<port>/v1 (a trailing slash is dropped)."""
+    if isinstance(value, str) and "${" in value:
+        raise GatewayRefused(f"{value!r} is an unexpanded variable; set it, or leave it empty for this host's record")
+    try:
+        parts = urllib.parse.urlsplit(value.strip())
+        port = parts.port
+        ok = (parts.scheme == "http" and port is not None and port > 0 and parts.netloc == f"127.0.0.1:{port}"
+              and not parts.query and not parts.fragment and parts.path.rstrip("/") == "/v1")
+    except (AttributeError, TypeError, ValueError):
+        ok = False
+    if not ok:
+        raise GatewayRefused(f"{value!r} is not a gateway endpoint; write it as http://127.0.0.1:<port>/v1")
+    return f"http://127.0.0.1:{port}/v1"
+
+
+def loopback_port(value):
+    """The port of an http(s) URL whose host is any loopback or unspecified spelling; otherwise None."""
+    try:
+        parts = urllib.parse.urlsplit(value.strip())
+        port, host = parts.port, (parts.hostname or "").rstrip(".")
+        if parts.scheme not in ("http", "https") or port is None or not host:
+            return None
+        if host == "localhost" or host.endswith(".localhost"):
+            return port
+        try:
+            address = ipaddress.ip_address(host)
+        except ValueError:
+            address = ipaddress.ip_address(socket.inet_aton(host))  # short IPv4 forms such as 127.1
+        address = getattr(address, "ipv4_mapped", None) or address
+        return port if address.is_loopback or address.is_unspecified else None
+    except (AttributeError, OSError, TypeError, ValueError):
+        return None
+
+
+def installation_id():
+    """sha256 of this installation's /etc/machine-id (machine-id(5): 32 lowercase hex digits). There is no default."""
+    try:
+        text = pathlib.Path("/etc/machine-id").read_text(encoding="ascii").strip()
+    except (OSError, UnicodeDecodeError) as error:
+        raise GatewayRefused(f"/etc/machine-id cannot be read here ({type(error).__name__}), so no host gateway "
+                             f"record can be bound to this installation; {_OVERRIDE_FIX}") from None
+    if len(text) != 32 or text.strip("0123456789abcdef") or not text.strip("0"):
+        raise GatewayRefused(f"/etc/machine-id is not a 32-digit lowercase hex id; {_OVERRIDE_FIX}")
+    return hashlib.sha256(text.encode("ascii")).hexdigest()
+
+
+def recorded_gateway():
+    """This host's own gateway, as its writer recorded it. There is no default."""
+    try:
+        import pwd
+    except ImportError:
+        raise GatewayRefused(f"this platform has no passwd database and so no host gateway record; "
+                             f"{_OVERRIDE_FIX}") from None
+    try:
+        home = pathlib.Path(pwd.getpwuid(os.getuid()).pw_dir)
+    except KeyError:
+        raise GatewayRefused("this uid has no passwd entry in this context (a user namespace or container); "
+                             f"{_OVERRIDE_FIX}") from None
+    try:
+        text = (home / HOST_GATEWAY_RECORD).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        try:
+            visible = home.is_dir()
+        except OSError:
+            visible = False
+        if not visible:
+            raise GatewayRefused("the passwd home is not visible in this context (a sandbox); run outside it, "
+                                 f"or {_OVERRIDE_FIX}") from None
+        raise GatewayRefused(f"no host gateway record at {_RECORD_WHERE}. If this host runs a gateway: python3 "
+                             f"<checkout>/{HOST_GATEWAY_WRITER} --port <PORT> --unit <UNIT>. If it has none: "
+                             f"{_OVERRIDE_FIX}") from None
+    except OSError as error:
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} exists but cannot be read here "
+                             f"({error.strerror}); run outside the sandbox, or {_OVERRIDE_FIX}") from None
+    try:
+        record = json.loads(text)
+        host, endpoint, machine = record["host"], record["endpoint"], record["machine_id_sha256"]
+        if (record.get("schema") != HOST_GATEWAY_SCHEMA or not isinstance(host, str) or not isinstance(endpoint, str)
+                or not isinstance(machine, str) or len(machine) != 64 or machine.strip("0123456789abcdef")):
+            raise ValueError  # a missing, null, empty or malformed machine_id_sha256 is malformed
+    except (AttributeError, KeyError, TypeError, ValueError):
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} is malformed or has another schema; "
+                             f"rewrite it: python3 <checkout>/{HOST_GATEWAY_WRITER} --replace --port <PORT>") from None
+    if host != socket.gethostname():
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} was written under another host name; "
+                             f"if this host runs a gateway: python3 <checkout>/{HOST_GATEWAY_WRITER} --replace "
+                             "--port <PORT>")
+    if machine != installation_id():  # installation_id() refuses when this installation's machine id cannot be read
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} was written by another installation "
+                             f"(the machine id differs); python3 <checkout>/{HOST_GATEWAY_WRITER} --replace "
+                             "--port <PORT>")
+    try:
+        return gateway_endpoint(endpoint)
+    except GatewayRefused:
+        raise GatewayRefused(f"the host gateway record at {_RECORD_WHERE} names an endpoint outside the "
+                             "contract") from None
+
+
+def resolve_gateway(explicit, reason, variables):
+    """The rule. Returns {endpoint, source, reason} or raises GatewayRefused."""
+    explicit = explicit if isinstance(explicit, str) and explicit.strip() else None  # empty means no flag
+    if explicit is not None:
+        explicit = gateway_endpoint(explicit)
+    if reason is not None:
+        if explicit is None or not reason.strip():
+            raise GatewayRefused(f"{HOST_GATEWAY_OVERRIDE} needs an explicit gateway and a non-blank reason")
+        return {"endpoint": explicit, "source": "unrecorded", "reason": reason.strip()}
+    recorded = recorded_gateway()
+    if explicit is not None and explicit != recorded:
+        raise GatewayRefused(f"{explicit} is not this host's recorded gateway ({recorded}); to use it "
+                             f"deliberately add {HOST_GATEWAY_OVERRIDE} TEXT")
+    port = urllib.parse.urlsplit(recorded).port
+    for name in variables:
+        found = loopback_port(os.environ.get(name) or "")
+        if found is not None and found != port:
+            raise GatewayRefused(f"{name} names a loopback gateway on port {found}, not this host's recorded "
+                                 f"gateway ({recorded}); unset it (env -u {name} ...), or pass the gateway "
+                                 f"explicitly with {HOST_GATEWAY_OVERRIDE} TEXT")
+    return {"endpoint": recorded, "source": "host-record", "reason": None}
+
+
+def _toml():
+    try:
+        import tomllib
+    except ImportError:
+        raise GatewayRefused("this Python has no tomllib (3.11+), so the endpoint check cannot run; use Python "
+                             "3.11 or later for a gateway run") from None
+    return tomllib
+
+
+def refuse_endpoint_overrides(overrides):
+    """A generic Codex -c value may not choose or redefine a provider endpoint; only the gateway flag may."""
+    if not overrides:
+        return
+    tomllib = _toml()
+    for override in overrides:
+        try:
+            keys = set(tomllib.loads(override)) & ENDPOINT_OVERRIDE_KEYS
+        except (TypeError, tomllib.TOMLDecodeError):
+            raise GatewayRefused(f"{override!r} is not a KEY=TOML override") from None
+        if keys:
+            raise GatewayRefused(f"{override!r} sets {', '.join(sorted(keys))}; an endpoint is chosen only by "
+                                 "the gateway flag and this host's record")
+
+
+def home_endpoint_ports(home):
+    """(file:key, port) for each loopback endpoint that a Codex home's *config.toml files name."""
+    paths = sorted(pathlib.Path(home).glob("*config.toml"))
+    if not paths:
+        return []
+    tomllib, found = _toml(), []
+    for path in paths:
+        try:
+            data = tomllib.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
+            raise GatewayRefused(f"{path.name} in the Codex home cannot be read or parsed "
+                                 f"({type(error).__name__}); fix it before a gateway run") from None
+        stack = [((), data)]
+        while stack:
+            keys, node = stack.pop()
+            if isinstance(node, dict):
+                stack.extend(((*keys, key), value) for key, value in node.items())
+            elif isinstance(node, str) and keys and keys[-1] in CODEX_ENDPOINT_KEYS:
+                port = loopback_port(node)
+                if port is not None:
+                    found.append((path.name + ":" + ".".join(keys), port))
+    return found
+
+
+def refuse_home_endpoints(home, gateway, variables=()):
+    """C1 for the Codex-home channel: a home may name no loopback endpoint but the run's gateway."""
+    found = home_endpoint_ports(home)
+    if not found:
+        return  # no loopback route in the home: no record is read
+    gateway = gateway or resolve_gateway(None, None, variables)
+    port = urllib.parse.urlsplit(gateway["endpoint"]).port
+    for where, other in found:
+        if other != port:
+            raise GatewayRefused(f"the Codex home names a loopback gateway on port {other} ({where}), not "
+                                 f"{gateway['endpoint']}; use a Codex home that names this run's gateway or none")
+
+
+def probe_gateway(endpoint, timeout=3.0):
+    """A bounded TCP connect before any side effect: on mirrored WSL an unbound loopback port hangs."""
+    try:
+        socket.create_connection(("127.0.0.1", urllib.parse.urlsplit(endpoint).port), timeout=timeout).close()
+    except OSError as error:
+        raise GatewayRefused(f"gateway {endpoint} did not accept a TCP connection within {timeout:g} s "
+                             f"({type(error).__name__}); start this host's gateway unit, then run python3 "
+                             "<checkout>/tools/omniroute/host_gateway.py check") from None
+
+
+def child_env(env):
+    """A child's environment with loopback exempt from every proxy (NO_PROXY and no_proxy)."""
+    env = dict(env)
+    for name in ("NO_PROXY", "no_proxy"):
+        entries = [item.strip() for item in (env.get(name) or "").split(",") if item.strip()]
+        env[name] = ",".join(entries + [host for host in LOOPBACK_NO_PROXY if host not in entries])
+    return env
+
+
+def gateway_check(argv, flags, variables, overrides=(), homes=()):
+    """--gateway-check, called at module top before any SDK import: resolve, print one JSON line, exit 0 or 2.
+    flags maps each gateway flag of the holder to a function that returns a /v1 URL from the flag's value;
+    overrides names its generic Codex -c flags and homes its Codex-home flags, which are checked too."""
+    names = ("--gateway-check", HOST_GATEWAY_OVERRIDE, *flags, *overrides, *homes)
+    pre = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+    pre.add_argument("--gateway-check", action="store_true")
+    pre.add_argument(HOST_GATEWAY_OVERRIDE, dest="reason")
+    for index, flag in enumerate(flags):
+        pre.add_argument(flag, dest=f"gateway_{index}")
+    for index, flag in enumerate(overrides):
+        pre.add_argument(flag, dest=f"override_{index}", action="append", default=[])
+    for index, flag in enumerate(homes):
+        pre.add_argument(flag, dest=f"home_{index}")
+    known, rest = pre.parse_known_args(argv)
+    if not known.gateway_check:
+        return
+    try:
+        for item in rest:
+            name = item.split("=", 1)[0]
+            if name.startswith("--") and any(full != name and full.startswith(name) for full in names):
+                raise GatewayRefused(f"{name} is an abbreviation; spell the option in full")
+        values = [getattr(known, f"gateway_{index}") for index in range(len(flags))]
+        given = [convert(value) for convert, value in zip(flags.values(), values) if value and value.strip()]
+        results = [resolve_gateway(value, known.reason, variables) for value in given]
+        result = results[0] if results else resolve_gateway(None, known.reason, variables)
+        refuse_endpoint_overrides([item for index in range(len(overrides))
+                                   for item in getattr(known, f"override_{index}")])
+        for index in range(len(homes)):
+            if getattr(known, f"home_{index}"):
+                refuse_home_endpoints(getattr(known, f"home_{index}"), result, variables)
+    except GatewayRefused as error:
+        print(f"gateway refused: {error}", file=sys.stderr)
+        raise SystemExit(2)
+    print(json.dumps({"gateway": result}, sort_keys=True))
+    raise SystemExit(0)
+# --- end host-gateway contract v2 ---
+
+GATEWAY_FLAGS = {"--gateway": lambda v: v.strip().rstrip("/") + "/v1"}
+GATEWAY_VARIABLES = ("ANTHROPIC_BASE_URL",)
+GATEWAY_OVERRIDES = ()
+GATEWAY_HOMES = ()
+
+if __name__ == "__main__":
+    gateway_check(sys.argv[1:], GATEWAY_FLAGS, GATEWAY_VARIABLES, GATEWAY_OVERRIDES, GATEWAY_HOMES)
 
 import anyio
 from claude_agent_sdk import (
@@ -43,11 +314,7 @@ SDK_VERSION = "0.2.162"
 SDK_COMMIT = "f2204bb956bab02907aaf3cb88eb9dead28eaa35"
 OMNIROUTE_LAUNCH_COMMIT = "2f42a9ac19d1a247ec9ce5473b790843724b3061"
 DEFAULT_MODEL = "dva/claude-opus-5-max"
-DEFAULT_GATEWAY = "http://127.0.0.1:21128"
 RUN_MARKER = "nas-claude-runtime-sdk"
-GATEWAY_TOPOLOGY = Path(
-    "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json"
-)
 MODEL_ID = re.compile(r"(?:[A-Za-z0-9_.:-]+/)?claude-[A-Za-z0-9_.:-]+\Z")
 USAGE_COUNTERS = {
     "input_tokens",
@@ -68,53 +335,18 @@ MODEL_COUNTERS = {
 }
 
 
-def default_gateway_root() -> str:
-    # Main's canonical gateway.endpoint is OpenAI-shaped; Claude adds /v1/messages.
-    # Source: native-agent-stack@ecfa11276, plan topology JSON:9.
-    try:
-        topology = Path(__file__).resolve().parents[2] / GATEWAY_TOPOLOGY
-        endpoint = json.loads(topology.read_text(encoding="utf-8"))["gateway"]["endpoint"]
-        if isinstance(endpoint, str):
-            parsed = urlsplit(endpoint)
-            if (
-                parsed.scheme == "http"
-                and parsed.hostname in {"127.0.0.1", "localhost", "::1"}
-                and parsed.port not in {None, 20128, 20129}
-                and parsed.username is None
-                and parsed.password is None
-                and not parsed.query
-                and not parsed.fragment
-                and parsed.path.rstrip("/") == "/v1"
-            ):
-                return endpoint.rstrip("/").removesuffix("/v1")
-    except (OSError, ValueError, KeyError, TypeError, IndexError):
-        pass
-    return DEFAULT_GATEWAY
 
 
-def loopback_root(value: str) -> str:
-    """Claude's Anthropic transport appends /v1/messages to this root."""
-    try:
-        parts = urlsplit(value)
-        port = parts.port
-    except ValueError:
-        raise ValueError("invalid gateway root") from None
-    if (
-        parts.scheme not in {"http", "https"}
-        or parts.hostname not in {"127.0.0.1", "localhost", "::1"}
-        or port is None
-        or parts.username is not None
-        or parts.password is not None
-        or parts.path not in {"", "/"}
-        or parts.query
-        or parts.fragment
-    ):
-        raise ValueError("gateway must be a credential-free loopback root with a port")
-    return value.rstrip("/")
 
 
 def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
-    """Compose SDK options; opaque explicit gateway credentials stay in memory."""
+    """Compose SDK options only after this host's gateway has been admitted."""
+    explicit = GATEWAY_FLAGS["--gateway"](args.gateway) if args.gateway and args.gateway.strip() else None
+    args.gateway_resolution = resolve_gateway(
+        explicit, args.unrecorded_gateway_reason, GATEWAY_VARIABLES
+    )
+    probe_gateway(args.gateway_resolution["endpoint"])
+    gateway = args.gateway_resolution["endpoint"][:-3]
     if "CLAUDE_CODE_EFFORT_LEVEL" in os.environ:
         raise ValueError("inherited CLAUDE_CODE_EFFORT_LEVEL must be unset before launch")
     if not MODEL_ID.fullmatch(args.model):
@@ -137,7 +369,6 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
             raise ValueError("local plugin path must be an existing directory")
     if args.mcp_config is not None and not args.mcp_config.is_file():
         raise ValueError("MCP configuration path must be an existing file")
-    gateway = loopback_root(args.gateway)
     auth_token = "omniroute-no-auth"
     if args.gateway_token_env is not None:
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.gateway_token_env):
@@ -155,7 +386,12 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
         effort="max",
         cwd=args.cwd.resolve(),
         # OmniRoute buildClaudeEnv, pinned above; retain native compaction policy.
-        env={
+        # SDK@f2204bb9 subprocess_cli.py:657-660 forwards this as --settings,
+        # the highest user-controlled settings layer. Managed settings remain native.
+        settings=json.dumps({"env": {"ANTHROPIC_BASE_URL": gateway}}),
+        env=child_env({
+            "NO_PROXY": os.environ.get("NO_PROXY", ""),
+            "no_proxy": os.environ.get("no_proxy", ""),
             "ANTHROPIC_BASE_URL": gateway,
             "ANTHROPIC_AUTH_TOKEN": auth_token,
             # SDK@f2204bb9 subprocess_cli.py:819-825 passes native CLI env.
@@ -164,7 +400,7 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
                 "X-OmniRoute-Session-Id: " + RUN_MARKER + "-" + uuid.uuid4().hex
             ),
             "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
-        },
+        }),
         setting_sources=args.setting_source or ["user", "project"],
         skills=skills,
         plugins=[{"type": "local", "path": str(p.resolve())} for p in args.plugin or []],
@@ -413,16 +649,18 @@ async def run_worker(
 
 
 def parser() -> argparse.ArgumentParser:
-    cli = argparse.ArgumentParser(description=__doc__)
+    cli = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     cli.add_argument(
         "--preflight", action="store_true", help="configuration only; no model request"
     )
     cli.add_argument("--cwd", type=Path, default=Path.cwd())
     cli.add_argument(
         "--gateway",
-        default=default_gateway_root(),
-        help="loopback Anthropic root, without /v1",
+        default=None,
+        help="default: this host's recorded gateway; explicit Anthropic root without /v1",
     )
+    cli.add_argument("--unrecorded-gateway-reason", metavar="TEXT")
+    cli.add_argument("--gateway-check", action="store_true")
     cli.add_argument(
         "--gateway-token-env",
         help="optional application env binding for gateway auth; values are never printed",
@@ -469,15 +707,15 @@ def parser() -> argparse.ArgumentParser:
     return cli
 
 
-def main() -> int:
-    args = parser().parse_args()
+def main(argv=None) -> int:
+    args = parser().parse_args(argv)
     try:
         if not math.isfinite(args.timeout) or args.timeout <= 0 or args.max_turns <= 0:
             raise ValueError("timeout and max-turns must be positive")
         if args.interrupt_after is not None and not 0 < args.interrupt_after < args.timeout:
             raise ValueError("interrupt-after must be positive and smaller than timeout")
         options = build_options(args)
-        configuration = preflight(options)
+        configuration = {**preflight(options), "gateway": args.gateway_resolution}
         if args.preflight:
             print(json.dumps(configuration, sort_keys=True))
             return 0

@@ -20,8 +20,10 @@ accepted by these discovery checks.
 import asyncio
 import contextlib
 import io
+import hashlib
 import json
 import os
+import pwd
 import sys
 import tempfile
 import threading
@@ -179,12 +181,32 @@ class FixtureGateway:
 
 class NativeTransportTests(unittest.TestCase):
     def setUp(self):
+        # Only these noncredential launcher values survive the hermetic fixture.
+        environment = {key: os.environ[key] for key in ("PATH", "TMPDIR", "LANG", "LC_ALL")
+                       if key in os.environ}
+        self.environment = patch.dict(os.environ, environment, clear=True)
+        self.environment.start()
+        self.addCleanup(self.environment.stop)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.project = Path(self.temp.name) / "project"
         self.home = Path(self.temp.name) / "codex-home"
         self.project.mkdir()
         self.home.mkdir(mode=0o700)
+        # Data-only parser cases use a valid ephemeral fixture route; native
+        # transport cases supply their own endpoint with a named override.
+        self.record_gateway = self.enterContext(FixtureGateway())
+        self.record_url = self.record_gateway.url
+        self.passwd_home = Path(self.temp.name) / "passwd-home"
+        record = self.passwd_home / worker.HOST_GATEWAY_RECORD
+        record.parent.mkdir(parents=True)
+        machine = hashlib.sha256(b"fixture-machine").hexdigest()
+        record.write_text(json.dumps({"schema": worker.HOST_GATEWAY_SCHEMA,
+                                     "host": "fixture-host", "machine_id_sha256": machine,
+                                     "endpoint": self.record_url}))
+        self.enterContext(patch.object(pwd, "getpwuid", return_value=SimpleNamespace(pw_dir=str(self.passwd_home))))
+        self.enterContext(patch.object(worker.socket, "gethostname", return_value="fixture-host"))
+        self.enterContext(patch.object(worker, "installation_id", return_value=machine))
         # Gate the unused curated Git sync in every fixture home, including
         # metadata-only fixtures. Source: a956835d core-plugins/src/manager.rs:753.
         (self.home / "config.toml").write_text("[features]\nplugins = false\n")
@@ -201,6 +223,8 @@ class NativeTransportTests(unittest.TestCase):
                 str(self.home),
                 "--base-url",
                 gateway.url,
+                "--unrecorded-gateway-reason",
+                "ephemeral deterministic transport fixture",
                 "--request-id",
                 "fixture-owned-request",
                 "--sandbox",
@@ -509,7 +533,7 @@ class NativeTransportTests(unittest.TestCase):
         for name in ["OMNIROUTE_API_KEY", "WORKER_GATEWAY_TOKEN"]:
             with self.subTest(name=name):
                 args = self.args(
-                    SimpleNamespace(url=worker.DEFAULT_BASE_URL), "--api-key-env", name
+                    SimpleNamespace(url=self.record_url), "--api-key-env", name
                 )
                 overrides = worker.runtime_config(args).config_overrides
                 self.assertIn(f'model_providers.{worker.PROVIDER}.env_key="{name}"', overrides)
@@ -527,7 +551,7 @@ class NativeTransportTests(unittest.TestCase):
 
     def test_custom_provider_enables_standalone_web_search(self):
         overrides = worker.runtime_config(
-            self.args(SimpleNamespace(url=worker.DEFAULT_BASE_URL))
+            self.args(SimpleNamespace(url=self.record_url))
         ).config_overrides
         self.assertIn(
             f"model_providers.{worker.PROVIDER}.supports_standalone_web_search=true", overrides
@@ -900,6 +924,8 @@ class NativeTransportTests(unittest.TestCase):
                 str(self.home),
                 "--base-url",
                 gateway.url,
+                "--unrecorded-gateway-reason",
+                "ephemeral deterministic transport fixture",
                 "--timeout",
                 "15",
                 "--preflight",

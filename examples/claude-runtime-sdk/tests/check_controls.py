@@ -20,7 +20,13 @@ def main():
         test_worker,
     )
     if parsed.disarm_route:
-        with patch.object(test_worker.worker, "loopback_root", lambda value: value):
+        # Contract v2's resolver owns both URL shape and host-record admission.
+        # Synthetic mutation only; ConfigurationTests patches the TCP probe.
+        with patch.object(
+            test_worker.worker,
+            "resolve_gateway",
+            lambda endpoint, *_: {"endpoint": endpoint, "source": "synthetic-control"},
+        ):
             result = unittest.TextTestRunner(verbosity=2).run(suite)
     else:
         result = unittest.TextTestRunner(verbosity=2).run(suite)

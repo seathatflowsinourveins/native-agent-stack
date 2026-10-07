@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
+import json
 import os
+import pwd
 import sys
 import tempfile
 import unittest
 import uuid
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import anyio
@@ -52,6 +56,17 @@ class ConfigurationTests(unittest.TestCase):
         self.environment = patch.dict(os.environ, {}, clear=True)
         self.environment.start()
         self.addCleanup(self.environment.stop)
+        self.gateway_root = "http://127.0.0.1:43080"
+        record = self.cwd / worker.HOST_GATEWAY_RECORD
+        record.parent.mkdir(parents=True)
+        machine = hashlib.sha256(b"fixture-machine").hexdigest()
+        record.write_text(json.dumps({"schema": worker.HOST_GATEWAY_SCHEMA,
+                                     "host": "fixture-host", "machine_id_sha256": machine,
+                                     "endpoint": self.gateway_root + "/v1"}))
+        self.enterContext(patch.object(pwd, "getpwuid", return_value=SimpleNamespace(pw_dir=str(self.cwd))))
+        self.enterContext(patch.object(worker.socket, "gethostname", return_value="fixture-host"))
+        self.enterContext(patch.object(worker, "installation_id", return_value=machine))
+        self.enterContext(patch.object(worker.socket, "create_connection"))
 
     def options(self, *args):
         return worker.build_options(worker.parser().parse_args(["--cwd", str(self.cwd), *args]))
@@ -68,7 +83,9 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(command[command.index("--effort") + 1], "max")
         self.assertNotIn("--tools", command)
         self.assertEqual(options.system_prompt, {"type": "preset", "preset": "claude_code"})
-        self.assertEqual(options.env["ANTHROPIC_BASE_URL"], worker.DEFAULT_GATEWAY)
+        self.assertEqual(options.env["ANTHROPIC_BASE_URL"], self.gateway_root)
+        self.assertEqual(json.loads(options.settings)["env"]["ANTHROPIC_BASE_URL"], self.gateway_root)
+        self.assertIn("--settings", command)
         self.assertEqual(options.env["ANTHROPIC_AUTH_TOKEN"], "omniroute-no-auth")
         self.assertEqual(options.env["CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY"], "1")
         self.assertNotIn("ANTHROPIC_API_KEY", options.env)

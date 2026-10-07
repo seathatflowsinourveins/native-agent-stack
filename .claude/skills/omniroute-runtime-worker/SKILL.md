@@ -21,30 +21,31 @@ Pass native readiness before dispatch, requiring Context Mode. Add
 selected skill in the private worker home; a new home with none installed has
 no skill requirement. Require Serena too when the task needs semantic navigation. Tell it other workers
 are present and that it must preserve their edits. Feed the task on stdin.
-For every NativeStack2604 launch, pass `--base-url http://127.0.0.1:21128/v1`
-explicitly, including readiness checks. Before dispatch, complete both model-free
-checks in `examples/omniroute-codex-sdk/README.md`, "2604 gateway preflights".
+Run the gateway tripwire before readiness or dispatch. An older checkout that
+does not recognize `--gateway-check` stops the command chain. Complete both
+model-free checks in `examples/omniroute-codex-sdk/README.md`, "Gateway tripwire
+and readiness", using this host's activated record.
 
 ```sh
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
-  --base-url http://127.0.0.1:21128/v1 \
+  --gateway-check &&
+rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --preflight --require-mcp context-mode \
   --timeout 60 &&
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
-  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --timeout 600 \
   --prompt -
 ```
 
-Use NativeStack2604's native Responses lane at loopback port 21128. WSL
-distributions share networking, and ports 20128 and 20129 belong to NativeStack. The worker
-reads `gateway.endpoint` from the install plan's checked-out
-`config/gpt-gateway-topology.json`, with 21128 as the fallback. An explicit
-`--base-url` selects the caller's intended endpoint. Keep
+Use this host's recorded gateway. Its operator activates the record with the
+shipped `tools/omniroute/host_gateway.py write` and verifies it with `check`, as
+documented in the worker README. A missing or foreign record refuses the run.
+An explicit observer endpoint also needs `--unrecorded-gateway-reason TEXT`;
+ordinary runs resolve the record without a gateway flag. Keep
 the exact model route in the live catalog; the default Sol/max suffix requires
 an OmniRoute build carrying PR #15167. Requested effort does not establish
 gateway-forwarded effort or backend identity. Keep
