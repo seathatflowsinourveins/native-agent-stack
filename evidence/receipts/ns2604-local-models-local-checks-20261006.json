@@ -319,5 +319,83 @@
       "condition": "The documentary payloads lacked the registry metadata envelope or disagreed with it.",
       "correction": "Add payload id/kind/component_ids/claim as required by the existing validator; derive registry metadata from each payload, preserving the source-review limitations."
     }
-  ]
+  ],
+  "documentary_repair": {
+    "date": "2026-10-07",
+    "base_commit": "0c4d32868f2b7b1d294d73cbbd0d5d3e41664c3d",
+    "fixes": [
+      "P2-1: sixteen source-bound cleanup dispositions and distinct observed states",
+      "point5: original historical headings/text restored with appended dated amendment"
+    ],
+    "checks": [
+      {
+        "scope": "handbook/pin-source/source-projection focused suites",
+        "attempt_log": "repair-rebased-touched.log",
+        "exit_code": 0,
+        "stdout_stderr_sha256": "bf22451a32373af747172dc3258a7a72831f3ff0022ebb2ae8379e680171fe63",
+        "returned_summary": [
+          "Ran 95 tests in 37.738s",
+          "OK"
+        ]
+      },
+      {
+        "scope": "ecosystem initial post-rebase",
+        "attempt_log": "repair-rebased-ecosystem.log",
+        "exit_code": 1,
+        "stdout_stderr_sha256": "db77249c009cbec253a8bc03153f619ea36bb8595f07e87efafa953020467330",
+        "returned_summary": [
+          "Explorer validation failed: component references an unknown receipt"
+        ]
+      },
+      {
+        "scope": "ecosystem after registration",
+        "attempt_log": "repair-rebased-ecosystem-second.log",
+        "exit_code": 0,
+        "stdout_stderr_sha256": "74d6649f9688b09908b52a5311db173f0e57553110addbe70a7c94d3363b84d7",
+        "returned_summary": [
+          "{\"bytes\": 15429318, \"sha256\": \"129a9bbf83798d3d9b20866fe5c052d9f6b8485e16b231aa571fff3cd6eadcb9\", \"status\": \"written\"}"
+        ]
+      },
+      {
+        "scope": "tables --check",
+        "attempt_log": "repair-rebased-tables-check.log",
+        "exit_code": 0,
+        "stdout_stderr_sha256": "93fdeb8afa33cc95292fbafef21bb93b2a11dffa9064c493e21fe5cbfc846604",
+        "returned_summary": [
+          "the record's tables are current"
+        ]
+      },
+      {
+        "scope": "handbook --check",
+        "attempt_log": "repair-rebased-handbook-check.log",
+        "exit_code": 0,
+        "stdout_stderr_sha256": "a2f02d64397b2e67fdbf38a303c6ead288239ae212ea2dbab87e65a0997d8680",
+        "returned_summary": [
+          "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"fe1b2a614f09fa6e7948ca799b344a3182df87dfc2ba8d2975d8bf71c135e698\", \"docs/new-wsl-handbook.md\": \"029dbda7c33e716a519835b647c903506354814d37bbde448b261767767f7413\"}, \"status\": \"passed\"}"
+        ]
+      },
+      {
+        "scope": "ecosystem --check",
+        "attempt_log": "repair-rebased-ecosystem-check.log",
+        "exit_code": 0,
+        "stdout_stderr_sha256": "2e58319dc51bc1ffe90bc0352e729e41a850062414a6f05a30cd5a02cfdd1e3a",
+        "returned_summary": [
+          "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"sandbox-runtime\", \"edition_pin\": \"0.0.78\", \"row\": \"foundation/isolation\", \"stack_pin\": \"0.0.77\"}, {\"component_id\": \"jcodemunch-mcp\", \"edition_pin\": \"1.108.319\", \"row\": \"foundation/code-navigation\", \"stack_pin\": \"1.108.327\"}, {\"component_id\": \"openresearch\", \"edition_pin\": \"0.2.7\", \"row\": \"foundation/web-research\", \"stack_pin\": \"0.2.15\"}, {\"component_id\": \"rtk\", \"edition_pin\": \"0.50.0\", \"row\": \"foundation/token-efficiency\", \"stack_pin\": \"0.51.0\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"mcporter\", \"edition_pin\": \"0.14.1\", \"row\": \"foundation/mcp-surfaces\", \"stack_pin\": \"0.14.2\"}, {\"component_id\": \"mcp-inspector\", \"edition_pin\": \"2.8.0\", \"row\": \"foundation/mcp-surfaces\", \"stack_pin\": \"2.9.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"rtk\", \"edition_pin\": \"0.50.0\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.51.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"syft\", \"edition_pin\": \"1.52.0\", \"row\": \"us-equities/security-supply-chain\", \"stack_pin\": \"1.54.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.160.0\"}], \"bytes\": 15429318, \"input_sha256\": \"ce4bcc34d6771aadc26ff2a539110acb95bd2ba8083e293505bce255cb5da8d6\", \"output_sha256\": \"129a9bbf83798d3d9b20866fe5c052d9f6b8485e16b231aa571fff3cd6eadcb9\", \"status\": \"passed\"}"
+        ]
+      },
+      {
+        "scope": "python3 scripts/validate.py",
+        "attempt_log": "repair-rebased-validate.log",
+        "exit_code": 0,
+        "stdout_stderr_sha256": "dc4453414e17deb8b005edd0ccdfb759eb64df0637166928ab0d3d1aa0603bf8",
+        "returned_summary": [
+          "{\"components\": 69, \"hashed_files\": 10387, \"profiles\": 4, \"receipts\": 226, \"status\": \"passed\"}"
+        ]
+      }
+    ],
+    "original_historical_prefix_sha256": "c3e2d0a439a8c0a0e74d9f607e69ddde65ffbbc1cdcf4da6b0048f6af5076564",
+    "plan_owner_failure": "Unchanged seven incompatibilities and two related client-plan failures remain pending owner-authored integration after #723 lands. No plan or owner assertion altered.",
+    "vllm_row": "Exact approved0.31 source row retained unchanged; no native GPU acceptance.",
+    "host_operations_by_this_repair": 0
+  }
 }

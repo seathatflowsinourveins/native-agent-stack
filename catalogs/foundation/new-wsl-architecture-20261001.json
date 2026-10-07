@@ -147,7 +147,7 @@
           "component_id": "skills-ref",
           "repository": "https://github.com/agentskills/agentskills",
           "pin": "0.1.0",
-          "pin_source": "manifests/stack.json:1632",
+          "pin_source": "manifests/stack.json:1638",
           "install": {
             "command": "git clone https://github.com/agentskills/agentskills.git \"$STACK_HOME/tools/agentskills\"; git -C \"$STACK_HOME/tools/agentskills\" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379; cd \"$STACK_HOME/tools/agentskills/skills-ref\" && uv sync --locked",
             "kind": "repo_recipe",
@@ -331,7 +331,7 @@
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.80.0",
-          "pin_source": "manifests/stack.json:1071",
+          "pin_source": "manifests/stack.json:1077",
           "install": {
             "command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix",
             "kind": "repo_recipe",
@@ -457,7 +457,7 @@
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.80.0",
-          "pin_source": "manifests/stack.json:1071",
+          "pin_source": "manifests/stack.json:1077",
           "install": {"command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/max-sixty/worktrunk/releases"}
@@ -466,7 +466,7 @@
           "component_id": "sandbox-runtime",
           "repository": "https://github.com/anthropics/sandbox-runtime",
           "pin": "0.0.78",
-          "pin_source": "manifests/stack.json:869",
+          "pin_source": "manifests/stack.json:870",
           "install": {
             "command": "npm install --global --prefix \"$STACK_HOME/tools/sandbox-runtime-0.0.78\" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.78",
             "kind": "repo_recipe",
@@ -526,7 +526,7 @@
           "component_id": "serena",
           "repository": "https://github.com/oraios/serena",
           "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
-          "pin_source": "manifests/stack.json:892",
+          "pin_source": "manifests/stack.json:893",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd (then find_symbol and find_referencing_symbols through the client)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.7.0 (2026-08-09); the pin is a 2.0.0.dev0 development commit 123 commits ahead of that release, so release currency does not apply", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "unknown", "url": "https://github.com/oraios/serena/releases"}
@@ -553,7 +553,7 @@
           "component_id": "jcodemunch-mcp",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp",
           "pin": "1.108.319",
-          "pin_source": "manifests/stack.json:1697",
+          "pin_source": "manifests/stack.json:1703",
           "install": {"command": "eco=\"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}\"; UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "a deliberately scoped local code index, then search_symbols and get_symbol_source through jcodemunch-mcp's native MCP tools (called through mcporter): the exact requested function returned (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-jcodemunch-20260920.json"},
           "upstream_currency": {"latest_release": "v1.108.320 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/jgravelle/jcodemunch-mcp/releases"}
@@ -602,7 +602,7 @@
           "component_id": "qmd",
           "repository": "https://github.com/tobi/qmd",
           "pin": "2.8.3",
-          "pin_source": "manifests/stack.json:769",
+          "pin_source": "manifests/stack.json:770",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "qmd --index \"$QMD_INDEX\" search 'local code' -c \"$QMD_COLLECTION\" -n 2 --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v2.8.3 (2026-08-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/tobi/qmd/releases"}
@@ -620,7 +620,7 @@
           "component_id": "poppler",
           "repository": "https://github.com/tsdgeos/poppler_mirror",
           "pin": "26.09.0",
-          "pin_source": "manifests/stack.json:1831",
+          "pin_source": "manifests/stack.json:1837",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "acceptance": {"command": "pdftotext -bbox-layout -enc UTF-8 on the frozen source list only", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "upstream_currency": {"latest_release": "26.09.0 on the project's release page (the GitHub mirror lists no tags)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://poppler.freedesktop.org/"}
@@ -678,7 +678,7 @@
           "component_id": "socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode",
           "pin": "1.15.0",
-          "pin_source": "manifests/stack.json:974",
+          "pin_source": "manifests/stack.json:975",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_health --args '{}' --output text --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.16.0 (2026-09-28)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/giancarloerra/SocratiCode/releases"}
@@ -687,7 +687,7 @@
           "component_id": "qdrant",
           "repository": "https://github.com/qdrant/qdrant",
           "pin": "1.19.1",
-          "pin_source": "manifests/stack.json:738",
+          "pin_source": "manifests/stack.json:739",
           "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "GET / on the running Qdrant server: it answered with version 1.19.1 at commit 6ab21ca, the catalog pin (host receipt, stage use, result pass)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json"},
           "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
@@ -696,7 +696,7 @@
           "component_id": "vllm",
           "repository": "https://github.com/vllm-project/vllm",
           "pin": "0.31.0",
-          "pin_source": "manifests/stack.json:1038",
+          "pin_source": "manifests/stack.json:1042",
           "install": {"command": "uv venv --python 3.13 \"$STACK_HOME/tools/vllm-0.31.0\"; uv pip install --python \"$STACK_HOME/tools/vllm-0.31.0/bin/python\" vllm==0.31.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "Current source choice only; no serving operation repeated. Historical 1B/0.30 proof remains in evidence/receipts/vllm-030-switch-20260925.json.", "evidence_class": "source_review", "source_path": "evidence/receipts/ns2604-local-models-rulings-20261006.json"},
           "upstream_currency": {"latest_release": "v0.31.0 (2026-10-05); CC pin record 2026-10-06", "checked_at": "2026-10-06T21:25Z", "pin_is_latest": "yes", "url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0"}
@@ -714,7 +714,7 @@
           "name": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text embedding)",
           "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
           "pin": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
-          "pin_source": "manifests/stack.json:2096",
+          "pin_source": "manifests/stack.json:2114",
           "install": {"command": "hf download nvidia/Nemotron-3-Embed-8B-BF16 --revision d1f2f25730bbd775b99b29185134bc86653bf2d1 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
           "acceptance": {"command": "Source-review selection of the shared 8B/4096 role; no model request run by this PR. Prior 1B native proof retains its original vllm-030-switch-20260925 receipt.", "evidence_class": "source_review", "source_path": "evidence/receipts/ns2604-local-models-rulings-20261006.json"},
           "upstream_currency": {"latest_release": "HF metadata HEAD d1f2f257, last modified 2026-08-28; card release 2026-07-16", "checked_at": "2026-10-06T21:25Z", "pin_is_latest": "yes", "url": "https://huggingface.co/api/models/nvidia/Nemotron-3-Embed-8B-BF16"}
@@ -822,7 +822,7 @@
           "component_id": "tavily-cli",
           "repository": "https://github.com/tavily-ai/tavily-cli",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:1939",
+          "pin_source": "manifests/stack.json:1945",
           "install": {"command": "uv tool install 'tavily-cli==0.1.8'", "kind": "repo_recipe", "source_path": "recipes/tavily.md"},
           "acceptance": {"command": "tvly search \"Codex CLI Claude Code native agent harness skills official documentation\" --depth basic --max-results 4 --include-domains developers.openai.com,code.claude.com --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/tavily.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI tavily-cli 0.1.8 (2026-09-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://pypi.org/project/tavily-cli/"}
@@ -878,7 +878,7 @@
           "component_id": "openresearch",
           "repository": "https://github.com/alphaXiv/OpenResearch",
           "pin": "0.2.7",
-          "pin_source": "manifests/stack.json:658",
+          "pin_source": "manifests/stack.json:659",
           "install": {"command": "gh release download v0.2.7 --repo alphaXiv/OpenResearch (openresearch-cli-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "orx --no-telemetry discover keyword 'agent memory' --published-after 2026-06-21 --published-before 2026-09-19 --limit 3", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.2.14 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/alphaXiv/OpenResearch/releases"}
@@ -928,7 +928,7 @@
           "component_id": "rtk",
           "repository": "https://github.com/rtk-ai/rtk",
           "pin": "0.50.0",
-          "pin_source": "manifests/stack.json:833",
+          "pin_source": "manifests/stack.json:834",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "rtk git log -6; rtk proxy git log -6", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.50.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/rtk-ai/rtk/releases"}
@@ -955,7 +955,7 @@
           "component_id": "repomix",
           "repository": "https://github.com/yamadashy/repomix",
           "pin": "1.18.1",
-          "pin_source": "manifests/stack.json:804",
+          "pin_source": "manifests/stack.json:805",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "repomix \"$PROJECT_ROOT\" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output \"$STACK_HOME/output/selected-code.xml\"", "evidence_class": "local_integration_check", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.18.1 (2026-09-21)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/yamadashy/repomix/releases"}
@@ -964,7 +964,7 @@
           "component_id": "toon",
           "repository": "https://github.com/toon-format/toon",
           "pin": "4.1.1",
-          "pin_source": "manifests/stack.json:1011",
+          "pin_source": "manifests/stack.json:1012",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "toon fixtures/records.json --stats -o \"$STACK_HOME/output/records.toon\"; toon \"$STACK_HOME/output/records.toon\" --decode --strict -o \"$STACK_HOME/output/records.recovered.json\"", "evidence_class": "local_integration_check", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v4.1.1 (2026-08-05)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/toon-format/toon/releases"}
@@ -1027,7 +1027,7 @@
           "component_id": "promptfoo",
           "repository": "https://github.com/promptfoo/promptfoo",
           "pin": "0.123.1",
-          "pin_source": "manifests/stack.json:712",
+          "pin_source": "manifests/stack.json:713",
           "install": {
             "command": "npm install --global --prefix \"$STACK_HOME/tools/promptfoo-0.123.1\" promptfoo@0.123.1",
             "kind": "repo_recipe",
@@ -1049,7 +1049,7 @@
           "component_id": "playwright-test",
           "repository": "https://github.com/microsoft/playwright",
           "pin": "1.63.0",
-          "pin_source": "manifests/stack.json:1879",
+          "pin_source": "manifests/stack.json:1885",
           "install": {
             "command": "the wsl-application blueprint's pinned lock with the measured pnpm, plus the verified Chrome for Testing archive extracted into tools/chrome-linux64",
             "kind": "repo_recipe",
@@ -1216,7 +1216,7 @@
           "component_id": "zizmor",
           "repository": "https://github.com/zizmorcore/zizmor",
           "pin": "1.30.1",
-          "pin_source": "manifests/stack.json:1585",
+          "pin_source": "manifests/stack.json:1591",
           "install": {"command": "uv tool install zizmor==1.30.1", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "acceptance": {"command": "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "upstream_currency": {"latest_release": "v1.30.1 (2026-09-09)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/zizmorcore/zizmor/releases"}
@@ -1225,7 +1225,7 @@
           "component_id": "syft",
           "repository": "https://github.com/anchore/syft",
           "pin": "1.54.0",
-          "pin_source": "manifests/stack.json:1411",
+          "pin_source": "manifests/stack.json:1417",
           "install": {
             "command": "mise use -g syft@1.54.0",
             "kind": "repo_recipe",
@@ -1295,7 +1295,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1350",
+          "pin_source": "manifests/stack.json:1356",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary (the recipe omits this step)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
@@ -1304,7 +1304,7 @@
           "component_id": "systemd",
           "repository": "https://github.com/systemd/systemd",
           "pin": "255.4-1ubuntu8.17",
-          "pin_source": "manifests/stack.json:1464",
+          "pin_source": "manifests/stack.json:1470",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
           "acceptance": {"command": "systemd 255 user units on the historical host: the timer started paper-ext-20260929.service at 16:00:05 ET on 2026-09-29, and journalctl --user -o json USER_UNIT=<unit>.service and systemctl --user show recorded its exit (status 3, Result=exit-code) and the run of its OnFailure alert unit", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version; upstream v255 source is cited for semantics only", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
@@ -1355,7 +1355,7 @@
           "component_id": "fastapi",
           "repository": "https://github.com/fastapi/fastapi",
           "pin": "0.141.1",
-          "pin_source": "manifests/stack.json:1782",
+          "pin_source": "manifests/stack.json:1788",
           "install": {"command": "make setup; make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "0.142.2 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/fastapi/fastapi/releases"}
@@ -1364,7 +1364,7 @@
           "component_id": "nextjs",
           "repository": "https://github.com/vercel/next.js",
           "pin": "16.3.6",
-          "pin_source": "manifests/stack.json:1736",
+          "pin_source": "manifests/stack.json:1742",
           "install": {"command": "make setup", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "v16.3.8 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/vercel/next.js/releases"}
@@ -1373,7 +1373,7 @@
           "component_id": "postgresql",
           "repository": "https://github.com/postgres/postgres",
           "pin": "18.6",
-          "pin_source": "manifests/stack.json:1804",
+          "pin_source": "manifests/stack.json:1810",
           "install": {"command": "make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "18.6 is the current 18.x release on the project's versioning page (the GitHub mirror publishes tags only)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://www.postgresql.org/support/versioning/"}
@@ -1421,7 +1421,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1322",
+          "pin_source": "manifests/stack.json:1328",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -1476,7 +1476,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.162.0",
-          "pin_source": "manifests/stack.json:1100",
+          "pin_source": "manifests/stack.json:1106",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -1485,7 +1485,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1133",
+          "pin_source": "manifests/stack.json:1139",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -1494,7 +1494,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1171",
+          "pin_source": "manifests/stack.json:1177",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -1603,7 +1603,7 @@
           "component_id": "mcporter",
           "repository": "https://github.com/openclaw/mcporter",
           "pin": "0.14.1",
-          "pin_source": "manifests/stack.json:632",
+          "pin_source": "manifests/stack.json:633",
           "install": {
             "command": "bash adoption/bootstrap-linux.sh --profile token-efficiency",
             "kind": "repo_recipe",
@@ -1781,7 +1781,7 @@
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.80.0",
-          "pin_source": "manifests/stack.json:1071",
+          "pin_source": "manifests/stack.json:1077",
           "install": {"command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/max-sixty/worktrunk/releases"}
@@ -1855,7 +1855,7 @@
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.60.0",
-          "pin_source": "manifests/stack.json:1532",
+          "pin_source": "manifests/stack.json:1538",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
           "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
@@ -1864,7 +1864,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1564",
+          "pin_source": "manifests/stack.json:1570",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1873,7 +1873,7 @@
           "component_id": "duckdb",
           "repository": "https://github.com/duckdb/duckdb",
           "pin": "1.5.5",
-          "pin_source": "manifests/stack.json:1290",
+          "pin_source": "manifests/stack.json:1296",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
@@ -1932,7 +1932,7 @@
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.60.0",
-          "pin_source": "manifests/stack.json:1532",
+          "pin_source": "manifests/stack.json:1538",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
           "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
@@ -1941,7 +1941,7 @@
           "component_id": "duckdb",
           "repository": "https://github.com/duckdb/duckdb",
           "pin": "1.5.5",
-          "pin_source": "manifests/stack.json:1290",
+          "pin_source": "manifests/stack.json:1296",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
@@ -1950,7 +1950,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1564",
+          "pin_source": "manifests/stack.json:1570",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -2009,7 +2009,7 @@
           "component_id": "duckdb",
           "repository": "https://github.com/duckdb/duckdb",
           "pin": "1.5.5",
-          "pin_source": "manifests/stack.json:1290",
+          "pin_source": "manifests/stack.json:1296",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
@@ -2027,7 +2027,7 @@
           "component_id": "edgartools",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.60.0",
-          "pin_source": "manifests/stack.json:1532",
+          "pin_source": "manifests/stack.json:1538",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
           "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
@@ -2036,7 +2036,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1564",
+          "pin_source": "manifests/stack.json:1570",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -2083,7 +2083,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1350",
+          "pin_source": "manifests/stack.json:1356",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
@@ -2110,7 +2110,7 @@
           "component_id": "systemd",
           "repository": "https://github.com/systemd/systemd",
           "pin": "255.4-1ubuntu8.17",
-          "pin_source": "manifests/stack.json:1464",
+          "pin_source": "manifests/stack.json:1470",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
           "acceptance": {"command": "systemd 255 user units on the historical host: the timer started paper-ext-20260929.service at 16:00:05 ET on 2026-09-29, and journalctl --user -o json USER_UNIT=<unit>.service and systemctl --user show recorded its exit (status 3, Result=exit-code) and the run of its OnFailure alert unit", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
@@ -2119,7 +2119,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.162.0",
-          "pin_source": "manifests/stack.json:1100",
+          "pin_source": "manifests/stack.json:1106",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -2128,7 +2128,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1133",
+          "pin_source": "manifests/stack.json:1139",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -2137,7 +2137,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1171",
+          "pin_source": "manifests/stack.json:1177",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -2146,7 +2146,7 @@
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
           "pin": "13.2.3",
-          "pin_source": "manifests/stack.json:1208",
+          "pin_source": "manifests/stack.json:1214",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only grafana", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/grafana/releases"}
@@ -2155,7 +2155,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1322",
+          "pin_source": "manifests/stack.json:1328",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -2214,7 +2214,7 @@
           "role": "SEC filing acquisition and parsing",
           "repository": "https://github.com/dgunning/edgartools",
           "pin": "5.60.0",
-          "pin_source": "manifests/stack.json:1532",
+          "pin_source": "manifests/stack.json:1538",
           "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
           "acceptance": {"command": "2026-10-04: native_edgar.py with operator-supplied SEC identity completed upstream get_filings and bounded Filings.to_context at EdgarTools 5.60.0 on NativeStack, CPython 3.12.3: one GET answered 200, zero retries, 371 index rows for 2020-03-02 and the same five selected CIK/accession rows as the historical receipts (native-sec-edgartools-5600-20261004)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"},
           "upstream_currency": {"latest_release": "v5.60.0 (2026-10-02)", "checked_at": "2026-10-04", "pin_is_latest": "yes", "url": "https://github.com/dgunning/edgartools/releases/tag/v5.60.0"}
@@ -2224,7 +2224,7 @@
           "role": "portfolio models and chronological evaluation",
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9",
-          "pin_source": "manifests/stack.json:1509",
+          "pin_source": "manifests/stack.json:1515",
           "install": {"command": "uv venv --python \"$PYTHON\" \"$WAVE_DIR/venv\"; uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
           "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\" (the receipt: native skfolio 1.2.9 produced 20 chronological development folds and one reserved 2021Q1 evaluation)", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/receipt.json"},
           "upstream_currency": {"latest_release": "v1.4.10 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/skfolio/skfolio/releases"}
@@ -2284,7 +2284,7 @@
           "role": "frozen comparison oracle, not the destination",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1383",
+          "pin_source": "manifests/stack.json:1389",
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
@@ -2379,7 +2379,7 @@
           "role": "frozen comparison oracle",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1383",
+          "pin_source": "manifests/stack.json:1389",
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
@@ -2444,7 +2444,7 @@
           "role": "comparison oracle",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1383",
+          "pin_source": "manifests/stack.json:1389",
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
@@ -2464,7 +2464,7 @@
           "role": "walk-forward splitter only; winner in one place of the layer entry and conditional in another",
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9",
-          "pin_source": "manifests/stack.json:1509",
+          "pin_source": "manifests/stack.json:1515",
           "install": {"command": "uv venv --python \"$PYTHON\" \"$WAVE_DIR/venv\"; uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
           "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\"", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/receipt.json"},
           "upstream_currency": {"latest_release": "v1.4.10 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/skfolio/skfolio/releases"}
@@ -2527,7 +2527,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1350",
+          "pin_source": "manifests/stack.json:1356",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
@@ -2536,7 +2536,7 @@
           "component_id": "systemd",
           "repository": "https://github.com/systemd/systemd",
           "pin": "255.4-1ubuntu8.17",
-          "pin_source": "manifests/stack.json:1464",
+          "pin_source": "manifests/stack.json:1470",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
           "acceptance": {"command": "systemd 255 user units on the historical host: the timer started paper-ext-20260929.service at 16:00:05 ET on 2026-09-29, and journalctl --user -o json USER_UNIT=<unit>.service and systemctl --user show recorded its exit (status 3, Result=exit-code) and the run of its OnFailure alert unit", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
@@ -2545,7 +2545,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.162.0",
-          "pin_source": "manifests/stack.json:1100",
+          "pin_source": "manifests/stack.json:1106",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -2554,7 +2554,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1133",
+          "pin_source": "manifests/stack.json:1139",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -2563,7 +2563,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1171",
+          "pin_source": "manifests/stack.json:1177",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -2572,7 +2572,7 @@
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
           "pin": "13.2.3",
-          "pin_source": "manifests/stack.json:1208",
+          "pin_source": "manifests/stack.json:1214",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only grafana", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/grafana/releases"}
@@ -2581,7 +2581,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1322",
+          "pin_source": "manifests/stack.json:1328",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -2676,7 +2676,7 @@
           "component_id": "socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode",
           "pin": "1.15.0",
-          "pin_source": "manifests/stack.json:974",
+          "pin_source": "manifests/stack.json:975",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_health --args '{}' --output text --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.16.0 (2026-09-28)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/giancarloerra/SocratiCode/releases"}
@@ -2685,7 +2685,7 @@
           "component_id": "qmd",
           "repository": "https://github.com/tobi/qmd",
           "pin": "2.8.3",
-          "pin_source": "manifests/stack.json:769",
+          "pin_source": "manifests/stack.json:770",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "qmd --index \"$QMD_INDEX\" search 'local code' -c \"$QMD_COLLECTION\" -n 2 --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v2.8.3 (2026-08-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/tobi/qmd/releases"}
@@ -2694,7 +2694,7 @@
           "component_id": "serena",
           "repository": "https://github.com/oraios/serena",
           "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
-          "pin_source": "manifests/stack.json:892",
+          "pin_source": "manifests/stack.json:893",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd (then find_symbol and find_referencing_symbols through the client)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.7.0 (2026-08-09); the pin is a 2.0.0.dev0 development commit 123 commits ahead of that release, so release currency does not apply", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "unknown", "url": "https://github.com/oraios/serena/releases"}
@@ -2703,7 +2703,7 @@
           "component_id": "qdrant",
           "repository": "https://github.com/qdrant/qdrant",
           "pin": "1.19.1",
-          "pin_source": "manifests/stack.json:738",
+          "pin_source": "manifests/stack.json:739",
           "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "GET / on the running Qdrant server: it answered with version 1.19.1 at commit 6ab21ca, the catalog pin (host receipt, stage use, result pass)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json"},
           "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
@@ -2721,7 +2721,7 @@
           "component_id": "rtk",
           "repository": "https://github.com/rtk-ai/rtk",
           "pin": "0.50.0",
-          "pin_source": "manifests/stack.json:833",
+          "pin_source": "manifests/stack.json:834",
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "rtk git log -6; rtk proxy git log -6", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v0.50.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/rtk-ai/rtk/releases"}
@@ -2788,7 +2788,7 @@
           "component_id": "dagu",
           "repository": "https://github.com/dagucloud/dagu",
           "pin": "2.16.6",
-          "pin_source": "manifests/stack.json:1350",
+          "pin_source": "manifests/stack.json:1356",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
           "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
@@ -2797,7 +2797,7 @@
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
           "pin": "0.162.0",
-          "pin_source": "manifests/stack.json:1100",
+          "pin_source": "manifests/stack.json:1106",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
@@ -2806,7 +2806,7 @@
           "component_id": "prometheus",
           "repository": "https://github.com/prometheus/prometheus",
           "pin": "3.15.0",
-          "pin_source": "manifests/stack.json:1133",
+          "pin_source": "manifests/stack.json:1139",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "promtool check config and check rules (14 rules) on the live files, systemd-analyze --user verify of the rendered unit, then daemon-reload and restart of ecosystem-prometheus.service: /-/ready answered 0.86 s after the restart, buildinfo read 3.15.0, the seven targets were up and the 14 rules evaluated with health ok (2026-09-26)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/prometheus-3150-qualification-20260926.json"},
           "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
@@ -2815,7 +2815,7 @@
           "component_id": "loki",
           "repository": "https://github.com/grafana/loki",
           "pin": "3.7.8",
-          "pin_source": "manifests/stack.json:1171",
+          "pin_source": "manifests/stack.json:1177",
           "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
           "acceptance": {"command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true (exit 0: the final native Loki OTLP structured-metadata configuration accepted)", "evidence_class": "structural_validation", "source_path": "observability/receipt.json"},
           "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
@@ -2824,7 +2824,7 @@
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
           "pin": "13.2.3",
-          "pin_source": "manifests/stack.json:1208",
+          "pin_source": "manifests/stack.json:1214",
           "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only grafana", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
           "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
           "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/grafana/releases"}
@@ -2833,7 +2833,7 @@
           "component_id": "restic",
           "repository": "https://github.com/restic/restic",
           "pin": "0.19.1",
-          "pin_source": "manifests/stack.json:1322",
+          "pin_source": "manifests/stack.json:1328",
           "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
           "acceptance": {"command": "restic check and restore of two synthetic snapshots on a GitHub-hosted runner, after seven unchanged upstream restic tests passed there", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
           "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
@@ -2876,7 +2876,7 @@
           "component_id": "syft",
           "repository": "https://github.com/anchore/syft",
           "pin": "1.52.0",
-          "pin_source": "manifests/stack.json:1411",
+          "pin_source": "manifests/stack.json:1417",
           "install": {"command": "gh release download v1.52.0 --repo anchore/syft (the linux_amd64 archive and its checksums); verify, then tar --no-same-owner -xzf into a versioned prefix", "kind": "repo_recipe", "source_path": "blueprints/us-equities/supply-chain/README.md"},
           "acceptance": {"command": "syft scan of the NautilusTrader 2.0.0rc5 virtual environment with the binary catalogers selected by exact name (venv-syft exit 0; 21 packages), then grype over that SBOM (exit 0)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/3-syft-binary-os-coverage.json"},
           "upstream_currency": {"latest_release": "v1.52.0 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/anchore/syft/releases"}
@@ -3067,7 +3067,7 @@
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
           "pin": "3.8.51",
-          "pin_source": "manifests/stack.json:1900",
+          "pin_source": "manifests/stack.json:1906",
           "install": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only gpt-gateway",
             "kind": "repo_recipe",

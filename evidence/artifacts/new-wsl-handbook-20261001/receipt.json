@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
   "outputs": {
-    "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
-    "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
+    "docs/new-wsl-handbook.md": "029dbda7c33e716a519835b647c903506354814d37bbde448b261767767f7413",
+    "docs/new-wsl-handbook.json": "fe1b2a614f09fa6e7948ca799b344a3182df87dfc2ba8d2975d8bf71c135e698"
   },
   "inventory": {
     "layers": 37,
@@ -653,6 +653,22 @@
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "56541a271b75b1148566e1257effb4d74c367eb170411f09138aec7a02487e83",
         "docs/new-wsl-handbook.json": "09e511413a4dabf7572e123f19946511eb9fb3ddd7c15770ab2aaea208b128af"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "round": "local-model-repair-rebase-current-main",
+      "source_main": "0c4d32868f2b7b1d294d73cbbd0d5d3e41664c3d",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Reconcile new main inputs and preserved generator-owned histories with the documentary sixteen-item source receipt; no host requalification or readiness derivation.",
+      "previous_generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "previous_profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
+        "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
