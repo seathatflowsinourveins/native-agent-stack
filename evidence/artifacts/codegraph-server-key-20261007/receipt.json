@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "kind": "codegraph-server-key-repository-integration",
+  "date_utc": "2026-10-07",
+  "source_base": "003804f24fa5d998ba429dff3235b0d7dba9fa93",
+  "direction_records": [
+    "task-ns2604-coop-20261007T142046Z",
+    "task-ns2604-coop-20261007T144733Z",
+    "task-ns2604-coop-20261007T150457Z",
+    "task-ns2604-coop-20261007T150807Z"
+  ],
+  "prepared_mapping_sha256": "df3da37389d1f61abe0c7327658571493b3a63eba5966f4048580d97663b79f7",
+  "current_key": "codebase-memory-mcp",
+  "component_owner_unchanged": "codebase-memory",
+  "preserved_main_registrations": {
+    "claude": 7,
+    "codex": 8,
+    "stack_worker_policies": 6
+  },
+  "models_effort_permissions_payloads_preserved": true,
+  "historical_observations_and_raw_accounting_labels_preserved": true,
+  "byte_budgets": {
+    "key_only_compact": 8080,
+    "key_only_rendered": 9146,
+    "key_only_startup": 20105,
+    "qualified_compact": 8076,
+    "qualified_rendered": 9142,
+    "qualified_startup": 20101,
+    "fixed_startup_limit": 20103
+  },
+  "evidence_classes": [
+    "primary-source review",
+    "native repository integration",
+    "synthetic fixtures",
+    "native source-byte comparison"
+  ],
+  "qualification": {
+    "python_distinct_tests": 1135,
+    "python_skipped": 27,
+    "modular_exit_code": 0,
+    "first_group_tests": 1135,
+    "first_group_seconds": 312.798,
+    "first_group_exit_code": 1,
+    "first_group_failures": 1,
+    "first_group_errors": 0,
+    "first_group_raw_sha256": "86eac398991c1982d448d732efbb7689b0fb9aa81159237b4981aade086675e2",
+    "retained_failure": "tests.test_codex_agents.CustomAgentInstructionsTests.test_readme_rows_and_dated_section: new appendix required supersession wording",
+    "repair": "new current binding appendix adds required wording; historical text/assertions unchanged",
+    "affected_module_rerun_tests": 19,
+    "affected_module_rerun_seconds": 0.155,
+    "affected_module_rerun_exit_code": 0,
+    "affected_rerun_raw_sha256": "18e3c23db79192db2efa28cc270aaea696486266ab0deb62f7b7fa254b831f8b",
+    "node_accounting_tests": 170,
+    "node_accounting_failed": 0,
+    "node_accounting_exit_code": 0,
+    "node_raw_sha256": "0fda04f636f40a8c852caefff19b1cdc7bc69fb925c23f9c139324b1d418e2a9",
+    "node_optional_parser": "reported skipped: optional parser not installed",
+    "counting": "1135 distinct Python tests; the19-test rerun replaces the same19 methods and is never added to1135"
+  },
+  "instruction_text": [
+    "adoption/templates/codex.AGENTS.template.md:42",
+    "adoption/agents/codex/stack-researcher.toml:22",
+    "adoption/agents/codex/stack-researcher.toml:60",
+    "adoption/agents/codex/stack-verifier.toml:22",
+    "adoption/agents/codex/stack-verifier.toml:59",
+    "adoption/agents/codex/workers/evidence-reviewer.toml:60",
+    "adoption/agents/codex/workers/isolated-builder.toml:60",
+    "adoption/agents/codex/workers/semantic-evidence-reviewer.toml:60",
+    "adoption/hooks/claude/token-lanes-block.main.md:8",
+    "adoption/hooks/claude/token-lanes-block.md:2",
+    "adoption/hooks/claude/token-lanes-block.md:6",
+    "adoption/hooks/claude/token-lanes-block.md:8",
+    "adoption/new-wsl/codex-user-instructions.md:20",
+    "adoption/new-wsl/codex-user-instructions.md:66",
+    "adoption/scaffold/AGENTS.md:21",
+    "adoption/templates/codex.AGENTS.template.md:20",
+    "examples/codex-native/agents/evidence-reviewer.toml:43",
+    "examples/codex-native/agents/isolated-builder.toml:43",
+    "examples/codex-native/agents/semantic-evidence-reviewer.toml:70",
+    "examples/codex-native/agents/stack-researcher.toml:22",
+    "examples/codex-native/agents/stack-researcher.toml:60",
+    "examples/codex-native/agents/stack-verifier.toml:22",
+    "examples/codex-native/agents/stack-verifier.toml:59"
+  ],
+  "host_changes": false,
+  "live_MCP_or_model_execution": false,
+  "upstream_acceptance_claim": false,
+  "limits": [
+    "Source/integration checks establish no live-host or provider acceptance.",
+    "Full-suite/landing checks are deferred to the named landing turn.",
+    "Optional shell-parser tests report their unavailable dependency; no skip is promoted to pass."
+  ],
+  "instruction_text_scope": "Retained inspected context anchors, not an exhaustive list of changed instruction hunks. Some anchors are unchanged context; actual changed hunks are listed separately below.",
+  "formal_changed_instruction_hunks": [
+    {
+      "order": 1,
+      "path": "adoption/templates/codex.AGENTS.template.md",
+      "line": 42,
+      "change": "four_byte_trim",
+      "meaning": "Delete exactly ` too` from the second git-show example",
+      "authority": "Q26"
+    },
+    {
+      "order": 2,
+      "path": "adoption/new-wsl/codex-user-instructions.md",
+      "line": 66,
+      "change": "four_byte_trim",
+      "meaning": "Native rendered trim copy",
+      "authority": "Q26"
+    },
+    {
+      "order": 3,
+      "path": "adoption/agents/codex/stack-researcher.toml",
+      "line": 60,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim projection",
+      "authority": "Q26"
+    },
+    {
+      "order": 4,
+      "path": "adoption/agents/codex/stack-verifier.toml",
+      "line": 59,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim projection",
+      "authority": "Q26"
+    },
+    {
+      "order": 5,
+      "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
+      "line": 60,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim projection",
+      "authority": "Q26"
+    },
+    {
+      "order": 6,
+      "path": "adoption/agents/codex/workers/isolated-builder.toml",
+      "line": 60,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim projection",
+      "authority": "Q26"
+    },
+    {
+      "order": 7,
+      "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
+      "line": 60,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim projection",
+      "authority": "Q26"
+    },
+    {
+      "order": 8,
+      "path": "examples/codex-native/agents/stack-researcher.toml",
+      "line": 60,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim mirror",
+      "authority": "Q26"
+    },
+    {
+      "order": 9,
+      "path": "examples/codex-native/agents/stack-verifier.toml",
+      "line": 59,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim mirror",
+      "authority": "Q26"
+    },
+    {
+      "order": 10,
+      "path": "examples/codex-native/agents/evidence-reviewer.toml",
+      "line": 43,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim mirror",
+      "authority": "Q26"
+    },
+    {
+      "order": 11,
+      "path": "examples/codex-native/agents/isolated-builder.toml",
+      "line": 43,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim mirror",
+      "authority": "Q26"
+    },
+    {
+      "order": 12,
+      "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
+      "line": 70,
+      "change": "four_byte_trim",
+      "meaning": "Native F4 trim mirror",
+      "authority": "Q26"
+    },
+    {
+      "order": 13,
+      "path": "adoption/templates/codex.AGENTS.template.md",
+      "line": 20,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical graph lane token only",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 14,
+      "path": "adoption/new-wsl/codex-user-instructions.md",
+      "line": 20,
+      "change": "canonical_graph_server_key",
+      "meaning": "Rendered canonical graph lane token",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 15,
+      "path": "adoption/scaffold/AGENTS.md",
+      "line": 21,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical graph lane token",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 16,
+      "path": "adoption/hooks/claude/token-lanes-block.md",
+      "line": 2,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical graph tool IDs in bootstrap",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 17,
+      "path": "adoption/hooks/claude/token-lanes-block.md",
+      "line": 8,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical graph key in existing navigation clause",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 18,
+      "path": "adoption/hooks/claude/token-lanes-block.main.md",
+      "line": 8,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical graph key in existing navigation clause",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 19,
+      "path": "docs/token-session-handbook.md",
+      "line": 279,
+      "change": "canonical_graph_server_key",
+      "meaning": "Matched canonical tool-ID bootstrap",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 20,
+      "path": "docs/token-session-handbook.md",
+      "line": 305,
+      "change": "canonical_graph_server_key",
+      "meaning": "Matched canonical graph navigation clause",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 21,
+      "path": "docs/token-session-handbook.md",
+      "line": 341,
+      "change": "canonical_graph_server_key",
+      "meaning": "Matched main-session graph clause",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 22,
+      "path": "docs/token-session-handbook.md",
+      "line": 372,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical graph key in existing routing advice",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 23,
+      "path": "docs/token-session-handbook.md",
+      "line": 456,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical key in existing MCP setup instructions",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    },
+    {
+      "order": 24,
+      "path": "adoption/bootstrap.md",
+      "line": 471,
+      "change": "canonical_graph_server_key",
+      "meaning": "Canonical key in existing registration setup inventory",
+      "authority": "SERVER-KEY; RENAME-PR \u00a71"
+    }
+  ],
+  "formal_instruction_hunk_provenance": {
+    "base": "003804f24fa5d998ba429dff3235b0d7dba9fa93",
+    "source_head": "0aae66bd9ca5ff68c007cd00de47bceac7e25388",
+    "derived_manifest_sha256": "8accd45c4048fab778bbd1b520c08ad82b1fbd47f3fff5818079258419064357",
+    "derivation": "Actual additions/deletions in git diff --no-ext-diff --unified=0 between base and source_head; unchanged diff context is excluded. Scope includes served instruction carriers, native role fragments and their changed setup/copied-guidance instructions.",
+    "count": 24,
+    "trim_first": "adoption/templates/codex.AGENTS.template.md:42"
+  }
+}

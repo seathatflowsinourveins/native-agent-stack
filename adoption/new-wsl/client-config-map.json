@@ -446,13 +446,13 @@
     },
     {
       "match": [
-        "claude/mcp/server/codebase-memory",
-        "codex/*/mcp_servers.codebase-memory.*"
+        "claude/mcp/server/codebase-memory-mcp",
+        "codex/*/mcp_servers.codebase-memory-mcp.*"
       ],
       "wiring": "slot:code-graph",
       "owner": "codebase-memory",
       "names": [
-        "codebase-memory"
+        "codebase-memory-mcp"
       ],
       "source": "DeusData/codebase-memory-mcp v0.11.0, installed by the code-graph row of evidence/artifacts/new-wsl-install-plan-20261002/install.sh. docs/decisions/2026-09-25-codex-mcp-scope.md requires explicit index_repository and auto_index=false; this entry registers only the MCP server and never invokes indexing."
     },

@@ -36,7 +36,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 PARSER_DIR = Path(os.environ.get("CHILD_USAGE_SHELL_PARSER") or Path.home() / ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1")
 LANES = ["qmd", "toon", "repomix", "markitdown", "headroom", "jcodemunch-mcp", "codebase-memory-mcp", "ai-memory", "serena", "context-mode"]
-SERVERS = ["codebase-memory", "context-mode", "socraticode", "serena", "qmd", "headroom", "jcodemunch", "ai-memory"]
+SERVERS = ["codebase-memory-mcp", "context-mode", "socraticode", "serena", "qmd", "headroom", "jcodemunch", "ai-memory"]
 REAL = ["env", "timeout", "nice", "nohup", "stdbuf", "xargs", "cat", "bash", "sh", "dash"]
 SEEDS = range(1, 9)
 PER_SEED = 60
@@ -194,7 +194,7 @@ PROBES = [
     ("lane version", "qmd --version"),
     ("lane help", "toon --help"),
     ("lane after dashdash", "qmd search -- --help"),
-    ("mcporter call", "mcporter call codebase-memory.search_graph --args '{}'"),
+    ("mcporter call", "mcporter call codebase-memory-mcp.search_graph --args '{}'"),
     ("mcporter list", "mcporter list socraticode --brief"),
     ("mcporter version", "mcporter --version"),
     # tree-sitter-bash 0.25.1 cuts an assignment's word at the second `$` of `a=$x/$y-$z` and reads the tail as the command's name (and the

@@ -17,7 +17,7 @@ The harness exists to build complex systems, projects and the north-star R&D; ea
 `codex -p omniroute` is the GPT-6 lane, and Claude-side judgment runs on Opus 5.5 at max through the cooperation lanes.
 A coordinator records each decision in a dated `docs/decisions/YYYY-MM-DD-<slug>.md` naming its alternatives and the comparison that would overturn it.
 No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed.
-Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
+Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory-mcp` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
 
 <!-- native-agent-stack:session-lanes -->
 Before Serena use, read initial_instructions once/session; project-from-cwd activates this worktree; switches need returned session_id.
@@ -63,7 +63,7 @@ tokens; behavior and exit code are unchanged.
 RTK prefix/output/exit exceptions:
 rtk 0.51.0 needs `--shell` for positional expansion; explicit `rtk` prefix bypasses exclusions. For the forms below use native commands or `rtk proxy <command>`:
 - A skill's `SKILL.md`: read it with plain `sed -n '1,400p' <path>` (no `rtk` prefix, not `cat`/`head`/`tail`) so Codex counts the load as `codex.skill.injected`.
-- `git show REV:path` (any; `git -C DIR show REV:path` too): ~8 KiB cap.
+- `git show REV:path` (any; `git -C DIR show REV:path`): ~8 KiB cap.
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 - `git branch`: may mark other-worktree branches remote-only.
 - `git log` full: silent 10-commit cap; no merges.

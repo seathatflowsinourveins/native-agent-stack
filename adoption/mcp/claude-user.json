@@ -63,7 +63,7 @@
         "DO_NOT_TRACK": "1"
       }
     },
-    "codebase-memory": {
+    "codebase-memory-mcp": {
       "type": "stdio",
       "command": "${ECO_ROOT}/bin/codebase-memory-mcp",
       "args": [],

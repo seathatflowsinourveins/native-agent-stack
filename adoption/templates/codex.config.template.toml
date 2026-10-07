@@ -59,7 +59,7 @@ enabled = false
 # "cwd" and resolve their project from Codex's own launch directory (serena's own --project-from-cwd).
 # ai-memory's registration carries no project: its workspace/project scoping is a per-call argument.
 # headroom, codebase-memory and qmd mirror the Claude user-scope set: headroom's dead proxy URL means
-# it reroutes no model traffic, codebase-memory indexes only on an explicit index_repository call,
+# it reroutes no model traffic, codebase-memory-mcp indexes only on an explicit index_repository call,
 # and qmd serves the named catalog index. jcodemunch is registered below at user scope (the user's directive of 2026-10-04,
 # docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md). context-mode's plugin
 # supplies its hooks and skills, while its MCP server is registered below, bound to each session's own
@@ -127,7 +127,7 @@ HF_HUB_OFFLINE = "1"
 TRANSFORMERS_OFFLINE = "1"
 DO_NOT_TRACK = "1"
 
-[mcp_servers.codebase-memory]
+[mcp_servers.codebase-memory-mcp]
 command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 
 [mcp_servers.qmd]

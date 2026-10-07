@@ -38,7 +38,7 @@ CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.main.m
                        "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
-USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd", "jcodemunch"}
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd", "jcodemunch"}
 # A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
 # it out. None now: jCodeMunch was the one (registered per project since the 2026-09-25 addendum of
 # docs/decisions/2026-09-23-claude-user-profile.md) until the user's directive of 2026-10-04 put it back at user scope
@@ -1444,7 +1444,7 @@ class McpCarrierCoverageTests(unittest.TestCase):
         # only (no mcp__ ids), so the union is the general block's set.
         self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
                          sorted(CARRIER_BLOCK_NAMES))
-        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
+        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory-mcp", "headroom"}
         self.assertEqual(carrier_servers(carrier_blocks_text(self.BLOCKS)), lanes)
         self.assertEqual(carrier_servers(CARRIER.read_text(encoding="utf-8")), lanes)
         self.assertEqual(carrier_servers("mcp__plugin_context-mode_context-mode__ctx_execute, mcp__qmd__get"), {"qmd"})
@@ -1519,7 +1519,7 @@ class McpCodexParityTests(unittest.TestCase):
             "command": ("headroom", lambda entry: entry.update(command="${ECO_ROOT}/bin/headroom-x")),
             "argument": ("qmd", lambda entry: entry.update(args=["--index", "other", "mcp"])),
             "env name missing": ("headroom", lambda entry: entry["env"].pop("DO_NOT_TRACK")),
-            "env name added": ("codebase-memory", lambda entry: entry.setdefault("env", {}).update(X="1")),
+            "env name added": ("codebase-memory-mcp", lambda entry: entry.setdefault("env", {}).update(X="1")),
             "env value": ("socraticode", lambda entry: entry["env"].update(QDRANT_URL="http://127.0.0.1:1")),
             "url": ("ai-memory", lambda entry: entry.update(url="http://127.0.0.1:1/mcp")),
         }
@@ -1532,7 +1532,7 @@ class McpCodexParityTests(unittest.TestCase):
     def test_codebase_memory_is_the_bare_frontend_of_the_shared_daemon(self):
         # Each session's codebase-memory-mcp is a frontend of one shared daemon, so the entry is the binary itself:
         # no wrapper (a bounded runner that stops its scope would take a daemon it started down with it), no args.
-        entry = self.claude()["codebase-memory"]
+        entry = self.claude()["codebase-memory-mcp"]
         self.assertEqual(entry["command"], "${ECO_ROOT}/bin/codebase-memory-mcp")
         self.assertEqual(entry.get("args", []), [])
         self.assertEqual(entry.get("env", {}), {})

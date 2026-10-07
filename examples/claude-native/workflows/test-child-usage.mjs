@@ -714,6 +714,7 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['mcporter call --server ai-memory --tool create_comment', ['mcporter/mcporter:call@ai-memory']], ['mcporter call qmd create_comment', ['mcporter/mcporter:call@qmd']],
     ['mcporter call create_comment server=headroom', ['mcporter/mcporter:call@headroom']],
     ['mcporter --config c.json --log-level debug call context-mode.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@context-mode']],
+    ['mcporter call codebase-memory-mcp.search_graph', ['mcporter/mcporter:call@codebase-memory-mcp']],
     ['mcporter call codebase-memory.search_graph', ['mcporter/mcporter:call@codebase-memory']],
   ])
   check('cli lanes: data, lookups, registrations, remote strings, version and help, and programs a variable names', [

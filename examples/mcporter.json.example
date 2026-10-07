@@ -13,7 +13,7 @@
       },
       "lifecycle": "keep-alive"
     },
-    "codebase-memory": {
+    "codebase-memory-mcp": {
       "command": "/ABSOLUTE/STACK_HOME/bin/codebase-memory-mcp",
       "cwd": "/ABSOLUTE/PROJECT_ROOT",
       "env": {
