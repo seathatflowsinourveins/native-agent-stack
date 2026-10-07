@@ -17,7 +17,7 @@
 # (that unit's header quotes systemd.unit(5)). The separate ExecStartPre model proposal mode makes bounded,
 # read-only primary-source checks; currency_due.py itself stays offline.
 #
-# The run makes no network call and writes nothing into the checkout. scripts/currency_due.py runs
+# The currency_due.py step makes no network call and writes nothing into the checkout. It runs
 # receipt_staleness.py, adoption_status.py --pinned-versions and saturation_ledger.py --report, then writes
 # $XDG_STATE_HOME/native-agent-stack/currency-due.json (~/.local/state/... when XDG_STATE_HOME is unset; mode 0600)
 # when something is due and removes it otherwise. Its --network option (runtime-worker skill pins through gh api)

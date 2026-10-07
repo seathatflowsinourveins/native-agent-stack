@@ -1153,7 +1153,7 @@ def collect_model_currency(root: Path, inventory: Path, *, checked_at_utc: str |
         for row in document[row_kind + "s"]:
             current = row.get("latest_version") if row_kind == "package" else row["revision"]
             line = row.get("release_line")
-            if line is None:
+            if row_kind == "model" and row["status"] == "package_bound":
                 package = packages[row["package"]["id"]]
                 line = package["release_line"]
                 current = row["package"]["version"]
@@ -1164,7 +1164,7 @@ def collect_model_currency(root: Path, inventory: Path, *, checked_at_utc: str |
                       "release_line": line, **observed}
             if row_kind == "model":
                 record["model_id"], record["revision"] = row["model_id"], row["revision"]
-            if "package" in row:
+            if row_kind == "model" and row["status"] == "package_bound":
                 package = packages[row["package"]["id"]]
                 record["package"] = {"id": package["id"], "version": row["package"]["version"],
                                      "source": package["release_source"], "checked_at": package["checked_at"]}
@@ -1192,7 +1192,8 @@ def collect_model_currency(root: Path, inventory: Path, *, checked_at_utc: str |
         check = row.get("landscape_check")
         check_age = (when - date.fromisoformat(check["date"])).days if check else None
         needs_check = release_age > policy["max_release_age_days"]
-        refresh = needs_check and (check_age is None or check_age >= policy["max_landscape_age_days"] - policy["refresh_lead_days"])
+        refresh = ((check_age is not None and check_age >= policy["max_landscape_age_days"] - policy["refresh_lead_days"])
+                   or (needs_check and check_age is None))
         expired = needs_check and (check_age is None or check_age > policy["max_landscape_age_days"])
         landscape.append({"id": row["id"], "effective_release_date": effective["release_date"],
                           "release_age_days": release_age, "landscape_age_days": check_age,

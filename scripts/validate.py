@@ -15,7 +15,9 @@ import re
 import struct
 import subprocess
 import zlib
+from datetime import date, datetime, timezone
 from pathlib import Path, PurePosixPath
+from urllib.parse import urlsplit
 
 
 RECEIPT_KINDS = {
@@ -46,6 +48,160 @@ PRIVATE_CONTENT = (
 
 class InvalidPublication(ValueError):
     """One or more manifest, integrity, or publication hygiene failures."""
+
+
+MODEL_CURRENCY_PATH = "catalogs/foundation/model-currency.json"
+MODEL_MAX_RELEASE_AGE_DAYS = 42
+MODEL_MAX_LANDSCAPE_AGE_DAYS = 7
+
+
+def model_currency_problems(document, today: date | None = None, *, enforce_age=True) -> list[str]:
+    """Check the dated model inventory offline; package bindings use the latest package date."""
+    today = today if today is not None else datetime.now(timezone.utc).date()
+    errors = []
+    if type(today) is not date:
+        return ["model currency: today must be a date"]
+    if not isinstance(document, dict) or type(document.get("schema_version")) is not int or document["schema_version"] != 1:
+        return ["model currency: expected schema_version 1 object"]
+
+    def text(value, label):
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"{label}: expected nonempty string")
+            return False
+        return True
+
+    def parsed_date(value, label):
+        try:
+            if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+                raise ValueError
+            result = date.fromisoformat(value)
+        except ValueError:
+            errors.append(f"{label}: expected valid YYYY-MM-DD date")
+            return None
+        if result > today:
+            errors.append(f"{label}: future date")
+        return result
+
+    def source(value, label):
+        try:
+            parts = urlsplit(value) if isinstance(value, str) else None
+            valid = parts is not None and parts.scheme == "https" and bool(parts.hostname) and not parts.username and not parts.password
+        except ValueError:
+            valid = False
+        if not valid:
+            errors.append(f"{label}: expected primary HTTPS source URL")
+
+    def records(key):
+        result = {}
+        values = document.get(key)
+        if not isinstance(values, list):
+            errors.append(f"model currency {key}: expected array")
+            return result
+        for i, row in enumerate(values):
+            label = f"model currency {key}[{i}]"
+            if not isinstance(row, dict):
+                errors.append(f"{label}: expected object")
+                continue
+            identifier = row.get("id")
+            if text(identifier, f"{label}.id"):
+                if identifier in result:
+                    errors.append(f"{label}: duplicate id {identifier}")
+                result[identifier] = row
+        return result
+
+    def release_line(value, label):
+        if not isinstance(value, dict):
+            errors.append(f"{label}: expected release line object")
+            return
+        kind = value.get("kind")
+        if kind == "huggingface":
+            text(value.get("repository"), f"{label}.repository")
+            if value.get("ref") != "main":
+                errors.append(f"{label}.ref: latest-line checks require the Hub default main branch, not a pinned revision or tag")
+        elif kind == "github_release":
+            if not isinstance(value.get("repository"), str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", value["repository"]):
+                errors.append(f"{label}.repository: expected owner/repository")
+        elif kind == "pypi":
+            text(value.get("package"), f"{label}.package")
+        elif kind == "vendor_page":
+            source(value.get("url"), f"{label}.url")
+        else:
+            errors.append(f"{label}: unsupported release line kind")
+
+    if not isinstance(document.get("inventory_status"), str) or document["inventory_status"] not in {"pending", "complete"}:
+        errors.append("model currency: inventory_status must be pending or complete")
+    expected_policy = {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2}
+    if document.get("policy") != expected_policy:
+        errors.append("model currency: policy must retain the 42-day/7-day limits and 2-day refresh lead")
+    packages = records("packages")
+    package_dates = {}
+    for identifier, package in packages.items():
+        label = f"model currency package {identifier}"
+        text(package.get("latest_version"), f"{label}.latest_version")
+        package_dates[identifier] = parsed_date(package.get("release_date"), f"{label}.release_date")
+        source(package.get("release_source"), f"{label}.release_source")
+        parsed_date(package.get("checked_at"), f"{label}.checked_at")
+        release_line(package.get("release_line"), f"{label}.release_line")
+    models = records("models")
+    if document.get("inventory_status") == "complete" and not models:
+        errors.append("model currency: a complete inventory needs model rows")
+    for identifier, model in models.items():
+        label = f"model currency model {identifier}"
+        for field in ("role", "consumer", "model_id", "revision"):
+            text(model.get(field), f"{label}.{field}")
+        released = parsed_date(model.get("release_date"), f"{label}.release_date")
+        source(model.get("release_source"), f"{label}.release_source")
+        parsed_date(model.get("checked_at"), f"{label}.checked_at")
+        status = model.get("status")
+        if not isinstance(status, str) or status not in {"in_use", "held", "package_bound"}:
+            errors.append(f"{label}: unsupported status")
+        effective_release = released
+        if status == "package_bound":
+            binding = model.get("package")
+            package_id = binding.get("id") if isinstance(binding, dict) else None
+            package = packages.get(package_id) if isinstance(package_id, str) else None
+            if package is None:
+                errors.append(f"{label}: package binding must join a package record")
+            else:
+                if binding.get("version") != package.get("latest_version"):
+                    errors.append(f"{label}: package version does not follow the recorded latest release")
+                effective_release = package_dates.get(package_id)
+        else:
+            release_line(model.get("release_line"), f"{label}.release_line")
+            if isinstance(model.get("release_line"), dict) and model["release_line"].get("kind") == "huggingface":
+                if not isinstance(model.get("revision"), str) or not re.fullmatch(r"[0-9a-f]{40}", model["revision"]):
+                    errors.append(f"{label}.revision: expected exact Hugging Face commit SHA")
+        landscape = model.get("landscape_check")
+        reviewed = None
+        if landscape is not None:
+            if not isinstance(landscape, dict):
+                errors.append(f"{label}.landscape_check: expected object")
+            else:
+                reviewed = parsed_date(landscape.get("date"), f"{label}.landscape_check.date")
+                sources = landscape.get("sources")
+                if not isinstance(sources, list) or not sources:
+                    errors.append(f"{label}.landscape_check.sources: expected nonempty source array")
+                else:
+                    for i, url in enumerate(sources):
+                        source(url, f"{label}.landscape_check.sources[{i}]")
+                candidates = landscape.get("newer_candidates")
+                if not isinstance(candidates, list):
+                    errors.append(f"{label}.landscape_check.newer_candidates: expected array")
+                else:
+                    for i, candidate in enumerate(candidates):
+                        candidate_label = f"{label}.landscape_check.newer_candidates[{i}]"
+                        if not isinstance(candidate, dict):
+                            errors.append(f"{candidate_label}: expected object")
+                            continue
+                        for field in ("model_id", "revision", "reason"):
+                            text(candidate.get(field), f"{candidate_label}.{field}")
+                        source(candidate.get("source"), f"{candidate_label}.source")
+                text(landscape.get("reason"), f"{label}.landscape_check.reason")
+                text(model.get("overturn"), f"{label}.overturn")
+        if enforce_age and effective_release is not None and (today - effective_release).days > MODEL_MAX_RELEASE_AGE_DAYS:
+            if reviewed is None or not 0 <= (today - reviewed).days <= MODEL_MAX_LANDSCAPE_AGE_DAYS:
+                errors.append(f"{label}: release older than 42 days needs a sourced landscape check within 7 days")
+    return errors
 
 
 def _json_without_duplicates(pairs):
@@ -142,9 +298,10 @@ def scan_file_for_private_content(path: Path) -> list[str]:
 
 
 class Validator:
-    def __init__(self, root: Path):
+    def __init__(self, root: Path, *, today: date | None = None):
         self.root = root.resolve()
         self.errors: list[str] = []
+        self.today = today
 
     def error(self, message: str) -> None:
         self.errors.append(message)
@@ -474,6 +631,8 @@ class Validator:
             for receipt_id in self.identifiers(model.get("evidence_ids", []), "model.evidence_ids"):
                 if receipt_id not in receipts:
                     self.error(f"model: unknown evidence {receipt_id}")
+        if (self.root / MODEL_CURRENCY_PATH).exists():
+            self.errors.extend(model_currency_problems(self.load(MODEL_CURRENCY_PATH), self.today))
         self.check_credential_inventory()
         self.scan_publication(files)
         if self.errors:
@@ -481,13 +640,14 @@ class Validator:
         return {"components": len(components), "profiles": len(profiles), "receipts": len(receipts), "hashed_files": len(files)}
 
 
-def validate(root: Path) -> dict[str, int]:
-    return Validator(root).validate()
+def validate(root: Path, *, today: date | None = None) -> dict[str, int]:
+    return Validator(root, today=today).validate()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--today", type=date.fromisoformat, help="Model currency UTC date YYYY-MM-DD; default is today's UTC date")
     parser.add_argument(
         "--scan-file", action="append", default=[], type=Path, metavar="PATH",
         help="Scan an arbitrary file (repeatable) for PRIVATE_CONTENT patterns and "
@@ -505,7 +665,7 @@ def main() -> int:
         print(json.dumps({"status": "passed", "scanned_files": len(args.scan_file)}, sort_keys=True))
         return 0
     try:
-        summary = validate(args.root)
+        summary = validate(args.root, today=args.today)
     except InvalidPublication as error:
         print(f"Publication validation failed:\n{error}")
         return 1

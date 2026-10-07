@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "inventory_status": "pending",
+  "policy": {
+    "max_release_age_days": 42,
+    "max_landscape_age_days": 7,
+    "refresh_lead_days": 2
+  },
+  "packages": [],
+  "models": []
+}

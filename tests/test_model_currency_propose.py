@@ -41,8 +41,8 @@ class CollectModelCurrencyTests(unittest.TestCase):
         self.schema = patch.object(fp, "_model_currency_problems", return_value=[])
         self.check_schema = self.schema.start()
         self.addCleanup(self.schema.stop)
-        (ROOT / ".cache").mkdir(exist_ok=True)
-        self.temp = tempfile.TemporaryDirectory(prefix="model-currency-", dir=ROOT / ".cache")
+        (ROOT / ".runtime").mkdir(exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(prefix="model-currency-", dir=ROOT / ".runtime")
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / "inventory.json"
 
@@ -116,12 +116,43 @@ class CollectModelCurrencyTests(unittest.TestCase):
         self.assertTrue(result["landscape"][0]["refresh_due"])
         self.assertTrue(result["landscape"][0]["expired"])
 
+    def test_landscape_refresh_precedes_the_42_day_transition(self):
+        doc = inventory()
+        doc["models"][0]["release_date"] = "2026-08-26"  # Exactly 42 days old.
+        doc["models"][0]["landscape_check"] = {"date": "2026-09-30", "sources": ["https://example.org/source"],
+                                                "newer_candidates": [], "reason": "reviewed alternatives"}
+        result = self.collect(doc)
+        self.assertTrue(result["landscape"][0]["refresh_due"])
+        self.assertFalse(result["landscape"][0]["expired"])
+        self.assertEqual(result["proposals"][0]["action"], "refresh_landscape")
+
     def test_pending_empty_inventory_is_reported_without_any_source_call(self):
         doc = {"schema_version": 1, "inventory_status": "pending", "policy": POLICY, "packages": [], "models": []}
         reader = Mock(side_effect=AssertionError("pending inventory must not fetch"))
         result = self.collect(doc, reader)
         self.assertEqual(result["proposals"][0]["action"], "complete_inventory")
         reader.assert_not_called()
+
+    def test_package_bound_always_follows_its_package_line(self):
+        doc = inventory()
+        doc["packages"] = [{"id": "runtime", "latest_version": "2.0.0", "release_date": "2026-10-01",
+                            "release_source": "https://pypi.org/project/runtime/2.0.0/", "checked_at": "2026-10-06",
+                            "release_line": {"kind": "pypi", "package": "runtime"}}]
+        # The retained model line describes weights; the shipping-package
+        # contract must win for both the primary check and the effective age.
+        doc["models"][0].update(status="package_bound", package={"id": "runtime", "version": "2.0.0"})
+        reader = Mock(return_value=observed("2.0.0", kind="published_release", release_date="2026-10-01"))
+        result = self.collect(doc, reader)
+        self.assertTrue(all(call.args[0]["kind"] == "pypi" for call in reader.call_args_list))
+        self.assertEqual(result["observations"][1]["current"], "2.0.0")
+        self.assertFalse(result["review_required"])
+
+    def test_nonbinding_package_metadata_cannot_crash_primary_checks(self):
+        doc = inventory()
+        doc["models"][0]["package"] = {"id": "not-a-binding", "version": "x"}
+        result = self.collect(doc)
+        self.assertEqual(result["observations"][0]["current"], SHA)
+        self.assertNotIn("package", result["observations"][0])
 
     def test_invalid_inventory_is_rejected_before_any_source_or_write(self):
         self.check_schema.return_value = ["invalid row"]
