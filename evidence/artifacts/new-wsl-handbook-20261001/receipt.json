@@ -642,6 +642,19 @@
         "docs/new-wsl-handbook.json": "ce93a4d6d436eec83d0cf7797a09a01e5967a81f17eb818a20c684ff93a358a2"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "round": "local-model-sixteen-cleanup-dispositions",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "The new documentary ruling receipt now carries all sixteen source-bound cleanup dispositions and dated owner state. Its source hash flows through the maintained current-ruling projection; no installed model or readiness change.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "56541a271b75b1148566e1257effb4d74c367eb170411f09138aec7a02487e83",
+        "docs/new-wsl-handbook.json": "09e511413a4dabf7572e123f19946511eb9fb3ddd7c15770ab2aaea208b128af"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]
 }

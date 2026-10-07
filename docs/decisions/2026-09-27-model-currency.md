@@ -31,24 +31,7 @@ is merged and the session starts or reloads its settings, so its two fallback gu
 ([settings](https://code.claude.com/docs/en/settings#when-edits-take-effect)); the portable file and the template
 apply only where a host loads or re-applies them.
 
-## NativeStack2604 supersession, 2026-10-06
-
-The local-model rows and holds below retain the workstation's 2026-09-27
-observations. For NativeStack2604, use the later
-[retrieval-first decision](2026-10-06-retrieval-first-local-models.md): shared
-Nemotron 8B/4096 text embeddings, QMD lexical search with kept expansion and a
-consumer-limited reranker exception, and retired general local generation.
-The former 1B and MiniLM defaults do not select this host's current model;
-MiniLM deletion remains subject to the CC's separate Gate 3/holder gate.
-
-The historical Jina hold at lines 69-73 describes the old QMD backend limit.
-The kept QMD reranker and its reopening triggers now have the later dated
-exception record. The old ai-memory 2.5 release hold at lines 74-76 is likewise
-historical: the later choice uses ai-memory 2.5.2's supported external-embedding
-interface. These updates do not rewrite the earlier returned evidence or
-describe another distribution's present state.
-
-## Historical decision table (2026-09-27)
+## Decision table
 
 No row switches a model: every routed model is the newest in its family on 2026-09-27, and four rows hold a newer
 model behind an upstream gate.
@@ -81,7 +64,7 @@ Two rows keep a model that a single source could rank lower:
 - **Extraction.** GPT-6 Luna shares Sol's release date. The frozen #359 metric (billed tokens) picked Sol; a rerun that
   scores credits or included usage could favour Luna, and changing that metric is the user's call.
 
-## Historical holds and their gates (2026-09-27)
+## Holds and their gates
 
 - **jina-reranker-v3.5 for qmd.** qmd reranks through node-llama-cpp's `createRankingContext` and `rankAll`
   (tobi/qmd `v2.8.3` `src/llm.ts`), so only a GGUF that stock llama.cpp can rank-pool is a drop-in. The v3.5 GGUF card
@@ -545,3 +528,20 @@ they describe the September 27 state. The
 also points forward and retains its old quote through this record's unchanged line 132. Keeping Fable was the previous
 selection; Opus replaces it at the user's request, with post-change savings and quality still unmeasured. Revisit the
 selection through the October 4 record's observation contract or a subsequent user decision.
+
+## Amendment (2026-10-06): NativeStack2604 supersession
+
+The local-model rows and holds below retain the workstation's 2026-09-27
+observations. For NativeStack2604, use the later
+[retrieval-first decision](2026-10-06-retrieval-first-local-models.md): shared
+Nemotron 8B/4096 text embeddings, QMD lexical search with kept expansion and a
+consumer-limited reranker exception, and retired general local generation.
+The former 1B and MiniLM defaults do not select this host's current model;
+MiniLM deletion remains subject to the CC's separate Gate 3/holder gate.
+
+The historical Jina hold at lines 69-73 describes the old QMD backend limit.
+The kept QMD reranker and its reopening triggers now have the later dated
+exception record. The old ai-memory 2.5 release hold at lines 74-76 is likewise
+historical: the later choice uses ai-memory 2.5.2's supported external-embedding
+interface. These updates do not rewrite the earlier returned evidence or
+describe another distribution's present state.

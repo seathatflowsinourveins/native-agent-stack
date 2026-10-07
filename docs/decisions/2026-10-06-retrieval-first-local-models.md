@@ -38,8 +38,20 @@ No foundation readiness count is derived.
 Nemotron 1B and the ai-memory MiniLM baseline are superseded on NativeStack2604.
 The old workstation's Qwen li26 serving receipt and all earlier acceptance/model
 measurements remain historical evidence. This ruling does not describe another
-distribution's current state or authorize changing it. MiniLM deletion still
-waits for the CC's Gate 3/control ruling and holder check.
+distribution's current state or authorize changing it. The receipt's
+`/retirement_and_cleanup_dispositions` contains all sixteen cleanup items,
+each with its original ruling hash/pointer, executor, preparation scope,
+gates, ordering, exclusions and separately dated recorded state.
+
+The CC's manifests record QMD's retired 8B unit and embeddinggemma as deleted.
+A later MiniLM manifest records deletion at 2026-10-06T23:52:52Z, after the
+earlier preparation-only HOLD and integration rerun. These are source-reviewed
+owner operation reports, not this PR's filesystem census or a new model run.
+The MiniLM chronology retains the rerun's false strict canary-text control and
+its non-failure-gate metric declaration; the reviewed documents do not provide
+a separate explicit Gate 3 adjudication/rollback-closure record. That provenance
+gap remains visible rather than being inferred from deletion. Unverified cleanup
+states remain unknown, and Docling remains held for its separate side project.
 
 ## Alternatives and evidence
 

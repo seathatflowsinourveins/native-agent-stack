@@ -281,5 +281,376 @@
     "huggingface-hub-native"
   ],
   "provenance_type": "documentary_local_model_rulings",
-  "claim": "Dated source-review record of the command center local-model choices. Ten roles, consumer-limited exceptions, retirement, pins and pending application gates; no new model run, native acceptance or readiness aggregate."
+  "claim": "Dated source-review record of the command center local-model choices. Ten roles, consumer-limited exceptions, retirement, pins and pending application gates; no new model run, native acceptance or readiness aggregate.",
+  "retirement_and_cleanup_dispositions": [
+    {
+      "source_index": 0,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/0",
+      "target_scope": "QMD retired 8B model, partial and parked indexes, and refetch/rebuild units",
+      "ruling_item": "qmd Qwen3-Embedding-8B unit: the model, the partial index (759 of 4,957 vectors when attempt-003 stopped), the lane's parked copy, and the lane units that would re-fetch or rebuild it",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "lm-qmd packet",
+      "original_ruling_gate": "Apply step 1 is acked. Order: confirm both timers are disabled (they were at 19:58Z, and the timers.target.wants link is already gone), remove the eight unit files, daemon-reload, reset-failed; only then the model and the indexes, so nothing can re-fetch or rebuild them. With the YAML gone a restart would fall back to qmd's compiled default embedder, embeddinggemma by hf: URI. Before each: zero processes with --index native-agent-stack-catalog-q3e8b and a holder check on the exact files. The 8 GB hash runs at nice 19 outside the closed hours. Keep the lane's logs and receipts.",
+      "ordering": "Disable retired timers, remove eight units and reload/reset before model/index cleanup.",
+      "exclusions": [
+        "Retained lane logs and receipts; never restore the retired rebuild."
+      ],
+      "recorded_state": "OWNER_REPORTED_DELETED",
+      "state_evidence_class": "source_review_of_CC_operation_report; not new independent filesystem observation",
+      "observed_operation_utc": "2026-10-06T21:55:55Z",
+      "operation_record": {
+        "locator": "coordination:e2e-truth-20261006/deletions/deletion-manifest-q3e8b-20261006T215554Z.json",
+        "sha256": "8a9223091db5f665e9f25b2c75c932e251f5a461879e267b1b0dd046993314b4",
+        "json_pointers": [
+          "/kind",
+          "/completed_at",
+          "/files",
+          "/checks"
+        ],
+        "files_recorded_deleted": 20
+      }
+    },
+    {
+      "source_index": 1,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/1",
+      "target_scope": "QMD unused embeddinggemma weights and etag",
+      "ruling_item": "embeddinggemma-300M Q8_0, qmd's unused default embedder, and its etag",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "fixwave preparation packet",
+      "original_ruling_gate": "After tonight's window, GO and apply step 6. Then the CC's own packet (embeddinggemma-cc-packet-20261006T1733Z.json): both files re-checked against the manifest; a full-scope holder re-check; a census that no process or registration uses qmd's default index. The census must expect step 6's two changes: index.yml has a new sha256 and still names Gemma on line 3, and the -lex YAML carries qmd's default embed line. Both are names, not use. Accepted: a stray qmd embed or qmd pull would fetch the file again from main.",
+      "ordering": "After GO and pinned-copy preparation; recheck exact files and default-index usage.",
+      "exclusions": [
+        "A config model name alone is not use; stray embed/pull can refetch from main."
+      ],
+      "recorded_state": "OWNER_REPORTED_DELETED",
+      "state_evidence_class": "source_review_of_CC_operation_report; not new independent filesystem observation",
+      "observed_operation_utc": "2026-10-06T22:19:10Z",
+      "operation_record": {
+        "locator": "coordination:e2e-truth-20261006/deletions/deletion-manifest-embeddinggemma-20261006T221910Z.json",
+        "sha256": "a8a5cd6cce2e624c87ab0fcd0d8efa1c72660d6ee00a4b2d897c23398d021fb1",
+        "json_pointers": [
+          "/kind",
+          "/completed_at",
+          "/files",
+          "/checks"
+        ],
+        "files_recorded_deleted": 2
+      }
+    },
+    {
+      "source_index": 2,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/2",
+      "target_scope": "QMD former live 0.6B embedding index",
+      "ruling_item": "qmd live index on Qwen3-Embedding-0.6B (the blue unit)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "lm-qmd preparation and memory-h2h smoke prerequisite",
+      "original_ruling_gate": "Apply steps 5, 8 and 10 passed. Zero processes carry exactly --index native-agent-stack-catalog: match the argument itself, because the -lex and -q3e8b names share its prefix. 58 processes (29 servers) held it at 19:45Z; the step 8 window, which closes and relaunches every session, is what clears them. Then the holder check. If step 5's smoke test ran and failed, it is not deleted: it stays as the NAMED_EXCEPTION fallback.",
+      "ordering": "After successful executed cutover prerequisites; never substitute prefix matches for exact argument census.",
+      "exclusions": [
+        "An actually executed failed smoke retains this model/index as a named fallback exception."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 3,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/3",
+      "target_scope": "Unpinned HF reranker/expansion caches and etags",
+      "ruling_item": "Unpinned hf: cache copies of the kept reranker and expansion models, with their etags (the same bytes as the pinned copies)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "lm-qmd pinned-copy preparation",
+      "original_ruling_gate": "Apply step 6's pinned copies exist with equal sha256. No YAML names the two hf: URIs any more: the q3e8b and live-index items are done, and lines 4 and 5 of <owned-private-path> point at the pinned files. Every qmd server has restarted onto the -lex index, since a server fixes its model URIs at startup and re-fetches a missing hf: file from main. Then the holder check.",
+      "ordering": "After pinned equal-hash copies, old-index retirement and lexical server restart.",
+      "exclusions": [
+        "Pinned reranker and expansion weights remain kept."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 4,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/4",
+      "target_scope": "Swift pinned-download copy",
+      "ruling_item": "Swift-1.5 IQ3_S copy 1 (pinned download directory)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "fixwave plan/pin prerequisite",
+      "original_ruling_gate": "Local generation is RETIRED and the install-plan amendment has merged (apply step 2), per item 173025Z. Holder check; full sha256 at nice 19 outside 10:45Z to 13:45Z and 19:50Z to 00:10Z.",
+      "ordering": "After retirement and install-plan amendment merge.",
+      "exclusions": [
+        "No model deletion by this PR."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 5,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/5",
+      "target_scope": "Swift Ollama import-source copy and Modelfiles",
+      "ruling_item": "Swift-1.5 copy 2 with both Modelfiles (the Ollama import source)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "fixwave plan/pin prerequisite",
+      "original_ruling_gate": "With copy 1, on the same gate.",
+      "ordering": "Jointly with the pinned-download copy on the same gate.",
+      "exclusions": [
+        "Do not split the joint copy/Modelfile retirement gate."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 6,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/6",
+      "target_scope": "Ollama store as one retirement unit",
+      "ruling_item": "Ollama store: Swift copy 3 (blob sha256-1333c6ea…), the qwen3-embedding 0.6b and 8k blob (sha256-06507c7b…), manifests and small blobs",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "fixwave plan prerequisite",
+      "original_ruling_gate": "Apply step 2 merged; ollama.service inactive and disabled (it was at 19:45Z); holder check; every blob's sha256 in the manifest. Delete the store as one unit, never single blobs and never by ollama rm. The Ollama identity key pair beside it (id_ed25519, id_ed25519.pub) was not read and stays unless the CC rules.",
+      "ordering": "After amendment merge and stopped/disabled service; retire the store as one unit.",
+      "exclusions": [
+        "Native identity key pair is excluded and remains unread; no individual blob removal or ollama rm."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 7,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/7",
+      "target_scope": "Ollama Modelfile/service/env configuration",
+      "ruling_item": "Ollama configuration: Modelfile copies, the unit and its env files",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "fixwave plan prerequisite",
+      "original_ruling_gate": "With the store. Run daemon-reload afterwards; keep port 21434 in gpu-owner-guard.",
+      "ordering": "With store retirement, followed by native unit reload.",
+      "exclusions": [
+        "GPU owner guard retains reserved port21434."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 8,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/8",
+      "target_scope": "Ollama 0.35.0 runtime and tool pin",
+      "ruling_item": "Ollama 0.35.0 runtime and its tool pin",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "fixwave plan/pin prerequisite",
+      "original_ruling_gate": "With the store. Back up the pin edit first; remove the runtime with mise's own uninstall command.",
+      "ordering": "With store retirement; back up pin change before supported uninstall.",
+      "exclusions": [
+        "No runtime/tool-pin removal by this PR."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 9,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/9",
+      "target_scope": "Obsolete vLLM 0.30.0 prefix",
+      "ruling_item": "vLLM 0.30.0 runtime prefix, superseded by 0.31.0",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "No row-specific preparation packet established in the reviewed sources; collective preparers remain lm-qmd/fixwave/memory-h2h.",
+      "original_ruling_gate": "No unit, process or config names it; vllm-embed.service runs from the 0.31.0 venv. Record unique bytes in the manifest.",
+      "ordering": "After no unit/process/config references it and current service runs 0.31.0.",
+      "exclusions": [
+        "Current0.31.0 runtime remains kept."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 10,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/10",
+      "target_scope": "Local-model lane uv cache, a hard-link holder",
+      "ruling_item": "The local-models lane's uv cache, the third holder of those hard links (a cache, not weights)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "No row-specific preparation packet established in the reviewed sources; collective preparers remain lm-qmd/fixwave/memory-h2h.",
+      "original_ruling_gate": "After apply step 9, the last install that may use it. Clear it with uv's own command (uv cache clean with UV_CACHE_DIR set to this path), not rm; vllm-0.31.0 keeps its own links.",
+      "ordering": "After final applicable install; use scoped native cache clean.",
+      "exclusions": [
+        "Cache is not model weights; keep0.31.0 runtime hard links."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 11,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/11",
+      "target_scope": "Semble smoke index cache",
+      "ruling_item": "semble-smoke index cache (an index, not a model)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "No row-specific preparation packet established in the reviewed sources; collective preparers remain lm-qmd/fixwave/memory-h2h.",
+      "original_ruling_gate": "Holder check. Never semble-codex or semble-claude.",
+      "ordering": "After exact holder check.",
+      "exclusions": [
+        "Keep semble-codex and semble-claude indexes; cache is not a model."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 12,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/12",
+      "target_scope": "Two exact stale Magika links",
+      "ruling_item": "Stale magika link pair from readiness job 13 (inode 4069902, 3,163,737 B, links=2)",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "No row-specific preparation packet established in the reviewed sources; collective preparers remain lm-qmd/fixwave/memory-h2h.",
+      "original_ruling_gate": "Holder check. Only these two links: never a whole job directory.",
+      "ordering": "After exact holder check, only the two named links.",
+      "exclusions": [
+        "Never remove whole job directory; reviewed source proves two links, not symlink type."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 13,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/13",
+      "target_scope": "Former ai-memory MiniLM embedder and tier-1 rollback",
+      "ruling_item": "all-MiniLM-L6-v2, ai-memory's former embedder and its tier-1 rollback",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "memory-h2h preparation packet",
+      "original_ruling_gate": "The CC rules explicitly on the Gate 3 record of 17:47Z, whose recall and marker controls passed from Claude to Codex but whose strict no-canary-text control reads false, and closes the rollback window. Then: the census shows 0 latest rows on local/MiniLM/384, no config names the directory, and the holder check is clean.",
+      "ordering": "Only after explicit CC Gate3 ruling/rollback closure and holder/profile checks.",
+      "exclusions": [
+        "Do not infer Gate3 adjudication or rollback closure from a deletion report."
+      ],
+      "recorded_state": "OWNER_REPORTED_DELETED",
+      "state_evidence_class": "source_review_of_CC_operation_report; not new independent filesystem observation",
+      "observed_operation_utc": "2026-10-06T23:52:52Z",
+      "operation_record": {
+        "locator": "coordination:e2e-truth-20261006/deletions/deletion-manifest-minilm-20261006T235252Z.json",
+        "sha256": "0070add553649e97bd6a59b27ac00592773398ffaaa3559f48fe40dc75cad7e7",
+        "json_pointers": [
+          "/kind",
+          "/completed_at",
+          "/files",
+          "/checks"
+        ],
+        "files_recorded_deleted": 3
+      },
+      "chronology": [
+        {
+          "state": "HOLD_PREPARATION_ONLY",
+          "recorded_at_utc": "2026-10-06T22:48:04.646063Z",
+          "source": "coordination:ns2604-coop/memory-slot-20261006/minilm-deletion-packet-20261006.json",
+          "sha256": "35ba27cac37c26cab22480544b4effb5c8dcde8a9a10fad1058a29f8c585c8a4",
+          "deletion_authorized": false,
+          "deletion_performed": false
+        },
+        {
+          "state": "GATE3_INTEGRATION_RERUN_REPORTED_PASS; cleanup still CC-owned",
+          "recorded_at_utc": "2026-10-06T23:47:19.571631Z",
+          "source": "coordination:ns2604-coop/memory-slot-20261006/gate3-c2x-consolidation-rerun1-20261006/receipt.json",
+          "sha256": "772f222f0107cffcc48b3b328b527bcfb4a65101d027d11006c2dc87959d32ed",
+          "strict_control_no_canary_fact_text": false,
+          "strict_metric_is_failure_gate": false,
+          "deletion_performed": false
+        },
+        {
+          "state": "OWNER_REPORTED_DELETED",
+          "recorded_at_utc": "2026-10-06T23:52:52Z",
+          "source": "coordination:e2e-truth-20261006/deletions/deletion-manifest-minilm-20261006T235252Z.json",
+          "sha256": "0070add553649e97bd6a59b27ac00592773398ffaaa3559f48fe40dc75cad7e7"
+        }
+      ],
+      "adjudication_provenance": "The reviewed preparation, rerun and deletion records do not supply a separate explicit CC Gate3 adjudication/rollback-closure record. The operation is recorded without inferring that missing decision."
+    },
+    {
+      "source_index": 14,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/14",
+      "target_scope": "Docling side-project models/environment",
+      "ruling_item": "HELD: docling's models, kept for the librarium-course side project",
+      "disposition": "HELD_SIDE_PROJECT",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "librarium-course side-project dependency",
+      "original_ruling_gate": "Held until librarium-course moves pipeline/ingest/pdf.py off docling. Then remove whole hub repositories and the uv environment as units, with their own tools; never single blobs or files inside site-packages.",
+      "ordering": "Held until the side-project ingestion moves off Docling.",
+      "exclusions": [
+        "No individual hub blobs or files inside site-packages."
+      ],
+      "recorded_state": "HELD",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    },
+    {
+      "source_index": 15,
+      "source_rulings_sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "source_json_pointer": "/syn/delete/15",
+      "target_scope": "Two MinerU reference-only HF stubs",
+      "ruling_item": "Two ref-only Hugging Face hub stubs left by MinerU's downloader",
+      "disposition": "RETIRE_OR_REMOVE_ONLY_AFTER_ITEM_GATES",
+      "execution_owner": "command-center",
+      "execution_owner_source_json_pointer": "/syn/apply/11",
+      "preparation_scope": "original fixwave step11; later owner status transfers MinerU to currency",
+      "original_ruling_gate": "After apply step 11 passes; model.source is still huggingface today. The weights under <owned-private-path> are the CURRENT owner and are not deleted.",
+      "ordering": "After local-source native verification and parse pass.",
+      "exclusions": [
+        "Current local MinerU weights are excluded; remove only reference stubs."
+      ],
+      "recorded_state": "PENDING_NOT_VERIFIED",
+      "state_evidence_class": "source_review_of_ruling; no target filesystem census",
+      "observed_operation_utc": null
+    }
+  ],
+  "cleanup_scope": {
+    "execution_by_this_pr": false,
+    "state_boundary": "Prospective dispositions and dated owner-reported operations are separate; PENDING_NOT_VERIFIED is unknown, not proof that an operation did not occur.",
+    "original_clock_gates": "Historical ruling text retained; later FOUNDATION-FIRST removes foundation paper/three-minute holds while preserving nice19/ionice-c3 and owner/item gates.",
+    "missing_adjudication": "MiniLM Gate3/rollback-closure provenance requested through Q30; no new replay or host action."
+  }
 }

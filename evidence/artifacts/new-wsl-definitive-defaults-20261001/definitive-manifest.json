@@ -72,7 +72,7 @@
   },
   "settlements": {
    "file": "settlements.json",
-   "sha256": "8cd771f2ec125075d225021aa568e2a03193cd5b60921afb2f80ff3e2703cf7b"
+   "sha256": "2be48d48805198d261094845cb94117abf38e89f8308c6df3fda961100abb61c"
   },
   "convergence": {
    "file": "convergence.json",
@@ -1445,7 +1445,7 @@
     "receipts": [
      {
       "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
-      "sha256": "4fe3ddd0fc17ae381867ef187e7597e0cb7ebfe280144bb938f9fde4dc44cd48"
+      "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5"
      }
     ],
     "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
@@ -2706,7 +2706,7 @@
     "receipts": [
      {
       "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
-      "sha256": "4fe3ddd0fc17ae381867ef187e7597e0cb7ebfe280144bb938f9fde4dc44cd48"
+      "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5"
      }
     ]
    }
@@ -2838,7 +2838,7 @@
     "receipts": [
      {
       "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
-      "sha256": "4fe3ddd0fc17ae381867ef187e7597e0cb7ebfe280144bb938f9fde4dc44cd48"
+      "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5"
      }
     ]
    }
