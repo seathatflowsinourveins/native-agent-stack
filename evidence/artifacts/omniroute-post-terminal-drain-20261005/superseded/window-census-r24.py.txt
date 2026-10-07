@@ -30,10 +30,7 @@ event was delivered the rows follow its line by at most that long) and 1 s; a li
 (xii) the serving process is established where MainPID and its start time cannot (they identify the CLI supervisor, which restarts the serving child on a crash): the process listening on the guard receipt's port (ss -ltnp) is in the unit's cgroup, started before the guard receipt began (/proc starttime against /proc/uptime, margin 2 s), is the writer of every request line of the range (a restarted
         child leaves lines of two pids), no supervisor restart diagnostic or child startup banner occurs in the range, and no other process of this user holds the store open; the unit's journal limits are read and the range's busiest stretch must stay below a tenth of the rate limit (journald drops lines above it and says so only in the system journal);
 (xiii) no Responses-over-WebSocket turn reaches the window padded by the usage pad: such a turn (call_logs method WEBSOCKET or request_type responses_websocket, written by the gateway's WebSocket proxy through POST /api/internal/codex-responses-ws) is stamped at its START in both tables, with the turn's length as its duration and latency, and writes neither an arrival line nor a stream-end line, so no journal record covers it; a call row of such a turn whose [start, start + duration] reaches the padded window makes the result INCONCLUSIVE;
-(xiv) for the canary (`scope=canary`: four arms, the real /proc and the system's journalctl, ss, systemctl and systemd-analyze), every inbound request line since the serving process's start is accounted for (review r13, P1: a non-streaming foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one): the journal is read from the listener's start and must hold a startup banner (Next.js or Ready: the `[DB] Driver` line is printed at every database open, review r14, P1-2) of every listener pid from [its start - 1 s, its start + 120 s] (a vacuum, a rotation, another sink or a console that is not forwarded is INCONCLUSIVE) and no entry of a listener dated more than 1 s before its start and no request line (arrival or stream-end) of a listener dated before its own start (a wall-clock step against the boot clock, which would move the computed start past lines that are in the journal: review 5, L1-2), and each inbound POST line since the start is matched to a distinct call row of its path, own or foreign, whose estimated start is not more than 3 s before the line, whatever the line's lead over the duration clock (a maximum matching, greedily from the latest line); a line with no call row (a request that left none: dropped, rejected before the call log, or another client's lost row) is INCONCLUSIVE; a listener's own startup lines (from 1 s before ITS start to 120 s after), and the supervisor's restart lines within 10 s before a listener's start, are not restart evidence, in the trial's scope as well; the unit's cgroup is established from the entries of the incarnation (the user manager's own entry about the unit, dated before the child's start, is not one of the unit's processes); a run with CENSUS_PROC_ROOT set, or with a journalctl, ss, systemctl or systemd-analyze that is not the system's, says `scope=canary-fixture` (or `trial-fixture`) and is never canary acceptance (review r13, P2: the process evidence of a fixture could reach `scope=canary`);
-(xv) for the canary, the read r14 of 115b885ba and the command center's ruling add REFUSALS only (every window that PASSes now PASSed before): the listeners' own entries are also read by boot and pid with no wall-clock lower bound (`journalctl --user -u UNIT _BOOT_ID=... _PID=... -o json --all`; each entry is checked again here), so that a step of the wall clock cannot move the computed start past lines that are in the journal
-and the incarnation's arrival lines are those of that read; coverage is the listener's startup banner (Next.js or Ready, never the repeatable `[DB] Driver` line) on the journal's MONOTONIC stamp within 120 s of the process's start in boot-clock seconds (/proc/PID/stat), no banner kind twice for a pid, the realtime minus monotonic offset of the entries of each pid varying by at most 1 s (a step of the wall clock since its birth is INCONCLUSIVE; slewing moves both clocks alike),
-and the service manager's monotonic start stamp of the unit (`systemctl --user show -p ExecMainStartTimestampMonotonic`) not later than the earliest listener's start + 1 s; every call row of the incarnation on a path with arrival lines has a correlation id, no two call rows share one (whatever their paths), and no such path has a call row without a matched arrival line (a request can leave several persisted attempt rows, and the spare row balanced a request that left none: review r14, P1-1);
+(xiv) for the canary (`scope=canary`: four arms, the real /proc and the system's journalctl, ss, systemctl and systemd-analyze), every inbound request line since the serving process's start is accounted for (review r13, P1: a non-streaming foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one): the journal is read from the listener's start and must hold a startup banner (Next.js, Ready or [DB] Driver) of every listener pid from [its start - 1 s, its start + 120 s] (a vacuum, a rotation, another sink or a console that is not forwarded is INCONCLUSIVE) and no entry of a listener dated more than 1 s before its start and no request line (arrival or stream-end) of a listener dated before its own start (a wall-clock step against the boot clock, which would move the computed start past lines that are in the journal: review 5, L1-2), and each inbound POST line since the start is matched to a distinct call row of its path, own or foreign, whose estimated start is not more than 3 s before the line, whatever the line's lead over the duration clock (a maximum matching, greedily from the latest line); a line with no call row (a request that left none: dropped, rejected before the call log, or another client's lost row) is INCONCLUSIVE; a listener's own startup lines (from 1 s before ITS start to 120 s after), and the supervisor's restart lines within 10 s before a listener's start, are not restart evidence, in the trial's scope as well; the unit's cgroup is established from the entries of the incarnation (the user manager's own entry about the unit, dated before the child's start, is not one of the unit's processes); a run with CENSUS_PROC_ROOT set, or with a journalctl, ss, systemctl or systemd-analyze that is not the system's, says `scope=canary-fixture` (or `trial-fixture`) and is never canary acceptance (review r13, P2: the process evidence of a fixture could reach `scope=canary`);
 The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE. The result line ends `scope=canary` for the canary's four-arm gate and `scope=trial` for anything else (fewer or more arms, a diagnostic run): only `PASS ... scope=canary` accepts the canary; a run whose process evidence is a fixture (CENSUS_PROC_ROOT set, or a journalctl, ss, systemctl or systemd-analyze that is not the system's) ends `scope=canary-fixture` or `scope=trial-fixture`.
 What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row (for the endpoints whose handler logs an arrival line: the chat and responses handlers; `/v1/search` and the gateway's other endpoints log none). What stays outside, which the receipt states verbatim as an untested boundary (the line `UNTESTED-BOUNDARY`, refined by `UNTESTED-BOUNDARY-DETAIL`) next to its evidence classes (the line `EVIDENCE-CLASS`): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain (for the arrival lines measured from the lost request's estimated start, not from its arrival; for the stream-end lines within 0.25 s of the implied start); (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup); and traffic that is not an inbound POST (a non-streaming foreign request, and a streaming one whose stream-end line comes late (review r13, P1-2), are covered by their arrival lines over the whole incarnation of the canary, not by a stream-end line, and a Responses-over-WebSocket turn is covered by neither journal record, whose rows are stamped at its start: a WebSocket turn whose call row reaches the padded window makes the window INCONCLUSIVE, and one whose call row was lost is a case of items (1) and (3)). A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal's inbound lines in the counted range pair one to one with the own requests and its stream-end groups with them too (the untested boundary above stays outside), the guard was idle at its start, the serving process was the same (listener, start, writer of the request lines) and the wrapper's journal line per arm was 0.
 --require-arms N (default 4, the canary's four arms: raw, race, native, native tool-call): the number of arm outputs that must be given; fewer or more is INCONCLUSIVE, so that an omitted arm cannot pass unnoticed (a live trial of fewer arms states its own number).
@@ -103,10 +100,9 @@ ARRIVAL_LAG_MAX_S = 30.0   # ... nor earlier by more than this (measured on this
 STARTUP_WINDOW_S = 120.0   # a serving child prints its startup banners within this long of its start (measured on this host: 0.61 s the Next.js banner, 0.61 s Ready, 1.4 s the database driver): the journal must hold a startup banner of every listener pid from [its start - STARTUP_BANNER_LEAD_S, its start + this] (the proof that the read reaches the start), and the diagnostics inside it are the listener's own start
 STARTUP_LEAD_S = 10.0   # ... and the supervisor's restart messages that led to the listener lie at most this long before its start
 STARTUP_BANNER_LEAD_S = 1.0   # a listener's own entries cannot precede its own start by more than the clocks' agreement: an entry dated earlier is a wall-clock step against the boot clock (or a mis-dated start), review r13 L1-2
-MONOTONIC_SPAN_TOLERANCE_S = 1.0   # the realtime minus monotonic offset of the entries of one process varies by at most this: only a STEP of the wall clock changes it (slewing moves both clocks alike; review r14, P1-2 and the review of round 25, R25-4; measured on this host: 0.0 s over 19.3 h)
 HOST_TOOLS = ("journalctl", "ss", "systemctl", "systemd-analyze")   # the programs whose output the census trusts as the host's
 SYSTEM_BIN_DIRS = ("/usr/bin", "/usr/sbin", "/bin", "/sbin")
-SQL_INCARNATION_CALLS = "select id, timestamp, path, duration, method, request_type, correlation_id from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id"   # every call row since the serving process's start, any requester (review r13, P1)
+SQL_INCARNATION_CALLS = "select id, timestamp, path, duration, method, request_type from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id"   # every call row since the serving process's start, any requester (review r13, P1)
 SETTLE_S = 5
 OBSERVE_SLACK_S = 2   # the store is read this long after the declared interval (window end + the usage pad) has ended: the gateway's last write of the window has landed
 MAX_WAIT_S = 30   # a declared interval that ends further ahead than this is a clock or stamp fault, not something to wait for
@@ -236,7 +232,7 @@ class JournalError(RuntimeError):
         self.info = info
 
 
-def journal_events(unit, since, until, pids=None, boot_id=None):
+def journal_events(unit, since, until):
     """Every request-lifecycle record of the gateway unit's journal between `since` and `until`, from ONE `journalctl --user -u UNIT -o json --all` run (the user journal; the receipt prints the command):
       "posts": [(time, label, path, pid)]  inbound-request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`): written when a request ARRIVES, before the policy work, the credential refresh and the duration clock (src/sse/handlers/chat.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e);
       "streams": [(time, provider, model, ms, status, pid)]  stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`): printed by the stream controller when a stream ends (open-sse/utils/streamHandler.ts logStream: complete, disconnect, aborted, error), whatever happens to the request's rows afterwards;
@@ -244,17 +240,14 @@ def journal_events(unit, since, until, pids=None, boot_id=None):
       "stamps": the time of every entry (the rate check), "cgroups": the _SYSTEMD_CGROUP values of the entries, "cgroup_entries": [(time, value)] (the canary uses only those of the incarnation: the user manager's own entry about the unit is dated before the child's start and lies in the manager's cgroup), "info": the exact command, binary, version, stderr and the number of entries.
     The time of a stream-end line and of a diagnostic is journald's own `__REALTIME_TIMESTAMP` (its receive stamp, in 2000-2100); the time of an ARRIVAL line is the gateway's own record `time` (the pino field, a valid gateway stamp), which must lie between ARRIVAL_LAG_EARLY_S after and ARRIVAL_LAG_MAX_S before journald's receive stamp of the same entry (else the observation fails: the two clocks disagree or the field was forged). Raises JournalError (the check then fails closed, the receipt keeps the command) when journalctl cannot be run, exits non-zero or times out, writes a word of loss on stderr (data it skipped), or when an entry cannot be read:
     a line that is not JSON, a null or non-string message (journalctl writes a field over 4096 bytes as null unless it is given --all), a message that starts with `{` and does not parse, an arrival or stream-end marker that was not counted, a timestamp outside 2000-2100."""
-    if pids is not None:   # review r14, P1-2: the listeners' own entries by boot and pid, with NO wall-clock lower bound (a step of the wall clock moves the computed start, so a bounded read can omit lines that are in the journal); the tool's filtering is not trusted, each entry is checked again below
-        cmd = ["journalctl", "--user", "-u", unit, f"_BOOT_ID={boot_id}"] + [f"_PID={p}" for p in sorted(pids)] + ["-o", "json", "--all", "--no-pager"]
-    else:
-        start = since.replace(microsecond=0)
-        stop = until.replace(microsecond=0) + dt.timedelta(seconds=1)
-        cmd = ["journalctl", "--user", "-u", unit, "--since", start.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "--until", stop.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "-o", "json", "--all", "--no-pager"]
+    start = since.replace(microsecond=0)
+    stop = until.replace(microsecond=0) + dt.timedelta(seconds=1)
+    cmd = ["journalctl", "--user", "-u", unit, "--since", start.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "--until", stop.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "-o", "json", "--all", "--no-pager"]
     try:
         version = subprocess.run(["journalctl", "--version"], capture_output=True, timeout=10).stdout.decode("utf-8", "replace").splitlines()[0][:60]
     except (OSError, subprocess.TimeoutExpired, IndexError):
         version = "unavailable"
-    info = {"argv": " ".join(cmd), "binary": shutil.which("journalctl") or "?", "version": version, "stderr": "", "entries": 0, "dropped": 0}
+    info = {"argv": " ".join(cmd), "binary": shutil.which("journalctl") or "?", "version": version, "stderr": "", "entries": 0}
     try:
         p = subprocess.run(cmd, capture_output=True, timeout=120)
     except (OSError, subprocess.TimeoutExpired) as error:
@@ -274,8 +267,6 @@ def journal_events(unit, since, until, pids=None, boot_id=None):
     unreadable = 0
     skewed = 0
     first_by_pid = {}
-    off_min, off_max = {}, {}   # per pid: the smallest and the largest realtime-minus-monotonic offset of its entries (constant unless the wall clock stepped)
-    mono_first, mono_last, banner_mono = {}, {}, collections.defaultdict(list)   # the read by boot and pid: per pid the first and the last entry by the journal's MONOTONIC stamp (realtime stamp, seconds), and the monotonic stamps of each startup banner
     for line in p.stdout.decode("utf-8", "replace").splitlines():
         if not line.strip():
             continue
@@ -290,32 +281,12 @@ def journal_events(unit, since, until, pids=None, boot_id=None):
         except (ValueError, KeyError, TypeError, OverflowError, OSError):
             unreadable += 1
             continue
-        raw_pid = entry.get("_PID")
-        pid = int(raw_pid) if isinstance(raw_pid, str) and raw_pid.isascii() and raw_pid.isdigit() and len(raw_pid) <= 10 else None
-        mono_s = None
-        if pids is not None:
-            if entry.get("_BOOT_ID") != boot_id or pid not in pids:
-                info["dropped"] += 1   # another boot (a reused pid) or another process: counted and printed, never used
-                continue
-            if stamp > until.replace(microsecond=0) + dt.timedelta(seconds=1):
-                continue   # after the counted range: the future of the observation
-            raw_mono = entry.get("__MONOTONIC_TIMESTAMP")
-            if not (isinstance(raw_mono, str) and raw_mono.isascii() and raw_mono.isdigit() and 0 < len(raw_mono) <= 18):
-                unreadable += 1
-                continue
-            mono_s = int(raw_mono) / 1e6
         info["entries"] += 1
         stamps.append(stamp)
+        raw_pid = entry.get("_PID")
+        pid = int(raw_pid) if isinstance(raw_pid, str) and raw_pid.isascii() and raw_pid.isdigit() and len(raw_pid) <= 10 else None
         if pid is not None and (pid not in first_by_pid or stamp < first_by_pid[pid]):
             first_by_pid[pid] = stamp   # the earliest entry of each process: the proof that the range reaches a listener's start
-        if mono_s is not None:
-            if pid not in mono_first or mono_s < mono_first[pid][1]:
-                mono_first[pid] = (stamp, mono_s)
-            if pid not in mono_last or mono_s > mono_last[pid][1]:
-                mono_last[pid] = (stamp, mono_s)
-            off_ = stamp.timestamp() - mono_s
-            off_min[pid] = min(off_min.get(pid, off_), off_)
-            off_max[pid] = max(off_max.get(pid, off_), off_)
         cgroup = entry.get("_SYSTEMD_CGROUP")
         if isinstance(cgroup, str) and cgroup:
             cgroups.add(cgroup)
@@ -364,8 +335,6 @@ def journal_events(unit, since, until, pids=None, boot_id=None):
             for name, pattern in RESTART_PATTERNS:
                 if pattern.search(plain):
                     diagnostics.append((stamp, name, plain.strip()[:100], pid))
-                    if mono_s is not None and name.startswith("child startup: "):
-                        banner_mono[(pid, name)].append(mono_s)
         if entry.get("MESSAGE_ID") == SUPPRESSED_MESSAGE_ID or re.match(r"Suppressed [0-9]+ messages", plain):
             losses.append((stamp, plain.strip()[:100]))
         if not counted and marker in message:
@@ -377,7 +346,7 @@ def journal_events(unit, since, until, pids=None, boot_id=None):
         if skewed:
             parts.append(f"{skewed} arrival line(s) carry a `time` more than {ARRIVAL_LAG_MAX_S:g} s before or {ARRIVAL_LAG_EARLY_S:g} s after journald's receive stamp (the gateway's clock and journald's disagree, or the field was forged)")
         raise JournalError("; ".join(parts) + ": the independent record of the window's requests cannot be trusted", info)
-    return {"posts": posts, "streams": streams, "diagnostics": diagnostics, "stamps": stamps, "cgroups": cgroups, "cgroup_entries": cgroup_entries, "losses": losses, "info": info, "first_by_pid": first_by_pid, "mono_first": mono_first, "mono_last": mono_last, "banner_mono": dict(banner_mono), "off_min": off_min, "off_max": off_max}
+    return {"posts": posts, "streams": streams, "diagnostics": diagnostics, "stamps": stamps, "cgroups": cgroups, "cgroup_entries": cgroup_entries, "losses": losses, "info": info, "first_by_pid": first_by_pid}
 
 
 def stream_groups(streams):
@@ -453,19 +422,6 @@ def process_started(pid, now):
     return now - dt.timedelta(seconds=uptime - ticks / CLK_TCK)
 
 
-def boottime_minus_monotonic():
-    """The seconds that the kernel has been suspended since boot: CLOCK_BOOTTIME (which the start time of /proc/PID/stat runs on) minus CLOCK_MONOTONIC (which journald's `__MONOTONIC_TIMESTAMP` and the service manager's stamps run on); 0.0 on a fixture /proc root. A process that started after the last suspend is converted exactly; one that started before it comes out too early and is refused (review of round 25, R25-2)."""
-    if PROC_ROOT != "/proc":
-        return 0.0
-    return time.clock_gettime(time.CLOCK_BOOTTIME) - time.clock_gettime(time.CLOCK_MONOTONIC)
-
-
-def process_boot_start(pid):
-    """When a process started, in seconds since boot on the clock of /proc (CLOCK_BOOTTIME): field 22 of its /proc/PID/stat over the clock ticks per second. A step of the wall clock does not move it (the wall-clock start that process_started derives is moved by one: review r14, P1-2)."""
-    stat = proc_read(f"{pid}/stat").decode("utf-8", "replace")
-    return int(stat[stat.rindex(")") + 2:].split()[19]) / CLK_TCK
-
-
 def process_cgroup(pid):
     for line in proc_read(f"{pid}/cgroup").decode("utf-8", "replace").splitlines():
         if line.startswith("0::"):
@@ -533,7 +489,7 @@ def gateway_grace(text):
 
 def serving_probe(guard):
     """The listener(s) on the guard receipt's port before the journal is read (the journal's range depends on the disconnect grace that the serving process runs with): their pids, start times, cgroups and STREAM_DISCONNECT_GRACE_PERIOD_MS (the drain after a client that left after the terminal event: rows follow the stream-end line by at most that long; default 10000 ms, src/shared/utils/runtimeTimeouts.ts:48 at OmniRoute c1e30b7)."""
-    probe = {"pids": set(), "starts": {}, "boot_starts": {}, "suspended_s": 0.0, "cgroups": {}, "binary": shutil.which("ss") or "?", "error": None, "port": None, "grace_ms": DEFAULT_DISCONNECT_GRACE_MS, "grace_source": "default", "grace_problem": None}
+    probe = {"pids": set(), "starts": {}, "cgroups": {}, "binary": shutil.which("ss") or "?", "error": None, "port": None, "grace_ms": DEFAULT_DISCONNECT_GRACE_MS, "grace_source": "default", "grace_problem": None}
     if guard is None:
         probe["error"] = "no guard receipt (a diagnostic run)"
         return probe
@@ -544,10 +500,8 @@ def serving_probe(guard):
     now = now_utc()
     try:
         values = set()
-        probe["suspended_s"] = boottime_minus_monotonic()
         for pid in sorted(probe["pids"]):
             probe["starts"][pid] = process_started(pid, now)
-            probe["boot_starts"][pid] = process_boot_start(pid) - probe["suspended_s"]   # on the monotonic clock of the journal and the service manager
             probe["cgroups"][pid] = process_cgroup(pid)
             values.add(process_env(pid, "STREAM_DISCONNECT_GRACE_PERIOD_MS"))
     except (OSError, ValueError, IndexError) as error:
@@ -664,7 +618,7 @@ def serving_check(rep, probe, guard, events, db, canary=False):
         rep.bad(f"the serving process's disconnect grace cannot be established: {probe['grace_problem']}")
     if canary:   # coverage of the incarnation (review r13, P1; review 5, L1-2 and L1-3): the journal read must reach every listener's start, on the journal's own clock
         first = events["first_by_pid"]
-        banner_names = ("child startup: next", "child startup: ready")   # review r14, P1-2: `[DB] Driver:` is printed at EVERY database open (the DB import route too), so it is not evidence of a start
+        banner_names = ("child startup: next", "child startup: ready", "child startup: database")
         banner = {p: min((d[0] for d in events["diagnostics"] if d[3] == p and d[1] in banner_names and own_start(d[0], p)), default=None) for p in pids}
         missing = sorted(p for p in pids if banner[p] is None)
         early = sorted(p for p in pids if first.get(p) is not None and (probe["starts"][p] - first[p]).total_seconds() > STARTUP_BANNER_LEAD_S)
@@ -677,7 +631,7 @@ def serving_check(rep, probe, guard, events, db, canary=False):
         if early_lines:
             rep.bad(f"listener pid(s) {early_lines} wrote request lines (arrival or stream-end) dated before their own process start: a request cannot reach a process that has not started, so the wall clock stepped against the boot clock (a host resume, an NTP step; a step under {STARTUP_BANNER_LEAD_S:g} s passes the check of the listener's other entries) or the start is mis-dated, and the lines before the computed start were dropped")
         if missing:
-            rep.bad(f"the journal read holds no startup banner (Next.js or Ready) of listener pid(s) {missing} from [their start - {STARTUP_BANNER_LEAD_S:g} s, their start + {STARTUP_WINDOW_S:g} s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded to the journal), so the arrivals since the start were not all counted")
+            rep.bad(f"the journal read holds no startup banner (Next.js, Ready or [DB] Driver) of listener pid(s) {missing} from [their start - {STARTUP_BANNER_LEAD_S:g} s, their start + {STARTUP_WINDOW_S:g} s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded to the journal), so the arrivals since the start were not all counted")
     if unit_cgroup is None:
         rep.bad(f"the journal entries carry {len(cgroups)} different _SYSTEMD_CGROUP values (exactly one is needed): the unit's cgroup, and so the serving child, cannot be established")
     else:
@@ -741,15 +695,12 @@ def incarnation_unmatched(arrivals, rows, tau):
     return sorted(leftovers, key=lambda a: a[0])
 
 
-def incarnation_check(rep, con, posts, started, u1s, c_hi, bounded=True):
+def incarnation_check(rep, con, posts, started, u1s, c_hi):
     """review r13, P1 (r12-P1-1 across the required scope): for the canary, every inbound POST line since the serving process's start is accounted for, so that a foreign request whose arrival precedes its duration clock by more than the counted range cannot stand in
-    for an own one: each line is matched to a distinct call row of its path (any requester), whatever its lead; a line with no call row (a request that left none: dropped, rejected before the call log, another client's lost row) is INCONCLUSIVE.
-    Review r14, P1-1 (REFUSALS only): a request can leave several persisted attempt rows (a failed attempt, then the successful one, one correlation id), and the spare row balanced a request with no row of its own (45 lines matched to 45 rows, PASS). So the incarnation is also INCONCLUSIVE when
-    two call rows share a correlation id (whatever their paths), when a call row of a path with arrival lines has none, and when such a path has call rows without a matched arrival line (the correlation id is read only to refuse; rows are never merged into requests).
-    bounded=False: `posts` come from the read by boot and pid, which has no wall-clock lower bound (review r14, P1-2)."""
+    for an own one: each line is matched to a distinct call row of its path (any requester), whatever its lead; a line with no call row (a request that left none: dropped, rejected before the call log, another client's lost row) is INCONCLUSIVE."""
     rows = con.execute(SQL_INCARNATION_CALLS, (utc(started), u1s)).fetchall()
-    starts, corr_of, unreadable = [], [], 0
-    for _id, ts, path, duration, method, request_type, corr in rows:
+    starts, unreadable = [], 0
+    for _id, ts, path, duration, method, request_type in rows:
         if str(path).startswith("/api/") or method == "WEBSOCKET" or request_type == "responses_websocket":
             continue   # the gateway's own provider-test calls write no arrival line; a WebSocket turn is refused by its own check
         t = parse_ts(ts)
@@ -761,12 +712,10 @@ def incarnation_check(rep, con, posts, started, u1s, c_hi, bounded=True):
             unreadable += 1
             continue
         starts.append((t - dt.timedelta(milliseconds=length), path))
-        corr_of.append((path, corr))
-    arrivals = [(t, label, lpath) for t, label, lpath, _pid in posts if (t >= started or not bounded) and t <= c_hi]
+    arrivals = [(t, label, lpath) for t, label, lpath, _pid in posts if started <= t <= c_hi]
     leftovers = incarnation_unmatched(arrivals, starts, JOURNAL_PAIR_S)
     rep.say(f"INCARNATION-ARRIVALS the serving process started {utc(started)}: inbound POST lines since then={len(arrivals)}, call rows since then on inference paths (any requester)={len(starts)}, rows whose duration could not be read={unreadable}, "
-            f"lines with no call row={len(leftovers)} (each line is matched to a distinct call row of its path whose estimated start is not more than {JOURNAL_PAIR_S:g} s before the line, whatever the line's lead over the duration clock: a maximum matching; "
-            f"the lines are {'those of the read by boot and pid, with no wall-clock lower bound' if not bounded else 'those of the bounded read'})")
+            f"lines with no call row={len(leftovers)} (each line is matched to a distinct call row of its path whose estimated start is not more than {JOURNAL_PAIR_S:g} s before the line, whatever the line's lead over the duration clock: a maximum matching)")
     for t, label, _lpath in leftovers[:20]:
         rep.say(f"   inbound line since the start with no call row at {utc(t)} {label}")
     if leftovers:
@@ -774,118 +723,6 @@ def incarnation_check(rep, con, posts, started, u1s, c_hi, bounded=True):
                 "a foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one, so PASS is not possible")
     if unreadable:
         rep.bad(f"{unreadable} call row(s) since the serving process started have a duration that cannot be read: their estimated start is unknown, so the lines cannot all be matched")
-    arrival_paths = {lpath for _t, _l, lpath in arrivals}
-    on_paths = [(p, c) for p, c in corr_of if p in arrival_paths]
-    without_id = sum(1 for _p, c in on_paths if not (isinstance(c, str) and c.strip()))
-    shared = {k: n for k, n in collections.Counter(c for _p, c in corr_of if isinstance(c, str) and c.strip()).items() if n > 1}   # whatever the paths of the rows (review of round 25, R25-6)
-    per_rows, per_arrivals, per_left = collections.Counter(p for p, _c in on_paths), collections.Counter(lp for _t, _l, lp in arrivals), collections.Counter(lp for _t, _l, lp in leftovers)
-    surplus = {p: per_rows[p] - (per_arrivals[p] - per_left[p]) for p in per_rows}
-    surplus_rows = sum(v for v in surplus.values() if v > 0)
-    rep.say(f"INCARNATION-ROWS call rows since the start on the paths with arrival lines={len(on_paths)}, rows without a correlation id={without_id}, correlation ids shared by several rows={len(shared)} (rows {sum(shared.values())}), call rows without a matched arrival line on their path={surplus_rows} "
-            "(a request can leave several persisted attempt rows with one correlation id: such a spare row could balance a request that left none; the correlation id is read only to refuse)")
-    if without_id:
-        rep.bad(f"{without_id} call row(s) since the serving process started, on paths with arrival lines, carry no correlation id: whether such a row is a further attempt of a request that already has a row cannot be established, and a spare row could stand in for a request with no row of its own (review r14, P1-1)")
-    if shared:
-        rep.bad(f"{len(shared)} correlation id(s) are shared by {sum(shared.values())} call rows since the serving process started (several persisted attempt rows of one request, whatever their paths, or a client that reuses an id): the rows of one request are not told apart from those of other requests, "
-                "and a spare attempt row could stand in for a request with no row of its own (review r14, P1-1)")
-    if surplus_rows:
-        rep.bad(f"{surplus_rows} call row(s) on paths with arrival lines have no inbound line of their own (no arrival line is matched to them) since the serving process started ({dict(sorted((str(p), n) for p, n in surplus.items() if n > 0))}): a request whose arrival line was not logged or not kept, or a further attempt row, could balance a request that left no row (review r14, P1-1)")
-
-
-def read_boot_id():
-    """This boot's id as journald writes it (_BOOT_ID: 32 lower-case hex digits), or None."""
-    try:
-        raw = proc_read("sys/kernel/random/boot_id", 100).decode("ascii", "replace").strip().replace("-", "").lower()
-    except OSError:
-        return None
-    return raw if re.fullmatch(r"[0-9a-f]{32}", raw) else None
-
-
-def unit_manager_stamp(unit):
-    """(MainPID, the service manager's MONOTONIC start stamp of the unit's main process in seconds since boot, error): `systemctl --user show UNIT -p MainPID -p ExecMainStartTimestampMonotonic`. The manager's stamp is a boot-clock reading, so a step of the wall clock does not move it."""
-    try:
-        shown = subprocess.run(["systemctl", "--user", "show", unit, "-p", "MainPID", "-p", "ExecMainStartTimestampMonotonic"], capture_output=True, timeout=20)
-    except (OSError, subprocess.TimeoutExpired) as error:
-        return None, None, f"the service manager cannot be asked ({type(error).__name__})"
-    if shown.returncode != 0:
-        return None, None, f"systemctl exited with status {shown.returncode}"
-    props = dict(line.split("=", 1) for line in shown.stdout.decode("utf-8", "replace").splitlines() if "=" in line)
-    raw, main = props.get("ExecMainStartTimestampMonotonic", ""), props.get("MainPID", "")
-    if not (raw.isascii() and raw.isdigit() and 0 < len(raw) <= 18 and int(raw) > 0):
-        return None, None, f"the manager's ExecMainStartTimestampMonotonic is {raw[:20]!r}, not a positive number of microseconds"
-    return (int(main) if main.isascii() and main.isdigit() and len(main) <= 10 else None), int(raw) / 1e6, None
-
-
-def monotonic_birth_check(rep, probe, until, legacy_posts, started, c_hi):
-    """review r14, P1-2 and the command center's ruling J757-R14-FIX (REFUSALS only): the canary's coverage from process-birth evidence that a step of the wall clock does not move. The listeners' own entries are read by boot and pid with no wall-clock lower bound (a step moved the computed start past lines that were
-    in the journal, and a later genuine `[DB] Driver` line, printed at every database open, then satisfied the old banner rule). For each listener pid: the journal's first entry (by its MONOTONIC stamp) is not older than the process and not later than 120 s after its start (the start from /proc converted to the
-    monotonic clock: R25-2), a startup banner (Next.js or Ready) of the pid lies in that window on the monotonic stamp, no banner kind occurs twice for the pid, and the realtime minus monotonic offset of its entries varies by at most 1 s (only a step of the wall clock changes it: R25-4); the service manager's monotonic start stamp
-    of the unit is not later than the earliest listener's start. The read by boot and pid must also hold every arrival line of a listener that the bounded read counted (R25-1: a line of another boot, or entries that journalctl left out, made r25 PASS where r24 refused). Returns the events of the read (None when it could not be made)."""
-    pids = sorted(probe["pids"])
-    boot_id = read_boot_id()
-    if boot_id is None:
-        rep.say("INCARNATION-BIRTH boot_id=unreadable")
-        rep.bad("the boot id cannot be read (/proc/sys/kernel/random/boot_id): the serving processes' journal entries cannot be tied to this boot, so the incarnation's coverage cannot be established from process-birth evidence (review r14, P1-2)")
-        return None
-    try:
-        inc = journal_events(JOURNAL_UNIT, None, until, pids=pids, boot_id=boot_id)
-    except JournalError as error:
-        failed = error.info
-        rep.say(f"INCARNATION-JOURNAL-COMMAND argv={failed['argv']} binary={shown_db(failed['binary'])} version={failed['version']!r} stderr={failed['stderr']!r} entries_read={failed['entries']}")
-        rep.bad(f"the serving processes' own journal entries (by boot and pid) cannot be read ({error}): the incarnation's coverage cannot be established from process-birth evidence (review r14, P1-2)")
-        return None
-    jinfo = inc["info"]
-    rep.say(f"INCARNATION-JOURNAL-COMMAND argv={jinfo['argv']} binary={shown_db(jinfo['binary'])} version={jinfo['version']!r} stderr={jinfo['stderr']!r} entries_read={jinfo['entries']} entries_dropped_for_another_boot_or_pid={jinfo['dropped']} arrival_lines_read={len(inc['posts'])}")
-    have = collections.Counter((t, label, lpath, pid) for t, label, lpath, pid in inc["posts"])
-    need = collections.Counter((t, label, lpath, pid) for t, label, lpath, pid in legacy_posts if pid in probe["pids"] and started <= t <= c_hi)
-    missing_lines = sum((need - have).values())
-    main_pid, unit_mono, unit_error = unit_manager_stamp(JOURNAL_UNIT)
-    kinds = {"next": "child startup: next", "ready": "child startup: ready", "database": "child startup: database"}
-    shown_pids, missing, early, late_first, uncovered, repeated, steps = [], [], [], [], [], [], []
-    for p in pids:
-        born = probe["boot_starts"][p]
-        first, last = inc["mono_first"].get(p), inc["mono_last"].get(p)
-        counts = {k: len(inc["banner_mono"].get((p, n), [])) for k, n in kinds.items()}
-        if first is None:
-            missing.append(p)
-            shown_pids.append(f"{p}: boot_start_s={born:.2f} no entry of this boot")
-            continue
-        age = first[1] - born
-        spread = inc["off_max"][p] - inc["off_min"][p]
-        shown_pids.append(f"{p}: boot_start_s={born:.2f} first_entry_age_s={age:.2f} banners={counts} span_realtime_s={(last[0] - first[0]).total_seconds():.2f} span_monotonic_s={last[1] - first[1]:.2f} offset_spread_s={spread:.2f}")
-        if age < -STARTUP_BANNER_LEAD_S:
-            early.append(p)
-        if age > STARTUP_WINDOW_S:
-            late_first.append(p)
-        if not any(born - STARTUP_BANNER_LEAD_S <= m <= born + STARTUP_WINDOW_S for n in (kinds["next"], kinds["ready"]) for m in inc["banner_mono"].get((p, n), [])):
-            uncovered.append(p)
-        if any(c > 1 for c in counts.values()):
-            repeated.append((p, {k: c for k, c in counts.items() if c > 1}))
-        if spread > MONOTONIC_SPAN_TOLERANCE_S:
-            steps.append((p, round(spread, 2)))
-    earliest_born = min(probe["boot_starts"][p] for p in pids)
-    rep.say(f"INCARNATION-BIRTH boot_id={boot_id[:8]} listener_pids={pids} kernel_suspended_s={probe['suspended_s']:.2f} unit_manager_main_pid={main_pid} unit_manager_start_mono_s={unit_mono if unit_mono is not None else 'unreadable'} " + "; ".join(shown_pids) +
-            f" arrival_lines_of_the_bounded_read_missing_from_this_read={missing_lines} (needed, on the monotonic clock: a first entry of each listener from {STARTUP_BANNER_LEAD_S:g} s before to {STARTUP_WINDOW_S:g} s after its start, a Next.js or Ready banner in that window, each banner kind at most once, the realtime minus monotonic offset of its entries varying by at most {MONOTONIC_SPAN_TOLERANCE_S:g} s, "
-            "the manager's start stamp of the unit not later than the earliest listener's start + 1 s, and every arrival line of the bounded read also in this read)")
-    if missing:
-        rep.bad(f"the journal holds no entry of listener pid(s) {missing} for this boot: the serving process's own lines cannot be read, so the incarnation's arrivals were not all counted (review r14, P1-2)")
-    if early:
-        rep.bad(f"listener pid(s) {early} have a journal entry dated on the monotonic clock more than {STARTUP_BANNER_LEAD_S:g} s before the process started: the entries are of another process (a reused pid) or the start is mis-read")
-    if late_first:
-        rep.bad(f"the first journal entry of listener pid(s) {late_first} is later than {STARTUP_WINDOW_S:g} s after the process started (on the monotonic clock): the oldest part of the journal is missing (a vacuum, a rotation), so the incarnation's early arrivals were not counted")
-    if uncovered:
-        rep.bad(f"the journal holds no startup banner (Next.js or Ready) of listener pid(s) {uncovered} within [their start - {STARTUP_BANNER_LEAD_S:g} s, their start + {STARTUP_WINDOW_S:g} s] on the monotonic clock: the read does not reach the process's birth (the `[DB] Driver` line is printed at every database open and is no evidence of a start)")
-    if repeated:
-        rep.bad(f"listener pid(s) show a startup banner kind more than once ({repeated}): Next.js and Ready are printed once per process start, so a repeat is not birth evidence (a restart), and a second `[DB] Driver` line is a second database open (an import can replace the store under the census)")
-    if steps:
-        rep.bad(f"the realtime minus monotonic offset of the journal entries of listener pid(s) {steps} varies by more than {MONOTONIC_SPAN_TOLERANCE_S:g} s (seconds, largest minus smallest): the wall clock stepped since the process's birth, so the wall-clock stamps of the incarnation are not comparable (review r14, P1-2)")
-    if missing_lines:
-        rep.bad(f"{missing_lines} arrival line(s) of a listener that the bounded read counted are not in the read by boot and pid (entries of another boot, or entries that journalctl left out of the pid read): the read by boot and pid is not a superset of the bounded read, so the incarnation's arrivals cannot be established from it (review of round 25, R25-1)")
-    if unit_error:
-        rep.bad(f"the service manager's monotonic start stamp of the unit cannot be read ({unit_error}): the unit's run cannot be tied to the listeners by a clock that a wall-clock step does not move (review r14, P1-2)")
-    elif unit_mono > earliest_born + 1.0:
-        rep.bad(f"the service manager's monotonic start stamp of the unit ({unit_mono:.2f} s) is later than the earliest listener's start ({earliest_born:.2f} s) by more than 1 s: a listener older than its unit's run (a process of an earlier run that the manager did not stop, or a reused pid)")
-    return inc
 
 
 def journal_limit_check(rep, events):
@@ -1393,7 +1230,7 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
     # ---- queries (printed first, so a failure below still leaves them in the receipt)
     for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("incarnation-calls", SQL_INCARNATION_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
         rep.say(f"QUERY {name}: {sql}")
-    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s, and for the canary the serving process's start; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed; for the canary a second run, `journalctl --user -u {JOURNAL_UNIT} _BOOT_ID=<this boot> _PID=<each listener> -o json --all --no-pager`, reads the listeners' own entries from their birth with no wall-clock lower bound: the INCARNATION-JOURNAL-COMMAND and INCARNATION-BIRTH lines)")
+    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s, and for the canary the serving process's start; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed)")
     rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({u0s}, {w1s}) (the window's start padded by the same {CANDIDATE_SECONDS} s as the usage rows); window-usage: ({u0s}, {u1s}); "
             f"candidates: (shift(call row timestamp, -{CANDIDATE_SECONDS}), shift(call row timestamp, {CANDIDATE_SECONDS}), model, tokens_in, tokens_out) per own call row; competing-calls: (shift(usage row timestamp, -{CANDIDATE_SECONDS}), shift(usage row timestamp, {CANDIDATE_SECONDS}), model, tokens_input, tokens_output) per usage row an own call row can claim; all-*-stamps: every timestamp of the two tables, each validated here (text, the gateway's format {TS_GLOB}, calendar-valid, year 2000-2100)")
     # ---- the store is read only after the whole declared interval (the window, the usage rows' pad and a settling slack) has elapsed on the host clock: a row of the window's tail cannot be missed because the census ran too early
@@ -1429,10 +1266,10 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
         rep.bad(f"the measurement failed ({type(error).__name__}: {str(error)[:80]}): the rest was not measured, so nothing here is a PASS")
     finally:
         con.close()
-    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the request's lifecycle: measured within about 0.2 s of the rows of a completed request on this host (checks/census-calibration-measurements.txt: one host over one range, NOT a bound: an unread downstream queue delays a successful stream's line behind its rows without bound, 5.7 s in the native reproduction, r13-P1-2), and up to the disconnect grace before the rows of a request whose client left: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
+    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the request's lifecycle: within about 0.2 s of the rows of a completed request, and up to the disconnect grace before the rows of a request whose client left: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
     rep.say("UNTESTED-BOUNDARY the residual of this check, stated as an untested boundary (no real run has observed these; the synthetic controls R3, J10, J15, J22f and J27a show that the census passes them): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain; (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup)")
     rep.say("UNTESTED-BOUNDARY-DETAIL (added after the full-scope read r12; these refine the three items above and do not replace them): (2) holds for each of the two journal records separately: for the arrival lines the 3 s is measured from the lost request's ESTIMATED start (timestamp minus duration), so its physical arrival may be earlier by a delay that nothing bounds and the two lines may lie further apart; "
-            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it passes the HTTP stream controller of chatCore and its line falls in the counted range (an unread downstream queue delays a successful stream's line behind its rows without bound: r13-P1-2): a non-streaming foreign request prints no stream-end line, and since the read r13 the canary census covers the ARRIVAL line of such a request, and of a late-ending streaming one, over the whole incarnation instead (every inbound POST line since the serving process's start needs a call row of its path, whatever its lead over the duration clock), so it can stand in for an own request only when its arrival line was not logged or not kept (item (1)) or when a call row of its path without an arrival line balances it one for one (item (2): a request whose line was lost beside a request that left no row, control J37e); since the read r14 the incarnation is INCONCLUSIVE when a spare row would balance it without such a pair (several persisted attempt rows of one request, a row without a correlation id, or a call row without a matched arrival line on a path: review r14, P1-1); a Responses-over-WebSocket turn (dist/server-ws.mjs; its rows are written by POST /api/internal/codex-responses-ws, both stamped at the turn's START, with the turn's length as duration and latency) writes neither an arrival line nor a stream-end line, so it is covered by neither either: the census refuses a window that a WebSocket call row reaches (the WEBSOCKET line), and a WebSocket turn whose call row was lost is a case of items (1) and (3) above. "
+            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it passes the HTTP stream controller of chatCore and its line falls in the counted range (an unread downstream queue delays a successful stream's line behind its rows without bound: r13-P1-2): a non-streaming foreign request prints no stream-end line, and since the read r13 the canary census covers the ARRIVAL line of such a request, and of a late-ending streaming one, over the whole incarnation instead (every inbound POST line since the serving process's start needs a call row of its path, whatever its lead over the duration clock), so it can stand in for an own request only when its arrival line was not logged or not kept (item (1)) or when a spare call row of its path without an arrival line balances it (item (2)); a Responses-over-WebSocket turn (dist/server-ws.mjs; its rows are written by POST /api/internal/codex-responses-ws, both stamped at the turn's START, with the turn's length as duration and latency) writes neither an arrival line nor a stream-end line, so it is covered by neither either: the census refuses a window that a WebSocket call row reaches (the WEBSOCKET line), and a WebSocket turn whose call row was lost is a case of items (1) and (3) above. "
             "Journald's drops are bounded only by the unit's entry rate against its limit (its suppression notice is in the system journal, which this user cannot read), a vacuum or rotation gap is not detected, and the serving process, its start and the holders of the store are read at one point in time (a transient listener or writer inside the window is not seen)")
     rep.say("EVIDENCE-CLASS local_integration and synthetic controls, plus the stated real rows (the baseline arms and the quiet-window live trial of 2026-10-06: checks/census-baseline-real-data.txt and checks/census-live-trial.txt in the evidence folder of PR #757): the census is validated by its controls and those rows")
     rep.say(f"CENSUS-RESULT {rep.state} exit={0 if rep.state == 'PASS' else 2} problems={len(rep.reasons)} scope={scope}")
@@ -1581,11 +1418,7 @@ def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary=False
         # -- the serving process (r12-P1-2): the listener, its start, its cgroup, the processes that wrote the request lines, the holders of the store, the supervisor's restart diagnostics
         serving_check(rep, probe, guard, events, db, canary)
         if started is not None:
-            inc_events = monotonic_birth_check(rep, probe, c_hi + dt.timedelta(seconds=JOURNAL_PAD_S), posts, started, c_hi)
-            if inc_events is not None:   # the arrival lines of the listeners since their birth, by boot and pid, with no wall-clock lower bound (review r14, P1-2)
-                incarnation_check(rep, con, inc_events["posts"], started, u1s, c_hi, bounded=False)
-            else:
-                incarnation_check(rep, con, posts, started, u1s, c_hi)
+            incarnation_check(rep, con, posts, started, u1s, c_hi)
         # -- what journald keeps (r12 design check, hole 4): the unit's targets and rate limit against the busiest stretch of the range
         journal_limit_check(rep, events)
     # ---- clocks: own rows inside their arm's interval and inside the window

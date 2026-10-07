@@ -8,7 +8,7 @@
 
 # guard 5 controls: the connection parser on records captured on the live host
 # guard 5: sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b; guard 4 (superseded): sha256 b587c3a48700a7e7802e527784b5d25d76c96f358d8fc36c5bf512e4a965856f; guard 5 before round 13 (K12-K19, E7): sha256 62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b
-# started 2026-10-07T07:54:42Z; python 3.13.15
+# started 2026-10-07T11:06:07Z; python 3.13.15
 
 ### K1a: an idle connection and a busy one (the real sample's shape), server end printed first
     guard 5: OK {'127.0.0.1:57989 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335]), '127.0.0.1:59077 -> 127.0.0.1:20128': ((0, 0, 729017, 1559298), [1521275])}   [as expected]
@@ -112,7 +112,7 @@
     guard 5 before round 13 (the defect): intact []   [as expected]
 ### K16b: a directory in place of the target prefix's shim (shim/lsof): guard 5 before round 13 crashes reading it for its hash (the whole guard exits 3 with ERROR IsADirectoryError, not with a CHECK FAIL)
     guard 5: FAIL ['shim/lsof is a directory, not a regular file']   [as expected]
-    guard 5 before round 13 (the defect: a crash, not a FAIL): CRASH IsADirectoryError: [Errno 21] Is a directory: '$HOME/.cache/guard5-controls-5q4i3sgy/tools-K16b/omniroute-ctl-tar   [as expected]
+    guard 5 before round 13 (the defect: a crash, not a FAIL): CRASH IsADirectoryError: [Errno 21] Is a directory: '$HOME/.cache/guard5-controls-uxaof4jm/tools-K16b/omniroute-ctl-tar   [as expected]
 ### K17: the rollback prefix's entrypoint is a dangling symlink (its target file removed)
     guard 5: FAIL ['bin/omniroute is a dangling symlink']   [as expected]
     guard 5 before round 13 (not a defect of that version: it reports it as missing): FAIL ['missing bin/omniroute']   [as expected]
@@ -133,48 +133,48 @@
     guard 5 before round 13 (positive control): intact []   [as expected]
 
 ### part E: the whole guard 5 in --idle-only mode (E1-E6) and in full mode (E7) against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1), every run inside a private network namespace (unshare -rn) whose 127.0.0.1:20128 is the controls' own stub
-### E0: a private network namespace answers 127.0.0.1:20128 with the controls' own stub: exit=0 marker=1 stub_hits=1 namespace net:[4026532190] vs the host's net:[4026531833] (the host has listener on :20128 in its own namespace, unreachable from inside)   [as expected]
+### E0: a private network namespace answers 127.0.0.1:20128 with the controls' own stub: exit=0 marker=1 stub_hits=1 namespace net:[4026532470] vs the host's net:[4026531833] (the host has listener on :20128 in its own namespace, unreachable from inside)   [as expected]
 ### E0b: the guard's network primitives, by AST: calls [('pending_total', 'urlopen')], imports none besides urllib.request   [as expected]
 ### E1: an idle gateway (one empty connection of the tolerated unit): exit 0, IDLE-RESULT clean=True (and never a GUARD-RESULT line)
-    exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T07:54:44.593Z
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532679] (the host's is net:[4026531833])   [as expected]
+    exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T11:06:09.604Z
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532681] (the host's is net:[4026531833])   [as expected]
 ### E2: a server-end record with no TCP info: the guard FAILS (exit 4), where guard 4 would have read zeros
-    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T07:54:46.773Z
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T11:06:11.774Z
     CHECK nothing in flight for 2 s (3 samples): FAIL ['the socket observation failed: a record has no TCP info (no mss: and cwnd:), so its byte counters are unavailable, not zero']
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532190] (the host's is net:[4026531833])   [as expected]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532470] (the host's is net:[4026531833])   [as expected]
 ### E3: a client-only record: the guard FAILS (exit 4)
-    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T07:54:48.965Z
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T11:06:13.946Z
     CHECK nothing in flight for 2 s (3 samples): FAIL ['the socket observation failed: the connection 127.0.0.1:58002 -> 127.0.0.1:20128 was observed on its client end only: the other end is missing (a co
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532679] (the host's is net:[4026531833])   [as expected]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532681] (the host's is net:[4026531833])   [as expected]
 ### E4a: the same client port from two client addresses: an empty connection of the tolerated unit and a connection with queued data, idle one first: the busy one is ACTIVE (exit 4)
-    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T07:54:51.146Z
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T11:06:16.125Z
     CHECK nothing in flight for 2 s (3 samples): FAIL ["1 ACTIVE connection(s) to port 20128: ['queued data (owner not visible)']"]
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532190] (the host's is net:[4026531833])   [as expected]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532470] (the host's is net:[4026531833])   [as expected]
 ### E4b: the same records, the busy connection first: the same verdict
-    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T07:54:53.325Z
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T11:06:18.299Z
     CHECK nothing in flight for 2 s (3 samples): FAIL ["1 ACTIVE connection(s) to port 20128: ['queued data (owner not visible)']"]
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532679] (the host's is net:[4026531833])   [as expected]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532681] (the host's is net:[4026531833])   [as expected]
 ### E5: an unrelated remote :20128 record next to an idle gateway: exit 0 (not a failure)
-    exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T07:54:55.527Z
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532190] (the host's is net:[4026531833])   [as expected]
+    exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T11:06:20.474Z
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532470] (the host's is net:[4026531833])   [as expected]
 ### E6: without --switch-tool and without --idle-only the guard refuses to start (usage error, exit 3), in a private namespace like E1-E5; the usage error comes before the guard's HTTP read, so the stub counts no request
     exit=3 ERROR usage: --switch-tool is required unless --idle-only
-    the private stub counted 0 request(s), in namespace net:[4026532679] (the host's is net:[4026531833])   [as expected]
+    the private stub counted 0 request(s), in namespace net:[4026532681] (the host's is net:[4026531833])   [as expected]
 ### E7a: full mode, both prefixes as installed (positive control): guard 5 exits 0, GUARD-RESULT clean=True
-    exit=0 GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T07:54:57.813Z
+    exit=0 GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T11:06:22.760Z
     CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
     CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
     the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532470] (the host's is net:[4026531833])   [as expected]
 ### E7b: full mode, the rollback prefix's shim without its execute permission (mode 0644): guard 5 before round 13 passes the pre-switch gate (exit 0, the defect)
-    exit=0 GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T07:55:00.004Z
+    exit=0 GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T11:06:24.935Z
     CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
     CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
-    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532190] (the host's is net:[4026531833])   [as expected]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532681] (the host's is net:[4026531833])   [as expected]
 ### E7c: the same prefixes with guard 5: `rollback prefix intact` FAILS and the guard exits 4
-    exit=4 GUARD-RESULT clean=False failed_checks=['rollback prefix intact'] end=2026-10-07T07:55:02.185Z
+    exit=4 GUARD-RESULT clean=False failed_checks=['rollback prefix intact'] end=2026-10-07T11:06:27.107Z
     CHECK rollback prefix intact: FAIL ['shim/lsof is not readable and executable by this user (mode 0o644)']
     CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
     the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532470] (the host's is net:[4026531833])   [as expected]
 
-# scratch directory (remove with rm -rf after reading): $HOME/.cache/guard5-controls-5q4i3sgy
-# finished 2026-10-07T07:55:02Z; scenarios not as expected: none
+# scratch directory (remove with rm -rf after reading): $HOME/.cache/guard5-controls-uxaof4jm
+# finished 2026-10-07T11:06:27Z; scenarios not as expected: none

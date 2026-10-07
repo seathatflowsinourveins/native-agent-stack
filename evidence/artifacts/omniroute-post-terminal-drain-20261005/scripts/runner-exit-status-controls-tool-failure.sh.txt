@@ -1,0 +1,29 @@
+#!/bin/bash
+# Control of the control (5f's read r14 of 115b885ba, P3-1): scripts/runner-exit-status-controls.sh.txt must never report success when a tool it relies on fails. For each of awk, sed, grep and wc, a scratch executable of that name first on PATH prints a diagnostic and exits 42, and the control is run on the given scripts:
+# it must exit 1 and say `VERDICT: INVALID RUN` (before the repair a failing awk made every stage and case vanish, and "cases as required 0 of 0" with the success verdict was the result).
+# usage: runner-exit-status-controls-tool-failure.sh <the control> <evidence folder> <drain-prototype script> <handler-e2e script> <handler-e2e-session-tag script>   (exit 0 when the control refused every failing tool as required, 1 otherwise)
+set -u
+CONTROL=${1:?the control (scripts/runner-exit-status-controls.sh.txt)}
+shift
+W=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/runner-tool-failure-XXXXXX") || exit 2
+BAD=0
+mask() { sed "s#$HOME#\$HOME#g"; }
+echo "# runner-exit-status-controls-tool-failure: run $(date -u +%Y-%m-%dT%H:%M:%SZ); scratch $(echo "$W" | mask)"
+for tool in awk sed grep wc; do
+  mkdir -p "$W/$tool-bin"
+  printf '#!/bin/sh\necho "%s: simulated failure" >&2\nexit 42\n' "$tool" > "$W/$tool-bin/$tool"
+  chmod 755 "$W/$tool-bin/$tool"
+  PATH="$W/$tool-bin:$PATH" WORK_ROOT="$W" bash "$CONTROL" "$@" > "$W/$tool.out" 2>&1
+  rc=$?
+  summary=$(grep -a '^== summary' "$W/$tool.out" | tail -1 | cut -c1-210)
+  verdict=$(grep -a '^VERDICT' "$W/$tool.out" | tail -1 | cut -c1-120)
+  if [ "$rc" = 1 ] && grep -aq '^VERDICT: INVALID RUN' "$W/$tool.out"; then mark="as required"; else mark="NOT AS REQUIRED"; BAD=$((BAD + 1)); fi
+  echo "  failing $tool (every call exits 42): control exit=$rc | ${summary:-no summary line} | ${verdict:-no verdict line} -> $mark"
+done
+rm -rf "$W"
+if [ "$BAD" = 0 ]; then
+  echo "every failing tool was refused as required (exit 1, VERDICT: INVALID RUN)"
+  exit 0
+fi
+echo "$BAD failing tool(s) were NOT refused as required"
+exit 1

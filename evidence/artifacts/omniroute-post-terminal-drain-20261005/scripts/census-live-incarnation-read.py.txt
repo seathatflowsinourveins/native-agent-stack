@@ -51,8 +51,8 @@ cmd = [sys.executable, "-B", args.census, "--guard-receipt", str(guard), "--db",
 p = subprocess.run(cmd, capture_output=True, timeout=600)
 out = p.stdout.decode("utf-8", "replace")
 home = os.path.expanduser("~")
-keep = ("SCOPE", "CENSUS ", "WINDOW", "SERVING-PROCESS", "INCARNATION-COVERAGE", "INCARNATION-ARRIVALS", "JOURNAL-COMMAND", "JOURNAL-LIMITS", "JOURNAL unit", "CENSUS-RESULT", "OBSERVED-AT", "STORE")
-lines = [l for l in out.splitlines() if l.startswith(keep) or (l.startswith("PROBLEM ") and any(w in l for w in ("since the serving process started", "startup banner", "listener", "cgroup", "restart diagnostic")))]
+keep = ("SCOPE", "CENSUS ", "WINDOW", "SERVING-PROCESS", "INCARNATION-COVERAGE", "INCARNATION-ARRIVALS", "INCARNATION-ROWS", "INCARNATION-BIRTH", "INCARNATION-JOURNAL-COMMAND", "JOURNAL-COMMAND", "JOURNAL-LIMITS", "JOURNAL unit", "CENSUS-RESULT", "OBSERVED-AT", "STORE")
+lines = [l for l in out.splitlines() if l.startswith(keep) or (l.startswith("PROBLEM ") and any(w in l for w in ("since the serving process started", "startup banner", "listener", "cgroup", "restart diagnostic", "correlation id", "arrival lines", "boot clock", "monotonic", "boot id")))]
 print(f"# exit={p.returncode}; problems in the whole receipt: {sum(1 for l in out.splitlines() if l.startswith('PROBLEM '))} (the others are the fabricated arms: no own rows)")
 for l in lines:
     print(l.replace(home, "$HOME"))
