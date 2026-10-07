@@ -221,3 +221,44 @@ to the CC with its own lifecycle, and the CPU precondition is a CC window step
 before activation. The source lines and value-free read-back sequence remain in
 the linked MinerU recipe; neither source review nor unit syntax proves native
 CPU-only behavior.
+
+## Amendment (2026-10-07): CI dependency and portable-carrier repair
+
+The exact-head hosted validation job at `5a6842f1` ran the full unittest suite
+and exposed four dependency gaps that the preceding scoped checks did not cover.
+The historical source-host architecture still references the 1B model; its
+complete original fields and receipt IDs are restored with an explicit retired
+NativeStack2604 scope, while the separate selected 8B row stays. The current
+catalog's locator points to that restored revision field. The old acceptance
+is neither rewritten nor attributed to the 8B model.
+
+The earlier prepared Claude carrier's 21633/28231 endpoint values are superseded
+in the portable template by the host-example defaults, matching Codex's existing
+parameterized contract. The 8B model and 4096 dimensions remain. NativeStack2604
+uses its existing target-specific registration path; this lane applies no client
+configuration. Three current setup pages disclose that the model carrier changed
+after the pinned release. The moved SDK test's disposition citation now points
+to the line that actually names its environment key. No parity, pin-source,
+release-disclosure or citation oracle is relaxed.
+
+Sources are the existing source contracts at
+`native-agent-stack@5a6842f1700520b94b78b74ade8b010b84c663ce`:
+`adoption/hosts/example.json`,
+`tools/adoption/install_claude_profile.py:350-378`,
+`tests/test_install_claude_profile.py:1509-1530`,
+`tests/test_adoption_docs_consistency.py:499-538`,
+`tests/test_architecture_pin_source.py:73-80,192`,
+`tests/test_ecosystem_manifest.py:2155-2158`, and
+`tests/test_upstream_surface_watch.py:2054-2060`.
+The preserved 1B source record is
+`native-agent-stack@3d7d4a4b:manifests/stack.json:2098-2109`.
+The failed hosted log is retained separately; these fixes are deterministic
+integration work, not new model, host or unchanged-upstream acceptance.
+
+The current setup-page disclosures regenerate the handbook through its existing
+builder. The old October 1 receipt retains every frozen hash and observation.
+A [new dated projection receipt](../../evidence/artifacts/model-currency-enforcement-20261007/handbook-projection.json)
+binds the current generator, profile and outputs, linking the preserved receipt.
+The existing publication test reads this current receipt; its exact hash and
+inventory assertions remain unchanged. The failed stale-output and old-binding
+checks are retained in that new record, not removed from the evidence history.

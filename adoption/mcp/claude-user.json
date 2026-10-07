@@ -32,9 +32,9 @@
       ],
       "env": {
         "QDRANT_MODE": "external",
-        "QDRANT_URL": "http://127.0.0.1:21633",
+        "QDRANT_URL": "http://127.0.0.1:16333",
         "EMBEDDING_PROVIDER": "lmstudio",
-        "LMSTUDIO_URL": "http://127.0.0.1:28231/v1",
+        "LMSTUDIO_URL": "http://127.0.0.1:8231/v1",
         "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-8B-BF16",
         "EMBEDDING_DIMENSIONS": "4096",
         "EMBEDDING_CONTEXT_LENGTH": "4096",

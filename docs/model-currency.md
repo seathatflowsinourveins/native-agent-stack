@@ -140,3 +140,10 @@ owner sources. This PR does not hand-edit or recreate the generated installer.
 The existing stack component pin stays 2.4.1 until its owner supplies the pin,
 saturation-audit row and qualification receipt. FILL item 7 is partial until that
 plan-owner amendment lands; the independent example and model metadata are ready.
+
+The portable Claude MCP template retains the host-example endpoint defaults,
+matching the parameterized Codex template. NativeStack2604's registrations use
+their own 21633/28231 endpoints through the existing host-specific configuration
+path; changing a portable template is not a host apply. The old 1B stack model
+record remains for source-host architecture and acceptance references, explicitly
+retired on NativeStack2604. Its old evidence does not qualify the selected 8B.
