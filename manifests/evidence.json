@@ -5351,13 +5351,13 @@
     },
     {
       "path": "adoption/workflow/README.md",
-      "sha256": "e66662c7935b8dd475119915b4af16602a4afe2ed314a433f9dfe96f1388d572",
-      "bytes": 3163
+      "sha256": "6bed0be413ec811185a68b4e5b372babdb71fd2ac82e0275e72dcf127635cb47",
+      "bytes": 3463
     },
     {
       "path": "adoption/workflow/manifest.json",
-      "sha256": "15d6a03b849de02daff7e0b331a525d60f786a17f57d9290a2faf50889bf06a7",
-      "bytes": 34028
+      "sha256": "4756b185bb5e8e5f3a6897a66ac9f0c7592d488005f50fc71afd94036b50bc40",
+      "bytes": 34036
     },
     {
       "path": "adoption/workflow/pending-agents/isolated-builder-broker-adapter.md",
@@ -5386,8 +5386,8 @@
     },
     {
       "path": "adoption/workflow/role-tool-measurements.md",
-      "sha256": "e7cb4045408a1eb5c12a2fc489e1da0c431cd11b3fcf8dfe8d78de1462a5b739",
-      "bytes": 4854
+      "sha256": "61aedc89481237562c45ee9a3b7fb1e3e1369dc8ecd2f9e301b1248ebeb637ca",
+      "bytes": 6527
     },
     {
       "path": "adoption/workflow/routing.md",
@@ -17689,6 +17689,11 @@
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
+    },
+    {
+      "path": "docs/decisions/2026-10-06-skill-row-acceptance-amendment.md",
+      "sha256": "444c1872fa4bcbc520e3e5d2ac92fc1224e37cb1afb9ab9f218fa8c38dc58db3",
+      "bytes": 3061
     },
     {
       "path": "docs/decisions/2026-10-06-sota-workflow-manifest.md",
@@ -46709,6 +46714,16 @@
       "path": "evidence/artifacts/skills-pin-verification-20260930/pin-verification.json",
       "sha256": "ea5768d80df8d6ac432f2660e9a49e1144b44c79cb91006fa6ab92a8ead607e7",
       "bytes": 17035
+    },
+    {
+      "path": "evidence/artifacts/skills-role-organic-before-20261007/before.md",
+      "sha256": "b7b3afc959c860dfcf45ee36f5c3b6ae0652edcacab40292e4078427b1bcdc24",
+      "bytes": 1372
+    },
+    {
+      "path": "evidence/artifacts/skills-role-organic-before-20261007/receipt.json",
+      "sha256": "86c5a974ec59fc649cb4e0dc3c78f4450a0add7ede9351b662501108f67a0bec",
+      "bytes": 6286
     },
     {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
