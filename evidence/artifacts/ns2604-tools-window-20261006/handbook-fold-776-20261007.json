@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-profile-integration",
+  "recorded_at_utc": "2026-10-07 02:58:49 UTC",
+  "evidence_class": "local_integration",
+  "source_base": "8d4f16be8903f313bc96d555cebf4f593a6faf36",
+  "source_prs": [
+    {
+      "pr": 780,
+      "head": "50bf3c544db95c5121efd3229938148e21763b67",
+      "source_main_merge_base": "1fa865066b4a9e82522170ca48759ffebc07ed0c"
+    },
+    {
+      "pr": 815,
+      "head": "9db54c83f707634340619576e896dbba42b6b60b",
+      "source_main_merge_base": "e28d0eec112527ac02659ac23753533b8ed39a73"
+    }
+  ],
+  "prior_receipt": {
+    "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+    "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749"
+  },
+  "folded_source_receipt": {
+    "path": "evidence/artifacts/ns2604-tools-window-20261006/handbook-receipt.json",
+    "sha256": "dbd37f4ea0fff1c820d65e0b6d1db0b7f1fb370adc9570b07b062cc7a0d8b2d6",
+    "preservation": "The complete source-PR815 receipt, including all recorded observations and validation results, is byte-identical to source head9db54c83f707634340619576e896dbba42b6b60b."
+  },
+  "supersession_scope": "New fold regeneration record for the retained PR776 current handbook and publication-contract test. Both prior receipts remain byte-identical; only the current test pointer follows this record. No old observed value or decided text is changed. No unrelated source-base builder or receipt is imported.",
+  "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
+  "profile_sha256": "bf96a1d0b9d7610a4e5ca7f52a9d57c3f3a50c14a5f1cae2e0d08a7becb8fde0",
+  "outputs": {
+    "docs/new-wsl-handbook.md": "6a3b342ae604da042f343baa666b69bfc5685a60fd485f9c12f2288be38d67d1",
+    "docs/new-wsl-handbook.json": "34854a5da9de3fd973e1f3b90e10a157a2760173019fbf6f7e166a5a0a3f320b"
+  },
+  "inventory": {
+    "layers": 37,
+    "profile_entries": 78,
+    "projected_tools": 82,
+    "canonical_package_ids": 26
+  },
+  "native_generation": {
+    "argv": [
+      "nice",
+      "-n",
+      "19",
+      "ionice",
+      "-c3",
+      "python3",
+      "scripts/build_new_wsl_handbook.py",
+      "--write"
+    ],
+    "start_utc": "2026-10-07 02:58:48 UTC",
+    "end_utc": "2026-10-07 02:58:49 UTC",
+    "exit_code": 0,
+    "stdout_stderr": "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"34854a5da9de3fd973e1f3b90e10a157a2760173019fbf6f7e166a5a0a3f320b\", \"docs/new-wsl-handbook.md\": \"6a3b342ae604da042f343baa666b69bfc5685a60fd485f9c12f2288be38d67d1\"}, \"status\": \"written\"}\n",
+    "session_id": null
+  },
+  "source_output_comparison": {
+    "source_pr": 815,
+    "source_generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+    "source_outputs": {
+      "docs/new-wsl-handbook.md": "c6cf822f7033ebdd47e6aee04ef277d3334b4b355f4aa9c8ea168a0a140e07b4",
+      "docs/new-wsl-handbook.json": "50acc8c9ba8c85ff7eab810e64a05275d6fe56ac69aa2d6ebacd30edb02d6489"
+    },
+    "comparison": "The retained target generator differs from the source-PR815 generator. These current outputs are independently regenerated through the unchanged retained target builder; source-PR815 output hashes and returned results remain historical facts in its original receipt."
+  },
+  "current_carrier_merge": "Apply the exact source-PR815 publication-contract test changes and select this new fold receipt as the current hash mirror. Preserve its prior-path/hash assertion against the retained PR776 historical receipt. All generator/profile/output/inventory and one-byte-change controls stay present.",
+  "validation_status": "PENDING root focused tests and publication validation. Only the native regeneration command has returned exit0; no upstream suite, host installation, model execution, smoke, organic counter or qualification is claimed."
+}

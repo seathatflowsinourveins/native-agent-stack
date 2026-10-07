@@ -1686,7 +1686,7 @@
     {
       "id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "version": "1.108.319",
+      "version": "1.108.330",
       "license": "Dual-Use License 1.1; upstream non-commercial/commercial terms retained",
       "profile": "supporting",
       "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
@@ -1699,7 +1699,7 @@
           }
         }
       ],
-      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "source_pin": "288033668f0425ab0547f420dd647c14bd186c7f",
       "evidence_ids": [
         "native-jcodemunch-20260920",
         "native-token-focus-clients-20260920",
@@ -1715,10 +1715,11 @@
         "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE"
+        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.330",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/LICENSE",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/pyproject.toml"
       ],
-      "freshness": "Pinned upstream installation, direct artifact acceptance and one bounded task in each native client verified 2026-09-20; no causal provider savings claim.",
+      "freshness": "Current pin 1.108.330 follows the clean upstream tools window of 2026-10-06. Retained native acceptance from 2026-09-20 exercised 1.108.319 and does not qualify the new pin; no causal provider savings claim.",
       "command_scope": "Index only selected code; default upstream index root; sharing, AI summaries, watchers, cross-repository defaults and external context providers disabled. See native recipe and receipt for whole-file versus focused-source baselines."
     },
     {
