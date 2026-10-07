@@ -9,7 +9,7 @@ All listeners bind to `127.0.0.1`; Alertmanager cluster gossip is disabled.
 |---|---|---|---|
 | Prometheus | 3.15.0 | `http://127.0.0.1:19090` | TSDB, seven-day / 512 MiB retention |
 | Loki | 3.7.8 | `http://127.0.0.1:13100` | TSDB v13, filesystem chunks, WAL, 72-hour retention |
-| Grafana OSS | 13.2.2 | `http://127.0.0.1:13000` | SQLite settings, provisioned dashboard and data sources |
+| Grafana OSS | 13.2.3 | `http://127.0.0.1:13000` | SQLite settings, provisioned dashboard and data sources |
 | Alertmanager | 0.34.1 | `http://127.0.0.1:19093` | Silences and notification history, 72-hour retention |
 | ntfy | 2.28.0 | `http://127.0.0.1:18080` | SQLite notification cache, 72-hour retention |
 
@@ -248,7 +248,8 @@ curl --fail --silent 'http://127.0.0.1:18080/ecosystem-alerts/json?poll=1&since=
 curl --fail --silent 'http://127.0.0.1:18080/ecosystem-lanes/json?poll=1&since=all'
 ```
 
-Grafana anonymous access and sign-up are disabled. Optional Grafana and Loki
+Sign-up is disabled; anonymous Viewer access is enabled on loopback (see
+[Install and configure](#install-and-configure)). Optional Grafana and Loki
 analytics/update checks are disabled. The other backend endpoints intentionally
 rely on loopback and local-user trust, not authentication. Do not expose these
 ports through a public reverse proxy without separately designing authentication,
@@ -292,7 +293,7 @@ production availability guarantee.
 
 - [Prometheus 3.15.0 release](https://github.com/prometheus/prometheus/releases/tag/v3.15.0) and [storage semantics](https://prometheus.io/docs/prometheus/latest/storage/).
 - [Loki 3.7.8 release](https://github.com/grafana/loki/releases/tag/v3.7.8), [OpenTelemetry ingestion](https://grafana.com/docs/loki/latest/send-data/otel/), and [retention](https://grafana.com/docs/loki/latest/operations/storage/retention/).
-- [Grafana OSS 13.2.2 binaries and checksums](https://grafana.com/grafana/download/13.2.2?edition=oss&platform=linux) and [native provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/).
+- [Grafana OSS 13.2.3 binaries and checksums](https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux) and [native provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 - [Alertmanager 0.34.1 release](https://github.com/prometheus/alertmanager/releases/tag/v0.34.1) and [webhook configuration](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config).
 - [ntfy 2.28.0 release](https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0), [configuration](https://docs.ntfy.sh/config/), and [bundled webhook templates](https://docs.ntfy.sh/publish/#message-templating).
 

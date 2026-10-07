@@ -182,8 +182,8 @@ python3 observability/native-data/render.py \
 ```
 
 That provider sets `disableDeletion: true`. Deleting the file later only
-unprovisions the dashboard (Grafana 13.2.2 `handleMissingDashboardFiles` in
-`pkg/services/provisioning/dashboards/file_reader.go`); removing the remaining copy
+unprovisions the dashboard (Grafana 13.2.3
+[`handleMissingDashboardFiles`](https://github.com/grafana/grafana/blob/v13.2.3/pkg/services/provisioning/dashboards/file_reader.go#L286-L298)); removing the remaining copy
 is an administrator action inside Grafana.
 
 To undo the deployment, disable the timer, remove the installed units and the

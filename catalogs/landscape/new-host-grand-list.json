@@ -2016,7 +2016,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
               "bootstrap_pinned": true,
-              "bootstrap_version": "0.38.1"
+              "bootstrap_version": "0.38.2"
             },
             "macos-arm64": {
               "e2e_state": "untested",

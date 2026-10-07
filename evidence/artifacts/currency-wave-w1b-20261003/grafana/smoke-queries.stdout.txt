@@ -1,0 +1,135 @@
+[ns] ip link set lo up exit=0
+[ns] interfaces: lo(127.0.0.1/8) 
+[ns] listeners before start: 0
+[pinned-13.2.2] synthetic Prometheus (127.0.0.1:19090) and Loki (127.0.0.1:13100) backends bound in the namespace
+[pinned-13.2.2-q] /api/health up after ~26s: {"database":"ok","version":"13.2.2","commit":"1bea008f7e4e858b6824c9e364d608bd4d10b13a"}
+[pinned-13.2.2] ds-health:
+{
+  "ecosystem-loki": {
+    "http": 200,
+    "message": "Data source successfully connected.",
+    "status": "OK"
+  },
+  "ecosystem-prometheus": {
+    "http": 200,
+    "message": "Successfully queried the Prometheus API.",
+    "status": "OK"
+  }
+}
+[pinned-13.2.2] smoke_checks ds-health exit=0
+[pinned-13.2.2] ds-queries:
+{
+  "by_datasource": {
+    "ecosystem-loki": {
+      "frames": 22,
+      "result_ok": 22,
+      "targets": 22
+    },
+    "ecosystem-prometheus": {
+      "frames": 14,
+      "result_ok": 14,
+      "targets": 14
+    }
+  },
+  "errors": [],
+  "frames": 36,
+  "http_ok": 36,
+  "result_ok": 36,
+  "targets": 36
+}
+[pinned-13.2.2] smoke_checks ds-queries exit=0
+[pinned-13.2.2] graceful stop (SIGTERM) -> grafana exit=0
+[pinned-13.2.2] listeners after stop: 2
+[pinned-13.2.2] synthetic backend request counts: {"loki": {"/loki/api/v1/query": 12, "/loki/api/v1/query_range": 11}, "prometheus": {"/api/v1/query": 8, "/api/v1/query_range": 7, "/api/v1/status/buildinfo": 1}}
+[pinned-13.2.2-q] log lines=27 warn=10 error=16
+   logger=migrator t=2026-10-03T02:03:06.263023412-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop unique orgID index on alert_configuration if exists"
+   logger=migrator t=2026-10-03T02:03:09.394719718-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop index UQE_dashboard_public_config_uid - v1"
+   logger=migrator t=2026-10-03T02:03:09.420012672-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop index IDX_dashboard_public_config_org_id_dashboard_uid - v1"
+   logger=migrator t=2026-10-03T02:03:10.064421412-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key to file table if my_row_id exists (auto-generate
+   logger=migrator t=2026-10-03T02:03:10.245242704-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key to file_meta table if my_row_id exists (auto-gen
+   logger=migrator t=2026-10-03T02:03:13.576538233-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns snapshot_uid,resource_type,partitio
+   logger=secret-migrator t=2026-10-03T02:03:18.217461524-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns namespace,name,version to ta
+   logger=resource-migrator t=2026-10-03T02:03:19.027575237-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns group,resource to table re
+   t=2026-10-03T02:03:21.805741099-04:00 level=warn caller=logger.go:224 time=2026-10-03T02:03:21.805728418-04:00 msg="skipped registering status sub-resource that does not support dual writing" resource=alertrules.rules.alerting.gra
+   t=2026-10-03T02:03:21.805812401-04:00 level=warn caller=logger.go:224 time=2026-10-03T02:03:21.805806961-04:00 msg="skipped registering status sub-resource that does not support dual writing" resource=recordingrules.rules.alerting
+   logger=provisioning.plugins t=2026-10-03T02:03:22.359705432-04:00 level=error msg="Failed to read plugin provisioning files from directory" path=<QUALIFICATION_ROOT>/graf
+   logger=provisioning.alerting t=2026-10-03T02:03:22.359795435-04:00 level=error msg="can't read alerting provisioning files from directory" path=<QUALIFICATION_ROOT>/grafa
+   logger=plugin.opentsdb t=2026-10-03T02:03:23.587935534-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafan
+   logger=plugin.influxdb t=2026-10-03T02:03:23.589015737-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafan
+   logger=plugin.tempo t=2026-10-03T02:03:23.589779984-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafana-1
+   logger=plugin.elasticsearch t=2026-10-03T02:03:23.589878866-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-g
+   logger=plugin.mssql t=2026-10-03T02:03:23.589923847-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafana-1
+   logger=plugin.mysql t=2026-10-03T02:03:23.590213119-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafana-1
+   logger=plugin.zipkin t=2026-10-03T02:03:23.592194586-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafana-
+   logger=plugin.prometheus t=2026-10-03T02:03:23.593287383-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-graf
+   logger=plugin.stackdriver t=2026-10-03T02:03:23.593752891-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-gra
+   logger=plugin.grafana-pyroscope-datasource t=2026-10-03T02:03:23.59376468-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/too
+   logger=plugin.grafana-postgresql-datasource t=2026-10-03T02:03:23.594544678-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/t
+   logger=plugin.loki t=2026-10-03T02:03:23.594595165-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafana-13
+   logger=plugin.jaeger t=2026-10-03T02:03:23.59514862-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/ref-13.2.2/tools/ecosystem-grafana-1
+[candidate-13.2.3] synthetic Prometheus (127.0.0.1:19090) and Loki (127.0.0.1:13100) backends bound in the namespace
+[candidate-13.2.3-q] /api/health up after ~21s: {"database":"ok","version":"13.2.3","commit":"90ffed056f0884267356c12a0eeb72a022af53f1"}
+[candidate-13.2.3] ds-health:
+{
+  "ecosystem-loki": {
+    "http": 200,
+    "message": "Data source successfully connected.",
+    "status": "OK"
+  },
+  "ecosystem-prometheus": {
+    "http": 200,
+    "message": "Successfully queried the Prometheus API.",
+    "status": "OK"
+  }
+}
+[candidate-13.2.3] smoke_checks ds-health exit=0
+[candidate-13.2.3] ds-queries:
+{
+  "by_datasource": {
+    "ecosystem-loki": {
+      "frames": 22,
+      "result_ok": 22,
+      "targets": 22
+    },
+    "ecosystem-prometheus": {
+      "frames": 14,
+      "result_ok": 14,
+      "targets": 14
+    }
+  },
+  "errors": [],
+  "frames": 36,
+  "http_ok": 36,
+  "result_ok": 36,
+  "targets": 36
+}
+[candidate-13.2.3] smoke_checks ds-queries exit=0
+[candidate-13.2.3] graceful stop (SIGTERM) -> grafana exit=0
+[candidate-13.2.3] listeners after stop: 2
+[candidate-13.2.3] synthetic backend request counts: {"loki": {"/loki/api/v1/query": 12, "/loki/api/v1/query_range": 11}, "prometheus": {"/api/v1/query": 8, "/api/v1/query_range": 7, "/api/v1/status/buildinfo": 1}}
+[candidate-13.2.3-q] log lines=27 warn=10 error=16
+   logger=migrator t=2026-10-03T02:03:30.583195704-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop unique orgID index on alert_configuration if exists"
+   logger=migrator t=2026-10-03T02:03:32.016234205-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop index UQE_dashboard_public_config_uid - v1"
+   logger=migrator t=2026-10-03T02:03:32.030791445-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop index IDX_dashboard_public_config_org_id_dashboard_uid - v1"
+   logger=migrator t=2026-10-03T02:03:32.468490382-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key to file table if my_row_id exists (auto-generate
+   logger=migrator t=2026-10-03T02:03:32.547739781-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key to file_meta table if my_row_id exists (auto-gen
+   logger=migrator t=2026-10-03T02:03:34.371547627-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns snapshot_uid,resource_type,partitio
+   logger=secret-migrator t=2026-10-03T02:03:38.045179912-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns namespace,name,version to ta
+   logger=resource-migrator t=2026-10-03T02:03:38.888088134-04:00 level=warn msg="Skipping migration: Already executed, but not recorded in migration log" id="drop my_row_id and add primary key with columns group,resource to table re
+   t=2026-10-03T02:03:42.796827236-04:00 level=warn caller=logger.go:224 time=2026-10-03T02:03:42.796815645-04:00 msg="skipped registering status sub-resource that does not support dual writing" resource=alertrules.rules.alerting.gra
+   t=2026-10-03T02:03:42.796875277-04:00 level=warn caller=logger.go:224 time=2026-10-03T02:03:42.796872587-04:00 msg="skipped registering status sub-resource that does not support dual writing" resource=recordingrules.rules.alerting
+   logger=provisioning.plugins t=2026-10-03T02:03:43.296047022-04:00 level=error msg="Failed to read plugin provisioning files from directory" path=<QUALIFICATION_ROOT>/graf
+   logger=provisioning.alerting t=2026-10-03T02:03:43.296124735-04:00 level=error msg="can't read alerting provisioning files from directory" path=<QUALIFICATION_ROOT>/grafa
+   logger=plugin.tempo t=2026-10-03T02:03:44.85881225-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem-
+   logger=plugin.stackdriver t=2026-10-03T02:03:44.859314523-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/eco
+   logger=plugin.zipkin t=2026-10-03T02:03:44.85936059-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem
+   logger=plugin.grafana-pyroscope-datasource t=2026-10-03T02:03:44.859535134-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installe
+   logger=plugin.prometheus t=2026-10-03T02:03:44.859907823-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecos
+   logger=plugin.mysql t=2026-10-03T02:03:44.859917738-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem
+   logger=plugin.opentsdb t=2026-10-03T02:03:44.860853108-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosys
+   logger=plugin.elasticsearch t=2026-10-03T02:03:44.861189279-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/e
+   logger=plugin.loki t=2026-10-03T02:03:44.861200271-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem-
+   logger=plugin.jaeger t=2026-10-03T02:03:44.861498939-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosyste
+   logger=plugin.influxdb t=2026-10-03T02:03:44.861944325-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosys
+   logger=plugin.mssql t=2026-10-03T02:03:44.862843325-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-installer-smoke/tools/ecosystem
+   logger=plugin.grafana-postgresql-datasource t=2026-10-03T02:03:44.862963179-04:00 level=error msg="plugin process exited" plugin=<QUALIFICATION_ROOT>/grafana/repo-install

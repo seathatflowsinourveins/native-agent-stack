@@ -7224,13 +7224,12 @@
         "install": [],
         "use": [
           "grafana --version",
-          "curl --fail --silent http://127.0.0.1:13000/api/health",
-          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:13000/api/health"
+          "curl --fail --silent --show-error --output \"$GRAFANA_HEALTH_FILE\" http://127.0.0.1:13000/api/health"
         ],
         "statistics": [],
-        "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
+        "command_kind": "Read-only upstream validation and health commands. Before the health check, set GRAFANA_HEALTH_FILE to an owned real file; require curl's exit status and inspect that file (docs/token-session-handbook.md, quiet-download routing). The retained 2026-09-20 observation below was taken with the earlier stdout forms. No installer or service mutation is run by this row."
       },
-      "returned_result_summary": "2026-09-20 14:17 UTC: /api/health returned HTTP 200 with database 'ok', version '13.2.2', and the retained commit identity. The native user service was active in the follow-up. This current health check does not constitute a new visual dashboard acceptance or a token-savings measurement. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
+      "returned_result_summary": "2026-09-20 14:17 UTC: /api/health returned HTTP 200 with database 'ok', version '13.2.2', and the retained commit identity. The native user service was active in the follow-up. This current health check does not constitute a new visual dashboard acceptance or a token-savings measurement. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -7249,7 +7248,7 @@
         "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
         "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
       },
-      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2.",
       "source_paths": [
         "evidence/receipts/current-session-observation-20260920.json",
         "docs/current-session-observation.md",

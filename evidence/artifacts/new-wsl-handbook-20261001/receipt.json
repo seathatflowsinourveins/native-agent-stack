@@ -4,10 +4,10 @@
   "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-  "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
+  "profile_sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
   "outputs": {
-    "docs/new-wsl-handbook.md": "a1a0cb17fb9df414c02577d04fd3f120f7ee59447bc89ace44bf2f662180d19c",
-    "docs/new-wsl-handbook.json": "a42c89153ce6b91da53699342caa75217e3efacdda565c0ce6648f2298345467"
+    "docs/new-wsl-handbook.md": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
+    "docs/new-wsl-handbook.json": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa"
   },
   "inventory": {
     "layers": 37,
@@ -721,6 +721,54 @@
       },
       "native_exit_code": 0,
       "returned_status": "passed"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Content refresh of PR #645 onto main d9eb68750 after #642 (W1) landed: #645 moves Grafana's stack pin to 13.2.3, a handbook input, so main's committed handbook outputs were stale on the merged sources. Regenerated through the unchanged native builder as the handbook carry (the command center's ruling (a), items task-native-agent-stack-5f-20261006T112334Z and task-native-agent-stack-5f-20261006T232821Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "d9eb68750311d5f888adec140723da174f9fe10c",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
+        "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "#645 land-slot P2 (the command center's ruling (a), item task-native-agent-stack-5f-20261006T235735Z): W1's sentence 'The host stack remains 13.2.2 at this head.' became stale when W1b moved the stack manifest and snapshot selection to 13.2.3, so the profile now carries the approved replacement. Regenerated through the unchanged native builder; every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "d9eb68750311d5f888adec140723da174f9fe10c",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
+        "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Custody refresh of PR #645 onto main 3d7d4a4b2: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "3d7d4a4b2640c8583d8855670111ef5d023d3e03",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "c6a357756080c7651a3890f5ff2c9bcd4d5c14a0e596d7a7fa7372d2e08c2303",
+        "docs/new-wsl-handbook.json": "e85827c513b80cf075792edbcaf0c1b03c59ca89ca0c31e8fe846f2f3d1fa174"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Custody refresh of PR #645 onto main 003804f24: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "003804f24fa5d998ba429dff3235b0d7dba9fa93",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "a1a0cb17fb9df414c02577d04fd3f120f7ee59447bc89ace44bf2f662180d19c",
+        "docs/new-wsl-handbook.json": "a42c89153ce6b91da53699342caa75217e3efacdda565c0ce6648f2298345467"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ],
   "previous_outputs": [

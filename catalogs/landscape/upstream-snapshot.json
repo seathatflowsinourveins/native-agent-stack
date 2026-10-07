@@ -139,32 +139,40 @@
     {
       "component_id": "agent-browser",
       "repository": "https://github.com/vercel-labs/agent-browser",
-      "selected_repository_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
-      "selected_version": "0.38.1",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+      "selected_version": "0.38.2",
+      "selected_source_pin": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
       "checks": [
         {
           "endpoint": "repos/vercel-labs/agent-browser",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:28.880011+00:00",
-          "ended_at": "2026-09-21T22:30:29.357135+00:00",
-          "stdout_sha256": "a9ade155472dff8668235ee883d1ac6c90f917ff32dcb6dd5357421eadb3f7a0",
+          "started_at": "2026-10-03T07:15:37.870837+00:00",
+          "ended_at": "2026-10-03T07:15:38.293371+00:00",
+          "stdout_sha256": "f8ece5872fc9bed2e63e611de0e361d83f55f56024dbcc2ab00202d999481113",
           "status": "ok"
         },
         {
           "endpoint": "repos/vercel-labs/agent-browser/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:29.357243+00:00",
-          "ended_at": "2026-09-21T22:30:29.695194+00:00",
-          "stdout_sha256": "78a11b98f2c8cf3f6f1a7a36d207c9c6200adc4dd68c08090b6d69a43f9c533f",
+          "started_at": "2026-10-03T07:15:37.871125+00:00",
+          "ended_at": "2026-10-03T07:15:38.219460+00:00",
+          "stdout_sha256": "5a1e45fb31cc1d29df29e030af5ce312af9b6beed640433255ae61b1e7028189",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel-labs/agent-browser/commits/v0.38.1",
+          "endpoint": "repos/vercel-labs/agent-browser/commits/39a74c70d7759d5a6de7a22c04570bb626bbd081",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:29.695431+00:00",
-          "ended_at": "2026-09-21T22:30:30.194852+00:00",
-          "stdout_sha256": "7706950272245259fab5904bd4676800877dafcf4fe0a1b4b4e364f2654f3789",
+          "started_at": "2026-10-03T07:15:37.871559+00:00",
+          "ended_at": "2026-10-03T07:15:38.210703+00:00",
+          "stdout_sha256": "563d5b972227872122e12f5b59f14313e1b5fd0de6870b28cbd7e4a399ead76c",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/vercel-labs/agent-browser/commits/v0.38.2",
+          "exit_code": 0,
+          "started_at": "2026-10-03T07:15:37.872108+00:00",
+          "ended_at": "2026-10-03T07:15:38.200337+00:00",
+          "stdout_sha256": "563d5b972227872122e12f5b59f14313e1b5fd0de6870b28cbd7e4a399ead76c",
           "status": "ok"
         }
       ],
@@ -172,27 +180,98 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T19:15:59Z",
+      "pushed_at": "2026-10-03T06:28:26Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.38.1",
-        "published_at": "2026-09-16T20:05:12Z",
-        "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+        "tag_name": "v0.38.2",
+        "published_at": "2026-10-01T21:44:28Z",
+        "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.38.1",
-        "sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
-        "html_url": "https://github.com/vercel-labs/agent-browser/commit/aff6125c023b810ea3f2e5deec5379e9a4270bdc",
-        "committed_at": "2026-09-16T19:51:04Z"
+        "ref": "v0.38.2",
+        "sha": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "html_url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "committed_at": "2026-10-01T20:12:51Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/vercel-labs/agent-browser",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_matches_latest_release_commit": true,
+      "checked_at": "2026-10-03T07:15:38.293371+00:00",
+      "dated_observations": [
+        {
+          "checked_at": "2026-09-21T22:30:30.194852+00:00",
+          "observation": {
+            "component_id": "agent-browser",
+            "repository": "https://github.com/vercel-labs/agent-browser",
+            "selected_repository_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+            "selected_version": "0.38.1",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/vercel-labs/agent-browser",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:30:28.880011+00:00",
+                "ended_at": "2026-09-21T22:30:29.357135+00:00",
+                "stdout_sha256": "a9ade155472dff8668235ee883d1ac6c90f917ff32dcb6dd5357421eadb3f7a0",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/vercel-labs/agent-browser/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:30:29.357243+00:00",
+                "ended_at": "2026-09-21T22:30:29.695194+00:00",
+                "stdout_sha256": "78a11b98f2c8cf3f6f1a7a36d207c9c6200adc4dd68c08090b6d69a43f9c533f",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/vercel-labs/agent-browser/commits/v0.38.1",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:30:29.695431+00:00",
+                "ended_at": "2026-09-21T22:30:30.194852+00:00",
+                "stdout_sha256": "7706950272245259fab5904bd4676800877dafcf4fe0a1b4b4e364f2654f3789",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/vercel-labs/agent-browser",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-21T19:15:59Z",
+            "license_spdx": "Apache-2.0",
+            "latest_stable_release": {
+              "tag_name": "v0.38.1",
+              "published_at": "2026-09-16T20:05:12Z",
+              "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v0.38.1",
+              "sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+              "html_url": "https://github.com/vercel-labs/agent-browser/commit/aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+              "committed_at": "2026-09-16T19:51:04Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/vercel-labs/agent-browser",
+            "release_relationship": "selected_version_matches_latest_stable"
+          }
+        }
+      ],
+      "selected_pin_source": {
+        "ref": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "sha": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "html_url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "committed_at": "2026-10-01T20:12:51Z"
+      }
     },
     {
       "component_id": "agentsview",
@@ -3067,40 +3146,40 @@
     {
       "component_id": "grafana",
       "repository": "https://github.com/grafana/grafana",
-      "selected_repository_url": "https://github.com/grafana/grafana",
-      "selected_version": "13.2.2",
-      "selected_source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "selected_repository_url": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+      "selected_version": "13.2.3",
+      "selected_source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
       "checks": [
         {
           "endpoint": "repos/grafana/grafana",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:56.229222+00:00",
-          "ended_at": "2026-09-21T22:32:56.672834+00:00",
-          "stdout_sha256": "1cd7411fb9474610b749d5a27393700fa673acf36fe68875b830d73547b080fa",
+          "started_at": "2026-10-03T07:15:38.200705+00:00",
+          "ended_at": "2026-10-03T07:15:38.592069+00:00",
+          "stdout_sha256": "20c828adae1e7e00cf17eddd6d091e99bbb1f1cde0ac6eff551a7634249e6a92",
           "status": "ok"
         },
         {
           "endpoint": "repos/grafana/grafana/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:56.672930+00:00",
-          "ended_at": "2026-09-21T22:32:57.067125+00:00",
-          "stdout_sha256": "e8e4f275a3e404682209f801ccaae7522b5a3538007269bf79ed8cb06eb95eb2",
+          "started_at": "2026-10-03T07:15:38.211231+00:00",
+          "ended_at": "2026-10-03T07:15:38.558280+00:00",
+          "stdout_sha256": "5267ee018a849e68b8fce649d154ed6170a6fef012ef45856805f7b03ff0ef1e",
           "status": "ok"
         },
         {
-          "endpoint": "repos/grafana/grafana/commits/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+          "endpoint": "repos/grafana/grafana/commits/6193dc03311b631b9727b560d24369e683dc396e",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:57.067255+00:00",
-          "ended_at": "2026-09-21T22:32:57.530539+00:00",
-          "stdout_sha256": "73131a86af43f9844e739c813df9ceefc663c1a5065812f24e67ba8c09d32d95",
+          "started_at": "2026-10-03T07:15:38.219818+00:00",
+          "ended_at": "2026-10-03T07:15:38.593972+00:00",
+          "stdout_sha256": "2aa7523d47863cee8569fefffbce6539d3485b4200f15360f2a683431cc97599",
           "status": "ok"
         },
         {
-          "endpoint": "repos/grafana/grafana/commits/v13.2.2",
+          "endpoint": "repos/grafana/grafana/commits/v13.2.3",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:57.530992+00:00",
-          "ended_at": "2026-09-21T22:32:57.981558+00:00",
-          "stdout_sha256": "73131a86af43f9844e739c813df9ceefc663c1a5065812f24e67ba8c09d32d95",
+          "started_at": "2026-10-03T07:15:38.293706+00:00",
+          "ended_at": "2026-10-03T07:15:38.637092+00:00",
+          "stdout_sha256": "2aa7523d47863cee8569fefffbce6539d3485b4200f15360f2a683431cc97599",
           "status": "ok"
         }
       ],
@@ -3108,34 +3187,113 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T22:28:33Z",
+      "pushed_at": "2026-10-03T05:26:04Z",
       "license_spdx": "AGPL-3.0",
       "latest_stable_release": {
-        "tag_name": "v13.2.2",
-        "published_at": "2026-09-15T12:21:32Z",
-        "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+        "tag_name": "v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z",
+        "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "sha": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "html_url": "https://github.com/grafana/grafana/commit/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "committed_at": "2026-09-15T11:07:13Z"
+        "ref": "6193dc03311b631b9727b560d24369e683dc396e",
+        "sha": "6193dc03311b631b9727b560d24369e683dc396e",
+        "html_url": "https://github.com/grafana/grafana/commit/6193dc03311b631b9727b560d24369e683dc396e",
+        "committed_at": "2026-09-29T09:01:04Z"
       },
       "latest_release_source": {
-        "ref": "v13.2.2",
-        "sha": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "html_url": "https://github.com/grafana/grafana/commit/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "committed_at": "2026-09-15T11:07:13Z"
+        "ref": "v13.2.3",
+        "sha": "6193dc03311b631b9727b560d24369e683dc396e",
+        "html_url": "https://github.com/grafana/grafana/commit/6193dc03311b631b9727b560d24369e683dc396e",
+        "committed_at": "2026-09-29T09:01:04Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/grafana/grafana",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "checked_at": "2026-10-03T07:15:38.637092+00:00",
+      "dated_observations": [
+        {
+          "checked_at": "2026-09-21T22:32:57.981558+00:00",
+          "observation": {
+            "component_id": "grafana",
+            "repository": "https://github.com/grafana/grafana",
+            "selected_repository_url": "https://github.com/grafana/grafana",
+            "selected_version": "13.2.2",
+            "selected_source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+            "checks": [
+              {
+                "endpoint": "repos/grafana/grafana",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:56.229222+00:00",
+                "ended_at": "2026-09-21T22:32:56.672834+00:00",
+                "stdout_sha256": "1cd7411fb9474610b749d5a27393700fa673acf36fe68875b830d73547b080fa",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/grafana/grafana/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:56.672930+00:00",
+                "ended_at": "2026-09-21T22:32:57.067125+00:00",
+                "stdout_sha256": "e8e4f275a3e404682209f801ccaae7522b5a3538007269bf79ed8cb06eb95eb2",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/grafana/grafana/commits/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:57.067255+00:00",
+                "ended_at": "2026-09-21T22:32:57.530539+00:00",
+                "stdout_sha256": "73131a86af43f9844e739c813df9ceefc663c1a5065812f24e67ba8c09d32d95",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/grafana/grafana/commits/v13.2.2",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:57.530992+00:00",
+                "ended_at": "2026-09-21T22:32:57.981558+00:00",
+                "stdout_sha256": "73131a86af43f9844e739c813df9ceefc663c1a5065812f24e67ba8c09d32d95",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/grafana/grafana",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-21T22:28:33Z",
+            "license_spdx": "AGPL-3.0",
+            "latest_stable_release": {
+              "tag_name": "v13.2.2",
+              "published_at": "2026-09-15T12:21:32Z",
+              "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "selected_pin_source": {
+              "ref": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+              "sha": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+              "html_url": "https://github.com/grafana/grafana/commit/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+              "committed_at": "2026-09-15T11:07:13Z"
+            },
+            "latest_release_source": {
+              "ref": "v13.2.2",
+              "sha": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+              "html_url": "https://github.com/grafana/grafana/commit/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+              "committed_at": "2026-09-15T11:07:13Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "git_commit",
+            "primary_repository": "https://github.com/grafana/grafana",
+            "release_relationship": "selected_version_matches_latest_stable",
+            "selected_pin_matches_latest_release_commit": true
+          }
+        }
+      ]
     },
     {
       "component_id": "alertmanager",
@@ -6719,6 +6877,18 @@
     "Public stars are discovery preferences, not a quality ranking. The one added repository received a bounded primary-source screen and remains a conditional targeted candidate; it was not installed or adopted.",
     "Full upstream API bodies are not retained, so output hashes identify the observed bodies but cannot reconstruct them.",
     "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
-    "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head. Snapshot status and release relationships describe dated upstream metadata, not release-gate or host acceptance."
+    "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2. Snapshot status and release relationships describe dated upstream metadata, not release-gate or host acceptance."
+  ],
+  "scoped_refreshes": [
+    {
+      "checked_at": "2026-10-03T07:15:38.637092+00:00",
+      "component_ids": [
+        "agent-browser",
+        "grafana"
+      ],
+      "api_commands": 8,
+      "api_nonzero_results": 0,
+      "methodology": "Existing gh api endpoint method, four calls per component: repository, latest stable release, selected commit, release tag commit. Original observations remain in each refreshed row dated_observations; all other rows and the original snapshot-wide summary retain their earlier scope."
+    }
   ]
 }

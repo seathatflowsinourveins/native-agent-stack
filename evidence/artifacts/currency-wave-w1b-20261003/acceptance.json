@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "kind": "repository_integration_acceptance",
+  "scope": "Historical W1b command results are retained unchanged in commands. R645 review-repair command results, failure/retry evidence and final publication validation are retained in repair_round. These are repository integration/structural checks, not unchanged upstream component suites or new browser/provider/host-service acceptance.",
+  "preparation_commands": [
+    {
+      "command": "rtk python3 scripts/component_matrix.py --write",
+      "exit_code": 0,
+      "stdout": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}\n"
+    },
+    {
+      "command": "rtk python3 scripts/new_host_grand_list.py --write",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}\n"
+    }
+  ],
+  "commands": [
+    {
+      "id": "validate",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "stdout": "{\"components\": 69, \"hashed_files\": 9424, \"profiles\": 4, \"receipts\": 189, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stdout_sha256": "fd6bbf39fa6023903a434a5bbb59ccc0e34aa124ede12e5ca7a983d717696f40",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "convergence",
+      "command": "rtk python3 scripts/validate_convergence.py --all-recorded --root . --json",
+      "exit_code": 0,
+      "stdout": "{\"records\": [{\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/memory-experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 4, \"path\": \"blueprints/catalog-runtime-review/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 15, \"path\": \"blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/application-delivery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/ci-security/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/document-ingestion/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/gpu-inference/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-macos.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 7, \"path\": \"blueprints/convergence-practice/local-inference-latest-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/mac-memory-patch/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/claude/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/native-worker/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 20, \"path\": \"blueprints/convergence-practice/omniroute-routing-20260928/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-memory-maintenance/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-retrieval/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/wsl-transport-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 8, \"path\": \"blueprints/us-equities/sim-capacity/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 6, \"path\": \"evidence/artifacts/local-model-workloads-20260924/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 24, \"path\": \"evidence/artifacts/memory-stack-20260925/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+      "stdout_sha256": "672ad5b6c96651f6d613a584d812f00e78339b7db50fec643a27aaaf148c906c",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "landscape",
+      "command": "rtk python3 scripts/landscape.py --root .",
+      "exit_code": 0,
+      "stdout": "{\"counts\": {\"applied_skills\": 3, \"comparison_candidates\": 365, \"comparison_repositories\": 161, \"current_public_stars\": 343, \"dispositions\": {\"conditional\": 164, \"measured_tradeoff\": 9, \"out_of_scope\": 9, \"overlap\": 14, \"selected\": 136, \"unqualified\": 33}, \"domain_layers\": 4, \"explained_components\": 69, \"foundation_decisions\": 54, \"foundation_layers\": 20, \"foundation_statuses\": {\"accepted_within_scope\": 44, \"partial_acceptance\": 2, \"source_review\": 8}, \"historical_candidate_cards\": 154, \"layers\": 32, \"quality_review_repositories\": 16, \"research_queue_layers\": 32, \"research_repositories\": 875, \"selected_components\": 69}, \"scope\": \"Coverage and reference integrity; no new runtime or ranking acceptance.\", \"status\": \"passed\"}\n",
+      "stdout_sha256": "f2ffcf6bb1442024fdf17236278925740ad8416a239fe8aa8133c7b75cabeadb",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "unit-suite",
+      "command": "rtk python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness",
+      "exit_code": 0,
+      "stdout": "Installed dashboard and two units; service activation remains explicit.\nstarted start-race\nnot started launch-refused: the job runner could not start\n",
+      "stdout_sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
+      "stderr": "........................................................................................................................................s.................................................................................................ss............................\n----------------------------------------------------------------------\nRan 264 tests in 46.532s\n\nOK (skipped=3)\n",
+      "stderr_sha256": "c2216b5258a9a7d0d8ebc0bc775fc8c626864b948eb90fd2bd1e3ddfb3e59b6d"
+    },
+    {
+      "id": "catalogs",
+      "command": "rtk python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "stdout": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n",
+      "stdout_sha256": "8f241daedb4f7a5eaaff358e5653981120ee9436a8959c7b968eedb30dbe9a01",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "foundation",
+      "command": "rtk python3 scripts/validate_foundation.py --root . --json",
+      "exit_code": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"counts\": {\n    \"layers\": 20,\n    \"decisions\": 54,\n    \"foundation_components\": 61,\n    \"domain_components\": 7,\n    \"evidence_receipts\": 84,\n    \"candidates\": 3\n  },\n  \"errors\": []\n}\n",
+      "stdout_sha256": "b6535ffab61c1faafa85b93dbe965f253fa479ac0c58dfb6af61c0094a001d3f",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "component-matrix",
+      "command": "rtk python3 scripts/component_matrix.py --check",
+      "exit_code": 0,
+      "stdout": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "stdout_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "grand-list",
+      "command": "rtk python3 scripts/new_host_grand_list.py --check",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n",
+      "stdout_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "ecosystem",
+      "command": "rtk python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "stdout": "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"agent-browser\", \"edition_pin\": \"0.38.1\", \"row\": \"foundation/web-research\", \"stack_pin\": \"0.38.2\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.159.3\"}], \"bytes\": 15087303, \"input_sha256\": \"853a4768d978fc689a00646d165d6639961166104200803fb4a5dbcdd2a70c52\", \"output_sha256\": \"1c65834862f56928a48fb07cf60e8f6773586eb424f8c04209a58ecbceb37584\", \"status\": \"passed\"}\n",
+      "stdout_sha256": "5dd7e44476b0f753b1ab5473c3ec935972edcbfc2c2988474c60d2f3c8dd65ea",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "registry-lockfiles",
+      "command": "rtk python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed",
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.039s\n\nOK\n",
+      "stderr_sha256": "50123f26e6d30940556cc448291d77c1880d497121f6c91559a6a7bdb8620941"
+    },
+    {
+      "id": "registry-blueprints",
+      "command": "rtk python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified",
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.195s\n\nOK\n",
+      "stderr_sha256": "64ef6a1d5dbc4246f2f0b78e2a4fad11112a3c5229a99dfafe49b4cbbccda2ef"
+    },
+    {
+      "id": "registry-workflows",
+      "command": "rtk python3 -B -m unittest tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+      "exit_code": 0,
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "stderr_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+    }
+  ],
+  "known_check_output": "build_ecosystem.py --check passes and reports twelve architecture_pin_drift rows. Four concern the two newly moved components (agent-browser once, grafana three times); eight concern pre-existing codex/nextjs differences. These configuration-owner editions are outside this contract.",
+  "original_scope": "Actual returned output from all twelve contract-required repository checks after pin integration, receipt indexing and source/report registration, before this acceptance artifact is added. Native repository tests and deterministic validation, not unchanged upstream component suites or new live provider/browser/host-service acceptance. A final validate.py run after registering this artifact verifies its publication integrity.",
+  "repair_round": {
+    "contract_id": "R645",
+    "base_head": "081e4ae68af70c7463620251a803c4e73f04efb8",
+    "worktree_state": "Uncommitted R645 repair of PR #645; no commit or push.",
+    "recorded_at_utc": "2026-10-03T08:32:16.380110+00:00",
+    "north_star_action": "Correct the foundation observation/browser evidence supporting US-equities research and historical simulation.",
+    "sanitization": "Worktree/builds roots are role markers; scripts/host_receipts.py sanitize removes remaining private home paths/identifiers. Public output hashes cover those sanitized returned bytes.",
+    "preparation_commands": [
+      {
+        "command": "rtk python3 scripts/component_matrix.py --write",
+        "exit_code": 0,
+        "output": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}\n",
+        "output_sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      },
+      {
+        "command": "rtk python3 scripts/new_host_grand_list.py --write",
+        "exit_code": 0,
+        "output": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}\n",
+        "output_sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      }
+    ],
+    "source_checks": [
+      {
+        "command": "rtk gh api repos/grafana/grafana/releases/tags/v13.2.3 --jq '{tag_name, published_at, draft, prerelease, body, html_url}'",
+        "exit_code": 0,
+        "output": "{\"body\":\"[Download page](https://grafana.com/grafana/download/13.2.3)\\n[What's new highlights](https://grafana.com/docs/grafana/latest/whatsnew/)\\n\\n### Security\\n\\n- Security: Fix CVE-2026-13719\\n- Security: Fix CVE-2026-13720\\n- Security: Fix CVE-2026-81841\",\"draft\":false,\"html_url\":\"https://github.com/grafana/grafana/releases/tag/v13.2.3\",\"prerelease\":false,\"published_at\":\"2026-09-29T09:02:18Z\",\"tag_name\":\"v13.2.3\"}\n",
+        "output_sha256": "548bb9171293fc341b367c8d64855027c0df465c872ab7ec520c40064daa3edb",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      },
+      {
+        "command": "rtk gh api repos/vercel-labs/agent-browser/releases/tags/v0.38.2 --jq '{tag_name, published_at, draft, prerelease, body, html_url}'",
+        "exit_code": 0,
+        "output": "{\"body\":\"### Bug Fixes\\n\\n- Fixed **auth vault login** to pick usable controls when hidden duplicates exist, and to bind credential entry to the selected field so replaced fields or redirected focus are rejected before submitting (#2014)\\n- Fixed **chat mode** to allow `webmcp`, `skills`, and other top-level browser commands, so the model uses page WebMCP tools instead of falling back to `eval` (#2015)\\n- Fixed **Kernel profiles** so `KERNEL_PROFILE_NAME` sessions send the profile as an object instead of failing with a 400, and added `KERNEL_PROFILE_SAVE_CHANGES` to opt into saving changes back (#2004)\\n- Fixed **Chrome freezing after launch** by draining its stderr for the browser's lifetime, so a full log pipe no longer blocks the browser (#2003)\\n- Fixed **Browser Use** by switching to Cloud V4, which creates, attaches to, and stops the same browser with bounded timeouts (#1879)\\n- Fixed **Vercel Sandbox shared memory detection** by measuring `/dev/shm` capacity and adding `--disable-dev-shm-usage` below 256 MiB, so Chrome no longer terminates renderers on the undersized mount (#1890)\\n\\n### Improvements\\n\\n- Upgraded the **eve integration** from eve 0.47.3 to 0.57.0, so apps on eve 0.50 and later build again (#1945)\\n\\n### Documentation\\n\\n- Updated the **contact sheet example** with the loading-flash demo output (#1871)\\n\\n### Contributors\\n\\n- @Railly\\n- @benjamincanac\\n- @boatri\\n- @luxleader\\n- @petehunt\\n- @robertjamesprior\\n- @simonellefsen\\n- @zyz619963502zyz\\n\",\"draft\":false,\"html_url\":\"https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2\",\"prerelease\":false,\"published_at\":\"2026-10-01T21:44:28Z\",\"tag_name\":\"v0.38.2\"}\n",
+        "output_sha256": "cfc7061512ffbd3581e9029579a71fab4efe2f3492b0288e3268cc497575143c",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      },
+      {
+        "command": "rtk gh api /advisories/GHSA-46f2-3vm3-9h7j --jq '{ghsa_id,cve_id,html_url,description}'",
+        "exit_code": 0,
+        "output": "{\"cve_id\":\"CVE-2026-13719\",\"description\":\"An authenticated user can list alert rules stored in folders they are not allowed to read through the alert rules API list endpoint. When the set of folders the user may read was empty, the folder restriction was dropped and every alert rule in the organization was returned. From Grafana 13.1.0, any user can trigger this with a folder filter. The exposed data is rule configuration; data source credentials are not exposed.\",\"ghsa_id\":\"GHSA-46f2-3vm3-9h7j\",\"html_url\":\"https://github.com/advisories/GHSA-46f2-3vm3-9h7j\"}\n",
+        "output_sha256": "cccf67ef3a2ffc80a6ada4d6cc7d009e906e0b63de513cd83d50dcc449637ddc",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      },
+      {
+        "command": "rtk gh api /advisories/GHSA-9q62-r26p-xcjv --jq '{ghsa_id,cve_id,html_url,description}'",
+        "exit_code": 0,
+        "output": "{\"cve_id\":\"CVE-2026-13720\",\"description\":\"An Editor can set file-provisioning metadata (the grafana.app/managedBy, grafana.app/managerId and grafana.app/sourcePath annotations) when creating a dashboard through the dashboard API, because these fields were stored without an authorization check. The dashboard then appears file-provisioned, and administrators can no longer update or delete it through Grafana. The impact is limited to the same organization and no data is exposed.\",\"ghsa_id\":\"GHSA-9q62-r26p-xcjv\",\"html_url\":\"https://github.com/advisories/GHSA-9q62-r26p-xcjv\"}\n",
+        "output_sha256": "c2e99d761d0aa2e5374e84ebb5f79ad6ac2ae66fb06e40daf444fea8475b72b4",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      },
+      {
+        "command": "rtk gh api /advisories/GHSA-4jjr-w7m9-wx5q --jq '{ghsa_id,cve_id,html_url,description}'",
+        "exit_code": 0,
+        "output": "{\"cve_id\":\"CVE-2026-81841\",\"description\":\"Pausing a shared (public) dashboard did not revoke its access token for the endpoints that serve frontend bootstrap data. Anyone holding the link to a paused shared dashboard could still retrieve, without authenticating, the configuration of the dashboard's data sources, including stored credentials for data sources using browser access (missing authorization). Deleting the shared dashboard does revoke the token.\",\"ghsa_id\":\"GHSA-4jjr-w7m9-wx5q\",\"html_url\":\"https://github.com/advisories/GHSA-4jjr-w7m9-wx5q\"}\n",
+        "output_sha256": "01233c6af46752d7be31b209f01c2a9130cbb8e50c99c9ab73b7f593a576afad",
+        "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+      }
+    ],
+    "source_check_timing": "Start/end times were not instrumented for these read-only source/preparation calls; recorded_at_utc is the record write time.",
+    "failed_attempts": [
+      {
+        "command": "rtk gitleaks git --help",
+        "exit_code": 1,
+        "output": "<HOST_GITLEAKS_LAUNCHER>: line 22: /run/user/<uid>/ecosystem-gitleaks.lock: Read-only file system\n"
+      },
+      {
+        "command": "rtk env XDG_RUNTIME_DIR=<WORKTREE>/.r645-tmp/runtime gitleaks git --help",
+        "exit_code": 1,
+        "output": "<HOST_GITLEAKS_LAUNCHER>: line 22: /run/user/<uid>/ecosystem-gitleaks.lock: Read-only file system\n"
+      },
+      {
+        "id": "required-unittests",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness",
+        "exit_code": 1,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:23:25.526Z",
+        "stdout_path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stdout.txt",
+        "stdout_sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
+        "stderr_path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt",
+        "stderr_sha256": "7379e23243ff91eda3a028f525c3b2506ea1b5d3af8494718d1bd7d086e3a146",
+        "cause": "TMPDIR was inside the checkout, so the existing sweep harness outside-repository guard refused the synthetic fixtures. No harness/test defect was changed; the retry uses a directory under the writable builds workspace, outside Git repositories."
+      },
+      {
+        "id": "final-validate-scratch-in-checkout",
+        "command": "rtk env TMPDIR=<BUILDS_WORKSPACE>/R645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+        "exit_code": 1,
+        "started_at": "2026-10-03T08:35:02.336Z",
+        "ended_at": "2026-10-03T08:36:48.366Z",
+        "stdout": "Publication validation failed:\n.r645-tmp/acceptance/required-unittests.stderr.txt: contains possible personal home path\n.r645-tmp/git-objects/2b/d734a0fc2f80c121f1d87e9f518daf1afe3243: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/2f/4d874377ded169bd8406174995bd4b42f177f6: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/49/7e7fdf9057e19a68d13015abd82299d5204de2: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/53/44d82c53737f6f55545fad4fb8aec999624be5: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/54/ed713adf678bec1fa34a5d9c12b2d47ca2fa41: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/69/b49b72a535076d4a16a58bceb6b543e30e42d8: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/7b/ff7fa644c8d9712988c952e7a9c9fff5a44d1e: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/8c/0c787bad8a67919a4f5e91f2d9f03c19daa21d: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/91/3db3df312bc5e41fdc4366330a934219b303b8: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/93/8525f1f6169aa86e2c569b87efb0942c51acac: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/93/a45e4de0d568f1b4e6b2f3b365c9263b44de2c: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/bb/ff1e3202eb2833eee8a59c06371fedce2fd705: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/c6/28f087df4f76e6e09a0128bf36377b1b78381a: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/d3/05d0ce9f31705cf0f6a38275c28e5950fb33a9: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/f6/64d19038064a724333fa06a88220d80add1259: cannot inspect as UTF-8 publication text\n.r645-tmp/git-objects/fa/298e218f0bd6ed7f6f6ce6c1bbb13eb40a2b77: cannot inspect as UTF-8 publication text\n.r645-tmp/gitleaks-metadata.json: contains possible personal home path\n.r645-tmp/recording-metadata.json: contains possible personal home path\n.r645-tmp/staged.index: cannot inspect as UTF-8 publication text\n",
+        "stdout_sha256": "fc5d10cbfb9528527b253c1ce534fe41fcc5e94daa354c1bb3f1e493eba66105",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cause": "The unchanged publication checker scans untracked files. Raw R645 scratch logs/metadata and temporary Git objects inside the checkout were not publication text. All R645 scratch state was moved to the owned builds workspace outside the checkout before retry."
+      }
+    ],
+    "feedback_loop": {
+      "command": "rtk env TMPDIR=<BUILDS_WORKSPACE>/R645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_landscape_sweep_harness.BuildArgsTests.test_args_are_compact_and_the_run_is_staged",
+      "exit_code": 0,
+      "output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.072s\n\nOK\n",
+      "output_sha256": "25731833f9409651c24426b70de0f6929e729bd36ae02e81a30e9ce0a804794f",
+      "stream_boundary": "Merged exec_command output; stdout/stderr were not separately instrumented for this preparation/source call."
+    },
+    "commands": [
+      {
+        "id": "validate",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.963Z",
+        "ended_at": "2026-10-03T08:23:25.525Z",
+        "stdout": "{\"components\": 69, \"hashed_files\": 9425, \"profiles\": 4, \"receipts\": 189, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+        "stdout_sha256": "da242f5c1d2b31dd3c4cd10654c25b9309df5a189bd770a15930a50b32e1f689",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "convergence",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate_convergence.py --all-recorded --root . --json",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:23:25.526Z",
+        "stdout": "{\"records\": [{\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/blind-catalog-convergence/memory-experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 4, \"path\": \"blueprints/catalog-runtime-review/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 15, \"path\": \"blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/application-delivery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/ci-security/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/document-ingestion/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/gpu-inference/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-macos.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 7, \"path\": \"blueprints/convergence-practice/local-inference-latest-20260926/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/mac-memory-patch/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/claude/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/native-worker/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 20, \"path\": \"blueprints/convergence-practice/omniroute-routing-20260928/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-memory-maintenance/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 0, \"path\": \"blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-retrieval/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/wsl-transport-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 8, \"path\": \"blueprints/us-equities/sim-capacity/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 6, \"path\": \"evidence/artifacts/local-model-workloads-20260924/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 24, \"path\": \"evidence/artifacts/memory-stack-20260925/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+        "stdout_sha256": "672ad5b6c96651f6d613a584d812f00e78339b7db50fec643a27aaaf148c906c",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "landscape",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/landscape.py --root .",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.918Z",
+        "stdout": "{\"counts\": {\"applied_skills\": 3, \"comparison_candidates\": 365, \"comparison_repositories\": 161, \"current_public_stars\": 343, \"dispositions\": {\"conditional\": 164, \"measured_tradeoff\": 9, \"out_of_scope\": 9, \"overlap\": 14, \"selected\": 136, \"unqualified\": 33}, \"domain_layers\": 4, \"explained_components\": 69, \"foundation_decisions\": 54, \"foundation_layers\": 20, \"foundation_statuses\": {\"accepted_within_scope\": 44, \"partial_acceptance\": 2, \"source_review\": 8}, \"historical_candidate_cards\": 154, \"layers\": 32, \"quality_review_repositories\": 16, \"research_queue_layers\": 32, \"research_repositories\": 875, \"selected_components\": 69}, \"scope\": \"Coverage and reference integrity; no new runtime or ranking acceptance.\", \"status\": \"passed\"}\n",
+        "stdout_sha256": "f2ffcf6bb1442024fdf17236278925740ad8416a239fe8aa8133c7b75cabeadb",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "required-unittests",
+        "command": "rtk env TMPDIR=<BUILDS_WORKSPACE>/R645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_stack_lifecycle tests.test_render_config tests.test_adoption_contract tests.test_grand_dashboard tests.test_landscape_sweep_harness",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:25:56.892Z",
+        "ended_at": "2026-10-03T08:28:41.947Z",
+        "stdout": "Installed dashboard and two units; service activation remains explicit.\nstarted start-race\nnot started launch-refused: the job runner could not start\n",
+        "stdout_sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
+        "stderr": "........................................................................................................................................s.................................................................................................ss............................\n----------------------------------------------------------------------\nRan 264 tests in 46.197s\n\nOK (skipped=3)\n",
+        "stderr_sha256": "84685f7ba854da260daf831f0b0a5f1d1f2fe889b4dc71e0186e2a12eda8d6f9"
+      },
+      {
+        "id": "catalogs",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate_catalogs.py",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.402Z",
+        "stdout": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n",
+        "stdout_sha256": "8f241daedb4f7a5eaaff358e5653981120ee9436a8959c7b968eedb30dbe9a01",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "foundation",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate_foundation.py --root . --json",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.305Z",
+        "stdout": "{\n  \"ok\": true,\n  \"counts\": {\n    \"layers\": 20,\n    \"decisions\": 54,\n    \"foundation_components\": 61,\n    \"domain_components\": 7,\n    \"evidence_receipts\": 84,\n    \"candidates\": 3\n  },\n  \"errors\": []\n}\n",
+        "stdout_sha256": "b6535ffab61c1faafa85b93dbe965f253fa479ac0c58dfb6af61c0094a001d3f",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "matrix",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/component_matrix.py --check",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.429Z",
+        "stdout": "{\"rows\": 32, \"status\": \"checked\"}\n",
+        "stdout_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "grand-list",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/new_host_grand_list.py --check",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.277Z",
+        "stdout": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n",
+        "stdout_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "ecosystem",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_ecosystem.py --check",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:23:25.527Z",
+        "stdout": "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"agent-browser\", \"edition_pin\": \"0.38.1\", \"row\": \"foundation/web-research\", \"stack_pin\": \"0.38.2\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.159.3\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"13.2.3\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.159.3\"}], \"bytes\": 15088788, \"input_sha256\": \"060768f001260951c71a60b3fdb001f58179c8925509ce3c36a1512ec606a463\", \"output_sha256\": \"829ec5adfed1126f422c13a9e686d55a6bae9ac642def3f497e451fd2650fa2d\", \"status\": \"passed\"}\n",
+        "stdout_sha256": "6d149e793ffceec26adef81e2940871b0fd2a2c644ddd6d3eab609b6a1c75f85",
+        "stderr": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "registry-lockfiles",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.315Z",
+        "stdout": "",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.037s\n\nOK\n",
+        "stderr_sha256": "15e1b3902e99e62bc7f061b84c3f571d085b893e42f8ed52ac52d3ab8d134652"
+      },
+      {
+        "id": "registry-blueprints",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.614Z",
+        "stdout": "",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.346s\n\nOK\n",
+        "stderr_sha256": "b95562903a365f072ad284e7af902de7b951a81ab2860d8c00c3030bc8112e99"
+      },
+      {
+        "id": "registry-workflows",
+        "command": "rtk env TMPDIR=<WORKTREE>/.r645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered",
+        "exit_code": 0,
+        "started_at": "2026-10-03T08:22:19.977Z",
+        "ended_at": "2026-10-03T08:22:20.255Z",
+        "stdout": "",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+        "stderr_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+      }
+    ],
+    "final_validation_recording_protocol": "The final_validate command ran after this artifact and all corrected evidence were registered. Its actual returned output is retained below. Recording that output changes this file, so register_file is applied once more and the same command is repeated as the last read-only publication check; the last result is reported in the requested R645-thread-replies.md. The staged scan is also repeated for the final stored state.",
+    "inventory": {
+      "agent-browser": [
+        "adoption/pins-linux-x86_64.json",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/agent-browser-0382-qualification-20261003.json",
+        "manifests/stack.json"
+      ],
+      "grafana": [
+        "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
+        "evidence/receipts/grafana-1323-qualification-20261003.json",
+        "observability/README.md",
+        "observability/backends/README.md"
+      ],
+      "shared_review_and_validation": [
+        "catalogs/landscape/upstream-snapshot.json",
+        "docs/decisions/2026-10-03-currency-wave-w1b.md",
+        "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
+        "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json",
+        "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+        "manifests/evidence.json",
+        "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stdout.txt",
+        "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt"
+      ]
+    },
+    "staged_secret_scan": {
+      "exit_code": 0,
+      "started_at": "2026-10-03T08:33:34.888063+00:00",
+      "ended_at": "2026-10-03T08:33:35.352883+00:00",
+      "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "repository_command_source": "scripts/git-hooks/pre-commit",
+      "native_binary_reason": "Installed host launcher could not create its lock in read-only /run/user; native upstream binary and supported staged-scan flags were verified with installed help.",
+      "staged_files": [
+        "adoption/pins-linux-x86_64.json",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "catalogs/landscape/upstream-snapshot.json",
+        "docs/decisions/2026-10-03-currency-wave-w1b.md",
+        "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+        "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
+        "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
+        "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt",
+        "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stdout.txt",
+        "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json",
+        "evidence/receipts/agent-browser-0382-qualification-20261003.json",
+        "evidence/receipts/grafana-1323-qualification-20261003.json",
+        "manifests/evidence.json",
+        "manifests/stack.json",
+        "observability/README.md",
+        "observability/backends/README.md"
+      ],
+      "temporary_index": "<WORKTREE>/.r645-tmp/staged.index",
+      "temporary_objects": "<WORKTREE>/.r645-tmp/git-objects",
+      "read_only_object_source": "<COMMON_GIT_OBJECTS>",
+      "original_index_sha256_before": "e9fc059ddaa60016bb2fda70dd5ee2bbdcf394cd7f8cea6d9e032e848684033a",
+      "original_index_sha256_after": "e9fc059ddaa60016bb2fda70dd5ee2bbdcf394cd7f8cea6d9e032e848684033a",
+      "original_index_unchanged": true,
+      "command": "rtk <GITLEAKS_NATIVE> git --pre-commit --staged --redact --no-banner --no-color --config <WORKTREE>/.gitleaks.toml --report-format json --report-path <WORKTREE>/.r645-tmp/acceptance/gitleaks.report.json <WORKTREE>",
+      "stdout": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "4:33AM INF 0 commits scanned.\n4:33AM INF scanned ~178440 bytes (178.44 KB) in 188ms\n4:33AM INF no leaks found\n",
+      "stderr_sha256": "e16419a8210b5dddcda24253b94933b78159344f014e8c338d8913232ea780e7",
+      "report": [],
+      "recording_scope": "This scan covered all 16 repaired/stored evidence files before its own result and final validation output were appended to acceptance.json. The supported staged scan is repeated after final recording/registration, with the last returned result reported in R645-thread-replies.md."
+    },
+    "final_validate": {
+      "id": "final-validate-after-registration",
+      "command": "rtk env TMPDIR=<BUILDS_WORKSPACE>/R645-tmp/test-tmp PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "exit_code": 0,
+      "started_at": "2026-10-03T08:39:17.711Z",
+      "ended_at": "2026-10-03T08:40:56.652Z",
+      "stdout": "{\"components\": 69, \"hashed_files\": 9427, \"profiles\": 4, \"receipts\": 189, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stdout_sha256": "b83134d80b9b5c10b4cbb68667ab7e95136b08498071e3080d0c35978522c181",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Final validate.py run on base head 081e4ae68af70c7463620251a803c4e73f04efb8 plus uncommitted R645 repairs, after corrected receipts, source files, failure artifacts and this acceptance artifact were registered. Storing this result is followed by one last register_file and read-only validation."
+    }
+  }
+}
