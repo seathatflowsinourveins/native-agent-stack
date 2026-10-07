@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "kind": "native-navigation-carrier-integration-followup",
+  "date": "2026-10-07",
+  "evidence_class": "repository_integration_checks",
+  "source_head": "4b87e90d0b456f1204936781ddfe49a59bd300a2",
+  "decision": "docs/decisions/2026-10-07-serena-jcodemunch-native-navigation-wiring.md",
+  "retained_prior_receipt": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/ci8-followup-20261007.json",
+  "authorization": "J819e: the prepared manual grant and native carrier lines follow the coordinator's passing exact-head CI read-back at4b87e90d; repository changes only",
+  "source_classes": {
+    "primary_source_review": "Pinned Serena manual/session and jCodeMunch current-policy/task/model contracts",
+    "previous_ci_readback": "Coordinator reported validate passing at4b87e90d; the stacked-base-not-main gate is separately expected",
+    "local_checks": "Repository-owned render, grant/loader/order controls and synthetic workflow fixtures; results recorded below after execution",
+    "native_client_smokes": "pending command-center apply and fresh-session observation",
+    "organic_use": "pending working-day client records",
+    "token_savings": "not measured by carrier bytes or these checks"
+  },
+  "prepared_inputs": [
+    {
+      "name": "serena-manual-grants-complete.patch",
+      "sha256": "7bb9c6c1ca51fb7c0996ac56b716339053f4ad5837e008cbece16b80a448b0ad"
+    },
+    {
+      "name": "carrier-lines-proposed-v2.patch",
+      "sha256": "33ffd501bd11d51969d63785ee839d80a067b18092212c1e2ede3bc218e12802"
+    }
+  ],
+  "grant_scope": {
+    "roles": ["stack-researcher", "evidence-reviewer", "security-reviewer", "isolated-builder"],
+    "added_tool": "mcp__serena__initial_instructions",
+    "other_tools_models_effort_sandbox": "unchanged",
+    "verifier_and_scout": "no manual grant or instruction",
+    "reviewer_builder_menu_boundary": "unchanged; no menu grant"
+  },
+  "static_carrier_bytes": {
+    "full": {"bytes": 4087, "limit": 4100},
+    "researcher": {"bytes": 3348, "limit": 4100},
+    "main": {"bytes": 2327, "limit": 2600},
+    "reviewer": {"bytes": 2133, "limit": 4100},
+    "builder": {"bytes": 2922, "limit": 4100},
+    "codex_compact": {"bytes": 8060, "limit": 8192},
+    "codex_rendered": {"bytes": 9126},
+    "codex_loaded_file_aggregate": {"bytes": 20085, "limit": 20103}
+  },
+  "protected_scope_bindings": {
+    "canonical_top_rule_sha256": "f4b66fb52b0fceeed8b6207e0003de792cabfaef5ece49b6f5d6a445ee2d26ef",
+    "canonical_top_rule_base_bytes": "unchanged",
+    "previous_complete_pre_rtk_sha256": "d80240892f3b9230f589a0b57400f1244da9ba912e7dfa5f8b016562d6b20a29",
+    "current_complete_pre_rtk_sha256": "6c919bcd739d18b045d11cbb6e7d571a78062e2a8056e3d0e8a7141a081c2569",
+    "scope": "The pre-RTK prefix includes the approved session-lanes additions outside the protected canonical block"
+  },
+  "retained_failed_conditions": [
+    {
+      "attempt": "private carrier v1",
+      "condition": "Global handbook substitutions prescribed the manual to a Context Mode-only verifier and removed unchanged role-topic wording",
+      "correction": "New v2 restores the verifier selector, scopes changed paragraphs, preserves actual named role variants and verifies all seven carrier mappings; v1 remains immutable"
+    },
+    {
+      "attempt": "initial native-render replay and overly broad canonical-copy step",
+      "native_exit_code": 0,
+      "condition": "Three independently dated worker examples were copied from canonical worker sources, changing their model/effort/body settings",
+      "correction": "Restore only those three files to exact4b87e90d bytes; keep the approved researcher mirror and native user-instruction render",
+      "restored_examples": [
+        {"path": "examples/codex-native/agents/evidence-reviewer.toml", "sha256": "8392c5708e6aec7c9b827dd7950b017d3fb3fe8651ec06346e6eb145c5500ab8"},
+        {"path": "examples/codex-native/agents/isolated-builder.toml", "sha256": "55da37bc08a172b6bc0bb0ed129737675015795742f13b4ca3832679b4b028ec"},
+        {"path": "examples/codex-native/agents/semantic-evidence-reviewer.toml", "sha256": "1d3967be95195daf20ac41daef59570e7df3d1687c5150ee45140faf324199dc"}
+      ]
+    },
+    {
+      "attempt": "first J819e exact-eight local run",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane",
+      "exit_code": 1,
+      "tests": 361,
+      "failures": 3,
+      "skips": 13,
+      "elapsed_seconds": 108.330,
+      "condition": "Two unchanged shared sentences were no longer present; the pre-RTK prefix hash also included the approved outside-top-rule guidance",
+      "correction": "Restore both exact sentences; keep the full-prefix hash assertion with its current binding and add a separate hard canonical-top-rule hash/unique-marker assertion",
+      "retained_log": "exact-eight.first.log",
+      "retained_log_sha256": "ab2b2bd89e8f3965e4b2e7a1c9cda523a02d9edaeb4bf02e084e9028ac240d2a"
+    },
+    {
+      "attempt": "first touched profile/managed-block/record local run",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_install_claude_profile tests.test_managed_block tests.test_new_wsl_client_config.RecordTests",
+      "exit_code": 1,
+      "tests": 153,
+      "failures": 2,
+      "skips": 1,
+      "elapsed_seconds": 1.627,
+      "condition": "Aggregate Codex startup bytes20164 exceeded unchanged limit20103 by61; the growth control consequently had a negative margin",
+      "correction": "Trim only the two approved new lines by79bytes, native-render the user copy and rebind the mutable prefix; no budget or rejection control changed",
+      "retained_log": "touched-profile-record.log",
+      "retained_log_sha256": "c63480546ac437ca81adbbda6d95d5a1357e7db9989eadeb96fb13351e54bacf"
+    }
+  ],
+  "checks": [
+    {
+      "kind": "previous-input repository integration checks",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane",
+      "exit_code": 0,
+      "tests": 361,
+      "skips": 13,
+      "elapsed_seconds": 115.614,
+      "pre_rtk_sha256": "faf6c0647a8acb0e168cb69abc6d68d19b790010f0bcf806ce223271096d8f2b",
+      "condition": "Before the subsequent two-line startup-budget correction; final inputs require their own check",
+      "retained_log": "exact-eight.final.log",
+      "retained_log_sha256": "0a389942eb4c92a2ba51926de87aba1fb66d40fe31175dbb0272e5aedd601267"
+    },
+    {
+      "kind": "final-input repository integration checks",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane",
+      "exit_code": 0,
+      "tests": 361,
+      "skips": 13,
+      "elapsed_seconds": 115.574,
+      "pre_rtk_sha256": "6c919bcd739d18b045d11cbb6e7d571a78062e2a8056e3d0e8a7141a081c2569",
+      "retained_log": "exact-eight-qualified.log",
+      "retained_log_sha256": "23527cd2c6761cd9668d986181cf02adde2986cfe7a1ea5d2c72ae67723c6c45",
+      "non_failing_condition": "A fixture subprocess ResourceWarning was retained; the recorded process was absent when read back after completion"
+    },
+    {
+      "kind": "touched repository integration and synthetic formatter controls",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_install_claude_profile tests.test_managed_block tests.test_new_wsl_client_config.RecordTests",
+      "exit_code": 0,
+      "tests": 153,
+      "skips": 1,
+      "elapsed_seconds": 1.624,
+      "retained_log": "touched-profile-record-final.log",
+      "retained_log_sha256": "f831c3cdeca7381a56d6033f0e29fc412fcb28bc0d54dfb226451b0e60462b65"
+    },
+    {
+      "kind": "focused fixed-budget and prefix rejection controls",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_install_claude_profile.PortableTopRuleTests tests.test_codex_worker_lane.TemplateTests",
+      "exit_code": 0,
+      "tests": 28,
+      "elapsed_seconds": 0.084,
+      "retained_log": "focused-startup-prefix.log",
+      "retained_log_sha256": "742dba1ffb91fb7900c15ae11beeb343e8cb4ad06a19797c170ff275d8686ca4"
+    },
+    {
+      "kind": "repository-owned workflow protocol and exact-grant fixtures",
+      "command": "CI=true nice -n 19 ionice -c3 node examples/claude-native/workflows/test-envelope.mjs",
+      "exit_code": 0,
+      "passed": 254,
+      "failed": 0,
+      "total": 254,
+      "retained_log": "node-envelope.log",
+      "retained_log_sha256": "e137100e406134a5c5a236c738814d001ff31739d6682f20bd113b3fbd7a04ec"
+    }
+  ],
+  "scope_limits": "No host/client configuration, hook installation/trust, model call, gateway change, index mutation, merge or rebase; historical observations and decided text preserved"
+}

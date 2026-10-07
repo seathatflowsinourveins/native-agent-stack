@@ -682,6 +682,17 @@
       },
       "native_exit_code": 0,
       "check": "python3 -B scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B scripts/build_new_wsl_handbook.py --write",
+      "cause": "J819e native navigation carriers and the four-role manual grant are applied after exact-head CI at4b87e90d passes. Re-run the native generator; its outputs remain byte-identical. The previous observations and audit prefix are preserved.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "66cc76581e936241676d7b3933c5bec9c0c72f3fbc53f73fbed89ba74ecd485a",
+        "docs/new-wsl-handbook.json": "b714400572380e8acf943acc338acb064bf0431c910a095a7a7cbf16590a53a2"
+      },
+      "native_exit_code": 0,
+      "check": "python3 -B scripts/build_new_wsl_handbook.py --check"
     }
   ],
   "previous_outputs": [

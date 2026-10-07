@@ -1139,3 +1139,19 @@ All earlier decided text, local-time addendum and historical projections remain 
 
 ```text
 ```
+
+### Amendment 2026-10-07 — J819e current instruction inventory
+
+The native `new_wsl_client_config.py --check --markdown` now counts the two navigation lines
+outside the unchanged top-rule block. This current generated inventory supersedes earlier
+line-count projections. The decided configuration policy and historical inventories remain intact.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 73 of 73 lines stay):
+
+```text
+```

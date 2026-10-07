@@ -81,6 +81,7 @@ NEEDS = (
     (r"\bctx_batch_execute\b", CTX + "ctx_batch_execute"),
     (r"\bctx_search\b", CTX + "ctx_search"),
     (r"\bctx_fetch_and_index\b", CTX + "ctx_fetch_and_index"),
+    (r"\binitial_instructions\b", "mcp__serena__initial_instructions"),
     (r"\bfind_symbol\b", "mcp__serena__find_symbol"),
     (r"\bfind_referencing_symbols\b", "mcp__serena__find_referencing_symbols"),
     (r"\broute\(", "mcp__jcodemunch__route"),
@@ -183,6 +184,55 @@ class TokenLanesHookTests(unittest.TestCase):
                     self.assertIn("menu(query?)", rule)
                 else:
                     self.assertNotIn("menu(", rule)
+
+    def test_serena_manual_loader_and_role_grants_precede_navigation(self):
+        # Serena c6fbd1c5 workflow_tools.py:28-40 and config_tools.py:44-49:
+        # the manual establishes the session id; selecting symbols alone cannot replace it.
+        manual = "mcp__serena__initial_instructions"
+        roles = ("stack-researcher", "evidence-reviewer", "security-reviewer", "isolated-builder")
+        for role in roles:
+            with self.subTest(role=role):
+                context = self.injected(role)
+                bootstrap = next(line for line in context.splitlines() if "ToolSearch" in line)
+                selected = bootstrap.split('"select:', 1)[1].split('"', 1)[0].split(",")
+                self.assertEqual(selected.count(manual), 1)
+                self.assertLess(selected.index(manual), selected.index("mcp__serena__find_symbol"))
+                name, tools, _skills = frontmatter(AGENTS / f"{role}.md")
+                self.assertEqual(name, role)
+                self.assertIn(manual, tools)
+                body = (AGENTS / f"{role}.md").read_text(encoding="utf-8").split("---\n", 2)[2]
+                first = body.lstrip().splitlines()[0]
+                self.assertTrue(first.startswith("Before Serena navigation, read initial_instructions"))
+                self.assertIn("once per session", first)
+                self.assertIn("manual and session_id", first)
+                self.assertIn("authorized switch", first)
+
+        for role in ("stack-verifier", "source-scout"):
+            with self.subTest(no_manual_role=role):
+                context = self.injected(role)
+                _name, tools, _skills = frontmatter(AGENTS / f"{role}.md")
+                self.assertNotIn(manual, tools)
+                self.assertNotIn("initial_instructions", context)
+                needed = lambda text: {tool for pattern, tool in NEEDS if re.search(pattern, text)} - set(tools)
+                self.assertEqual(needed(context), set())
+                # Control: the new requirement catches an actual unauthorized manual prescription.
+                self.assertEqual(needed(context + "\ninitial_instructions"), {manual})
+
+    def test_native_navigation_front_doors_keep_manual_and_policy_sequence(self):
+        # jCodeMunch d94049d0 server.py:446-463,4724-4752: task/model schema and native guide.
+        for role in ("workflow-subagent", "stack-researcher"):
+            with self.subTest(role=role):
+                context = self.injected(role)
+                rule = next(line for line in context.splitlines() if line.startswith("- Use Serena"))
+                self.assertLess(rule.index("initial_instructions"), rule.index("find_symbol"))
+                self.assertIn("before Serena navigation", rule)
+                self.assertIn("read its manual", rule)
+                self.assertIn("switches need returned session_id", rule)
+                self.assertLess(rule.index('order(action="jcodemunch_guide",args={})'),
+                                rule.index("route(task=...,model=<actual caller model>)"))
+                self.assertIn("(no execute)", rule)
+                self.assertIn("Missing index: owner", rule)
+                self.assertNotIn("before Python navigation", rule)
 
     def test_injected_web_rule_routes_fetches_and_quotes_to_source_text(self):
         # context-mode v1.0.169 src/server.ts L3423-3478; Claude WebFetch contract:

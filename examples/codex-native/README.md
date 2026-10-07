@@ -240,3 +240,25 @@ repair they were `9b8838cf074223e302061e1953f687223b62163b637421801ccd37f8b2633e
 (researcher) and `7bc14292b6a4c2a5eb8f9eea7ebd2275309b6008020cd1afe2a745a89404f448`
 (verifier). Historical freeze artifacts remain unchanged. This is a structural
 repair, with no new spawned-role or model acceptance.
+
+## 2026-10-07: J819e native navigation bindings
+
+This current binding supersedes the earlier carrier hash inventory; no new role or installer is needed.
+The dated inventories above remain historical snapshots. The researcher uses a focused read for a known
+exact path and line, and the native navigation lane for unfamiliar code, symbols, callers and references.
+Before using Serena it reads `initial_instructions` once per session; switching projects requires the
+returned session id and authorization. For jCodeMunch it obtains the current policy through
+`order(action="jcodemunch_guide",args={})`, opens `route(task=...,model=<actual caller model>)`
+with execute off, then uses its granted menu/order actions on an owner-indexed repository.
+
+Sources: [Serena's manual-first contract at c6fbd1c5](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/workflow_tools.py#L28),
+[project-switch session id](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/config_tools.py#L44),
+and [jCodeMunch's task/model route schema at d94049d0](https://github.com/jgravelle/jcodemunch-mcp/blob/d94049d03e3ec21a90253c9a619598211157f00b/src/jcodemunch_mcp/server.py#L446).
+The [dated wiring record](../../docs/decisions/2026-10-07-serena-jcodemunch-native-navigation-wiring.md)
+separates repository integration checks from the command center's later client apply and fresh-session smoke.
+The models, effort, role abilities, sandbox inheritance and seven RTK exceptions retain their existing pins.
+
+| File | SHA-256 |
+| --- | --- |
+| `stack-researcher.toml` | `9578c60c279d1e319935ba2ab25e4157176446a1a7011df94a6a81c51e0ad3d3` |
+| `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |

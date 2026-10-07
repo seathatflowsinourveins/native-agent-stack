@@ -20,6 +20,8 @@ No audits, trials or network at startup; the daily currency timer's one read-onl
 Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
 
 <!-- native-agent-stack:session-lanes -->
+Before Serena use, read initial_instructions once/session; project-from-cwd activates this worktree; switches need returned session_id.
+Code navigation: first order(action="jcodemunch_guide",args={}); open route(task=...,model=<actual caller model>) (no execute), then menu/order; missing indexes go to owner.
 Catalog: qmd for keyword search and document retrieval; codebase_search with the main checkout's projectPath for meaning-based search of the catalog; never run qmd embed or qmd pull. Use qmd query with typed lex and named collections; get a line window; rerank:false is optional.
 Run large command output via `context-mode` (`ctx_execute`, `ctx_batch_execute`); set `cwd` to your working directory (a writer's owned worktree).
 If `semble` MCP is connected, use `search` for conceptual/natural-language code queries with the absolute repo path; omit `content`, which overrides the code default per call. `find_related` gives embedding-similar chunks only; get callers, implementations and references from Serena.
