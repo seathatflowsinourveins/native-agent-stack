@@ -1783,6 +1783,26 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 with self.subTest(surface=name, dropped=phrase):
                     self.assertNotIn(phrase, text)
 
+    # The repository AGENTS.md keeps its own core (docs/decisions/2026-10-07-instruction-core.md and its amendment):
+    # the maintainer sentence, the trading prerequisite that applies before any trading activity wherever it runs, and
+    # none of the dropped clauses.
+    ROOT_CORE = (
+        "Prefer the maintainer's own organization repositories (the vendor's GitHub org) and their clean releases, and "
+        "never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.",
+        "Each coordinator unit names the north-star action it serves",
+        "trading work of any kind (research, data acquisition, strategy gates, decision registration, paper or broker "
+        "operation) reads `blueprints/us-equities/AGENTS.md` first, wherever it runs.",
+    )
+
+    def test_the_repository_file_keeps_its_core_and_the_trading_prerequisite(self):
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for sentence in self.ROOT_CORE:
+            with self.subTest(sentence=sentence[:48]):
+                self.assertIn(sentence, text)
+        for phrase in self.DROPPED:
+            with self.subTest(dropped=phrase):
+                self.assertNotIn(phrase, text)
+
     # A user-level reporting rule (docs/decisions/2026-10-05-user-facing-local-time.md): one wording in the two client
     # blocks and in the carriers F9 renders from them, once each. It is not a standing clause of the repository
     # AGENTS.md, so SHARED does not hold it.
