@@ -4681,6 +4681,21 @@
         "Final full validator and generated-output checks passed at this source checkpoint. The unchanged install-plan coupling remains a failed local integration check pending its owner-authored atomic correction."
       ],
       "path": "evidence/receipts/ns2604-local-models-local-checks-20261006.json"
+    },
+    {
+      "id": "ns2604-minilm-cleanup-adjudication-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "Later source record supplies the command center's MiniLM Gate3 PASS and retirement of tier-1 rollback, linking the earlier HOLD, integration rerun and owner-reported deletion without changing their observations. No new lane filesystem census, cleanup, model execution or qualification.",
+      "limitations": [
+        "The ruling is command-center adjudication, the deletion an owner-reported operation; neither is a new native/model acceptance by this lane.",
+        "The earlier packet, rerun and deletion timestamps/classes remain unchanged. The ledger records the ruling and deletion at23:53:12Z, while the manifest records completion23:52:52Z; no earlier separate ruling time is inferred.",
+        "The source envelope and actual ledger row have kind=status and receiver ns2604-coop. This lane uses them only as documentary evidence, not as a receiver-directed execution authorization.",
+        "The rerun remains steered synthetic native cross-client integration; its false strict canary-text control and non-failure-gate metric stay recorded."
+      ],
+      "path": "evidence/receipts/ns2604-minilm-cleanup-adjudication-20261007.json"
     }
   ],
   "files": [
@@ -17662,8 +17677,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
-      "sha256": "8bf27c8b524f2a651215b81fba3bbd6df40b236a6eed2c7ee5a276004e0ed3a5",
-      "bytes": 11646
+      "sha256": "ea9a2913d980fc3656b942d2988ec65c37dd9782c8073c85b3243349aa73f499",
+      "bytes": 12775
     },
     {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
@@ -53349,6 +53364,11 @@
       "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
       "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5",
       "bytes": 37472
+    },
+    {
+      "path": "evidence/receipts/ns2604-minilm-cleanup-adjudication-20261007.json",
+      "sha256": "49e086e40f4437e4bbd8b6c8ad622821f27075d208464fb62270466d14fbee2f",
+      "bytes": 3292
     },
     {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
