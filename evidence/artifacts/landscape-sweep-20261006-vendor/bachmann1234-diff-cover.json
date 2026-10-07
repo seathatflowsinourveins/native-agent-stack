@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bachmann1234-diff-cover",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Bachmann1234/diff_cover",
+ "reviewed_commit": "c9f69a72e05c9aa8afcb23c8d8727a7d3bc57942",
+ "readme_path": "README.rst",
+ "license": "Apache-2.0",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of Bachmann1234/diff_cover at commit c9f69a72e05c9aa8afcb23c8d8727a7d3bc57942 (license Apache-2.0), read from README.rst at that commit. Repository description: \"Automatically find diff lines that need test coverage.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 847,
+  "pushed_at": "2026-10-01T19:03:59Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.rst@c9f69a72e05c9aa8afcb23c8d8727a7d3bc57942",
+   "text": "diff-cover |pypi-version| |conda-version| |build-status| ========================================================================================"
+  },
+  {
+   "source": "README.rst@c9f69a72e05c9aa8afcb23c8d8727a7d3bc57942",
+   "text": "Automatically find diff lines that need test coverage. Also finds diff lines that have violations (according to tools such as pycodestyle, pyflakes, flake8, or pylint). This is used as a code quality metric during code reviews."
+  },
+  {
+   "source": "README.rst@c9f69a72e05c9aa8afcb23c8d8727a7d3bc57942",
+   "text": "Diff coverage is the percentage of new or modified lines that are covered by tests. This provides a clear and achievable standard for code review: If you touch a line of code, that line should be covered. Code coverage is *every* developer's responsibility!"
+  }
+ ]
+}

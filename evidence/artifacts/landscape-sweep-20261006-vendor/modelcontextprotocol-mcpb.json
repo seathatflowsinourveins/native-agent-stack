@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-modelcontextprotocol-mcpb",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/modelcontextprotocol/mcpb",
+ "reviewed_commit": "70fe3b34cd6dff1b3bba046638edc72a6467a4fb",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of modelcontextprotocol/mcpb at commit 70fe3b34cd6dff1b3bba046638edc72a6467a4fb (license NOASSERTION), read from README.md at that commit. Repository description: \"Desktop Extensions: One-click local MCP server installation in desktop apps\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2131,
+  "pushed_at": "2026-05-26T14:13:36Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@70fe3b34cd6dff1b3bba046638edc72a6467a4fb",
+   "text": "> **⚠️ IMPORTANT NOTICE: This project is being renamed from DXT (Desktop Extensions) to MCPB (MCP Bundles)** > > If you're looking for the DXT tools, they have been renamed to MCPB. Please update your dependencies and tooling: > > - `dxt` CLI is now `mcpb` > - `.dxt` files are now `.mcpb` files > - `@anthropic-ai/dxt` package will be moved to `@anthropic-ai/mcpb`"
+  },
+  {
+   "source": "README.md@70fe3b34cd6dff1b3bba046638edc72a6467a4fb",
+   "text": "MCP Bundles (`.mcpb`) are zip archives containing a local MCP server and a `manifest.json` that describes the server and its capabilities. The format is spiritually similar to Chrome extensions (`.crx`) or VS Code extensions (`.vsix`), enabling end users to install local MCP servers with a single click."
+  },
+  {
+   "source": "README.md@70fe3b34cd6dff1b3bba046638edc72a6467a4fb",
+   "text": "This repository provides three components: The bundle specification in [MANIFEST.md](MANIFEST.md), a CLI tool for creating bundles (see [CLI.md](CLI.md)), and the code used by Claude for macOS and Windows to load and verify MCPB bundles ([src/index.ts](src/index.ts))."
+  }
+ ]
+}

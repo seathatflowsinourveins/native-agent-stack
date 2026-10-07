@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-openai-tunnel-client",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/openai/tunnel-client",
+ "reviewed_commit": "fda241e2343ddd49dd63a7da3e1afab2a6e91722",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of openai/tunnel-client at commit fda241e2343ddd49dd63a7da3e1afab2a6e91722 (license Apache-2.0), read from README.md at that commit. Repository description: \"Customer-run client for Secure MCP Tunnel: connect private or localhost MCP servers to ChatGPT, Codex, the Responses API, and AgentKit without exposing them to the public internet.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 538,
+  "pushed_at": "2026-10-06T23:12:28Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@fda241e2343ddd49dd63a7da3e1afab2a6e91722",
+   "text": "`tunnel-client` is the customer-run agent behind Secure MCP Tunnel. It connects a private or localhost MCP (Model Context Protocol) server to ChatGPT, Codex, the Responses API, and AgentKit through an OpenAI-hosted MCP tunnel endpoint, while keeping the MCP server off the public internet."
+  },
+  {
+   "source": "README.md@fda241e2343ddd49dd63a7da3e1afab2a6e91722",
+   "text": "- You have an MCP server on a laptop, VM, Kubernetes cluster, or private network and need an OpenAI-hosted product to reach it. - Security will not approve a new inbound firewall rule or public endpoint for the MCP server. - You want an operator-visible daemon with `/healthz`, `/readyz`, `/metrics`, and `/ui` before a connector or API call depends on it."
+  },
+  {
+   "source": "README.md@fda241e2343ddd49dd63a7da3e1afab2a6e91722",
+   "text": "If you searched for \"secure MCP tunnel\", \"MCP tunnel ChatGPT\", \"connect local MCP server to ChatGPT\", \"connect local MCP server to Codex\", \"localhost to ChatGPT\", or \"Codex local MCP\", start with `tunnel-client help quickstart`, then read the onboarding guide below."
+  }
+ ]
+}

@@ -94,6 +94,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -1535,6 +1539,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-roles"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -1924,6 +1932,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -2402,6 +2414,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-roles"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -2687,6 +2703,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -2898,6 +2918,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -3194,6 +3218,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-roles"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -3660,6 +3688,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -4108,6 +4140,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-roles"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -4691,6 +4727,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -5182,6 +5222,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -6341,6 +6385,10 @@
           {
             "date": "2026-10-06",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -8727,6 +8775,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-10-06",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "unresolved": [],
@@ -9442,6 +9494,12 @@
             "layers": 7,
             "manifest_ref": "catalogs/sota-convergence/manifest-20261006-runtimes.json",
             "sweep_id": "landscape-sweep-20261006-runtimes"
+          },
+          {
+            "date": "2026-10-06",
+            "layers": 13,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20261006-vendor.json",
+            "sweep_id": "landscape-sweep-20261006-vendor"
           }
         ],
         "host_e2e_platform": "linux-wsl2-x86_64",

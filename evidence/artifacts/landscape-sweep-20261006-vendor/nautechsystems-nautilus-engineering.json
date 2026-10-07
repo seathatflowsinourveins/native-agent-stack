@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nautechsystems-nautilus-engineering",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/nautechsystems/nautilus_engineering",
+ "reviewed_commit": "93a1b1736772f85d3021d58714f430c1a9953b5c",
+ "readme_path": "README.md",
+ "license": "LGPL-3.0",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of nautechsystems/nautilus_engineering at commit 93a1b1736772f85d3021d58714f430c1a9953b5c (license LGPL-3.0), read from README.md at that commit. Repository description: \"Engineering standards, lint configurations, pre-commit definitions, and repository checks for Nautilus projects\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2,
+  "pushed_at": "2026-10-05T03:14:21Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@93a1b1736772f85d3021d58714f430c1a9953b5c",
+   "text": "Nautilus Engineering is the maintained source for engineering standards, lint configurations, pre-commit definitions, and repository checks shared across Nautilus projects. Consumer repositories vendor selected files at a pinned commit, review each update locally, and keep their own project policy."
+  },
+  {
+   "source": "README.md@93a1b1736772f85d3021d58714f430c1a9953b5c",
+   "text": "It covers stable behavior that should stay consistent across projects. Release processes, deployment logic, generated-file exceptions, compiler pins, and other repository-specific decisions stay with each consumer."
+  },
+  {
+   "source": "README.md@93a1b1736772f85d3021d58714f430c1a9953b5c",
+   "text": "1. A shared change is committed and tested here. 1. A consumer vendors selected artifacts from that exact commit. 1. The sync command records the source revision, manifest hash, target paths, file hashes, and executable modes in `.nautilus-engineering.lock`. 1. The consumer reviews and tests the adoption as a normal repository change."
+  }
+ ]
+}

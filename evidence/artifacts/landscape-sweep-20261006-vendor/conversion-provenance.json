@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "source_review",
+  "workflow_run": "wf_62ccd24a-231",
+  "raw_record_sha256": "531d9336936d53d00f25412505b54c1ec1caf1025294c9162523649f4a6e0b5f",
+  "raw_record_bytes": 2645135,
+  "raw_record_retained_unchanged": "private original; no raw streams published",
+  "sanitized_derivative_sha256": "880b1d716b5c997587276044da3bb1284ee51aed3cfbaf42e3475a420e199462",
+  "redaction_rule": "native-agent-stack@8b844d37ac7f89b116d69f86681d06f5d4dc7791:scripts/validate.py:27",
+  "redaction_scope": "Six Claude narrative UUID-shaped identifiers replaced with a placeholder. Original raw retained; all other parsed values, metrics, identities, outcomes, scopes and GPT outputs unchanged.",
+  "attempts": [
+    {"phase": "original conversion", "exit_code": 3, "reason": "privacy guard rejected seven derived locations", "artifacts_written": false},
+    {"phase": "sanitized conversion", "exit_code": 0, "observations_and_gpt_outputs_unchanged": true},
+    {"phase": "publication notes with source corrections", "exit_code": 0, "returns_byte_identical_to_previous_phase": true}
+  ],
+  "returns_sha256": "3c934132e5317f864797a5fe63c3dc3af7f0f0d86eea74773b80c8e7aa766aaf",
+  "source_reviews": {"unique_repository_snapshots": 33, "historical_survivor_assessments": 36, "scope": "current default-branch README at a commit; not the historical adjudication pin or native runtime acceptance"},
+  "publication_status": {"catalog_candidate_assessments": 24, "validated_not_adopted_assessments": 12, "installation_authorized_by_publication": false, "native_acceptance_established": false},
+  "usage": {"native_measurement_exit_code": 0, "children": 101, "status": "complete", "model_rerun_for_sanitization": false, "note": "Worker-declared call counts, native child usage, GPT job usage and run-summary token metadata have separate scopes; never sum cumulative or subset counters."},
+  "integrity": {"gpt6_jobs": 40, "gpt6_status_ok": 40, "gpt6_copy_match": 40, "retained_failures": [], "lost": [], "reopened_layers": []},
+  "limits": ["Catalog inclusion is not adoption or an install authorization.", "Research-layer frozen requirement applicability awaits its canonical owner; completed outcomes/hashes are preserved.", "Critic findings are leads; verified corrections and owner fix seams are recorded separately."]
+}

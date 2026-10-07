@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-wsl",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/WSL",
+ "reviewed_commit": "ffb4e186968486d297cd8792af3714fbb07f459e",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "hosting-services",
+  "isolation"
+ ],
+ "claim": "Source and documentation review of microsoft/WSL at commit ffb4e186968486d297cd8792af3714fbb07f459e (license MIT), read from README.md at that commit. Repository description: \"Windows Subsystem for Linux\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 33977,
+  "pushed_at": "2026-10-06T23:16:23Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ffb4e186968486d297cd8792af3714fbb07f459e",
+   "text": "# Welcome to the Windows Subsystem for Linux (WSL) repository"
+  },
+  {
+   "source": "README.md@ffb4e186968486d297cd8792af3714fbb07f459e",
+   "text": "[Learn more about WSL](https://aka.ms/wsldocs) | [Downloads & Release notes](https://github.com/microsoft/WSL/releases) | [Contributing to WSL](./CONTRIBUTING.md)"
+  },
+  {
+   "source": "README.md@ffb4e186968486d297cd8792af3714fbb07f459e",
+   "text": "Windows Subsystem for Linux (WSL) is a powerful way for you to run your Linux command-line tools, utilities and applications, all unmodified and directly on Windows without the overhead of a traditional virtual machine or dual boot setup."
+  }
+ ]
+}

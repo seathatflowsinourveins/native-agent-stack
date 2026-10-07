@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-qdrant-fastembed",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/qdrant/fastembed",
+ "reviewed_commit": "c0588acf95250d2497e5f5e83233ef343ea74842",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of qdrant/fastembed at commit c0588acf95250d2497e5f5e83233ef343ea74842 (license Apache-2.0), read from README.md at that commit. Repository description: \"Fast, Accurate, Lightweight Python library to make State of the Art Embedding\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 3236,
+  "pushed_at": "2026-10-06T19:04:41Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@c0588acf95250d2497e5f5e83233ef343ea74842",
+   "text": "FastEmbed is a lightweight, fast, Python library built for embedding generation. We [support popular text models](https://qdrant.github.io/fastembed/examples/Supported_Models/). Please [open a GitHub issue](https://github.com/qdrant/fastembed/issues/new) if you want us to add a new model."
+  },
+  {
+   "source": "README.md@c0588acf95250d2497e5f5e83233ef343ea74842",
+   "text": "The default text embedding (`TextEmbedding`) model is Flag Embedding, presented in the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard. It supports \"query\" and \"passage\" prefixes for the input text. Here is an example for [Retrieval Embedding Generation](https://qdrant.github.io/fastembed/qdrant/Retrieval_with_FastEmbed/) and how to use [FastEmbed with Qdrant](https://qdrant.github.io/fastembed/qdrant/Usage_With_Qdrant/)."
+  },
+  {
+   "source": "README.md@c0588acf95250d2497e5f5e83233ef343ea74842",
+   "text": "1. Light: FastEmbed is a lightweight library with few external dependencies. We don't require a GPU and don't download GBs of PyTorch dependencies, and instead use the ONNX Runtime. This makes it a great candidate for serverless runtimes like AWS Lambda."
+  }
+ ]
+}

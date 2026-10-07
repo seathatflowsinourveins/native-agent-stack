@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-catboost-catboost",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/catboost/catboost",
+ "reviewed_commit": "f1474790beb1f5f5c9119378fdf2e17e1b53ad11",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of catboost/catboost at commit f1474790beb1f5f5c9119378fdf2e17e1b53ad11 (license Apache-2.0), read from README.md at that commit. Repository description: \"A fast, scalable, high performance Gradient Boosting on Decision Trees library, used for ranking, classification, regression and other machine learning tasks for Python, R, Java, C++. Supports computation on CPU and GPU.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 9132,
+  "pushed_at": "2026-10-06T23:13:07Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f1474790beb1f5f5c9119378fdf2e17e1b53ad11",
+   "text": "[Website](https://catboost.ai) | [Documentation](https://catboost.ai/docs/) | [Tutorials](https://catboost.ai/docs/concepts/tutorials.html) | [Installation](https://catboost.ai/docs/concepts/installation.html) | [Release Notes](https://github.com/catboost/catboost/releases)"
+  },
+  {
+   "source": "README.md@f1474790beb1f5f5c9119378fdf2e17e1b53ad11",
+   "text": "CatBoost is a machine learning method based on [gradient boosting](https://en.wikipedia.org/wiki/Gradient_boosting) over decision trees."
+  },
+  {
+   "source": "README.md@f1474790beb1f5f5c9119378fdf2e17e1b53ad11",
+   "text": "Main advantages of CatBoost: -------------- - Superior quality [compared](https://github.com/catboost/benchmarks/blob/master/README.md) with other GBDT libraries on many datasets. - Best-in-class [prediction](https://catboost.ai/docs/concepts/c-plus-plus-api.html) speed. - Support for both [numerical and categorical](https://catboost.ai/docs/concepts/algorithm-main-stages.html) features. - Fast GPU and multi-GPU support for out-of-the box training. - Built-in [visualization tools](https://catboo"
+  }
+ ]
+}

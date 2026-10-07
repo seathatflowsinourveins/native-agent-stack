@@ -150,3 +150,61 @@ overturns the incumbent or authorizes installation.
 - `native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a`:
   `docs/acceptance-evidence-policy.md:24-33` (claim boundaries) and
   `docs/lanes.md:94-128` (shared hot-file and registry protocol).
+
+## Vendor pass addendum (2026-10-07)
+
+The completed vendor-official run `wf_62ccd24a-231` adds a third manifest,
+`manifest-20261006-vendor.json`. Its 13 layers and seven critic follow-up
+rounds retain 133 proposals and 36 survivor assessments. Those assessments
+include 24 candidate records and 12 validated `not_adopted` records; refuters
+can uphold a discovery rejection, so survival never means adoption. The new
+reconciliation input declares each publication status and preserves the
+original labels/votes. This publication installs or authorizes no candidate.
+
+All 40 GPT job statuses are ok and all 40 copy checks match. Native child usage
+is complete for 101 children. The initial conversion refused privacy content
+with exit3 and wrote no artifacts. The original raw SHA
+`531d9336936d53d00f25412505b54c1ec1caf1025294c9162523649f4a6e0b5f`
+is retained privately unchanged. A linked derivative replaces six narrative
+UUID-shaped identifiers only; all other parsed values, observed metrics,
+identities, outcomes, scopes and GPT outputs remain identical. Native conversion
+then passes. The returned evidence SHA is
+`3c934132e5317f864797a5fe63c3dc3af7f0f0d86eea74773b80c8e7aa766aaf`.
+
+The 33 native source-review receipts snapshot current default-branch README
+commits for the 36 assessments. They are source evidence distinct from the
+historical adjudication pins, candidate execution and host acceptance. Official
+creation metadata labels microsoft/nvx, openai/codex-security and UiPath/coder_eval
+as too new to assess at the frozen sweep date; age alone changes no vote.
+The manifest reuses the retained roles freshness snapshot rather than pulling
+another one. The original two dated manifests and their observations stay intact.
+
+The nine critic findings and next-layer leads are retained in
+`evidence/artifacts/landscape-sweep-20261006-vendor/critic-followup.json`.
+Two source corrections matter. The hosting absence was a first-round snapshot;
+the completed follow-up has two hosting survivor assessments. Current V1 already
+supports Hub identities and commit/card reviews and actually retained two Hub
+models with their own refutations. Its remaining model gap is standing slot and
+currency coverage, not a missing adapter; V2 remains pending. Sources:
+native-agent-stack@8b844d37ac7f89b116d69f86681d06f5d4dc7791:
+`tools/sota-convergence/landscape-sweep/schemas/discover.json:30-31`,
+`sweep_common.py:33-40`, `make_result.py:85-86`,
+`source_reviews.py:205-218,243-269`; retained vendor votes `/semantic-rag/10,11`.
+
+Twelve added slots lack inputs, and canonical research-factors wording describes
+broker/parity tasks. The builder copied it faithfully; legacy requirement hashes
+bind only next_action and decision_ref. The CC settles added-slot scope, the
+trading owner repairs current requirements, and the ledger owner settles a
+forward semantic-binding contract. Completed requirements/hashes and old decided
+text are not rewritten. Research-layer applicability therefore remains pending
+owner review. Sources at the same pin:
+`evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/slots.json:6-50`,
+`scripts/build_new_wsl_handbook.py:460-490`,
+`catalogs/landscape/us-equities.json:1529`,
+`catalogs/landscape/research-state.json:294-295`,
+`scripts/saturation_ledger.py:524-526`, and
+`docs/decisions/2026-10-01-trading-layer-verdicts.md:118-119`.
+
+The CC's live audit follow-up and later adoption synthesis remain separate gates.
+The evidence-updated 72-row audit table follows both conversions and synthesis.
+This addendum supersedes no observed result or earlier decided text.

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-max-sixty-worktrunk",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/max-sixty/worktrunk",
+ "reviewed_commit": "dea4029c593a89a39fb141da9d0849e4d10dae19",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "git-github-automation"
+ ],
+ "claim": "Source and documentation review of max-sixty/worktrunk at commit dea4029c593a89a39fb141da9d0849e4d10dae19 (license NOASSERTION), read from README.md at that commit. Repository description: \"Worktrunk is a CLI for Git worktree management, designed for parallel AI agent workflows\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 8915,
+  "pushed_at": "2026-10-06T15:00:05Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@dea4029c593a89a39fb141da9d0849e4d10dae19",
+   "text": "> **October 2026**: Worktrunk was [released](https://x.com/max_sixty/status/2006077845391724739?s=20) at the start of the year, and has quickly become the most popular git worktree manager. It's built with love (there's no slop!). Please let me know any frictions at all; I'm intensely focused on continuing to make Worktrunk excellent, and the biggest help is folks posting problems they perceive."
+  },
+  {
+   "source": "README.md@dea4029c593a89a39fb141da9d0849e4d10dae19",
+   "text": "Worktrunk is a CLI for git worktree management, designed for running AI agents in parallel."
+  },
+  {
+   "source": "README.md@dea4029c593a89a39fb141da9d0849e4d10dae19",
+   "text": "Worktrunk's three core commands make worktrees as easy as branches. Plus, Worktrunk has a bunch of quality-of-life features to simplify working with many parallel changes, including hooks to automate local workflows & copy-on-write build caches."
+  }
+ ]
+}

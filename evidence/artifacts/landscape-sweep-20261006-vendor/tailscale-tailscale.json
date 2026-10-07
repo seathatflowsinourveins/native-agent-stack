@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tailscale-tailscale",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/tailscale/tailscale",
+ "reviewed_commit": "4862f5f466e1ebc049eea666be1dbf500dc90eaa",
+ "readme_path": "README.md",
+ "license": "BSD-3-Clause",
+ "layers": [
+  "hosting-services"
+ ],
+ "claim": "Source and documentation review of tailscale/tailscale at commit 4862f5f466e1ebc049eea666be1dbf500dc90eaa (license BSD-3-Clause), read from README.md at that commit. Repository description: \"The easiest, most secure way to use WireGuard and 2FA.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 37202,
+  "pushed_at": "2026-10-07T00:09:50Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@4862f5f466e1ebc049eea666be1dbf500dc90eaa",
+   "text": "This repository contains the majority of Tailscale's open source code. Notably, it includes the `tailscaled` daemon and the `tailscale` CLI tool. The `tailscaled` daemon runs on Linux, Windows, [macOS](https://tailscale.com/kb/1065/macos-variants/), and to varying degrees on FreeBSD and OpenBSD. The Tailscale iOS and Android apps use this repo's code, but this repo doesn't contain the mobile GUI code."
+  },
+  {
+   "source": "README.md@4862f5f466e1ebc049eea666be1dbf500dc90eaa",
+   "text": "Other [Tailscale repos](https://github.com/orgs/tailscale/repositories) of note:"
+  },
+  {
+   "source": "README.md@4862f5f466e1ebc049eea666be1dbf500dc90eaa",
+   "text": "* the Android app is at https://github.com/tailscale/tailscale-android * the Synology package is at https://github.com/tailscale/tailscale-synology * the QNAP package is at https://github.com/tailscale/tailscale-qpkg * the Chocolatey packaging is at https://github.com/tailscale/tailscale-chocolatey"
+  }
+ ]
+}

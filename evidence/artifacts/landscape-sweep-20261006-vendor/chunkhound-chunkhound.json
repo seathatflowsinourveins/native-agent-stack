@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-chunkhound-chunkhound",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/chunkhound/chunkhound",
+ "reviewed_commit": "092792a93660facbc9d2f503c9495a333d965d17",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of chunkhound/chunkhound at commit 092792a93660facbc9d2f503c9495a333d965d17 (license MIT), read from README.md at that commit. Repository description: \"Your entire engineering context, deeply understood\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1445,
+  "pushed_at": "2026-10-06T13:13:40Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@092792a93660facbc9d2f503c9495a333d965d17",
+   "text": "- **Python 3.10+** - **uv** — install via `curl -LsSf https://astral.sh/uv/install.sh | sh` - **API keys** (optional — regex search works without any): - Embeddings: [VoyageAI](https://dash.voyageai.com/) (recommended) | [OpenAI](https://platform.openai.com/api-keys) | [Ollama](https://ollama.ai/) (local) - LLM: Claude Code CLI or Codex CLI (no key needed) | [Anthropic](https://console.anthropic.com/) | [OpenAI](https://platform.openai.com/api-keys) | [Grok](https://console.x.ai)"
+  },
+  {
+   "source": "README.md@092792a93660facbc9d2f503c9495a333d965d17",
+   "text": "Agents can generate code, but they still miss the context that makes software safe to change: how behavior flows across files, what changed across a branch or release, and which external constraints matter."
+  },
+  {
+   "source": "README.md@092792a93660facbc9d2f503c9495a333d965d17",
+   "text": "Reviewers, support, and product teams hit the same wall when large PRs, merge conflicts, bugs, and release notes need implementation-backed explanation instead of guesses."
+  }
+ ]
+}

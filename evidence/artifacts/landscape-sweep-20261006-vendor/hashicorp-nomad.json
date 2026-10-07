@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hashicorp-nomad",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/hashicorp/nomad",
+ "reviewed_commit": "65a1c427bb3a91d767287bed8e16e45e13a715f0",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of hashicorp/nomad at commit 65a1c427bb3a91d767287bed8e16e45e13a715f0 (license NOASSERTION), read from README.md at that commit. Repository description: \"Nomad is an easy-to-use, flexible, and performant workload orchestrator that can deploy a mix of microservice, batch, containerized, and non-containerized applications. Nomad is easy to operate and scale and has native Consul and Vault integrations.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 16991,
+  "pushed_at": "2026-10-06T17:20:28Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@65a1c427bb3a91d767287bed8e16e45e13a715f0",
+   "text": "Nomad [![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL--1.1-yellow.svg)](LICENSE) [![Discuss](https://img.shields.io/badge/discuss-nomad-00BC7F?style=flat)](https://discuss.hashicorp.com/c/nomad) ==="
+  },
+  {
+   "source": "README.md@65a1c427bb3a91d767287bed8e16e45e13a715f0",
+   "text": "Nomad is a simple and flexible workload orchestrator to deploy and manage containers ([docker](https://developer.hashicorp.com/nomad/docs/deploy/task-driver/docker), [podman](https://developer.hashicorp.com/nomad/plugins/drivers/podman)), non-containerized applications ([executable](https://developer.hashicorp.com/nomad/docs/deploy/task-driver/exec), [Java](https://developer.hashicorp.com/nomad/docs/deploy/task-driver/java)), and virtual machines ([qemu](https://developer.hashicorp.com/nomad/doc"
+  },
+  {
+   "source": "README.md@65a1c427bb3a91d767287bed8e16e45e13a715f0",
+   "text": "Nomad is supported on Linux, Windows, and macOS. A commercial version of Nomad, [Nomad Enterprise](https://developer.hashicorp.com/nomad/docs/enterprise), is also available."
+  }
+ ]
+}
