@@ -17358,8 +17358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-north-star-start-line.md",
-      "sha256": "3e8cbc6285f077efa1254900dfed3fbcb676cd7f205ba6a228748f94adc0607c",
-      "bytes": 7264
+      "sha256": "95157f78ee4e329445bada1634fd15adb5a790fab6cc8ef07c75401377035563",
+      "bytes": 16416
     },
     {
       "path": "docs/decisions/2026-10-06-ns2604-native-bar-recount.md",
@@ -40892,6 +40892,11 @@
       "bytes": 114093
     },
     {
+      "path": "evidence/artifacts/ns2604-start-line-20261007/interim-plans.json",
+      "sha256": "0ed787ffd6f874fed8474845d9cf524691ad4de057df075a69c3716e6c8dc6d0",
+      "bytes": 10850
+    },
+    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -53988,8 +53993,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "7a424c0d8994461fb9570b021db246a56e243d81d477c8d77a6b34e3ad5e24fc",
-      "bytes": 23643
+      "sha256": "701ba7a7e9aa8b93e5ddf1ef9556f679713fed9cd6dd09c718762e16a12cc7d6",
+      "bytes": 23681
     },
     {
       "path": "observability/memory-scheduled-20260923.json",

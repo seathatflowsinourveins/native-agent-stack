@@ -366,7 +366,7 @@
       "kind": "gate",
       "id": "new-wsl-distribution-20261002",
       "title": "NativeStack2604 native bar / readiness-runner",
-      "state": "reported 27 of 80 / S4 pending / RD earliest Oct9 likely Oct13 / full79 date unknown / owner readiness-runner",
+      "state": "historical reported 27 of 80 / S4 review by Oct8 04Z / adjudication by Oct8 22Z / N1 data-integrity / full79 date unknown / owner readiness-runner",
       "evidence_ref": "evidence/artifacts/ns2604-native-bar-20261006/README.md"
     },
     {
@@ -422,7 +422,7 @@
       "kind": "gate",
       "id": "two-host-architecture-20261002",
       "title": "Two-host architecture for North Star R and D (macOS and workstation)",
-      "state": "two-host design resolved / offline R and D starts with SPY one_stress mapping / 179 starter tests pass / workstation activation not attested",
+      "state": "two-host design resolved / N1 data-integrity opening unit under Oct7 amendment / 179 starter tests pass / workstation activation not attested",
       "evidence_ref": "docs/decisions/2026-10-02-two-host-north-star-architecture.md"
     },
     {
