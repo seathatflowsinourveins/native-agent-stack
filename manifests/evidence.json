@@ -15027,6 +15027,11 @@
       "bytes": 13876
     },
     {
+      "path": "blueprints/us-equities/mover-coverage-asof/evidence/native-e2-replay-2604-20261006.json",
+      "sha256": "de1d09f2b8d9479d9ace878b169d8688758bb81f110e208846822bb8bbdc2b03",
+      "bytes": 3724
+    },
+    {
       "path": "blueprints/us-equities/mover-coverage-asof/evidence/summary-asof-20260929.json",
       "sha256": "1258bd04252ad100acc9f81b821f739d77e49b6348fa8efad7b97084f34aacde",
       "bytes": 8414
