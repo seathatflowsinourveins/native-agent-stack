@@ -16528,8 +16528,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "67aa04ee3eae8fd9e6b3c5e4d85bece27dd4a715cbf5c6957850b03f4f307fa7",
-      "bytes": 158922
+      "sha256": "7a11c341ad0c194ae42e4bcd8fc0fc61c3765bb871e97fec31bef03f3c933594",
+      "bytes": 155287
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -17635,11 +17635,6 @@
       "path": "docs/decisions/2026-10-06-cc-orchestration-composition.md",
       "sha256": "5f5a6d54e9de82ba99fda40547036677800785787d6670f449280af0cfaef964",
       "bytes": 21371
-    },
-    {
-      "path": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
-      "sha256": "3da47da0b6014c4ebd711a911017849ac7014b46c2edd45f869164e8b1fb015e",
-      "bytes": 7282
     },
     {
       "path": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
@@ -41252,11 +41247,6 @@
       "bytes": 8310
     },
     {
-      "path": "evidence/artifacts/ns2604-context-audit-completion-20261006/review.json",
-      "sha256": "2985f35e5549ef9d2a2f4a38f8b7c549c57be7ff37dd24cd38540efc52d2d22d",
-      "bytes": 16673
-    },
-    {
       "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
       "sha256": "2905791626d06cc9ba44215cecd1a346482ba2c718dcbc0b00e567bba7101843",
       "bytes": 2111
@@ -56063,8 +56053,8 @@
     },
     {
       "path": "tests/test_upstream_surface_watch.py",
-      "sha256": "3a7a6b7f304a45422573ce4b8689347c7d4794e74dd533cf78a3b6c35eb3ab61",
-      "bytes": 125483
+      "sha256": "e2b67d99b2921273c683fad75b89c78c3b1643f64bddec8887a818d50cf97d56",
+      "bytes": 125461
     },
     {
       "path": "tests/test_us_equities_hosting.py",
