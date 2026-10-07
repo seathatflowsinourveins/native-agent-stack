@@ -1,0 +1,12 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {createStreamController} from "../../open-sse/utils/streamHandler.ts";
+test("one controller may print several non-echo error lines",()=>{
+ const lines:string[]=[]; const old=console.log; console.log=(...a)=>lines.push(a.join(" "));
+ try { const c=createStreamController({provider:"openai",model:"review"}); c.handleError(new Error("first")); c.handleError(new Error("second")); c.handleComplete(); }
+ finally {console.log=old;}
+ const end=lines.filter(x=>/🌊 \[STREAM\]/.test(x));
+ old("REVIEW-CONTROLLER-LINES",JSON.stringify(end));
+ assert.equal(end.length,3);
+ assert.equal(end.filter(x=>x.includes("post-abort")).length,0);
+});

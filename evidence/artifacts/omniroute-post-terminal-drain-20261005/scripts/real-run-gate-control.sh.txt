@@ -15,6 +15,8 @@
 #   G7 ACCEPT_TEST_ text only in VALUES (one of them a newline followed by ACCEPT_TEST_N_TWO_PRE=1), or a name with another prefix
 #      (XACCEPT_TEST_N_TWO_PRE, ACCEPT_TESTS, ACCEPT_TEST, accept_test_n_two_pre)                                                         required: exit 0
 #   G8 usage errors: no arguments, an uppercase or 63-digit expected value, a missing wrapper file                                       required: exit 2
+#   G9 (read r13, P2-3) a listing command first on the gate's PATH that fails: it exits 42 with no output while ACCEPT_TEST_N_TWO_PRE=1 is exported (G9a: the reviewer's reproduction), exits 0 with no output (G9b),
+#      lists the real environment (no ACCEPT_TEST_ name in it) and then exits 3 (G9c)                                                   required: exit 1, `could not be enumerated`, never `clean`; G9d a pass-through listing command (positive control)  required: exit 0
 set -u
 WRAPPER=${1:?wrapper file}
 FROZEN=${2:?frozen sha256 of the wrapper}
@@ -78,6 +80,16 @@ UPPER=$(printf '%s' "$FROZEN" | tr a-f A-F)
 CASE_ENV=(); gate_case "G8b an uppercase expected value" 2 "" "" -- "$WRAPPER" "$UPPER"
 CASE_ENV=(); gate_case "G8c a 63-digit expected value" 2 "" "" -- "$WRAPPER" "${FROZEN:0:63}"
 CASE_ENV=(); gate_case "G8d a missing wrapper file" 2 "" "" -- "$W/no-such-wrapper.sh" "$FROZEN"
+mkdir -p "$W/env42" "$W/envempty" "$W/envpartial" "$W/envpass"   # G9: scratch stand-ins for the listing command, each named env and first on the gate's PATH
+printf '#!/bin/sh\nexit 42\n' > "$W/env42/env"
+printf '#!/bin/sh\nexit 0\n' > "$W/envempty/env"
+printf '#!/bin/sh\n/usr/bin/env "$@"\nexit 3\n' > "$W/envpartial/env"
+printf '#!/bin/sh\nexec /usr/bin/env "$@"\n' > "$W/envpass/env"
+chmod 755 "$W/env42/env" "$W/envempty/env" "$W/envpartial/env" "$W/envpass/env"
+CASE_ENV=(ACCEPT_TEST_N_TWO_PRE=1 "PATH=$W/env42:/usr/local/bin:/usr/bin:/bin"); gate_case "G9a the listing command exits 42 with no output while ACCEPT_TEST_N_TWO_PRE=1 is exported" 1 "could not be enumerated" "REAL-RUN-GATE clean" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=("PATH=$W/envempty:/usr/local/bin:/usr/bin:/bin"); gate_case "G9b the listing command exits 0 and lists nothing" 1 "could not be enumerated" "REAL-RUN-GATE clean" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=("PATH=$W/envpartial:/usr/local/bin:/usr/bin:/bin"); gate_case "G9c the listing command lists the real environment (no ACCEPT_TEST_ name in it) and then exits 3" 1 "could not be enumerated" "REAL-RUN-GATE clean" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=("PATH=$W/envpass:/usr/local/bin:/usr/bin:/bin"); gate_case "G9d a pass-through listing command first on PATH (positive control for G9a-G9c)" 0 "REAL-RUN-GATE clean" "" -- "$WRAPPER" "$FROZEN"
 echo "gate cases not as required: $FAILED"
 echo "scratch directory (remove with rm -rf after reading): $(echo "$W" | mask)"
 [ "$FAILED" = 0 ]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Controls for pre-switch guard version 5 (full-scope read of 8f9d89662, P2-2 and P2-3): the strict `ss` parse and the full-tuple connection keys, on fixtures built from records CAPTURED on the live host (2026-10-06, `ss -O -Htnpi state established '( sport = :20128 or dport = :20128 )'`).
 Guard version 4 (pre-switch-guard-20261006-v4.py, superseded) runs on the same records in its own two-line format where a control reproduces a defect the review named. Part K: the connection parser in-process (the module is loaded without its trailing main() call and `sh` is replaced by a fixture, so no host state is read);
-part E: the whole guard in --idle-only mode as a subprocess with an `ss` shim first on PATH, a stub identity script and a scratch database, INSIDE A PRIVATE NETWORK NAMESPACE (`unshare -rn`; ROUND-13, full-scope read r10 P2-5)
+part E: the whole guard in --idle-only mode as a subprocess with an `ss` shim first on PATH, a stub identity script and a scratch database, INSIDE A PRIVATE NETWORK NAMESPACE (`unshare -rn`; ROUND-13, delta read r10 P2-5)
 in which 127.0.0.1:20128, the guard's default port, is the controls' own stub of the one endpoint the guard reads (`/api/usage/history`): no request of Part E can reach the host's gateway. The earlier executions of Part E (before this
 round) did not have that isolation: the guard's `pending_total` sent read-only GETs to the live gateway (two per guard run at most); the recorded statement that no gateway request was sent was wrong for them.
 Round 13 (full-scope read r12, P2-4 and P3-1): part K adds the prefix checks K12-K19, check_prefix() of guard 5 and of guard 5 as it was before this round (`--guard5-r12`) on scratch install prefixes in which the entrypoint

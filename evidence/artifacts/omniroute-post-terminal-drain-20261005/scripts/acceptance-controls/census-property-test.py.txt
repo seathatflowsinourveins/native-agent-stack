@@ -4,6 +4,8 @@ usage: census-property-test.py --controls census-controls.py --census window-cen
 Each random world is the controls' default world (a raw arm and a native arm: 6 own call rows, each with its usage row, a clean guard receipt) with 0-3 faults injected into DISTINCT own requests (so that faults cannot cancel each other), or with the documented residual.
 The ground truth is the construction: a fault of the first group means the window is NOT clean (an own usage row dropped or duplicated, a foreign call row, a foreign usage row with another or the same metadata as an own call's while the own usage row exists, an own call row dropped, a latency or a usage timestamp just outside the association's tolerance), and the census must say INCONCLUSIVE;
 a fault of the second group changes nothing that belongs to the window (a latency exactly at the tolerance, foreign rows well before or after the window) and the census must say PASS; the residual (an own usage row dropped AND a foreign usage row with identical metadata whose call row never existed: the four-fault coincidence) is the documented limit and is expected to PASS.
+Round 21: one world in three is the canary's four arms (scope=canary-fixture on the controls' fixture root), and the ground truth there adds the incarnation: every inbound request line since the serving process's start needs its own call row of its path, whatever its lead over the duration clock, and the journal must reach the listener's start:
+an arrival line with no call row before the window (`post_outside_window` before it, `prior_unmatched_arrival`), a non-streaming foreign request whose usage row stands in for an own one (`nonstream_substitution`, the former residual J22e), a successful foreign stream whose stream-end line comes far beyond the counted range (`late_end_substitution`, 5f's r13-P1-2) and a journal with no startup banner of the listener from its first 120 s (`no_startup`) are detected in the canary's scope and are the documented trial residual (PASS) in a trial; a forward clock step (`clock_step`: the listener's banners dated before its own start) is INCONCLUSIVE in both scopes, and the user manager's entry about the unit before the start (`manager_start_entry`, canary worlds only) has no effect.
 A world with no fault must PASS. The test fails on any disagreement, and on any crash (a traceback, an exit status other than 0 and 2). It imports the controls' fixture builders (the controls module runs nothing at import) and runs the census as a subprocess, as the protocol does."""
 import argparse
 import shutil
@@ -29,11 +31,13 @@ work.mkdir(parents=True, exist_ok=True)
 ctrl.ARGS = argparse.Namespace(work=str(work), schema=args.schema, census=args.census)
 rng = random.Random(args.seed)
 plus, call, usage_for = ctrl.plus, ctrl.call, ctrl.usage_for
-MUST_DETECT = ["drop_usage", "dup_usage", "foreign_call", "foreign_usage_distinct", "foreign_usage_second_candidate", "drop_call", "latency_outside", "usage_timestamp_outside", "foreign_post_only", "drop_post", "residual_logged", "foreign_stream_only", "drop_stream", "restart_diag", "residual_stream", "listener_young", "second_writer", "ws_reaching", "arrival_skew"]
+MUST_DETECT = ["drop_usage", "dup_usage", "foreign_call", "foreign_usage_distinct", "foreign_usage_second_candidate", "drop_call", "latency_outside", "usage_timestamp_outside", "foreign_post_only", "drop_post", "residual_logged", "foreign_stream_only", "drop_stream", "restart_diag", "residual_stream", "listener_young", "second_writer", "ws_reaching", "arrival_skew", "clock_step"]
+CANARY_PASS_ONLY = ["manager_start_entry"]   # round 23 (review 5, L1-1): no effect in the canary's scope; not generated in a trial
+CANARY_DETECT = ["nonstream_substitution", "prior_unmatched_arrival", "no_startup", "late_end_substitution", "listener_line_before_start"]   # round 21: detected in the canary's scope only (the incarnation); a trial does not read it, and these worlds are the documented trial residual (PASS)
 NO_EFFECT = ["latency_at_tolerance", "foreign_after_window", "foreign_before_window", "post_outside_window", "stream_echo", "drain_tail", "stream_old", "ws_outside", "json_markers"]
-ALL = MUST_DETECT + NO_EFFECT
+ALL = MUST_DETECT + NO_EFFECT + CANARY_DETECT + CANARY_PASS_ONLY
 print(f"# census property test: seed {args.seed}, {args.worlds} worlds; census {Path(args.census).name}")
-print("# fault groups: must be INCONCLUSIVE: " + ", ".join(MUST_DETECT) + "; must PASS: " + ", ".join(NO_EFFECT) + ", no fault; documented residual in its narrowest form (expected PASS: the foreign request is absent from the gateway journal too): drop_usage + a foreign usage row with identical metadata and no call row on the same request")
+print("# fault groups: must be INCONCLUSIVE: " + ", ".join(MUST_DETECT) + "; must be INCONCLUSIVE in the canary's scope only (PASS in a trial): " + ", ".join(CANARY_DETECT) + ", and a post_outside_window line before the window; must PASS: " + ", ".join(NO_EFFECT) + ", no fault; documented residual in its narrowest form (expected PASS: the foreign request is absent from the gateway journal too): drop_usage + a foreign usage row with identical metadata and no call row on the same request")
 tally = {}
 bad = []
 
@@ -70,6 +74,8 @@ def apply(spec_, kind, a, r):
         f = call(plus(-60 - rng.random() * 100), 33, 3, 100)
         spec_["foreign_calls"].append(f)
         spec_["foreign_usage"].append(usage_for(f))
+        if rng.random() < 0.5:
+            spec_["foreign_arrival_lead"] = rng.choice([5.0, 45.0])   # round 21: the arrival line leads the request's duration clock (a slow policy or credential step): matched by its own call row, whatever the lead
     elif kind == "residual":   # the documented residual in its narrowest form: the foreign request is absent from the gateway journal too
         req["usage"].pop()
         spec_["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
@@ -125,7 +131,38 @@ def apply(spec_, kind, a, r):
             spec_.setdefault("journal_noise", []).append(ctrl.json.dumps({"__REALTIME_TIMESTAMP": str(int(when.timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": ctrl.CGROUP,
                                                                          "MESSAGE": ctrl.json.dumps({"level": 30, "time": ctrl.utc(when), "tag": "HTTP", "method": "GET", "msg": "\U0001F4E5 GET /api/x | " + text_})}))
     elif kind == "post_outside_window":
-        spec_.setdefault("journal_extra", []).append(plus(rng.choice([-1, 1]) * (500 + rng.random() * 100)) if rng.random() < 0.5 else plus(-60 - rng.random() * 100))
+        when = plus(rng.choice([-1, 1]) * (500 + rng.random() * 100)) if rng.random() < 0.5 else plus(-60 - rng.random() * 100)
+        spec_.setdefault("journal_extra", []).append(when)
+        if when < plus(0):
+            spec_["canary_detect"] = True   # after the serving process's start, before the window: a line with no call row (the canary's incarnation); outside the counted range of a trial
+    elif kind == "nonstream_substitution":   # round 21 (r13 P1): the own usage row dropped, a FOREIGN request's usage row (the same numbers, a clock twin) stands in, the foreign request's arrival far before its clock, no stream-end line (it did not stream), its call row never written
+        req["usage"].pop()
+        spec_["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+        spec_.setdefault("journal_extra", []).append((plus(rng.choice([-3000.0, -600.0, -120.0, -40.0])), c["path"]))
+        spec_["canary_detect"] = True
+    elif kind == "listener_line_before_start":   # round 24 (our check of the repair before the push): an arrival line of the LISTENER dated 0.1-0.9 s before its own start (a forward clock step under the 1 s tolerance of the entry check): dropped as before the start in the canary's read
+        began = spec_["guard"]["start"] + dt.timedelta(seconds=spec_.get("listener_start_offset", -3600.0))
+        spec_.setdefault("journal_extra", []).append((began - dt.timedelta(seconds=rng.choice([0.1, 0.3, 0.9])), c["path"]))
+        spec_["canary_detect"] = True
+    elif kind == "manager_start_entry":   # round 23 (review 5, L1-1): the user manager's own entry about the unit (its cgroup is the manager's init scope), dated 2.09 s before the listener's start
+        began = spec_["guard"]["start"] + dt.timedelta(seconds=spec_.get("listener_start_offset", -3600.0))
+        spec_.setdefault("journal_noise", []).append(ctrl.json.dumps({"__REALTIME_TIMESTAMP": str(int((began - dt.timedelta(seconds=2.09)).timestamp() * 1e6)), "_PID": "1", "_SYSTEMD_CGROUP": "/user.slice/user-1000.slice/user@1000.service/init.scope",
+                                                                     "SYSLOG_IDENTIFIER": "systemd", "MESSAGE": "Started omniroute.service - OmniRoute gateway."}))
+    elif kind == "clock_step":   # round 23 (review 5, L1-2): a forward wall-clock step against the boot clock: the listener's banners are dated before its own /proc-derived start
+        spec_["startup_delay"] = -rng.choice([3.0, 8.0, 30.0, 300.0])
+    elif kind == "late_end_substitution":   # round 22 (5f r13, P1-2): a foreign SUCCESSFUL STREAM: its usage row stands in, its call row was never written, its arrival line is logged before the window, its stream-end line comes far beyond the counted range (an unread downstream queue)
+        req["usage"].pop()
+        spec_["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(milliseconds=2)))
+        spec_.setdefault("journal_extra", []).append((plus(rng.choice([-3000.0, -600.0, -120.0, -40.0])), c["path"]))
+        end = c["ts"] + dt.timedelta(seconds=rng.choice([450.0, 900.0, 5000.0]))
+        spec_.setdefault("stream_extra", []).append((end, round((end - (c["ts"] - dt.timedelta(milliseconds=c["duration"] + 3))).total_seconds() * 1000), str(c["provider"]).upper(), c["model"], "complete"))
+        spec_["canary_detect"] = True
+    elif kind == "prior_unmatched_arrival":   # round 21: an inbound request line after the serving process's start and before the window with no call row at all
+        spec_.setdefault("journal_extra", []).append((plus(-rng.choice([60.0, 300.0, 1800.0, 3000.0]) - rng.random() * 30), c["path"]))
+        spec_["canary_detect"] = True
+    elif kind == "no_startup":   # round 21: the journal read does not reach the serving process's start (no entry of the listener in its first 120 s)
+        spec_["no_startup_lines"] = True
+        spec_["canary_detect"] = True
     else:
         raise AssertionError(kind)
 
@@ -133,20 +170,26 @@ def apply(spec_, kind, a, r):
 for i in range(args.worlds):
     name = f"w{i}"
     spec_ = ctrl.default_spec(name)
+    canary = i % 3 == 0   # round 21: one world in three is the canary's four arms
+    if canary:
+        ctrl.four_arms(spec_)
     pairs = [(a, r) for a, arm in enumerate(spec_["arms"]) for r in range(len(arm["requests"]))]
     rng.shuffle(pairs)
     kinds = [rng.choice(ALL + ["residual"] * 2) for _ in range(rng.choice([0, 0, 1, 1, 2, 3]))]
-    COUNT_UP = ("foreign_post_only", "residual_logged", "drop_call", "foreign_call", "foreign_stream_only", "residual_stream")
+    kinds = [k for k in kinds if canary or k not in CANARY_PASS_ONLY]   # round 23: a trial's read does not reach the manager's entry
+    if "no_startup" in kinds:   # round 23: a clock step shows in the listener's banners; a world without banners has nothing to show it
+        kinds = [k for k in kinds if k != "clock_step"]
+    COUNT_UP = ("foreign_post_only", "residual_logged", "drop_call", "foreign_call", "foreign_stream_only", "residual_stream", "nonstream_substitution", "late_end_substitution", "listener_line_before_start")
     if ("drop_post" in kinds or "drop_stream" in kinds) and any(k in COUNT_UP for k in kinds):   # a lost own line balanced by a foreign line: two journal faults that the pairing catches only outside its 3 s width (the controls J9 and J10): not generated here
         kinds = [k for k in kinds if k not in ("drop_post", "drop_stream")]
     for kind, (a, r) in zip(kinds, pairs):
         apply(spec_, kind, a, r)
-    expect = 2 if any(k in MUST_DETECT for k in kinds) else 0
-    label = ",".join(sorted(kinds)) or "no fault"
+    expect = 2 if any(k in MUST_DETECT for k in kinds) or (canary and spec_.get("canary_detect")) else 0
+    label = ("canary: " if canary else "") + (",".join(sorted(kinds)) or "no fault")
     db, files, guard = ctrl.materialize(spec_, work)
-    rc, out, err = ctrl.run_census(db, files, guard)
+    rc, out, err = ctrl.run_census(db, files, guard, extra=["@NO_REQUIRE_ARMS@"] if canary else None)
     verdict = {0: "PASS", 2: "INCONCLUSIVE"}.get(rc, f"exit {rc}")
-    key = ("detect" if expect == 2 else "pass")
+    key = ("canary-" if canary else "trial-") + ("detect" if expect == 2 else "pass")
     t = tally.setdefault(key, {"worlds": 0, "agree": 0})
     t["worlds"] += 1
     if "Traceback" in err or rc not in (0, 2):

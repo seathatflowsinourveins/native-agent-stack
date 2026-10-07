@@ -14,6 +14,10 @@ The logging boolean was a substring test on the Environment property, so OMNIROU
 (OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e, bin/cli/runtime/processSupervisor.mjs:77: `process.env.OMNIROUTE_SHOW_LOG === "1"`) applied to the parsed assignments: the last assignment of the variable
 named exactly OMNIROUTE_SHOW_LOG has the value exactly 1.
 
+Round 21 (the read r13 of ec4b489d9, P2-4). journalctl can exit 0 and say on stderr that it skipped data (for example `Warning: some journal files were not opened due to insufficient permissions.`), and the receipt then
+counted the lines that it did get and printed all-zero counts. The unit journal read is now unavailable, never counts, when journalctl exits 0 with a stderr that holds a word of the census's JOURNAL_STDERR_ALARM
+(scripts/window-census.py.txt: truncat, corrupt, ignor, fail, error, inconsisten, skipp, missing, unavailable, denied, insufficient, not opened, permission), with the sanitized stderr as the diagnostic and exit 2.
+
 Prints, per unit: the drop-in paths and whether OMNIROUTE_SHOW_LOG=1 is set (a boolean; no other Environment value is printed, and /proc/<pid>/environ and the EnvironmentFile are never read),
 MainPID, the start timestamps, the health response, one journal line from the unit that shows its child's output reaches journald (chosen by a start-up pattern, rejected if it looks like a credential),
 and counts only (no values) of credential-shaped strings in the unit's journal since its start, plus the user journal's disk use and the retention keys that are set.
@@ -42,6 +46,7 @@ PATTERNS = {
     "api_key_assignment_with_value": r"(?i)(?<![A-Za-z_])api[_-]?key[\"']?\s*[:=]\s*[\"']?(?!false|null|true|undefined)[A-Za-z0-9._-]{8,}",
 }
 UNAVAILABLE = []   # the systemctl and journalctl observations that were not obtained; the exit status is 2 when there is one
+STDERR_ALARM = re.compile(r"(?i)truncat|corrupt|ignor|fail|error|inconsisten|skipp|missing|unavailable|denied|insufficient|not opened|permission")   # the words with which journalctl reports data that it did not read (JOURNAL_STDERR_ALARM of scripts/window-census.py.txt)
 
 
 def describe_dropin(path):
@@ -77,14 +82,17 @@ def sanitize(text):
     return text[:160]
 
 
-def run(*args):
-    """(stdout, "") of a command that exited 0; (None, a sanitized diagnostic) of one that exited non-zero or could not be started: a failed command is never read as empty output."""
+def run(*args, alarm=False):
+    """(stdout, "") of a command that exited 0; (None, a sanitized diagnostic) of one that exited non-zero or could not be started: a failed command is never read as empty output. alarm: a command that exited 0 but wrote a word of loss on stderr (journalctl skipping files it could not open) is
+    unavailable too (review r13, P2-4): the lines it did print are a partial read."""
     try:
         proc = subprocess.run(args, capture_output=True, text=True)
     except OSError as error:
         return None, f"{args[0]} could not be started ({type(error).__name__})"
     if proc.returncode != 0:
         return None, f"{args[0]} exited {proc.returncode}: {sanitize(proc.stderr) or '(nothing on stderr)'}"
+    if alarm and STDERR_ALARM.search(proc.stderr or ""):
+        return None, f"{args[0]} exited 0 but wrote on stderr, so it may have skipped data: {sanitize(proc.stderr)}"
     return proc.stdout, ""
 
 
@@ -138,7 +146,7 @@ for port, unit in UNITS.items():
     elif not since:
         journal, why = None, "the unit has no ActiveEnterTimestamp (not started, or not loaded): there is no journal since its start to read"
     else:
-        journal, why = run("journalctl", "--user", "-u", unit, "--since", since, "-o", "cat", "--no-pager")
+        journal, why = run("journalctl", "--user", "-u", unit, "--since", since, "-o", "cat", "--no-pager", alarm=True)
     lines = [l for l in (journal or "").splitlines() if l != "-- No entries --"]
     if journal is not None and not lines:
         journal, why = None, "journalctl printed no entry since the unit's start, where at least the manager's start line is expected"

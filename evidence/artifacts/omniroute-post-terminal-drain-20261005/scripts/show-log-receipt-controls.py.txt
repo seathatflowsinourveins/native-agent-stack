@@ -5,7 +5,7 @@ argument vector), INSIDE A PRIVATE NETWORK NAMESPACE (`unshare -rn`) whose 127.0
 these controls can reach the host's gateways (S0 checks the isolation first; every run prints what reached each stub). No systemd unit, journal or gateway is read; the helper's own reads of the host's
 /etc/systemd/journald.conf(.d) are real. The credential-shaped strings of the journal fixtures are synthetic and assembled at run time (this file holds none); the helper prints counts only.
 Cases: a (both commands succeed: the counts as before), b (journalctl exits non-zero with empty stdout), c1 (systemctl exits non-zero), c2 (systemctl succeeds but the unit has no start timestamp), d (journalctl
-succeeds with no credential-shaped line: a genuine zero), d2 (journalctl succeeds with no entry at all), f (the disk-usage read fails), e1-e7 (the logging boolean on Environment assignments).
+succeeds with no credential-shaped line: a genuine zero), d2 (journalctl succeeds with no entry at all), f (the disk-usage read fails), d3 and d4 (round 21, the read r13 P2-4: journalctl exits 0 with ordinary lines and a partial-read warning on stderr, and with a stderr that holds no word of loss), e1-e7 (the logging boolean on Environment assignments).
 usage: show-log-receipt-controls.py --before FILE --fixed FILE [--work-root DIR]
 """
 import argparse
@@ -244,6 +244,17 @@ run_case("d2", "journalctl succeeds but prints no entry since the units' start, 
          make_case("d2", journal={u: ("-- No entries --\n", "", 0) for u in UNITS}),
          (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["1", "1"], "all-zero counts of `1` journal line (the marker line), exit 0", "the defect"),
          (2, lambda out, reads: unavailable_counts(out, reads) and all("no entry" in l for l in per_unit(out, LINES)), "counts unavailable: no entry since the start", "the fixed helper"))
+PARTIAL = "Warning: some journal files were not opened due to insufficient permissions.\n"
+run_case("d3", "journalctl exits 0 with ordinary lines and, on stderr, the warning that some journal files were not opened (a partial read; round 21, the read r13 P2-4)",
+         make_case("d3", journal={u: (QUIET, PARTIAL, 0) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["3", "3"] and reads == 2, "all-zero counts of the 3 lines that were printed, exit 0, `observations not obtained: none` (a partial read passed as a genuine zero)", "the defect"),
+         (2, lambda out, reads: unavailable_counts(out, reads) and all("journalctl exited 0 but wrote on stderr" in l and "not opened" in l for l in per_unit(out, LINES)) and per_unit(out, NOT_OBTAINED) == ["['20128 journal', '20129 journal']"],
+          "counts unavailable for both units, the diagnostic says that journalctl exited 0 and wrote the warning, both journals listed as not obtained", "the fixed helper"))
+run_case("d4", "journalctl exits 0 with ordinary lines and a stderr line that holds no word of loss (a notice, not a warning that data was skipped): a genuine zero, as before",
+         make_case("d4", journal={u: (QUIET, "-- Journal begins at Mon 2026-10-05 16:12:12 EDT. --\n", 0) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["3", "3"] and reads == 2, "all-zero counts of 3 journal lines each", "not a defect"),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["3", "3"] and reads == 2 and obtained_all(out), "all-zero counts of 3 journal lines each, exit 0, no observation missing", "the fixed helper"),
+         same_output=True)
 run_case("f", "the disk-usage read fails (journalctl --user --disk-usage exits 1)",
          make_case("f", disk=("", "Failed to get disk usage: Input/output error\n", 1)),
          (0, lambda out, reads: "\n## user journal\n\nretention keys" in out, "an empty disk-usage line, exit 0", "the defect"),

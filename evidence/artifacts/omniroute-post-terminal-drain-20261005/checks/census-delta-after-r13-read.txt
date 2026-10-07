@@ -1,0 +1,269 @@
+# The complete diff of the window census between the head that the read r13 read (ec4b489d9; superseded/window-census-r20.py.txt, sha256 385e6dddb4fdd3195a4864f2488861609ee3c2b09d49a697225d0551403ffd2e) and this head (scripts/window-census.py.txt, sha256 2ac70c6e718e311d2dc7b980f0ac11742771da967715747ae006b341483f66f4), as `diff -u` with one line of context. Nothing else of the census differs.
+# The causes: the command center's GPT read of ec4b489d9 (P1: every inbound request line since the serving process's start needs its own call row of its path, whatever its lead over the duration clock, and the journal must reach the start: the former residual J22e is INCONCLUSIVE; P2: a run on a fixture root or on shimmed host programs says `scope=canary-fixture` or `scope=trial-fixture`, never the accepting `scope=canary`), the listener's own startup lines that the coverage rule needs, and the labels of the untested boundary. The controls are J36-J39, X6 and X7 (J22e and J22f changed).
+
+--- superseded/window-census-r20.py.txt
++++ scripts/window-census.py.txt
+@@ -20,5 +20,11 @@
+ (x)   the gateway's journal (journalctl --user -u omniroute.service, `-o json --all`) holds exactly as many inbound request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`), counted by the gateway's own clock (the line's `time`, which must lie between 1 s after and 30 s before journald's receive stamp) from 4 s BEFORE the window's start to 4 s AFTER its end (the usage pad plus 1 s; the 3 s pairing tolerance is measured from the own row's ESTIMATED start, not from the request's arrival, which can precede it by a delay that nothing bounds), as there are own call rows, and they pair one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration); a journalctl that cannot be run, exits non-zero or reports a loss on stderr, and an entry the census cannot read (a line that is not JSON, a null or non-string message, a message that starts with `{` and does not parse, an arrival marker it did not count, a timestamp outside 2000-2100) make the window INCONCLUSIVE; the receipt prints the exact command, the binary, its version and its stderr, also when the observation failed;
+-(xi)  the same journal run holds the stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`, printed by the stream controller when a stream ends or its client leaves: open-sse/utils/streamHandler.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e), whose time is anchored at the end of the request's lifecycle (for a completed request within about 0.2 s of its rows; after a client that left, the rows follow the line by up to the disconnect grace, and an error row can precede its line: checks/census-calibration-measurements.txt), whatever the delay between the arrival line and the
+-        duration clock was and whatever happened to the rows. Lines of one controller (a primary line and its `client_disconnect (post-abort)` echo) are one group; each own call row pairs one to one with a group of its provider and model whose implied start (line time minus its ms) lies within 0.25 s of the row's estimated start, and no group is left over whose line lies in the window padded by the 3 s usage pad, the serving process's
+-        STREAM_DISCONNECT_GRACE_PERIOD_MS (read from its environment, default 10 s: after a client that left once the terminal event was delivered the rows follow its line by at most that long) and 1 s; a claimed usage row's clock start (timestamp minus latency) agrees with its call row's (timestamp minus duration) within 0.25 s (one request has one duration clock: a foreign request's row standing in for it started elsewhere);
++(xi)  the same journal run holds the stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`, printed by the stream controller when a stream ends or its client leaves: open-sse/utils/streamHandler.ts at OmniRoute
++c1e30b7676975feb298b49eff6ff58923c04b89e). Their time is where the CONTROLLER ends, not where the rows are written: a successful HTTP stream persists its rows at the transform's flush and prints its line when the downstream reader has seen the terminal event, which an
++unread downstream queue delays by the reader's pace, with no bound (review r13, P1-2: 5.75 s measured natively at default queues; on this host's rows a completed request's line lies within about 0.2 s of them, a measurement and not an enforced bound; after a client that left the rows follow
++the line by up to the disconnect grace, and an error row can precede its line: checks/census-calibration-measurements.txt). The census uses the lines as a SECOND record, whatever the delay between the arrival line and the duration clock was and whatever happened to the rows. A controller's
++`client_disconnect (post-abort)` echo is folded into its primary line; every other line is a group of its own (a controller can print several primary lines: repeated handleError calls and a handleComplete, review r13, P3-5), a conservative convention: extra groups can only leave lines over (INCONCLUSIVE),
++two requests are never merged, and a group is a controller, not an inbound request (a combo's failed attempts and a client's retries each end one). Each own call row pairs one to one with a group of its provider and model whose implied start (line time minus its ms: the controller's start, which does
++not move when the line is late) lies within 0.25 s of the row's estimated start, and no group is left over whose line lies in the window padded by the 3 s usage pad, the serving process's STREAM_DISCONNECT_GRACE_PERIOD_MS (read from its environment, default 10 s: after a client that left once the terminal
++event was delivered the rows follow its line by at most that long) and 1 s; a line later than that range is not read, so the stream-end record covers no request whose line is late (for the canary the arrival matching of clause (xiv) is the record that does); a claimed usage row's clock start
++(timestamp minus latency) agrees with its call row's (timestamp minus duration) within 0.25 s (one request has one duration clock: a foreign request's row standing in for it started elsewhere);
+ (xii) the serving process is established where MainPID and its start time cannot (they identify the CLI supervisor, which restarts the serving child on a crash): the process listening on the guard receipt's port (ss -ltnp) is in the unit's cgroup, started before the guard receipt began (/proc starttime against /proc/uptime, margin 2 s), is the writer of every request line of the range (a restarted
+@@ -26,4 +32,5 @@
+ (xiii) no Responses-over-WebSocket turn reaches the window padded by the usage pad: such a turn (call_logs method WEBSOCKET or request_type responses_websocket, written by the gateway's WebSocket proxy through POST /api/internal/codex-responses-ws) is stamped at its START in both tables, with the turn's length as its duration and latency, and writes neither an arrival line nor a stream-end line, so no journal record covers it; a call row of such a turn whose [start, start + duration] reaches the padded window makes the result INCONCLUSIVE;
+-The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE. The result line ends `scope=canary` for the canary's four-arm gate and `scope=trial` for anything else (fewer or more arms, a diagnostic run): only `PASS ... scope=canary` accepts the canary.
+-What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row (for the endpoints whose handler logs an arrival line: the chat and responses handlers; `/v1/search` and the gateway's other endpoints log none). What stays outside, which the receipt states verbatim as an untested boundary (the line `UNTESTED-BOUNDARY`, refined by `UNTESTED-BOUNDARY-DETAIL`) next to its evidence classes (the line `EVIDENCE-CLASS`): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain (for the arrival lines measured from the lost request's estimated start, not from its arrival; for the stream-end lines within 0.25 s of the implied start); (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup); and traffic that is not an inbound POST (a non-streaming foreign request is covered by neither journal record, and neither is a Responses-over-WebSocket turn, whose rows are stamped at its start: a WebSocket turn whose call row reaches the padded window makes the window INCONCLUSIVE, and one whose call row was lost is a case of items (1) and (3)). A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal's inbound lines in the counted range pair one to one with the own requests and its stream-end groups with them too (the untested boundary above stays outside), the guard was idle at its start, the serving process was the same (listener, start, writer of the request lines) and the wrapper's journal line per arm was 0.
++(xiv) for the canary (`scope=canary`: four arms, the real /proc and the system's journalctl, ss, systemctl and systemd-analyze), every inbound request line since the serving process's start is accounted for (review r13, P1: a non-streaming foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one): the journal is read from the listener's start and must hold a startup banner (Next.js, Ready or [DB] Driver) of every listener pid from [its start - 1 s, its start + 120 s] (a vacuum, a rotation, another sink or a console that is not forwarded is INCONCLUSIVE) and no entry of a listener dated more than 1 s before its start and no request line (arrival or stream-end) of a listener dated before its own start (a wall-clock step against the boot clock, which would move the computed start past lines that are in the journal: review 5, L1-2), and each inbound POST line since the start is matched to a distinct call row of its path, own or foreign, whose estimated start is not more than 3 s before the line, whatever the line's lead over the duration clock (a maximum matching, greedily from the latest line); a line with no call row (a request that left none: dropped, rejected before the call log, or another client's lost row) is INCONCLUSIVE; a listener's own startup lines (from 1 s before ITS start to 120 s after), and the supervisor's restart lines within 10 s before a listener's start, are not restart evidence, in the trial's scope as well; the unit's cgroup is established from the entries of the incarnation (the user manager's own entry about the unit, dated before the child's start, is not one of the unit's processes); a run with CENSUS_PROC_ROOT set, or with a journalctl, ss, systemctl or systemd-analyze that is not the system's, says `scope=canary-fixture` (or `trial-fixture`) and is never canary acceptance (review r13, P2: the process evidence of a fixture could reach `scope=canary`);
++The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE. The result line ends `scope=canary` for the canary's four-arm gate and `scope=trial` for anything else (fewer or more arms, a diagnostic run): only `PASS ... scope=canary` accepts the canary; a run whose process evidence is a fixture (CENSUS_PROC_ROOT set, or a journalctl, ss, systemctl or systemd-analyze that is not the system's) ends `scope=canary-fixture` or `scope=trial-fixture`.
++What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row (for the endpoints whose handler logs an arrival line: the chat and responses handlers; `/v1/search` and the gateway's other endpoints log none). What stays outside, which the receipt states verbatim as an untested boundary (the line `UNTESTED-BOUNDARY`, refined by `UNTESTED-BOUNDARY-DETAIL`) next to its evidence classes (the line `EVIDENCE-CLASS`): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain (for the arrival lines measured from the lost request's estimated start, not from its arrival; for the stream-end lines within 0.25 s of the implied start); (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup); and traffic that is not an inbound POST (a non-streaming foreign request, and a streaming one whose stream-end line comes late (review r13, P1-2), are covered by their arrival lines over the whole incarnation of the canary, not by a stream-end line, and a Responses-over-WebSocket turn is covered by neither journal record, whose rows are stamped at its start: a WebSocket turn whose call row reaches the padded window makes the window INCONCLUSIVE, and one whose call row was lost is a case of items (1) and (3)). A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal's inbound lines in the counted range pair one to one with the own requests and its stream-end groups with them too (the untested boundary above stays outside), the guard was idle at its start, the serving process was the same (listener, start, writer of the request lines) and the wrapper's journal line per arm was 0.
+ --require-arms N (default 4, the canary's four arms: raw, race, native, native tool-call): the number of arm outputs that must be given; fewer or more is INCONCLUSIVE, so that an omitted arm cannot pass unnoticed (a live trial of fewer arms states its own number).
+@@ -62,3 +69,3 @@
+ STREAM_GROUP_S = 0.1   # stream-end lines of one process, provider and model whose implied starts differ by at most this are the lines of ONE stream controller
+-COMPLETION_MARGIN_S = 1.0   # the stream-end line of a COMPLETED request lies within about 0.2 s of its row (its console write against the row's timestamp, journald's own stamp 12-25 ms after the write; measured -0.177 to +0.002 s over 541 rows of status 200); after a client that left, the rows follow the line by up to the disconnect grace and an error row can precede its line, which is why the pairing uses the implied START and the counted range reaches the grace back (checks/census-calibration-measurements.txt)
++COMPLETION_MARGIN_S = 1.0   # the stream-end line of a COMPLETED request lies within about 0.2 s of its row, a MEASUREMENT and not an enforced bound: an unread downstream queue delays the line behind the rows without limit (review r13, P1-2) (its console write against the row's timestamp, journald's own stamp 12-25 ms after the write; measured -0.177 to +0.002 s over 541 rows of status 200); after a client that left, the rows follow the line by up to the disconnect grace and an error row can precede its line, which is why the pairing uses the implied START and the counted range reaches the grace back (checks/census-calibration-measurements.txt)
+ DEFAULT_DISCONNECT_GRACE_MS = 10000   # STREAM_DISCONNECT_GRACE_PERIOD_MS, src/shared/utils/runtimeTimeouts.ts:48 at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e: a client that left after the terminal event: the drain writes the rows at most this long after the stream-end line (streamHandler.ts drainCompletedToolHandoff)
+@@ -70,3 +77,3 @@
+ RATE_SAFETY = 0.1   # the busiest stretch of the range must stay below this fraction of the limit
+-PROC_ROOT = os.environ.get("CENSUS_PROC_ROOT") or "/proc"   # the controls point this at a fixture tree; a PASS receipt shows `proc_root=/proc`
++PROC_ROOT = os.environ.get("CENSUS_PROC_ROOT") or "/proc"   # the controls point this at a fixture tree; a PASS receipt on the host shows `proc_root=/proc` (a fixture run shows `proc_root=<overridden by CENSUS_PROC_ROOT>` and says `-fixture`)
+ CLK_TCK = os.sysconf("SC_CLK_TCK") if hasattr(os, "sysconf") else 100
+@@ -92,2 +99,8 @@
+ ARRIVAL_LAG_MAX_S = 30.0   # ... nor earlier by more than this (measured on this host: 0.010-3.5 s under load, checks/census-calibration-measurements.txt): a larger difference is a clock fault or a forged field
++STARTUP_WINDOW_S = 120.0   # a serving child prints its startup banners within this long of its start (measured on this host: 0.61 s the Next.js banner, 0.61 s Ready, 1.4 s the database driver): the journal must hold a startup banner of every listener pid from [its start - STARTUP_BANNER_LEAD_S, its start + this] (the proof that the read reaches the start), and the diagnostics inside it are the listener's own start
++STARTUP_LEAD_S = 10.0   # ... and the supervisor's restart messages that led to the listener lie at most this long before its start
++STARTUP_BANNER_LEAD_S = 1.0   # a listener's own entries cannot precede its own start by more than the clocks' agreement: an entry dated earlier is a wall-clock step against the boot clock (or a mis-dated start), review r13 L1-2
++HOST_TOOLS = ("journalctl", "ss", "systemctl", "systemd-analyze")   # the programs whose output the census trusts as the host's
++SYSTEM_BIN_DIRS = ("/usr/bin", "/usr/sbin", "/bin", "/sbin")
++SQL_INCARNATION_CALLS = "select id, timestamp, path, duration, method, request_type from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id"   # every call row since the serving process's start, any requester (review r13, P1)
+ SETTLE_S = 5
+@@ -226,4 +239,4 @@
+       "diagnostics": [(time, name, text, pid)]  the supervisor's restart diagnostics and the child's startup banners (bin/cli/runtime/processSupervisor.mjs): a serving child that was restarted inside the range;
+-      "stamps": the time of every entry (the rate check), "cgroups": the _SYSTEMD_CGROUP values of the entries, "info": the exact command, binary, version, stderr and the number of entries.
+-    Every time is journald's own `__REALTIME_TIMESTAMP`. Raises JournalError (the check then fails closed, the receipt keeps the command) when journalctl cannot be run, exits non-zero or times out, writes a word of loss on stderr (data it skipped), or when an entry cannot be read:
++      "stamps": the time of every entry (the rate check), "cgroups": the _SYSTEMD_CGROUP values of the entries, "cgroup_entries": [(time, value)] (the canary uses only those of the incarnation: the user manager's own entry about the unit is dated before the child's start and lies in the manager's cgroup), "info": the exact command, binary, version, stderr and the number of entries.
++    The time of a stream-end line and of a diagnostic is journald's own `__REALTIME_TIMESTAMP` (its receive stamp, in 2000-2100); the time of an ARRIVAL line is the gateway's own record `time` (the pino field, a valid gateway stamp), which must lie between ARRIVAL_LAG_EARLY_S after and ARRIVAL_LAG_MAX_S before journald's receive stamp of the same entry (else the observation fails: the two clocks disagree or the field was forged). Raises JournalError (the check then fails closed, the receipt keeps the command) when journalctl cannot be run, exits non-zero or times out, writes a word of loss on stderr (data it skipped), or when an entry cannot be read:
+     a line that is not JSON, a null or non-string message (journalctl writes a field over 4096 bytes as null unless it is given --all), a message that starts with `{` and does not parse, an arrival or stream-end marker that was not counted, a timestamp outside 2000-2100."""
+@@ -240,2 +253,5 @@
+     except (OSError, subprocess.TimeoutExpired) as error:
++        partial = getattr(error, "stderr", None) if isinstance(error, subprocess.TimeoutExpired) else None   # review r13, P3-3: what journalctl wrote to stderr before the timeout is provenance
++        if partial:
++            info["stderr"] = (partial if isinstance(partial, str) else bytes(partial).decode("utf-8", "replace")).strip()[:200]
+         raise JournalError(f"journalctl could not be run: {type(error).__name__}", info)
+@@ -249,4 +265,6 @@
+     posts, streams, diagnostics, stamps, cgroups, losses = [], [], [], [], set(), []
++    cgroup_entries = []
+     unreadable = 0
+     skewed = 0
++    first_by_pid = {}
+     for line in p.stdout.decode("utf-8", "replace").splitlines():
+@@ -269,2 +287,4 @@
+         pid = int(raw_pid) if isinstance(raw_pid, str) and raw_pid.isascii() and raw_pid.isdigit() and len(raw_pid) <= 10 else None
++        if pid is not None and (pid not in first_by_pid or stamp < first_by_pid[pid]):
++            first_by_pid[pid] = stamp   # the earliest entry of each process: the proof that the range reaches a listener's start
+         cgroup = entry.get("_SYSTEMD_CGROUP")
+@@ -272,2 +292,3 @@
+             cgroups.add(cgroup)
++            cgroup_entries.append((stamp, cgroup))
+         if "MESSAGE" not in entry:   # an entry without a message field carries no request line
+@@ -327,3 +348,3 @@
+         raise JournalError("; ".join(parts) + ": the independent record of the window's requests cannot be trusted", info)
+-    return {"posts": posts, "streams": streams, "diagnostics": diagnostics, "stamps": stamps, "cgroups": cgroups, "losses": losses, "info": info}
++    return {"posts": posts, "streams": streams, "diagnostics": diagnostics, "stamps": stamps, "cgroups": cgroups, "cgroup_entries": cgroup_entries, "losses": losses, "info": info, "first_by_pid": first_by_pid}
+ 
+@@ -331,4 +352,4 @@
+ def stream_groups(streams):
+-    """Group the stream-end lines by stream controller. One controller prints one PRIMARY line (complete, disconnect: ..., aborted, error: ..., client_disconnect) and, when handleError runs after a disconnect or a completion, an ECHO (`client_disconnect (post-abort)`): all lines of one controller share its startTime, so lines of one process, provider and model whose
+-    implied starts (line time minus its ms) differ by at most STREAM_GROUP_S belong together. Two primary lines that close together are two requests (two groups), an echo is attached to the nearest primary line of the same process, provider and model whose implied start lies within STREAM_GROUP_S (only that group's echo count rises); an echo with no such primary is a group of its own (primary False), and the census refuses the window for it.
++    """Group the stream-end lines by stream controller. A controller normally prints one PRIMARY line (complete, disconnect: ..., aborted, error: ..., client_disconnect) and, when handleError runs after a disconnect or a completion, an ECHO (`client_disconnect (post-abort)`), but one primary line per controller is NOT an upstream invariant (review r13, P3-5: repeated handleError calls and a handleComplete printed three primary lines for one controller in upstream's node:test): all lines of one controller share its startTime, so lines of one process, provider and model whose
++    implied starts (line time minus its ms) differ by at most STREAM_GROUP_S belong together. Two primary lines that close together are two groups (a conservative counting convention, not controller identity: extra groups leave lines over and make the window INCONCLUSIVE, they never hide a request, and a group is a controller, not an inbound request: a combo's failed attempts and a client's retries each end one), an echo is attached to the nearest primary line of the same process, provider and model whose implied start lies within STREAM_GROUP_S (only that group's echo count rises); an echo with no such primary is a group of its own (primary False), and the census refuses the window for it.
+     A group: {"t", "provider", "model", "ms", "status", "pid", "start" (implied start), "echoes", "primary"}."""
+@@ -563,3 +584,3 @@
+ 
+-def serving_check(rep, probe, guard, events, db):
++def serving_check(rep, probe, guard, events, db, canary=False):
+     """r12-P1-2: the identity of the serving process, established where the frozen helpers cannot (MainPID and ExecMainStartTimestamp identify the CLI supervisor, which restarts the serving child on a crash while both stay equal: bin/cli/runtime/processSupervisor.mjs:204 at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e):
+@@ -584,7 +605,31 @@
+     guard_start = guard["start"] if guard is not None else None
+-    diagnostics = events["diagnostics"]
++    started = min(probe["starts"][p] for p in pids)
++    def own_start(t, pid):
++        """A listener's own startup banners lie in ITS window [its start - STARTUP_BANNER_LEAD_S, its start + STARTUP_WINDOW_S]; a restart message of another process (the supervisor's) is the start of a listener when it lies in [that listener's start - STARTUP_LEAD_S, its start + STARTUP_WINDOW_S] (review r13, L1-6)."""
++        if pid in pids:
++            s = probe["starts"][pid]
++            return s - dt.timedelta(seconds=STARTUP_BANNER_LEAD_S) <= t <= s + dt.timedelta(seconds=STARTUP_WINDOW_S)
++        return any(probe["starts"][q] - dt.timedelta(seconds=STARTUP_LEAD_S) <= t <= probe["starts"][q] + dt.timedelta(seconds=STARTUP_WINDOW_S) for q in pids)
++    expected = [d for d in events["diagnostics"] if own_start(d[0], d[3])]
++    diagnostics = [d for d in events["diagnostics"] if not own_start(d[0], d[3])]
+     rep.say(f"SERVING-PROCESS port={probe['port']} listener_pids={sorted(pids)} started={[utc(probe['starts'][p]) for p in sorted(pids)]} unit_cgroup={unit_cgroup} request_line_pids={sorted(p for p in line_pids if p is not None)} "
+-            f"store_holders={sorted(holders) if holders is not None else None} disconnect_grace_ms={probe['grace_ms']} ({probe['grace_source']}) restart_or_startup_diagnostics_in_range={len(diagnostics)} guard_start={utc(guard_start) if guard_start else None} ss={shown_db(probe['binary'])} {where}")
++            f"store_holders={sorted(holders) if holders is not None else None} disconnect_grace_ms={probe['grace_ms']} ({probe['grace_source']}) startup_lines_of_the_listener_itself={len(expected)} restart_or_startup_diagnostics_in_range={len(diagnostics)} guard_start={utc(guard_start) if guard_start else None} ss={shown_db(probe['binary'])} {where}")
+     if probe["grace_problem"]:
+         rep.bad(f"the serving process's disconnect grace cannot be established: {probe['grace_problem']}")
++    if canary:   # coverage of the incarnation (review r13, P1; review 5, L1-2 and L1-3): the journal read must reach every listener's start, on the journal's own clock
++        first = events["first_by_pid"]
++        banner_names = ("child startup: next", "child startup: ready", "child startup: database")
++        banner = {p: min((d[0] for d in events["diagnostics"] if d[3] == p and d[1] in banner_names and own_start(d[0], p)), default=None) for p in pids}
++        missing = sorted(p for p in pids if banner[p] is None)
++        early = sorted(p for p in pids if first.get(p) is not None and (probe["starts"][p] - first[p]).total_seconds() > STARTUP_BANNER_LEAD_S)
++        dropped = events.get("dropped_before_start", ((0, 0), []))
++        rep.say(f"INCARNATION-COVERAGE the serving process started {utc(started)}; first journal entry per listener pid {{{', '.join(f'{p}: {utc(first[p]) if first.get(p) else None}' for p in sorted(pids))}}}, first startup banner of each listener pid {{{', '.join(f'{p}: {utc(banner[p]) if banner[p] else None}' for p in sorted(pids))}}} "
++                f"(needed: a startup banner of each listener from [its start - {STARTUP_BANNER_LEAD_S:g} s, its start + {STARTUP_WINDOW_S:g} s] and no entry of it dated more than {STARTUP_BANNER_LEAD_S:g} s before its start); lines dated before the start and dropped: arrival {dropped[0][0]}, stream-end {dropped[0][1]}, of process(es) {dropped[1]}")
++        if early:
++            rep.bad(f"listener pid(s) {early} wrote journal entries dated more than {STARTUP_BANNER_LEAD_S:g} s before their own process start: the wall clock stepped against the boot clock (a host resume, an NTP step) or the start is mis-dated, so the lines before the computed start were dropped and the incarnation cannot be established")
++        early_lines = events.get("listener_lines_before_own_start", [])
++        if early_lines:
++            rep.bad(f"listener pid(s) {early_lines} wrote request lines (arrival or stream-end) dated before their own process start: a request cannot reach a process that has not started, so the wall clock stepped against the boot clock (a host resume, an NTP step; a step under {STARTUP_BANNER_LEAD_S:g} s passes the check of the listener's other entries) or the start is mis-dated, and the lines before the computed start were dropped")
++        if missing:
++            rep.bad(f"the journal read holds no startup banner (Next.js, Ready or [DB] Driver) of listener pid(s) {missing} from [their start - {STARTUP_BANNER_LEAD_S:g} s, their start + {STARTUP_WINDOW_S:g} s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded to the journal), so the arrivals since the start were not all counted")
+     if unit_cgroup is None:
+@@ -616,2 +661,66 @@
+         rep.bad(f"{len(diagnostics)} supervisor restart diagnostic(s) or child startup banner(s) in the journal range ({sorted({d[1] for d in diagnostics})}): the serving child was (re)started while the idle receipt and the window were observed")
++
++
++def host_fixture_reasons():
++    """Why this run's process, socket and journal evidence may not be the host's: [] for a run on the real /proc with the system's own journalctl, ss, systemctl and systemd-analyze. A run with a reason says `scope=canary-fixture` (or `trial-fixture`) and is
++    never canary acceptance (review r13, P2: a CENSUS_PROC_ROOT fixture could reach `scope=canary`; the same holds for a shim of the programs that the census trusts)."""
++    reasons = []
++    if PROC_ROOT != "/proc":
++        reasons.append("CENSUS_PROC_ROOT is set")
++    for tool in HOST_TOOLS:
++        found = shutil.which(tool)
++        if found is None or os.path.dirname(os.path.realpath(found)) not in SYSTEM_BIN_DIRS:
++            reasons.append(f"{tool} resolves to {shown_db(found) if found else 'nothing'}, not a system binary")
++    return reasons
++
++
++def incarnation_unmatched(arrivals, rows, tau):
++    """The arrival lines that a maximum matching leaves without a call row. arrivals: [(time, label, path)], rows: [(estimated start, path)]. An arrival may be matched to any call row of its path whose estimated start (its timestamp minus its duration) is not more than tau
++    before the arrival, whatever the arrival's lead over that clock (the line is written before the policy work, the credential refresh and the duration clock, by a delay that nothing bounds); each row serves one arrival. The sets of rows that can serve an arrival are nested
++    (a later arrival can use only the rows that an earlier one can use), so the greedy order from the latest arrival, taking any available row, is a maximum matching: the leftovers are the exact count (the controls check it against a brute force)."""
++    leftovers = []
++    for path in sorted({p for _t, _l, p in arrivals}, key=str):
++        latest_first = sorted((a for a in arrivals if a[2] == path), key=lambda a: a[0], reverse=True)
++        starts = sorted(s for s, p in rows if p == path)
++        j, pool = len(starts), 0
++        for t, label, _p in latest_first:
++            threshold = t - dt.timedelta(seconds=tau)
++            while j > 0 and starts[j - 1] >= threshold:
++                j -= 1
++                pool += 1
++            if pool == 0:
++                leftovers.append((t, label, path))
++            else:
++                pool -= 1
++    return sorted(leftovers, key=lambda a: a[0])
++
++
++def incarnation_check(rep, con, posts, started, u1s, c_hi):
++    """review r13, P1 (r12-P1-1 across the required scope): for the canary, every inbound POST line since the serving process's start is accounted for, so that a foreign request whose arrival precedes its duration clock by more than the counted range cannot stand in
++    for an own one: each line is matched to a distinct call row of its path (any requester), whatever its lead; a line with no call row (a request that left none: dropped, rejected before the call log, another client's lost row) is INCONCLUSIVE."""
++    rows = con.execute(SQL_INCARNATION_CALLS, (utc(started), u1s)).fetchall()
++    starts, unreadable = [], 0
++    for _id, ts, path, duration, method, request_type in rows:
++        if str(path).startswith("/api/") or method == "WEBSOCKET" or request_type == "responses_websocket":
++            continue   # the gateway's own provider-test calls write no arrival line; a WebSocket turn is refused by its own check
++        t = parse_ts(ts)
++        try:
++            length = float(duration) if duration is not None else 0.0
++        except (TypeError, ValueError, OverflowError):
++            length = float("nan")
++        if t is None or not math.isfinite(length) or length < 0 or length > MAX_DURATION_MS:
++            unreadable += 1
++            continue
++        starts.append((t - dt.timedelta(milliseconds=length), path))
++    arrivals = [(t, label, lpath) for t, label, lpath, _pid in posts if started <= t <= c_hi]
++    leftovers = incarnation_unmatched(arrivals, starts, JOURNAL_PAIR_S)
++    rep.say(f"INCARNATION-ARRIVALS the serving process started {utc(started)}: inbound POST lines since then={len(arrivals)}, call rows since then on inference paths (any requester)={len(starts)}, rows whose duration could not be read={unreadable}, "
++            f"lines with no call row={len(leftovers)} (each line is matched to a distinct call row of its path whose estimated start is not more than {JOURNAL_PAIR_S:g} s before the line, whatever the line's lead over the duration clock: a maximum matching)")
++    for t, label, _lpath in leftovers[:20]:
++        rep.say(f"   inbound line since the start with no call row at {utc(t)} {label}")
++    if leftovers:
++        rep.bad(f"{len(leftovers)} inbound POST line(s) since the serving process started ({utc(started)}) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock): "
++                "a foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one, so PASS is not possible")
++    if unreadable:
++        rep.bad(f"{unreadable} call row(s) since the serving process started have a duration that cannot be read: their estimated start is unknown, so the lines cannot all be matched")
+ 
+@@ -1028,4 +1137,6 @@
+     canary_gate = require_arms == DEFAULT_REQUIRED_ARMS and not diagnostic   # the canary contract: four wrapper arms (raw set, race set, native one-request set, native tool-call set, from `run-acceptance.sh canary`), each with the wrapper's header and identity lines
+-    scope = "canary" if canary_gate else "trial"
+-    rep.say(f"SCOPE {scope}" + ("" if canary_gate else ": not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance"))
++    fixture_reasons = host_fixture_reasons()
++    scope = ("canary" if canary_gate else "trial") + ("-fixture" if fixture_reasons else "")
++    rep.say(f"SCOPE {scope}" + ("" if canary_gate else ": not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance")
++            + (f" FIXTURE ({'; '.join(fixture_reasons)}): the process, socket and journal evidence may not be the host's, so this run can never be canary acceptance (the protocol accepts only `scope=canary`)" if fixture_reasons else ""))
+     if canary_gate:
+@@ -1119,5 +1230,5 @@
+     # ---- queries (printed first, so a failure below still leaves them in the receipt)
+-    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
++    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("incarnation-calls", SQL_INCARNATION_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
+         rep.say(f"QUERY {name}: {sql}")
+-    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed)")
++    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s, and for the canary the serving process's start; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed)")
+     rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({u0s}, {w1s}) (the window's start padded by the same {CANDIDATE_SECONDS} s as the usage rows); window-usage: ({u0s}, {u1s}); "
+@@ -1152,3 +1263,3 @@
+     try:
+-        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db)
++        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary_gate)
+     except Exception as error:   # whatever fails here, the receipt printed so far stays and the result is INCONCLUSIVE, never a crash without a receipt and never a PASS
+@@ -1158,5 +1269,5 @@
+     rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the request's lifecycle: within about 0.2 s of the rows of a completed request, and up to the disconnect grace before the rows of a request whose client left: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
+-    rep.say("UNTESTED-BOUNDARY the residual of this check, stated as an untested boundary (no real run has observed these; the synthetic controls R3, J10, J15, J22e, J22f and J27a show that the census passes them): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain; (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup)")
++    rep.say("UNTESTED-BOUNDARY the residual of this check, stated as an untested boundary (no real run has observed these; the synthetic controls R3, J10, J15, J22f and J27a show that the census passes them): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain; (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup)")
+     rep.say("UNTESTED-BOUNDARY-DETAIL (added after the full-scope read r12; these refine the three items above and do not replace them): (2) holds for each of the two journal records separately: for the arrival lines the 3 s is measured from the lost request's ESTIMATED start (timestamp minus duration), so its physical arrival may be earlier by a delay that nothing bounds and the two lines may lie further apart; "
+-            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it passes the HTTP stream controller of chatCore: a non-streaming foreign request prints no stream-end line and its arrival line does not bound it (the delay before its duration clock starts is unbounded), so it is covered by neither; a Responses-over-WebSocket turn (dist/server-ws.mjs; its rows are written by POST /api/internal/codex-responses-ws, both stamped at the turn's START, with the turn's length as duration and latency) writes neither an arrival line nor a stream-end line, so it is covered by neither either: the census refuses a window that a WebSocket call row reaches (the WEBSOCKET line), and a WebSocket turn whose call row was lost is a case of items (1) and (3) above. "
++            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it passes the HTTP stream controller of chatCore and its line falls in the counted range (an unread downstream queue delays a successful stream's line behind its rows without bound: r13-P1-2): a non-streaming foreign request prints no stream-end line, and since the read r13 the canary census covers the ARRIVAL line of such a request, and of a late-ending streaming one, over the whole incarnation instead (every inbound POST line since the serving process's start needs a call row of its path, whatever its lead over the duration clock), so it can stand in for an own request only when its arrival line was not logged or not kept (item (1)) or when a spare call row of its path without an arrival line balances it (item (2)); a Responses-over-WebSocket turn (dist/server-ws.mjs; its rows are written by POST /api/internal/codex-responses-ws, both stamped at the turn's START, with the turn's length as duration and latency) writes neither an arrival line nor a stream-end line, so it is covered by neither either: the census refuses a window that a WebSocket call row reaches (the WEBSOCKET line), and a WebSocket turn whose call row was lost is a case of items (1) and (3) above. "
+             "Journald's drops are bounded only by the unit's entry rate against its limit (its suppression notice is in the system journal, which this user cannot read), a vacuum or rotation gap is not detected, and the serving process, its start and the holders of the store are read at one point in time (a transient listener or writer inside the window is not seen)")
+@@ -1167,3 +1278,3 @@
+ 
+-def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db):
++def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary=False):
+     # ---- timestamp format: a row whose timestamp has another format would be skipped by the string bounds, silently
+@@ -1234,2 +1345,3 @@
+     grace_s = probe["grace_ms"] / 1000.0
++    started = min(probe["starts"].values()) if canary and not probe["error"] and probe["starts"] else None   # the canary's incarnation: the serving process's start (review r13, P1)
+     lo = w0 - dt.timedelta(seconds=JOURNAL_LEAD_S)   # arrival lines are counted from here to c_hi, the end of the usage pad plus the completion margin after the window's end
+@@ -1238,2 +1350,4 @@
+     earliest = min(lo, c_lo, guard["start"] if guard is not None and guard["start"] is not None else lo)   # the range also covers the guard receipt's observation (a restart of the serving process inside it)
++    if started is not None:
++        earliest = min(earliest, started)
+     try:
+@@ -1247,4 +1361,12 @@
+     if events is not None:
++        if started is not None:   # the lines of the previous child, just before the start, are not the incarnation's; the user manager's own entry about the unit (dated before the child's start, in the manager's cgroup) is not one of the unit's processes (review 5, L1-1)
++            events["listener_lines_before_own_start"] = sorted({p[3] for p in events["posts"] if p[3] in probe["pids"] and p[0] < probe["starts"][p[3]]} | {s[5] for s in events["streams"] if s[5] in probe["pids"] and s[0] < probe["starts"][s[5]]})   # a request line of a listener dated before ITS OWN start: a clock fault, whatever the step's size
++            before_posts = [p for p in events["posts"] if p[0] < started]
++            before_streams = [s for s in events["streams"] if s[0] < started]
++            events["dropped_before_start"] = ((len(before_posts), len(before_streams)), sorted({p[3] for p in before_posts if p[3] is not None} | {s[5] for s in before_streams if s[5] is not None}))
++            events["posts"] = [p for p in events["posts"] if p[0] >= started]
++            events["streams"] = [s for s in events["streams"] if s[0] >= started]
++            events["cgroups"] = {c for s_, c in events["cgroup_entries"] if s_ >= started}
+         jinfo, posts, streams = events["info"], events["posts"], events["streams"]
+-        rep.say(f"JOURNAL-COMMAND argv={jinfo['argv']} binary={shown_db(jinfo['binary'])} version={jinfo['version']!r} stderr={jinfo['stderr']!r} entries_read={jinfo['entries']} arrival_lines_read={len(posts)} stream_end_lines_read={len(streams)} restart_or_startup_diagnostics_read={len(events['diagnostics'])}")
++        rep.say(f"JOURNAL-COMMAND argv={jinfo['argv']} binary={shown_db(jinfo['binary'])} version={jinfo['version']!r} stderr={jinfo['stderr']!r} entries_read={jinfo['entries']} arrival_lines_read={len(posts)} stream_end_lines_read={len(streams)} restart_or_startup_diagnostics_read={len(events['diagnostics'])}" + (f" lines_dropped_as_dated_before_the_serving_process_start=(arrival {events['dropped_before_start'][0][0]}, stream-end {events['dropped_before_start'][0][1]})" if 'dropped_before_start' in events else ""))
+         # -- arrival lines: written when a request ARRIVES, before the policy work, the credential refresh and the duration clock (so a line can precede the request's estimated start by a delay that nothing bounds)
+@@ -1273,3 +1395,3 @@
+             rep.bad(f"the gateway's journal and the own call rows do not pair one to one by estimated start and path: {unpaired_own} own call row(s) have no inbound line of their path within {JOURNAL_PAIR_S:.0f} s of their estimated start and {unpaired_lines} inbound line(s) have no own call row (a lost line balanced by another client's line of the same path within {JOURNAL_PAIR_S:.0f} s of the lost request's estimated start cannot be told apart; the lost request's physical arrival may lie earlier than its estimated start by a delay that nothing bounds)")
+-        # -- stream-end lines: printed when a stream ENDS (or its client leaves), anchored to the end of the request's lifecycle where its usage row is written, whatever the arrival-to-clock delay was and whatever happened to the rows
++        # -- stream-end lines: printed when a stream controller ENDS (or its client leaves), whatever the arrival-to-clock delay was and whatever happened to the rows; NOT where the usage row is written: a successful stream persists its rows at the transform's flush and its line follows when the downstream reader has seen the terminal event, which an unread downstream queue delays without bound (review r13, P1-2), so a line can fall after the counted range and the record is a second record, not a bound
+         groups = stream_groups(streams)
+@@ -1283,3 +1405,3 @@
+         rep.say(f"COMPLETION-RECORD stream_end_lines_read={len(streams)} controllers={len(groups)} (post-abort echoes folded in: {sum(g['echoes'] for g in groups)}) controllers_in_the_counted_range={len(relevant)} statuses={dict(sorted(statuses.items()))} counted from {utc(c_lo)} to {utc(c_hi)} "
+-                f"(the window padded by the {CANDIDATE_SECONDS} s usage pad, the {grace_s:g} s disconnect grace of the serving process (a client that left after the terminal event: its rows follow its stream-end line by at most that long) and {COMPLETION_MARGIN_S:g} s)")
++                f"(the window padded by the {CANDIDATE_SECONDS} s usage pad, the {grace_s:g} s disconnect grace of the serving process (a client that left after the terminal event: its rows follow its stream-end line by at most that long) and {COMPLETION_MARGIN_S:g} s; a line later than that, which an unread downstream queue can cause without bound (review r13, P1-2), is not in the range: this record is a second record, not a bound)")
+         rep.say(f"COMPLETION-PAIRING each own call row to one stream-end controller of its provider and model whose implied start (line time - its ms) lies within {STREAM_PAIR_START_S:g} s of its estimated start: own_call_rows_without_a_stream_end_line={len(s_left_calls)} stream_end_controllers_without_an_own_call_row={len(s_left_groups)}")
+@@ -1296,3 +1418,5 @@
+         # -- the serving process (r12-P1-2): the listener, its start, its cgroup, the processes that wrote the request lines, the holders of the store, the supervisor's restart diagnostics
+-        serving_check(rep, probe, guard, events, db)
++        serving_check(rep, probe, guard, events, db, canary)
++        if started is not None:
++            incarnation_check(rep, con, posts, started, u1s, c_hi)
+         # -- what journald keeps (r12 design check, hole 4): the unit's targets and rate limit against the busiest stretch of the range
