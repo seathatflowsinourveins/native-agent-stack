@@ -272,3 +272,25 @@ A dated exclusion applies when expected-file integration cannot pass.
 Otherwise retain passed integration while the client owner completes the
 switch and observes real use. A host awaiting its required ACK remains
 pending; source review and a draft PR are not host acceptance.
+
+## Dated dependency limit (2026-10-07): consolidation gateway
+
+From2026-10-07T01:47Z, CC review
+`review-ns2604-coop-20261007T015759Z` reports degraded ai-memory consolidation
+and auto-improve calls on21128: about one in four to one in three Sol calls
+succeeds until the owner's pool decision. The reported cause is one free-plan
+ChatGPT connection in the nine-connection Codex pool without Sol entitlement;
+chat/Responses requests landing there can return400, while reported upstream8307
+sibling fallback covers images. The bounded01:47–01:52Z sample reports six Sol
+rows, four landing there, three explicit400s and one explicit200 elsewhere;
+unspecified outcomes are not inferred. Locators: that CC review, dispatch
+`task-ns2604-coop-20261007T014716Z`, and its allowlisted21128
+`/api/usage/call-logs` observations. This lane's count was canceled and not run.
+
+The [composition decision](../docs/decisions/2026-10-05-omniroute-gateway-composition.md)
+retains `cx/gpt-6.1-sol-max`; no model or alias change is needed. The pool
+choice/configuration belongs to the owner/CC, not this migration recipe or lane.
+The23:47Z C2X PASS stands as one run, not later steady-state acceptance. This is
+**a dated dependency limit, not a new Qdrant gating row**. It does not establish
+or alter the unexecuted native migration, qualify recovery limits, or authorize
+route edits, a second smoke, or access to decrypted-settings endpoints.
