@@ -102,7 +102,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   spawn, message or follow up with other agents); working directory (a task's own instruction wins, and `cwd` goes to context-mode only for a
   directory other than the launch directory, which the server is already bound to: the "Codex workers" bullet of
   [the handbook](../../docs/token-session-handbook.md#context-mode-executor-and-session-store); the frozen M13 leg reads sentinel files with
-  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list six commands). The verifier also says that it
+  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list seven entries). The verifier also says that it
   does not use web search.
 - **Registration.** Discovery only. Codex loads every `*.toml` under `$CODEX_HOME/agents/` (`load_agent_roles` in
   [`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)), so the roles carry no
@@ -143,8 +143,12 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `52620afd5a6ded09adeffcfa652007c04f413c18d200ff0c2ae268b5f310fe52` |
-| `stack-verifier.toml` | `aab3b1f7980344adac583bb74ceb5f7d3b1cb98f75b552d993cb4b77626bfc34` |
+| `stack-researcher.toml` | `157bff82245a9c5dc4faa38ee71e6b2a5e613158c9f09d9cfd7f3edd35834120` |
+| `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |
+
+### 2026-10-06: SKILL.md read exception
+
+The current table and carrier checksums include the plain-sed skill-document exception. The six existing RTK exceptions, role grants and verbatim awareness bytes are preserved. This is a source-backed instruction/render read-back, not a new frozen E2E or role-use trial. The native `codex.skill.injected` counter identifies an invocation attempt before execution; it does not prove a successful/full read or application. See [the decision](../../docs/decisions/2026-10-06-codex-skill-read-exception.md).
 
 ### 2026-10-04: RTK pin guidance amendment
 

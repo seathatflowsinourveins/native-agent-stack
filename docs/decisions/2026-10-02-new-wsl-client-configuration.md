@@ -1089,7 +1089,7 @@ After the refresh onto main 9e9553277, which carries wave 5's four browser-regis
 ```text
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 69 of 69 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 70 of 70 lines stay):
 
 ```text
 ```
@@ -1104,6 +1104,24 @@ The [local-time decision](2026-10-05-user-facing-local-time.md) adds one sentenc
 ```
 
 `adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 70 of 70 lines stay):
+
+```text
+```
+
+## Amendment 2026-10-07: #803 landing projection
+
+The one authorized landing rebase combines the existing local-time instruction with the SKILL.md
+RTK exception. The native managed-block renderer measures 7,798 compact bytes and 8,864 rendered
+bytes; the protected pre-RTK prefix and its local-time provenance stay as main pinned them.
+The current source-only `new_wsl_client_config.py --check --markdown` inventory follows.
+All earlier decided text, local-time addendum and historical projections remain intact.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 59 of 59 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 71 of 71 lines stay):
 
 ```text
 ```
