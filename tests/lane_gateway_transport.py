@@ -16,6 +16,8 @@ Sources:
 - https://code.claude.com/docs/en/env-vars (read 2026-10-07):
   CLAUDE_CONFIG_DIR and the documented nonessential-traffic/update opt-outs.
 - https://curl.se/docs/manpage.html#-L : native 307-following observer control.
+- https://platform.claude.com/docs/en/build-with-claude/streaming
+  (read 2026-10-07): authored success response uses the vendor's SSE grammar.
 """
 from __future__ import annotations
 
@@ -94,6 +96,38 @@ def fixture_gateway_class():
     return namespace["FixtureGateway"]
 
 
+def anthropic_fixture_sse(model):
+    """Authored text-only reply using the official Messages streaming grammar."""
+    events = [
+        {"type": "message_start", "message": {
+            "id": "msg_fixture_transport", "type": "message", "role": "assistant",
+            "content": [], "model": model, "stop_reason": None, "stop_sequence": None,
+            "usage": {"input_tokens": 25, "output_tokens": 1}}},
+        {"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}},
+        {"type": "content_block_delta", "index": 0,
+         "delta": {"type": "text_delta", "text": "Fixture response."}},
+        {"type": "content_block_stop", "index": 0},
+        {"type": "message_delta", "delta": {"stop_reason": "end_turn", "stop_sequence": None},
+         "usage": {"output_tokens": 3}},
+        {"type": "message_stop"},
+    ]
+    return "".join(f"event: {event['type']}\ndata: {json.dumps(event)}\n\n" for event in events).encode()
+
+
+def codex_http_status(error):
+    """Read only the pinned typed public status field, never error messages."""
+    info = getattr(error, "codex_error_info", None)
+    root = getattr(info, "root", None)
+    # openai/codex@a956835d generated/v2_all.py:559-622,7628-7650.
+    for name in ("http_connection_failed", "response_stream_connection_failed",
+                 "response_stream_disconnected", "response_too_many_failed_attempts"):
+        payload = getattr(root, name, None)
+        value = getattr(payload, "http_status_code", None)
+        if isinstance(value, int) and not isinstance(value, bool) and 100 <= value <= 599:
+            return value
+    return None
+
+
 class CountingFixture:
     """Ephemeral HTTP listener with metadata counters and the existing SSE reply."""
     def __init__(self, label, *, redirect=None, model="claude-opus-5"):
@@ -108,11 +142,17 @@ class CountingFixture:
             def record(self):
                 # No body, authentication field, or arbitrary header is retained.
                 path = urlsplit(self.path).path
-                owner.rows.append({
+                self._metadata_row = {
                     "method": self.command, "path": path,
                     "correlation": self.headers.get("x-request-id")
                         or self.headers.get("x-correlation-id"),
-                })
+                }
+                owner.rows.append(self._metadata_row)
+
+            def send_response(self, code, message=None):
+                if hasattr(self, "_metadata_row"):
+                    self._metadata_row["response_status"] = code
+                super().send_response(code, message)
 
             def do_GET(self):
                 self.record()
@@ -138,11 +178,9 @@ class CountingFixture:
                     return
                 if urlsplit(self.path).path.endswith("/messages"):
                     self.rfile.read(int(self.headers.get("Content-Length", "0")))
-                    # A vendor-shaped API failure finishes the real CLI's transport
-                    # attempt without authored model/tool output.
-                    body = b'{"type":"error","error":{"type":"invalid_request_error","message":"fixture transport stop"}}'
-                    self.send_response(400)
-                    self.send_header("Content-Type", "application/json")
+                    body = anthropic_fixture_sse(owner.model)
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/event-stream")
                     self.send_header("Content-Length", str(len(body)))
                     self.end_headers()
                     self.wfile.write(body)
@@ -173,6 +211,7 @@ class CountingFixture:
             "model_post": sum(row["method"] == "POST" and
                               row["path"].endswith(("/responses", "/messages"))
                               for row in self.rows),
+            "served_307": sum(row.get("response_status") == 307 for row in self.rows),
             "correlations": sorted({row["correlation"] for row in self.rows if row["correlation"]}),
         }
 
@@ -215,26 +254,56 @@ class NativeTransportCells(unittest.TestCase):
                     "ALL_PROXY", "all_proxy", "NO_PROXY", "no_proxy"):
             os.environ.pop(key, None)
         self.started = []
+        self.closed = set()
+        self.terminal = {}
 
     @contextlib.contextmanager
     def observe_native_children(self):
         if self.args.client == "codex":
             from openai_codex.client import CodexClient
+            from openai_codex import _run
             original = CodexClient.start
+            original_close = CodexClient.close
+            original_raise = _run._raise_for_failed_turn
             def start(client):
                 original(client)
                 if client._proc is not None:
                     self.started.append(client._proc.pid)
-            with patch.object(CodexClient, "start", start):
+            def close(client):
+                process = client._proc
+                original_close(client)
+                if process is not None and process.poll() is not None:
+                    self.closed.add(process.pid)
+            def completed(turn):
+                # _run.py at the exact SDK pin raises RuntimeError for a failed
+                # completed turn. Observe typed fields and preserve that raise.
+                self.terminal = {
+                    "native_terminal_kind": "TurnCompleted",
+                    "native_terminal_status": turn.status.value,
+                    "native_api_error_status": codex_http_status(turn.error),
+                }
+                return original_raise(turn)
+            with patch.object(CodexClient, "start", start), \
+                    patch.object(CodexClient, "close", close), \
+                    patch.object(_run, "_raise_for_failed_turn", completed):
                 yield
         else:
+            from claude_agent_sdk import ClaudeSDKClient
             from claude_agent_sdk._internal.transport.subprocess_cli import SubprocessCLITransport
             original = SubprocessCLITransport.connect
+            original_close = ClaudeSDKClient.__aexit__
             async def connect(transport):
                 await original(transport)
                 if transport._process is not None:
                     self.started.append(transport._process.pid)
-            with patch.object(SubprocessCLITransport, "connect", connect):
+            async def close(client, *args):
+                value = await original_close(client, *args)
+                # Successful __aexit__ plus independent PID liveness is the
+                # cleanup observation; no status is guessed from a POST.
+                self.closed.update(pid for pid in self.started if not alive(pid))
+                return value
+            with patch.object(SubprocessCLITransport, "connect", connect), \
+                    patch.object(ClaudeSDKClient, "__aexit__", close):
                 yield
 
     def proxy_environment(self, proxy):
@@ -272,6 +341,7 @@ class NativeTransportCells(unittest.TestCase):
                     exit_code = worker.main()
                 result = json.loads(stdout.getvalue().splitlines()[-1])
                 result["_worker_exit"] = exit_code
+                result.update(self.terminal)
                 return result
             argv = [
                 "--cwd", str(self.project), "--gateway", endpoint[:-3],
@@ -293,8 +363,14 @@ class NativeTransportCells(unittest.TestCase):
                     contextlib.redirect_stdout(stdout):
                 exit_code = worker.main(argv)
             result = json.loads(stdout.getvalue().splitlines()[-1])
+            observation = result.get("observation", {})
+            terminal = observation.get("last_result") or {}
             return {"status": result.get("status") or result.get("observation", {}).get("status"),
-                    "_worker_exit": exit_code}
+                    "_worker_exit": exit_code,
+                    "native_terminal_kind": "ResultMessage" if observation.get("result_count", 0) else None,
+                    "native_result_is_error": terminal.get("is_error"),
+                    "native_api_error_status": terminal.get("api_error_status"),
+                    "native_terminal_reason": terminal.get("terminal_reason")}
 
     def observe(self, phase, result, listeners, *, exit_code=None):
         row = {
@@ -303,18 +379,63 @@ class NativeTransportCells(unittest.TestCase):
             "requested_model": self.worker.DEFAULT_MODEL,
             "native_children_started": len(set(self.started)),
             "native_children_alive": sum(alive(pid) for pid in set(self.started)),
+            "cleanup_settled": bool(self.started) and set(self.started).issubset(self.closed),
             "counts": fixture_counts(listeners), "usage": "UNKNOWN",
         }
         if exit_code is not None or "_worker_exit" in result:
             row["exit_code"] = result.get("_worker_exit") if exit_code is None else exit_code
+        for name in ("cleanup_status", "phase", "error_type", "native_terminal_kind",
+                     "native_terminal_status", "native_api_error_status",
+                     "native_result_is_error", "native_terminal_reason"):
+            if name in result:
+                row[name] = result[name]
         self.observations.append(row)
         self.assertEqual(row["native_children_alive"], 0, "fixture native child remains alive")
         return row
 
-    def assert_armed(self, row):
+    def assert_routed(self, row):
         self.assertGreater(row["counts"]["first"]["model_post"], 0, "no model-shaped fixture POST observed")
         self.assertEqual(row["counts"]["second"]["total"], 0, "second listener was reached")
         self.assertEqual(row["counts"]["proxy"]["total"], 0, "proxy listener was reached")
+
+    def assert_completed(self, row):
+        self.assertEqual(row["status"], "completed", "normal cell did not complete")
+        self.assertEqual(row["exit_code"], 0, "normal cell exited nonzero")
+        self.assertTrue(row["cleanup_settled"], "native cleanup did not settle")
+        self.assertEqual(row["native_children_alive"], 0)
+        if row["client"] == "codex":
+            self.assertEqual(row["cleanup_status"], "closed")
+            self.assertEqual(row["native_terminal_kind"], "TurnCompleted")
+            self.assertEqual(row["native_terminal_status"], "completed")
+        else:
+            self.assertEqual(row["native_terminal_kind"], "ResultMessage")
+            self.assertIs(row["native_result_is_error"], False)
+
+    def assert_armed(self, row):
+        self.assert_routed(row)
+        self.assert_completed(row)
+
+    def assert_redirect_refused(self, row):
+        self.assert_routed(row)
+        self.assertGreater(row["counts"]["first"]["served_307"], 0, "no 307 was served")
+        self.assertTrue(row["cleanup_settled"], "native cleanup did not settle")
+        self.assertEqual(row["native_children_alive"], 0)
+        self.assertEqual(row.get("native_api_error_status"), 307,
+                         "typed native result did not identify HTTP307")
+        if row["client"] == "codex":
+            self.assertEqual(row["status"], "failed")
+            self.assertEqual(row["exit_code"], 2)
+            self.assertEqual(row["cleanup_status"], "closed")
+            self.assertEqual(row.get("phase"), "turn_run")
+            self.assertEqual(row.get("error_type"), "RuntimeError")
+            self.assertEqual(row.get("native_terminal_kind"), "TurnCompleted")
+            self.assertEqual(row.get("native_terminal_status"), "failed")
+        else:
+            self.assertEqual(row["status"], "native_error")
+            self.assertEqual(row["exit_code"], 1)
+            self.assertEqual(row.get("native_terminal_kind"), "ResultMessage")
+            self.assertIs(row.get("native_result_is_error"), True)
+            self.assertIn(row.get("native_terminal_reason"), (None, "completed"))
 
     def test_redirect(self):
         with CountingFixture("second", model=self.worker.DEFAULT_MODEL) as second, \
@@ -324,7 +445,7 @@ class NativeTransportCells(unittest.TestCase):
             with self.observe_native_children():
                 result = self.invoke(first.url)
             row = self.observe("armed-307", result, (first, second, proxy))
-            self.assert_armed(row)
+            self.assert_redirect_refused(row)
             # curl's documented -L control proves both counters respond to a
             # POST-preserving 307 follow; it is not SDK/provider acceptance.
             before_first, before_second = len(first.rows), len(second.rows)
@@ -353,6 +474,7 @@ class NativeTransportCells(unittest.TestCase):
             with self.observe_native_children():
                 result = self.invoke(first.url, remove_proxy_guard=True)
             row = self.observe("no-proxy-guard-control", result, (first, second, proxy))
+            self.assert_completed(row)
             self.assertGreater(row["counts"]["proxy"]["model_post"], 0,
                                "disarmed native proxy guard did not exercise proxy counter")
             self.assertEqual(row["counts"]["second"]["total"], 0)
@@ -407,6 +529,7 @@ class NativeTransportCells(unittest.TestCase):
             with self.observe_native_children():
                 result = self.invoke(first.url, remove_pin=True)
             row = self.observe("settings-pin-removed-control", result, (first, second, proxy))
+            self.assert_completed(row)
             self.assertGreater(row["counts"]["second"]["model_post"], 0,
                                "pin-removed control did not load the fixture user settings")
             self.assertEqual(row["counts"]["first"]["total"], 0)
