@@ -325,3 +325,12 @@ The 25 further modules are the other test modules that name a changed path:
 - Not examined: the user-level text outside the managed blocks, the auto-memory
   index and the skills listing, which are larger parts of the first request than
   the bytes removed here.
+
+## Amendment, 2026-10-07: one trading sentence stays always loaded
+
+The trading lane's custodian asked for it before acknowledging this change. Paper and broker operation, data acquisition and
+trading research mostly run outside the repository's paths (the paper roots and engines under the coordination state, the
+broker gateway on the host), so a path-scoped rule does not load in exactly the sessions that operate paper. The root file's
+"Subtree rules" line therefore says, for every session, that each coordinator unit names the north-star action it serves and
+that trading work of any kind reads `blueprints/us-equities/AGENTS.md` first, wherever it runs. The path-scoped rule stays as
+it is for sessions that do work in the trading paths.

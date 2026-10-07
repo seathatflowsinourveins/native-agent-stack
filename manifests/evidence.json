@@ -4911,8 +4911,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "a250eb45988fe8c92517dd717916f30f7e29c4599c7cae420767f75e5029d4f8",
-      "bytes": 7294
+      "sha256": "beefdeb286ac7bb70e05f70caeaa9b7a2aa81a0212dfdcd69a5bdedc382664be",
+      "bytes": 7499
     },
     {
       "path": "CLAUDE.md",
@@ -17817,8 +17817,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-instruction-core.md",
-      "sha256": "43c481cef3127d4da3cc2e68883f9dbcc60e89f8473f3cb033fa0c78c1047aaa",
-      "bytes": 23009
+      "sha256": "10414a1ba8463c1fbc8902c98bd0ba39bebd25749f38cfa67c24d6fb02b0029a",
+      "bytes": 23755
     },
     {
       "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
