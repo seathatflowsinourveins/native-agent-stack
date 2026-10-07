@@ -16872,8 +16872,8 @@
     },
     {
       "path": "catalogs/us-equities/models.json",
-      "sha256": "1d27c65593ab6dc8a0d13de36f5a51298c9ff34afcbaf00b5627731367207f38",
-      "bytes": 35274
+      "sha256": "647ec2cd735b8ea1c9a50dd7ececd99d12462091d2f3ea334aab538436ee0631",
+      "bytes": 39440
     },
     {
       "path": "catalogs/us-equities/models.md",
