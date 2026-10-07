@@ -46,6 +46,28 @@ recovery remains the CLI startup operation; target
 retains it. Source compatibility is not an executed restore or retrieval
 qualification: those gates remain required after ACK.
 
+## Pending recovery verification
+
+The patch-version compatibility contract does not close these limits:
+
+- **PENDING: storage-format and WAL differences.** Retain a review of the
+  pinned [1.19.1-to-1.19.2 source comparison](https://github.com/qdrant/qdrant/compare/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de...016542aa5deb6c66380bb137badf73d54f742bde)
+  and the [1.19.2 release notes](https://github.com/qdrant/qdrant/releases/tag/v1.19.2).
+  The review must address storage-format changes, WAL/flush ordering and
+  recovery behavior relevant to this snapshot route, with file/line
+  citations and an explicit compatibility conclusion before execution ACK.
+  A supported snapshot route is not permission to open the target's state
+  in place with the older binary.
+- **PENDING: interrupted recovery and a second invocation.** Close this with
+  retained review of the pinned
+  [target recovery failure paths](https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/src/snapshots.rs#L145)
+  and relevant unchanged upstream tests, or a CC-authorized isolated
+  rehearsal using supported Qdrant commands. Retain the exact inputs,
+  interruption point, returned state and inventory checks. Label upstream
+  test evidence and local rehearsal evidence separately; neither is a host
+  restore receipt. The ordinary successful-start sequence below does not
+  establish safe replay into a partially recovered target.
+
 ## Preserve the whole owned store
 
 Use the supported **full-storage snapshot** for a standalone store.
@@ -113,6 +135,15 @@ Omit `--force-snapshot`. A first-start systemd drop-in clears inherited
 ExecStart=
 ExecStart=/ABSOLUTE/STACK_HOME/tools/qdrant-1.19.2/qdrant --config-path /ABSOLUTE/CONFIG/qdrant.yaml --disable-telemetry --storage-snapshot /ABSOLUTE/SNAPSHOTS/verified.snapshot
 ```
+
+If recovery fails or is interrupted, stop and disable the owned native unit
+using the rollback entry below, and preserve the partial target, snapshot
+and returned failure evidence. Do not start that partial target ordinarily,
+retry recovery into it or add `--force-snapshot` as a workaround. Return to
+the preserved source with its rollback checks; any subsequently authorized
+restore attempt uses new, empty, separately owned target state. The pending
+failure-path limit above must be resolved before allowing any other retry
+policy.
 
 Wait for native HTTP readiness and the complete restored collection/alias
 inventory before treating recovery as complete. A Type=simple unit being
@@ -183,20 +214,50 @@ other owners, or use cross-process SIGTERM as a presumed batch checkpoint.
 Keep these controls throughout the quiesced snapshot/restore and validation.
 Production-client startup policy remains the client's owner's decision.
 
-Before new native writes, rollback stops the native unit and restarts the
-preserved owned rootless container on its original port. After new writes,
-including integration metadata, the old volume is stale: re-quiesce every
-writer, preserve a fresh native full snapshot and restore into a **separate
-fresh rootless rollback volume** with a compatible release and one-time
-recovery discipline. Keep writers quiesced through restore and revalidation.
-Retain both stores until their owner retires them. Do not assume a 1.19.2
-snapshot restores into 1.19.1.
+Keep every writer quiesced for either rollback branch. If the native target
+has received new writes, including integration metadata, preserve and verify
+a fresh native full snapshot while its endpoint is still available; record
+the current inventory and known-answer expectation for that snapshot. The
+old source volume is then stale. If a fresh snapshot cannot be verified,
+preserve both stores, report the gap and keep writers quiesced; do not
+restore service from the stale volume.
+
+At entry to **either** rollback branch, persistently disable and stop the
+native unit before restoring the original service arrangement:
+
+```sh
+systemctl --user disable --now native-stack-qdrant.service
+systemctl --user show native-stack-qdrant.service -p ActiveState -p UnitFileState
+```
+
+Retain both commands' exit codes and returned output. Require successful
+disablement and an explicit read-back of `ActiveState=inactive` and
+`UnitFileState=disabled` before starting a rollback service. A stopped but
+enabled unit could reopen the abandoned store when the user manager starts.
+
+- **Before new native writes:** restart the preserved owned rootless
+  container on its original port and preserved volume.
+- **After new native writes:** restore the verified fresh snapshot into a
+  **separate fresh rootless rollback volume**, with a compatible release and
+  one-time recovery discipline. Do not assume a 1.19.2 snapshot restores
+  into 1.19.1, or start the stale original volume as the current source.
+
+For either branch, require rollback-service HTTP readiness, the recorded
+complete collection/alias inventory, vector configurations and point counts,
+and the same actual known-answer retrieval check before releasing writers.
+Compare against the quiesced original source before new writes, or against
+the fresh native snapshot's recorded inventory and oracle after new writes.
+Keep writers quiesced through restore and revalidation. Retain the preserved
+source, partial target if any, and rollback stores until their owner retires
+them.
 
 Sources: [snapshot compatibility](https://qdrant.tech/documentation/operations/snapshots/),
 [SocratiCode@f6191f0 watcher modes](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/watcher.ts#L593),
 [startup off control](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/startup.ts#L56),
 [startup incremental update](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/startup.ts#L299),
 [pre-scan metadata write](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/indexer.ts#L1657),
+[systemctl disable, --now and property read-back](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html),
+[user-manager default target](https://www.freedesktop.org/software/systemd/man/latest/systemd.special.html#default.target1),
 [canonical user-unit example](../examples/native-stack-qdrant.service.example).
 
 ## Organic use is a separate gate
