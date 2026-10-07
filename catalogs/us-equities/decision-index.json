@@ -407,16 +407,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 875,
+    "repositories": 876,
     "public_star_repositories": 357,
-    "beyond_public_stars": 518,
-    "references": 2054,
+    "beyond_public_stars": 519,
+    "references": 2056,
     "repositories_by_record_type": {
       "catalog_card": 148,
-      "component_record": 69,
+      "component_record": 70,
       "legacy_candidate": 34,
       "public_star": 357,
-      "research_supplement": 581,
+      "research_supplement": 582,
       "star_review": 357
     }
   },
@@ -8994,6 +8994,29 @@
           "path": "manifests/stack.json",
           "pointer": "/components/38",
           "id": "loki"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/grafana/mcp-grafana",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/13",
+          "disposition": "selected"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/69",
+          "id": "mcp-grafana"
         }
       ]
     },
