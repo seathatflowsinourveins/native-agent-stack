@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "kind": "dated_interim_completion_plan_bindings",
+  "recorded_at_utc": "2026-10-07T07:59:19Z",
+  "authority": {
+    "item": "review-ns2604-coop-20261007T072919Z",
+    "sha256": "6b0bde35825d0dbba8d55f1238cb0628621974eb41cb56b1f143580e7c3858e8",
+    "scope": "interim dated plans, not a duplicate essential profile"
+  },
+  "membership": "Original memory plus eleven token interim rows; ccusage and statusline are outside this set.",
+  "review_no_later_than_utc": "2026-10-08T04:00:00Z",
+  "completion_dates": "Not committed by these sources; keep unknown/pending rather than manufacture a delivery date.",
+  "rules": "Upstream evidence and clean release integration first; retained requested smokes are not organic. Eligible native use closes as observed; after a real working day an appropriately measured zero or CC dated exclusion is available. No local campaign gates the row.",
+  "rows": [
+    {
+      "slot": "durable-memory/memory-owner",
+      "owner": "memory-h2h / CC",
+      "plan_date": "2026-10-06",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/memory-slot-20261006/keep-ruling-and-smoke-plan.md",
+          "sha256": "61eca2af0cc508f9511b45acbb5ba5153c129fc3b74f212187f815c00e4aea73"
+        },
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/2/rows/1",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        }
+      ],
+      "next_action": "Retain KEEP ai-memory/Nemotron; document native ordinary-use and safe recovery evidence. Upstream re-drive follows the retained trigger, not a local comparison campaign.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/context-supply",
+      "owner": "overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/4/rows/1",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        }
+      ],
+      "next_action": "Bind matching upstream/install and retained consuming-client smoke; record eligible native counters or the ruled disposition without repeating the smoke.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/command-output",
+      "owner": "overlap-token / codex-token-parity",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/4/rows/3",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        },
+        {
+          "locator": "coordination:ns2604-coop/lanes/overlap-token-durable/tool-wiring-20261007/rtk-audit-dry-run-20261007.md",
+          "sha256": "5a553a4a397fa926b7f1f27affa09c5ef57f0cc6d17b31abd5e226b4e4e0be50"
+        }
+      ],
+      "next_action": "Qualify actual Codex hook application/firing and bind counters; explicit CLI filtering alone does not prove automatic hook use.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/output-compression",
+      "owner": "overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/lanes/overlap-token-durable/tool-wiring-20261007/headroom-window.md",
+          "sha256": "725b8871cbf52f4eb1d605dae9584378a663e45901952d278a96e790b6ec6d89"
+        }
+      ],
+      "next_action": "CC reviews route-preserving/protection binding, applies the prepared window item, then consuming-client integration and eligible ordinary use are recorded.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/code-index",
+      "owner": "overlap-token / codex-token-parity",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/lanes/overlap-token-durable/tool-wiring-20261007/jcodemunch-window.md",
+          "sha256": "c3c6f306bbbba89a625bc8b92a80fd1870d12f2b631a8566aa4360d1a0da7bc7"
+        }
+      ],
+      "next_action": "Finish the named read-back helper/source binding, actual application and role exposure; retain requested smokes and subsequent native counters separately.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/code-graph",
+      "owner": "overlap-token / memory-h2h",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/memory-slot-20261006/tool-wiring-20261007/window-items-20261007.md#CBM-W1",
+          "sha256": "6c715d56da73e3e5267975b9453b76e78eaf6582ab6a8341f2f29f1607a9d328"
+        }
+      ],
+      "next_action": "Verify the native hook/trust/output integration and graph coverage; repair only a demonstrated gap. Indexing and ordinary task evidence remain separately scoped.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/repo-packing",
+      "owner": "overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/4/rows/4",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        }
+      ],
+      "next_action": "Bind the retained source/smoke and eligible native counters; no new comparison campaign.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/structured-data",
+      "owner": "overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/4/rows/5",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        }
+      ],
+      "next_action": "Bind retained source/smoke evidence and eligible native counters.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/doc-conversion",
+      "owner": "overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/4/rows/6",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        }
+      ],
+      "next_action": "Bind retained source/smoke evidence and eligible native counters.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/api-docs",
+      "owner": "codex-token-parity",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/5/rows/0",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        },
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/REPLAN-BOARD-20261006/api-docs-consumer-addendum-20261007T032132Z.json#/row_delta",
+          "sha256": "6cd67bc4486ca29fbd6d3201399e9806a5bed278fb7bba99c67203ffacb81d1e"
+        }
+      ],
+      "next_action": "Codex-only consumer; preserve the retained chub smoke and measure eligible native use. No Claude leg is invented.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/trace-viewer",
+      "owner": "overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/readiness-20261005/jobs/RUN-LIST-20261006/run-list.json#/b3_by_owner/4/rows/7",
+          "sha256": "676809a15197bfca6de3654e312367a42a89c5c7f08b78c235330f4b6f12443f"
+        }
+      ],
+      "next_action": "Retain the existing operational service/UI-smoke observation and its original interim membership; S4 independently reviews the evidence, without a fresh READY increment.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    },
+    {
+      "slot": "token-efficiency/token-lane-carriers",
+      "owner": "codex-token-parity / overlap-token",
+      "plan_date": "2026-10-07",
+      "sources": [
+        {
+          "locator": "coordination:ns2604-coop/lanes/overlap-token-durable/tool-wiring-20261007/role-carrier-gaps-20261007.json#/role_grants_section",
+          "sha256": "92c77000c08779986ffb1dbc3640577c176094d79215b1964ac494e1013a64fb"
+        }
+      ],
+      "next_action": "Follow the retained carrier plan after #819; actual application, effective role exposure and eligible invocation remain unverified until their own read-back.",
+      "completion_date_utc": null,
+      "evidence_boundary": "Dated plan and pending/source bindings; no new run, installation, usage count, acceptance or state change."
+    }
+  ],
+  "profile_reference": {
+    "carrier": "adoption/manifest.json",
+    "entry": "north-star-rnd",
+    "owner": "grand-catalog",
+    "delivery": "#820 chain after J820-FIX2",
+    "single_base_commit": "e712bae606e8d27f010af8e3c13ded6b7a7c207a",
+    "source_record": "essential-profile-wf_383f6a1e-0cd.json#/profile/base_commit",
+    "source_sha256": "6685923cc99f4457d5c0afa35f0e48cb4295b568709519e2a12ad41bb678ab5c",
+    "publication": "pending; no second essential list created"
+  },
+  "gating_rows_added": 0,
+  "existing_observations_changed": 0
+}

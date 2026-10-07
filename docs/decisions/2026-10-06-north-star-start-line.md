@@ -56,3 +56,67 @@ The [board](../../evidence/artifacts/ns2604-native-bar-20261006/board.json) reco
 
 Publish through the co-op GPT read, CC acknowledgment and 5f queue. Registry and dashboard checkpoint stay in the last commit. Native dashboard generation readback remains a separate CC/co-op step.
 
+## Amendment (2026-10-07): date-certain review and opening unit
+
+This amendment supersedes the conditional start forecast and campaign-based waiting in the earlier sections. Their decided text and historical observations remain intact. The command center's START RULINGS, review-ns2604-coop-20261007T072919Z (SHA256 `6b0bde35825d0dbba8d55f1238cb0628621974eb41cb56b1f143580e7c3858e8`), govern the opening unit and the dated readings below.
+
+### Fixed review and adjudication
+
+The independent S4 review starts **no later than midnight EDT on October 8 (2026-10-08T04:00Z)**, on the same 80-slot board as it stands then. It does not wait for all open original gates to close. Each still-open original gate receives the CC's dated exclusion or removal from the start gate that day; this record adds no gate or regrouping.
+
+The CC adjudicates the start **by October 8, 6:00 PM EDT (2026-10-08T22:00Z)**. Only a **safety finding in the paper-engine path** or a **sign-in that only the owner can perform** may hold adjudication past that deadline. The authority is task-ns2604-coop-20261007T002252Z, point 1. This records a deadline and its two allowed holds, not a completed review or a declaration that R&D has started.
+
+S4 uses upstream evidence and clean upstream installation/configuration, the required integration smoke, and eligible organic client records. No local comparison campaign decides a row. Service, timer, dashboard and UI rows use their required one smoke; requested smokes are not organic counts. The interim completion plans are recorded separately below.
+
+### N1: data integrity, then N2 and N3
+
+The unit opened by adjudication is **N1, the data-integrity unit**, owned by **rnd-r1**, with **5f's custody for trading-lane landings**. It applies Layer 1.5 in [the pinned trading rules](https://github.com/seathatflowsinourveins/native-agent-stack/blob/6e6df2372bf7f11bf5bf5289b8bb71828d601912/blueprints/us-equities/AGENTS.md#L35), landed by #827 at `6e6df2372bf7f11bf5bf5289b8bb71828d601912` (lines 35–46).
+
+1. Inventory what the selected platform repositories already provide for security identity, splits and corporate actions, and delisting and terminal prices. Each inventory entry names its repository/pin and exact source locator, plus the source's limitations. Inspect and use existing upstream features before proposing glue. Subjects include the selected NautilusTrader 2.0.0rc5 catalog/adjustment surfaces, EdgarTools identity maps, alpaca-py corporate actions, Lean map/factor files and an already entitled vendor feed. These are inventory subjects, not availability or acceptance evidence.
+2. Produce the residual glue plan, with a maintained reference for each part and a demonstrated remaining gap. Foundation layers retain their upstream implementation; desk glue is confined to what the upstreams leave open.
+3. Accept the unit through a **historical-data end-to-end backtest using the selected NautilusTrader 2.0.0rc5 on a known-answer set**. No strategy number is cited before that acceptance. The retained split-inversion and no-data research can inform that set; a newly supplied research package is not historical availability evidence.
+
+**N2**, after N1's inventory and its applicable data gates, is the **D1 prospective holdout**, whose validation window opens **2026-10-14**. **N3** is the **catalyst Wave 1 rerun** when its data gates permit it. The SPY `one_stress` mapping remains under its separate mapping condition; it is not the unit this start opens. These are unit definitions and ordering constraints, not new runs or completed data gates.
+
+### One canonical essential profile
+
+The essential profile is one planned **`north-star-rnd` entry in [adoption/manifest.json](../../adoption/manifest.json)**, a task-scoped projection of the finalized catalog. **grand-catalog** writes it on **#820's chain after J820-FIX2**. This record references that carrier; it creates no second essential-tool list and does not claim the entry is already published.
+
+Its **single profile base commit is `e712bae606e8d27f010af8e3c13ded6b7a7c207a`**, resolved from `essential-profile-wf_383f6a1e-0cd.json#/profile/base_commit` (record SHA256 `6685923cc99f4457d5c0afa35f0e48cb4295b568709519e2a12ad41bb678ab5c`). The later trading-rule and START RULINGS references above do not define additional profile bases. The profile is evaluated against N1's task requirements; rnd-r1 supplies their install/smoke state or exact gap, rather than treating catalog inclusion as acceptance.
+
+### Dated readings and exclusions, re-checked at S4
+
+All of these readings are dated **2026-10-07** and re-checked at the fixed S4 review:
+
+| Reading or exclusion | Scope and control | Re-check or overturn |
+| --- | --- | --- |
+| N1 execution route | N1's executors are Codex CLI lanes using native sign-in. The gateway is not on N1's execution path and does not hold this start. Cross-family reads retain their established co-op GPT and 5f Claude routes under the dated deviation. | Re-check executor identity and the dated deviation at S4. Plan line 98 resumes for SDK-worker/research-runtime execution from N2 onward and after GW-ROUTE acceptance; this is not a general gateway waiver. |
+| Research process isolation | Network and credential restrictions apply to backtest/data-job processes, not to reading upstream documentation. Before N1's first backtest, rnd-r1 with codex-token-parity names supported installed-client launch arguments and smokes one job: network off for the backtest, scrubbed environment with no broker credential pointer; any data pull is a separate job naming its vendor hosts. | Actual launch/smoke proof is required; no configuration or successful job is asserted here. R&D first-turn exposure must show zero `codex_apps` tools through the native feature setting, or carry a dated exclusion. A disable instruction alone is not exposure proof. |
+| Landing distribution | 5f may land from the retiring distribution until retirement. Every landing requires the CC's individual ledger cue. | A landing without its cue overturns this reading; re-check custody and cue at S4. This lane performs no landing. |
+| Trading output repository | N1 outputs land in this repository under `lane:trading`, with 5f's custody. A later repository move retains its separate gates. | Re-check repository policy and custody at S4; no repository move is performed. |
+| Data entitlement | N1 uses sources already entitled or public. Paid additions remain the owner's decision and must be named. | Re-check every proposed source's entitlement and permitted observation; this is not a blanket purchase or provider-fetch approval. |
+
+Publication of this amendment follows the co-op's exact-head read with CI at that head, the CC's ACK and its slot ahead of the S4 review. It uses the existing #801 and changes no other PR. No early rebase, host action, native smoke, model/provider run or measured readiness promotion follows from this documentary amendment.
+
+#801's existing dependency on #791 is retained. The co-op's landing cue must reconcile that parent and T10's record-publication dependencies; this amendment does not authorize unstacking or changing queued #791.
+
+## Amendment (2026-10-07): dated interim completion bindings
+
+The original memory-plus-eleven-token interim membership remains. The [dated completion-plan bindings](../../evidence/artifacts/ns2604-start-line-20261007/interim-plans.json) name each existing source locator, source digest, accountable owner and next action. They are plans to finish alongside R&D, not completion evidence or an invented delivery date. ccusage and statusline remain outside this interim set. Re-check each plan at the fixed S4 review.
+
+| Interim slot | Accountable completion lane | Plan date |
+| --- | --- | --- |
+| `durable-memory/memory-owner` | memory-h2h / CC | 2026-10-06 |
+| `token-efficiency/context-supply` | overlap-token | 2026-10-07 |
+| `token-efficiency/command-output` | overlap-token / codex-token-parity | 2026-10-07 |
+| `token-efficiency/output-compression` | overlap-token | 2026-10-07 |
+| `token-efficiency/code-index` | overlap-token / codex-token-parity | 2026-10-07 |
+| `token-efficiency/code-graph` | overlap-token / memory-h2h | 2026-10-07 |
+| `token-efficiency/repo-packing` | overlap-token | 2026-10-07 |
+| `token-efficiency/structured-data` | overlap-token | 2026-10-07 |
+| `token-efficiency/doc-conversion` | overlap-token | 2026-10-07 |
+| `token-efficiency/api-docs` | codex-token-parity | 2026-10-07 |
+| `token-efficiency/trace-viewer` | overlap-token | 2026-10-07 |
+| `token-efficiency/token-lane-carriers` | codex-token-parity / overlap-token | 2026-10-07 |
+
+The memory plan retains its upstream re-drive trigger; D3r4 steps 8 onward and local token comparison campaigns do not gate the start. Requested integration smokes, eligible native ordinary counters and independently reviewed S4 remain separate evidence classes. The trace-viewer plan preserves its recorded operational service/UI observation; retaining an interim plan is not a new promotion or demotion. These bindings do not duplicate the canonical `north-star-rnd` projection and add no gate.
