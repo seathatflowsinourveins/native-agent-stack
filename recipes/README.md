@@ -325,7 +325,7 @@ ai-memory is the shared durable-memory lane; routine hook observations are not c
 ai-memory init
 ```
 
-Use the relevant fields from [ai-memory-config.toml.example](../examples/ai-memory-config.toml.example) in the default data directory's `config.toml`. The selected semantic-memory profile uses upstream `embedding_provider="local"`: checksum-pinned MiniLM, 384 dimensions, about 87 MiB downloaded once, with inference inside ai-memory. Use `none` for a deliberately FTS-only profile. Leave the LLM provider and reranker unset; literal `llm_provider="none"` is invalid. Historical transcript backfill, assistant capture and session-end LLM consolidation remain disabled. Embedding backfill is separate: an enabled server embeds existing latest pages across its configured store, so inspect that store's scope first. Keep one data directory/config shared by service and native hooks; choosing a different server config alone does not redirect hook fallback storage. See the [qualified memory/RAG workflow](../docs/memory-rag-native-practice.md) for native returns, recovery and interface boundaries.
+Use the relevant fields from [ai-memory-config.toml.example](../examples/ai-memory-config.toml.example) in the default data directory's `config.toml`. Its portable CPU profile uses upstream `embedding_provider="local"`: checksum-pinned MiniLM, 384 dimensions, about 87 MiB downloaded once, with inference inside ai-memory. Use `none` for a deliberately FTS-only profile. That portable example leaves the LLM provider and reranker unset; literal `llm_provider="none"` is invalid. Historical transcript backfill, assistant capture and session-end LLM consolidation are disabled in that example. NativeStack2604's accepted Nemotron profile and enabled SessionEnd consolidation are recorded separately below; the portable example is not its active configuration. Embedding backfill is separate: an enabled server embeds existing latest pages across its configured store, so inspect that store's scope first. Keep one data directory/config shared by service and native hooks; choosing a different server config alone does not redirect hook fallback storage. See the [qualified memory/RAG workflow](../docs/memory-rag-native-practice.md) for native returns, recovery and interface boundaries.
 
 The portable CPU default above remains available. NativeStack2604's accepted
 GPU alternative uses ai-memory2.5.2's supported prefix keys and the already
@@ -343,12 +343,25 @@ embedding_document_prefix = "passage: "
 embedding_backfill_interval_secs = 900
 ```
 
-See the [2026-10-06 decision and native receipt](../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md)
-for335/335 latest-page coverage, the29-target known-answer comparison,
-prefix proof and the remaining cross-client/environment boundaries. This
-profile follows the October6 upstream KEEP decision for ai-memory; changing
-the separate SocratiCode index requires its own qualification. The [pinned upstream prefix path](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465)
+The [new dated successor record](../docs/decisions/2026-10-07-memory-keep-and-consolidated-recall.md)
+owns the current NativeStack2604 KEEP decision and Hindsight re-drive trigger.
+The unchanged [October6 acceptance record](../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md)
+and [original receipt](../evidence/artifacts/ai-memory-embedder-switch-20261006/receipt.json)
+retain the335/335 acceptance-time coverage,29-target comparison and prefix
+proof. Their older D3r4/evaluation-only gates and MiniLM rollback guidance are
+historical, superseded by the successor; no local selection campaign resumes.
+Historical receipts and decisions are never corrected in place. Changing the
+separate SocratiCode index requires its own qualification. The [pinned upstream prefix path](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465)
 preserves the significant spaces in both strings.
+
+The accepted host also enables the optional upstream OpenAI-compatible
+consolidator on its approved worker route, with SessionEnd consolidation.
+Source: [optional compatible-provider key](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/factory.rs#L79)
+and [SessionEnd enqueue](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-hooks/src/router.rs#L2686).
+The successor separates the failed long-prompt attempt, its one passing
+consolidation rerun, and the CC's later filesystem cleanup. Client wiring and
+cleanup remain operator/CC actions; this recipe is not authorization to apply
+either, and a private accepted configuration is not published here.
 
 For a text-only clean-install trial, explicitly set `embedding_provider="none"`
 or the supported `AI_MEMORY_EMBEDDING_PROVIDER=none` in that owned service's

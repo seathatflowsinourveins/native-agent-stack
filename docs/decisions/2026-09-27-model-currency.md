@@ -528,17 +528,3 @@ they describe the September 27 state. The
 also points forward and retains its old quote through this record's unchanged line 132. Keeping Fable was the previous
 selection; Opus replaces it at the user's request, with post-change savings and quality still unmeasured. Revisit the
 selection through the October 4 record's observation contract or a subsequent user decision.
-
-## Addendum (2026-10-06): ai-memory prefix support and accepted 8B route
-
-The September 27 hold above describes ai-memory v2.4.1 and remains a dated
-decision. Prefix keys shipped in v2.5.0 and are wired in v2.5.2, commit
-`7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83`:
-[v2.5.0 config.rs:489](https://github.com/akitaonrails/ai-memory/blob/v2.5.0/crates/ai-memory-cli/src/config.rs#L489),
-[v2.5.2 config.rs:461](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L461),
-and [prefix application at embedding.rs:465](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465).
-NativeStack2604's supported 8B integration is now
-[accepted with its native receipt and dated boundaries](2026-10-06-ai-memory-nemotron-embedder.md).
-The 1B model requires separate qualification. The October 6 command-center
-KEEP ruling and upstream re-drive trigger supersede the earlier memory
-selection gates; they do not turn this dated hold into a new measurement.
