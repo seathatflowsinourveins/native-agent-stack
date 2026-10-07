@@ -1,5 +1,6 @@
 """Local renderer contract fixtures; native Grafana/Loki read-back stays separate."""
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 
@@ -56,6 +57,29 @@ class J775PanelContracts(unittest.TestCase):
         self.assertIn('shell_rtk=~"true|false"', expression)
         self.assertIn('> 0', expression)
         self.assertNotIn('vector(0)', expression)
+
+    def test_superseded_prometheus_drop_in_has_no_active_exec_start(self):
+        example = (ROOT / 'observability/collector/ns2604-prometheus-start-timestamps.conf.example').read_text()
+        first_line = example.splitlines()[0]
+        self.assertIn('SUPERSEDED on 2026-10-07', first_line)
+        self.assertIn('DO NOT APPLY', first_line)
+        self.assertNotRegex(example, r'(?m)^\s*ExecStart\s*=')
+        self.assertIn('\n# ExecStart=\n', example)
+        self.assertIn('# ExecStart=%h/.local/bin/prometheus ', example)
+
+    def test_rendered_prometheus_unit_retains_both_required_features(self):
+        plan = json.loads((ROOT / 'evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json').read_text())
+        rows = [row for row in plan['owners'] if row['slot'] == 'prometheus']
+        self.assertEqual(1, len(rows))
+        service = rows[0]['service']
+        for feature in ('created-timestamp-zero-ingestion', 'promql-extended-range-selectors'):
+            with self.subTest(feature=feature):
+                self.assertIn(feature, service['enable_features'])
+        self.assertEqual('$config_root/ns2604-prometheus.service', service['rendered_unit'])
+        proposal = service['startup_proposal']
+        self.assertIn('Superseded on 2026-10-07', proposal['status'])
+        self.assertTrue(proposal['apply_gate'].startswith('none;'))
+        self.assertIn('rendered ns2604-prometheus.service', proposal['readback_gate'])
 
 
 if __name__ == '__main__':

@@ -125,7 +125,7 @@ processors:
           - attributes["event.name"] == "ecosystem.sdk_receipt"
         statements:
           # SDK receipts carry none of these names, nor a Codex call id; the shared allowlist must not let a receipt file add them.
-          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id|call_id)$")
+          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id|call_id|source|hook_name|hook\\.event_name|hook_event|hook_source|num_hooks|num_success|num_blocking|num_non_blocking_error|num_cancelled|total_duration_ms|tool_source|server_name|transport_type|error_code|trigger|pre_tokens|post_tokens)$")
       - context: log
         statements:
           # First-party Codex desktop clients are named "Codex <App>" (codex-rs login default_client.rs
@@ -340,10 +340,10 @@ processors:
           # Dropping an attribute that splits one writer's streams (agent.name, skill.name, mcp_server.name, decision,
           # phase, ...) must add those streams together; keep_keys alone leaves same-identity duplicates that
           # overwrite each other (cumulative) or are dropped as out of order (delta). Same allowlist as below.
-          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "server", "skill", "invoke_type", "plugin_id", "skill.name", "agent.name", "plugin.name", "mcp_server.name", "mcp_tool.name"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "server", "skill", "invoke_type", "plugin_id"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
           # Exact native plural names (otel/src/metrics/names.rs:61-62) and closed typed dimensions
           # (core/src/hook_runtime.rs:985-1029). Preserve them before aggregation as well as below.
-          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id", "skill.name", "agent.name", "plugin.name", "mcp_server.name", "mcp_tool.name"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms")
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id"]) where (metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM) and (metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms")
       - context: datapoint
         statements:
           - set(resource.schema_url, "")
@@ -353,8 +353,8 @@ processors:
           - set(metric.description, "")
           - keep_keys(metric.metadata, [])
           - set(exemplars, nil) where metric.type != METRIC_DATA_TYPE_SUMMARY
-          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "server", "skill", "invoke_type", "plugin_id", "skill.name", "agent.name", "plugin.name", "mcp_server.name", "mcp_tool.name"]) where metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
-          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id", "skill.name", "agent.name", "plugin.name", "mcp_server.name", "mcp_tool.name"]) where metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms"
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "server", "skill", "invoke_type", "plugin_id"]) where metric.name != "codex.hooks.run" and metric.name != "codex.hooks.run.duration_ms"
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id"]) where metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms"
           - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
           - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
   # Level and reason of a clock-offset-check line, from the script's fixed vocabulary; an optional <0-7> syslog prefix

@@ -80,6 +80,9 @@ class CollectorProfileTests(unittest.TestCase):
         # Keep this small configuration regression active without optional deps.
         privacy = COLLECTOR.read_text().split("  transform/privacy:\n", 1)[1]
         logs, metrics = privacy.split("    metric_statements:\n", 1)
+        # Only this processor's metric contexts belong to the metric privacy contract.
+        # Later span/log processors may retain the same correlation keys.
+        metrics = re.split(r"(?m)^  [A-Za-z0-9_./-]+:\s*$", metrics, maxsplit=1)[0]
         resource, records = logs.split("      - context: log\n", 1)
         resource_keys = json.loads(re.search(r"keep_keys\(attributes, (\[.*\])\)", resource)[1])
         log_keys = json.loads(re.search(r"keep_keys\(attributes, (\[.*\])\)", records)[1])

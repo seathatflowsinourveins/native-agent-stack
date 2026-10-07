@@ -281,3 +281,45 @@ assets. Both checks ran at nice 19. These are locally authored integration
 checks, not upstream tests or deployed acceptance. No configuration was applied.
 The README separately classifies all six retained 13000 references and requires
 a compatible emitter checkout while its timer is enabled.
+
+## Amendment (2026-10-07): one Prometheus startup carrier at landing
+
+The co-op's A13 option B, confirmed by command-center item
+`task-ns2604-coop-20261007T115959Z`, makes this PR compatible with A27's landed
+contract at the named landing base `1f65867315b12138e09add6e443f42ad5dcd2274`.
+This records compatibility, not a new feature selection or a host action.
+The current startup carrier is the rendered `ns2604-prometheus.service`, built
+from the plan row's complete `enable_features` list. Both
+`created-timestamp-zero-ingestion` and `promql-extended-range-selectors`, the
+rendered-unit reference, activation owner, native service-health checks and
+main's notes remain intact. Source:
+[A27 renderer at the named base](https://github.com/seathatflowsinourveins/native-agent-stack/blob/1f65867315b12138e09add6e443f42ad5dcd2274/evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py#L175).
+
+The earlier `startup_proposal` and its example are dated, superseded records.
+Their original argument text and the 2026-10-06 native read-back observation
+remain unchanged. The proposal has no apply gate, and both example `ExecStart`
+lines are commented beneath an explicit DO NOT APPLY notice. Its remaining
+read-back gate now refers to the rendered unit. An aligned, current drop-in
+was the alternative; A13 rejected it because it would create a second startup
+definition to keep synchronized with the authoritative template.
+
+One recorded difference remains visible to the activation owner: the earlier
+live `ExecStart` included `--web.enable-otlp-receiver`, whereas
+[main's rendered-unit template](https://github.com/seathatflowsinourveins/native-agent-stack/blob/1f65867315b12138e09add6e443f42ad5dcd2274/evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-prometheus.service.example#L15)
+omits it. No flag is restored by this amendment. In A13 the co-op reported a
+read-only native API observation at approximately 11:52Z on 2026-10-07: the flag
+was on and `prometheus_http_requests_total` for `/api/v1/otlp/v1/metrics` showed
+0 requests over 22.07 hours of uptime. The command center separately reported
+0 requests over 22.19 hours at 11:59:45Z, with the collector/native scrape jobs
+UP and no known writer. These are attributed reports, not probes by this lane
+or proof that a future writer cannot exist. The plan's collector metrics use
+its Prometheus exporter and scrape jobs rather than this OTLP endpoint:
+[collector exporter/pipelines](https://github.com/seathatflowsinourveins/native-agent-stack/blob/1f65867315b12138e09add6e443f42ad5dcd2274/evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml#L270)
+and [native scrape jobs](https://github.com/seathatflowsinourveins/native-agent-stack/blob/1f65867315b12138e09add6e443f42ad5dcd2274/evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml#L17).
+
+Activation remains a separate command-center host-window step, with read-back
+of both features and the scrape jobs, and an inverse. Created-timestamp
+negotiation and newly born single-turn reconciliation follow activation; they
+are not landing gates. Lower-bound token qualifications remain until that
+acceptance passes. Native evidence of an OTLP writer is a compatibility issue
+for the activation owner, not permission to reactivate the superseded drop-in.

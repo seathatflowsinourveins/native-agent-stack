@@ -513,9 +513,8 @@ class NativeCollectorTests(unittest.TestCase):
         time.sleep(2)
         exported = self.scrape(self.exporter)
         claude_points = list(samples(exported, "ecosystem_claude_code_token_usage_tokens_total"))
-        self.assertEqual(len(claude_points), 3)
-        self.assertEqual({labels["agent_name"] for labels, _ in claude_points},
-                         {"workflow-subagent", "general-purpose"})
+        self.assertEqual(len(claude_points), 2)
+        self.assertTrue(all("agent_name" not in labels for labels, _ in claude_points))
         claude = {}
         for labels, value in claude_points:
             claude[labels["instance"]] = claude.get(labels["instance"], 0.0) + float(value)
