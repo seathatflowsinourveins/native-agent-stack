@@ -1912,6 +1912,8 @@ class GatewayRoutingTests(unittest.TestCase):
         commands = (("gateway-check", str(self.work)),
                     ("--work-dir", str(self.work), "start", "refused", str(self.prompt), str(self.schema)),
                     ("--work-dir", str(self.work), "run", "refused"))
+        before = {path.relative_to(self.work): path.read_bytes() if path.is_file() else None
+                  for path in self.work.rglob("*")}
         with self.fixture_record(), \
                 mock.patch.object(codex_job.subprocess, "Popen", side_effect=AssertionError("a guard spawned")) as spawn, \
                 mock.patch.object(codex_job, "probe_gateway", side_effect=AssertionError("a guard probed")) as probe:
@@ -1919,6 +1921,8 @@ class GatewayRoutingTests(unittest.TestCase):
                 with self.subTest(argv=argv), contextlib.redirect_stderr(io.StringIO()) as error:
                     self.assertEqual(codex_job.main(list(argv)), 2)
                     self.assertIn("gateway refused:", error.getvalue())
+                    self.assertEqual({path.relative_to(self.work): path.read_bytes() if path.is_file() else None
+                                      for path in self.work.rglob("*")}, before)
             spawn.assert_not_called()
             probe.assert_not_called()
 
@@ -2375,28 +2379,79 @@ class OmniRouteLaneRunnerTests(RunnerCase):
     def test_primary_gateway_changed_between_binding_and_detached_launch_is_refused(self):
         self.lane()
         staged = json.loads((self.work / "staged.json").read_text())["codex"]
-        self.settings({**staged, "api_key_placeholder": "local-loopback"})
-        replacement_gateway = self.gateway_listener()
-        launches = []
+        for change, replacement_gateway in (("changed", self.gateway_listener()),
+                                            ("invalid", "invalid-gateway-endpoint")):
+            with self.subTest(change=change):
+                self.settings({**staged, "api_key_placeholder": "local-loopback"})
+                job = "primary-race-" + change
+                directory = self.work / "gpt6" / job
+                directory.mkdir(parents=True)
+                previous_prompt = b"Retained previous prompt.\n"
+                schema_bytes = self.schema.read_bytes()
+                previous_inputs = codex_job.job_inputs(
+                    previous_prompt, schema_bytes, "cx/gpt-6-astra", "omniroute",
+                    gateway={"endpoint": self.gateway_endpoint, "source": "unrecorded",
+                             "reason": FIXTURE_GATEWAY_REASON})
+                previous = {"prompt.txt": previous_prompt, "schema.json": schema_bytes,
+                            "inputs.json": (json.dumps(previous_inputs, sort_keys=True) + "\n").encode(),
+                            "events.jsonl": (json.dumps(COMPLETED) + "\n").encode(),
+                            "last.json": (json.dumps(LAST) + "\n").encode(), "exit": b"0\n", "done": b""}
+                for name, data in previous.items():
+                    (directory / name).write_bytes(data)
+                older = directory / "attempts" / "1"
+                older.mkdir(parents=True)
+                (older / "stderr.txt").write_bytes(b"retained older refusal\n")
+                (older / "exit").write_bytes(b"2\n")
+                launches = []
+                bound_bytes = {}
+                archived_bytes = {}
 
-        def launch(argv, **kwargs):
-            launches.append(argv)
-            self.assertEqual(len(launches), 1, "a model process launched after the gateway input changed")
-            self.settings({**staged, "api_key_placeholder": "local-loopback", "base_url": replacement_gateway})
-            inherited = os.dup(kwargs["pass_fds"][0])
-            with mock.patch.dict(os.environ, {**kwargs["env"], "SWEEP_JOB_LOCK_FD": str(inherited)}):
-                self.assertEqual(codex_job.run(self.work, "primary-race"), 2)
-            return mock.Mock()
+                def launch(argv, **kwargs):
+                    launches.append(argv)
+                    self.assertEqual(len(launches), 1, "a model process launched after the gateway input changed")
+                    bound_bytes.update({name: (directory / name).read_bytes()
+                                        for name in ("inputs.json", "prompt.txt", "schema.json")})
+                    archived_bytes.update({path.relative_to(directory): path.read_bytes()
+                                           for path in (directory / "attempts").rglob("*") if path.is_file()})
+                    self.settings({**staged, "api_key_placeholder": "local-loopback",
+                                   "base_url": replacement_gateway})
+                    inherited = os.dup(kwargs["pass_fds"][0])
+                    with mock.patch.dict(os.environ, {**kwargs["env"], "SWEEP_JOB_LOCK_FD": str(inherited)}):
+                        self.assertEqual(codex_job.run(self.work, job), 2)
+                    return mock.Mock()
 
-        with mock.patch.dict(os.environ, self.env), \
-                mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch), \
-                mock.patch.object(codex_job, "probe_gateway", side_effect=AssertionError("mismatched inputs probed")):
-            self.assertEqual(codex_job.start(self.work, "primary-race", str(self.prompt), str(self.schema)), 0)
-        self.assertEqual(len(launches), 1)
-        result = codex_job.result(self.work, "primary-race")
-        self.assertEqual((result["exit"], result["failure"]["kind"]), (2, "inputs_changed"))
-        self.assertEqual(result["inputs"]["gateway"]["endpoint"], self.gateway_endpoint)
-        self.assertFalse((self.bin / "record.json").exists())
+                with mock.patch.dict(os.environ, self.env), \
+                        mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch), \
+                        mock.patch.object(codex_job, "probe_gateway",
+                                          side_effect=AssertionError("mismatched inputs probed")) as probe:
+                    self.assertEqual(codex_job.start(self.work, job, str(self.prompt), str(self.schema)), 0)
+                    probe.assert_not_called()
+                self.assertEqual(len(launches), 1)
+                self.assertFalse(codex_job.running(directory))
+                result = codex_job.result(self.work, job)
+                self.assertEqual((result["status"], result["exit"], result["failure"]["kind"]),
+                                 ("failed", 2, "inputs_changed"))
+                self.assertTrue(result["finished"])
+                self.assertEqual(result["inputs"]["gateway"]["endpoint"], self.gateway_endpoint)
+                waited = io.StringIO()
+                with contextlib.redirect_stdout(waited):
+                    self.assertEqual(codex_job.wait(self.work, job, 0), 0)
+                self.assertEqual(waited.getvalue().strip(), "done exit=2")
+                if change == "invalid":
+                    self.assertIn("invalid-gateway-endpoint", result["stderr_tail"])
+                    self.assertIn("not a gateway endpoint", result["stderr_tail"])
+                self.assertEqual(bound_bytes["prompt.txt"], self.prompt.read_bytes())
+                self.assertEqual(bound_bytes["schema.json"], schema_bytes)
+                self.assertNotEqual(bound_bytes["inputs.json"], previous["inputs.json"])
+                for name, data in bound_bytes.items():
+                    self.assertEqual((directory / name).read_bytes(), data, name)
+                for name, data in previous.items():
+                    self.assertEqual((directory / "attempts" / "2" / name).read_bytes(), data, name)
+                self.assertEqual((older / "stderr.txt").read_bytes(), b"retained older refusal\n")
+                self.assertEqual((older / "exit").read_bytes(), b"2\n")
+                self.assertEqual({path.relative_to(directory): path.read_bytes()
+                                  for path in (directory / "attempts").rglob("*") if path.is_file()}, archived_bytes)
+                self.assertFalse((self.bin / "record.json").exists())
 
     def test_lane_overrides_profile_effort_and_web_search_from_staged_settings(self):
         self.lane()

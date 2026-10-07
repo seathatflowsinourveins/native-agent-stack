@@ -193,3 +193,28 @@ byte-equivalence/control test overturns this transport choice.
 The synthetic and source checks do not establish model or gateway acceptance.
 Publication receives a delta read before the separate native full-input job;
 project-precedence qualification and the later merged-code check remain distinct.
+
+## Amendment (2026-10-07): owned detached gateway refusal accounting
+
+The exact-head source review found that a gateway becoming invalid after
+`start()` bound a fresh snapshot released the inherited lock without a terminal
+receipt. The regression now reproduces that path, distinct from a valid endpoint
+whose changed input identity was already handled. The original source and
+verification record remain retained as the earlier observation.
+
+An owned detached refusal now enters the existing configuration-error terminal
+path: write its refusal cause, finish with exit 2 and `inputs_changed`, then release
+the inherited lock. An initial or hand-run gateway refusal still raises before
+creating a lock or receipt. Bound input bytes and earlier archived attempts are
+unchanged, and neither a gateway probe nor a model process starts.
+
+Source: `native-agent-stack@d466be191f2d6c4026530961a12360e8024843a9:tools/sota-convergence/landscape-sweep/codex_job.py:771-788,1055-1139,1380-1403`
+and the existing race fixture in `tests/test_landscape_sweep_harness.py:2375`.
+The new controlled race and filesystem-preservation checks verify local lifecycle
+accounting, not upstream model or gateway acceptance. A future refusal path that
+loses its terminal record or mutates retained inputs overturns this fix.
+
+The current review direction schedules the separate native complete-input job
+after this repair's push. Its returned output and native usage will be recorded
+separately; source review, fixture passes and a missing hosted validation run do
+not grant command-center acknowledgment or satisfy project-precedence proof.

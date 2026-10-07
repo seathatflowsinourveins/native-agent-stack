@@ -1383,10 +1383,12 @@ def run(base: Path, job: str) -> int:
     config_error = None
     try:
         config = settings(base)
-    except GatewayRefused:
-        if lock_fd >= 0:
-            os.close(lock_fd)
-        raise  # check a hand-run or detached job before creating any lock or receipt
+    except GatewayRefused as error:
+        if lock_fd < 0:
+            raise  # a hand-run refusal creates no lock or receipt
+        # start already owns this inherited lock and has bound the fresh snapshot.
+        # Retain the refusal through the existing inputs_changed terminal path below.
+        config_error = error
     except (UsageError, ValueError, TypeError, OSError) as error:
         config_error = error
     if lock_fd < 0:  # started by hand, not by `start`

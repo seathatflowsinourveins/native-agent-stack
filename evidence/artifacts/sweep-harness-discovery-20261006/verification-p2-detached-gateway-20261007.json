@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "local_integration_verification",
+  "date": "2026-10-07",
+  "supersedes_nothing": true,
+  "extends": "evidence/artifacts/sweep-harness-discovery-20261006/verification-gateway-stdin-20261007.json",
+  "scope": "Owned detached gateway refusal terminal accounting; no native model or gateway acceptance",
+  "source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "pin": "d466be191f2d6c4026530961a12360e8024843a9",
+    "runner_path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+    "reference_lines": "771-788,1055-1139,1380-1403",
+    "fixture_path": "tests/test_landscape_sweep_harness.py",
+    "fixture_line": 2375
+  },
+  "changed_sources": [
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "sha256": "7b275d6cf1d93fa0b09a4f29970492c29da05eaa86c2562d7c1e5e649356ebcd"
+    },
+    {
+      "path": "tests/test_landscape_sweep_harness.py",
+      "sha256": "20efb93050ce631b23a8c9541ff0e372f41530c20450aa9647909678635782f9"
+    }
+  ],
+  "phases": [
+    {
+      "name": "before_fix",
+      "command": "python3 -m unittest tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests.test_primary_gateway_changed_between_binding_and_detached_launch_is_refused -q",
+      "exit_code": 1,
+      "tests": 1,
+      "error": "GatewayRefused escapes the owned detached runner; no terminal receipt"
+    },
+    {
+      "name": "focused_after_fix",
+      "command": "python3 -m unittest tests.test_landscape_sweep_harness.OmniRouteLaneRunnerTests tests.test_landscape_sweep_harness.GatewayRoutingTests tests.test_landscape_sweep_harness.GatewayInputBindingTests -q",
+      "exit_code": 0,
+      "tests": 26,
+      "elapsed_seconds": 3.092
+    },
+    {
+      "name": "harness_regression",
+      "command": "python3 -m unittest tests.test_landscape_sweep_harness -q",
+      "exit_code": 0,
+      "tests": 316,
+      "skipped": 3,
+      "elapsed_seconds": 84.363
+    }
+  ],
+  "controls": [
+    "Invalid gateway after fresh input binding ends with exit2/inputs_changed and retained cause before lock release.",
+    "wait and result expose the terminal refusal.",
+    "Bound prompt/schema/input bytes and previous/older archived attempts remain identical.",
+    "No gateway probe or model process starts.",
+    "Initial and hand-run gateway refusals preserve filesystem bytes and create no receipt."
+  ],
+  "source_review": {
+    "verdict": "ACCEPT",
+    "coverage": "Runner excluded and test index stale; exact-source fallback"
+  },
+  "evidence_classes": [
+    "source_review",
+    "synthetic",
+    "local_integration"
+  ],
+  "provider_usage": null,
+  "cost": null,
+  "native_model_acceptance": false,
+  "hosted_ci": "not_run_at_previous_head_dirty_base; landing-turn validation remains required"
+}
