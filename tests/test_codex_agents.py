@@ -58,7 +58,7 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `565338e8060ac5762d3de688e26c80db1e7d6dacde4f38d3f4fe2d7fae32c00a` |",
+    "| `stack-researcher.toml` | `bcce9561bfe2cb8476376b47a9a32cecdd056ec725156027506c54a5ae831627` |",
     "| `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |",
 )
 

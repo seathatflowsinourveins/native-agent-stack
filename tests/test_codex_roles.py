@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 SOURCE = ROOT / "adoption" / "agents" / "codex"
 NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 GOOD_ROWS = {
-    "stack-researcher.toml": "565338e8060ac5762d3de688e26c80db1e7d6dacde4f38d3f4fe2d7fae32c00a",
+    "stack-researcher.toml": "bcce9561bfe2cb8476376b47a9a32cecdd056ec725156027506c54a5ae831627",
     "stack-verifier.toml": "f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3",
 }
 # The worker roles: their own folder and SHA256SUMS, so the carriers' folder keeps exactly the two files the frozen

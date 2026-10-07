@@ -73,3 +73,41 @@ After this PR and its base #803 land, the configuration owner applies the
 ruling's cutover and re-renders installed instruction carriers in its window.
 The owner then reads back the named lexical index and first-turn retrieval
 through both clients. This lane applies nothing on the host.
+
+## 2026-10-07 clarification: kept reranking and current maintenance
+
+The J819 review identified two corrections to the current instruction carriers.
+The original decided text above is retained as the dated source of this
+clarification; its description of reranking as superseded is corrected here.
+Lexical candidate retrieval does not imply a requirement to disable reranking.
+The command-center ruling explicitly keeps BM25, query expansion and reranking
+on the vector-less catalog index (`local-models-rulings-wf_96bbdf83-4f5.json`,
+lines 22 and 34, SHA-256
+`cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a`).
+
+QMD [`v2.8.3`, `src/mcp/server.ts:334-335`](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L334-L335)
+declares `rerank` optional and defaults it to true. A particular request may
+choose `rerank: false`; this is an optional request choice, not a catalog-wide
+policy. Typed lexical searches still select keyword candidates, and meaning-based
+catalog retrieval still uses `codebase_search` with the main checkout's explicit
+`projectPath`. The rule forbidding `qmd embed` and `qmd pull` remains unchanged.
+
+The owner's cutover acceptance retains reranking: the ruling's lines 160 and
+181 require a known-answer query with reranking on, returning its document
+without a "Reranker unavailable" warning. A fresh session of each client must
+read back the lexical index registration and answer that query after the owner
+applies the cutover. This instruction PR neither runs nor claims that acceptance.
+
+Both current `adoption/update.md` refresh workflows now wait for the owner's
+applied and read-back `native-agent-stack-catalog-lex` cutover. They use that
+index for later `update`, `status`, `search` and bounded `get`, and carry no
+embedding or model-pull branch. QMD's embedding notice does not authorize those
+operations. Its [bounded CLI syntax at `v2.8.3`, `README.md:1033-1037`](https://github.com/tobi/qmd/blob/v2.8.3/README.md#L1033-L1037)
+is the source for the maintenance retrieval example.
+
+The [new J819 followup receipt](../../evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819-followup-20261007.json)
+links the prior receipts without rewriting them and retains the original
+decision body's hash. The correction is to current instructions and this
+explicitly requested dated addendum; historical receipts and frozen fixtures
+remain unchanged. The lesson is to verify the complete ruling before treating
+lexical candidate retrieval as a ban on its maintained reranker.

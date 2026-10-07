@@ -143,7 +143,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `565338e8060ac5762d3de688e26c80db1e7d6dacde4f38d3f4fe2d7fae32c00a` |
+| `stack-researcher.toml` | `bcce9561bfe2cb8476376b47a9a32cecdd056ec725156027506c54a5ae831627` |
 | `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |
 
 ### 2026-10-06: SKILL.md read exception
@@ -152,7 +152,7 @@ The current table and carrier checksums include the plain-sed skill-document exc
 
 ### 2026-10-06: Lexical catalog retrieval
 
-The current researcher checksum includes the catalog's lexical QMD route and meaning-based `codebase_search` route with the main checkout's explicit `projectPath`. QMD MCP calls select lexical searches and disable reranking before bounded document retrieval. The seven RTK exceptions and all role grants, models and effort are preserved. The verifier and three worker-role copies have identical bytes to the base. This instruction change applies no client configuration or index; see [the catalog-lane decision](../../docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md).
+The current researcher checksum includes the catalog's lexical QMD route and meaning-based `codebase_search` route with the main checkout's explicit `projectPath`. QMD MCP calls select lexical searches and may optionally disable reranking before bounded document retrieval. The seven RTK exceptions and all role grants, models and effort are preserved. The verifier and three worker-role copies have identical bytes to the base. This instruction change applies no client configuration or index; see [the catalog-lane decision](../../docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md).
 
 ### 2026-10-04: RTK pin guidance amendment
 
