@@ -32,6 +32,18 @@ UUID/status and newly captured historical values are not original availability o
 historical universe membership. Reuse retained anchored runs before refetching;
 new hosts must establish their own permitted observations and acceptance.
 
+Desk data-integrity glue ("Layer 1.5"): foundation layers stay free of custom code.
+The trading desk may close a data-integrity gap, such as a CIK identity map, split
+verification, delisting and terminal-price resolution, or survivorship, with its
+own glue, but only after the upstream features are installed and used first.
+Those features are NautilusTrader's data catalog and adjustment handling,
+EdgarTools' CIK and ticker maps, alpaca-py's corporate-actions endpoint, Lean's
+map and factor files, and the vendor feeds. Build the glue from cited SOTA
+references and the platform repositories, and name each action's source
+(repository and pin, file or paper). It is accepted only by a historical-data
+end-to-end backtest through the upstream engine. Until that backtest passes, no
+strategy number may be cited.
+
 For the catalyst-convergence wave, read `blueprints/us-equities/catalyst-convergence/README.md`
 and its plan on demand. The frozen daily/intraday protocol is in
 `blueprints/us-equities/catalyst-experiment/protocol.json`; lifecycle evidence is in
