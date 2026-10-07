@@ -2003,6 +2003,648 @@
           "exp_alerts": []
         }
       ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2 FAILURE-CLEARED NEGATIVE: unknown remains unknown/firing through12m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"unknown\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "30s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "6m",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2 FAILURE-CLEARED NEGATIVE: cached inactive then newer unknown remains unknown/firing through12m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x39 1 _x39"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"unknown\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x40 1x39"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "630s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "645s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "630s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "645s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2 FAILURE-CLEARED NEGATIVE: empty remains unknown/firing through12m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "30s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "6m",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2 FAILURE-CLEARED NEGATIVE: cached inactive then newer empty remains unknown/firing through12m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x39 1 _x39"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x40 1x39"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "630s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "645s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "630s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "645s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2 FAILURE-CLEARED NEGATIVE: foreign remains unknown/firing through12m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"foreign\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "30s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "6m",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2 FAILURE-CLEARED NEGATIVE: cached inactive then newer foreign remains unknown/firing through12m",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x39 1 _x39"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"foreign\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "_x40 1x39"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "630s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "645s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "12m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-drill-w2.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "630s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "645s",
+          "exp_samples": []
+        },
+        {
+          "expr": "ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"}",
+          "eval_time": "12m",
+          "exp_samples": []
+        }
+      ]
     }
   ]
 }
