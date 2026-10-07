@@ -16918,8 +16918,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "12baac774b50380c6efed35cdab7bde4568ec269083fb9961f1434e402bad6db",
-      "bytes": 48542
+      "sha256": "2129a38ad372062886dbb10beda2a1a537e5f0c61d6019097395e2405618701f",
+      "bytes": 48925
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
@@ -16978,8 +16978,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "120b310705edb5d6fcdc6cb4a2d11751b59b5b1d62a126c188ee9eb0a4a8fb23",
-      "bytes": 57933
+      "sha256": "bdf09820c6aa2faa590a52e1832ed87d2812989a54b4e244b45464fe74ba00c1",
+      "bytes": 58875
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -17353,8 +17353,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md",
-      "sha256": "1bef4907ddefc0c5e342f158841bd3666404116f8742fc0342620540e1d3dce0",
-      "bytes": 9489
+      "sha256": "94403ab99f6d136444f6b756ab0ccd1395f005bfc370f039df026905a436c525",
+      "bytes": 14661
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
@@ -17493,8 +17493,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "b987653d73b7d246b3e3b358279a604a67932bce07965e60112dda5c8079ad4b",
-      "bytes": 227963
+      "sha256": "4ec23da1ad8754880916812f0dcf549b564c749d504fb089f906d7d3aa85a217",
+      "bytes": 229422
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -17543,8 +17543,8 @@
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
-      "sha256": "656958c2f7a373052514a8929e880ef7fa933d4e09838e6b90868704f6f73804",
-      "bytes": 13119
+      "sha256": "254f18336a6520f19b35a235c60d177e0ae2e6fa709308fb61e0cf7dce6ddf8f",
+      "bytes": 16368
     },
     {
       "path": "docs/memory-rag-native-practice.md",
@@ -18163,8 +18163,8 @@
     },
     {
       "path": "evidence/artifacts/ai-memory-embedder-switch-20261006/README.md",
-      "sha256": "8b2e9a8247741bfb18fe843a8cbfdc08f7b8240630b455e390796e360d917692",
-      "bytes": 2018
+      "sha256": "952e2ede650d2db40afcdbe67864fc914efc72637e8b8b65ea8729558b688f24",
+      "bytes": 3130
     },
     {
       "path": "evidence/artifacts/ai-memory-embedder-switch-20261006/SHA256SUMS",
@@ -53308,8 +53308,8 @@
     },
     {
       "path": "examples/ai-memory-project.toml.example",
-      "sha256": "c4f33e8ca3630777b6c2326c41df46f2b901d8b72276a0863373ee0d7a94967f",
-      "bytes": 207
+      "sha256": "3be4adde4d0c70cced153dd3b7be1b00071b775b219323cb4b765e1913a4fff4",
+      "bytes": 294
     },
     {
       "path": "examples/claude-mcp.json.example",
@@ -54073,8 +54073,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "d756cf8aa3ebd3fa5f79e8cd5f056c951b91236de9b07e741baef5bac671a998",
-      "bytes": 130161
+      "sha256": "c7121d22359791dcf4be48300179cdefd08b28c9cff0857011a801df8c1efb34",
+      "bytes": 130903
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
