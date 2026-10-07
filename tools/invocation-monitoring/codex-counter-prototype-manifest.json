@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "codex-counter-prototype-source-20261007",
+  "kind": "source_snapshot",
+  "evidence_class": "source_review",
+  "status": "pinned_prototype_unqualified",
+  "files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "d44d5ea4dcb9cf3c69f606fc25aba847084d593597025f853d76d67528d46eec"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "519e9f54bc9e0c901aae97865abbb62c9516a0537337c968068a484f91e5ac5a"
+    }
+  ],
+  "pin_semantics": "The commit containing these files and this manifest pins their bytes. Source worktree head alone did not pin the formerly untracked files.",
+  "source_observation": {
+    "source_worktree_branch": "codex/ns2604-codex-counter-20261006",
+    "source_worktree_head": "425a3784fa50c2f1fe6b4dadaf4333908ee7eb4f",
+    "files_were_untracked": true,
+    "source_worktree_modified": false
+  },
+  "historical_binding": {
+    "manifest_ref": "coordination:ns2604-coop/lanes/overlap-token-durable/codex-counter-v2/manifest.json",
+    "fixture_ref": "coordination:ns2604-coop/lanes/overlap-token-durable/codex-counter-v2/fixture-result.json",
+    "fixture_artifact_sha256": "d2863450b1f5b5c61b5a8ac765e1bf5e2d8ab226dd1c2f58d1f4a8e86528484f",
+    "counter_sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
+    "test_sha256": "1c88c483bf50c4b12658aa43fec806060c557dda1215178c3e2dff1feb75a86e",
+    "evidence_class": "synthetic",
+    "applies_to_current_files": false,
+    "rule": "Keep the original manifest/fixture bytes and outcomes historical; do not reattribute their old hashes or result to this snapshot."
+  },
+  "qualification": {
+    "requested_classifier": "pending",
+    "smoke_classifier": "pending",
+    "general_first_turn_exclusion": "pending",
+    "named_turn_commands_and_skills_and_mcp": "pending",
+    "all_native_tool_identity_dedup": "pending",
+    "fixture_proofs": "pending",
+    "native_counts": "not_qualified",
+    "adoption_synthesis": "pending_source"
+  },
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "a40a083172af588f4b97646db87dfc8ef3c0b60e",
+      "path": "tools/skill-usage/skill_usage.py",
+      "lines": "775-781,921-934,1314-1342"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "a40a083172af588f4b97646db87dfc8ef3c0b60e",
+      "path": "examples/claude-native/workflows/child-usage.mjs",
+      "lines": "2854-2878"
+    }
+  ],
+  "limitations": [
+    "Source pin only, not the completed OptionB oracle, upstream acceptance, organic observation or adopted result.",
+    "Prototype raw/provisional classifications remain unqualified until all five control groups have meaningful fixtures and the relevant actual native proof.",
+    "No raw transcripts, native IDs, credentials, active configuration or historical observed values copied into this manifest."
+  ],
+  "dependencies": [
+    {
+      "path": "tools/skill-usage/skill_usage.py",
+      "source_commit": "a40a083172af588f4b97646db87dfc8ef3c0b60e",
+      "sha256": "d8f37f929fc9f7fc170b6ac794c9e23d84c4a7e70f6328e565f3d9ac9595b65b"
+    },
+    {
+      "path": "examples/claude-native/workflows/child-usage.mjs",
+      "source_commit": "a40a083172af588f4b97646db87dfc8ef3c0b60e",
+      "sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4"
+    }
+  ],
+  "native_client_observation": {
+    "command": "codex --version",
+    "exit_code": 0,
+    "output": "codex-cli 0.160.1",
+    "scope": "Installed version only; native record-contract qualification remains pending."
+  }
+}
