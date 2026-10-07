@@ -53,7 +53,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # Protected canonical block stops at the session-lanes marker. The current pre-RTK
 # prefix also includes the approved session guidance; those are separate scopes.
 TOP_RULE_SHA256 = "f4b66fb52b0fceeed8b6207e0003de792cabfaef5ece49b6f5d6a445ee2d26ef"
-PRE_RTK_SHA256 = "6c919bcd739d18b045d11cbb6e7d571a78062e2a8056e3d0e8a7141a081c2569"
+PRE_RTK_SHA256 = "ae8784589d6a042b1feedfbdb746544ba547dac8a38dfb84991923af591764fc"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n'
 
@@ -438,8 +438,8 @@ class TemplateTests(unittest.TestCase):
         self.assertNotIn(lane.managed_block.RTK_INCLUDE, rendered)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
         self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
-        # This local 8,192-byte check covers the compact source (8,060 bytes).
-        # The rendered Codex carrier is 9,126 bytes, counted by the startup budget.
+        # This local 8,192-byte check covers the compact source (8,076 bytes).
+        # The rendered Codex carrier is 9,142 bytes, counted by the startup budget.
         self.assertLess(len(text.encode("utf-8")), 8192)
 
     def test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source(self):

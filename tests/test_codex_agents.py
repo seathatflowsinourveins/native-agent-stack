@@ -50,7 +50,7 @@ ROLE_KEYS = {"name", "description", "model", "model_reasoning_effort", "develope
 BUILTIN_ROLES = {"default", "explorer", "worker"}
 ROLE_MODEL = "gpt-6-astra"
 ROLE_EFFORT = "max"
-README_HEADING = "## 2026-10-07: J819e native navigation bindings"
+README_HEADING = "## 2026-10-07: #819 landing RTK exception bindings"
 
 # SHA-256 of each stack role carrier (`sha256sum adoption/agents/codex/<file>`); the examples copy is the same
 # blob. Table rows, not "name": "digest" pairs, which the pre-commit gitleaks generic-api-key rule reads as a
@@ -58,8 +58,8 @@ README_HEADING = "## 2026-10-07: J819e native navigation bindings"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `9578c60c279d1e319935ba2ab25e4157176446a1a7011df94a6a81c51e0ad3d3` |",
-    "| `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |",
+    "| `stack-researcher.toml` | `1c76164a7afefbf4a02f673e5cd07d806418dc57c966fc7e5a2738965b1a1802` |",
+    "| `stack-verifier.toml` | `77c08cf1ae42ab4ad1dca9d88f14a9d5c0602862c7ec72b458ccb5b7ac6363fb` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each

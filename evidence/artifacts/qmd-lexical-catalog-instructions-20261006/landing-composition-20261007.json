@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "kind": "qmd-instruction-landing-composition",
+  "date": "2026-10-07",
+  "evidence_class": "repository_source_comparison_and_local_integration",
+  "source_head": "3ba087b28ef4910d6208b8bc81d295badc5be087",
+  "landed_base": "b59337210a7a1cdf9fada8a6c7d135d4793ad023",
+  "local_rebase_checkpoint": "1296e6a932bac2af99eaccb623d3c01df5b8ef16",
+  "decision": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
+  "prior_receipt": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819f-followup-20261007.json",
+  "direction": {
+    "id": "review-ns2604-coop-20261007T070358Z",
+    "sha256": "8849ff8acc1882f66ace4e9166aa4e22a60f2d18d90b5375b08bab3236cad487"
+  },
+  "accepted_scope_variant_sha256": "26d49e8608f60409049b227fbebf3da628f938bd87334bbc95393ba10abcea42",
+  "actual_instruction_bytes": {
+    "compact": 8181,
+    "rendered": 9247,
+    "compact_limit_exclusive": 8192,
+    "claude_full": 4095,
+    "claude_full_limit": 4100
+  },
+  "protected": {
+    "canonical_top_rule_sha256": "f4b66fb52b0fceeed8b6207e0003de792cabfaef5ece49b6f5d6a445ee2d26ef",
+    "complete_compact_pre_exception_prefix_sha256": "a292568fb0ded7773357e1b30b10ece020fa11b34e1034a28c57d888d8599ea0",
+    "rendered_pre_rtk_test_segment_sha256": "ae8784589d6a042b1feedfbdb746544ba547dac8a38dfb84991923af591764fc",
+    "seven_exception_entries": true,
+    "skill_load_line_exact": true,
+    "model_effort_grants_unchanged": true,
+    "dated_worker_examples_fragment_only": true
+  },
+  "current_amendment4_role_rows": [
+    "| `isolated-builder.md` | `e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096` |",
+    "| `stack-researcher.md` | `5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240` |",
+    "| `evidence-reviewer.md` | `84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399` |"
+  ],
+  "historical_qmd_receipts_unchanged": [
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/citation-followup.json",
+      "sha256": "7be0ec4b9a2b0fd490e2d856d3550db0d6dbffd4eb0bb165fa705d2c6c7ebc0a"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819f-followup-20261007.json",
+      "sha256": "1e1793ecaf278dd9b41e168bcd72b06c3e8b35e8b2fc639d80d97945931e26ce"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/researcher-availability-followup.json",
+      "sha256": "81b87d0bfa5b79229d77abe9ff92635d4d1723676af62f2fedfdf5ca8598b2e1"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/marker-followup-20261007.json",
+      "sha256": "544a68f4c3ad8cac639c75f1a0b4ba65db36c0d281e0aba9b2a53e9ed15818ef"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/ci8-followup-20261007.json",
+      "sha256": "2984947354f56af7397fd26d0e8f227a3d7c3d0e655a62bd7e82f2a8e862bb08"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/catalog-lookup-supersession.json",
+      "sha256": "3a56f1cca99bdc105f163cefa57ae0d2527a9d6d4da60873086dae9c353ccb87"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819e-followup-20261007.json",
+      "sha256": "7c0ff792683502f9d5c9d06af7d75fd621a58e556dcb04e76998931648f483df"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819-followup-20261007.json",
+      "sha256": "426613d02256fa1330964043294eaf36019c6d82adfa67d55103dbb5bd2fe37d"
+    },
+    {
+      "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/receipt.json",
+      "sha256": "acdffe5707ba8f652f5d08a4e432d714afb5c302815131a3756c158753860c73"
+    }
+  ],
+  "token_e2e_seals_unchanged": [
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+      "sha256": "d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/token-e2e-run.mjs",
+      "sha256": "eb7029f9c7f5d6672525b0c8cb59263b78a29b40bc4254cf84a666e99dc47913"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md",
+      "sha256": "135340b608e0a0229822e52508bb74f6afdbd34e5a2ba500694a67d8a0e62427"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e"
+    }
+  ],
+  "checks": [],
+  "failed_attempts": [
+    {
+      "operation": "apply_patch with native unified-diff range headers",
+      "result": "context parser rejected the range header before source mutation",
+      "correction": "same approved patch applied using supported bare context headers"
+    },
+    {
+      "kind": "repository-owned qualification at initial accepted trim composition",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane tests.test_token_e2e_preregistration tests.test_new_wsl_client_config.RecordTests tests.test_install_claude_profile tests.test_managed_block tests.test_task_model_routing",
+      "native_exit_code": 1,
+      "tests": 560,
+      "elapsed_seconds": 115.592,
+      "failure_subcases": 15,
+      "skipped": 14,
+      "raw_log_name": "final-python-modules.log",
+      "raw_log_sha256": "c25d45e653acd1c8d5b0500a94c78d6bfd575f861555dd527419add45e0ce644",
+      "conditions": [
+        "Native handbook write produces documents without updating its receipt binding; old output hashes were retained until this caught the gap.",
+        "Current README requires the existing no-new-role-or-installer supersession clause.",
+        "Accepted compact wording placed All/Full before two command-leading citation bullets.",
+        "Full native startup bytes20206 exceeded unchanged20103 despite compact source8181 fitting8192.",
+        "Correct current graph namespace differs from portable legacy registration alias in carrier coverage fixtures."
+      ],
+      "action": "First three source corrections accepted; further trim and portable namespace decision held under Q20. No test assertion or budget was relaxed."
+    }
+  ],
+  "not_claimed": [
+    "new host apply",
+    "native client smoke",
+    "organic use",
+    "model or provider execution",
+    "new token savings",
+    "token-E2E result or execution authorization"
+  ],
+  "sources": [
+    "native-agent-stack@b59337210a7a1cdf9fada8a6c7d135d4793ad023:tools/adoption/managed_block.py:168-184",
+    "native-agent-stack@b59337210a7a1cdf9fada8a6c7d135d4793ad023:tools/adoption/codex_roles.py:287-291",
+    "native-agent-stack@3ba087b28ef4910d6208b8bc81d295badc5be087:tests/test_token_e2e_preregistration.py:637-663",
+    "native-agent-stack@cda3e5089f28d3839d5a5a1fc7fb0d5001e07ff7:adoption/hooks/claude/token-lanes-block.md:7",
+    "rtk-ai/rtk@v0.51.0:hooks/rtk-awareness-full.md"
+  ],
+  "correction_verified_this_unit": "The maintained build_new_wsl_handbook.py main at lines1333-1373 writes only document outputs, not receipt or registry bindings; register_file separately maintains registry."
+}

@@ -1155,3 +1155,19 @@ line-count projections. The decided configuration policy and historical inventor
 
 ```text
 ```
+
+### Amendment 2026-10-07 — #819 landing current instruction inventory
+
+The authorized landing composition preserves main's local-time addendum and every earlier
+decided projection. The native source-only formatter below reflects the accepted
+post-exception trim and unchanged navigation guidance; it supplies no host apply.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 59 of 59 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 74 of 74 lines stay):
+
+```text
+```

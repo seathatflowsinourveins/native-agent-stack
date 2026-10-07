@@ -94,6 +94,13 @@ ROLE_BODY_ROWS = (
 AMENDMENT_3_ROLE_BODY_ROWS = (
     "| `isolated-builder.md` | `0f8e0834012ec80af39398bfb948b0fe7f0b6dff8effaf06f264d20eb3ed5db7` |",
 )
+
+# Amendment 4: prospective current replacements; prior source/observed rows remain.
+AMENDMENT_4_ROLE_BODY_ROWS = (
+    "| `isolated-builder.md` | `e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096` |",
+    "| `stack-researcher.md` | `5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240` |",
+    "| `evidence-reviewer.md` | `84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399` |",
+)
 # The README amendment rule preserves every earlier seal table: the Repair 1
 # rows, verbatim. Kept as table rows, not "name": "digest" pairs, which the
 # pre-commit gitleaks generic-api-key rule reads as a keyed secret.
@@ -644,7 +651,12 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
         for row in ROLE_BODY_ROWS:
             with self.subTest(file=row.split("`")[1], field="readme_row"):
                 self.assertIn(row, amendment_2)
-        current = {row.split("`")[1]: row.split("`")[3] for row in ROLE_BODY_ROWS + AMENDMENT_3_ROLE_BODY_ROWS}
+        amendment_4 = section(readme, "## Amendment 4 (2026-10-07)", "\n## ")
+        for row in AMENDMENT_4_ROLE_BODY_ROWS:
+            with self.subTest(file=row.split("`")[1], field="amendment_4_row"):
+                self.assertIn(row, amendment_4)
+        current = {row.split("`")[1]: row.split("`")[3]
+                   for row in ROLE_BODY_ROWS + AMENDMENT_3_ROLE_BODY_ROWS + AMENDMENT_4_ROLE_BODY_ROWS}
         self.assertEqual(len(current), len(ROLE_BODY_ROWS))
         for filename, digest in current.items():
             for copy in ("adoption/agents/claude", ".claude/agents"):

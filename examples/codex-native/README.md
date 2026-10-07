@@ -146,6 +146,28 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 | `stack-researcher.toml` | `bcce9561bfe2cb8476376b47a9a32cecdd056ec725156027506c54a5ae831627` |
 | `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |
 
+## 2026-10-07: #819 landing RTK exception bindings
+
+This current binding supersedes the earlier carrier hash inventory after the authorized
+landing rebase onto #803 and the accepted exception-prose trim. The stack-researcher and
+stack-verifier roles keep their model, effort, abilities and all guidance outside that trim.
+As before, no new role or installer is needed.
+The rendered pre-RTK prefix includes main's local-time sentence, and the canonical top rule
+and upstream RTK awareness stay unchanged. Seven exception entries keep the same facts;
+the SKILL.md line remains exact. The three dated project worker examples receive only
+the same exception fragment, preserving their inherited model and effort fields.
+
+Sources: [the SKILL.md exception record](../../docs/decisions/2026-10-06-codex-skill-read-exception.md),
+[the pinned F4 exception findings](../../docs/decisions/2026-09-26-token-practice-f1-f9.md),
+and the 2026-10-07 landing cue and accepted scope variant recorded in the new landing receipt.
+These bindings are source integrity and repository integration evidence; they supply no
+host apply, model execution or fresh-session acceptance.
+
+| File | SHA-256 |
+| --- | --- |
+| `stack-researcher.toml` | `1c76164a7afefbf4a02f673e5cd07d806418dc57c966fc7e5a2738965b1a1802` |
+| `stack-verifier.toml` | `77c08cf1ae42ab4ad1dca9d88f14a9d5c0602862c7ec72b458ccb5b7ac6363fb` |
+
 ### 2026-10-06: SKILL.md read exception
 
 The current table and carrier checksums include the plain-sed skill-document exception. The six existing RTK exceptions, role grants and verbatim awareness bytes are preserved. This is a source-backed instruction/render read-back, not a new frozen E2E or role-use trial. The native `codex.skill.injected` counter identifies an invocation attempt before execution; it does not prove a successful/full read or application. See [the decision](../../docs/decisions/2026-10-06-codex-skill-read-exception.md).

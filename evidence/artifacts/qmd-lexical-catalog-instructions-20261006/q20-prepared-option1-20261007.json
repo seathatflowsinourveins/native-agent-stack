@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "kind": "q20-local-option1-preparation",
+  "date": "2026-10-07",
+  "evidence_class": "repository_integration_and_native_source_byte_counts",
+  "source_base": "b59337210a7a1cdf9fada8a6c7d135d4793ad023",
+  "source_checkpoint": "1296e6a932bac2af99eaccb623d3c01df5b8ef16",
+  "direction": "A20 2026-10-07T07:53:17Z: local prepare option1, no push; command center rules on extra trim and client-template namespace",
+  "prior_receipt": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/landing-composition-20261007.json",
+  "decision": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
+  "prepared_budgets": {
+    "compact": 8076,
+    "rendered": 9142,
+    "startup": 20101,
+    "compact_limit_exclusive": 8192,
+    "startup_limit": 20103,
+    "claude_full": 4095,
+    "claude_full_limit": 4100
+  },
+  "canonical_namespace": "codebase-memory-mcp",
+  "namespace_changed_files": [
+    "adoption/mcp/claude-user.json",
+    "adoption/templates/codex.config.template.toml",
+    "adoption/templates/codex.stack-worker.config.toml",
+    "adoption/new-wsl/client-config-map.json",
+    "tests/test_install_claude_profile.py",
+    "tests/test_new_wsl_client_config.py",
+    "tests/test_codex_worker_lane.py",
+    "adoption/bootstrap.md",
+    "adoption/platforms/linux-wsl2.md",
+    "adoption/platforms/macos-arm64.md"
+  ],
+  "namespace_only_patch_sha256": "c66f585a221871dfe1c383073b8fc36268c5bbdf7a6c591adb708a5054bbd92f",
+  "payload_proofs": [
+    {
+      "path": "adoption/templates/codex.config.template.toml",
+      "key_only_payload_unchanged": true
+    },
+    {
+      "path": "adoption/templates/codex.stack-worker.config.toml",
+      "key_only_payload_unchanged": true
+    },
+    {
+      "path": "adoption/mcp/claude-user.json",
+      "key_only_payload_unchanged": true
+    },
+    {
+      "path": "adoption/new-wsl/client-config-map.json",
+      "exact_schema_refs_only": true,
+      "component_owner_unchanged": true
+    }
+  ],
+  "protected_prefix_sha256": "a292568fb0ded7773357e1b30b10ece020fa11b34e1034a28c57d888d8599ea0",
+  "known_open_contract": "Q21: protected token-lane line retains legacy name; exact literal server-coverage assertion intentionally retained",
+  "private_overlap_observations": [
+    {
+      "pr": 776,
+      "paths": [
+        "adoption/mcp/claude-user.json",
+        "adoption/templates/codex.config.template.toml",
+        "adoption/templates/codex.stack-worker.config.toml",
+        "adoption/new-wsl/client-config-map.json"
+      ],
+      "source": "parent cached GitHub file list read0"
+    },
+    {
+      "pr": 826,
+      "paths": [
+        "adoption/mcp/claude-user.json",
+        "adoption/templates/codex.config.template.toml"
+      ],
+      "source": "parent cached GitHub file list read0"
+    }
+  ],
+  "donor_correction": {
+    "pin": "cda3e5089f28d3839d5a5a1fc7fb0d5001e07ff7",
+    "path": "adoption/mcp/claude-user.json",
+    "canonical_key_verified": true,
+    "legacy_fixture_path": "tests/test_install_claude_profile.py:41",
+    "legacy_fixture_verified": true
+  },
+  "checks": [
+    {
+      "kind": "source-only native client-config map analysis",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B tools/adoption/new_wsl_client_config.py --check --markdown",
+      "native_exit_code": 0,
+      "raw_log_name": "a20-client-config-markdown.log",
+      "raw_log_sha256": "648499b877e8d7381c32493d4d8030e98d8bd95e077c596ef7a39debb8419491"
+    },
+    {
+      "kind": "repository-owned bounded qualification with strict namespace schema and registered-name fixtures",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane tests.test_token_e2e_preregistration tests.test_new_wsl_client_config.RecordTests tests.test_install_claude_profile tests.test_managed_block tests.test_task_model_routing tests.test_new_wsl_client_config.MapTests tests.test_new_wsl_client_config.AgentGapTests tests.test_new_wsl_client_config.RenderTests tests.test_new_wsl_client_config.ApplyTests.test_the_first_run_writes_what_the_wired_pieces_name_and_nothing_else",
+      "native_exit_code": 1,
+      "tests": 595,
+      "seconds": 118.405,
+      "failure_subcases": 3,
+      "skipped": 14,
+      "raw_log_name": "a20-python-modules.log",
+      "conditions": [
+        "Current bootstrap registered-name list still used old namespace",
+        "Two maintained platform pages did not mark this changed MCP-template input since release",
+        "The protected token-lane name literal stays old; Q21 owner decision required"
+      ],
+      "raw_log_sha256": "1efbf9e7253369050366c842943ba5768bb174b5f5f9c2017b697d00d935ce1c"
+    },
+    {
+      "kind": "unchanged repository-owned Node workflow/grant/body envelope fixtures",
+      "command": "CI=true nice -n 19 ionice -c3 node examples/claude-native/workflows/test-envelope.mjs",
+      "native_exit_code": 0,
+      "passed": 254,
+      "failed": 0,
+      "raw_log_name": "a20-node-envelope.log",
+      "raw_log_sha256": "e137100e406134a5c5a236c738814d001ff31739d6682f20bd113b3fbd7a04ec"
+    },
+    {
+      "kind": "focused repository-owned followup for concrete required recipe corrections",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_adoption_docs_consistency",
+      "native_exit_code": 0,
+      "tests": 39,
+      "seconds": 14.478,
+      "skipped": 1,
+      "raw_log_name": "a20-docs-followup.log",
+      "source_scope": "Bootstrap registered-name literal and two adjacent current changed-input notes only; test bodies unchanged",
+      "raw_log_sha256": "6587ac78d084736e0f3f95333361436002fd70133da324aa48319812faf3484d"
+    }
+  ],
+  "not_claimed": [
+    "command center acceptance or publication",
+    "host apply",
+    "native client availability",
+    "organic usage",
+    "new model or provider run",
+    "token savings"
+  ],
+  "namespace_and_required_docs_patch_sha256": "73a5945ab0819db68c4e21752f9f751dbb2b5883120fe2a982cbd4924f176f8a",
+  "current_qualified_limits": "595/3 failures retained; focused39 followup closes two recipe failures. No all-green full scope is claimed; protected literal guard stays pending.",
+  "private_fallback_source_contract": {
+    "namespace_diff_reverse_context_check_exit": 0,
+    "native_source_coverage_error_if_only_keys_reverted": "codebase-memory-mcp: named by the carrier, not registered at user scope and not an exception",
+    "all_green_fallback_claimed": false
+  }
+}
