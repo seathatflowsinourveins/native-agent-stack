@@ -16533,8 +16533,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "82fae20369f6c5219cf6111c22c8daea74068ac35cee210cc611e5efa7aa0d88",
-      "bytes": 158923
+      "sha256": "09735ed23f80acc2edeca679979956fcf25547bd4dbf2ea5d3029d8a5c57761d",
+      "bytes": 159862
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -17630,6 +17630,11 @@
       "path": "docs/decisions/2026-10-05-user-facing-local-time.md",
       "sha256": "8bc7cb99e2b415fff9a1c4a7784c21291f3cacefac97107277a11988af9b1a34",
       "bytes": 35121
+    },
+    {
+      "path": "docs/decisions/2026-10-06-agent-teams-carrier-corrections.md",
+      "sha256": "10bcd1c49f88d24ff884196277f4d247e561f6a1c31f8aae76e1a43fcbc9a3e6",
+      "bytes": 3755
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
@@ -53938,8 +53943,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "466817eba6c4c99d3bc7620cf0b241e14f7d031abfa825dc84de6f028c91901f",
-      "bytes": 110684
+      "sha256": "b3405f0b93a738d2e3b2ff5f032c2874acb7dd8d15b0800fe8010bbd4dfc0ece",
+      "bytes": 111528
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -54915,6 +54920,26 @@
       "path": "tests/fixtures/guard_685/monotonicity.json",
       "sha256": "896a72ead08b7aea38d142c817e9eaa97624b2d2ce0653d5255a537abe31f694",
       "bytes": 767
+    },
+    {
+      "path": "tests/fixtures/harness-context-moves/09-20261006.txt",
+      "sha256": "df2a6b435b576fabd32ad3b519fbbfc48d6adedcf90656b1cb9b22471b8b2901",
+      "bytes": 865
+    },
+    {
+      "path": "tests/fixtures/harness-context-moves/10-20261006.txt",
+      "sha256": "5c21f4f6f2342502f10eb822eb502be8200ae3472dd3574ef39a2861be9e647c",
+      "bytes": 2034
+    },
+    {
+      "path": "tests/fixtures/harness-context-moves/README.md",
+      "sha256": "5d319c926920103dec6ad6e565850b1dfe3388d6fc8a651012d74c865488e907",
+      "bytes": 1740
+    },
+    {
+      "path": "tests/fixtures/harness-context-moves/contracts.json",
+      "sha256": "6f8beb0b57ddff87ee5b0d8a0652e5c054bce2b6ee915015967b1418082e6153",
+      "bytes": 1744
     },
     {
       "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",

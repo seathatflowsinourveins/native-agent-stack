@@ -225,15 +225,15 @@
   },
   {
    "key": "claude:env:CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS",
-   "disposition": "adopt-pending",
-   "reason": "User order 2026-10-04 (rule 3). NativeStack has 1, 2604 unset. Additions env merges key by key (new_wsl_client_config.py:466-467).",
-   "source": "https://code.claude.com/docs/en/env-vars.md",
+   "disposition": "enabled",
+   "reason": "CC rule 18: \"The CC leads at most 3 teammates\"; switch set. command-center/cc-tools/CC-RULES-ADDENDUM-20261006.md:9-23.",
+   "source": "https://code.claude.com/docs/en/env-vars.md#L293",
    "carrier": "adoption/new-wsl/templates/claude.settings.additions.json",
    "value": "1",
-   "scope": "NativeStack2604",
-   "overturn": "User revokes the 10-04 order, or teams leave experimental under another switch.",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "2.1.289"
+   "scope": "\"The CC leads at most 3 teammates\"; \"forbids writes\" by brief",
+   "overturn": "The CC changes rule 18's \"The CC leads at most 3 teammates\" or \"forbids writes\" scope, or upstream changes the switch.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:env:CLAUDE_CODE_EXTRA_BODY",
@@ -693,15 +693,15 @@
   },
   {
    "key": "claude:env:MCP_PROTOCOL_NEGOTIATION",
-   "disposition": "declined",
-   "reason": "Unset already probes HTTP servers, and stdio servers as Anthropic rolls that out (v2.1.285+); forcing auto has no measured gain.",
-   "source": "https://code.claude.com/docs/en/mcp.md",
+   "disposition": "default-on",
+   "reason": "Upstream 2.1.292 defaults stdio to revision 2026-07-28 on every install; unset keeps the default and legacy opts out.",
+   "source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L76",
    "carrier": null,
    "value": null,
    "scope": null,
-   "overturn": "a token-stack stdio server needs revision 2026-07-28 before the rollout reaches us",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "2.1.289"
+   "overturn": "A server compatibility failure requires the documented legacy opt-out, or upstream changes the protocol default.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:env:MCP_SDK_GENERATION",
@@ -1065,39 +1065,39 @@
   },
   {
    "key": "claude:hook:TaskCompleted",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:333 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:333",
+   "disposition": "not-applicable",
+   "reason": "Opus/Sonnet 5.5 Task tools are withdrawn without TODO opt-in (CHANGELOG 2.1.268 L1986); TaskCompleted cannot fire in that scope.",
+   "source": "https://code.claude.com/docs/en/hooks.md#L2509-L2513",
    "carrier": null,
    "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "scope": "5.5 models without TODO opt-in",
+   "overturn": "A team needs ordered tasks and the owner enables CLAUDE_CODE_ENABLE_TODO_TOOLS before launch.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:hook:TaskCreated",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:333 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:333",
+   "disposition": "not-applicable",
+   "reason": "Current Opus/Sonnet 5.5 runs omit Task tools; TaskCreated does not fire without TaskCreate.",
+   "source": "https://code.claude.com/docs/en/hooks.md#L2455-L2457",
    "carrier": null,
    "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "scope": "5.5 models without TODO opt-in",
+   "overturn": "A team needs ordered tasks and the owner enables CLAUDE_CODE_ENABLE_TODO_TOOLS before launch.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:hook:TeammateIdle",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:333 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:333",
-   "carrier": null,
+   "disposition": "adopt-pending",
+   "reason": "Pending a claim-locator exit-2 gate after the first real team run; no installed handler or lifecycle acceptance is recorded.",
+   "source": "https://code.claude.com/docs/en/hooks.md#L2699-L2728",
+   "carrier": "Claude user settings hooks.TeammateIdle (planned)",
    "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "scope": "CC-led agent teams",
+   "overturn": "After the first real team run, the owner installs the bounded locator gate; an upstream hook change reopens the recipe.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:hook:UserPromptExpansion",
@@ -1137,15 +1137,15 @@
   },
   {
    "key": "claude:mod:cc-plugin-you-should-know",
-   "disposition": "adopt-pending",
-   "reason": "User order 2026-10-04 (rule 3): 2604 and the shared template. Side-agent tokens counted separately. Needs telemetry on; 2604 env sets no DISABLE_TELEMETRY.",
-   "source": "https://code.claude.com/docs/en/plugins/mods/overview.md",
-   "carrier": "adoption/templates/claude.settings.template.json",
+   "disposition": "enabled",
+   "reason": "Configured enabled; side-agent activity and costs remain unattributed. Keep separate native usage when an event identifies it.",
+   "source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L421",
+   "carrier": "adoption/new-wsl/templates/claude.settings.additions.json",
    "value": "true",
    "scope": "NativeStack2604",
-   "overturn": "User withdraws the order, or its measured side-agent cost outweighs its flags.",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "2.1.289"
+   "overturn": "The owner disables the mod, or changed upstream evidence warrants a different choice.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:setting:advisorModel",
@@ -1389,15 +1389,15 @@
   },
   {
    "key": "claude:setting:crossSessionInbound",
-   "disposition": "adopt-pending",
-   "reason": "The user's 2026-10-02 yes on messaging and his 2026-10-04 directive overturn the wave-2 ruling: an authorization piece on 2604",
-   "source": "https://code.claude.com/docs/en/settings-reference.md",
+   "disposition": "enabled",
+   "reason": "The accept delivery policy is applied; the previous pending disposition was stale.",
+   "source": "https://code.claude.com/docs/en/cross-session-messaging.md#L191-L199",
    "carrier": "adoption/new-wsl/templates/claude.settings.additions.json (authorization class)",
    "value": "accept",
    "scope": "NativeStack2604",
    "overturn": "a measured unwanted delivery without a hold, or the user asks for hold",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:setting:deniedMcpServers",
@@ -2238,6 +2238,18 @@
    "overturn": "the record is superseded by a measured result",
    "reviewed_utc": "2026-10-04T18:55:00Z",
    "version": "2.1.289"
+  },
+  {
+   "key": "claude:setting:teammateMode",
+   "disposition": "default-on",
+   "reason": "Unset uses documented in-process display; split panes remain outside this narrow adoption.",
+   "source": "https://code.claude.com/docs/en/agent-teams.md#L107-L111",
+   "carrier": null,
+   "value": null,
+   "scope": "Claude agent teams",
+   "overturn": "The owner selects another display mode, or upstream changes the documented default.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:setting:theme",
