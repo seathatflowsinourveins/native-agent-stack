@@ -1,0 +1,20 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:07Z",
+  "item": "evidence/receipts/ns2604-e2e-20261004.json",
+  "item_sha256": "4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705",
+  "class": "unknown-gateway",
+  "label": "E4; original_revision=0d5e6506434fab598dee861c749a22e628beb75a; scope=/limitations and /data/model_records reviewer provenance. Endpoint provenance unknown; review content unaffected. This records no new host execution or installed-model proof.",
+  "basis": [
+    {
+      "path": "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/receipts/ns2604-e2e-20261004.json",
+      "line": 19,
+      "quote": "\"Reviewer records report the requested gateway model cx/gpt-6.1-sol-max and max effort; no resolved backend model identity is inferred.",
+      "sha256": "4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705"
+    }
+  ],
+  "consumers": [
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/receipts/ns2604-e2e-20261004.json"
+  ],
+  "requalifies_by": "The corresponding reviewer/decider's own sanitized dispatch log, with actual endpoint provenance. Missing call-log rows prove nothing; no local review campaign or forced replay is added."
+}

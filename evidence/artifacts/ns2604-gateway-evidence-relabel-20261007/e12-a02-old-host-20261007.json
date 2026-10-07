@@ -1,0 +1,42 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:23Z",
+  "item": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
+  "item_sha256": "3a55c99b2c80a4f5f841aa9b2edc86c8e0d7be14c1a47445c89a8c687ab0a4a7",
+  "class": "old-gateway-inferred",
+  "label": "scope=E12/a02@line:132; source_revision=0d5e6506434fab598dee861c749a22e628beb75a; ran on NativeStack; never 2604 evidence. Old gateway inferred from the retained 20128 configuration and the original README's run scope. The original dynamic-arm observations remain unchanged; this correction makes no claim of NativeStack2604 qualification.",
+  "basis": [
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
+      "line": 4,
+      "quote": "host (NativeStack, WSL2), deterministic commands.",
+      "sha256": "3a55c99b2c80a4f5f841aa9b2edc86c8e0d7be14c1a47445c89a8c687ab0a4a7"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/codex_hook_qual.py",
+      "line": 41,
+      "quote": "\"model_providers.omniroute_runtime.base_url=\\\"http://127.0.0.1:20128/v1\\\"\",",
+      "sha256": "fb2a2426a6564567a8276c74c2d6ada73e95643017d9536e8c3dd85a6f7fbe4f"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
+      "line": 132,
+      "quote": "The dynamic arms ran through the loopback gateway route `cx/gpt-6.1-sol-max`",
+      "sha256": "3a55c99b2c80a4f5f841aa9b2edc86c8e0d7be14c1a47445c89a8c687ab0a4a7"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
+      "line": 138,
+      "quote": "The 2604 after snapshot, the PATH of each real launcher and a hook trust grant on a real host are",
+      "sha256": "3a55c99b2c80a4f5f841aa9b2edc86c8e0d7be14c1a47445c89a8c687ab0a4a7"
+    }
+  ],
+  "consumers": [
+    "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md:24@cd1cd78ec3f8bb82ca4343be4f859a2e107e2035",
+    "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md:65@cd1cd78ec3f8bb82ca4343be4f859a2e107e2035",
+    "docs/harness-defaults.md:127@cd1cd78ec3f8bb82ca4343be4f859a2e107e2035",
+    "docs/token-efficiency-stack.json:732@cd1cd78ec3f8bb82ca4343be4f859a2e107e2035",
+    "docs/token-session-handbook.md:433@cd1cd78ec3f8bb82ca4343be4f859a2e107e2035"
+  ],
+  "requalifies_by": "None for 2604: preserve E12/a01 and E12/a02 as historical NativeStack-only evidence. Relabelling does not qualify a 2604 installation or its gateway, hook, native-client route or counters."
+}

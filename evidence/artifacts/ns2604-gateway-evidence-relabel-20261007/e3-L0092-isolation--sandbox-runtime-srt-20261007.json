@@ -1,0 +1,27 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:23Z",
+  "item": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+  "item_sha256": "e545be05b199d5afcda50a03afa2e9120cb5edf192f94d26b6680658f4e56fef",
+  "class": "unknown-gateway",
+  "label": "scope=/slots/isolation~1sandbox-runtime-srt/model_reviews/0; source_revision=0d5e6506434fab598dee861c749a22e628beb75a; endpoint provenance unknown; review content unaffected. This scoped GPT artifact review is non-gating and is not upstream or whole-slot acceptance. This correction does not classify the slot's other reviews or native stage observations.",
+  "basis": [
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "line": 92,
+      "quote": "\"dispatch_model\":\"cx/gpt-6.1-sol-max\"",
+      "sha256": "e545be05b199d5afcda50a03afa2e9120cb5edf192f94d26b6680658f4e56fef"
+    },
+    {
+      "path": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "line": 12,
+      "quote": "\"model_reviews\":\"scoped model artifact reviews; verdicts are not upstream acceptance\"",
+      "sha256": "e545be05b199d5afcda50a03afa2e9120cb5edf192f94d26b6680658f4e56fef"
+    }
+  ],
+  "consumers": [
+    "evidence/artifacts/ns2604-native-bar-20261006/board.json:1974@d7dfe84713a7c294a370d05558f00e7e5acd0d1e",
+    "docs/decisions/2026-10-05-ns2604-foundation-requalification.md:98@cd1cd78ec3f8bb82ca4343be4f859a2e107e2035"
+  ],
+  "requalifies_by": "E3/GW-05b: inspect the original reviewer's dispatch log if retained to establish the effective endpoint. If that provenance is unavailable, the unknown-gateway label remains. No model rerun or readiness promotion is required for these non-gating reviews."
+}
