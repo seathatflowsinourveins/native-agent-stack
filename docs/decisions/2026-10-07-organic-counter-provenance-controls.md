@@ -187,3 +187,48 @@ The supported representation seam follows
 the [Python 3.12 shell-token serialization reference](https://docs.python.org/3.12/library/shlex.html#shlex.join),
 and `rtk-ai/rtk@v0.51.0:README.md:6,313`. The unchanged provisional paths are
 `native-agent-stack@dee7cae97c74a6657cb40c7bf8324ccbd41f9111:tools/invocation-monitoring/codex_counter.py:198-224,788-799,874`.
+
+## Amendment (2026-10-07): original name spans and resolved projection agreement
+
+The qualified named-turn mask extracts complete name tokens from the original
+Unicode text before comparison. Unicode general-category M characters remain
+within that token. Format characters (category Cf) are retained rather than
+discarded or turned into a boundary inside a name. Both the extracted token
+and the configured name use Python's documented canonical caseless form:
+`NFD(NFD(value).casefold())`. The same rule applies to the original
+`mcp__<server>__<tool>` components; the prefix is recognized without case.
+
+This follows `python/cpython@v3.12.0:Doc/howto/unicode.rst:465-480` and
+`python/cpython@v3.13.0:Doc/howto/unicode.rst:465-480`, whose
+`compare_caseless` reference cites section 3.13 of the Unicode Standard.
+The language's [general-category API](https://docs.python.org/3.13/library/unicodedata.html#unicodedata.category)
+supplies the category classification. The installed interpreter is Python
+3.13.16 with Unicode data 15.1.0; the latest documentation's Unicode database
+is not substituted for that observation.
+
+The token rule preserves internal punctuation and distinct longer names.
+It does not join hyphen-separated or newline-separated fragments into another
+name. An invisible format character remains a different string under the
+canonical comparison; this is not compatibility normalization or arbitrary
+Unicode word segmentation. Raw native tool identities retain their case.
+
+For completed commands of different representation kinds, agreement now
+requires both the existing documented serialization relationship and equal,
+resolved read-attribution projections. `shell_reads(argv)` and
+`shell_reads(shell_text)` must return equal counts and zero unknown counts on
+both sides. Otherwise the existing sticky conflict makes attribution unknown.
+This predicate applies to the bare RTK serialization and the exact
+three-element Sh/Bash/Zsh `-c`/`-lc` wrapper allowance. Identical typed
+duplicates, supported request/completion enrichment, every original within
+direct/explicit alias groups and their pairwise checks remain intact. The
+projection parser itself is unchanged; equal serialization alone cannot
+establish equal attribution.
+
+The [new FIX4 receipt](../../evidence/receipts/ns2604-catalog-fix4-20261007.json)
+keeps the old-code Unicode and RTK apostrophe witnesses, the finite table
+invariants, source snapshots and actual returned red/green outputs separate.
+All 57 earlier methods remain byte-identical; 14 controls are added. The
+plain agreeing serialization control prevents an always-disagree predicate
+from passing the invariant vacuously. The fixtures and same-family source
+review supply no native organic observation, upstream acceptance or adopted
+slot. Existing failed stages and their receipts are unchanged.

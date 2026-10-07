@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-catalog-fix4-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Preserve original Unicode name spans before canonical caseless comparison and require equal resolved attribution for documented cross-kind command agreement.",
+  "limitations": [
+    "All controls are synthetic fixtures, not organic use, native host/model smoke or upstream acceptance.",
+    "Same-family source review verifies the requested classes and preserved bytes; it executes no tests and is not independent cross-family acceptance.",
+    "Hosted validate has not run because the draft conflicts with main and has no merge ref; local checks remain separate.",
+    "Canonical name-token matching does not define arbitrary Unicode word segmentation or compatibility normalization; raw tool identifiers remain unchanged.",
+    "Representation-sensitive projection parsing is unchanged. Agreement supplies a declared attribution invariant, not equivalence of an external shell environment.",
+    "Unsupported/malformed native formats retain their existing unknown scope; no final native/organic/adopted verdict is issued."
+  ],
+  "reviewed_base_commit": "d99e8a2e84f531c2c6be2dd5e890e801ec8c76ce",
+  "prior_records": [
+    {
+      "path": "evidence/receipts/ns2604-catalog-fix3-20261007.json",
+      "sha256": "15ba25045295469f122bfb6082217ea438b821303ac3e2c9d41309bb17f90c77"
+    },
+    {
+      "path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
+      "sha256": "48e1dbb4981b224c95a313dc85972852dfd2535bb0724565e1a131a0b6d0b7a7"
+    }
+  ],
+  "name_rule": {
+    "tokenization": "Original text first; Unicode word characters and categoryM/Cf are retained within original name spans. Original MCP components preserve boundaries before canonical comparison.",
+    "canonical_comparison": "NFD(NFD(a).casefold()) == NFD(NFD(b).casefold())",
+    "not_equivalent": [
+      "Different longer names",
+      "Hyphen/newline-separated fragments",
+      "Invisible format characters versus their absence"
+    ],
+    "python": "3.13.16",
+    "unicode_data_version": "15.1.0"
+  },
+  "agreement_rule": {
+    "different_kinds": "Existing documented serialization AND equal shell_reads counts, with both unknown counts0. Otherwise sticky incomplete identity and null attribution.",
+    "applies_to": [
+      "Precisely shlex.join-escaped bare RTK argv",
+      "Exact three-element Sh/Bash/Zsh -c/-lc serialization"
+    ],
+    "parser_changed": false,
+    "typed_duplicates_and_enrichment": "preserved",
+    "all_alias_original_pairs": "preserved"
+  },
+  "checks": [
+    {
+      "id": "red",
+      "evidence_class": "synthetic",
+      "tests": 14,
+      "elapsed_seconds": 23.885,
+      "failure_subcases": {
+        "test_canonical_named_dotted_i_masks_composed_and_decomposed": 4,
+        "test_canonical_dotted_i_longer_names_remain_distinct": 4,
+        "test_canonical_accented_configured_name_masks_decomposed_prompt": 3,
+        "test_canonical_expansion_table_masks_whole_original_names": 54,
+        "test_canonical_expansion_table_preserves_distinct_longer_names": 12,
+        "test_invisible_formats_and_separated_fragments_do_not_name_tool": 12,
+        "test_canonical_mcp_parent_components_mask_child_turn": 3,
+        "test_rtk_apostrophe_completion_conflicts_are_unknown": 12,
+        "test_rtk_apostrophe_completion_conflicts_follow_alias_groups": 24,
+        "test_final_scan_rtk_apostrophe_conflicts_remain_unknown": 4,
+        "test_rtk_cross_kind_agreement_implies_equal_resolved_projection": 4,
+        "test_unresolved_documented_cross_kind_completions_do_not_agree": 8
+      },
+      "error_cases": {},
+      "summary": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 14 tests in 23.885s",
+        "",
+        "FAILED (failures=144)"
+      ],
+      "started_utc": "2026-10-07T11:50:38Z",
+      "completion_observed_utc": "2026-10-07T11:51:02Z",
+      "boundary_kind": "Observed native clock immediately before/after exec; actual unittest elapsed retained separately.",
+      "exit_code": 1,
+      "cwd": "tools/invocation-monitoring",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "TMPDIR=<owned-external-lane-cache>",
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_codex_counter.OrganicControlChecks.test_canonical_named_dotted_i_masks_composed_and_decomposed",
+        "test_codex_counter.OrganicControlChecks.test_canonical_dotted_i_longer_names_remain_distinct",
+        "test_codex_counter.OrganicControlChecks.test_canonical_accented_configured_name_masks_decomposed_prompt",
+        "test_codex_counter.OrganicControlChecks.test_canonical_expansion_table_masks_whole_original_names",
+        "test_codex_counter.OrganicControlChecks.test_canonical_expansion_table_preserves_distinct_longer_names",
+        "test_codex_counter.OrganicControlChecks.test_invisible_formats_and_separated_fragments_do_not_name_tool",
+        "test_codex_counter.OrganicControlChecks.test_canonical_mcp_parent_components_mask_child_turn",
+        "test_codex_counter.OrganicControlChecks.test_rtk_apostrophe_completion_conflicts_are_unknown",
+        "test_codex_counter.OrganicControlChecks.test_rtk_apostrophe_completion_conflicts_follow_alias_groups",
+        "test_codex_counter.OrganicControlChecks.test_final_scan_rtk_apostrophe_conflicts_remain_unknown",
+        "test_codex_counter.OrganicControlChecks.test_rtk_cross_kind_agreement_implies_equal_resolved_projection",
+        "test_codex_counter.OrganicControlChecks.test_known_plain_cross_kind_projection_agreement_is_nonvacuous",
+        "test_codex_counter.OrganicControlChecks.test_unresolved_documented_cross_kind_completions_do_not_agree",
+        "test_codex_counter.OrganicControlChecks.test_identical_typed_apostrophe_completions_keep_original_projection"
+      ],
+      "source_sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b",
+      "test_sha256": "907169fc42c9df523f5872f9fdfc3f0a0c154da8d88e849e1c9e84dfb9fe3c41",
+      "stdout_ref": ".local/j820-fix4/red.stdout.log",
+      "stderr_ref": ".local/j820-fix4/red.stderr.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c316e85e43f02f0badd721d9d3889e9c3dc227741c41728ed98006e3999e386a"
+    },
+    {
+      "id": "first-green",
+      "evidence_class": "synthetic",
+      "tests": 71,
+      "elapsed_seconds": 46.202,
+      "failure_subcases": {},
+      "error_cases": {},
+      "summary": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 71 tests in 46.202s",
+        "",
+        "OK"
+      ],
+      "started_utc": "2026-10-07T11:52:26Z",
+      "completion_observed_utc": "2026-10-07T11:53:13Z",
+      "boundary_kind": "Observed native clock immediately before/after exec; actual unittest elapsed retained separately.",
+      "exit_code": 0,
+      "cwd": "<owned-counter-worktree-root>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "TMPDIR=<owned-external-lane-cache>",
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-v",
+        "-s",
+        "tools/invocation-monitoring",
+        "-p",
+        "test_codex_counter.py"
+      ],
+      "source_sha256": "78f2a745473983042bb3ba8626caf8672d2140264248b71bda96d2314a4f85b8",
+      "test_sha256": "907169fc42c9df523f5872f9fdfc3f0a0c154da8d88e849e1c9e84dfb9fe3c41",
+      "stdout_ref": ".local/j820-fix4/first-green.stdout.log",
+      "stderr_ref": ".local/j820-fix4/first-green.stderr.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5410edb555b34043840fd9d9a45b99aa9156bbba0a6a4d9aa56e02c0d2fd3301"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "78f2a745473983042bb3ba8626caf8672d2140264248b71bda96d2314a4f85b8"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "907169fc42c9df523f5872f9fdfc3f0a0c154da8d88e849e1c9e84dfb9fe3c41"
+    }
+  ],
+  "preservation": {
+    "baseline_test_methods": 57,
+    "byte_identical_baseline_test_methods": 57,
+    "new_methods": 14,
+    "unchanged_functions": {
+      "shell_reads": true,
+      "scan": true,
+      "prompt_names_by_turn": true,
+      "_record_facts": true
+    },
+    "log_and_snapshot_bindings": [
+      {
+        "path": ".local/j820-fix4/baseline-counter.py",
+        "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b"
+      },
+      {
+        "path": ".local/j820-fix4/baseline-test.py",
+        "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      },
+      {
+        "path": ".local/j820-fix4/red-test.py",
+        "sha256": "907169fc42c9df523f5872f9fdfc3f0a0c154da8d88e849e1c9e84dfb9fe3c41"
+      },
+      {
+        "path": ".local/j820-fix4/red.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".local/j820-fix4/red.stderr.log",
+        "sha256": "c316e85e43f02f0badd721d9d3889e9c3dc227741c41728ed98006e3999e386a"
+      },
+      {
+        "path": ".local/j820-fix4/first-green-counter.py",
+        "sha256": "78f2a745473983042bb3ba8626caf8672d2140264248b71bda96d2314a4f85b8"
+      },
+      {
+        "path": ".local/j820-fix4/first-green-test.py",
+        "sha256": "907169fc42c9df523f5872f9fdfc3f0a0c154da8d88e849e1c9e84dfb9fe3c41"
+      },
+      {
+        "path": ".local/j820-fix4/first-green.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".local/j820-fix4/first-green.stderr.log",
+        "sha256": "5410edb555b34043840fd9d9a45b99aa9156bbba0a6a4d9aa56e02c0d2fd3301"
+      }
+    ],
+    "dependency_bindings": [
+      {
+        "path": "tools/skill-usage/skill_usage.py",
+        "sha256": "d8f37f929fc9f7fc170b6ac794c9e23d84c4a7e70f6328e565f3d9ac9595b65b"
+      },
+      {
+        "path": "examples/claude-native/workflows/child-usage.mjs",
+        "sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4"
+      }
+    ],
+    "worker_proof_sha256": "72c4771d409bc041c7ad43b78c0313535fee8c5eb90d9800fe843a55d29c1e54",
+    "original_failed_receipts": "unchanged",
+    "decision": "append-only amendment",
+    "root_verification": "Initial AST audit counted fixture helpers alongside tests and stopped before applying a patch; exact test_-method audit then independently verified all57 old bodies. No test or source was changed to satisfy that audit."
+  },
+  "review": {
+    "same_family_source": {
+      "completed_utc": "2026-10-07T11:54:33Z",
+      "verdict": "ACCEPT_WITHIN_REQUESTED_SOURCE_CLASS_SCOPE",
+      "unresolved_findings": 0,
+      "record_ref": "coordination:ns2604-coop/lanes/grand-catalog-durable-20261006/j820-fix4-class-review-20261007.json",
+      "record_sha256": "9eba6422bf1e81a4b7f5ef85107d03ef8bdaabbc6ea289b1a64f3d04e1881f32",
+      "evidence_class": "source_review",
+      "scope": "No test/network/native trial execution; source classes only."
+    },
+    "co_op_delta": "pending",
+    "command_center": "pending"
+  },
+  "native_counts": null,
+  "organic_verdict": null,
+  "adoption_status": null,
+  "synthesis_status": "pending_synthesis",
+  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+  "sources": [
+    {
+      "repository": "python/cpython",
+      "pin": "v3.12.0",
+      "path": "Doc/howto/unicode.rst",
+      "lines": "465-480",
+      "source_sha256": "c5cf5081618e2b06a519d2ede00fb52a53922c5a8d636c4be337810fed2bd17c"
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "v3.13.0",
+      "path": "Doc/howto/unicode.rst",
+      "lines": "465-480",
+      "source_sha256": "c5cf5081618e2b06a519d2ede00fb52a53922c5a8d636c4be337810fed2bd17c"
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/unicodedata.html#unicodedata.category",
+      "scope": "Native Unicode general-category classifier."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "d99e8a2e84f531c2c6be2dd5e890e801ec8c76ce",
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "lines": "49-125,299-309,320-352,411-477,658",
+      "scope": "Original representation-sensitive attribution and stated serialization allowances."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "path": "codex-rs/core/src/shell.rs",
+      "lines": "20-30",
+      "scope": "Native exact shell-wrapper serialization, not a shell environment equivalence claim."
+    }
+  ]
+}

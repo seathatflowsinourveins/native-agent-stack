@@ -11,7 +11,9 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import shlex
 import tempfile
+import unicodedata
 import unittest
 from unittest import mock
 
@@ -911,6 +913,220 @@ class OrganicControlChecks(unittest.TestCase):
                     for cell in result["by_tool"].values():
                         self.assertIsNone(cell["organic_count"])
                         self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def _unicode_prompt_result(self, spelling, configured="serena", runner=None):
+        prompt = native_row("event_msg", {"type": "user_message", "turn_id": "work",
+                                          "message": "Use " + spelling + "."}, ordinal=8)
+        return (runner or self.run_controls)([records(mcp(), prompt)],
+            lambda _, control: control["tools"]["serena"].update({"prompt_names": [configured]}))
+
+    def test_canonical_named_dotted_i_masks_composed_and_decomposed(self):
+        for spelling in ("\u0130NIT", "I\u0307NIT"):
+            for runner in (self.run_controls, self._run_final_scan):
+                with self.subTest(spelling=spelling, runner=runner.__name__):
+                    result = self._unicode_prompt_result(spelling, "\u0130NIT", runner)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["by_tool"]["serena"]["organic_count"], 0)
+                    self.assertEqual(result["by_tool"]["serena"]["reasons"]["named_turn"], 1)
+
+    def test_canonical_dotted_i_longer_names_remain_distinct(self):
+        for spelling in ("\u0130Serena", "I\u0307Serena"):
+            for runner in (self.run_controls, self._run_final_scan):
+                with self.subTest(spelling=spelling, runner=runner.__name__):
+                    result = self._unicode_prompt_result(spelling, runner=runner)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["by_tool"]["serena"]["organic_count"], 1)
+                    self.assertNotIn("named_turn", result["by_tool"]["serena"]["reasons"])
+
+    def test_canonical_accented_configured_name_masks_decomposed_prompt(self):
+        for spelling in ("E\u0301Serena", "MCP__E\u0301Serena__search", "MCP__gateway__E\u0301Serena"):
+            with self.subTest(spelling=spelling):
+                result = self._unicode_prompt_result(spelling, "\u00c9Serena")
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"]["serena"]["organic_count"], 0)
+                self.assertEqual(result["by_tool"]["serena"]["reasons"]["named_turn"], 1)
+
+    def test_canonical_expansion_table_masks_whole_original_names(self):
+        # Fixed Unicode controls requested by FIX4. The oracle is CPython's
+        # documented compare_caseless contract, not the counter's tokenizer.
+        for character in ("\u0130", "\u00df", "\u0149", "\u01f0", "\u0390", "\ufb01"):
+            for position, name in (("start", character + "tool"),
+                                   ("inside", "na" + character + "vtool"),
+                                   ("end", "navtool" + character)):
+                for form in ("NFC", "NFD"):
+                    original = unicodedata.normalize(form, name)
+                    for presentation in (original, "MCP__" + original + "__search",
+                                         "McP__gateway__" + original):
+                        with self.subTest(character=ord(character), position=position,
+                                          form=form, presentation=presentation):
+                            result = self._unicode_prompt_result(presentation, name)
+                            self.assertEqual(result["status"], "controls_complete")
+                            self.assertEqual(result["by_tool"]["serena"]["organic_count"], 0)
+                            self.assertEqual(result["by_tool"]["serena"]["reasons"]["named_turn"], 1)
+
+    def test_canonical_expansion_table_preserves_distinct_longer_names(self):
+        for character in ("\u0130", "\u00df", "\u0149", "\u01f0", "\u0390", "\ufb01"):
+            for position, name in (("start", character + "Serena"),
+                                   ("inside", "Ser" + character + "ena"),
+                                   ("end", "Serena" + character)):
+                for form in ("NFC", "NFD"):
+                    original = unicodedata.normalize(form, name)
+                    for presentation in (original, "MCP__" + original + "__search",
+                                         "McP__gateway__" + original):
+                        with self.subTest(character=ord(character), position=position,
+                                          form=form, presentation=presentation):
+                            result = self._unicode_prompt_result(presentation)
+                            self.assertEqual(result["status"], "controls_complete")
+                            self.assertEqual(result["by_tool"]["serena"]["organic_count"], 1)
+                            self.assertNotIn("named_turn", result["by_tool"]["serena"]["reasons"])
+
+    def test_invisible_formats_and_separated_fragments_do_not_name_tool(self):
+        names = ["se-rena", "se\nrena", "se\r\nrena"]
+        for format_character in ("\u200b", "\u2060", "\ufeff"):
+            names.extend((format_character + "Serena", "Se" + format_character + "rena",
+                          "Serena" + format_character))
+        for original in names:
+            for presentation in (original, "MCP__" + original + "__search",
+                                 "McP__gateway__" + original):
+                with self.subTest(presentation=presentation):
+                    result = self._unicode_prompt_result(presentation)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["by_tool"]["serena"]["organic_count"], 1)
+                    self.assertNotIn("named_turn", result["by_tool"]["serena"]["reasons"])
+
+    def test_canonical_mcp_parent_components_mask_child_turn(self):
+        for name in ("\u0130NIT", "I\u0307NIT", "E\u0301Serena"):
+            configured = "\u00c9Serena" if name.startswith("E") else "\u0130NIT"
+            parent = records(command(), native_row("event_msg", {"type": "user_message",
+                "turn_id": "work", "message": "Use MCP__" + name + "__search."}, ordinal=8))
+            child = records(owner="child", parent="owner")
+            child[0]["payload"]["subagent_history_start_ordinal"] = 5
+            child = [child[0], started("child-first", ordinal=5, root_turn="work"),
+                     finished("child-first", ordinal=6), started("child-work", ordinal=7, root_turn="work"),
+                     mcp("child-mcp", turn="child-work", ordinal=8, owner="child"), finished("child-work", ordinal=9)]
+            def bind_parent(_, control):
+                control["tools"]["serena"]["prompt_names"] = [configured]
+                for turn in control["turns"]:
+                    if turn["owner_id"] == "child":
+                        turn.update({"parent_turn": {"owner_id": "owner", "turn_id": "work"},
+                                     "parent_ref": proof("/parent")})
+            with self.subTest(name=name):
+                result = self.run_controls([parent, child], bind_parent)
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"]["serena"]["organic_count"], 0)
+                self.assertEqual(result["by_tool"]["serena"]["reasons"]["named_turn"], 1)
+
+    def test_rtk_apostrophe_completion_conflicts_are_unknown(self):
+        argv = ["rtk", "cat", "/fixture/skills/openai-docs/SKILL.md'"]
+        script = shlex.join(argv)
+        self.assertEqual(shlex.split(script), argv)
+        self.assertEqual(c.shell_reads(argv), ({}, 0))
+        self.assertEqual(c.shell_reads(script), ({"openai-docs": 1}, 0))
+        first, second = command(command=argv, status="failed"), command(command=script, status="failed")
+        for ordered in ((first, second), (second, first)):
+            for repeats in ((), (copy.deepcopy(ordered[0]),), (copy.deepcopy(ordered[1]),)):
+                for streams in ([records(*ordered, *repeats)],
+                                [records(ordered[0]), records(ordered[1], *repeats)]):
+                    with self.subTest(first=ordered[0]["payload"]["item"]["command"],
+                                      sources=len(streams), repeats=len(repeats)):
+                        result = self.run_controls(streams)
+                        self.assertEqual(result["status"], "unknown")
+                        self.assertEqual(result["native_call_attempts"], 1)
+                        self.assertIn("conflicting_native_representation", result["diagnostics"])
+                        for cell in result["by_tool"].values():
+                            self.assertIsNone(cell["organic_count"])
+                            self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_rtk_apostrophe_completion_conflicts_follow_alias_groups(self):
+        argv = ["rtk", "cat", "/fixture/skills/openai-docs/SKILL.md'"]
+        script = shlex.join(argv)
+        for sibling in (False, True):
+            originals = [function("C", args={"cmd": script}, response_id="R1"), returned("C")]
+            if sibling:
+                originals.append(function("C", args={"cmd": script}, response_id="R2"))
+            first = command("R1", command=argv, status="failed")
+            second = command("R2" if sibling else "C", command=script, status="failed")
+            for ordered in ((first, second), (second, first)):
+                for repeats in ((), (copy.deepcopy(ordered[0]),), (copy.deepcopy(ordered[1]),)):
+                    for streams in ([records(*originals, *ordered, *repeats)],
+                                    [records(*originals), records(ordered[0]), records(ordered[1], *repeats)]):
+                        with self.subTest(sibling=sibling, first=ordered[0]["payload"]["item"]["id"],
+                                          sources=len(streams), repeats=len(repeats)):
+                            result = self.run_controls(streams)
+                            self.assertEqual(result["status"], "unknown")
+                            self.assertEqual(result["native_call_attempts"], 1)
+                            self.assertIn("conflicting_native_representation", result["diagnostics"])
+                            for cell in result["by_tool"].values():
+                                self.assertIsNone(cell["organic_count"])
+                                self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_final_scan_rtk_apostrophe_conflicts_remain_unknown(self):
+        argv = ["rtk", "cat", "/fixture/skills/openai-docs/SKILL.md'"]
+        first, second = command(command=argv, status="failed"), command(command=shlex.join(argv), status="failed")
+        for ordered in ((first, second), (second, first)):
+            for streams in ([records(*ordered)], [records(ordered[0]), records(ordered[1])]):
+                with self.subTest(first=ordered[0]["payload"]["item"]["command"], sources=len(streams)):
+                    result = self._run_final_scan(streams)
+                    self.assertEqual(result["status"], "unknown")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    self.assertIn("conflicting_native_representation", result["diagnostics"])
+                    for cell in result["by_tool"].values():
+                        self.assertIsNone(cell["organic_count"])
+                        self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_rtk_cross_kind_agreement_implies_equal_resolved_projection(self):
+        path = "/fixture/skills/openai-docs/SKILL.md"
+        operands = (path, path.replace("/fixture/", "/fixture with space/"),
+                    "'" + path, path.replace("/fixture/", "/fix'ture/"), path + "'",
+                    '"' + path, path.replace("/fixture/", '/fix"ture/'), path + '"',
+                    path.replace("/fixture/", "/fix\\ture/"), "$" + path, "`" + path,
+                    "*" + path, "?" + path, "[" + path, "X=1" + path, "<<EOF")
+        vectors = [["rtk", "cat", operand] for operand in operands]
+        vectors.append(["rtk", "X=1", "cat", path])
+        for argv in vectors:
+            script = shlex.join(argv)
+            first, second = c._completion_command_identity(argv), c._completion_command_identity(script)
+            for ordered in ((first, second), (second, first)):
+                with self.subTest(argv=argv, first_kind=ordered[0][0]):
+                    if c._completed_commands_agree(*ordered):
+                        self.assertEqual(c.shell_reads(argv), c.shell_reads(script))
+                        self.assertEqual(c.shell_reads(argv)[1], 0)
+                        self.assertEqual(c.shell_reads(script)[1], 0)
+
+    def test_known_plain_cross_kind_projection_agreement_is_nonvacuous(self):
+        argv = ["rtk", "cat", "/fixture/skills/openai-docs/SKILL.md"]
+        script = shlex.join(argv)
+        self.assertEqual(c.shell_reads(argv), ({"openai-docs": 1}, 0))
+        self.assertEqual(c.shell_reads(script), ({"openai-docs": 1}, 0))
+        first, second = c._completion_command_identity(argv), c._completion_command_identity(script)
+        self.assertTrue(c._completed_commands_agree(first, second))
+        self.assertTrue(c._completed_commands_agree(second, first))
+
+    def test_unresolved_documented_cross_kind_completions_do_not_agree(self):
+        cases = ((["rtk", "cat", "<<EOF"], shlex.join(["rtk", "cat", "<<EOF"])),
+                 (["/bin/bash", "-lc", "rtk cat <<EOF"], "rtk cat <<EOF"),
+                 (["/bin/sh", "-c", "rtk cat <<EOF"], "rtk cat <<EOF"),
+                 (["/bin/zsh", "-lc", "rtk cat <<EOF"], "rtk cat <<EOF"))
+        for argv, script in cases:
+            self.assertGreater(c.shell_reads(script)[1], 0)
+            first, second = c._completion_command_identity(argv), c._completion_command_identity(script)
+            for ordered in ((first, second), (second, first)):
+                with self.subTest(argv=argv, first_kind=ordered[0][0]):
+                    self.assertFalse(c._completed_commands_agree(*ordered))
+
+    def test_identical_typed_apostrophe_completions_keep_original_projection(self):
+        argv = ["rtk", "cat", "/fixture/skills/openai-docs/SKILL.md'"]
+        for representation, expected in ((argv, 0), (shlex.join(argv), 1)):
+            for streams in ([records(command(command=representation, status="failed"),
+                                     command(command=copy.deepcopy(representation), status="failed"))],
+                            [records(command(command=representation, status="failed")),
+                             records(command(command=copy.deepcopy(representation), status="failed"))]):
+                with self.subTest(representation=representation, sources=len(streams)):
+                    result = self.run_controls(streams)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    self.assertEqual(result["by_tool"]["openai-docs-read"]["organic_count"], expected)
+                    self.assertNotIn("conflicting_native_representation", result["diagnostics"])
 
 
 if __name__ == "__main__":

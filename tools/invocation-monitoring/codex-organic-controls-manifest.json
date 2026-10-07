@@ -9,11 +9,11 @@
   "files": [
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b"
+      "sha256": "78f2a745473983042bb3ba8626caf8672d2140264248b71bda96d2314a4f85b8"
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      "sha256": "907169fc42c9df523f5872f9fdfc3f0a0c154da8d88e849e1c9e84dfb9fe3c41"
     }
   ],
   "prior_snapshot": {
@@ -44,7 +44,9 @@
     "Explicit one-hop native ID groups require agreeing completion commands/statuses across canonical and sibling alias originals, with sticky incomplete identity.",
     "Case-fold extracted and configured prompt names, including MCP components and inherited parent turns; preserve exact internal punctuation and longer-name boundaries.",
     "Retain completed argv and shell-text originals; compare every representation pair within direct and explicit alias groups. Unproved compatibility and non-transitive bridges leave attribution unknown.",
-    "Cross-kind serialization is limited to exact three-element Sh/Bash/Zsh -c/-lc wrappers or precisely shlex.join-escaped bare external RTK argv; distinct argv vectors retain executable and flags."
+    "Cross-kind serialization is limited to exact three-element Sh/Bash/Zsh -c/-lc wrappers or precisely shlex.join-escaped bare external RTK argv; distinct argv vectors retain executable and flags.",
+    "Extract original name spans including Unicode M/Cf; compare complete tokens/config/MCP components by NFD(NFD(value).casefold()), preserving longer names and format distinctions.",
+    "Different command representation kinds agree only when the documented serialization and resolved shell_reads projections agree; zero unknown counts required on both sides, including RTK and exact shell wrappers."
   ],
   "reference_boundary": "CanonicalRef shape declarations are not external hash resolution or original-context truth proof. Actual publication counts need the matching owner-controlled native evidence.",
   "historical_fixture_binding": {
@@ -59,7 +61,7 @@
     "claude_scope": "Not implemented by this Codex code unit; equivalent Claude provenance remains separate."
   },
   "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
-  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix3-20261007.json",
+  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix4-20261007.json",
   "prior_repair_snapshot": {
     "source_commit": "5530276d1df426db36ce2ddbd0f92e59105c0f1e",
     "manifest_path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
@@ -79,5 +81,21 @@
     "receipt_path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
     "receipt_sha256": "48e1dbb4981b224c95a313dc85972852dfd2535bb0724565e1a131a0b6d0b7a7",
     "scope": "Previous alias repair and its recorded outcomes are immutable. The later case and representation witnesses use new supplement records."
+  },
+  "fix3_controls_snapshot": {
+    "parent_commit": "d99e8a2e84f531c2c6be2dd5e890e801ec8c76ce",
+    "manifest_sha256": "dc1bb12b51e4ca5cbd0bb5d509feb2e47ec8da51d8a19986ea83f3c89f45dd4a",
+    "files": [
+      {
+        "path": "tools/invocation-monitoring/codex_counter.py",
+        "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b"
+      },
+      {
+        "path": "tools/invocation-monitoring/test_codex_counter.py",
+        "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      }
+    ],
+    "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix3-20261007.json",
+    "scope": "Historical FIX3 control/carrier bytes retained; no original record is reclassified."
   }
 }

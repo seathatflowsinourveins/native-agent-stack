@@ -21,6 +21,7 @@ from pathlib import Path
 import re
 import shlex
 import sqlite3
+import unicodedata
 
 _HELPER = Path(__file__).resolve().parents[1] / "skill-usage" / "skill_usage.py"
 _SPEC = importlib.util.spec_from_file_location("native_skill_usage", _HELPER)
@@ -296,16 +297,51 @@ def _canonical_ref(value):
             and re.fullmatch(r"[0-9a-f]{40}", value["source_commit"]) is not None)
 
 
+def _canonical_name(name):
+    # python/cpython@v3.12.0 and v3.13.0 Doc/howto/unicode.rst:465:
+    # canonical caseless comparison preserves combining marks and equivalence.
+    return unicodedata.normalize("NFD", unicodedata.normalize("NFD", name).casefold())
+
+
+def _name_character(character):
+    category = unicodedata.category(character)
+    # Marks belong to the original name. Keep invisible format characters
+    # literal too: splitting or discarding them could manufacture a tool name.
+    return (character.isalnum() or character == "_"
+            or category.startswith("M") or category == "Cf")
+
+
+def _original_name_tokens(text):
+    characters = []
+    for character in text:
+        if _name_character(character) or character in ".:-":
+            characters.append(character)
+        elif characters:
+            token = "".join(characters).strip(".:-")
+            if token:
+                yield token
+            characters = []
+    if characters:
+        token = "".join(characters).strip(".:-")
+        if token:
+            yield token
+
+
 def _prompt_words(payload):
     # Literal native user-message names, never prose inference of requestedness.
     item = payload.get("item") or {}
     content = payload.get("message", payload.get("content", item.get("content", []) if isinstance(item, dict) else []))
-    text = "\n".join(strings(content)).casefold()
+    text = "\n".join(strings(content))
     # Prose punctuation can surround a name; punctuation runs inside it are
     # literal name characters, so a longer name never names its prefix.
-    words = set(re.findall(r"\w(?:[\w.:-]*\w)?", text))
-    for server, tool in re.findall(r"\bmcp__([\w-]+?)__([\w-]+)\b", text):
-        words.update((server, tool))
+    original = list(_original_name_tokens(text))
+    words = {_canonical_name(token) for token in original}
+    for token in original:
+        parts = token.split("__", 2)
+        if (len(parts) == 3 and _canonical_name(parts[0]) == "mcp"
+                and all(part and all(_name_character(character) or character == "-"
+                                     for character in part) for part in parts[1:])):
+            words.update(_canonical_name(part) for part in parts[1:])
     return words
 
 
@@ -327,6 +363,8 @@ def _completed_commands_agree(first, second):
     Codex shell normalizer supports Sh/Bash/Zsh -c/-lc script extraction, but
     extra argv can bind positional parameters (skill_usage.py:926-935).
     Different argv vectors never agree merely because their scripts match.
+    Cross-kind agreement also requires equal resolved read projections, so a
+    quoting difference cannot let the later completion choose its attribution.
     """
     if first == second:
         return True
@@ -338,10 +376,15 @@ def _completed_commands_agree(first, second):
         return False
     if not all(isinstance(part, str) for part in argv):
         return False
-    if (len(argv) == 3 and argv[1] in {"-c", "-lc"}
-            and os.path.basename(argv[0]) in {"sh", "bash", "zsh"}):
-        return argv[2] == text
-    return bool(argv and argv[0] == "rtk" and shlex.join(argv) == text)
+    serialized = ((len(argv) == 3 and argv[1] in {"-c", "-lc"}
+                   and os.path.basename(argv[0]) in {"sh", "bash", "zsh"}
+                   and argv[2] == text)
+                  or (argv and argv[0] == "rtk" and shlex.join(argv) == text))
+    if not serialized:
+        return False
+    argv_reads, argv_unknown = shell_reads(list(argv))
+    text_reads, text_unknown = shell_reads(text)
+    return argv_unknown == text_unknown == 0 and argv_reads == text_reads
 
 
 def _completed_commands_conflict(commands):
@@ -655,7 +698,7 @@ def qualify_records(batches, *, since, until, controls):
                 else:
                     named.update(context["named_tools"])
         for tool_key, spec in tools.items():
-            if {name.casefold() for name in spec["prompt_names"]} & owner_names.get(key, set()):
+            if {_canonical_name(name) for name in spec["prompt_names"]} & owner_names.get(key, set()):
                 named.add(tool_key)
         parent = parent_ids.get(owner)
         if parent:
