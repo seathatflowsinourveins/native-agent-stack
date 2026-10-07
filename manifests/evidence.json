@@ -4665,6 +4665,38 @@
         "Original PR closures and merge/landing belong to the co-op/5f after verification and command-center review."
       ],
       "path": "evidence/receipts/grand-catalog-folds-20261007.json"
+    },
+    {
+      "id": "ns2604-catalog-fix2-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Repair the declared catalog refutation-provenance gate and two Codex invocation-control defects with separately retained synthetic regressions.",
+      "limitations": [
+        "Fixture tests and structural checks do not establish actual adoption, original model judgments, host acceptance or organic use.",
+        "Source-class declarations are resolved structurally; their truth remains an external evidence obligation.",
+        "No native transcript, rollout census or ordinary counter run was performed; the equivalent Claude qualification remains separate.",
+        "Prior receipts and their recorded source hashes/results remain historical and unchanged.",
+        "Command-center exact-head delta review and hosted validation remain required."
+      ],
+      "path": "evidence/receipts/ns2604-catalog-fix2-20261007.json"
+    },
+    {
+      "id": "ns2604-catalog-fix2-alias-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Complete the declared command-conflict guard across explicit one-hop native identity aliases, including sibling completion originals.",
+      "limitations": [
+        "These execution checks are synthetic fixtures, not native organic usage, host acceptance or actual adoption.",
+        "Identity groups use the existing projection's direct links.get(id,id) mapping; no transitive alias inference is introduced.",
+        "Each prior failed or passing stage retains its actual source hashes and returned outputs.",
+        "Command-center exact-head delta review and hosted validation are pending; recorded consistency does not prove external truth."
+      ],
+      "path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json"
     }
   ],
   "files": [
@@ -17671,13 +17703,13 @@
     },
     {
       "path": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
-      "sha256": "2ae97d1d4d8d3aa14b02ac08522a73d2637a1aa2430794eabcc3125445cf3a2a",
-      "bytes": 24423
+      "sha256": "5b00ab2266d05668d4041263f2e26be3d6966da194aeff01353bda9f6c0d425a",
+      "bytes": 26010
     },
     {
       "path": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
-      "sha256": "cdf6fb9dd3e6765e7ee83625fe9f5af6c65b4f2ae150f22df74bc1cc5403191f",
-      "bytes": 6056
+      "sha256": "81c58a4eaa497c6974b6766659d406e80791b139a30c167169fbb3cbaef90f6c",
+      "bytes": 9145
     },
     {
       "path": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
@@ -53330,6 +53362,16 @@
       "bytes": 24695
     },
     {
+      "path": "evidence/receipts/ns2604-catalog-fix2-20261007.json",
+      "sha256": "73731148a4cae941da307936105581fdb65753c97c3e1f884dc34a5cf1e8f109",
+      "bytes": 10814
+    },
+    {
+      "path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
+      "sha256": "48e1dbb4981b224c95a313dc85972852dfd2535bb0724565e1a131a0b6d0b7a7",
+      "bytes": 9026
+    },
+    {
       "path": "evidence/receipts/ns2604-catalog-native-wiring-contract-20261007.json",
       "sha256": "419665cb9b8aa2baea4282784636fba8bc537e63e09ced307fb1f1464744ec92",
       "bytes": 7731
@@ -54701,8 +54743,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "4c3531b763f126ebd78153651afba5fb44c3b1a44a9d08dc351a7122aebf1f34",
-      "bytes": 82201
+      "sha256": "8201cd367bf142c785c240bd8feb768499cdf1b69a9d33c0c88d92a7788e1700",
+      "bytes": 83414
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -55301,8 +55343,8 @@
     },
     {
       "path": "tests/test_finalized_foundation_catalog.py",
-      "sha256": "0ce4a4704ddb2b707459306828261ca2cfce9c27f70955ee242c221f80e380a9",
-      "bytes": 75089
+      "sha256": "a6b800588e3699cf97f41dd03c7c9b3955d0728ae08b52d84991b58de76d79f3",
+      "bytes": 80646
     },
     {
       "path": "tests/test_financial_data.py",
@@ -56226,18 +56268,18 @@
     },
     {
       "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
-      "sha256": "eb22a57c77c0bf26257c6c808ef6875d95c926bd0ee69bbb59f5f5ed69ab5367",
-      "bytes": 2502
+      "sha256": "0b5614cdb6ea68c037d1e6c873651c182a04fb2c6598c67fe971c2124a005571",
+      "bytes": 4528
     },
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
-      "bytes": 52981
+      "sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+      "bytes": 55328
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40",
-      "bytes": 33402
+      "sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3",
+      "bytes": 46076
     },
     {
       "path": "tools/omniroute/gateway_record.py",
