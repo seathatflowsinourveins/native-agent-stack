@@ -38,8 +38,8 @@ reserved above stays reserved however clear the evidence is. Check a capability
 claim in the order of the
 [harness defaults](harness-defaults.md#check-a-capability-claim-in-order):
 the installed client, its changelog for that version, its source at that tag,
-then its documentation. Whether an installed component stays follows the
-[retention decision](decisions/2026-10-07-native-workflow-effect-decides-retention.md).
+then its documentation. How a candidate is installed and finalized follows the
+[clean-install decision](decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md).
 Record a correction the same turn it is found.
 
 ## Where each answer comes from

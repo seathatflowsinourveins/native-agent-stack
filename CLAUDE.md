@@ -7,8 +7,8 @@ diagnostics first; if the claim remains unresolved, ask for the relevant `/plugi
 `/mcp` or `/context` output. Invoke a command through Skill only if the installed
 client exposes it there.
 
-A session that acts as the command center reads `docs/command-center.md` first. Whether an
-installed component stays follows `docs/decisions/2026-10-07-native-workflow-effect-decides-retention.md`.
+A session that acts as the command center reads `docs/command-center.md` first. How a candidate
+is installed and finalized follows `docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md`.
 
 ## Compact Instructions
 
