@@ -16597,8 +16597,8 @@
     },
     {
       "path": "catalogs/foundation/surfaces.json",
-      "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
-      "bytes": 20383
+      "sha256": "40dde472d2c1660e8baf64ff93b1fc766c86363e3aa91dd5e0d27d8333f53808",
+      "bytes": 20706
     },
     {
       "path": "catalogs/foundation/upstream-surface-baseline.json",
@@ -17192,8 +17192,8 @@
     },
     {
       "path": "docs/current-session-observation.md",
-      "sha256": "f531d9a279f8bab2caf56efcdb810a8d54853c83d3c348be1e620fb83869349c",
-      "bytes": 9108
+      "sha256": "b1d3f70a84a611cc2730a4897f8aa16ad9b66356626ad247706b1f7f95bfdcb5",
+      "bytes": 9509
     },
     {
       "path": "docs/dashboard-gap-resolution.md",
@@ -17671,6 +17671,11 @@
       "bytes": 135389
     },
     {
+      "path": "docs/decisions/2026-10-05-disk-headroom-enospc.md",
+      "sha256": "c752bb20e9a7cec69c2e810f736ef0132286ea45950227ad7b94882df0535888",
+      "bytes": 33132
+    },
+    {
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
       "sha256": "b0d7fcee643cd6b29b37dc48025d8006c564c4657c1225e5d9df379265bfaa0f",
       "bytes": 56929
@@ -17759,6 +17764,16 @@
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
+    },
+    {
+      "path": "docs/decisions/2026-10-06-native-lane-invocation-observability.md",
+      "sha256": "cfdd6259ea84da1f9aaf5735baea509ac32c83224a126461aa62cf39f6f6ccb6",
+      "bytes": 42616
+    },
+    {
+      "path": "docs/decisions/2026-10-06-ns2604-native-dashboard-countability.md",
+      "sha256": "22d280f870a6f58cbdcdc70832999225f19648e3260451a58de3a3206eb4d8ca",
+      "bytes": 4991
     },
     {
       "path": "docs/decisions/2026-10-06-ns2604-selected-browser-native-qualification.md",
@@ -17937,8 +17952,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d956ab78563864e8cc2513d391fe133bc9ef5cc88fb561f94c79adf4bec5abd1",
-      "bytes": 247602
+      "sha256": "cc613cced99f534e62cdcb23995b7e4c029b0dc624e39eb3496d2de79726ad6b",
+      "bytes": 248160
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -17992,8 +18007,8 @@
     },
     {
       "path": "docs/memory-rag-native-practice.md",
-      "sha256": "ceedaee1bd35c3b3f3a3b4376bae7b14a24dc592192dad9cc6429a24025459a8",
-      "bytes": 8539
+      "sha256": "e5f2464b58625b9edb8c27309f50e24e13b1adb7e114eff2e328129d447f66fb",
+      "bytes": 8694
     },
     {
       "path": "docs/model-currency.md",
@@ -18002,8 +18017,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "3f190f7532d8bfdfbad85b6aa119adc60f763cda45361f237cbbe6f5a1c30f8e",
-      "bytes": 19574
+      "sha256": "23f194dea172257c5abcea2f88a9d9f3ce55c2fd006d7b673c08f8ee617f6bc1",
+      "bytes": 23677
     },
     {
       "path": "docs/native-dashboard-operations-resolution.md",
@@ -18012,8 +18027,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "7873026e9de4f06c651de7edc5c4fdc05cc61b7eb34267160d263864e8c98ae9",
-      "bytes": 17782
+      "sha256": "1ac681a9f608a625d5c4013de9d27760f8a45a5b1fa3adf9cb2c9018fef6d3a3",
+      "bytes": 21948
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -18192,8 +18207,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b86061e11b96277c1488bba17bf91b9d84ff24d8de6d3e244331c9b93d42ed84",
-      "bytes": 113301
+      "sha256": "e4abc24b44f8c59604bd1946de57116bee04c2a6cd3c5ab45a36d89e5e9fb05c",
+      "bytes": 113399
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -40432,8 +40447,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "37ac9c4bf297fd86fed47356d06c2c9e11429c92d758815a7ef73e3dcd5afc4e",
-      "bytes": 91672
+      "sha256": "2436ec8832588b4cbf1a94ad8c85fe7a1f29cab0e6affe02e434dd4c6b65a825",
+      "bytes": 97777
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -40447,13 +40462,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "ae3cc45aecd2fd5fbcc7c900f2bc01de4bc8cb728e095be9cb16f5525422e33e",
-      "bytes": 198496
+      "sha256": "a69bf615b832e4b1d7b9619ed25206686c6bfbf277bdb087a7aed8abe7ecde55",
+      "bytes": 199836
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "4793420812ae1efd31f3fa27e4efbd32ebd74c782770b6f06598f72aa8b5fd9d",
-      "bytes": 49591
+      "sha256": "a2c0ad92f2203c9511963548854a924d3d176b709ce91b9cd005fdfc54d9dc42",
+      "bytes": 51606
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -40572,8 +40587,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-dashboards.yaml",
-      "sha256": "f2bd48bfb43f554cf2de6e0b7f13892ff8099aacaa565a1e9f61ceedfe8e36a2",
-      "bytes": 330
+      "sha256": "88e3ce0da58dc109060134ac3c194af2b953d061c7c3df1fef03e23a88a03146",
+      "bytes": 913
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-datasources.yaml",
@@ -40581,14 +40596,34 @@
       "bytes": 706
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-ecosystem-native.json",
+      "sha256": "f5fc3ad28fcc2a651dbeebd42266f1f2e68fbeef671e858ca28f606342e199c7",
+      "bytes": 47467
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-lanes.json",
+      "sha256": "b0ede411130ae0a9c8ccac0445b52836d23c5903c071ea3dca42c34cc885486c",
+      "bytes": 71384
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-native-foundation-data.json",
+      "sha256": "c4f4f8fb9286c7b10a250a339dda6ccac1b556a5900e5c384029c3f34369499c",
+      "bytes": 37016
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-research-grand.json",
+      "sha256": "bc794124335f1f4bb900157d02cdabd00803897e9416d7161c443453dd91e541",
+      "bytes": 29674
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-token-layer.json",
-      "sha256": "fb2c0449acb2f28fec1ec6c1bc6bfac6b35f1e2d61e3cd1592d94547dd73fe5f",
-      "bytes": 25857
+      "sha256": "ffe992ccd8a9caa4d56753b44b43da785cc6d80ed7415f99d8b1332f05138cdd",
+      "bytes": 37593
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
-      "sha256": "bb349bc6e266da242aeb144ec5c0c37f194e012ff366628d6502f28cf2d74303",
-      "bytes": 906
+      "sha256": "d0e6e66a4ca4e11b02b119903e1e0904737facb13414be7363f8fbd03b47b08f",
+      "bytes": 1142
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-accept.sh",
@@ -40604,6 +40639,11 @@
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-client-config.py",
       "sha256": "62c4f4e4113bf8246d7e76bf260200047a44c53cda73dd51f764660657091f69",
       "bytes": 6484
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/lanes-registry.json",
+      "sha256": "886b3d1e7d6e20038438f133c8c10e10fb3bfb42fd34dcfec8b48677acb39fe0",
+      "bytes": 28
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/loki.yaml",
@@ -40626,9 +40666,19 @@
       "bytes": 852
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.service",
+      "sha256": "9ee9f051e32ceb096cc7d090d03d093c8c675f9c5d3e20aa9a91d2ab267b2087",
+      "bytes": 1530
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.timer",
+      "sha256": "e9e99da977bbadf10c8a8c92d9a766b816c1a071b329a92b6281c6f9442d44f2",
+      "bytes": 502
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
-      "sha256": "51382783c1c608b30ff715bb63ecbe5b7a737b147fb0c092bf6179c09989fd47",
-      "bytes": 16112
+      "sha256": "0793b0b92f51597cdaffdfa4eafff6aaa3b0d2e568aad2d161bd0e261001dcd1",
+      "bytes": 22319
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
@@ -40707,8 +40757,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "abca05750aaddf9826a38686b9ea6717673e343d43b4afe7518d75ac3a7c9a26",
-      "bytes": 26270
+      "sha256": "fa2f6e73ea0bbaa8795d3334c032e90a1e4c29da8efc8d4b93dc1e2290dd676e",
+      "bytes": 53131
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
@@ -40847,13 +40897,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "1fb6561a2c65d00468325efa434b2b6d23281025b32043c81c578eae703c2853",
-      "bytes": 480726
+      "sha256": "3b5b29ba85c86037766bda1bb869efd2cc450eea21facef0ad333a1c497354c1",
+      "bytes": 487472
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "62409e6b048abd6e589c1b965bdb28bedcf51332cd1abe574e2121ff0e0b265c",
-      "bytes": 133248
+      "sha256": "f40f9023f10c273be1445d2fb4f3f4105e876e71c137bc87b1f3bd9e1f48f031",
+      "bytes": 134338
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -50132,8 +50182,8 @@
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py",
-      "sha256": "0fc025d1a486924e5f0095160e8d458bfafe55b0dfd1ed8262108d64dfdfb900",
-      "bytes": 6630
+      "sha256": "c9ac103ed8caf07c030e06c805884fba9e5941137451443f82c1853bfe9b4758",
+      "bytes": 8385
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_prometheus.py",
@@ -54892,8 +54942,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "e75d16a8ff9e0d651f9e33474c47fb9982d83fe5ce7b6d65328988d9cc8b0f61",
-      "bytes": 25850
+      "sha256": "ef41fd7abd8565ceeab94a545d984449a4e5ad703a2caf1e9b0a7f1f5ba7a3a1",
+      "bytes": 26587
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -55007,13 +55057,18 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "a6312ca3150dc8ef95e408adb6b4522bea0dc3e20d8351e394f7824b95d37de2",
-      "bytes": 26125
+      "sha256": "d46d57617085cc4cba494d27e4c33df4a02648d82cd31c33103d373a0c201bf7",
+      "bytes": 52875
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
       "sha256": "d2e7e5ee443f9fd0ba650f19351146f927421f674bcd8ee2fbd9cda383f84807",
       "bytes": 381
+    },
+    {
+      "path": "observability/collector/ns2604-prometheus-start-timestamps.conf.example",
+      "sha256": "f8ea75284fc667c73e5fe8504f5bb4e0f34a06b93fca2bd9f0e59889eca28261",
+      "bytes": 841
     },
     {
       "path": "observability/desktop-restart.md",
@@ -55027,8 +55082,8 @@
     },
     {
       "path": "observability/grand-dashboard/README.md",
-      "sha256": "22662cb7c468977a874f87fa1d2395e00dfd09991a0933e57e357b08b44cadd7",
-      "bytes": 8128
+      "sha256": "0b0418a119535427e805903cca458a00115abb10caf348c28ac9b994da667928",
+      "bytes": 10329
     },
     {
       "path": "observability/grand-dashboard/acceptance.py",
@@ -55046,6 +55101,11 @@
       "bytes": 8088
     },
     {
+      "path": "observability/grand-dashboard/hcom_status.py",
+      "sha256": "546682fe0b1314447b5405eb371f864df320d3ecf4ac28aebef5dd99c25f098a",
+      "bytes": 4635
+    },
+    {
       "path": "observability/grand-dashboard/install.py",
       "sha256": "5c210245bdf154dbe70f0cc26f8290a9aab508d7908c475fb4cc6df2df06abc9",
       "bytes": 2345
@@ -55057,13 +55117,13 @@
     },
     {
       "path": "observability/grand-dashboard/passwordless.md",
-      "sha256": "686719345c736aa29830d3afca74bc06cb0dc45d8c0283860dc83018db207a0b",
-      "bytes": 4976
+      "sha256": "24c967bd8cfe948e00566c3c609c5f5d7a533530d8b4d48f4af96329a7ee4746",
+      "bytes": 5457
     },
     {
       "path": "observability/grand-dashboard/progress.py",
-      "sha256": "9c386558e4f07d659179750d218bd78a8898c68b198e70e73484040a63110740",
-      "bytes": 14046
+      "sha256": "0bcde60433fe773dc2fee21e5030a51c23af5942bc4aa91288c9aa5193883fb2",
+      "bytes": 17207
     },
     {
       "path": "observability/grand-dashboard/receipt.json",
@@ -55072,13 +55132,23 @@
     },
     {
       "path": "observability/grand-dashboard/render.py",
-      "sha256": "9d5ebb8b6c9f9f532603d2b112905125a143e039b7d9dcc33a396b7596590772",
-      "bytes": 8173
+      "sha256": "a4de8aae670d9ef4ff224093debee9256b5815bbc11109341f7ee2fd6528f56d",
+      "bytes": 9232
     },
     {
       "path": "observability/grand-dashboard/state.json",
       "sha256": "6dc4f85e48a3ddc5b3b9f9f5e485aa66aaeb53b9a1e173c57d857a4e04da6274",
       "bytes": 24794
+    },
+    {
+      "path": "observability/lanes-tool-inventory.json",
+      "sha256": "a17e490820addbb9cff7e0429780b24c81c933212412443d4bffc2dae7ec8f2d",
+      "bytes": 12502
+    },
+    {
+      "path": "observability/lanes_dashboard.py",
+      "sha256": "03809caa625ce71be92a3649ae4e9036ea1b5305b0345f2dc54a96f65f9cfafd",
+      "bytes": 20106
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -55112,8 +55182,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "63bab52fea451f4dc941b8e02e5d0c0176d96899403cd03c063798b9374a9b20",
-      "bytes": 16711
+      "sha256": "1ab47e3f0af3cb3ebb02c4f16f1445aa6c43033568d011f123c08b2ee652f292",
+      "bytes": 17313
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -55142,13 +55212,18 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "0a0bf07fa2a8bacbfc8c5de3e7f615e776625167c976db81db639621ee6945f8",
-      "bytes": 18302
+      "sha256": "cd7808ca7f5e88b214a6125076655a32b3306cade7d94562b81d5e1fee056cec",
+      "bytes": 18616
     },
     {
       "path": "observability/native-data/snapshot.py",
       "sha256": "ec68f05a9dea2c8d3e37888b2928760bd085ce1567bcdd09145e82a6196fb68b",
       "bytes": 29140
+    },
+    {
+      "path": "observability/ns2604_dashboards.py",
+      "sha256": "00d0a555215c3bb44f1a8551dfdaabb9235e190d9f6cf8ae7caeef04350a1927",
+      "bytes": 7620
     },
     {
       "path": "observability/receipt.json",
@@ -56062,8 +56137,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "695a11868546649f5780170b423cd82322a72a811dd1fe9c49abf4b57a06428e",
-      "bytes": 15259
+      "sha256": "96521dbee17e59f10fb1b6d657f3f62d8cdab2cebddbee4be51457da43392055",
+      "bytes": 22863
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
@@ -56074,6 +56149,11 @@
       "path": "tests/test_hardware_profile.py",
       "sha256": "1c6d4b28c0f61c825e9cf761b2e486b7dff9cb37190830fb93b0d77204811d5d",
       "bytes": 32779
+    },
+    {
+      "path": "tests/test_hcom_status.py",
+      "sha256": "60daa38d902cb4111ce43adea45327ede9d34e8cf554faed174cf0e7f0797531",
+      "bytes": 3719
     },
     {
       "path": "tests/test_historical_comparison.py",
@@ -56124,6 +56204,11 @@
       "path": "tests/test_install_skills.py",
       "sha256": "7de56577e7b9aa721a9ad8799be488d6455986d381f9b6aa886af53416d33368",
       "bytes": 103496
+    },
+    {
+      "path": "tests/test_j775_panel_contracts.py",
+      "sha256": "c456549636a9ad006b6f54c08683327865eaa8efc2a83fe938157c4a25337951",
+      "bytes": 4805
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -56257,8 +56342,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "7696c21ef08a5a0fde82c67cebe928d7efe02e0e0fa5f465dd28f4b809157b4e",
-      "bytes": 40258
+      "sha256": "86046bfc209f68743cce27c01f6145cfd0fd234925f9e46898072c944a3da591",
+      "bytes": 41266
     },
     {
       "path": "tests/test_native_faults_min.py",
@@ -56326,6 +56411,11 @@
       "bytes": 19560
     },
     {
+      "path": "tests/test_ns2604_dashboards.py",
+      "sha256": "cdfe83175f42ec55d1ce30fce84e85a1f9f9198d960f4314d1822f3034f8006b",
+      "bytes": 18114
+    },
+    {
       "path": "tests/test_observability.py",
       "sha256": "ea9b9c80b3c9484954077236fdf21bff8286efcecffc08f999d70bbb71b7c9f2",
       "bytes": 7534
@@ -56347,13 +56437,18 @@
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "96b901ada162f4a9d5c7445a4f5272ca86011d5e9227211405051ad12fe79665",
-      "bytes": 38105
+      "sha256": "f8f95aa3a2163dbd2131c80263da5937ad811a9c257ce0eff30d19a89816e48d",
+      "bytes": 45397
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
       "sha256": "ed753ba402f5795c0d15d1e8e58430bb8fb71471f0a30d7650e6ddf196417c4a",
       "bytes": 61935
+    },
+    {
+      "path": "tests/test_observability_writer_identity_merge_guard.py",
+      "sha256": "4439f9b6fbf2092ae5cb4cb62fa048021b0c84929e671392fe826e885d571d98",
+      "bytes": 4024
     },
     {
       "path": "tests/test_offhost_app_state.py",
@@ -56909,6 +57004,31 @@
       "path": "tools/credentials/credential_run.py",
       "sha256": "bcab1b94a1cdf73b630b50c45c6a8a0189de089e987abb21b327e4238bd04222",
       "bytes": 55887
+    },
+    {
+      "path": "tools/invocation-monitoring/README.md",
+      "sha256": "f424a8b8e0feadf78184019f6ae1bbef24f7160ffaabce63476ac90841436d13",
+      "bytes": 2540
+    },
+    {
+      "path": "tools/invocation-monitoring/claude_counter.py",
+      "sha256": "f869e2dd4a35e5f1b43550a27144c424a77b148cecf90dcfad15adb1cb4979ec",
+      "bytes": 35365
+    },
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
+      "bytes": 24787
+    },
+    {
+      "path": "tools/invocation-monitoring/role_denominators.py",
+      "sha256": "0c7ff7f2a4acae8df39c70ab61729e6fee43d01c3df3a99e62a575f251f25353",
+      "bytes": 19691
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "1c88c483bf50c4b12658aa43fec806060c557dda1215178c3e2dff1feb75a86e",
+      "bytes": 5161
     },
     {
       "path": "tools/omniroute/gateway_record.py",
