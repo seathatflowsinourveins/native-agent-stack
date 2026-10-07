@@ -85,7 +85,7 @@ def current_matcher_section(text: str) -> str:
     """Read the latest dated matcher amendment while preserving the historical text."""
     sections = re.split(r"(?m)^## (?:Amendment|Addendum) \(\d{4}-\d{2}-\d{2}\):[^\n]*\n", text)
     for section in reversed(sections[1:]):
-        if OPERATIVE in section:
+        if OPERATIVE in section or quoted_matchers(section):
             return section
     return text
 
@@ -682,6 +682,14 @@ class DocumentationTests(unittest.TestCase):
         good = "permission_prompt|auth_success"
         text = f"matcher {OPERATIVE}`permission_prompt`.\n\n## Amendment: alert source\nmatcher {OPERATIVE}`{good}`."
         self.assertNotEqual(matcher_problems(current_matcher_section(text), good), [])
+
+    def test_a_later_unmarked_dated_matcher_cannot_bypass_the_selector(self):
+        matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
+        text = (ROOT / "docs/decisions/2026-09-28-terminal-experience.md").read_text(encoding="utf-8")
+        self.assertEqual(matcher_problems(current_matcher_section(text), matcher), [])
+        later = "\n## Amendment (2026-10-07): selector control\nCurrent matcher `permission_prompt|auth_success`.\n"
+        self.assertTrue(quoted_matchers(later))
+        self.assertNotEqual(matcher_problems(current_matcher_section(text + later), matcher), [])
 
     def test_a_wrong_operative_matcher_is_found_whatever_its_markup(self):
         matcher = "idle_prompt|permission_prompt|auth_success"
