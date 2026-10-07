@@ -93,7 +93,9 @@ and [paper policy](../paper-lane-policy.md) keep their own gates.
   test per task with literal assertions, `--repeat 3`); Harbor or Inspect for a
   containerized agent task; the vendor's own evaluation runner or a public
   benchmark harness for a memory or retrieval system. No runner of our own is
-  kept.
+  kept. The promptfoo form for headless client sessions has not been run in
+  this repository yet; it is an untested boundary until its first check, and
+  that check's record says whether it reproduced a result of 7 October.
 - **Evidence class.** A check on the host's own installed client is
   `local paired sessions`. It is never reported as upstream-harness acceptance,
   and a saving is never claimed from it beyond the tasks it ran.
