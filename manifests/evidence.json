@@ -54462,8 +54462,8 @@
     },
     {
       "path": "observability/invoke-rates/README.md",
-      "sha256": "4d70f0bc51bae3bc1c1bfbc99886ca59c82b1585fec1bbb741c9815cdf50a150",
-      "bytes": 5750
+      "sha256": "8282a95d194d8606ac9317345ee20ba977d2ab931ee3149b5e0233327bd105b7",
+      "bytes": 6136
     },
     {
       "path": "observability/invoke-rates/collector-identity.example.yaml",
