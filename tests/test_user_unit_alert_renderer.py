@@ -3,6 +3,7 @@ from copy import deepcopy
 import importlib.util
 import json
 from pathlib import Path
+import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,6 +15,28 @@ SPEC.loader.exec_module(r)
 class UserUnitRendererTests(unittest.TestCase):
     def policy(self):
         return r.load(ROOT / "observability/alert-lifecycle/policy.example.json")
+
+    def test_promtool_fixture_rosters_use_renderable_contracts(self):
+        fixtures = r.load(ROOT / "observability/alert-lifecycle/user-unit-alerts.test.json")
+        checked = 0
+        for case in fixtures["tests"]:
+            for source in case.get("input_series", []):
+                if not source["series"].startswith(r.EXPECTED + "{"):
+                    continue
+                labels = dict(re.findall(r'(\w+)="([^"]*)"', source["series"]))
+                unit = {"name": labels["unit"], "failure_class": labels["failure_class"],
+                        "severity": labels["severity"], "unit_kind": labels["unit_kind"],
+                        "armed": source["values"].startswith("1"),
+                        "recovery_contract": labels["recovery_contract"],
+                        "completion_contract": labels["completion_contract"]}
+                # Host labels are synthetic; validate the actual contract fields
+                # through the production renderer, not a weaker duplicate rule.
+                policy = self.policy()
+                policy["units"] = [unit]
+                with self.subTest(case=case["name"], unit=unit["name"]):
+                    self.assertEqual(r.validate_policy(policy)["units"], [unit])
+                checked += 1
+        self.assertGreater(checked, 0)
 
     def continuous(self, name, failure_class="StackUnitDown", severity="warning"):
         return {"name": name, "failure_class": failure_class, "severity": severity,

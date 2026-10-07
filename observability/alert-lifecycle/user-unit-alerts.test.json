@@ -8,15 +8,15 @@
   ],
   "tests": [
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: fresh active or inactive clears failure only; availability and completion are unqualified",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: fresh active is quiet; fresh inactive without Result is UNKNOWN-firing",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"stack.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"stack.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -46,24 +46,43 @@
         {
           "eval_time": "30s",
           "alertname": "PaperLaneUnitDown",
-          "exp_alerts": []
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
         },
         {
           "eval_time": "6m",
           "alertname": "PaperLaneUnitDown",
-          "exp_alerts": []
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
         }
       ],
       "promql_expr_test": [
         {
           "expr": "ns2604_user_unit_recovery{unit=\"paper.service\"}",
           "eval_time": "6m",
-          "exp_samples": [
-            {
-              "labels": "ns2604_user_unit_recovery{host=\"fixture-host\",unit=\"paper.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-              "value": 1
-            }
-          ]
+          "exp_samples": []
         }
       ]
     },
@@ -72,7 +91,7 @@
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"ns2604-F09-DRILL.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -80,7 +99,7 @@
           "values": "1x80"
         },
         {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"ns2604-F09-DRILL.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"failed\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
           "values": "1x80"
         }
       ],
@@ -97,11 +116,11 @@
             {
               "exp_labels": {
                 "host": "fixture-host",
-                "unit": "ns2604-F09-DRILL.service",
+                "unit": "paper-drill-w2.service",
                 "severity": "warning"
               },
               "exp_annotations": {
-                "summary": "DRILL: User unit ns2604-F09-DRILL.service needs attention",
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
                 "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
               }
             }
@@ -114,11 +133,11 @@
             {
               "exp_labels": {
                 "host": "fixture-host",
-                "unit": "ns2604-F09-DRILL.service",
+                "unit": "paper-drill-w2.service",
                 "severity": "warning"
               },
               "exp_annotations": {
-                "summary": "DRILL: User unit ns2604-F09-DRILL.service needs attention",
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
                 "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
               }
             }
@@ -131,11 +150,11 @@
             {
               "exp_labels": {
                 "host": "fixture-host",
-                "unit": "ns2604-F09-DRILL.service",
+                "unit": "paper-drill-w2.service",
                 "severity": "warning"
               },
               "exp_annotations": {
-                "summary": "DRILL: User unit ns2604-F09-DRILL.service needs attention",
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
                 "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
               }
             }
@@ -148,11 +167,11 @@
             {
               "exp_labels": {
                 "host": "fixture-host",
-                "unit": "ns2604-F09-DRILL.service",
+                "unit": "paper-drill-w2.service",
                 "severity": "warning"
               },
               "exp_annotations": {
-                "summary": "DRILL: User unit ns2604-F09-DRILL.service needs attention",
+                "summary": "DRILL: User unit paper-drill-w2.service needs attention",
                 "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
               }
             }
@@ -161,11 +180,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: fresh active recovery resolves only after 30s hold",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: fresh active recovery resolves only after 30s hold",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"active-recovery.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"active-recovery.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -241,11 +260,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: fresh inactive clears retained paper failure without asserting job success",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: inactive cannot resolve paper alert; only later fresh active plus hold resolves",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-recovery.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-recovery.service\",failure_class=\"PaperLaneUnitDown\",severity=\"critical\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -284,46 +303,75 @@
           ]
         },
         {
-          "eval_time": "60s",
-          "alertname": "PaperLaneUnitDown",
-          "exp_alerts": [
-            {
-              "exp_labels": {
-                "host": "fixture-host",
-                "unit": "paper-recovery.service",
-                "severity": "critical"
-              },
-              "exp_annotations": {
-                "summary": "User unit paper-recovery.service needs attention",
-                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
-              }
-            }
-          ]
-        },
-        {
-          "eval_time": "75s",
-          "alertname": "PaperLaneUnitDown",
-          "exp_alerts": [
-            {
-              "exp_labels": {
-                "host": "fixture-host",
-                "unit": "paper-recovery.service",
-                "severity": "critical"
-              },
-              "exp_annotations": {
-                "summary": "User unit paper-recovery.service needs attention",
-                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
-              }
-            }
-          ]
-        },
-        {
           "eval_time": "90s",
           "alertname": "PaperLaneUnitDown",
-          "exp_alerts": []
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
         },
         {
           "eval_time": "165s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "180s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "195s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "paper-recovery.service",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "User unit paper-recovery.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "210s",
           "alertname": "PaperLaneUnitDown",
           "exp_alerts": []
         }
@@ -332,21 +380,16 @@
         {
           "expr": "ns2604_user_unit_recovery{unit=\"paper-recovery.service\"}",
           "eval_time": "165s",
-          "exp_samples": [
-            {
-              "labels": "ns2604_user_unit_recovery{host=\"fixture-host\",unit=\"paper-recovery.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-              "value": 1
-            }
-          ]
+          "exp_samples": []
         }
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: exporter outage over 10m cannot resolve even with healthy-looking raw values",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: exporter outage over 10m cannot resolve even with healthy-looking raw values",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"outage.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"outage.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -424,11 +467,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: old cached active timestamp while HTTP up becomes unknown-firing",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: old cached active timestamp while HTTP up becomes unknown-firing",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cached.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cached.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -495,11 +538,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: missing registered unit while exporter up remains unknown-firing",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: missing registered unit while exporter up remains unknown-firing",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"missing.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"missing.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -550,11 +593,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: stale marker for failed unit cannot resolve",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: stale marker for failed unit cannot resolve",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"stale.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"stale.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -621,11 +664,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: old failed and new healthy cache overlap delays recovery conservatively",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: old failed and new healthy cache overlap delays recovery conservatively",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"overlap.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"overlap.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -725,11 +768,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: pending condition cancelled by fresh active before 30s",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: pending condition cancelled by fresh active before 30s",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"pending.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"pending.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -764,11 +807,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: zero valued active gauge is not recovery and does not survive fresh filter",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: zero valued active gauge is not recovery and does not survive fresh filter",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"zero.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"zero.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -825,11 +868,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: future healthy sample cannot resolve before its timestamp; negative-age filter rejects explicit future lookup",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: future healthy sample cannot resolve before its timestamp; negative-age filter rejects explicit future lookup",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"future.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"future.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -913,7 +956,7 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: unregistered failed units do not invent alerts",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: unregistered failed units do not invent alerts",
       "interval": "15s",
       "input_series": [
         {
@@ -939,11 +982,11 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: active to inactive remains no-failure; silent-stop availability and completion are outside F09",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT CONFIGURATION EXPECTATION: silent stop to fresh inactive without success remains attention beyond 6m",
       "interval": "15s",
       "input_series": [
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"silent-stop.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"silent-stop.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -973,34 +1016,65 @@
         {
           "eval_time": "90s",
           "alertname": "StackUnitDown",
-          "exp_alerts": []
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "silent-stop.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit silent-stop.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
         },
         {
           "eval_time": "6m",
           "alertname": "StackUnitDown",
-          "exp_alerts": []
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "silent-stop.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit silent-stop.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
         },
         {
           "eval_time": "12m",
           "alertname": "StackUnitDown",
-          "exp_alerts": []
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "host": "fixture-host",
+                "unit": "silent-stop.service",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "User unit silent-stop.service needs attention",
+                "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+              }
+            }
+          ]
         }
       ],
       "promql_expr_test": [
         {
           "expr": "ns2604_user_unit_recovery{unit=\"silent-stop.service\"}",
           "eval_time": "6m",
-          "exp_samples": [
-            {
-              "labels": "ns2604_user_unit_recovery{host=\"fixture-host\",unit=\"silent-stop.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-              "value": 1
-            }
-          ]
+          "exp_samples": []
         }
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC CURRENT-FAILED-STATE CONFIGURATION EXPECTATION: every pinned native nonfailed enum clears failure only, not availability/cadence/completion",
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native active clears W2 failure only, with completion unknown",
       "interval": "15s",
       "input_series": [
         {
@@ -1008,72 +1082,288 @@
           "values": "1x80"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-active.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-active.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-reloading.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-reloading.service\",state=\"reloading\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-inactive.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-inactive.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-activating.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-activating.service\",state=\"activating\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-deactivating.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-deactivating.service\",state=\"deactivating\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-maintenance.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-maintenance.service\",state=\"maintenance\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"enum-refreshing.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
-          "values": "1x80"
-        },
-        {
-          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"enum-refreshing.service\",state=\"refreshing\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"active\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
           "values": "1x80"
         }
       ],
       "alert_rule_test": [
         {
           "eval_time": "30s",
-          "alertname": "StackUnitDown",
+          "alertname": "PaperLaneUnitDown",
           "exp_alerts": []
         },
         {
           "eval_time": "6m",
-          "alertname": "StackUnitDown",
+          "alertname": "PaperLaneUnitDown",
           "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native reloading clears W2 failure only, with completion unknown",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"reloading\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native inactive clears W2 failure only, with completion unknown",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"inactive\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native activating clears W2 failure only, with completion unknown",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"activating\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native deactivating clears W2 failure only, with completion unknown",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"deactivating\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native maintenance clears W2 failure only, with completion unknown",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"maintenance\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCAL SYNTHETIC W2-ONLY FAILURE-CLEARED EXPECTATION: native refreshing clears W2 failure only, with completion unknown",
+      "interval": "15s",
+      "input_series": [
+        {
+          "series": "up{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"paper-drill-w2.service\",failure_class=\"PaperLaneUnitDown\",severity=\"warning\",unit_kind=\"drill\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "values": "1x80"
+        },
+        {
+          "series": "systemd_unit_state{host=\"fixture-host\",unit=\"paper-drill-w2.service\",state=\"refreshing\",job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\"}",
+          "values": "1x80"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "30s",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "PaperLaneUnitDown",
+          "exp_alerts": []
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "count(ns2604_user_unit_recovery{unit=\"paper-drill-w2.service\"})",
+          "eval_time": "6m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1
+            }
+          ]
         }
       ]
     },
@@ -1086,7 +1376,7 @@
           "values": "1x80"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"unknown.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"unknown.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -1094,7 +1384,7 @@
           "values": "1x80"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"empty.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"empty.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -1102,7 +1392,7 @@
           "values": "1x80"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"foreign.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"foreign.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
@@ -1463,7 +1753,7 @@
       ]
     },
     {
-      "name": "LOCAL SYNTHETIC EXPLICIT-RECOVERY-CONTRACT EXPECTATION: failure-cleared rejects newer unknown foreign or empty state over cached known nonfailed",
+      "name": "LOCAL SYNTHETIC ACTIVE-RECOVERY-CONTRACT EXPECTATION: newer unknown foreign or empty state overrides older active evidence and never clears a continuous alert",
       "interval": "15s",
       "input_series": [
         {
@@ -1471,11 +1761,11 @@
           "values": "1x80"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cleared-unknown.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cleared-unknown.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
-          "series": "systemd_unit_state{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\",host=\"fixture-host\",unit=\"cleared-unknown.service\",state=\"inactive\"}",
+          "series": "systemd_unit_state{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\",host=\"fixture-host\",unit=\"cleared-unknown.service\",state=\"active\"}",
           "values": "_x40 1 _x39"
         },
         {
@@ -1483,11 +1773,11 @@
           "values": "_x41 1x39"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cleared-foreign.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cleared-foreign.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
-          "series": "systemd_unit_state{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\",host=\"fixture-host\",unit=\"cleared-foreign.service\",state=\"inactive\"}",
+          "series": "systemd_unit_state{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\",host=\"fixture-host\",unit=\"cleared-foreign.service\",state=\"active\"}",
           "values": "_x40 1 _x39"
         },
         {
@@ -1495,11 +1785,11 @@
           "values": "_x41 1x39"
         },
         {
-          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cleared-empty.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"failure-cleared\",completion_contract=\"unknown\"}",
+          "series": "ns2604_user_unit_expected{host=\"fixture-host\",unit=\"cleared-empty.service\",failure_class=\"StackUnitDown\",severity=\"warning\",unit_kind=\"continuous\",recovery_contract=\"active\",completion_contract=\"unknown\"}",
           "values": "1x80"
         },
         {
-          "series": "systemd_unit_state{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\",host=\"fixture-host\",unit=\"cleared-empty.service\",state=\"inactive\"}",
+          "series": "systemd_unit_state{job=\"ns2604-user-unit-state\",instance=\"fixture-exporter\",host=\"fixture-host\",unit=\"cleared-empty.service\",state=\"active\"}",
           "values": "_x40 1 _x39"
         },
         {
