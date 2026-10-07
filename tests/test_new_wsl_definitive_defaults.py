@@ -2164,6 +2164,7 @@ destination.write_bytes((root / ("models.json" if url.endswith("/models") else "
         curl.chmod(0o755)
         env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
         env.update(MODEL_FIXTURE=str(scratch), CURL_FIXTURE_EXIT=str(curl_exit),
+                   PYTHONOPTIMIZE="1",
                    XDG_STATE_HOME=str(scratch / "state"), HOME=str(scratch / "home"),
                    PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
         return subprocess.run(["bash", "-euo", "pipefail", "-c", command], env=env,
@@ -3554,6 +3555,7 @@ else:
                 env = {key: value for key, value in os.environ.items()
                        if key not in ("BASH_ENV", "ENV", "QMD_CONFIG_DIR")}
                 env.update(QMD_FIXTURE=str(root), XDG_CACHE_HOME=str(cache), XDG_CONFIG_HOME=str(config),
+                           PYTHONOPTIMIZE="1",
                            XDG_STATE_HOME=str(root / "state"), HOME=str(root / "home"),
                            INDEX_PATH="MUST_BE_REMOVED", PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
                 result = subprocess.run(["bash", "-euo", "pipefail", "-c", command], env=env,
