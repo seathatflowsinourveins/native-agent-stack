@@ -92,3 +92,29 @@ never retune historical outcomes or substitute an invented identity.
 - `openai/codex@d27764b82f7118f674371e6d6e76271d9d606edb:codex-rs/protocol/src/models.rs:1061-1155`, `protocol.rs:1408,1417,1948-1960,2179-2184,2667-2737,3301-3307` and `items.rs:46-76`: response/native completion and explicit turn/root identities at the installed `rust-v0.160.1` pin. Optional or empty turn bindings remain unresolved. [Official release](https://github.com/openai/codex/releases/tag/rust-v0.160.1), published 2026-10-05T18:29:37Z; installed version check returned `codex-cli 0.160.1`.
 - `native-agent-stack@6eb5ed83914f37c3f0baca40cba89c8172cfa9e3:scripts/validate_foundation.py:79-196,457-611`: typed references and separate daily report qualification.
 - `native-agent-stack@7d20f02732f85ede3521f324efd4a11c5d250413:tools/invocation-monitoring/codex-counter-prototype-manifest.json`: exact source/dependency hashes and historical fixture binding. This local source commit awaits the retained publication path.
+
+## Amendment (2026-10-07): Named prose and conflicting command originals
+
+The source review of #820 at `77d35e41911c0f8c28a5561790cd8d8a8cd68175`
+identified two gaps in the proposed controls. A configured name followed by
+sentence punctuation must still exclude the named tool. Match names at prose
+boundaries while retaining punctuation internal to a valid configured name;
+`Use serena.` and `Use rtk:` are directed turns, not organic selections.
+
+Two completed command originals sharing a proven native identity must agree on
+their complete command representation. A contradictory command leaves attribution
+incomplete and counts unknown. This does not prevent supported enrichment of a
+request with its completion or deduplication of identical originals. Preserve
+the actual contradictory observations rather than selecting the last command.
+
+The repair evidence is separate in
+[`ns2604-catalog-fix2-20261007.json`](../../evidence/receipts/ns2604-catalog-fix2-20261007.json).
+Its deterministic controls are synthetic fixtures; they do not supply a native
+organic result or replace the prior receipt's recorded source and outcomes.
+Actual native input qualification and the equivalent Claude evidence remain open.
+
+Sources: `native-agent-stack@77d35e41911c0f8c28a5561790cd8d8a8cd68175:tools/invocation-monitoring/codex_counter.py:299-307,405-425,577-657`
+and `examples/claude-native/workflows/child-usage.mjs:2854-2878`;
+the [Python 3.12 regular-expression reference](https://docs.python.org/3.12/library/re.html)
+for literal escaping and boundary assertions; the pinned Codex native protocol
+sources listed above for original request/completion identities.

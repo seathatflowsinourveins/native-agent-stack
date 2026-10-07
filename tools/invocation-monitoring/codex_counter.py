@@ -301,7 +301,9 @@ def _prompt_words(payload):
     item = payload.get("item") or {}
     content = payload.get("message", payload.get("content", item.get("content", []) if isinstance(item, dict) else []))
     text = "\n".join(strings(content))
-    words = set(re.findall(r"[\w.:-]+", text))
+    # Prose punctuation can surround a name; punctuation runs inside it are
+    # literal name characters, so a longer name never names its prefix.
+    words = set(re.findall(r"\w(?:[\w.:-]*\w)?", text))
     for server, tool in re.findall(r"\bmcp__([\w-]+?)__([\w-]+)\b", text):
         words.update((server, tool))
     return words
@@ -405,7 +407,8 @@ def _record_facts(records):
                 fact = {"turn_id": turn, "timestamp": stamp, "command": command,
                         "tool": normalized_tool, "identity_complete": identity_complete,
                         "model_call": model_call, "completion_at": None if model_call else stamp,
-                        "completion_status": None if model_call else item.get("status")}
+                        "completion_status": None if model_call else item.get("status"),
+                        "completion_command": None if model_call or command is None else _USAGE.shell_script(command)}
                 prior = facts.get(ident)
                 if prior:
                     if prior["turn_id"] != turn or (prior["tool"] and normalized_tool and prior["tool"] != normalized_tool):
@@ -415,8 +418,18 @@ def _record_facts(records):
                             and prior["completion_status"] != fact["completion_status"]):
                         notes["conflicting_native_representation"] += 1
                         prior["identity_complete"] = False
-                    if command is not None:
-                        prior["command"] = command
+                    completed_command = fact["completion_command"]
+                    if (prior["completion_command"] is not None and completed_command is not None
+                            and prior["completion_command"] != completed_command):
+                        notes["conflicting_native_representation"] += 1
+                        prior["identity_complete"] = False
+                    else:
+                        # Complete originals must agree. Requests may enrich
+                        # them, but cannot replace an observed completed command.
+                        if command is not None and (not model_call or prior["completion_command"] is None):
+                            prior["command"] = command
+                        if completed_command is not None:
+                            prior["completion_command"] = completed_command
                     if normalized_tool:
                         prior["tool"] = normalized_tool
                     if model_call and not prior["model_call"]:

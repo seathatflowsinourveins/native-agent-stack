@@ -83,6 +83,9 @@ class SelectionEvidence:
     host_receipts.py:204-232,547-574,698-728 (pins/repositories/registration);
     saturation_ledger.py:414-516,538-555 (retained v2 judgments/RFC 6901);
     catalog_decisions.py:178-203 (candidate identities and typed source rows).
+    Refuter provenance guard extends native-agent-stack@77d35e41911c0f8c28a5561790cd8d8a8cd68175:
+    this file:120-148,702-753; saturation_ledger.py:431-442;
+    docs/acceptance-evidence-policy.md:26-33 (synthetic observations cannot qualify adoption).
     This verifies recorded consistency, not the truth of external observations.
     """
 
@@ -120,7 +123,7 @@ class SelectionEvidence:
             self.documents[path] = self.validator.load(path)
         return self.documents[path], digest
 
-    def reference(self, ref, label, *, evidence=False, binding=None):
+    def reference(self, ref, label, *, evidence=False, binding=None, source_classes=None):
         fields(ref, self.EVIDENCE_REF_FIELDS if evidence else self.REF_FIELDS, label)
         require(bool(self.HEX64.fullmatch(text(ref["sha256"], label + ".sha256"))), label, "expected SHA256")
         require(bool(SHA.fullmatch(text(ref["source_commit"], label + ".source_commit"))), label,
@@ -132,15 +135,24 @@ class SelectionEvidence:
         require(ref["sha256"] == digest, label, "reference hash differs from registered source")
         try:
             target = document
+            ancestry = [document]
             for token in pointer.split("/")[1:]:
                 if isinstance(target, list):
                     require(bool(re.fullmatch(r"0|[1-9][0-9]*", token)), label, "noncanonical array index")
                 target = self.saturation.resolve_pointer(target, "/" + token)
+                ancestry.append(target)
         except self.saturation.LedgerError as error:
             raise InvalidCatalog(f"{label}: {error}") from error
         if not evidence:
             if document.get("evidence_class") is not None:
                 self.classes.add(enum(document["evidence_class"], self.CLASSES, label + ".source_class"))
+            if source_classes is not None:
+                # Preserve every original ancestor's class; a nested positive
+                # declaration cannot erase a synthetic enclosing source.
+                source_classes.update(enum(parent["evidence_class"], self.CLASSES, label + ".source_class")
+                                      for parent in ancestry if isinstance(parent, dict)
+                                      and parent.get("evidence_class") is not None)
+                self.classes.update(source_classes)
             return target
         object_value(target, label + ".target")
         receipt_id = text(ref["receipt_id"], label + ".receipt_id")
@@ -685,6 +697,7 @@ class SelectionEvidence:
         required = {(family, role) for family in ("claude", "gpt6") for role in ("facts", "fit")}
         seen, documents, results, fields_by_role = set(), {"facts": [], "fit": []}, {}, {}
         judgment_ids = set()
+        originals_qualified = True
         for value in sequence(rows, label):
             fields(value, {"family", "role", "status", "reason", "source_field_ref", "judgment_refs", "result"}, label)
             key = (enum(value["family"], {"claude", "gpt6"}, label), enum(value["role"], {"facts", "fit"}, label))
@@ -721,7 +734,13 @@ class SelectionEvidence:
             member = matching[0]
             result = []
             for ref in sequence(value["judgment_refs"], label):
-                doc = object_value(self.reference(ref, label + ".judgment"), label)
+                original_classes = set()
+                doc = object_value(self.reference(ref, label + ".judgment", source_classes=original_classes), label)
+                originals_qualified = originals_qualified and bool(original_classes) and "synthetic" not in original_classes
+                if not original_classes:
+                    # Reading an unclassified original is documentary review,
+                    # but its unresolved provenance cannot qualify adoption.
+                    self.classes.add("source_review")
                 judgment = object_value(doc.get("judgment"), label + ".judgment.identity")
                 require(doc.get("role") == key[1] and judgment.get("family") == key[0], label, "refuter role/family mismatch")
                 jid = text(judgment.get("judgment_id"), label)
@@ -734,8 +753,6 @@ class SelectionEvidence:
                 documents[key[1]].append(doc)
             require(value["result"] == result, label, "refuter result differs from original retained judgments")
             results[key] = (member, source, status)
-            if not any(self.documents[ref["path"]].get("evidence_class") is not None for ref in value["judgment_refs"]):
-                self.classes.add("source_review")
         require(seen == required, label, "exactly four family/role refuter carriers required")
         for role, docs in documents.items():
             if not docs:
@@ -748,7 +765,7 @@ class SelectionEvidence:
                 if (family, role) in results:
                     require(f"{family}:incomplete_replication" not in screen["pending_reasons"],
                             label, "recorded refuter lacks canonical replicated judgments")
-        return all((family, role) in results and results[(family, role)][2] == "recorded" for family, role in required) and all(
+        return originals_qualified and all((family, role) in results and results[(family, role)][2] == "recorded" for family, role in required) and all(
             self.saturation.v2_screen(role, docs, results[("claude", role)][0], results[("claude", role)][1])["status"] == "credible"
             for role, docs in documents.items())
 

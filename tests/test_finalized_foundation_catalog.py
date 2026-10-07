@@ -5,6 +5,12 @@ scripts/validate_foundation.py:50-63 and scripts/validate_catalogs.py:110-186.
 JSON Schema's uniqueItems compares whole array values; projected repository
 identity also needs the existing case/alias canonicalization:
 https://json-schema.org/understanding-json-schema/reference/array#uniqueitems
+
+Refuter provenance guards extend native-agent-stack@77d35e41911c0f8c28a5561790cd8d8a8cd68175:
+scripts/validate_foundation.py:120-148,702-753;
+scripts/saturation_ledger.py:431-442 and docs/acceptance-evidence-policy.md:26-33.
+Declared source-review provenance here is synthetic contract input, never a
+returned model judgment, native proof or actual adoption.
 """
 
 import copy
@@ -256,6 +262,22 @@ class FinalizedSelectionTests(unittest.TestCase):
         row["evidence_classes"].append("synthetic")
         self.refresh_refs()
 
+    def bind_refuter_originals(self, evidence_class):
+        """Keep original payloads separate from the frozen scope's provenance."""
+        path = "evidence/artifacts/refuter-originals.json"
+        original = {"schema_version": 1, "kind": "refuter_provenance_fixture",
+                    "claim": "Synthetic declared-provenance fixture; no returned model judgment or native acceptance.",
+                    "limitations": ["Only the catalog's structural adoption declaration is exercised."],
+                    "data": {"judgments": copy.deepcopy(self.packet["data"]["judgments"])}}
+        if evidence_class is not None:
+            original["evidence_class"] = evidence_class
+        self.source_documents[path] = original
+        for carrier in self.default_row()["refutations"]:
+            carrier["judgment_refs"] = [self.source_ref(path, "/data/judgments/" + result["judgment_id"])
+                                        for result in carrier["result"]]
+        self.refresh_refs()
+        return original
+
     def external_evidence_ref(self, path, target):
         artifacts = self.packet["data"].setdefault("artifacts", [])
         if {"path": path} not in artifacts:
@@ -263,11 +285,12 @@ class FinalizedSelectionTests(unittest.TestCase):
         return {**self.source_ref(path, ""), "receipt_id": self.packet["id"],
                 "evidence_class": target["evidence_class"], "scope": target["scope"]}
 
-    def wiring_chain(self, *, instruction_path=False):
+    def wiring_chain(self, *, instruction_path=False, refutation_class="source_review"):
         """Source-declared prototype, never real deployment or owner qualification."""
         row, slot = self.default_row(), self.document["slots"][0]
         slot["task_scope"] = "One source-retrieval fixture"
         self.add_refuters()
+        self.bind_refuter_originals(refutation_class)
         for cid, repo in (("claude-code", "https://github.com/anthropics/claude-code"),
                          ("codex", "https://github.com/openai/codex")):
             self.stack["components"].append({"id": cid, "repository": repo, "version": "1.0.0", "source_pin": "e" * 40, "profile": "core",
@@ -439,6 +462,77 @@ class FinalizedSelectionTests(unittest.TestCase):
     def chain_invalid(self, fragment):
         with patch.object(SelectionEvidence, "qualified_organic_records", return_value=self.owner_records):
             self.assert_invalid(fragment)
+
+    def test_source_review_original_provenance_qualifies_structural_adoption_declaration(self):
+        self.wiring_chain()
+        original = self.source_documents["evidence/artifacts/refuter-originals.json"]
+        self.assertEqual(original["evidence_class"], "source_review")
+        self.assertEqual(original["data"]["judgments"], self.packet["data"]["judgments"])
+        self.assertEqual(self.packet["evidence_class"], "synthetic")
+        self.assertEqual(self.chain_check()["repositories"], 4)
+
+    def test_synthetic_original_judgments_cannot_supply_adoption(self):
+        self.wiring_chain(refutation_class="synthetic")
+        self.chain_invalid("adoption requires both clients")
+        self.default_row()["adoption_status"] = "recommendation"
+        self.assertEqual(self.chain_check()["repositories"], 4)
+
+    def test_every_original_judgment_needs_qualifying_provenance(self):
+        self.wiring_chain()
+        row = self.default_row()
+        original = self.source_documents["evidence/artifacts/refuter-originals.json"]
+        for carrier in row["refutations"]:
+            for index, result in enumerate(carrier["result"]):
+                jid = result["judgment_id"]
+                with self.subTest(judgment_id=jid):
+                    path = "evidence/artifacts/synthetic-original.json"
+                    self.source_documents[path] = {"evidence_class": "synthetic", "data": {
+                        "judgments": {jid: copy.deepcopy(original["data"]["judgments"][jid])}}}
+                    retained = carrier["judgment_refs"][index]
+                    carrier["judgment_refs"][index] = self.source_ref(path, "/data/judgments/" + jid)
+                    self.refresh_refs()
+                    try:
+                        self.chain_invalid("adoption requires both clients")
+                        row["adoption_status"] = "recommendation"
+                        self.assertEqual(self.chain_check()["repositories"], 4)
+                    finally:
+                        row["adoption_status"] = "adopted"
+                        carrier["judgment_refs"][index] = retained
+
+    def test_nested_synthetic_originals_cannot_be_relabelled_by_source_envelope(self):
+        self.wiring_chain()
+        self.source_documents["evidence/artifacts/refuter-originals.json"]["data"]["evidence_class"] = "synthetic"
+        self.refresh_refs()
+        self.chain_invalid("adoption requires both clients")
+        self.default_row()["adoption_status"] = "recommendation"
+        self.assertEqual(self.chain_check()["repositories"], 4)
+
+    def test_synthetic_original_ancestor_cannot_be_relabelled_by_nested_source_review(self):
+        self.wiring_chain(refutation_class="synthetic")
+        self.source_documents["evidence/artifacts/refuter-originals.json"]["data"]["evidence_class"] = "source_review"
+        self.refresh_refs()
+        self.chain_invalid("adoption requires both clients")
+        self.default_row()["adoption_status"] = "recommendation"
+        self.assertEqual(self.chain_check()["repositories"], 4)
+
+    def test_unresolved_original_provenance_remains_nonadopted(self):
+        self.wiring_chain(refutation_class=None)
+        self.chain_invalid("adoption requires both clients")
+        self.default_row()["adoption_status"] = "recommendation"
+        self.assertEqual(self.chain_check()["repositories"], 4)
+
+    def test_unknown_and_deferred_refuters_remain_valid_nonadopted(self):
+        self.wiring_chain()
+        row = self.default_row()
+        for status in ("unknown", "deferred"):
+            with self.subTest(status=status):
+                for carrier in row["refutations"]:
+                    carrier.update(status=status, reason="Original judgments unavailable in this fixture.",
+                                   source_field_ref=None, judgment_refs=[], result=None)
+                row["adoption_status"] = "adopted"
+                self.chain_invalid("adoption requires both clients")
+                row["adoption_status"] = "recommendation"
+                self.assertEqual(self.chain_check()["repositories"], 4)
 
     def test_adoption_requires_complete_native_chain_with_owner_declared_day(self):
         self.wiring_chain()

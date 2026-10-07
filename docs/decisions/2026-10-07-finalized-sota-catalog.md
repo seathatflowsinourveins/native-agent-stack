@@ -334,3 +334,30 @@ or a copied channel label cannot qualify adoption. Emitter documentation must
 match a known canonical client source pin. An unresolved version/source mapping
 remains unqualified until the owner supplies a supported pinned source identity;
 the current carrier does not manufacture that mapping from a documentation URL.
+
+## Amendment (2026-10-07): Original judgment provenance
+
+The source review of #820 at `77d35e41911c0f8c28a5561790cd8d8a8cd68175`
+found that recorded dispositions and credible vote screens alone allowed
+synthetic original judgments to qualify a refutation. Qualification must also
+resolve the inherited evidence class of every counted original judgment.
+Synthetic or unresolved original provenance remains a non-qualifying observation,
+including when one such original is mixed with otherwise qualifying originals.
+A nested positive declaration cannot erase a synthetic ancestor's provenance.
+
+Keep the frozen selection input's class separate from the original judgments'
+classes. Registered, hash-resolved original-judgment provenance supplies the
+declared source class; the canonical screen still checks identities, roles,
+families, frozen inputs and retained votes. Structural acceptance of a positive
+fixture verifies this declared contract, not actual adoption or the truth of a
+review. Pending and observed carriers remain valid without becoming adopted.
+
+The new
+[`repair receipt`](../../evidence/receipts/ns2604-catalog-fix2-20261007.json)
+links the prior controls and fold receipts without rewriting their recorded
+observations. Selections remain pending synthesis.
+
+Sources: `native-agent-stack@77d35e41911c0f8c28a5561790cd8d8a8cd68175:scripts/validate_foundation.py:123-144,702-753,877`
+and `scripts/saturation_ledger.py:439-495`; the same pin's
+`docs/acceptance-evidence-policy.md:26-33,42-69` defines the synthetic,
+source-review and structural-validation claim boundaries.

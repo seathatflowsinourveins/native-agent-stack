@@ -9,11 +9,11 @@
   "files": [
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7"
+      "sha256": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a"
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40"
+      "sha256": "b655bfdaa8fdf9af2b3a65932de04905ae81f183afd91255065c8e1a868b90c8"
     }
   ],
   "prior_snapshot": {
@@ -23,12 +23,24 @@
     "test_sha256": "519e9f54bc9e0c901aae97865abbb62c9516a0537337c968068a484f91e5ac5a",
     "scope": "Original unchanged prototype and three baseline fixtures; snapshot is historical after this implementation."
   },
+  "previous_controls_snapshot": {
+    "source_commit": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+    "manifest_path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+    "manifest_sha256": "eb22a57c77c0bf26257c6c808ef6875d95c926bd0ee69bbb59f5f5ed69ab5367",
+    "counter_sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
+    "test_sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40",
+    "receipt_path": "evidence/receipts/codex-organic-oracle-controls-20261007.json",
+    "receipt_sha256": "227bd42267b39a92fd779bd08045d448c5a4c7b892548a0353ca5fc9edc0a4f8",
+    "scope": "Earlier fixture source and outcomes remain historical; this repair does not relabel them."
+  },
   "controls": [
     "Explicit requested/smoke flags and producer provenance; absence is unknown.",
     "First native turns from complete owner history, plus relaunch masks, across tool classes.",
     "Complete per-tool named-turn masks, late context, referenced context and parent/root attribution.",
     "Full original streams joined per native owner before maintained native ledger, identity/window/dedup and masks.",
-    "Original response aliases and outcomes across split sources; missing ID/time/unsupported native call forms remain unknown."
+    "Original response aliases and outcomes across split sources; missing ID/time/unsupported native call forms remain unknown.",
+    "Prose punctuation still excludes configured names while internal punctuation and distinct longer names are preserved.",
+    "Contradictory completed commands sharing a native identity remain unknown; supported enrichment and identical duplicates are preserved."
   ],
   "reference_boundary": "CanonicalRef shape declarations are not external hash resolution or original-context truth proof. Actual publication counts need the matching owner-controlled native evidence.",
   "historical_fixture_binding": {
@@ -42,5 +54,6 @@
     "qualification": null,
     "claude_scope": "Not implemented by this Codex code unit; equivalent Claude provenance remains separate."
   },
-  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md"
+  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix2-20261007.json"
 }

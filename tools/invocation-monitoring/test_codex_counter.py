@@ -263,6 +263,52 @@ class OrganicControlChecks(unittest.TestCase):
         for key in ("command", "context-mode"):
             self.assertEqual(result["by_tool"][key]["organic_count"], 1)
 
+    def test_terminal_punctuation_masks_configured_turn_names(self):
+        for text, named in (("Use serena.", "serena"), ("Use rtk:", "rtk"),
+                            ('Use "serena".', "serena"), ("Use 'rtk':", "rtk"),
+                            ("Use [serena].", "serena"), ("Use [rtk]:", "rtk"),
+                            ("Use serena...:", "serena"), ("Use rtk::...", "rtk")):
+            with self.subTest(text=text):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work", "message": text}, ordinal=8)
+                result = self.run_controls([records(command(command="rtk cat /fixture/skills/openai-docs/SKILL.md"), mcp(), late)])
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"][named]["organic_count"], 0)
+                self.assertEqual(result["by_tool"][named]["reasons"]["named_turn"], 1)
+                for key in {"command", "rtk", "openai-docs-read", "serena"} - {named}:
+                    self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+
+    def test_internal_name_punctuation_is_preserved(self):
+        def add_tool(_, control):
+            control["tools"]["punctuated"] = {"kind": "mcp", "native_names": ["mcp__" + name + "__search"],
+                                                "prompt_names": [name]}
+        for text, name, named in (("Use openai-docs.", "vendor.search:tool", "openai-docs-read"),
+                                  ("Use vendor.search:tool.", "vendor.search:tool", "punctuated"),
+                                  ("Use vendor.search:tool:", "vendor.search:tool", "punctuated"),
+                                  ("Use vendor..search::tool", "vendor..search::tool", "punctuated"),
+                                  ("Use vendor..search::tool.", "vendor..search::tool", "punctuated"),
+                                  ("Use vendor.-:search:", "vendor.-:search", "punctuated")):
+            with self.subTest(text=text):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work", "message": text}, ordinal=8)
+                result = self.run_controls([records(command(command="rtk cat /fixture/skills/openai-docs/SKILL.md"),
+                                                    mcp(server=name), late)], add_tool)
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"][named]["organic_count"], 0)
+                self.assertEqual(result["by_tool"][named]["reasons"]["named_turn"], 1)
+                for key in {"command", "rtk", "openai-docs-read", "punctuated"} - {named}:
+                    self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+
+    def test_near_names_do_not_mask_configured_tools(self):
+        for text in ("Use serenade.", "Use xserena.", "Use serena2.", "Use serena_search.",
+                     "Use serena-helper.", "Use serena-search.", "Use serena.search.", "Use serena:search.",
+                     "Use \u00e9serena.", "Use rtkit:", "Use rtk.command:", "Use rtk:proxy"):
+            with self.subTest(text=text):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work", "message": text}, ordinal=8)
+                result = self.run_controls([records(command(command="rtk echo fixture"), mcp(), late)])
+                self.assertEqual(result["status"], "controls_complete")
+                for key in ("command", "rtk", "serena"):
+                    self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+                    self.assertNotIn("named_turn", result["by_tool"][key]["reasons"])
+
     def test_native_command_name_masks_the_entire_turn(self):
         late = native_row("response_item", {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Use exec_command"}]}, ordinal=8)
         result = self.run_controls([records(command(), late)])
@@ -454,6 +500,50 @@ class OrganicControlChecks(unittest.TestCase):
         result = self.run_controls([good, bad])
         self.assertEqual(result["status"], "unknown")
         self.assertIn("conflicting_native_representation", result["diagnostics"])
+
+    def test_conflicting_completed_commands_are_unknown(self):
+        first = command(command="echo fixture")
+        second = command(command="rtk cat /fixture/skills/openai-docs/SKILL.md")
+        for ordered in ((first, second), (second, first)):
+            for repeated in ((), (ordered[0],), (ordered[1],)):
+                for streams in ([records(*ordered, *repeated)], [records(ordered[0]), records(ordered[1], *repeated)]):
+                    with self.subTest(first=ordered[0]["payload"]["item"]["command"], sources=len(streams),
+                                      repeated=repeated[0]["payload"]["item"]["command"] if repeated else None):
+                        result = self.run_controls(streams)
+                        self.assertEqual(result["status"], "unknown")
+                        self.assertEqual(result["native_call_attempts"], 1)
+                        self.assertIn("conflicting_native_representation", result["diagnostics"])
+                        self.assertEqual(result["by_tool"]["command"]["reasons"]["native_call_identity_unknown"], 1)
+                        for cell in result["by_tool"].values():
+                            self.assertIsNone(cell["organic_count"])
+                            self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_command_request_completion_enrichment_remains_complete(self):
+        script = "rtk cat /fixture/skills/openai-docs/SKILL.md"
+        local = native_row("response_item", {"type": "local_shell_call", "call_id": "cmd-1",
+                          "action": {"type": "exec", "command": ["/bin/bash", "-lc", script]}})
+        for request in (function("cmd-1", args={"cmd": script}), local):
+            with self.subTest(kind=request["payload"]["type"]):
+                result = self.run_controls([records(request, returned("cmd-1"), command(command=script))])
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["native_call_attempts"], 1)
+                for key in ("command", "rtk", "openai-docs-read"):
+                    self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+                self.assertNotIn("conflicting_native_representation", result["diagnostics"])
+
+    def test_duplicate_completed_commands_retain_attribution(self):
+        script = "rtk cat /fixture/skills/openai-docs/SKILL.md"
+        for representation in (script, ["rtk", "cat", "/fixture/skills/openai-docs/SKILL.md"],
+                               ["/bin/bash", "-lc", script]):
+            first, second = command(command=script), command(command=representation)
+            for streams in ([records(first, second)], [records(first), records(second)]):
+                with self.subTest(command=representation, sources=len(streams)):
+                    result = self.run_controls(streams)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    for key in ("command", "rtk", "openai-docs-read"):
+                        self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+                    self.assertNotIn("conflicting_native_representation", result["diagnostics"])
 
     def test_declined_native_attempt_is_not_an_executed_invocation(self):
         result = self.run_controls([records(command(status="declined"))])

@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-catalog-fix2-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Repair the declared catalog refutation-provenance gate and two Codex invocation-control defects with separately retained synthetic regressions.",
+  "limitations": [
+    "Fixture tests and structural checks do not establish actual adoption, original model judgments, host acceptance or organic use.",
+    "Source-class declarations are resolved structurally; their truth remains an external evidence obligation.",
+    "No native transcript, rollout census or ordinary counter run was performed; the equivalent Claude qualification remains separate.",
+    "Prior receipts and their recorded source hashes/results remain historical and unchanged.",
+    "Command-center exact-head delta review and hosted validation remain required."
+  ],
+  "reviewed_parent_commit": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+  "review_source": {
+    "locator": "coordination/cc-reads-20261005/pr820/GPT-VERDICT-77d35e419.md",
+    "sha256": "c52540be818a3a1a32e147e52fecdfc5f1b1799dc3bdb2b8d71c7ad477314fbe",
+    "evidence_class": "source_review",
+    "tests_executed": false
+  },
+  "source_files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "b655bfdaa8fdf9af2b3a65932de04905ae81f183afd91255065c8e1a868b90c8"
+    },
+    {
+      "path": "scripts/validate_foundation.py",
+      "sha256": "8201cd367bf142c785c240bd8feb768499cdf1b69a9d33c0c88d92a7788e1700"
+    },
+    {
+      "path": "tests/test_finalized_foundation_catalog.py",
+      "sha256": "a6b800588e3699cf97f41dd03c7c9b3955d0728ae08b52d84991b58de76d79f3"
+    },
+    {
+      "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+      "sha256": "2ce8f1607bdd4e4cf8ec8206e4f348830351d09e596d7a14390bef862004e475"
+    }
+  ],
+  "prior_records": [
+    {
+      "path": "evidence/receipts/codex-organic-oracle-controls-20261007.json",
+      "sha256": "227bd42267b39a92fd779bd08045d448c5a4c7b892548a0353ca5fc9edc0a4f8",
+      "disposition": "Historical source bindings and fixture outcomes preserved without rewriting."
+    },
+    {
+      "path": "evidence/receipts/grand-catalog-folds-20261007.json",
+      "sha256": "efbedf979a8f0f27de37598d79233524d7c460c2164d64896840c234571e068d",
+      "disposition": "Conserved fold snapshot remains the historical receipt."
+    }
+  ],
+  "repairs": [
+    {
+      "id": "P2a",
+      "contract": "Configured names match at prose boundaries; internal punctuation and longer distinct names remain literal.",
+      "fixtures": [
+        "Use serena.",
+        "Use rtk:",
+        "Quoted/bracketed names and repeated terminal punctuation.",
+        "Internal punctuation runs and near-name controls."
+      ]
+    },
+    {
+      "id": "P2b",
+      "contract": "Contradictory complete commands for one proven native identity leave attribution incomplete and controlled counts unknown.",
+      "fixtures": [
+        "Both conflicting encounter orders, within one source and across same-owner sources.",
+        "Conflicts followed by either repeated completion remain unknown.",
+        "Identical/equivalent completed commands deduplicate; supported request/completion enrichment is preserved."
+      ]
+    },
+    {
+      "id": "P1",
+      "contract": "Every counted original judgment has resolved non-synthetic ancestry; synthetic or unclassified originals cannot qualify adoption.",
+      "fixtures": [
+        "Synthetic parent and nested ancestor; positive child cannot erase synthetic ancestry.",
+        "Each of eight originals independently synthetic.",
+        "Separate registered source_review originals with synthetic ancillary input qualify the declared chain.",
+        "Unknown/deferred or unresolved observations remain valid non-adopted carriers."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "counter-red",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T07:06:00Z",
+      "ended_utc": "2026-10-07T07:06:08Z",
+      "exit_code": 1,
+      "tests": 40,
+      "failing_subcases": 9,
+      "source_sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
+      "test_sha256": "60ffc72c1b228628436609aaf96be2bf7a1ed76e7b3eadf8d8a82f1232fdf027",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "55e74d6a6d54ce74c024b56f964dc7c06376f3705f5b1b145b384358fd5eb4ad"
+    },
+    {
+      "id": "counter-expanded-red",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T07:07:45Z",
+      "ended_utc": "2026-10-07T07:07:46Z",
+      "exit_code": 1,
+      "tests": 2,
+      "failing_subcases": 5,
+      "source_sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
+      "test_sha256": "51e5dae2a1742ad29b4ef4009e772218103650c5d521f9b890c413fab15ce9c7",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ff3d48e493bf05a1fc793c69d89e40f964c02a5a78a11f1efd2296b54b5eafaa"
+    },
+    {
+      "id": "counter-first-green",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T07:08:20Z",
+      "ended_utc": "2026-10-07T07:08:28Z",
+      "exit_code": 0,
+      "tests": 40,
+      "source_sha256": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a",
+      "test_sha256": "51e5dae2a1742ad29b4ef4009e772218103650c5d521f9b890c413fab15ce9c7",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c65ef2652602a280a1fada1e89f25344690eb5d3fb96ee599a09feb09cbc7865"
+    },
+    {
+      "id": "counter-final-green",
+      "evidence_class": "synthetic",
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 TMPDIR=<owned-external-cache> nice -n 19 ionice -c3 python3 -B -m unittest discover -s tools/invocation-monitoring -p test_codex_counter.py -v",
+      "started_utc": "2026-10-07T07:15:00Z",
+      "ended_utc": "2026-10-07T07:15:10Z",
+      "exit_code": 0,
+      "tests": 40,
+      "reported_duration_seconds": 9.104,
+      "source_sha256": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a",
+      "test_sha256": "b655bfdaa8fdf9af2b3a65932de04905ae81f183afd91255065c8e1a868b90c8",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "392d493433461034defc8e4293f9266a1f411a9945b2e34017670dd33eebcbed"
+    },
+    {
+      "id": "provenance-red",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T07:09:43Z",
+      "ended_utc": "2026-10-07T07:09:44Z",
+      "exit_code": 1,
+      "tests": 7,
+      "failing_subcases": 12,
+      "failed_condition": "InvalidCatalog was not raised for adopted chains with synthetic or unresolved original judgment provenance.",
+      "source_sha256": "4c3531b763f126ebd78153651afba5fb44c3b1a44a9d08dc351a7122aebf1f34",
+      "test_sha256": "a6b800588e3699cf97f41dd03c7c9b3955d0728ae08b52d84991b58de76d79f3",
+      "stderr_sha256": "6a54db948819587c504b15072193991b0f6e6f48a4156684a5790a88e83cb6b2"
+    },
+    {
+      "id": "provenance-focused-green",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T07:11:46Z",
+      "ended_utc": "2026-10-07T07:11:47Z",
+      "exit_code": 0,
+      "tests": 7,
+      "source_sha256": "8201cd367bf142c785c240bd8feb768499cdf1b69a9d33c0c88d92a7788e1700",
+      "test_sha256": "a6b800588e3699cf97f41dd03c7c9b3955d0728ae08b52d84991b58de76d79f3",
+      "stderr_sha256": "853504545684dee53b2b04a429e6d51c31ed3b2420c2bf9f20ea721f4acb912f"
+    },
+    {
+      "id": "provenance-full-green",
+      "evidence_class": "synthetic",
+      "command": "env TMPDIR=<owned-external-cache> rtk nice -n 19 ionice -c 3 python3 -m unittest -v tests.test_finalized_foundation_catalog",
+      "started_utc": "2026-10-07T07:12:00Z",
+      "ended_utc": "2026-10-07T07:12:03Z",
+      "exit_code": 0,
+      "tests": 67,
+      "source_sha256": "8201cd367bf142c785c240bd8feb768499cdf1b69a9d33c0c88d92a7788e1700",
+      "test_sha256": "a6b800588e3699cf97f41dd03c7c9b3955d0728ae08b52d84991b58de76d79f3",
+      "stderr_sha256": "fcfb119b04d6c80ff8aa3a83b28f3406483b98088104b289c1883efd6ddf95d6"
+    }
+  ],
+  "sanitization": "Public commands replace private owned TMPDIR/cwd locators; exact argv and unmodified stdout/stderr remain in the durable owned worktrees. No credential or native conversation data was accessed.",
+  "review": {
+    "same_family_source_critic": "pending",
+    "independent_delta": "pending",
+    "command_center": "pending"
+  },
+  "subsequent_source_review": {
+    "evidence_class": "source_review",
+    "scope": "Same-family completeness critic after the displayed fixture runs.",
+    "P1": "scoped_clear",
+    "P2a": "scoped_clear",
+    "P2b": "linked_response_id_and_call_id_completion_conflict_pending",
+    "limitation": "The initial command guard compares storage keys. Explicit native ID aliases can retain conflicting completions under separate keys; this snapshot does not establish that variant fixed.",
+    "disposition": "Retain these source bindings and outcomes; qualify the alias repair in a separate dated supplement."
+  },
+  "native_counts": null,
+  "organic_verdict": null,
+  "adoption_status": null,
+  "synthesis_status": "pending_synthesis",
+  "decision_refs": [
+    "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+    "docs/decisions/2026-10-07-finalized-sota-catalog.md"
+  ],
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+      "path": "scripts/validate_foundation.py",
+      "lines": "123-144,702-753,877"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "lines": "299-307,405-425,577-657"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "26-33,42-69"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "tag": "rust-v0.160.1",
+      "path": "codex-rs/protocol/src/models.rs",
+      "lines": "1061-1155"
+    },
+    {
+      "url": "https://docs.python.org/3.12/library/re.html",
+      "checked_date": "2026-10-07",
+      "scope": "Literal regex matching and Unicode word/prose boundary semantics."
+    }
+  ]
+}
