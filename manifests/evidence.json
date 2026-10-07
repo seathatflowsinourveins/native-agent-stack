@@ -4656,8 +4656,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
-      "bytes": 3840
+      "sha256": "20657f8f13159dd59710e8b754a51576a1c2416169582b8652c5ae12e586721a",
+      "bytes": 4080
     },
     {
       "path": ".gitattributes",
@@ -4696,8 +4696,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "3c7bed9c3899e22a022acf4172719dd510124d45664f24cf656def14e6ad999b",
-      "bytes": 15176
+      "sha256": "d0c2e4ede410ac4630d24c446acdab57708e531970dee0879cef197bd8fe27c3",
+      "bytes": 15596
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -5005,6 +5005,36 @@
       "bytes": 1137
     },
     {
+      "path": "adoption/hooks/claude/skill-routing/.claude-plugin/plugin.json",
+      "sha256": "d228b6e80858bd2b69d038083efb08bcfb9e6dcdb0cd083b1c7b7a6707978057",
+      "bytes": 205
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/README.md",
+      "sha256": "a5ff6e45b543561e99ef7a9cf9a69c06e927b2f147070d55942af27b35afaf8d",
+      "bytes": 9371
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/codex-hooks-proposal.json",
+      "sha256": "48ae8181f5c0f0a40753b846dd8cac25ef5127405be660d282096ce996327200",
+      "bytes": 585
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/hooks/hooks.json",
+      "sha256": "858448e0a13f1e1ecbbe84c8a8789b961ac3506b645f2117f74d65d36481ee42",
+      "bytes": 635
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/hooks/skill-routing.py",
+      "sha256": "2b7d470fbbdba229361075a6a229f2c45d2e80078b406ca275d334635220e3a8",
+      "bytes": 23648
+    },
+    {
+      "path": "adoption/hooks/claude/skill-state-recorder-proposal.md",
+      "sha256": "402e030a7bf6d1a1d4b0441865c83f2e62c27d9c0c510ba8e565276428a17a45",
+      "bytes": 12446
+    },
+    {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
       "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3",
       "bytes": 2888
@@ -5231,13 +5261,23 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "164f4a30bbf0838c65b229885455693539a96f1e7b32ce6c9f563fdbbddb59e6",
-      "bytes": 20171
+      "sha256": "0cd6b7db8817cb34f2cd28165addae935ab5161f55dbe370c13f32bd916238db",
+      "bytes": 23366
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
-      "bytes": 56885
+      "sha256": "5047895fa345af2159b7bd9996be1c1bd370e21a27cb549510552d95743cb4d1",
+      "bytes": 62907
+    },
+    {
+      "path": "adoption/skills/native-stack-research/LICENSE",
+      "sha256": "cdaba0c8e8dec15da68c3b182eefabc9d9bbc36cab255545e25853f8fd3fc49d",
+      "bytes": 1088
+    },
+    {
+      "path": "adoption/skills/native-stack-research/SKILL.md",
+      "sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+      "bytes": 1602
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5246,8 +5286,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a0e293941482230a1ccaaf8a3206a5c7e72b73690d47e3a211883e9dd6279abc",
-      "bytes": 12948
+      "sha256": "d75aaf4eb547e25a57d27a3a3b2174802d098341429d7c95ec904602c7e6be5c",
+      "bytes": 12983
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5256,8 +5296,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
-      "bytes": 19129
+      "sha256": "b94605d1b55d845323cbd7aa5d070751211e28c66d439c23fe70cef12029540f",
+      "bytes": 19255
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -5356,8 +5396,8 @@
     },
     {
       "path": "adoption/workflow/manifest.json",
-      "sha256": "4756b185bb5e8e5f3a6897a66ac9f0c7592d488005f50fc71afd94036b50bc40",
-      "bytes": 34036
+      "sha256": "104c48e44d8d82251fe2fbb76cc4b84bdd80535ea20b6fa7cb55410f1dba81aa",
+      "bytes": 34067
     },
     {
       "path": "adoption/workflow/pending-agents/isolated-builder-broker-adapter.md",
@@ -10912,8 +10952,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/host.py",
-      "sha256": "0bd757852494738de6d336f8c444ffac4625fdad6fe890c93b31621290d8068c",
-      "bytes": 104013
+      "sha256": "f0136bad4074f93172c6db175ed1e9eeee2cd7f327ea72f29a9fa8b887a33121",
+      "bytes": 104960
     },
     {
       "path": "blueprints/runtime-workers/openhands/install-container.sh",
@@ -11017,8 +11057,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "3275aff838a94516cd0dfb6cc29364fec492e59d7c60975ae91e8693ace219ae",
-      "bytes": 44474
+      "sha256": "7c759d0cefd9e1b75531ecba9180bc73b5d1a50ea4f5c956cbf802e7f92aaab7",
+      "bytes": 44993
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -11027,8 +11067,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "1a2db8d0ba28a0cf9ea330d31ade083d6e111ac5b58525157a415978f54b4499",
-      "bytes": 186836
+      "sha256": "75ae6bcb7bc587bcdae6c5820db196757bf53d66665c164af0ed5494adc1861e",
+      "bytes": 189558
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -16667,8 +16707,8 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "e11b6d24fc400cc097cd8efbc8d1e14260d511c64cf4ea7a706f92c6885a0896",
-      "bytes": 28617
+      "sha256": "50c01677f1d43647ac85b6c5188da2d6e6996dcebcd22b6b07003fcf5f8725e5",
+      "bytes": 33754
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -16687,13 +16727,13 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
-      "bytes": 403074
+      "sha256": "bbb3d025579f51649e8127fb6ba25b1c462a4f11cb8f09c2761cabe043e6367c",
+      "bytes": 541722
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "sha256": "76ee44ca2cdb48b6ce62379b6b1b7fd71276b868c5724138751b333331b1106c",
-      "bytes": 16558
+      "sha256": "9f577abc944ce10c7ca282c2642039735416526cd6034172290e9ea7bea4e9ec",
+      "bytes": 18937
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
@@ -16719,6 +16759,21 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu1.json",
+      "sha256": "2ec1e936f8bb65dd5c6594049c7d5da0ada64b54da0cbab6b1bfa0dcd8b5f09a",
+      "bytes": 343467
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu2.json",
+      "sha256": "82b5d440bde71c39598be9283bbb5ff4b7039c175706510c50926832566af0ec",
+      "bytes": 419091
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604.json",
+      "sha256": "4da18060fafb01c32d41b7dc1a75c9c2265f3842acad17a6ccc311861dd45e09",
+      "bytes": 976407
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -17472,8 +17527,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
-      "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
-      "bytes": 25043
+      "sha256": "806edaf238d614feb114b6d79925ee8bba3c194e1c5568cda4681dfafd18cd7c",
+      "bytes": 26767
     },
     {
       "path": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
@@ -17656,9 +17711,39 @@
       "bytes": 14176
     },
     {
+      "path": "docs/decisions/2026-10-05-research-skill-round2.md",
+      "sha256": "bb4a704be2d83a094ea1f3d5a68e404ab3f08e71b098ea18feda0d73aa7d6bb4",
+      "bytes": 13251
+    },
+    {
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
       "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
       "bytes": 23344
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-landscape-sweep-fu1.md",
+      "sha256": "85b6abd51cc5e088c4063c3fada035df2d82127f463c257cdddb0f8ff3024ebf",
+      "bytes": 8229
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-landscape-sweep-fu2.md",
+      "sha256": "40455c9d7dc87927b5e4f2d7631f395f93be8703a4cf854abe9c0ccb371568da",
+      "bytes": 9259
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-landscape-sweep.md",
+      "sha256": "12ba83e98e0d27ae61ed00f3e8f467f4b5293e21950702c47162cfb0f710818d",
+      "bytes": 147646
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-lifecycle-readiness.md",
+      "sha256": "360ffc0b4e193c00ef592e7b5227a9d41e05f00ca2819520290f14eb6a9ef2c6",
+      "bytes": 4191
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-native-readiness.md",
+      "sha256": "c2f3e268654732c714d266cceacab964de88995d6c5d8bdb68914aa5d9f4f28a",
+      "bytes": 7978
     },
     {
       "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
@@ -17686,9 +17771,29 @@
       "bytes": 19235
     },
     {
+      "path": "docs/decisions/2026-10-06-held-skill-routing-prototype.md",
+      "sha256": "64c276dd73cfdfdfb53cfe0c81bf917ac14f5abb6ece1a46bf8ec694330db24f",
+      "bytes": 8970
+    },
+    {
+      "path": "docs/decisions/2026-10-06-saved-workflow-install-plan.md",
+      "sha256": "ce95a4325eb17080a8273c5205aa764a0860dfd534a43248b70912a54c8ecf8b",
+      "bytes": 6738
+    },
+    {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
+    },
+    {
+      "path": "docs/decisions/2026-10-06-skill-recording-and-live-catalog-budgets.md",
+      "sha256": "5926a2a7c531fe07387aca405b53ea74b4206bfc4061cb2f0936112ffd110abc",
+      "bytes": 10562
+    },
+    {
+      "path": "docs/decisions/2026-10-06-skill-recording-cap-amendment.md",
+      "sha256": "7190aef410a138548ebf0143e013346e5c5ece925043c488f00089161750a161",
+      "bytes": 2525
     },
     {
       "path": "docs/decisions/2026-10-06-skill-row-acceptance-amendment.md",
@@ -17696,9 +17801,24 @@
       "bytes": 3061
     },
     {
+      "path": "docs/decisions/2026-10-06-skills-hygiene-and-discovery.md",
+      "sha256": "a57585f9a53ca5ae50ec775fe00a36fd1bcc2b7191817b6cc69f16ee0f42b161",
+      "bytes": 7482
+    },
+    {
       "path": "docs/decisions/2026-10-06-sota-workflow-manifest.md",
       "sha256": "31303ac22416954eab4000f55eba0955fef1649fbd65f7d6456d2669c6f008b7",
       "bytes": 19472
+    },
+    {
+      "path": "docs/decisions/2026-10-06-tier-a-skill-state-recorder.md",
+      "sha256": "ad116ef5ebd69e72828fc92ccfd85bce41b0d41846d10af55626d29847a9fd57",
+      "bytes": 6135
+    },
+    {
+      "path": "docs/decisions/2026-10-07-skills-fold-budget-amendment.md",
+      "sha256": "473bc13413d4fe43f390ad410364130f782ae0eae2dbe6ee939435631756491b",
+      "bytes": 3958
     },
     {
       "path": "docs/direct-results.md",
@@ -17832,8 +17952,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "de47afd8a928d2c9acdd74cb63c78a24b6b56975ce9af249d428f6ee74161c43",
-      "bytes": 231037
+      "sha256": "e534f0913a5cbddedd55301067830a575a9bdd63e1d3026d398a2aac55dff78d",
+      "bytes": 233274
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -45966,6 +46086,76 @@
       "bytes": 3039
     },
     {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/README.md",
+      "sha256": "f43dc504a08de13f2d598b905b0b78e22afb34ae78962ea485f98362b0c372a4",
+      "bytes": 2093
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/astra.json",
+      "sha256": "91451759df757666be2f6edc3716d1eb1ab3b75f69ada18634eb4ff16480ac7b",
+      "bytes": 12728
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/checks.json",
+      "sha256": "ee82c89a02f67269c0ab94f018c7fd39f9767e8b5f1a533968e6f57745d88eba",
+      "bytes": 7549
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/completeness.json",
+      "sha256": "25739a7e5fe5e6a55242283a1fea719e690f2808c427daba3466468914808fe8",
+      "bytes": 9634
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/completeness.schema.json",
+      "sha256": "569d747dc3547504cb70e176f48a45d2493d0d088e84b7e2fa367d5d4bda09cb",
+      "bytes": 1704
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/critic.schema.json",
+      "sha256": "0e48bb2feedc4a449950054c65e4b48e9de6bbbfa11701b9e80e436b60c96023",
+      "bytes": 2337
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/decider-a.json",
+      "sha256": "0af96d5944c09879b7def09060cbbb5f49a14ab76a92ccd6ab56b341812c8e30",
+      "bytes": 7749
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/decider-b.json",
+      "sha256": "bb6f7126f22575baafb5a7b424761e63ebdb3e1d81b35f410c75e92297634f9e",
+      "bytes": 8031
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/decision.schema.json",
+      "sha256": "0b169205d0f1edfdf84e136623c2612a022cb59a32be67c7c3da4d3153e2aa71",
+      "bytes": 2569
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/execution.json",
+      "sha256": "09b6afe13466a1999f34a7c74b353a78c673468f24b77d41116d9dc0251f69c2",
+      "bytes": 12084
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/package-origin.json",
+      "sha256": "a0d6b65d88bd3ec2338ed5125e64377157c77d44f1e21cd3389eb3cd0b8315bf",
+      "bytes": 3288
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/packet.json",
+      "sha256": "3fc67e5d65e67709ac91ee64c9daa5e7920986e1ad6cf21e8935f089804fcbab",
+      "bytes": 7383
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/plan.json",
+      "sha256": "fc1ef2021450ac4680adc5a175d9c5546345f2cfee32e4f5fa7e63c335732ec3",
+      "bytes": 3186
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/source-review.json",
+      "sha256": "33dde2689ee45d7116b1617809dfc240db27975949c887aea626ab0f19e2b22f",
+      "bytes": 4887
+    },
+    {
       "path": "evidence/artifacts/retrieved-code.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
@@ -46571,6 +46761,591 @@
       "bytes": 6747
     },
     {
+      "path": "evidence/artifacts/skills-folds-20261007/comparison.json",
+      "sha256": "66233dae7bfca81de15e0ea023fa6b54f16ca7f8f5d15b08af5ba7b689ff5d96",
+      "bytes": 3499
+    },
+    {
+      "path": "evidence/artifacts/skills-folds-20261007/overlaps.md",
+      "sha256": "e9e36870148f313c5423346227326bc06f1bde20dcd500ebb51527446cf90ec4",
+      "bytes": 5602
+    },
+    {
+      "path": "evidence/artifacts/skills-held-routing-20261006/dependency-inventory-correction.json",
+      "sha256": "0acf1f14035a310cab84afcf10f3de26eb00455c1ed066f3d7e43b9d4675a7c9",
+      "bytes": 3334
+    },
+    {
+      "path": "evidence/artifacts/skills-held-routing-20261006/source-review.json",
+      "sha256": "237e6087e8d4715defa63333474a51ab2d6773854c8395eb4b7f8145e7d25ee9",
+      "bytes": 10420
+    },
+    {
+      "path": "evidence/artifacts/skills-hygiene-20261006/mineru-registration.json",
+      "sha256": "0103bfe93461a3376daa6d44f85523858e1e7ecd93ad5fda4dd5f030812b179f",
+      "bytes": 2312
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/README.md",
+      "sha256": "c8f3138efc8606e859429561166d9eb60b343e7a95201f336869d7e0c988ca40",
+      "bytes": 1029
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/child-usage-wf_59d42fb7-8dc.json",
+      "sha256": "8d535da107c90db65d433d50c4bd625e189ccae80a6b0d0003a611fee2cf076e",
+      "bytes": 99595
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/child-usage-wf_b786bea1-429.json",
+      "sha256": "2c492c629f716aefaffc91e39d4ec381c0e6011d0e68b527165f32404fb43ebe",
+      "bytes": 2495983
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/smoke-lanes.json",
+      "sha256": "91412182a2c0bc5a4273c67213c8fffa0b8a65c3e106ce55400cd56b313c04d8",
+      "bytes": 61023
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/smoke-layers.json",
+      "sha256": "738f1c7f39ce38bd14d85078096f74efaad42a5725d2408bf08a780a10e809c7",
+      "bytes": 2843
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/smoke-returns.json",
+      "sha256": "6be66a0083ec4e613dbdf1b27cc6e05b22cbc9f02e1ba737ab9dbb7f6a4f6241",
+      "bytes": 109996
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/smoke-survivors.json",
+      "sha256": "a6d90a556d524df1552037d819179818f2223210dbe589e0cbdd6437e21a33db",
+      "bytes": 509
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/child-usage-wf_c2f7dbc8-129.json",
+      "sha256": "bcb5d9dcb6680e35294da6f1b02c6192a658361e8981fc35e85c60086722e2ac",
+      "bytes": 519387
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/convert-wf_c2f7dbc8-129.log",
+      "sha256": "f1c1ad55a2a50516ba92dc13cc550c38192a9869cb50fc6616cae901d7f5d05b",
+      "bytes": 1657
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/make-result.stderr",
+      "sha256": "838230e7052cf95431e57f652f7f2f3e5c2627d48f676cdbff7f47a6aada4717",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/README.md",
+      "sha256": "a604f17d4ccc577a5a0997bf79ae61174188c489b86aea833ad61494ea6ce7ce",
+      "bytes": 1461
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/RESULT-input.json",
+      "sha256": "de6042f0c589deeb712d2451ab547946d91f13700e58eb29509a25345421163c",
+      "bytes": 19407
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/akitaonrails-ai-memory-ai-memory-retrieval.json",
+      "sha256": "f9b81d0b53241c62aa4c432ad6b83dd4b95b09ac04115a8f321014073e961372",
+      "bytes": 4032
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/bgauryy-octocode-octocode-research.json",
+      "sha256": "a8dbbb40959444b5c0498c1d4959aed87a1218bb9be3e6e7b75792ba1285f25d",
+      "bytes": 3331
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/checks.json",
+      "sha256": "8d62099b386eadc93daf6a40aaf3698917858f9d8c7e8ee5213eea179581fc8a",
+      "bytes": 4173
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/cursor-plugins-fix-merge-conflicts.json",
+      "sha256": "d051ec4cd1f533d596006f136a16308f5665eebe5d2829854e7d0b4774eb1273",
+      "bytes": 3493
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/cursor-plugins-loop-on-ci.json",
+      "sha256": "f7fe57d4b8930c3f9db764abf1197196b6b6b62b87892a9a3118f303b6d98cd4",
+      "bytes": 3244
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/lanes.json",
+      "sha256": "112a1efbffe1a130c3ad0a2d5f75c8e4bcd547875d23ce9a61c76128d15a275d",
+      "bytes": 244523
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/layers.json",
+      "sha256": "56f7ad12f4c28e74adfa60ffb37042b1785c90f7188305ce034530235ef92132",
+      "bytes": 9722
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/openai-codex-babysit-pr.json",
+      "sha256": "636154b33b2a6bc16bec547effea56123181a0ebca2749a5b72cf995d5703b08",
+      "bytes": 3446
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/publication.json",
+      "sha256": "9dd3639d41b3be55619f9ba5562996023ea81f646650866b27eb9c906a7561dd",
+      "bytes": 4780
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json",
+      "sha256": "01e0f5e30850efd7ceee6496f83e5ef13e3eb2f3bc20e3a288cfd368411fcf57",
+      "bytes": 426549
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/source-review-index.json",
+      "sha256": "f17fc30b41e554b60175b77a334f6bd6d9ea6d2623353c4667cfbd4efc809d47",
+      "bytes": 2029
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/survivors.json",
+      "sha256": "e257613e8abe74176d94e1b9f38e181ca4383f1aed5d85b156ae1e4ff90dec1d",
+      "bytes": 2316
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/upstash-context7-find-docs.json",
+      "sha256": "c8e5663565768dd39375daf0ff66836541480f4abf167794320f356e5df34be5",
+      "bytes": 2909
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-diagnose-ci-failures.json",
+      "sha256": "eb3635fa3b41e4b87e6d2b85ec747cadc608afe3a279e36dfefb5c328ed25f78",
+      "bytes": 3208
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-resolve-merge-conflicts.json",
+      "sha256": "efd7c722bd055041dd4d7eada1184641c13e507fdc684765cc8e6802816c8226",
+      "bytes": 3200
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/child-usage-wf_4b9c7d98-ffd.json",
+      "sha256": "fce0cbb987bb8f49de7f9678f3be18eacb2e40702052ee0f67fe466c8a5b18ba",
+      "bytes": 903073
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/convert-wf_4b9c7d98-ffd.log",
+      "sha256": "a14bfd5b016188d562e610f39300c7da388d1b7627be04d900a3026141d1062b",
+      "bytes": 2653
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/make-result.stderr",
+      "sha256": "e2b3b268d5f1ce6728bc34e7b41240e7d6fe38507b84da398b39737f278f2372",
+      "bytes": 1026
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/sanitization.json",
+      "sha256": "da1341d7c6fd040760f9018f3a5aa7c7daed2b75989bef65901102b0e02d8ba5",
+      "bytes": 578
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/source-reviews.stderr",
+      "sha256": "f1f33244f053d6a30e27fd323757e112c553b8ec0062883afa339a5e0274586e",
+      "bytes": 587
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/README.md",
+      "sha256": "3b31f553734663d169c37978eda18f7bc63336862cd96476dd6c4707002778b0",
+      "bytes": 1978
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/RESULT-input.json",
+      "sha256": "daf9152dfd57969c4c72a1a70dcd77816d0b97aa36ca27ef1e7f39d239cc3324",
+      "bytes": 27112
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/agent-sh-agnix-agnix.json",
+      "sha256": "b0d2da36bbead14c21b4dc177ef328f91c0680e5b83a4de74c7d1a4a260bc13e",
+      "bytes": 3098
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/anthropics-claude-plugins-official-claude-md-improver.json",
+      "sha256": "6589e7a27384ee88d4beada054c6a2b3dc272c1c7eaa00174fd20454a77f36c7",
+      "bytes": 3373
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/ast-grep-agent-skill-ast-grep.json",
+      "sha256": "18d5c6b5f844d458ddb7f490a11569426566009340d380ac8cd5f2bb3d8a90c8",
+      "bytes": 3549
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/boundaryml-baml-baml-core.json",
+      "sha256": "6e6062499b7281403736ae7ef8a80b218fc682f39dbcf6623c4627156e289514",
+      "bytes": 3664
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/checks.json",
+      "sha256": "a1ef5c76a30938e15c9bcb4599daf6b365a3ec082ace26ab26627e0b07342cd0",
+      "bytes": 5567
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/dyoshikawa-rulesync-rulesync.json",
+      "sha256": "03604e7f6c3a91caaa518be61e9431a5c7c6b2d751a6554bb61a9a0e24228472",
+      "bytes": 3159
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/everyinc-compound-engineering-plugin-ce-babysit-pr.json",
+      "sha256": "452b1a4d9e89f4dd18cd32055e98716341be3a5aedd625fa92a7561969fb6664",
+      "bytes": 3589
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/getsentry-skills-agents-md.json",
+      "sha256": "4375326e3255699468994eccf2a4dd599e2e4bd28f7a8dfe67b028aee793fba7",
+      "bytes": 3445
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/lanes.json",
+      "sha256": "0838dfbee0ef8fc1a3d683d56f895efdf17a7fb36de5991c3e8821062d93e285",
+      "bytes": 352750
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/layers.json",
+      "sha256": "3c46ca9e43b00ef862d8bbd21ab0524ba5e3fcb997dc62062130b89de6ae3875",
+      "bytes": 13810
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/mattpocock-skills-code-review.json",
+      "sha256": "04228b9951235c23a0cf9f93c7d2e90b2ca9cd33f6bb621b76728d47d95e3cf5",
+      "bytes": 3243
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/mblode-agent-skills-agents-md.json",
+      "sha256": "486d8ffd529944163119fd5507ecfe65629818b948a2e0f8f4bbd8a6476ce347",
+      "bytes": 3696
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/parcha-ai-parcha-skills-review-loop.json",
+      "sha256": "c9bcb72a050140eece2ade1f9600700c5b6e91df524cbc538df5f09c1c9a0ecf",
+      "bytes": 3615
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/publication.json",
+      "sha256": "c94e51c3f485bfc5b01b09284935d1250f24c68a1fd5cd059eb388421528f19e",
+      "bytes": 5829
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json",
+      "sha256": "7e8f59f47610d311805400b25ae1a33bbaeb86597cad7248f7afeaca68ffe562",
+      "bytes": 630455
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/source-review-index.json",
+      "sha256": "8f7bde7b3e19b457b53562c0e9edf12d0a6117c4d3bf0609ce8e9701c0bbefc6",
+      "bytes": 3248
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/survivors.json",
+      "sha256": "530e3205cb790aad671e7e4fd8ff92c8dcb19bed4402b390812f864845a57243",
+      "bytes": 3885
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-diagnose-ci-failures.json",
+      "sha256": "426313f076e7ad82379d4af6f87ed81907dbfbcfad5883b46954b773208443ba",
+      "bytes": 3229
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-resolve-merge-conflicts.json",
+      "sha256": "c97c47a6e19b7b0ac0afab006ecad3e4abb552f6f94a904cc7ffb5fa15bc6332",
+      "bytes": 3221
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-respond-to-pr-comments-in-blocklist.json",
+      "sha256": "38c06a2ae6f16ada572fb1ca99c7a060f59f33a480f9b4baca39ced5b86298bd",
+      "bytes": 4045
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/zandereins-schliff-schliff.json",
+      "sha256": "f4fe2e88ad88160ac610773b4ef2d275e53434d1948fde4c694583a7d163e5fb",
+      "bytes": 2969
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/README.md",
+      "sha256": "43a7d0b93a45f1e803650be3349236eb2a3fb160ef8d9932700588c4ac42545e",
+      "bytes": 7843
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/RESULT-input.json",
+      "sha256": "6bc0826e1e275eae754a0e496b08ab39138987e9c0ddd0f84c05aef4b543541e",
+      "bytes": 84983
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/SHA256SUMS",
+      "sha256": "ba5e9b788bc69dd00c3d04636cbbaafe4e249c526fa9d6093a7745978b7c6951",
+      "bytes": 315
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/addyosmani-agent-skills-spec-driven-development.json",
+      "sha256": "a7d6eb04ea6dfb6f65011290628b4a2325963da63ec3beb26ca19959f041a6e6",
+      "bytes": 3319
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/addyosmani-agent-skills-test-driven-development.json",
+      "sha256": "31d04d963157199e3d38618b1a8e60eb4eade52dd34b901411c452ec6127c41a",
+      "bytes": 3322
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/affaan-m-ecc-intent-driven-development.json",
+      "sha256": "68031a50514b5179e8d58db2b0ce200cee29402223f044ad0c8073fc5aa48488",
+      "bytes": 3544
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/affaan-m-ecc-skill-comply.json",
+      "sha256": "47c30dbf5c4cbf191b7a9ce7750f64bc9ef4eedb678b6c43d7e924cd05754fa3",
+      "bytes": 3601
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/affaan-m-ecc-tdd-workflow.json",
+      "sha256": "700dfd0927e150537e38975ed23ccbdbd5614c6eb9f5d52f8675c065b5c95bdf",
+      "bytes": 3260
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/agent-sh-agnix-agnix.json",
+      "sha256": "909ddd7e1ae3b57f215be39f537abf7f0af1234ef125ad744e10155894581bf4",
+      "bytes": 3022
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/bgauryy-octocode-octocode-skills.json",
+      "sha256": "8c09b334aa5412baec3b14004d74ef73bfcbc150309802d011c94a77e5c4f0e2",
+      "bytes": 3859
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/bmad-code-org-bmad-method-bmad-advanced-elicitation.json",
+      "sha256": "f0a6cfa4ffa9b69338750f8c8953827ba0aaf4be9447204537ed1eb198e4b74b",
+      "bytes": 4043
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/bmad-code-org-bmad-method-bmad-forge-idea.json",
+      "sha256": "70a9850744470242e45efab043fbb4fa8a66fdc7732b9312878d999c9afbbb33",
+      "bytes": 3454
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/checks.json",
+      "sha256": "acd0bcffb2bba328c247518db1b78b829fde3c92eff85b200702d2ce5f05fb94",
+      "bytes": 6048
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/codybrom-clairvoyance-design-review.json",
+      "sha256": "573f221ac344c49ea9f1d159abdcca4e2588492c668222386c4d39d3d2171de0",
+      "bytes": 3305
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/completion-refusal.txt",
+      "sha256": "b0e60fedb6f0a789e37e7469a266b94f6907d339d3812cac8113659b2c38c265",
+      "bytes": 3451
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/cure-consulting-group-productengineeringskills-mcp-server-builder.json",
+      "sha256": "9af77c03bc17364b5508dd8e8b71ce5904a71eb48641f954ab2f45aeefc888f7",
+      "bytes": 3894
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/dmoka-skills-mutation-testing.json",
+      "sha256": "8daa00e8bbf6356f0bd99c892105c5f827eee7e5f152ed9707d47053a0544e98",
+      "bytes": 3665
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/endavis-pyproject-template-property-tests.json",
+      "sha256": "61f955970a44abf8a2972f1d992e0c62d8e838b9ad5cc24b53fee2745fcc705e",
+      "bytes": 3318
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/everyinc-compound-engineering-plugin-ce-brainstorm.json",
+      "sha256": "4916b84cf3085ee9f118fadbe4766fc8f6e4800c8fdb8a5867fde0f842967063",
+      "bytes": 3487
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/everyinc-compound-engineering-plugin-ce-resolve-pr-feedback.json",
+      "sha256": "9e9aaeffcd5bb2928920540a2cea3fc49d264645136d80b9e5f85b0b7a2fc9a8",
+      "bytes": 3892
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/fission-ai-openspec-openspec-explore.json",
+      "sha256": "014625f5c4b95e6963246c317c0f7492329d4412505c990f2f5f4d44e3c74297",
+      "bytes": 3400
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/getsentry-skills-secret-serialization.json",
+      "sha256": "15dc9304f760f5319d425a2d457e2cd80a69bbeda1ff660702e89fbdca270124",
+      "bytes": 3389
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/getsentry-skills-skill-writer.json",
+      "sha256": "7a053d7fbbc99aecb13b1f24f973e0ee578708031182fdd6c39f6f4fd4deec64",
+      "bytes": 3569
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/github-awesome-copilot-agent-skill-stack.json",
+      "sha256": "5bc73fe709a2b36768648c6c37cd94cde092582a9e1463b38d4abbe9f30f109f",
+      "bytes": 3450
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/github-awesome-copilot-codeql.json",
+      "sha256": "4423f4775d94631ee21c10f5054f3f9433c2809391dc85ab78f8cf17b9fe1e43",
+      "bytes": 3339
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/github-awesome-copilot-test-gap-audit.json",
+      "sha256": "fd2c800d59366b5c98ba163d1a2b557436d7b08c91dcc8a62acc843162bf8f16",
+      "bytes": 3556
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/internationalcolorconsortium-iccdev-clusterfuzzlite.json",
+      "sha256": "10e0ad0af1164f848762d635d383d5b36b776178e22bd333865550e720fe055e",
+      "bytes": 3758
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/lanes.json",
+      "sha256": "5729269906f3e27b85abc3410af8792c23c3e9f43be6b07c36cb7d4df41f464b",
+      "bytes": 1163160
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/layers.json",
+      "sha256": "18100e791aad74e353d7bc8b079239e1fd93db8df54f08ec462bed76667bdb81",
+      "bytes": 50878
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/ledger-check.txt",
+      "sha256": "9f12618587ebce48d5776679d8b4a34f21b84ea820a431fd8b0156ae6f9215c3",
+      "bytes": 55
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/levnikolaevich-claude-code-skills-ln-56-architecture-auditor.json",
+      "sha256": "517ad27d8766bf3df3d1b7fd399275ba961eb6bf919b380e96f6440a14f794e6",
+      "bytes": 4077
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/lgtm-hq-ai-skills-scorecard.json",
+      "sha256": "1d2c7ba34ee16f3c239007dcf77a8b26ab2816e7b68965756d29b59331d772ce",
+      "bytes": 2935
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/manifest-build.txt",
+      "sha256": "6efb9651d562d23a3a2d9d8c97155bfdefb8bee0c35a88c7645eeeb237ed156b",
+      "bytes": 3225
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/nousresearch-hermes-agent-python-debugpy.json",
+      "sha256": "a260dc2f4f497b17ae7aa2fe9fc915592e65b08b8e76e51b69a5aab8ba86a620",
+      "bytes": 3367
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/nvidia-skillspector-skill-inspector.json",
+      "sha256": "5bd57c34abd4e1578a502442681fcd2e18964a32e449710df14501186be5910c",
+      "bytes": 3123
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/nyxandro-property-testing-skill-property-testing.json",
+      "sha256": "f2d392bebbba7578ea633cec8fe75a45a50c29583b926717433068063d75c981",
+      "bytes": 3690
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/prefecthq-fastmcp-fastmcp-client-cli.json",
+      "sha256": "ef72c0cbda1e28090440642e618413a69b20b833bd125c253115fb09332f847b",
+      "bytes": 2911
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json",
+      "sha256": "1189baddb2b52d319936699b53f2e376a0ce8b189181f5125295b28a7c5fdd04",
+      "bytes": 1979437
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/socketdev-socket-btm-property-and-fuzz-testing.json",
+      "sha256": "57ce832daae2177f8219fff68f6489f13dbab07e1d5be5c6272de8373ed7f720",
+      "bytes": 3648
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json",
+      "sha256": "a4b408d6387ba8ade16c3721e7635f514a5861ad9880c19f86b0b051c5bbf505",
+      "bytes": 10385
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-stops.txt",
+      "sha256": "e5a2ea6e1342eef2a070a56202d0ae05b1b54c1009e3186b72b665182cc33fd8",
+      "bytes": 2468
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/survivors.json",
+      "sha256": "a87766c14fe63308a888e77c51670501652050665820091b99a84c627fb20ea8",
+      "bytes": 11248
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/tenequm-skills-mcp-best-practices.json",
+      "sha256": "5ec3ce2b024e826d881ad31ad54a10566106b8b451194e56284e71077530d1bb",
+      "bytes": 3455
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/terminalskills-skills-improve-codebase-architecture.json",
+      "sha256": "d1674e46995b230a7b920360d2140b45f1bef31febc25a9c586b02e09ba29440",
+      "bytes": 3739
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/tests-docs-release.txt",
+      "sha256": "90e97cc29a94e9078268183ecf671a2dd4def788073e28f49f958b0a82239a62",
+      "bytes": 1063
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/tests-skills-workers.txt",
+      "sha256": "7d9db4eea9ae3e94179a992e88d8bb8fe87fb07b04a8bccffab49ad2092d2383",
+      "bytes": 731
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/tests-sweep-ledger.txt",
+      "sha256": "0f1fb80aea6cf2a81a39fb021d0ae6abaa2584be7816101ff43a06059cc9fa89",
+      "bytes": 2051
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-atheris.json",
+      "sha256": "70d43e61798af9df9d3d9f5d0619f54e1b023a8a1818490b24cd06bf496f1f94",
+      "bytes": 3596
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-curated-openai-gh-address-comments.json",
+      "sha256": "e42cf997e5bf0f03ffe5baec295efffa2c2ff8fe8c6fc9158bb1cf5d2b33aa94",
+      "bytes": 3488
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-ossfuzz.json",
+      "sha256": "eba67f3e7bb291c5c9f62a82a8488a0670037ab96f92d680fb474d70a0de189c",
+      "bytes": 3903
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-semgrep-rule-creator.json",
+      "sha256": "f5e9cc5b2ddef34712d49591c09341abea7d37609233c3a26f82d11220b56a19",
+      "bytes": 3536
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/validation-initial.txt",
+      "sha256": "c0fb3319700275e221fb497a386eab1aa93957bf2832b6c254c70a0b03157eef",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/warpdotdev-common-skills-diagnose-ci-failures.json",
+      "sha256": "7fb98372d6cdaf0ea014cb59dd10dc2bc6d6c9454a24e60e7684e26af0ababba",
+      "bytes": 3148
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/yigitkonur-skills-by-yigitkonur-build-mcp-server-sdk-v2.json",
+      "sha256": "387d037e52e319e295a6c21219041f04d9abc9e3058746aba48d0616699d5971",
+      "bytes": 4081
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-readiness-20261005/README.md",
+      "sha256": "5c728d624d8ed88cf1a520b9b1f74d1d372f14082815370ad2c7a250c123fdb3",
+      "bytes": 11583
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-readiness-20261005/checks.json",
+      "sha256": "819c82796d4e02243fee1cbf4b7919b6dd22e545ffcdc9cb3fd4253010d13d33",
+      "bytes": 8331
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-readiness-20261005/inventory.json",
+      "sha256": "22f3d130dd5fcdb7c6d7fbfa85b3a048805c04b8217fd747a52390a419e1c565",
+      "bytes": 39385
+    },
+    {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
       "sha256": "13dc826b75e8160c11b31a2d7afef22754b6f5660fe6db9a1af721dff9cd3fd0",
       "bytes": 12541
@@ -46716,6 +47491,266 @@
       "bytes": 17035
     },
     {
+      "path": "evidence/artifacts/skills-readiness-20261005/README.md",
+      "sha256": "c2f407f25c4c59bc93a8c3e7b944f73c1a47b082dbe33213e4372e78bae1831d",
+      "bytes": 5252
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/authoring-fixture.json",
+      "sha256": "a19a477f38d367f6c4b5c0c1889229742c44c89bfa2451de0c66084860cd2dfc",
+      "bytes": 4246
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-analysis.json",
+      "sha256": "3da1bc8a898c8f72bf5e58464ee2c12479823668b91b2c54ad8f727d42221216",
+      "bytes": 10626
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-authoring-completion.json",
+      "sha256": "2eabb406346bb4434b20c3fc9a46ea3222dcf10a36b34039f85f3d9819fdf8d0",
+      "bytes": 8331
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-authoring-review.json",
+      "sha256": "65a1a5e0469bec56c8ea86ab57d0c91cc5d0020cafcaa4e86ebbbccaa8541592",
+      "bytes": 3202
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-authoring.json",
+      "sha256": "708692c33128b61d9ab72867cee265449d80d5553898dca59b8b5b8eed7d8c5c",
+      "bytes": 30152
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-completeness-critic.md",
+      "sha256": "e5a72ba101bf61e68665f4e33b19c305c0a4a219d4735aabed56c68daa038836",
+      "bytes": 20575
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-completion-results.md",
+      "sha256": "d8d57b6e6ccc911c6a023ebeba1155230960031948f0d0d9c4ae9f1c6190b671",
+      "bytes": 18608
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-native-command-results.txt",
+      "sha256": "df03ab7969d99a149aae7415f0afbf72f013eadaacbd22dee891d639c707b9d1",
+      "bytes": 2540
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/claude-validator-results.txt",
+      "sha256": "a84db733fce5674dd69f0e1a7bcc9d3da51fcfa4cb47e2decf8cb5197dd27094",
+      "bytes": 1445
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/codex-authoring-review.json",
+      "sha256": "f7af50fdea39202cbce02257e8a5e9e913863adc521331d8faafad898976645c",
+      "bytes": 1828
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/codex-authoring.json",
+      "sha256": "55ecb9b5816b24a3e27ba614189cd87268b9eddcb70e4482b19ac74e90662ed2",
+      "bytes": 14948
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/discovery-upstream-tests.json",
+      "sha256": "c5eabfe91e6b4103df664b9c199d6a2e5c8b0330d5bf46f81b81897e3dd7e4bb",
+      "bytes": 6050
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/engineering-upstream-tests.json",
+      "sha256": "b95b94fda3006b986ebe49dd6ffe99f71ded1ab24773864cdc37dd5de616babe",
+      "bytes": 2440
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/local-checks.json",
+      "sha256": "b26112d4a8b19e135348992a2ff0dcec622669e81cec47267d36a9ff11c20f2f",
+      "bytes": 5447
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-claude-install.stderr",
+      "sha256": "a9a14bf5d2540e6ab98b7b71aef54f5932cca1d7f61b2be78cda972bff20d5c8",
+      "bytes": 465
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-claude-install.stdout",
+      "sha256": "bf14b7a2bc076990244fa3239536925868dfe5ad05089c7d459b5fa482abfc72",
+      "bytes": 24
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-claude-loadability.stderr",
+      "sha256": "fd07cb4e859fffe4b3022278d65aed3a084ad9a72b65496d1c7423e187445d77",
+      "bytes": 1360
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-claude-loadability.stdout",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-clone.log",
+      "sha256": "c56822b40e0d1ad7850dff07ad920aa023774f75da2fc96034bae061bcbcd4d6",
+      "bytes": 47
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-codex-ci-loadability.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-codex-ci-loadability.stdout",
+      "sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf",
+      "bytes": 113
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-codex-host-loadability.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-codex-host-loadability.stdout",
+      "sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf",
+      "bytes": 113
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-codex-install.stderr",
+      "sha256": "c8d3634b4eedadeb6fe94129864315d296b329f9ab4b12383c606fe5ef8ba1f3",
+      "bytes": 27
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-codex-install.stdout",
+      "sha256": "0084a2467ddcb7209a9d3143448e657c43875f2b05b5c0c5e89ed25ab6b9a3dd",
+      "bytes": 24
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-emails.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-emails.stdout",
+      "sha256": "1af7cd40cd7ea9a58a9de001719d2bd2b95c1a051c3fb216476d19ba7edf1323",
+      "bytes": 57
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-frontmatter.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-frontmatter.stdout",
+      "sha256": "5895bbd3a491bbe88309c79d82a3f76cf8f2c01608c69ec394809fb2ac757c46",
+      "bytes": 78
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-metadata-self-test.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-metadata-self-test.stdout",
+      "sha256": "a103f57f399678c294905cd838439cbb8c7e9c330fe5bd57c77a331a1dcd23d2",
+      "bytes": 48
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-metadata.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/trailofbits-metadata.stdout",
+      "sha256": "1caf3f26d0225c30c51855973b01d02c3070c3c8bcb93ac229a01d393789d9d9",
+      "bytes": 860
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-build.stderr",
+      "sha256": "bde1a57f9c00ae1c4e38da82e1066140cde83a320a2c640d9fb411fe81f0a608",
+      "bytes": 1651
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-build.stdout",
+      "sha256": "12d1802ff32b47774120f6ae9ec4cd7b0fe7284209b5f3c6a973b7cd180f938e",
+      "bytes": 565
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-clone.stderr",
+      "sha256": "0c2fa29f136d4d0d9076b3bd1ad425b1a36d372114b3ff67f1a47a7e7b229f25",
+      "bytes": 42
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-clone.stdout",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-format.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-format.stdout",
+      "sha256": "7e3db2339f152eafb4b6b8948348a06266b56ddce05b9367cb8b73c44fb60702",
+      "bytes": 171
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-install.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-install.stdout",
+      "sha256": "243dc98598ce8c022c2ad46c8a1bf9aad384f3ca6f42a19352cdc67d26a0788d",
+      "bytes": 733
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-tests-retry.stderr",
+      "sha256": "41b553107f4eeb7c83a637636f11102d3fd60e04778d62cb73b2f55e3777fdab",
+      "bytes": 1095
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-tests-retry.stdout",
+      "sha256": "fd9b311d9461599cb18b9399e1dd3190777c37aa15403671e9ecb671aee2cb6f",
+      "bytes": 2784
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-tests.stderr",
+      "sha256": "64bbe990561a2459793dba873f3259b33a77c151f84053beb268268143d98e9c",
+      "bytes": 1613
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-tests.stdout",
+      "sha256": "3900cc5b8c82553635e0b4402a8e10ce4ac06f2c2b7d812494f22546e3e30422",
+      "bytes": 2874
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-typecheck.stderr",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/logs/vercel-typecheck.stdout",
+      "sha256": "1a72b2908bfb7a23dd4a6fc44a37be9f17d55b807f9a1df3cbbec250c3a57859",
+      "bytes": 66
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/returned-output-index.json",
+      "sha256": "efa350a03edbca2b22cfa7ec1a351d95d1bc1f09abbf8832fa66eecccdb7eb67",
+      "bytes": 21712
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/source-output-review.json",
+      "sha256": "ec5d3b40dc1b451019aac4b649fafa646604d66b5538e8fccb3e5ecd10a89e79",
+      "bytes": 1973
+    },
+    {
+      "path": "evidence/artifacts/skills-readiness-20261005/trailofbits-upstream-tests.json",
+      "sha256": "818152dce285074db3f552f2d7829b1a929601b0a65aa9ddcb4553e3a8522589",
+      "bytes": 7636
+    },
+    {
+      "path": "evidence/artifacts/skills-recording-live-catalog-20261006/local-checks.json",
+      "sha256": "07dac5610160c6b8222851a188bbe1009b9ec64c12819e874e22452b6159f09d",
+      "bytes": 5027
+    },
+    {
       "path": "evidence/artifacts/skills-role-organic-before-20261007/before.md",
       "sha256": "b7b3afc959c860dfcf45ee36f5c3b6ae0652edcacab40292e4078427b1bcdc24",
       "bytes": 1372
@@ -46724,6 +47759,36 @@
       "path": "evidence/artifacts/skills-role-organic-before-20261007/receipt.json",
       "sha256": "86c5a974ec59fc649cb4e0dc3c78f4450a0add7ede9351b662501108f67a0bec",
       "bytes": 6286
+    },
+    {
+      "path": "evidence/artifacts/skills-sdk-01601-20261007/folded-readback.json",
+      "sha256": "749d5f9f4bb8fdc2eba02c793a6e821409b508e2f9c56ce5eb903dcf2e7665b0",
+      "bytes": 4899
+    },
+    {
+      "path": "evidence/artifacts/skills-sdk-01601-20261007/inputs.json",
+      "sha256": "06dee5b1dad4b0b3d7d16dd4e3883531718db830a1246e584cfa55d45d4a9c8b",
+      "bytes": 1307
+    },
+    {
+      "path": "evidence/artifacts/skills-sdk-01601-20261007/receipt.json",
+      "sha256": "8b1938310e97bcffa57d5cf3ba5995043971a22990d8e03a120dad56589c5242",
+      "bytes": 5393
+    },
+    {
+      "path": "evidence/artifacts/skills-tier-a-recorder-20261006/alias-correction.json",
+      "sha256": "7413f2fcabb8aad65191361445a0ad329c6835b9428c66b6fdf58b589a624862",
+      "bytes": 2966
+    },
+    {
+      "path": "evidence/artifacts/skills-tier-a-recorder-20261006/fifo-profile-correction.json",
+      "sha256": "47af92d05fd8ad608e47b4d9f5e3430c9218ae2e7704c7ba67c8568e65812af0",
+      "bytes": 7811
+    },
+    {
+      "path": "evidence/artifacts/skills-tier-a-recorder-20261006/source-review.json",
+      "sha256": "7482ad13600c5b70934e146c63ec5e44362b98ea2279b24a69cc567a6b316b13",
+      "bytes": 6169
     },
     {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
@@ -54062,13 +55127,13 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "edcd00175931191ae19336c00405291eef92ca97a4a791295ebc9cd1aeaff434",
-      "bytes": 20410
+      "sha256": "64bec434b68fb5f593c8d920739e530d7fc0d66660ea3acc37ca7bc366040aa0",
+      "bytes": 21359
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
-      "sha256": "4c037b03e5b89295834eb49d3a04eb65a72f8203017c630bfbd70729912576df",
-      "bytes": 3014
+      "sha256": "cd5a83d9e8fa81ca8788a5bdcacd2fa250e02a352a5cfc6e762b28b4701cd2af",
+      "bytes": 3627
     },
     {
       "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
@@ -54082,7 +55147,7 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "034a8e301e0f14014e744b5bb46226db79b199079ba23ffc9ae1bdfd98fcd64b",
+      "sha256": "49641f39a64cb9a05ff7155d53c1527584db3d9a7788c0e1c195f330bc9d7563",
       "bytes": 10255
     },
     {
@@ -54097,28 +55162,28 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
-      "sha256": "49b2958498238c032cee9eb0b3ca8603bc17b633aaf72d348398a671873affb2",
+      "sha256": "b0dff7afd352b78ce8b337d93d46cb2e764726c06b887fcc077d836a269975ab",
       "bytes": 3630
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "d05bcc7a4451a2649becb0c32e31c3e6a0b909c9c02602ea68e2cc8bc59f2ddf",
+      "sha256": "4f365dd5c42d5e51c725c55fed4e94f3b1315b487e2c938adb723d4996a9371f",
       "bytes": 46248
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
-      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
-      "bytes": 12840
+      "sha256": "0efd94def645a838fb3fc4e6484c60761312343e35ebc1ddc4cfb6d91966b947",
+      "bytes": 12841
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea",
-      "bytes": 26572
+      "sha256": "a06aa977c8e5c77db6a834bd7e0789410b4dbbd1808d70490e7e29ec0eec10ce",
+      "bytes": 26575
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
-      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
-      "bytes": 12840
+      "sha256": "0efd94def645a838fb3fc4e6484c60761312343e35ebc1ddc4cfb6d91966b947",
+      "bytes": 12841
     },
     {
       "path": "examples/openhands-native-capabilities/README.md",
@@ -54732,8 +55797,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
-      "bytes": 42439
+      "sha256": "12b61fc0a2a5460f2509826ffaa6f448596551e1bd32f0571f6e01a56aa8ccfc",
+      "bytes": 74131
     },
     {
       "path": "scripts/trading_gates.py",
@@ -55492,8 +56557,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "7de56577e7b9aa721a9ad8799be488d6455986d381f9b6aa886af53416d33368",
-      "bytes": 103496
+      "sha256": "26d0d2d8704332a2d497a2e06ff3ffa75874542dc1beaa0bf6c4d3b358950e09",
+      "bytes": 117538
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -55529,6 +56594,11 @@
       "path": "tests/test_landscape_sweep_harness.py",
       "sha256": "472f0c0fbae4fc006345df7b1ba7150d2d72643a6838a48076ca2f482d9113e3",
       "bytes": 377687
+    },
+    {
+      "path": "tests/test_landscape_sweep_skills.py",
+      "sha256": "301125fed9640eec42827a1ea540adbc7bc1aa1886e1bd5c6cb626105b07c901",
+      "bytes": 184337
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -55742,8 +56812,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "2d81844b1041b71019c3d0caa529dbbc13b6a86af3c634c0c442c31023e9d760",
-      "bytes": 75161
+      "sha256": "1a78d428844c949a732fe47b9f8076086670e86de0220d77db6246231eee1d93",
+      "bytes": 75443
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",
@@ -55837,8 +56907,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands.py",
-      "sha256": "53dd326c5591fdd4513b134c061525c41edbf4f5260bf87bf0284837065ece63",
-      "bytes": 220510
+      "sha256": "0b99ea8856c4ef855492fd4cd2196f726869b11195e66bcc90477182c7db52d8",
+      "bytes": 222366
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
@@ -55847,13 +56917,13 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "bcb1218394b20467dcd5d76242bbe2023038807248f3eedbc2decb290233f052",
-      "bytes": 271414
+      "sha256": "1793871dfb0fabce1f1a24800144869d4d300df355903e649e8ffca041ba9ee1",
+      "bytes": 271600
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
-      "sha256": "7580739e21895c57be3fef8e7c9209e751c9ef90f975f3293cdb7f0efcde4b26",
-      "bytes": 24392
+      "sha256": "8195f9ce4890fe97d6525f06b6e859140909c59c8125b27f63d5e0f6fc8cc0f9",
+      "bytes": 25399
     },
     {
       "path": "tests/test_saturation_ledger.py",
@@ -55911,19 +56981,29 @@
       "bytes": 103131
     },
     {
+      "path": "tests/test_skill_routing_hook.py",
+      "sha256": "42fff0b29bb771b9fd682f42de0d4002ac08afec43db1da2ef23e0d7f9a0efb7",
+      "bytes": 22634
+    },
+    {
+      "path": "tests/test_skill_state_recorder.py",
+      "sha256": "581825d66770db16cfd3423ce7b0464b8d8c657da0b700f2f16173ac8c528c1e",
+      "bytes": 27543
+    },
+    {
       "path": "tests/test_skill_usage.py",
       "sha256": "994cc7796bf7995137a1cb117f96705e38fcf10fb9b43d970eca0292b93bc85f",
       "bytes": 249557
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "9020a7c87958c36df3c81e42e94869c5c49accde595e619c012e2f46d66d266e",
-      "bytes": 19524
+      "sha256": "d703bace82b839cd01ba47d1878250278ed44dc05c625eee399c8e86433733ad",
+      "bytes": 21265
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "7c7ffee80a370d9a6c0d7510c16cd96abc0d7314e93579816400b317ab169fb5",
-      "bytes": 67576
+      "sha256": "831b11a264b38d7f9c2bdb23cd8150fc6c204e8918868d75ef3ccd3f0fbdf72e",
+      "bytes": 83043
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -56137,8 +57217,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "c068934f1aa56204558e1b5b9898db6356a5682acca68b09ebaf49f3d9d7d538",
-      "bytes": 46809
+      "sha256": "90276770bbefd99aae80ace964974cc93ef0d35501477cc1a8850aeb55f26a90",
+      "bytes": 63514
     },
     {
       "path": "tools/adoption/managed_block.py",
@@ -56174,6 +57254,11 @@
       "path": "tools/adoption/runtime_skill_freshness.py",
       "sha256": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
       "bytes": 8628
+    },
+    {
+      "path": "tools/adoption/skill_state_recorder.py",
+      "sha256": "78b27bf27c6de9bbee5b061abe3204acdd1c4a1e8235aa9235a699c697a4369d",
+      "bytes": 25740
     },
     {
       "path": "tools/adoption/workflow_manifest.py",
@@ -56314,6 +57399,61 @@
       "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
       "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
       "bytes": 5277
+    },
+    {
+      "path": "tools/skill-routing-b13/README.md",
+      "sha256": "eaef9c3a28d0f6d936d9bc43c22a989af83dac6024e053cbdb8a4b5d2cf16dc3",
+      "bytes": 6344
+    },
+    {
+      "path": "tools/skill-routing-b13/cases.json",
+      "sha256": "0e8377d63b452f7dd24e7526aaa82bd09dc9a47a7c1b37d794649937f4f78759",
+      "bytes": 2530
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/checks.json",
+      "sha256": "22277c0f17ce3fe5f9234085c7fef1ee38d6f803bae7588d0b3239ce0e2f7df8",
+      "bytes": 155
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/ci-failed.log",
+      "sha256": "ba973ce12429ffcb75cf11a836007e6827cfbe56bf64631be9eb93b3ed1d996b",
+      "bytes": 417
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/AGENTS.md",
+      "sha256": "6acaf0a46dfcba9bbd60b419cfafea0d86cb04bb9a883eb2cb591f159ce811e3",
+      "bytes": 158
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/CLAUDE.md",
+      "sha256": "fbf7cd4fff740fb54aff9f4eb5269940ba138c0b54e6fdde5e9071d490b8ae04",
+      "bytes": 137
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/instructions/package.json",
+      "sha256": "382d195c20ee3996679d0f31693cb1d9b07457464e63d7b13cab8702a7babe30",
+      "bytes": 190
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/pr-status.json",
+      "sha256": "76613ba2e603da7f60143561f7b4c3b97581e7fcf0469ba07a1ba6bedb3753c4",
+      "bytes": 121
+    },
+    {
+      "path": "tools/skill-routing-b13/fixtures/review-threads.json",
+      "sha256": "94d396c5384a6e770d831f65d76d2602c032574cd7f65c0ac98f40417f39aeea",
+      "bytes": 569
+    },
+    {
+      "path": "tools/skill-routing-b13/harbor-keyless-smoke.md",
+      "sha256": "8fd1148de43fe4a650bd27b7082f157d491b3b61601c6697915321529a9881cd",
+      "bytes": 5264
+    },
+    {
+      "path": "tools/skill-routing-b13/promptfoo.codex.json",
+      "sha256": "90c5ba0ec8ac3520886625c3fe07e5fef523864b5c868f32e8ffa463d4b9a4ef",
+      "bytes": 2605
     },
     {
       "path": "tools/skill-usage/README.md",

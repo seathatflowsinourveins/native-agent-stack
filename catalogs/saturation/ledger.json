@@ -10913,7 +10913,3298 @@
      ]
     }
    ]
+  },
+  {
+   "sweep_id": "landscape-sweep-skills-20261005-ns2604",
+   "date": "2026-10-05",
+   "workflow_run": "wf_b786bea1-429",
+   "status": "stopped",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20261005-skills-ns2604.json",
+   "manifest_sha256": "4da18060fafb01c32d41b7dc1a75c9c2265f3842acad17a6ccc311861dd45e09",
+   "lane": "skills-lifecycle-landscape-20261005",
+   "prompts_sha256": "db29720fcf2acdf34154e1879d181a86bb96b567acf4fb61d671f358b7834d2a",
+   "usage_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-attempts/child-usage-wf_b786bea1-429.json",
+   "usage_sha256": "2c492c629f716aefaffc91e39d4ec381c0e6011d0e68b527165f32404fb43ebe",
+   "lower_bound_usage": true,
+   "returns_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json",
+   "returns_sha256": "1189baddb2b52d319936699b53f2e376a0ce8b189181f5125295b28a7c5fdd04",
+   "lost_workers": [],
+   "notes": [
+    "Publication is stopped, not saturated or accepted: original converted artifacts retain 13 layers, 140 proposals and all 48 vote survivors. Native source_reviews.py reviewed 37 and stopped on 11 provenance gates. Native make_result.py refused completion; only 37 successful reviews are bound in this stopped ledger input. Eleven unbound leads remain in original survivors/layers/returns and source-review-index.json, not reclassified as merit refutations.",
+    "GPT-6 degraded: 42 jobs, 28 ok, 13 file_only late after wrapper waits, 1 timeout exit 124; 14 jobs lack usage. Three earlier attempts remain separately in returns.gpt6_usage. Missing discovery/copy/vote failures reopen 11 converted layers; source-review stops additionally reopen skill-lifecycle (12 total). Sixteen proposals have missing GPT fit votes and are explicitly unadjudicated in original votes_note fields despite serialized refuted placeholders.",
+    "Claude native usage retains 106 complete children and one effort deviation in skills-test followup (max and low); usage_record.py exit 1 is preserved and mapped to returns.failures.skills-test. No incomplete Claude child is invented from late GPT wrapper jobs; lost_workers is empty. Claude, GPT, UI token estimate, parent and billing counters are separate scopes; unknown usage stays unknown.",
+    "Converter initially refused 13 personal home-path strings (exit 3). Co-op redacted them to /home/<user>/; retained converted inputs have zero native private-content findings. Final converter exit 4 retains file_only limits. Raw run conversations are excluded from public artifacts.",
+    "Returned votes remain votes=retained under the native ledger contract. The stopped recipe not_returned example describes interrupted votes and would mislabel these returned votes. Status stopped with lower_bound_usage=true neither counts nor resets saturation.",
+    "All 13 lane decisions select no adoption or keep-but-compare candidate. Source reviews verify pinned SKILL.md provenance only; supporting-code and license review, native skill-creator paired benchmark, command-center cross-family PR review, lifecycle-only install and fresh model/worker discovery remain required. No skill or client configuration changed.",
+    "Foundation and trading baselines were freshly extracted at main ec0b8fd821a7b2004c331d2185b33d9e5ed47896. Reused freshness is dated 2026-10-05 02:31 metadata, not new live acceptance. Smoke converted artifacts and usage are retained as separate earlier attempts, not added to full-run usage or benchmark evidence."
+   ],
+   "prev_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2",
+   "layers": [
+    {
+     "catalog": "skills",
+     "layer_id": "skills-research",
+     "requirement_sha256": "eaad1541c73c4ae3d83bde6b6740e4e12e1ff9466d20be5c677df04d5e8fd944",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "votes_note": "4 of 6 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: bgauryy/octocode@octocode-research, bgauryy/octocode@octocode-subagent, upstash/context7@find-docs, affaan-m/ecc@deep-research.",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-research",
+     "calls": {
+      "web_search": 9,
+      "web_fetch": 1,
+      "gh_api": 27
+     },
+     "proposed": [
+      "addyosmani/agent-skills@source-driven-development",
+      "ZhongHanLoo/deep-research-skill@deep-research",
+      "bgauryy/octocode@octocode-research",
+      "bgauryy/octocode@octocode-subagent",
+      "upstash/context7@find-docs",
+      "affaan-m/ECC@deep-research"
+     ],
+     "known": [],
+     "new": [
+      "addyosmani/agent-skills@source-driven-development",
+      "ZhongHanLoo/deep-research-skill@deep-research",
+      "bgauryy/octocode@octocode-research",
+      "bgauryy/octocode@octocode-subagent",
+      "upstash/context7@find-docs",
+      "affaan-m/ECC@deep-research"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "addyosmani/agent-skills@source-driven-development",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/0/fit"
+       }
+      },
+      {
+       "repo": "ZhongHanLoo/deep-research-skill@deep-research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/1/fit"
+       }
+      },
+      {
+       "repo": "bgauryy/octocode@octocode-research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/2/fit"
+       }
+      },
+      {
+       "repo": "bgauryy/octocode@octocode-subagent",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/3/fit"
+       }
+      },
+      {
+       "repo": "upstash/context7@find-docs",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/4/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@deep-research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-research/5/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-research"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-skill-lifecycle",
+     "requirement_sha256": "3e705acd5a522ce09901ab400027757c9fcb8640d1e01c36a1e2cd7797ff0887",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-skill-lifecycle",
+     "calls": {
+      "web_search": 13,
+      "web_fetch": 3,
+      "gh_api": 54,
+      "gpt6_web_search": 24,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "getsentry/skills@skill-writer",
+      "bgauryy/octocode@octocode-skills",
+      "getsentry/skills@skill-scanner",
+      "affaan-m/ECC@skill-comply",
+      "github/awesome-copilot@agent-skill-stack",
+      "trailofbits/skills@skill-improver",
+      "openai/codex@skill-installer",
+      "SunChJ/skillbench@skillbench",
+      "NVIDIA/SkillSpector@skill-inspector",
+      "openai/plugins@evaluate-skill",
+      "promptfoo/promptfoo@promptfoo-evals",
+      "agent-sh/agnix@agnix",
+      "openai/plugins@improve-skill",
+      "openai/plugins@metric-pack-designer",
+      "alchaincyf/darwin-skill@darwin-skill"
+     ],
+     "known": [],
+     "new": [
+      "getsentry/skills@skill-writer",
+      "bgauryy/octocode@octocode-skills",
+      "getsentry/skills@skill-scanner",
+      "affaan-m/ECC@skill-comply",
+      "github/awesome-copilot@agent-skill-stack",
+      "trailofbits/skills@skill-improver",
+      "openai/codex@skill-installer",
+      "SunChJ/skillbench@skillbench",
+      "NVIDIA/SkillSpector@skill-inspector",
+      "openai/plugins@evaluate-skill",
+      "promptfoo/promptfoo@promptfoo-evals",
+      "agent-sh/agnix@agnix",
+      "openai/plugins@improve-skill",
+      "openai/plugins@metric-pack-designer",
+      "alchaincyf/darwin-skill@darwin-skill"
+     ],
+     "survived": [
+      {
+       "repo": "getsentry/skills@skill-writer",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/0/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/getsentry-skills-skill-writer.json"
+      },
+      {
+       "repo": "bgauryy/octocode@octocode-skills",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/1/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/bgauryy-octocode-octocode-skills.json"
+      },
+      {
+       "repo": "affaan-m/ECC@skill-comply",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/3/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/affaan-m-ecc-skill-comply.json"
+      },
+      {
+       "repo": "github/awesome-copilot@agent-skill-stack",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/4/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/github-awesome-copilot-agent-skill-stack.json"
+      },
+      {
+       "repo": "NVIDIA/SkillSpector@skill-inspector",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/8/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/nvidia-skillspector-skill-inspector.json"
+      },
+      {
+       "repo": "agent-sh/agnix@agnix",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/11/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/agent-sh-agnix-agnix.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "getsentry/skills@skill-scanner",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/2/fit"
+       }
+      },
+      {
+       "repo": "trailofbits/skills@skill-improver",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/5/fit"
+       }
+      },
+      {
+       "repo": "openai/codex@skill-installer",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/6/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@metric-pack-designer",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-skill-lifecycle/13/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/37"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/43"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/44"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/46"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/47"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-design-intake",
+     "requirement_sha256": "f359dd309ac06090e97041bb8c5d0ef362682421b6d387782aa381e351973e17",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-design-intake",
+     "calls": {
+      "web_search": 15,
+      "web_fetch": 0,
+      "gh_api": 40,
+      "gpt6_web_search": 6,
+      "gpt6_web_fetch": 6,
+      "gpt6_gh_api": 39
+     },
+     "proposed": [
+      "affaan-m/ECC@intent-driven-development",
+      "addyosmani/agent-skills@interview-me",
+      "mattpocock/skills@grilling",
+      "EveryInc/compound-engineering-plugin@ce-brainstorm",
+      "bgauryy/octocode@octocode-brainstorming",
+      "addyosmani/agent-skills@spec-driven-development",
+      "EveryInc/compound-engineering-plugin@ce-doc-review",
+      "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+      "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+      "Fission-AI/OpenSpec@openspec-explore",
+      "garrytan/gstack@office-hours",
+      "xurble/mad-skills@clarify-requirements"
+     ],
+     "known": [],
+     "new": [
+      "affaan-m/ECC@intent-driven-development",
+      "addyosmani/agent-skills@interview-me",
+      "mattpocock/skills@grilling",
+      "EveryInc/compound-engineering-plugin@ce-brainstorm",
+      "bgauryy/octocode@octocode-brainstorming",
+      "addyosmani/agent-skills@spec-driven-development",
+      "EveryInc/compound-engineering-plugin@ce-doc-review",
+      "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+      "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+      "Fission-AI/OpenSpec@openspec-explore",
+      "garrytan/gstack@office-hours",
+      "xurble/mad-skills@clarify-requirements"
+     ],
+     "survived": [
+      {
+       "repo": "affaan-m/ECC@intent-driven-development",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/0/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/affaan-m-ecc-intent-driven-development.json"
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-brainstorm",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/3/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/everyinc-compound-engineering-plugin-ce-brainstorm.json"
+      },
+      {
+       "repo": "addyosmani/agent-skills@spec-driven-development",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/5/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/5/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/addyosmani-agent-skills-spec-driven-development.json"
+      },
+      {
+       "repo": "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/7/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/bmad-code-org-bmad-method-bmad-forge-idea.json"
+      },
+      {
+       "repo": "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/8/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/bmad-code-org-bmad-method-bmad-advanced-elicitation.json"
+      },
+      {
+       "repo": "Fission-AI/OpenSpec@openspec-explore",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/9/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/fission-ai-openspec-openspec-explore.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "addyosmani/agent-skills@interview-me",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/1/fit"
+       }
+      },
+      {
+       "repo": "mattpocock/skills@grilling",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/2/fit"
+       }
+      },
+      {
+       "repo": "bgauryy/octocode@octocode-brainstorming",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/4/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-doc-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/6/fit"
+       }
+      },
+      {
+       "repo": "xurble/mad-skills@clarify-requirements",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-design-intake/11/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-design-intake"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/41"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-architecture",
+     "requirement_sha256": "34522036e10f7be0c5eaf8695f757bf9cfdceb9975a15c8e05737db41780eefd",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-architecture",
+     "calls": {
+      "web_search": 5,
+      "web_fetch": 1,
+      "gh_api": 33
+     },
+     "proposed": [
+      "codybrom/clairvoyance@design-review",
+      "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+      "hyhmrright/brooks-lint@brooks-audit",
+      "wondelai/skills@software-design-philosophy",
+      "TerminalSkills/skills@improve-codebase-architecture",
+      "addyosmani/agent-skills@api-and-interface-design"
+     ],
+     "known": [],
+     "new": [
+      "codybrom/clairvoyance@design-review",
+      "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+      "hyhmrright/brooks-lint@brooks-audit",
+      "wondelai/skills@software-design-philosophy",
+      "TerminalSkills/skills@improve-codebase-architecture",
+      "addyosmani/agent-skills@api-and-interface-design"
+     ],
+     "survived": [
+      {
+       "repo": "codybrom/clairvoyance@design-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/0/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/codybrom-clairvoyance-design-review.json"
+      },
+      {
+       "repo": "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/1/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/levnikolaevich-claude-code-skills-ln-56-architecture-auditor.json"
+      },
+      {
+       "repo": "TerminalSkills/skills@improve-codebase-architecture",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/4/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/terminalskills-skills-improve-codebase-architecture.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "hyhmrright/brooks-lint@brooks-audit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/2/fit"
+       }
+      },
+      {
+       "repo": "wondelai/skills@software-design-philosophy",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/3/fit"
+       }
+      },
+      {
+       "repo": "addyosmani/agent-skills@api-and-interface-design",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-architecture/5/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-architecture"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-implement",
+     "requirement_sha256": "c72a8bcadfe922ece27580e0cdd656e2ac03255de93ce1f764924eff946f821c",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-implement",
+     "calls": {
+      "web_search": 6,
+      "web_fetch": 0,
+      "gh_api": 37,
+      "gpt6_web_search": 12,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "pbakaus/impeccable@impeccable",
+      "addyosmani/agent-skills@frontend-ui-engineering",
+      "Leonxlnx/taste-skill@redesign-existing-projects",
+      "nextlevelbuilder/ui-ux-pro-max-skill@ui-ux-pro-max",
+      "affaan-m/ECC@design-system",
+      "addyosmani/agent-skills@incremental-implementation",
+      "openai/plugins@frontend-app-builder",
+      "astral-sh/claude-code-plugins@uv"
+     ],
+     "known": [],
+     "new": [
+      "pbakaus/impeccable@impeccable",
+      "addyosmani/agent-skills@frontend-ui-engineering",
+      "Leonxlnx/taste-skill@redesign-existing-projects",
+      "nextlevelbuilder/ui-ux-pro-max-skill@ui-ux-pro-max",
+      "affaan-m/ECC@design-system",
+      "addyosmani/agent-skills@incremental-implementation",
+      "openai/plugins@frontend-app-builder",
+      "astral-sh/claude-code-plugins@uv"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "pbakaus/impeccable@impeccable",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/0/fit"
+       }
+      },
+      {
+       "repo": "addyosmani/agent-skills@frontend-ui-engineering",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/1/fit"
+       }
+      },
+      {
+       "repo": "Leonxlnx/taste-skill@redesign-existing-projects",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/2/fit"
+       }
+      },
+      {
+       "repo": "nextlevelbuilder/ui-ux-pro-max-skill@ui-ux-pro-max",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/3/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@design-system",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/4/fit"
+       }
+      },
+      {
+       "repo": "addyosmani/agent-skills@incremental-implementation",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/5/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@frontend-app-builder",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/6/fit"
+       }
+      },
+      {
+       "repo": "astral-sh/claude-code-plugins@uv",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-implement/7/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-test",
+     "requirement_sha256": "3df8de8533b0ed406f5015e39107ba5b26c977b68d35c5cd8a40cb96903942e1",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-test",
+     "calls": {
+      "web_search": 13,
+      "web_fetch": 7,
+      "gh_api": 76,
+      "gpt6_web_search": 5,
+      "gpt6_web_fetch": 3,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "addyosmani/agent-skills@test-driven-development",
+      "nyxandro/property-testing-skill@property-testing",
+      "trailofbits/skills@atheris",
+      "affaan-m/ECC@tdd-workflow",
+      "endavis/pyproject-template@property-tests",
+      "dmoka/skills@mutation-testing",
+      "github/awesome-copilot@test-gap-audit",
+      "trailofbits/skills@ossfuzz",
+      "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+      "SocketDev/socket-btm@property-and-fuzz-testing",
+      "lgtm-hq/ai-skills@scorecard",
+      "mattpocock/skills@tdd"
+     ],
+     "known": [],
+     "new": [
+      "addyosmani/agent-skills@test-driven-development",
+      "nyxandro/property-testing-skill@property-testing",
+      "trailofbits/skills@atheris",
+      "affaan-m/ECC@tdd-workflow",
+      "endavis/pyproject-template@property-tests",
+      "dmoka/skills@mutation-testing",
+      "github/awesome-copilot@test-gap-audit",
+      "trailofbits/skills@ossfuzz",
+      "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+      "SocketDev/socket-btm@property-and-fuzz-testing",
+      "lgtm-hq/ai-skills@scorecard",
+      "mattpocock/skills@tdd"
+     ],
+     "survived": [
+      {
+       "repo": "addyosmani/agent-skills@test-driven-development",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/0/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/addyosmani-agent-skills-test-driven-development.json"
+      },
+      {
+       "repo": "nyxandro/property-testing-skill@property-testing",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/1/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/nyxandro-property-testing-skill-property-testing.json"
+      },
+      {
+       "repo": "trailofbits/skills@atheris",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/2/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-atheris.json"
+      },
+      {
+       "repo": "affaan-m/ECC@tdd-workflow",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/3/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/affaan-m-ecc-tdd-workflow.json"
+      },
+      {
+       "repo": "endavis/pyproject-template@property-tests",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/4/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/endavis-pyproject-template-property-tests.json"
+      },
+      {
+       "repo": "dmoka/skills@mutation-testing",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/5/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/5/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/dmoka-skills-mutation-testing.json"
+      },
+      {
+       "repo": "github/awesome-copilot@test-gap-audit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/6/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/github-awesome-copilot-test-gap-audit.json"
+      },
+      {
+       "repo": "trailofbits/skills@ossfuzz",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/7/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-ossfuzz.json"
+      },
+      {
+       "repo": "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/8/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/internationalcolorconsortium-iccdev-clusterfuzzlite.json"
+      },
+      {
+       "repo": "SocketDev/socket-btm@property-and-fuzz-testing",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/9/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/socketdev-socket-btm-property-and-fuzz-testing.json"
+      },
+      {
+       "repo": "lgtm-hq/ai-skills@scorecard",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-test/10/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/lgtm-hq-ai-skills-scorecard.json"
+      }
+     ],
+     "refuted": [],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-test"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/42"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-debug",
+     "requirement_sha256": "716c3f4e71b42318084c058be43850fa70bc7d38b3822ebc979e739cfc0c0415",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-debug",
+     "calls": {
+      "web_search": 19,
+      "web_fetch": 3,
+      "gh_api": 73,
+      "gpt6_web_search": 5,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "tw93/Waza@hunt",
+      "obra/superpowers@systematic-debugging",
+      "addyosmani/agent-skills@debugging-and-error-recovery",
+      "wshobson/agents@parallel-debugging",
+      "getsentry/skills@iterate-pr",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "EveryInc/compound-engineering-plugin@ce-debug",
+      "NousResearch/hermes-agent@python-debugpy",
+      "garrytan/gstack@investigate",
+      "microsoft/DebugMCP@debug-live",
+      "clay584/nautilus-trader-skill@nautilus-trader",
+      "Jeffallan/claude-skills@debugging-wizard",
+      "dotnet/skills@dump-collect"
+     ],
+     "known": [],
+     "new": [
+      "tw93/Waza@hunt",
+      "obra/superpowers@systematic-debugging",
+      "addyosmani/agent-skills@debugging-and-error-recovery",
+      "wshobson/agents@parallel-debugging",
+      "getsentry/skills@iterate-pr",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "EveryInc/compound-engineering-plugin@ce-debug",
+      "NousResearch/hermes-agent@python-debugpy",
+      "garrytan/gstack@investigate",
+      "microsoft/DebugMCP@debug-live",
+      "clay584/nautilus-trader-skill@nautilus-trader",
+      "Jeffallan/claude-skills@debugging-wizard",
+      "dotnet/skills@dump-collect"
+     ],
+     "survived": [
+      {
+       "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/5/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/5/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/warpdotdev-common-skills-diagnose-ci-failures.json"
+      },
+      {
+       "repo": "NousResearch/hermes-agent@python-debugpy",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/7/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/nousresearch-hermes-agent-python-debugpy.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "tw93/Waza@hunt",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/0/fit"
+       }
+      },
+      {
+       "repo": "obra/superpowers@systematic-debugging",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/1/fit"
+       }
+      },
+      {
+       "repo": "addyosmani/agent-skills@debugging-and-error-recovery",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/2/fit"
+       }
+      },
+      {
+       "repo": "wshobson/agents@parallel-debugging",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/3/fit"
+       }
+      },
+      {
+       "repo": "getsentry/skills@iterate-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/4/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-debug",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/6/fit"
+       }
+      },
+      {
+       "repo": "garrytan/gstack@investigate",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/8/fit"
+       }
+      },
+      {
+       "repo": "microsoft/DebugMCP@debug-live",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/9/fit"
+       }
+      },
+      {
+       "repo": "clay584/nautilus-trader-skill@nautilus-trader",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/10/fit"
+       }
+      },
+      {
+       "repo": "Jeffallan/claude-skills@debugging-wizard",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/11/fit"
+       }
+      },
+      {
+       "repo": "dotnet/skills@dump-collect",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-debug/12/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-debug"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-review",
+     "requirement_sha256": "7de63286f27632979a8c4725fb82560a953a48622a455894e2583a85fb9a3c0e",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "votes_note": "3 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: trailofbits/skills@post-patch-validation, mattpocock/skills@code-review, affaan-m/ecc@santa-method.",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-review",
+     "calls": {
+      "web_search": 7,
+      "web_fetch": 6,
+      "gh_api": 25,
+      "gpt6_web_search": 12,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "trailofbits/skills@post-patch-validation",
+      "mattpocock/skills@code-review",
+      "K-Dense-AI/scientific-agent-skills@scientific-critical-thinking",
+      "github/awesome-copilot@build-evidence-map",
+      "addyosmani/agent-skills@code-review-and-quality",
+      "trailofbits/skills@trailmark-variant-neighborhood",
+      "getsentry/skills@find-bugs",
+      "affaan-m/ECC@santa-method"
+     ],
+     "known": [],
+     "new": [
+      "trailofbits/skills@post-patch-validation",
+      "mattpocock/skills@code-review",
+      "K-Dense-AI/scientific-agent-skills@scientific-critical-thinking",
+      "github/awesome-copilot@build-evidence-map",
+      "addyosmani/agent-skills@code-review-and-quality",
+      "trailofbits/skills@trailmark-variant-neighborhood",
+      "getsentry/skills@find-bugs",
+      "affaan-m/ECC@santa-method"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "trailofbits/skills@post-patch-validation",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/0/fit"
+       }
+      },
+      {
+       "repo": "mattpocock/skills@code-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/1/fit"
+       }
+      },
+      {
+       "repo": "K-Dense-AI/scientific-agent-skills@scientific-critical-thinking",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/2/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@build-evidence-map",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/3/fit"
+       }
+      },
+      {
+       "repo": "addyosmani/agent-skills@code-review-and-quality",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/4/fit"
+       }
+      },
+      {
+       "repo": "trailofbits/skills@trailmark-variant-neighborhood",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/5/fit"
+       }
+      },
+      {
+       "repo": "getsentry/skills@find-bugs",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/6/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@santa-method",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-review/7/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-review"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-security",
+     "requirement_sha256": "6b707e3fbf51159a2ad2c194a1a1b32d240104d545f3e4eb06d763a1097be833",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-security",
+     "calls": {
+      "web_search": 10,
+      "web_fetch": 1,
+      "gh_api": 53,
+      "gpt6_web_search": 2,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "getsentry/skills@security-review",
+      "alpha-omega-security/threat-model@threat-model",
+      "trailofbits/skills@semgrep-rule-creator",
+      "trailofbits/skills@vulnerability-triage-brocards",
+      "getsentry/skills@secret-serialization",
+      "github/awesome-copilot@codeql",
+      "openai/plugins@threat-model",
+      "openai/plugins@triage-finding",
+      "anthropics/claude-plugins-official@claude-security",
+      "garrytan/gstack@cso",
+      "github/awesome-copilot@threat-model-analyst",
+      "openai/plugins@security-scan",
+      "openai/plugins@validation",
+      "openai/plugins@security-diff-scan"
+     ],
+     "known": [],
+     "new": [
+      "getsentry/skills@security-review",
+      "alpha-omega-security/threat-model@threat-model",
+      "trailofbits/skills@semgrep-rule-creator",
+      "trailofbits/skills@vulnerability-triage-brocards",
+      "getsentry/skills@secret-serialization",
+      "github/awesome-copilot@codeql",
+      "openai/plugins@threat-model",
+      "openai/plugins@triage-finding",
+      "anthropics/claude-plugins-official@claude-security",
+      "garrytan/gstack@cso",
+      "github/awesome-copilot@threat-model-analyst",
+      "openai/plugins@security-scan",
+      "openai/plugins@validation",
+      "openai/plugins@security-diff-scan"
+     ],
+     "survived": [
+      {
+       "repo": "trailofbits/skills@semgrep-rule-creator",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/2/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-semgrep-rule-creator.json"
+      },
+      {
+       "repo": "getsentry/skills@secret-serialization",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/4/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/getsentry-skills-secret-serialization.json"
+      },
+      {
+       "repo": "github/awesome-copilot@codeql",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/5/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/5/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/github-awesome-copilot-codeql.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "getsentry/skills@security-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/0/fit"
+       }
+      },
+      {
+       "repo": "alpha-omega-security/threat-model@threat-model",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/1/fit"
+       }
+      },
+      {
+       "repo": "trailofbits/skills@vulnerability-triage-brocards",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/3/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@triage-finding",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/7/fit"
+       }
+      },
+      {
+       "repo": "anthropics/claude-plugins-official@claude-security",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/8/fit"
+       }
+      },
+      {
+       "repo": "garrytan/gstack@cso",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/9/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@threat-model-analyst",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/10/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@security-scan",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/11/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@validation",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/12/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@security-diff-scan",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-security/13/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-security"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/45"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-ci-pr",
+     "requirement_sha256": "c46b022530a9ee36e0c95d4f75dd226fc8b4e1eb220948cf39064541375f1a03",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "votes_note": "5 of 13 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: getsentry/skills@iterate-pr, openhands/extensions@iterate, warpdotdev/common-skills@resolve-merge-conflicts, neolabhq/context-engineering-kit@resolve-fixed-pr-comments, warpdotdev/common-skills@diagnose-ci-failures.",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-ci-pr",
+     "calls": {
+      "web_search": 8,
+      "web_fetch": 7,
+      "gh_api": 78,
+      "gpt6_web_search": 6,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "getsentry/skills@iterate-pr",
+      "OpenHands/extensions@iterate",
+      "warpdotdev/common-skills@resolve-merge-conflicts",
+      "cameroncooke/skills@reconcile-merge-conflicts",
+      "NeoLabHQ/context-engineering-kit@resolve-fixed-pr-comments",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+      "trailofbits/skills-curated@openai-gh-fix-ci",
+      "trailofbits/skills-curated@openai-gh-address-comments",
+      "github/awesome-copilot@copilot-pr-autopilot",
+      "davila7/claude-code-templates@gh-fix-ci",
+      "davila7/claude-code-templates@gh-address-comments"
+     ],
+     "known": [],
+     "new": [
+      "getsentry/skills@iterate-pr",
+      "OpenHands/extensions@iterate",
+      "warpdotdev/common-skills@resolve-merge-conflicts",
+      "cameroncooke/skills@reconcile-merge-conflicts",
+      "NeoLabHQ/context-engineering-kit@resolve-fixed-pr-comments",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+      "trailofbits/skills-curated@openai-gh-fix-ci",
+      "trailofbits/skills-curated@openai-gh-address-comments",
+      "github/awesome-copilot@copilot-pr-autopilot",
+      "davila7/claude-code-templates@gh-fix-ci",
+      "davila7/claude-code-templates@gh-address-comments"
+     ],
+     "survived": [
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/6/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/everyinc-compound-engineering-plugin-ce-resolve-pr-feedback.json"
+      },
+      {
+       "repo": "trailofbits/skills-curated@openai-gh-address-comments",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/9/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/trailofbits-skills-curated-openai-gh-address-comments.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "getsentry/skills@iterate-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/0/fit"
+       }
+      },
+      {
+       "repo": "OpenHands/extensions@iterate",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/1/fit"
+       }
+      },
+      {
+       "repo": "warpdotdev/common-skills@resolve-merge-conflicts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/2/fit"
+       }
+      },
+      {
+       "repo": "cameroncooke/skills@reconcile-merge-conflicts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/3/fit"
+       }
+      },
+      {
+       "repo": "NeoLabHQ/context-engineering-kit@resolve-fixed-pr-comments",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/4/fit"
+       }
+      },
+      {
+       "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/5/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/7/fit"
+       }
+      },
+      {
+       "repo": "trailofbits/skills-curated@openai-gh-fix-ci",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/8/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@copilot-pr-autopilot",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-ci-pr/10/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-ci-pr"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/39"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/40"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-agent-docs",
+     "requirement_sha256": "21267b522624bf2fb29f35d7889b0d071f1a2abde9bc31dd472a060a3aeee18a",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "votes_note": "4 of 13 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: x0c/agents-md-edit-skill@agents-md-edit, mblode/agent-skills@agents-md, anthropics/claude-plugins-official@claude-md-improver, juliusbrussee/caveman@caveman-learn.",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-agent-docs",
+     "calls": {
+      "web_search": 13,
+      "web_fetch": 10,
+      "gh_api": 49,
+      "gpt6_web_search": 7,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "x0c/agents-md-edit-skill@agents-md-edit",
+      "affaan-m/ECC@living-docs-governance",
+      "mblode/agent-skills@agents-md",
+      "getsentry/skills@agents-md",
+      "anthropics/claude-plugins-official@claude-md-improver",
+      "JuliusBrussee/caveman@caveman-learn",
+      "agent-sh/agnix@agnix",
+      "github/awesome-copilot@create-agentsmd",
+      "agent-sh/enhance@enhance-claude-memory",
+      "tw93/Waza@health",
+      "SteveVitali/agent-skills@agent-docs",
+      "affaan-m/ECC@context-budget",
+      "Jane-o-O-o-O/agent-pulse-skill@agent-pulse"
+     ],
+     "known": [],
+     "new": [
+      "x0c/agents-md-edit-skill@agents-md-edit",
+      "affaan-m/ECC@living-docs-governance",
+      "mblode/agent-skills@agents-md",
+      "getsentry/skills@agents-md",
+      "anthropics/claude-plugins-official@claude-md-improver",
+      "JuliusBrussee/caveman@caveman-learn",
+      "agent-sh/agnix@agnix",
+      "github/awesome-copilot@create-agentsmd",
+      "agent-sh/enhance@enhance-claude-memory",
+      "tw93/Waza@health",
+      "SteveVitali/agent-skills@agent-docs",
+      "affaan-m/ECC@context-budget",
+      "Jane-o-O-o-O/agent-pulse-skill@agent-pulse"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "x0c/agents-md-edit-skill@agents-md-edit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/0/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@living-docs-governance",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/1/fit"
+       }
+      },
+      {
+       "repo": "mblode/agent-skills@agents-md",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/2/fit"
+       }
+      },
+      {
+       "repo": "getsentry/skills@agents-md",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/3/fit"
+       }
+      },
+      {
+       "repo": "anthropics/claude-plugins-official@claude-md-improver",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/4/fit"
+       }
+      },
+      {
+       "repo": "JuliusBrussee/caveman@caveman-learn",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/5/fit"
+       }
+      },
+      {
+       "repo": "agent-sh/agnix@agnix",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/6/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@create-agentsmd",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/7/fit"
+       }
+      },
+      {
+       "repo": "agent-sh/enhance@enhance-claude-memory",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/8/fit"
+       }
+      },
+      {
+       "repo": "tw93/Waza@health",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/9/fit"
+       }
+      },
+      {
+       "repo": "SteveVitali/agent-skills@agent-docs",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/10/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@context-budget",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/11/fit"
+       }
+      },
+      {
+       "repo": "Jane-o-O-o-O/agent-pulse-skill@agent-pulse",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-agent-docs/12/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-agent-docs"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-browser",
+     "requirement_sha256": "ef8bdfea9bf007eecf8fa8b24e5a64317c79aa5fda08b7bf1400fac09bddb52a",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-browser",
+     "calls": {
+      "web_search": 7,
+      "web_fetch": 1,
+      "gh_api": 17
+     },
+     "proposed": [
+      "openai/plugins@frontend-testing-debugging",
+      "microsoft/playwright-cli@playwright-cli",
+      "ChromeDevTools/chrome-devtools-mcp@chrome-devtools-cli",
+      "browser-use/browser-use@browser-use",
+      "brettdavies/crawl4ai-skill@crawl4ai",
+      "affaan-m/ECC@browser-qa"
+     ],
+     "known": [],
+     "new": [
+      "openai/plugins@frontend-testing-debugging",
+      "microsoft/playwright-cli@playwright-cli",
+      "ChromeDevTools/chrome-devtools-mcp@chrome-devtools-cli",
+      "browser-use/browser-use@browser-use",
+      "brettdavies/crawl4ai-skill@crawl4ai",
+      "affaan-m/ECC@browser-qa"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "openai/plugins@frontend-testing-debugging",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/0/fit"
+       }
+      },
+      {
+       "repo": "microsoft/playwright-cli@playwright-cli",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/1/fit"
+       }
+      },
+      {
+       "repo": "ChromeDevTools/chrome-devtools-mcp@chrome-devtools-cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/2/fit"
+       }
+      },
+      {
+       "repo": "browser-use/browser-use@browser-use",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/3/fit"
+       }
+      },
+      {
+       "repo": "brettdavies/crawl4ai-skill@crawl4ai",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/4/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@browser-qa",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-browser/5/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-browser"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-mcp-build",
+     "requirement_sha256": "f99a12b78c83583066a7db051e6acd40b7704591c5a1f46cc6b3954e0e9cd883",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/discovery/skills-mcp-build",
+     "calls": {
+      "web_search": 11,
+      "web_fetch": 3,
+      "gh_api": 51,
+      "gpt6_web_search": 12,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "github/awesome-copilot@mcp-release-qa",
+      "anthropics/claude-plugins-official@build-mcp-server",
+      "affaan-m/ECC@mcp-server-patterns",
+      "microsoft/skills@mcp-builder",
+      "mcp-use/mcp-use@mcp-builder",
+      "NousResearch/hermes-agent@fastmcp",
+      "PrefectHQ/fastmcp@fastmcp-client-cli",
+      "hiadamhere/skills@mcp-sdk",
+      "modelcontextprotocol/kotlin-sdk@mcp-docs",
+      "modelcontextprotocol/modelcontextprotocol@search-mcp-github",
+      "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+      "tenequm/skills@mcp-best-practices",
+      "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+      "AlpayC/mcp-migration-check@mcp-migration"
+     ],
+     "known": [],
+     "new": [
+      "github/awesome-copilot@mcp-release-qa",
+      "anthropics/claude-plugins-official@build-mcp-server",
+      "affaan-m/ECC@mcp-server-patterns",
+      "microsoft/skills@mcp-builder",
+      "mcp-use/mcp-use@mcp-builder",
+      "NousResearch/hermes-agent@fastmcp",
+      "PrefectHQ/fastmcp@fastmcp-client-cli",
+      "hiadamhere/skills@mcp-sdk",
+      "modelcontextprotocol/kotlin-sdk@mcp-docs",
+      "modelcontextprotocol/modelcontextprotocol@search-mcp-github",
+      "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+      "tenequm/skills@mcp-best-practices",
+      "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+      "AlpayC/mcp-migration-check@mcp-migration"
+     ],
+     "survived": [
+      {
+       "repo": "PrefectHQ/fastmcp@fastmcp-client-cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/6/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/prefecthq-fastmcp-fastmcp-client-cli.json"
+      },
+      {
+       "repo": "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/10/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/cure-consulting-group-productengineeringskills-mcp-server-builder.json"
+      },
+      {
+       "repo": "tenequm/skills@mcp-best-practices",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/11/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/tenequm-skills-mcp-best-practices.json"
+      },
+      {
+       "repo": "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/12/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/12/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005/yigitkonur-skills-by-yigitkonur-build-mcp-server-sdk-v2.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "github/awesome-copilot@mcp-release-qa",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/0/fit"
+       }
+      },
+      {
+       "repo": "anthropics/claude-plugins-official@build-mcp-server",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/1/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@mcp-server-patterns",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/2/fit"
+       }
+      },
+      {
+       "repo": "microsoft/skills@mcp-builder",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/3/fit"
+       }
+      },
+      {
+       "repo": "mcp-use/mcp-use@mcp-builder",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/4/fit"
+       }
+      },
+      {
+       "repo": "NousResearch/hermes-agent@fastmcp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/5/fit"
+       }
+      },
+      {
+       "repo": "hiadamhere/skills@mcp-sdk",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/7/fit"
+       }
+      },
+      {
+       "repo": "modelcontextprotocol/kotlin-sdk@mcp-docs",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/8/fit"
+       }
+      },
+      {
+       "repo": "modelcontextprotocol/modelcontextprotocol@search-mcp-github",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/votes/skills-mcp-build/9/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/returns.json#/failures/skills-mcp-build"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005/source-review-index.json#/38"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sweep_id": "landscape-sweep-skills-20261005-fu1-ns2604",
+   "date": "2026-10-05",
+   "workflow_run": "wf_c2f7dbc8-129",
+   "status": "stopped",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu1.json",
+   "manifest_sha256": "2ec1e936f8bb65dd5c6594049c7d5da0ada64b54da0cbab6b1bfa0dcd8b5f09a",
+   "lane": "skills-lifecycle-landscape-20261005-fu1",
+   "prompts_sha256": "1c99d1c9a01a5b0d1e0d96408246767dd5e2c994b130e8ba9ae2e902f1cea302",
+   "usage_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1-attempts/child-usage-wf_c2f7dbc8-129.json",
+   "usage_sha256": "bcb5d9dcb6680e35294da6f1b02c6192a658361e8981fc35e85c60086722e2ac",
+   "lower_bound_usage": true,
+   "returns_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json",
+   "returns_sha256": "01e0f5e30850efd7ceee6496f83e5ef13e3eb2f3bc20e3a288cfd368411fcf57",
+   "lost_workers": [],
+   "notes": [
+    "Publication is stopped, not saturated or accepted. Converted artifacts retain 2 layers, 29 proposals, 10 vote survivors and 19 merit refutations. Native source_reviews.py bound 8 reviews and stopped on 2 CI/PR leads; native make_result.py exited2 refusing completion. Only the 8 bound leads enter this stopped ledger input; the 2 unbound leads remain in original survivors/layers/returns and source-review-index, never reclassified as merit refutations.",
+    "skills-research has all 3 source reviews and no converted reopen entries; this is scoped voting/provenance closure, not adoption or a clean completed saturation run. skills-ci-pr retains one follow-up GPT discovery timeout exit124 plus two source-review stops. All 29 final GPT fit votes returned; the timeout limits discovery coverage.",
+    "GPT usage: 8 current jobs, 7 ok and 1 failed_exit_124; 7 copy checks matched, no lost jobs. Usage unavailable for one current job and three earlier attempts, retained in separate scopes. Claude child-usage measurement exited0: 21 complete children, 641 requests, max effort only, zero capped searches. Claude, GPT, cache and reasoning subsets are not summed; unknown usage remains unknown.",
+    "All converted selected and alternatives_keep_but_compare arrays are empty. Proposal-level keep_but_compare labels are comparison leads, not adoption selections. Source reviews bind judged pins and SKILL.md bytes only; supporting-code/license review, upstream skill-creator paired benchmark, command-center PR read, lifecycle-only installation and fresh model/worker discovery remain subsequent gates.",
+    "Research and CI/PR baselines were extracted at fixed main e7d94e7bcc074edba093994c8853e59b650ce7e0. GitHub freshness was reused from the 2026-10-05 02:31-02:32 snapshot, not newly fetched currency or runtime acceptance. Original raw workflow record is retained privately with its hash, not copied into public conversations.",
+    "Frozen prompts_sha256 was recomputed from the retained run script's embedded A.T with the native documented json.dumps(sort_keys=True, ensure_ascii=False) algorithm. The shared scratch prompts_sha256.txt had already changed for a later run and was not used.",
+    "Returned votes remain votes=retained. status=stopped and lower_bound_usage=true neither counts nor resets saturation. Converted source bytes and source-review stops are preserved; no client configuration, skill installation or model launch was performed in this publication."
+   ],
+   "prev_sha256": "3f4148df0ab8a44661842e787f515d8fe52d066c5152c24f9543aa0e81258f09",
+   "layers": [
+    {
+     "catalog": "skills",
+     "layer_id": "skills-research",
+     "requirement_sha256": "eaad1541c73c4ae3d83bde6b6740e4e12e1ff9466d20be5c677df04d5e8fd944",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/discovery/skills-research",
+     "calls": {
+      "web_search": 13,
+      "web_fetch": 1,
+      "gh_api": 45,
+      "gpt6_web_search": 20,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "bgauryy/octocode@octocode-research",
+      "addyosmani/agent-skills@source-driven-development",
+      "mattpocock/skills@research",
+      "warpdotdev/common-skills@research",
+      "affaan-m/ECC@skill-scout",
+      "affaan-m/ECC@research-ops",
+      "anthropics/knowledge-work-plugins@search-strategy",
+      "upstash/context7@find-docs",
+      "akitaonrails/ai-memory@ai-memory-retrieval",
+      "github/awesome-copilot@agent-skill-stack",
+      "tobi/qmd@qmd",
+      "assafelovic/gpt-researcher@gpt-researcher",
+      "openai/plugins@aiq-research",
+      "affaan-m/ECC@architecture-decision-records",
+      "affaan-m/ECC@search-first"
+     ],
+     "known": [
+      "addyosmani/agent-skills@source-driven-development"
+     ],
+     "new": [
+      "bgauryy/octocode@octocode-research",
+      "mattpocock/skills@research",
+      "warpdotdev/common-skills@research",
+      "affaan-m/ECC@skill-scout",
+      "affaan-m/ECC@research-ops",
+      "anthropics/knowledge-work-plugins@search-strategy",
+      "upstash/context7@find-docs",
+      "akitaonrails/ai-memory@ai-memory-retrieval",
+      "github/awesome-copilot@agent-skill-stack",
+      "tobi/qmd@qmd",
+      "assafelovic/gpt-researcher@gpt-researcher",
+      "openai/plugins@aiq-research",
+      "affaan-m/ECC@architecture-decision-records",
+      "affaan-m/ECC@search-first"
+     ],
+     "survived": [
+      {
+       "repo": "bgauryy/octocode@octocode-research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/0/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/bgauryy-octocode-octocode-research.json"
+      },
+      {
+       "repo": "upstash/context7@find-docs",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/7/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/upstash-context7-find-docs.json"
+      },
+      {
+       "repo": "akitaonrails/ai-memory@ai-memory-retrieval",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/8/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/akitaonrails-ai-memory-ai-memory-retrieval.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "addyosmani/agent-skills@source-driven-development",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/1/fit"
+       }
+      },
+      {
+       "repo": "mattpocock/skills@research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/2/fit"
+       }
+      },
+      {
+       "repo": "warpdotdev/common-skills@research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/3/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@skill-scout",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/4/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@research-ops",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/5/fit"
+       }
+      },
+      {
+       "repo": "anthropics/knowledge-work-plugins@search-strategy",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/6/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@agent-skill-stack",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/9/fit"
+       }
+      },
+      {
+       "repo": "tobi/qmd@qmd",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/10/fit"
+       }
+      },
+      {
+       "repo": "assafelovic/gpt-researcher@gpt-researcher",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/11/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@aiq-research",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/12/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@architecture-decision-records",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/13/fit"
+       }
+      },
+      {
+       "repo": "affaan-m/ECC@search-first",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/14/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-research/14/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-ci-pr",
+     "requirement_sha256": "c46b022530a9ee36e0c95d4f75dd226fc8b4e1eb220948cf39064541375f1a03",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/discovery/skills-ci-pr",
+     "calls": {
+      "web_search": 14,
+      "web_fetch": 6,
+      "gh_api": 56,
+      "gpt6_web_search": 8,
+      "gpt6_web_fetch": 7,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "getsentry/skills@iterate-pr",
+      "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "warpdotdev/common-skills@resolve-merge-conflicts",
+      "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+      "wshobson/agents@git-advanced-workflows",
+      "openai/codex@babysit-pr",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "equinor/fusion-skills@fusion-github-review-resolution",
+      "OpenHands/extensions@iterate",
+      "amElnagdy/review-skills@babysit-pr",
+      "cursor/plugins@loop-on-ci",
+      "cursor/plugins@fix-merge-conflicts",
+      "github/awesome-copilot@copilot-pr-autopilot",
+      "microsoft/vscode-pull-request-github@address-pr-comments"
+     ],
+     "known": [
+      "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+      "github/awesome-copilot@copilot-pr-autopilot"
+     ],
+     "new": [
+      "getsentry/skills@iterate-pr",
+      "warpdotdev/common-skills@resolve-merge-conflicts",
+      "wshobson/agents@git-advanced-workflows",
+      "openai/codex@babysit-pr",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "equinor/fusion-skills@fusion-github-review-resolution",
+      "OpenHands/extensions@iterate",
+      "amElnagdy/review-skills@babysit-pr",
+      "cursor/plugins@loop-on-ci",
+      "cursor/plugins@fix-merge-conflicts",
+      "microsoft/vscode-pull-request-github@address-pr-comments"
+     ],
+     "survived": [
+      {
+       "repo": "warpdotdev/common-skills@resolve-merge-conflicts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/2/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-resolve-merge-conflicts.json"
+      },
+      {
+       "repo": "openai/codex@babysit-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/5/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/5/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/openai-codex-babysit-pr.json"
+      },
+      {
+       "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/6/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-diagnose-ci-failures.json"
+      },
+      {
+       "repo": "cursor/plugins@loop-on-ci",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/10/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/cursor-plugins-loop-on-ci.json"
+      },
+      {
+       "repo": "cursor/plugins@fix-merge-conflicts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/11/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/cursor-plugins-fix-merge-conflicts.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "getsentry/skills@iterate-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/0/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/1/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/3/fit"
+       }
+      },
+      {
+       "repo": "wshobson/agents@git-advanced-workflows",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/4/fit"
+       }
+      },
+      {
+       "repo": "OpenHands/extensions@iterate",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/8/fit"
+       }
+      },
+      {
+       "repo": "amElnagdy/review-skills@babysit-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/9/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@copilot-pr-autopilot",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/votes/skills-ci-pr/12/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/returns.json#/failures/skills-ci-pr"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/source-review-index.json#/8"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/source-review-index.json#/9"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sweep_id": "landscape-sweep-skills-20261005-fu2-ns2604",
+   "date": "2026-10-05",
+   "workflow_run": "wf_4b9c7d98-ffd",
+   "status": "stopped",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu2.json",
+   "manifest_sha256": "82b5d440bde71c39598be9283bbb5ff4b7039c175706510c50926832566af0ec",
+   "lane": "skills-lifecycle-landscape-20261005-fu2",
+   "prompts_sha256": "495e1b50d8c9f2aab2bc6507f0f912f96e46f7134914be68b64f30fd993a5fee",
+   "usage_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/child-usage-wf_4b9c7d98-ffd.json",
+   "usage_sha256": "fce0cbb987bb8f49de7f9678f3be18eacb2e40702052ee0f67fe466c8a5b18ba",
+   "lower_bound_usage": true,
+   "returns_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json",
+   "returns_sha256": "7e8f59f47610d311805400b25ae1a33bbaeb86597cad7248f7afeaca68ffe562",
+   "lost_workers": [],
+   "notes": [
+    "Stopped publication, not adoption, acceptance or saturation. Converted originals retain all 3 tasks, 41 proposals, 17 vote survivors and 24 merit refutations. Native source_reviews.py bound14 and stopped3; native make_result.py exited2 refusing completion. Only14successful reviews bind the stopped ledger input; all17leads remain in originals and review index. The three unbound leads are not reclassified as merit refutations.",
+    "CI/PR's first GPT discovery timeout exit124 remains a retained_failure reopen; all41final GPT fit votes returned. Source-review stops additionally reopen CI/PR (cursor/plugins@get-pr-comments, missing judged hash), agent-docs (addyosmani/agent-skills@context-engineering, missing judged hash), and review (openai/plugins@verify-fix not found in default CLI discovery locations without --full-depth at its valid pin). No invented judged hash or lookup-scope workaround.",
+    "All selected and alternatives_keep_but_compare arrays are empty. These source-bound survivors remain comparison leads pending supporting-code/license review, upstream skill-creator paired benchmarks, command-center cross-family review and owner-applied lifecycle installation with fresh model/worker discovery. No candidate, benchmark, model session, install or live setting apply occurred in this publication unit.",
+    "GPT has12current jobs,11ok/1failed_exit_124,11copy matches/no lost. Usage unavailable for1current job and2separately retained earlier attempts. Claude native measurement0:31completed children/990requests plus4superseded attempts/136requests, with complete same-label max reruns. by_resolved_model already includes superseded usage and must not be added again; its synthetic bucket is zero-counter metadata, not four extra model workers. Claude and Codex counters remain separate; cached input and reasoning output are subsets, and unknown usage stays unknown.",
+    "Co-op reported first converter refusal exit3 for a sibling scratchpad root outside the work-dir redaction. Its sanitized conversion exits0. The exact one-note replacement and both raw-run hashes are independently verified against sanitization.json; original and sanitized run records remain private. Actual first-attempt stdout/stderr is not present in the handed-off bundle, so its exit3 remains producer-reported, not an invented local observation.",
+    "Baselines extracted from an immutable main424b8a778222ae8857aade42c49ae6f7a13b3138 archive with the unchanged native extract_layers.py. GitHub freshness reuses the explicitly dated2026-10-05 02:31-02:32 snapshot, not new currency or runtime acceptance. Prompt digest computed from this run's retained embedded A.T using the native documented algorithm.",
+    "Returned votes remain votes=retained. status=stopped/lower_bound_usage=true neither counts nor resets saturation. No lost worker is invented from the GPT timeout or completed Claude superseded attempts. The harness critic and source stops feed the co-op's later task sweeps; no duplicate sweep is started."
+   ],
+   "prev_sha256": "66e2a4f431e4fbbd18dbe946ee50cff1df9d4fe8f94aa55d4c795c0451905fd8",
+   "layers": [
+    {
+     "catalog": "skills",
+     "layer_id": "skills-ci-pr",
+     "requirement_sha256": "c46b022530a9ee36e0c95d4f75dd226fc8b4e1eb220948cf39064541375f1a03",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/discovery/skills-ci-pr",
+     "calls": {
+      "web_search": 9,
+      "web_fetch": 3,
+      "gh_api": 61,
+      "gpt6_web_search": 11,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "getsentry/skills@iterate-pr",
+      "OpenHands/extensions@iterate",
+      "warpdotdev/common-skills@resolve-merge-conflicts",
+      "jMerta/codex-skills@rebase-assistant",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "github/awesome-copilot@copilot-pr-autopilot",
+      "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+      "cursor/plugins@fix-merge-conflicts",
+      "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+      "cursor/plugins@fix-ci",
+      "Parcha-ai/parcha-skills@review-loop",
+      "equinor/fusion-skills@fusion-github-review-resolution",
+      "cursor/plugins@get-pr-comments"
+     ],
+     "known": [
+      "getsentry/skills@iterate-pr",
+      "OpenHands/extensions@iterate",
+      "warpdotdev/common-skills@resolve-merge-conflicts",
+      "warpdotdev/common-skills@diagnose-ci-failures",
+      "github/awesome-copilot@copilot-pr-autopilot",
+      "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+      "cursor/plugins@fix-merge-conflicts"
+     ],
+     "new": [
+      "jMerta/codex-skills@rebase-assistant",
+      "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+      "cursor/plugins@fix-ci",
+      "Parcha-ai/parcha-skills@review-loop",
+      "equinor/fusion-skills@fusion-github-review-resolution",
+      "cursor/plugins@get-pr-comments"
+     ],
+     "survived": [
+      {
+       "repo": "warpdotdev/common-skills@resolve-merge-conflicts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/2/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-resolve-merge-conflicts.json"
+      },
+      {
+       "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/4/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-diagnose-ci-failures.json"
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/7/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/everyinc-compound-engineering-plugin-ce-babysit-pr.json"
+      },
+      {
+       "repo": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/9/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-respond-to-pr-comments-in-blocklist.json"
+      },
+      {
+       "repo": "Parcha-ai/parcha-skills@review-loop",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/11/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/parcha-ai-parcha-skills-review-loop.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "getsentry/skills@iterate-pr",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/0/fit"
+       }
+      },
+      {
+       "repo": "OpenHands/extensions@iterate",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/1/fit"
+       }
+      },
+      {
+       "repo": "jMerta/codex-skills@rebase-assistant",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/3/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@copilot-pr-autopilot",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/5/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/6/fit"
+       }
+      },
+      {
+       "repo": "cursor/plugins@fix-merge-conflicts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/8/fit"
+       }
+      },
+      {
+       "repo": "cursor/plugins@fix-ci",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/10/fit"
+       }
+      },
+      {
+       "repo": "equinor/fusion-skills@fusion-github-review-resolution",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-ci-pr/12/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/failures/skills-ci-pr"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/source-review-index.json#/15"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-agent-docs",
+     "requirement_sha256": "21267b522624bf2fb29f35d7889b0d071f1a2abde9bc31dd472a060a3aeee18a",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/discovery/skills-agent-docs",
+     "calls": {
+      "web_search": 11,
+      "web_fetch": 11,
+      "gh_api": 80,
+      "gpt6_web_search": 22,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "affaan-m/ECC@living-docs-governance",
+      "anthropics/claude-plugins-official@claude-md-improver",
+      "getsentry/skills@agents-md",
+      "pizzayap/pza-skills@astra-instruction-audit",
+      "microsoft/skills@wiki-agents-md",
+      "JuliusBrussee/caveman@caveman-compress",
+      "addyosmani/agent-skills@context-engineering",
+      "github/awesome-copilot@docs-sync-audit",
+      "agent-sh/agnix@agnix",
+      "dyoshikawa/rulesync@rulesync",
+      "anthropics/skills@claude-api",
+      "mblode/agent-skills@agents-md",
+      "Zandereins/schliff@schliff"
+     ],
+     "known": [
+      "affaan-m/ECC@living-docs-governance",
+      "getsentry/skills@agents-md",
+      "agent-sh/agnix@agnix"
+     ],
+     "new": [
+      "anthropics/claude-plugins-official@claude-md-improver",
+      "pizzayap/pza-skills@astra-instruction-audit",
+      "microsoft/skills@wiki-agents-md",
+      "JuliusBrussee/caveman@caveman-compress",
+      "addyosmani/agent-skills@context-engineering",
+      "github/awesome-copilot@docs-sync-audit",
+      "dyoshikawa/rulesync@rulesync",
+      "anthropics/skills@claude-api",
+      "mblode/agent-skills@agents-md",
+      "Zandereins/schliff@schliff"
+     ],
+     "survived": [
+      {
+       "repo": "anthropics/claude-plugins-official@claude-md-improver",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/1/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/anthropics-claude-plugins-official-claude-md-improver.json"
+      },
+      {
+       "repo": "getsentry/skills@agents-md",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/2/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/getsentry-skills-agents-md.json"
+      },
+      {
+       "repo": "agent-sh/agnix@agnix",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/8/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/agent-sh-agnix-agnix.json"
+      },
+      {
+       "repo": "dyoshikawa/rulesync@rulesync",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/9/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/dyoshikawa-rulesync-rulesync.json"
+      },
+      {
+       "repo": "mblode/agent-skills@agents-md",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/11/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/mblode-agent-skills-agents-md.json"
+      },
+      {
+       "repo": "Zandereins/schliff@schliff",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/12/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/12/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/zandereins-schliff-schliff.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "affaan-m/ECC@living-docs-governance",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/0/fit"
+       }
+      },
+      {
+       "repo": "pizzayap/pza-skills@astra-instruction-audit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/3/fit"
+       }
+      },
+      {
+       "repo": "microsoft/skills@wiki-agents-md",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/4/fit"
+       }
+      },
+      {
+       "repo": "JuliusBrussee/caveman@caveman-compress",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/5/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@docs-sync-audit",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/7/fit"
+       }
+      },
+      {
+       "repo": "anthropics/skills@claude-api",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-agent-docs/10/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/source-review-index.json#/14"
+      }
+     ]
+    },
+    {
+     "catalog": "skills",
+     "layer_id": "skills-review",
+     "requirement_sha256": "7de63286f27632979a8c4725fb82560a953a48622a455894e2583a85fb9a3c0e",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/discovery/skills-review",
+     "calls": {
+      "web_search": 14,
+      "web_fetch": 11,
+      "gh_api": 64,
+      "gpt6_web_search": 22,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "trailofbits/skills@post-patch-validation",
+      "mattpocock/skills@code-review",
+      "github/awesome-copilot@build-evidence-map",
+      "anthropics/claude-plugins-official@claude-security",
+      "cursor/plugins@verify-this",
+      "trailofbits/skills@trailmark-variant-neighborhood",
+      "getsentry/skills@find-bugs",
+      "EveryInc/compound-engineering-plugin@ce-code-review",
+      "ast-grep/agent-skill@ast-grep",
+      "openai/codex@review-agent",
+      "openai/plugins@assess-patch-risk",
+      "BoundaryML/baml@baml-core",
+      "pydantic/skills@building-pydantic-ai-agents",
+      "openai/plugins@verify-fix"
+     ],
+     "known": [
+      "github/awesome-copilot@build-evidence-map",
+      "trailofbits/skills@trailmark-variant-neighborhood",
+      "getsentry/skills@find-bugs"
+     ],
+     "new": [
+      "trailofbits/skills@post-patch-validation",
+      "mattpocock/skills@code-review",
+      "anthropics/claude-plugins-official@claude-security",
+      "cursor/plugins@verify-this",
+      "EveryInc/compound-engineering-plugin@ce-code-review",
+      "ast-grep/agent-skill@ast-grep",
+      "openai/codex@review-agent",
+      "openai/plugins@assess-patch-risk",
+      "BoundaryML/baml@baml-core",
+      "pydantic/skills@building-pydantic-ai-agents",
+      "openai/plugins@verify-fix"
+     ],
+     "survived": [
+      {
+       "repo": "mattpocock/skills@code-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/1/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/mattpocock-skills-code-review.json"
+      },
+      {
+       "repo": "ast-grep/agent-skill@ast-grep",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/8/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/ast-grep-agent-skill-ast-grep.json"
+      },
+      {
+       "repo": "BoundaryML/baml@baml-core",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/11/fit"
+       },
+       "source_review": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/boundaryml-baml-baml-core.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "trailofbits/skills@post-patch-validation",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/0/fit"
+       }
+      },
+      {
+       "repo": "github/awesome-copilot@build-evidence-map",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/2/fit"
+       }
+      },
+      {
+       "repo": "anthropics/claude-plugins-official@claude-security",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/3/fit"
+       }
+      },
+      {
+       "repo": "cursor/plugins@verify-this",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/4/fit"
+       }
+      },
+      {
+       "repo": "trailofbits/skills@trailmark-variant-neighborhood",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/5/fit"
+       }
+      },
+      {
+       "repo": "getsentry/skills@find-bugs",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/6/fit"
+       }
+      },
+      {
+       "repo": "EveryInc/compound-engineering-plugin@ce-code-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/7/fit"
+       }
+      },
+      {
+       "repo": "openai/codex@review-agent",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/9/fit"
+       }
+      },
+      {
+       "repo": "openai/plugins@assess-patch-risk",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/10/fit"
+       }
+      },
+      {
+       "repo": "pydantic/skills@building-pydantic-ai-agents",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json#/votes/skills-review/12/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/source-review-index.json#/16"
+      }
+     ]
+    }
+   ]
   }
  ],
- "head_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2"
+ "head_sha256": "b57467c21f5356e403068205f8a5e7e0f48e16364f78cab0637e5349f6beb09e"
 }
