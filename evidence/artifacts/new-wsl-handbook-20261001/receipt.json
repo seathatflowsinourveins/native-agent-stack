@@ -4,10 +4,10 @@
   "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-  "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
+  "profile_sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
   "outputs": {
-    "docs/new-wsl-handbook.md": "e78e949817a4dea214e32a021e33e50f33b5f18779fe05abff56686e58e76ce5",
-    "docs/new-wsl-handbook.json": "577c34b06a82a045fc950be30c1282fe94143f9f3d10a6307595acf6a8931304"
+    "docs/new-wsl-handbook.md": "c4c7dcc54299a918a80567c63802a74b57b5cde56c1373a0a258d14fc45cba51",
+    "docs/new-wsl-handbook.json": "8bb0eeb9b7cf69f6a72cce3fd31d50c6bbf18f9a7910a2aa085f7ba3537530a1"
   },
   "inventory": {
     "layers": 37,
@@ -617,6 +617,18 @@
       "date": "2026-10-06",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "cause": "Content refresh of PR #645 onto main d9eb68750 after #642 (W1) landed: #645 moves Grafana's stack pin to 13.2.3, a handbook input, so main's committed handbook outputs were stale on the merged sources. Regenerated through the unchanged native builder as the handbook carry (the command center's ruling (a), items task-native-agent-stack-5f-20261006T112334Z and task-native-agent-stack-5f-20261006T232821Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "d9eb68750311d5f888adec140723da174f9fe10c",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
+        "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "#645 land-slot P2 (the command center's ruling (a), item task-native-agent-stack-5f-20261006T235735Z): W1's sentence 'The host stack remains 13.2.2 at this head.' became stale when W1b moved the stack manifest and snapshot selection to 13.2.3, so the profile now carries the approved replacement. Regenerated through the unchanged native builder; every regeneration entry of both sides is kept unchanged.",
       "regenerated_against_main": "d9eb68750311d5f888adec140723da174f9fe10c",
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",

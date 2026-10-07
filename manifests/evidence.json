@@ -5095,8 +5095,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
-      "bytes": 260542
+      "sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
+      "bytes": 260809
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -10991,8 +10991,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "6edba6f48aa5f9b7bb6ba5d436454e8008fae42561df1c6f115cfc8f4f4a255a",
-      "bytes": 495540
+      "sha256": "57b0a8b511d4141c6d587d6a4254428b1e0e843f26e3c79a94daa70152b75f88",
+      "bytes": 495718
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -16616,8 +16616,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "66ac7cbe992d2ba0871f9a959d186d527d2614613453bb461e4b2d1f27491f20",
-      "bytes": 294748
+      "sha256": "da49a384a240c28ee7dbee035c8b163ff423ccacd9a05a32dc92f498f82b0090",
+      "bytes": 294837
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17901,13 +17901,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "577c34b06a82a045fc950be30c1282fe94143f9f3d10a6307595acf6a8931304",
-      "bytes": 692584
+      "sha256": "8bb0eeb9b7cf69f6a72cce3fd31d50c6bbf18f9a7910a2aa085f7ba3537530a1",
+      "bytes": 692762
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e78e949817a4dea214e32a021e33e50f33b5f18779fe05abff56686e58e76ce5",
-      "bytes": 368585
+      "sha256": "c4c7dcc54299a918a80567c63802a74b57b5cde56c1373a0a258d14fc45cba51",
+      "bytes": 368763
     },
     {
       "path": "docs/next-host-stages.md",
@@ -18001,8 +18001,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "34ccc066ebe2d2ca23d9b8c0a83690b523e1b72d23e3b85e19480bbfffdac086",
-      "bytes": 594971
+      "sha256": "a0f70bf8793b30e152ec5f97779d26057ddff0e8d54e01dc1cc111df03ac37ea",
+      "bytes": 595149
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -40191,8 +40191,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "a25461712be2395e42dbbc2e70420e2a77f506bb8eef71ea168b519a3187bb58",
-      "bytes": 38670
+      "sha256": "d7fe921dc9bc856e050a47682fb6c5d8a78fdc7460fbb832737131045b837c29",
+      "bytes": 39624
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40201,13 +40201,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "acd86662a43ba86258fd77c5209912af7be7269bd91c6e7eb9396b129a8ee7c0",
-      "bytes": 81773
+      "sha256": "0446a9d2945718b90e7693f29fa879b31ffb96bb726fd9d569c3fc42d7b73216",
+      "bytes": 81862
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "f6db1aba035e6c3938429f49286504b2beef910cd42ba6e0164b1a6e1d1bc13f",
-      "bytes": 175637
+      "sha256": "b6bdbb81ca6f6e24865bbcb2ce0c1f0f3f84368bf9bc583e28750d3360371e58",
+      "bytes": 175726
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -40516,8 +40516,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "f63f69ffcd17339faffe7fafc90be38eed9e57bf05ef852e1596b234eb40fd76",
-      "bytes": 391171
+      "sha256": "3d6d1704fb2cb7d4a0287f6328ef615e355ef2c4e9bfc36a493d538695c04cdd",
+      "bytes": 391260
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54271,8 +54271,8 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "c673dc9615240f35920a04e1624618c48ad5f8d059da4fa0617ad910f31ca1ec",
-      "bytes": 16960
+      "sha256": "59300865ac8a410ac2896319ae0cd04e9a0370c398b8191874db1b08542d9d13",
+      "bytes": 17017
     },
     {
       "path": "observability/backends/README.md",

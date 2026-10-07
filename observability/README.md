@@ -33,7 +33,7 @@ notifications. [Machine-readable evidence](receipt.json) records the exact scope
 | Alert delivery | prometheus/alertmanager 0.34.1; binwiederhier/ntfy 2.28.0 | Native webhook and bundled ntfy template; local inbox only |
 | Workflow/research | Dagu; DeerFlow; native Astra SDK; LEAN | Existing execution receipts plus local service observation; no connected broker |
 
-Grafana 13.2.3 remains the WSL profile/install-plan selection; qualified on scratch/synthetic validation only ([W1b receipt:11-14](https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14)); host acceptance pending. The NativeStack2604 release hold names `grafana/grafana#133835` and `#133856` ([record](../docs/decisions/2026-10-04-2604-e2e-fix-wave.md#L117)). The deployed-version evidence and host-stack selection above remain 13.2.2.
+Grafana 13.2.3 remains the WSL profile/install-plan selection; qualified on scratch/synthetic validation only ([W1b receipt:11-14](https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14)); host acceptance pending. The NativeStack2604 release hold names `grafana/grafana#133835` and `#133856` ([record](../docs/decisions/2026-10-04-2604-e2e-fix-wave.md#L117)). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2.
 
 See the [453-repository landscape index](../catalogs/us-equities/repository-index.md)
 for all recorded identities, including 337 freshly rechecked public stars.

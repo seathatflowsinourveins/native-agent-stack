@@ -7836,7 +7836,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3"
+      "sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -9894,7 +9894,7 @@
       "acceptance": {
         "command": null,
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2.",
         "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657"
       },
       "aliases": [
@@ -9904,7 +9904,7 @@
         "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
         "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
         "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass.",
-        "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
+        "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2.",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
