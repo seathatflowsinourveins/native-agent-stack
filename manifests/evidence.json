@@ -4700,6 +4700,11 @@
       "bytes": 4711
     },
     {
+      "path": ".claude/rules/trading.md",
+      "sha256": "cc2a9a3aa628458fcd6ecb03650b74daeb3c27122bd8264e8559364482520b11",
+      "bytes": 630
+    },
+    {
       "path": ".claude/settings.json",
       "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
       "bytes": 2884
@@ -4906,8 +4911,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "611caaf180166eaa6104ec3fc76781a5bf7db6349135b1837fbb17dd0afa9663",
-      "bytes": 10959
+      "sha256": "a250eb45988fe8c92517dd717916f30f7e29c4599c7cae420767f75e5029d4f8",
+      "bytes": 7294
     },
     {
       "path": "CLAUDE.md",
@@ -5156,8 +5161,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "2f1d38a12e5714c6178e33f7ade258cf7b5751f174afd059c37d2947ae6261ed",
-      "bytes": 11905
+      "sha256": "5daa26a4d1fc4289e28569cccd9973225adce96b48aad49d1c1d4f46b4037c8a",
+      "bytes": 11145
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -5166,8 +5171,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "23efb2008d34f4a7184547321ecf7c1d6d23b9d032b3b95f886721307ddba38f",
-      "bytes": 9142
+      "sha256": "56ab7a36808d078990346add089c751f30ced5a7ba94a8645b04a0d4b34f12d2",
+      "bytes": 8484
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -5296,8 +5301,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "501b98464a7ca919bd3e3f76f94517a3073c7c2f52fe60fcc1dfba66a4cf35e4",
-      "bytes": 8076
+      "sha256": "afd8cef8c3a1ff5abe8d5f6ce25166fc643338035b35783b51b3a3e58569c623",
+      "bytes": 7418
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -17457,8 +17462,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "01c9edcfa7a6660be7091b53e36b8f7db9d20c3394de9686be49b8a2db04f1b7",
-      "bytes": 139144
+      "sha256": "b659a3442c763a8e56a6281694bf9c8c62bf3679e15495b0ebd49b358176db67",
+      "bytes": 140205
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17682,8 +17687,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
-      "sha256": "b0d7fcee643cd6b29b37dc48025d8006c564c4657c1225e5d9df379265bfaa0f",
-      "bytes": 56929
+      "sha256": "42a11cd3d1dfe3d7f805991313600da97e460a8902cee1563ec752aad3564763",
+      "bytes": 58779
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
@@ -17809,6 +17814,11 @@
       "path": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md",
       "sha256": "694871937e1408b396eb3b24a5abdf9714bf37b6f5bc942ad93a71dfb2cf1e45",
       "bytes": 15271
+    },
+    {
+      "path": "docs/decisions/2026-10-07-instruction-core.md",
+      "sha256": "43c481cef3127d4da3cc2e68883f9dbcc60e89f8473f3cb033fa0c78c1047aaa",
+      "bytes": 23009
     },
     {
       "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
@@ -54467,8 +54477,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "2f1d38a12e5714c6178e33f7ade258cf7b5751f174afd059c37d2947ae6261ed",
-      "bytes": 11905
+      "sha256": "5daa26a4d1fc4289e28569cccd9973225adce96b48aad49d1c1d4f46b4037c8a",
+      "bytes": 11145
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -54522,8 +54532,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "b3405f0b93a738d2e3b2ff5f032c2874acb7dd8d15b0800fe8010bbd4dfc0ece",
-      "bytes": 111528
+      "sha256": "3d81d17304568702fca8d4787446b61dd5576cf0e22227622a63d37e262ccf0b",
+      "bytes": 112338
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -55541,14 +55551,24 @@
       "bytes": 2034
     },
     {
+      "path": "tests/fixtures/harness-context-moves/12.txt",
+      "sha256": "ae027977bfd554f3205fafcb57891781af778b3d3f4c382c520fd01abe94e18c",
+      "bytes": 485
+    },
+    {
+      "path": "tests/fixtures/harness-context-moves/13.txt",
+      "sha256": "f86cdf758f76cf7e9f3ec150fdec7aa838487e89c84ef17fdd830f76f8509525",
+      "bytes": 319
+    },
+    {
       "path": "tests/fixtures/harness-context-moves/README.md",
-      "sha256": "5d319c926920103dec6ad6e565850b1dfe3388d6fc8a651012d74c865488e907",
-      "bytes": 1740
+      "sha256": "aac38f07f347d3f8cb2d28bef961857788731a40e9fb3f707f5fa0978852575f",
+      "bytes": 3041
     },
     {
       "path": "tests/fixtures/harness-context-moves/contracts.json",
-      "sha256": "6f8beb0b57ddff87ee5b0d8a0652e5c054bce2b6ee915015967b1418082e6153",
-      "bytes": 1744
+      "sha256": "14f07c37efb1e64e8c6eeb0800577f5c4620fe110745481eeee13cce8a053ed8",
+      "bytes": 1977
     },
     {
       "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
@@ -55992,8 +56012,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "01e0348da041b08f7d7a47f22a2b5700e75edc8d6e4e4b42b45ff1a36bc07c77",
-      "bytes": 192015
+      "sha256": "fb6456e8b251e658b3840f2afb5287e95631c9275308391eafbb4ad6071fc81e",
+      "bytes": 192099
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -56212,8 +56232,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "8fea253861ff6da9f160f11c96bbf800deb2b8468791f550a0c314e8a99d91ca",
-      "bytes": 134004
+      "sha256": "0310bceff30d747ab5b618f6285967302758a35e834ff2a183a95865479e657c",
+      "bytes": 134208
     },
     {
       "path": "tests/test_install_skills.py",
