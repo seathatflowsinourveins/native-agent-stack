@@ -1541,8 +1541,11 @@ class AlpacaPaperTransport:
         while not self.ready:
             if time.monotonic() >= deadline or self.health["frozen"]:
                 self.freeze_health("start_not_ready")
+                with self._state_lock:
+                    reasons = ",".join(sorted(self._reasons))
                 await self.stop()
-                raise TransportError("stream authentication/subscription/quote readiness failed")
+                # The freeze reasons name what failed (for example quotes_disconnected or quote_stale).
+                raise TransportError("stream authentication/subscription/quote readiness failed (" + reasons + ")")
             await asyncio.sleep(0.02)
         self._ever_ready = True
 
@@ -1773,6 +1776,8 @@ class AlpacaPaperTransport:
                         "scope": "all_open_and_recent_plus_owned", "health": self.health}
             except Exception:
                 self.freeze_health("snapshot_incomplete")
+                # Suppressed, so no caller's traceback or log prints the failing read's foreign text. The
+                # exception still keeps __context__, from which a recovery receipt records only its type.
                 raise TransportError("snapshot incomplete; admissions remain frozen") from None
 
     async def stop(self):
