@@ -54262,8 +54262,8 @@
     },
     {
       "path": "observability/alert-lifecycle/user-unit-alerts.test.json",
-      "sha256": "5c1a801b92dbdb1ac67149e7eba0c005c49a728878d32e00fd384d774c49e1da",
-      "bytes": 78064
+      "sha256": "bc983e66889ba151d803d9d8228164fb90c6265c6840a10bf4bbb68550fa446b",
+      "bytes": 88184
     },
     {
       "path": "observability/alert-lifecycle/watchdog.disabled.rules.example.json",
@@ -56017,8 +56017,8 @@
     },
     {
       "path": "tests/test_user_unit_alert_renderer.py",
-      "sha256": "76f17026dbc61a994dc8fe751a804c4399db10dcfa64695972216daf23a45554",
-      "bytes": 9098
+      "sha256": "3a771279f0837c0a9ec0e3791832912189238fe34418fc3c86e4e49bb433e05e",
+      "bytes": 10428
     },
     {
       "path": "tests/test_validate.py",
