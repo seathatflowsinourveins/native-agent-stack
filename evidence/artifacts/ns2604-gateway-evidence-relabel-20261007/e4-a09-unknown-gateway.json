@@ -1,0 +1,20 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:07Z",
+  "item": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
+  "item_sha256": "aaaa99019d486ed3e2c3313dddb3e1495315ef2a2c5d5be2285f448226bae148",
+  "class": "unknown-gateway",
+  "label": "E4; original_revision=0d5e6506434fab598dee861c749a22e628beb75a; scope=round2 blind decider provenance; all retained /verdicts values unchanged. Endpoint provenance unknown; review content unaffected. This records no new host execution or installed-model proof.",
+  "basis": [
+    {
+      "path": "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
+      "line": 9,
+      "quote": "\"two blind GPT-6.1 Sol deciders with reversed candidate order\",",
+      "sha256": "aaaa99019d486ed3e2c3313dddb3e1495315ef2a2c5d5be2285f448226bae148"
+    }
+  ],
+  "consumers": [
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+  ],
+  "requalifies_by": "The corresponding reviewer/decider's own sanitized dispatch log, with actual endpoint provenance. Missing call-log rows prove nothing; no local review campaign or forced replay is added."
+}

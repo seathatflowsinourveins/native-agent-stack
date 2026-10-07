@@ -1,0 +1,20 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:07Z",
+  "item": "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
+  "item_sha256": "92b70fde74999cb3ae8f00462b01ce92a3a0a649dbc1380bc00619d7b1d7c6bc",
+  "class": "unknown-gateway",
+  "label": "E4; original_revision=0d5e6506434fab598dee861c749a22e628beb75a; scope=/round2 decider_A and decider_B provenance. Endpoint provenance unknown; review content unaffected. This records no new host execution or installed-model proof.",
+  "basis": [
+    {
+      "path": "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
+      "line": 10,
+      "quote": "\"model\": \"GPT-6.1 Sol, blind\",",
+      "sha256": "92b70fde74999cb3ae8f00462b01ce92a3a0a649dbc1380bc00619d7b1d7c6bc"
+    }
+  ],
+  "consumers": [
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json"
+  ],
+  "requalifies_by": "The corresponding reviewer/decider's own sanitized dispatch log, with actual endpoint provenance. Missing call-log rows prove nothing; no local review campaign or forced replay is added."
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:58:45Z",
+  "item": "evidence/artifacts/ns2604-requalification-20261005/slots.json",
+  "item_sha256": "e545be05b199d5afcda50a03afa2e9120cb5edf192f94d26b6680658f4e56fef",
+  "class": "unknown-gateway",
+  "label": "E5; original_revision=0d5e6506434fab598dee861c749a22e628beb75a; scope=mcp-surfaces/mcp-inspector attempt metadata; failed stages remain failed; GPT review is separately corrected by E3. No recorded per-run profile HOME/endpoint is bound by this attempt metadata. Do not infer old or new execution from a profile name; review/attempt/local-service evidence remain separate.",
+  "basis": [
+    {
+      "path": "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/ns2604-requalification-20261005/slots.json",
+      "line": 32,
+      "quote": "mcp-surfaces/mcp-inspector",
+      "sha256": "e545be05b199d5afcda50a03afa2e9120cb5edf192f94d26b6680658f4e56fef"
+    }
+  ],
+  "consumers": [
+    "native-agent-stack@d7dfe84713a7c294a370d05558f00e7e5acd0d1e:evidence/artifacts/ns2604-native-bar-20261006/board.json"
+  ],
+  "requalifies_by": "Its own recorded effective CODEX_HOME, including any default-home resolution, bound to the selected archived profile's path and hash, or the run's direct recorded endpoint; otherwise unknown remains. Any authorized new acceptance respects C3 and T4/GW prerequisites, and original failures are retained."
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:07Z",
+  "item": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+  "item_sha256": "808fd9eef9b48db7a930573f28e660f1b5f9dfc569642ee31fac17a8fb043ba7",
+  "class": "unknown-gateway",
+  "label": "E5; original_revision=0d5e6506434fab598dee861c749a22e628beb75a; scope=mcp-inspector profile-based acceptance command, with its failed attempt retained at line1793. The profile command alone does not bind a recorded per-run CODEX_HOME or endpoint; no execution is invented for an unrun entry.",
+  "basis": [
+    {
+      "path": "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "line": 1793,
+      "quote": "codex exec -p omniroute -m gpt-6.1-sol",
+      "sha256": "808fd9eef9b48db7a930573f28e660f1b5f9dfc569642ee31fac17a8fb043ba7"
+    }
+  ],
+  "consumers": [
+    "native-agent-stack@d7dfe84713a7c294a370d05558f00e7e5acd0d1e:evidence/artifacts/ns2604-native-bar-20261006/board.json"
+  ],
+  "requalifies_by": "Recorded effective CODEX_HOME, including any default-home resolution, bound to the selected archived profile's path and hash, or the run's direct recorded endpoint; otherwise unknown stays. Any new authorized after_sign_in only after C3 and the T4/GW prerequisites; no caller/route is launched here."
+}
