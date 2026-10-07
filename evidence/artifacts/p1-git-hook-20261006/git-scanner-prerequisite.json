@@ -1,0 +1,10 @@
+{
+  "name": "git_hook_scanner",
+  "command": "mise install --jobs=1 aqua:gitleaks/gitleaks@8.30.1",
+  "needs": {
+    "sudo": false
+  },
+  "source": {
+    "url": "https://github.com/jdx/mise/blob/050ce5a20287a0aafd872b1191699a5fdafff5ac/registry/gitleaks.toml#L1"
+  }
+}
