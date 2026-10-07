@@ -642,6 +642,38 @@ class ApplyIOTests(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data))
 
+    def test_the_shared_template_does_not_enable_ultracode_on_a_new_target(self):
+        with self._tmp() as tmp:
+            target = tmp / ".claude" / "settings.json"
+            template = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+            acs.apply(template, target, dry_run=False)
+            merged = json.loads(target.read_text(encoding="utf-8"))
+            self.assertNotIn("ultracode", merged)
+            self.assertIs(merged["enableWorkflows"], True)
+
+    def test_the_shared_template_preserves_either_explicit_ultracode_choice(self):
+        template = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+        for enabled in (False, True):
+            with self.subTest(ultracode=enabled), self._tmp() as tmp:
+                target = tmp / ".claude" / "settings.json"
+                self._write(target, {"ultracode": enabled, "hostOnlyKey": "retained"})
+                acs.apply(template, target, dry_run=False)
+                first = json.loads(target.read_text(encoding="utf-8"))
+                self.assertIs(first["ultracode"], enabled)
+                self.assertEqual(first["hostOnlyKey"], "retained")
+                acs.apply(template, target, dry_run=False)
+                self.assertEqual(json.loads(target.read_text(encoding="utf-8")), first)
+
+    def test_the_explicit_portable_settings_can_enable_ultracode(self):
+        with self._tmp() as tmp:
+            target = tmp / ".claude" / "settings.json"
+            self._write(target, {"ultracode": False, "hostOnlyKey": "retained"})
+            portable = ROOT / "examples" / "claude-native" / "ultracode.settings.json"
+            acs.apply(portable, target, dry_run=False)
+            merged = json.loads(target.read_text(encoding="utf-8"))
+            self.assertIs(merged["ultracode"], True)
+            self.assertEqual(merged["hostOnlyKey"], "retained")
+
     def test_refuses_a_symlinked_target(self):
         with self._tmp() as tmp:
             real = tmp / "real-settings.json"

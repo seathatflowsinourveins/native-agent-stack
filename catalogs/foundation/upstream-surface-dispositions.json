@@ -562,8 +562,8 @@
   {
    "key": "claude:env:CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/README.md:1083 names it",
-   "source": "examples/claude-native/workflows/README.md:1083",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-native/workflows/README.md:1089 names it",
+   "source": "examples/claude-native/workflows/README.md:1089",
    "carrier": null,
    "value": null,
    "scope": null,

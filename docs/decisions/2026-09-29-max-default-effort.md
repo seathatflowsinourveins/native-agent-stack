@@ -254,3 +254,11 @@ Revisit this record when any of these happens:
 ## Repository rule relocated verbatim (2026-10-05)
 
 - This repository commits `.claude/settings.json` with Ultracode on and `effortLevel: xhigh`, the saved fallback for any model. A terminal session started through the ecosystem `claude` launcher runs the coordinator at `max` (the launcher adds `--effort max` only when nothing chose an effort and the client is 2.1.284 or newer; `claude --effort xhigh` opts out). On Claude Code 2.1.284 Ultracode stays on at any effort level and the `ultracode` setting sets none, so a `max` session keeps its workflow orchestration on; the `max` default rests on the user's requirement, not on a measured gain here. Headless `-p` runs pass `--effort` per call site, and `CLAUDE_CODE_EFFORT_LEVEL` stays unset at every scope (any value overrides every child's effort). Pass `effort: 'max'` with an explicit task-matched `model` on every ad-hoc workflow `agent()` call: a stage that names no effort runs at its agent's frontmatter effort, else at the effort the session was given explicitly (`--effort`, `/effort`, the model picker), else at its model's saved level or default, and one that names no model takes its definition's model, else `CLAUDE_CODE_SUBAGENT_MODEL` (`opus`), else the lead's. `opus` takes judgment; `sonnet` (Sonnet 5.5) takes fan-out units that an executable oracle or a later Opus stage checks (`examples/claude-native/workflows/README.md`, "Sonnet 5.5 fan-out units"). Probes and overturn conditions: `docs/decisions/2026-09-29-max-default-effort.md`, `docs/decisions/2026-09-29-sonnet-5-5-dispatch.md` and `docs/decisions/2026-09-23-max-effort-default.md`.
+
+## Amendment (2026-10-07): orchestration is selected per task
+
+The [September 23 record's dated amendment](2026-09-23-max-effort-default.md#amendment-2026-10-07-select-orchestration-per-task)
+supersedes the standing-Ultracode setting retained above. The committed baseline
+and portable settings template omit that key; explicit task/session/launch
+opt-ins remain available. This amendment changes no model or effort rule, and
+does not alter the original measurements or relocated passage contract.

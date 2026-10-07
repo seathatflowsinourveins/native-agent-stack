@@ -545,11 +545,13 @@ GitHub-hosted macOS runner; see
    [jCodeMunch recipe](../recipes/README.md#focused-jcodemunch-retrieval)
    covers indexing and the native statistics.
 
-   Then apply the settings template itself (model, effort, ultracode,
+   Then apply the settings template itself (model, effort,
    workflow env, hooks, and the credential deny rules plus the `PreToolUse`
    secret-guard hook from [`docs/secret-storage.md`](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)) into the live `~/.claude/settings.json` with
    [`tools/adoption/apply_claude_settings.py`](../tools/adoption/apply_claude_settings.py),
    after rendering it for this host with step 4's `render_config.py --out`:
+   The baseline omits the standing Ultracode key; task/launch opt-in uses the
+   [native workflow profile](../recipes/claude-native-ultracode.md) separately.
    ```sh
    python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json"
    python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json" --dry-run

@@ -1107,3 +1107,16 @@ The [local-time decision](2026-10-05-user-facing-local-time.md) adds one sentenc
 
 ```text
 ```
+
+## Amendment (2026-10-07): omit standing Ultracode from the baseline
+
+The [task-dispatch amendment](2026-09-23-max-effort-default.md#amendment-2026-10-07-select-orchestration-per-task)
+removes the optional standing `ultracode` input from the portable settings
+template. Its native capability-map entry remains valid for an explicit opt-in;
+the baseline no longer renders that practice setting.
+
+Today: 397 pieces, 357 wired (206 practice, 151 through a slot), 24 not wired
+(0 through a slot that does not install, 24 by their own entry) and 16 authorization
+pieces. This is the current repository-input projection from
+`python3 tools/adoption/new_wsl_client_config.py --check`, not a new host
+installation or client acceptance run. The prior dated counts remain unchanged.

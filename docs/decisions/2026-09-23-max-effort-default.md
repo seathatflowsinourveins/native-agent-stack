@@ -297,3 +297,82 @@ Sonnet 5.5. The 2.1.281 findings above stay as history for that release. On 2.1.
   Opus level.
 - **The `child-usage.mjs` mirror statement under "Vendored lane" is history.** The file here has since grown well beyond agent-lab
   `b31f640`, and a local agent-lab checkout holds a different, smaller copy.
+
+## Amendment (2026-10-07): select orchestration per task
+
+This amendment supersedes the standing-Ultracode choice in decision item 1.
+It leaves the recorded probes and the effort/model rules unchanged.
+
+**Decision.** The repository and portable user-settings template omit the
+standing `ultracode` key. The coordinator chooses a dispatch mode for the task:
+direct execution or a deterministic script for suitable work, normally a
+bounded GPT lane or SDK worker for substantial research and builds, and a
+subagent, background agent, isolated builder, workflow or team when its
+coordination contract calls for it. Workflow availability stays enabled; this
+change selects when to use orchestration rather than changing effort.
+
+Claude Code 2.1.292 starts Ultracode off when the key is unset or false. A true
+value selects standing orchestration, subject to workflow/model availability.
+A shared project setting outranks user settings, which is why a committed true
+value could restore the standing choice in other checkouts. Removing the
+portable template's value also stops a subsequent profile apply from replacing
+an existing user false with true; native merge semantics preserve explicit user
+choices and unrelated settings.
+
+**Task opt-in.** A direct interactive prompt can request a workflow or use the
+native keyword. The session toggle is `/effort ultracode on|off`; interactive
+toggles do not persist. A launch can pass
+`claude --settings '{"ultracode":true}'` or the retained explicit opt-in example.
+Keep model and effort choices separate. Before opting in, specify finite stage
+and agent counts, concurrency, output limits, allowed effects, and verification.
+The size guideline is advisory, and Ultracode suppresses native large-workflow
+warnings and the session subagent concurrency limit; an unrestricted guideline
+does not supply a task budget. Existing project effort, workflow-size and
+environment settings are unchanged.
+
+**Observed motivation, not a controlled comparison.** On October 7, the
+command center recorded one task requesting five pieces of read-only evidence
+without naming a tool, once in each headless client. The Claude run with the
+standing switch on reported a workflow launch. The following are different
+counter scopes, not a token or cost ratio:
+
+| Observation | Scope | Reported value |
+| --- | --- | --- |
+| Codex Sol at max | Client session usage | 1,390,078 input tokens, including 1,264,640 cached input as a subset; 18,609 output tokens |
+| Codex execution | Runner start/end stamps for the call | 356 seconds |
+| Claude Opus 5.5 | Client model usage, cache-read input | 25,503,839 tokens |
+| Claude Sonnet 5.5 | Client model usage, cache-read input | 17,108,897 tokens |
+| Claude Fable 5.1 advisor | Client model usage | 297,092 input and 34,949 output tokens; 4.72 USD within the session estimate |
+| Claude session | Client result | 45 turns, approximately 536 seconds, 26.38 USD estimated across all three models |
+
+Cached input is not added to Codex input. The Claude figure is the client's
+estimate, not provider billing; advisor cost is included, not an additional
+charge to sum. One run per client establishes neither a general dispatch
+advantage nor equivalent task quality. No run was repeated for this amendment.
+The sanitized revision-2 extract has SHA256
+`7f5d26c423134ee3c11c4265375d5bdaf1c49280639f4bb7ebc231585c04190d`.
+The runner log's SHA256 is
+`e41bffad6830f3f25ef922a4140009bcbedd6b03c8bd26ebcc731141a5bb31b9`;
+its start/end stamps are 05:11:57Z and 05:17:53Z on October 7. No raw client
+record, session identifier or host path is included here.
+
+**Alternative and revisit condition.** Keeping standing orchestration would
+continue letting checkout settings select it for every eligible task. Keeping
+it as an explicit task choice preserves the native feature while avoiding that
+automatic dispatch. Revisit the choice when a changed native mode, a named
+workload or better upstream evidence establishes a different appropriate
+default; keep dispatch, information quality and complete usage scopes distinct.
+
+**Sources.** Installed Claude Code 2.1.292's optional Boolean schema is at byte
+204350508 of the Linux executable, SHA256
+`a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`;
+`claude --help` exposes `--settings`. The native schema notes that interactive
+toggles do not persist. Primary documentation read October 7:
+[setting/default](https://code.claude.com/docs/en/settings-reference.md#L1362-L1379),
+[scope precedence](https://code.claude.com/docs/en/settings.md#L631-L635),
+[workflow opt-ins and effects](https://code.claude.com/docs/en/workflows.md#L115-L162),
+[advisory sizing](https://code.claude.com/docs/en/workflows.md#L416-L447),
+[subagents](https://code.claude.com/docs/en/sub-agents.md),
+and [experimental teams](https://code.claude.com/docs/en/agent-teams.md).
+The [2.1.284 changelog entry at the installed release](https://github.com/anthropics/claude-code/blob/v2.1.292/CHANGELOG.md#L821)
+keeps the toggle independent of effort.

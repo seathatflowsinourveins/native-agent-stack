@@ -881,6 +881,14 @@ class CommittedSettingsFallbackGuardTests(unittest.TestCase):
     PORTABLE = ROOT / "examples" / "claude-native" / "ultracode.settings.json"
     RECIPE = ROOT / "recipes" / "claude-native-ultracode.md"
 
+    def test_only_the_explicit_portable_settings_enable_ultracode(self):
+        # The 2026-10-07 amendment to the max-default-effort decision makes Ultracode a per-task opt-in.
+        # Project scope overrides user scope; neither default may undo an adopter's saved false value.
+        for path in (self.PROJECT, self.TEMPLATE):
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertNotIn("ultracode", json.loads(path.read_text(encoding="utf-8")))
+        self.assertIs(json.loads(self.PORTABLE.read_text(encoding="utf-8"))["ultracode"], True)
+
     def test_project_and_portable_settings_carry_both_guards_in_the_template_form(self):
         template = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))
         for path in (self.PROJECT, self.PORTABLE):

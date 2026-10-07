@@ -357,7 +357,6 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "verbose": true,
-  "ultracode": true,
   "enableWorkflows": true,
   "showThinkingSummaries": true,
   "cleanupPeriodDays": 3650,

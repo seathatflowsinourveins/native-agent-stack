@@ -34,7 +34,7 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
 }
 ```
 
-The example persists `enableWorkflows`, `ultracode`, the `unrestricted` advisory size
+For an explicit launch, the example selects `enableWorkflows`, `ultracode`, the `unrestricted` advisory size
 (each workflow sized to its task; it replaced `small` on 2026-09-21, see the
 [routing guide](../docs/ultracode-token-routing-20260921.md)) and the per-workflow
 concurrency setting of eight, which makes a large run queue rather than burst (the
@@ -56,7 +56,12 @@ that also stops a subagent's or workflow child's fallback in Claude Code 2.1.283
 re-check it after each client update (the
 [model-currency record](../docs/decisions/2026-09-27-model-currency.md) and the
 [fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It also saves `effortLevel: xhigh`, the fallback coordinator effort for every model (the `ultracode` setting sets none on 2.1.284, and a terminal session started through the ecosystem launcher runs at `max`), and defaults an unnamed subagent, teammate or workflow agent to Opus with `CLAUDE_CODE_SUBAGENT_MODEL=opus`. It does not select the session's model, an account or a permission mode. To adopt it as a project default, merge only those
-keys into the existing `.claude/settings.json`; preserve all unrelated settings.
+keys other than `ultracode` into the existing `.claude/settings.json`; preserve
+all unrelated settings. The standing key is omitted from the baseline: select
+the full example only for an opted-in task with `--settings`, rather than
+copying its true value into persistent defaults. The
+[2026-10-07 dispatch amendment](../docs/decisions/2026-09-23-max-effort-default.md#amendment-2026-10-07-select-orchestration-per-task)
+governs the task choice and explicit bounds.
 Project environment settings require workspace trust, and organizational policy
 or feature availability can still restrict the profile. The dated rules set behind
 these values and the planned-workstation profile are in
@@ -178,7 +183,7 @@ and were measured on Claude Code 2.1.281; on 2.1.284 the reminder stayed present
 
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
-| Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`max` in a terminal session started through the ecosystem launcher, else saved `xhigh`, plus dynamic workflow orchestration), the default for every session (a Sonnet 5.5 coordinator, the user's choice, sends each judgment to an `opus` stage); escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
+| Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`max` in a terminal session started through the ecosystem launcher, else saved `xhigh`, plus dynamic workflow orchestration), an optional dispatch for an explicitly selected task (a Sonnet 5.5 coordinator, the user's choice, sends each judgment to an `opus` stage); escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
 | Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, max; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
 | Research from the web, documentation, repository and catalog | `stack-researcher` (Opus, max; Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill) | None yet. Added 2026-09-26 in place of the default child for research; its first-prompt size, lane use, correctness and billed cost against `general-purpose` are preregistered in the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) and not yet run |
 | Implementation from a clear contract | `isolated-builder` (Opus, max since 2026-09-27; edits only in the owned checkout its brief names, never the coordinator's own, with no frontmatter `isolation`; named MCP read tools behind ToolSearch; Serena's symbol-edit tools removed on 2026-09-26 because they would edit the parent session's checkout; `context-mode:context-mode` preloaded, and `verification-before-completion` no longer since its trial removal on 2026-09-28) | One real task on Sonnet, before the preload: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864). The Opus model, the preload and the coordinator-created worktree have no native qualification or measured first-prompt size; they join the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)'s preregistered comparison |
@@ -433,7 +438,7 @@ evaluation, so it starts only under a `Workflow` or `Workflow(<name>)` allow
 rule, auto or bypass permission mode, or a hook that allows the call
 ([workflows](https://code.claude.com/docs/en/workflows#approve-the-plan-before-it-runs),
 fetched 2026-09-23). Such a job fails at a usage limit instead of waiting. This
-repository's committed [`.claude/settings.json`](../.claude/settings.json) is the settings example's keys (`effortLevel`, `enableWorkflows`, `switchModelsOnFlag`, `ultracode`, `workflowSizeGuideline` and three of its four env values, without `CLAUDE_CODE_SUBAGENT_MODEL`, which the project file leaves unset on purpose) plus `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`, merged with this repository's secret-read `permissions.deny` rules and secret-path guard hook. Per the official
+repository's committed [`.claude/settings.json`](../.claude/settings.json) keeps the settings example's baseline keys (`effortLevel`, `enableWorkflows`, `switchModelsOnFlag`, `workflowSizeGuideline` and three of its four env values, without `CLAUDE_CODE_SUBAGENT_MODEL`, which the project file leaves unset on purpose), omits the standing `ultracode` key, and retains `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`, this repository's secret-read `permissions.deny` rules and secret-path guard hook. Per the official
 [cloud-session settings](https://code.claude.com/docs/en/settings#settings-in-cloud-sessions)
 docs, a cloud session on this one repository reads it, while a session with
 several repositories reads only its `enabledPlugins` and
