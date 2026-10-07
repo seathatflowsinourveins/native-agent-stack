@@ -649,6 +649,39 @@
       },
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "cause": "J819d CI8 repairs change current instruction source hashes; native generated documentation and its mutable producer/output bindings are refreshed under NO-REWRITE-FINAL. Recorded observations and previous audit entries are unchanged.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
+        "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
+      },
+      "native_exit_code": 0,
+      "check": "python3 -B scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "cause": "The first CI8 local group caught five additional pinned wording failures introduced by the compacting pass. Required bootstrap/fetch/cwd wording is restored; only unpinned prose is trimmed. Regenerate current derived bindings after that source correction; old observations/audits remain intact.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "66cc76581e936241676d7b3933c5bec9c0c72f3fbc53f73fbed89ba74ecd485a",
+        "docs/new-wsl-handbook.json": "b714400572380e8acf943acc338acb064bf0431c910a095a7a7cbf16590a53a2"
+      },
+      "native_exit_code": 0,
+      "check": "python3 -B scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-07",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "cause": "Second CI8 local group retained only the default block budget failure (4105 bytes). Trim its unpinned introduction to4092bytes, preserve every pinned phrase, then regenerate derived bindings; previous observations/audits remain unchanged.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "66cc76581e936241676d7b3933c5bec9c0c72f3fbc53f73fbed89ba74ecd485a",
+        "docs/new-wsl-handbook.json": "b714400572380e8acf943acc338acb064bf0431c910a095a7a7cbf16590a53a2"
+      },
+      "native_exit_code": 0,
+      "check": "python3 -B scripts/build_new_wsl_handbook.py --check"
     }
   ],
   "previous_outputs": [
