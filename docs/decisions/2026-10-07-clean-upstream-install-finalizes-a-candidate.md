@@ -1,4 +1,4 @@
-# A landscape candidate is finalized by its vendor's clean install and native use
+# A landscape candidate is finalized by its vendor's clean install and the vendor's own check
 
 Date: 2026-10-07. Lane: foundation. Status: decided by the command center on the
 owner's direction of 2026-10-07; repository record awaiting independent
@@ -38,18 +38,27 @@ and [paper policy](../paper-lane-policy.md) keep their own gates.
 
 1. **Selection is unchanged.** Upstream evidence selects a candidate for each
    job: the maintainer's organization, release discipline, tests, published
-   benchmarks and fit with both clients. The landscape manifest names the
-   candidates.
+   benchmarks and fit with both clients. The landscape manifest
+   ([`manifests/landscape.json`](../../manifests/landscape.json), reviewed by
+   the [landscape sweep](../../tools/sota-convergence/landscape-sweep/README.md))
+   names the candidates.
 2. **A candidate is installed the vendor's way, in full.** Use the vendor's
    official installer at the maintained release and the vendor's whole
    documented route on each client (registrations, hooks, skills, agents,
    plugins, services), then run the vendor's own verification command. Where
    the installer offers options on where data goes, on self-update, or on model
    calls made on the user's sign-in, choose them deliberately; choosing a
-   vendor option is configuration, not a patch.
-3. **Readiness is unchanged.** READY needs the source-backed selection, the
-   installation, a smoke check in each client and organic counters, exactly as
-   the 6 October decision says. Nothing else is asked of a row.
+   vendor option is configuration, not a patch. Two cases are settled the
+   same way: an installer whose default writes an exclusive routing policy or
+   a hook on every tool call is run in its documented selective form unless
+   that tool is the single owner of its job, and a route that moves a client's
+   model traffic or sign-in through another process is taken only on the
+   owner's word.
+3. **A row is ready when the vendor's install is checked.** READY needs the
+   source-backed selection, the vendor's installation, and the vendor's own
+   check or one named operation passing in each client the row applies to.
+   Organic counters are read and published under rule 7; a row does not wait
+   on them. This replaces the counter condition of the 6 October decision.
 4. **Zero or low use is an install gap first.** Compare what is installed with
    what the vendor's installer writes, complete it, and smoke it. No candidate
    is removed on the strength of our own short checks or call counts.
@@ -60,7 +69,9 @@ and [paper policy](../paper-lane-policy.md) keep their own gates.
 6. **Two candidates for one job are settled by upstream evidence,** as rule 1
    says, not by a local contest.
 7. **The monitor informs; it does not gate.** Invoke rates and spend are read
-   per client and lane from the clients' own telemetry and published. The first
+   per client and lane from the clients' own telemetry and published on the
+   command center's two pages, which a script builds from named records
+   ([guide](../command-center.md#evidence-the-command-center-publishes)). The first
    request's input tokens of a fresh session are recorded before and after
    every change of the installed stack. A reading that looks wrong prompts an
    install repair or a landscape review. No landing, readiness row or start
@@ -83,6 +94,16 @@ locators, not files added by this change.
   (SHA256 `7b583fceee521fae4683f82d96b96bb672a39a31db693c639cc7f9374bb8fbaf`).
 - Both clients' own server listings, read 2026-10-07T16:44Z: every registration
   named below is present; no hook handler names any of the last five rows.
+- Claude Code use: the transcripts of the twelve fresh sessions that ran with
+  the stack installed on 2026-10-07 (the as-installed and advisor-off arms of
+  the paired check cited below) show calls to context-mode, Serena and semble,
+  and none to qmd, jCodeMunch, Headroom or SocratiCode.
+
+State words in the table: **final** means the component is selected,
+installed by a route its vendor documents and checked in each client, which is
+rule 3's READY for that component. **Install owed** names the part of the
+vendor's route that is still to be installed. Use is given beside each row as
+information.
 
 | Component | Job | Install against the vendor's route | Use in the fleet window | State |
 | --- | --- | --- | --- | --- |
@@ -91,17 +112,28 @@ locators, not files added by this change.
 | ai-memory | durable memory | the vendor's installer on both clients | called by 10 lanes, fed by hook in 2 | final; its own upgrade to the release of 2026-10-07 follows |
 | codebase-memory-mcp | code graph | registration, agents and hooks | called by 1 lane, fed by hook in 11 | final |
 | Serena | code navigation | registration and the vendor's hooks | called by 5 lanes | final |
-| qmd | document search | registration and the vendor's skill on both clients | called by 1 lane on Codex; none on Claude Code | final; routing on Claude Code to be completed from the vendor's guide |
-| semble | code search | registration and the vendor's search agent | called by 1 lane | final; routing to be completed from the vendor's guide |
-| jCodeMunch | code index | partial: wired through this repository's text, not the installer's integration | none | the vendor's full install is owed |
-| Headroom | output compression | partial: registered against a placeholder proxy address | none | the vendor's full install is owed |
-| SocratiCode | code search and graph | partial: a server registration only | none | the vendor's full install is owed |
+| qmd | document search | the vendor's release, its skill on both clients and its documented manual server entry | called by 1 lane on Codex; none in the twelve Claude Code sessions | final |
+| semble | code search in any local or remote repository | the vendor's tool install, its search agent on both clients (byte-identical to what its installer writes) and its documented manual server entry with the vendor's model and cache options | called by 1 lane; 2 calls in one Claude Code session | final |
+| jCodeMunch | symbol retrieval on demand | the vendor's documented manual registration on both clients; its installer's exclusive policy and per-call hooks are not installed (rule 2's selective form) | none | final; the release of 2026-10-07 follows |
+| Headroom | output compression on demand | the vendor's server route on both clients; no traffic proxy (rule 2: only on the owner's word) | none | final |
+| SocratiCode | code search and graph for indexed projects | the vendor's server-only route at 1.15.0, healthy by the vendor's own check; its skills and agent are not installed | none | install owed: release 1.16.0 with the vendor's skills and agent |
 
-The two code-search candidates stay installed until upstream evidence settles
-the job under rule 6.
+The two code-search engines have one job each: SocratiCode for indexed projects
+on the local embedding model, semble for any other local or remote repository.
+If upstream evidence shows one of them covering both jobs, rule 6 settles it.
+
+Reading each vendor's installer the same day refined two of the three partial
+installs named above. jCodeMunch's installer, run in a throwaway home, appends
+a policy that makes it the only code-navigation tool and registers hooks on six
+events, one of them on every Read, Grep, Glob and Bash call (about 0.7 s each,
+measured on this host). Serena owns symbols and references here, so the
+selective form of rule 2 applies and jCodeMunch stays as on-demand symbol
+retrieval. Headroom's full route is a proxy in front of the client's model
+traffic; the owner's direction of 7 October is its server route only.
 
 One measurement of 7 October stays on record as information for rule 7. On
-three short tasks, 27 fresh Claude Code sessions answered equally well in three
+three short tasks, 27 fresh headless Claude Code sessions on this host (Sonnet
+5.5 at maximum effort, nine sessions per arm) answered equally well in three
 arms; with the advisor off, the installed stack cost 1.5, 1.2 and 1.6 times the
 no-stack arm on the main model, and a fresh session's first request was 46,866
 to 50,499 input tokens with the stack against 35,230 to 35,293 without it
@@ -121,7 +153,8 @@ the always-loaded instruction text is kept short.
   the host.
 - [Full-stack token owner default](2026-10-04-token-full-stack-owner-default.md):
   its owner defaults stay installed. Its two measurements for removing a
-  component are replaced by rules 4 and 5.
+  component are replaced by rules 4 and 5. Its modes stand: Headroom stays
+  server-only and the code graph's own `install` command stays prohibited.
 - [Harness defaults](../harness-defaults.md): the section on adopting a
   capability points here.
 - [Repository-quality rule](2026-10-04-repository-quality-rule.md): unchanged;
