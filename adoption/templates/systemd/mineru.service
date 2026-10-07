@@ -1,0 +1,46 @@
+# Proposed user unit; host installation and acceptance belong to the command center.
+# Source: opendatalab/MinerU@mineru-4.0.10-released (c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93),
+# README.md:462-484 and mineru/cli/commands/server.py:242-248. The documented start command
+# launches this same shipped module; mineru/doclib/app.py:443-449,552-558 supplies its
+# foreground entry. This is repository systemd integration, not an upstream systemd recipe.
+#
+# uv's persistent tool environment supplies the interpreter; confirm `uv tool dir --offline`
+# matches %h/.local/share/uv/tools before applying. For a different UV_TOOL_DIR or XDG_DATA_HOME,
+# render ExecStart with that existing environment's interpreter; do not install another copy.
+# Source: https://docs.astral.sh/uv/reference/storage/#tools
+#
+# MINERU_MODEL_SOURCE is a startup override (MinerU config.py:156-176,236-250). A fresh
+# DocLib propagates it to its managed parser (doclib/background/parse_server_health.py:205-221).
+# Clients consume the service and do not run their own server start/stop/restart commands.
+# Environment names and unit metadata are enough for the CC read-back; do not dump the
+# manager/process environment or read ~/.mineru/config.yaml. This sets no CPU/GPU guard.
+#
+# Type=exec tracks the foreground interpreter; control-group also stops its parser children.
+# Restart attempts are bounded, and OnFailure runs after unrecovered failure/start-limit-hit.
+# Confirm the CC-owned stack-alert@ template is loaded before activation. For this unit,
+# %n makes the handler name stack-alert@mineru.service.service.
+# Sources: systemd/systemd@v260:man/systemd.service.xml:158-169,
+# man/systemd.unit.xml (OnFailure=, StartLimitIntervalSec=), man/systemd.kill.xml:56-90.
+# Full CC apply/read-back and CPU-guard limitation: recipes/mineru-local-service.md.
+[Unit]
+Description=MinerU local document service
+Documentation=https://github.com/opendatalab/MinerU
+OnFailure=stack-alert@%n.service
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=exec
+Environment=MINERU_MODEL_SOURCE=local
+ExecStart=%h/.local/share/uv/tools/mineru/bin/python -m mineru.doclib.app
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+Nice=19
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target
