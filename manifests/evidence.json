@@ -4911,8 +4911,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "sha256": "9321c84716393baef05243d70d83030c27453d99235007800069f6d2534f22d0",
-      "bytes": 766
+      "sha256": "d8cacacf080b05efddcbe8f8cfd0943b7cf85ff4cd31e0db647fe4b7eec8b689",
+      "bytes": 975
     },
     {
       "path": "LICENSE",
@@ -17161,6 +17161,11 @@
       "bytes": 5494
     },
     {
+      "path": "docs/command-center.md",
+      "sha256": "59d471d6a25b2e33fc7c12093f40fadb28606cc650e477ae96258f8a67b0b3ff",
+      "bytes": 7179
+    },
+    {
       "path": "docs/community-native-practice.md",
       "sha256": "4334eda38f9961f971e4c5394cd6fef418cef236d3ad73c34a0e080b5b71be21",
       "bytes": 56958
@@ -17797,8 +17802,13 @@
     },
     {
       "path": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
-      "sha256": "396ad0e762f863854c36db4d971730ec21ce26c9462892428898aea8aa8c200a",
-      "bytes": 16404
+      "sha256": "84d221fd7d059107e586a353889401ac950e85955f79334c57c716731b9156a3",
+      "bytes": 16625
+    },
+    {
+      "path": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md",
+      "sha256": "694871937e1408b396eb3b24a5abdf9714bf37b6f5bc942ad93a71dfb2cf1e45",
+      "bytes": 15271
     },
     {
       "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
@@ -17952,8 +17962,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "cc613cced99f534e62cdcb23995b7e4c029b0dc624e39eb3496d2de79726ad6b",
-      "bytes": 248160
+      "sha256": "0a7e61f651f11a10c76074030d7530409f5741bb66317992e72d3bbfbc1983d3",
+      "bytes": 251209
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
