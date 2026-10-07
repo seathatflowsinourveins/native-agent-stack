@@ -75,6 +75,12 @@ and `tz-currency-check`. The emitter reads Dagu history with
 login and nothing in Dagu changes. Apply, read-back and rollback commands are in
 the plan's [README](../../evidence/artifacts/new-wsl-install-plan-20261002/README.md).
 
+Manual NativeStack2604 calls to `progress.py` must pass
+`--loki-url http://127.0.0.1:21300/loki/api/v1/push`. Its default uses port
+13100, which can reach the other WSL distribution through the shared network
+namespace. The installed NativeStack2604 service already passes the explicit
+21300 address.
+
 ## What freshness means
 
 [state.json](state.json) is a coordinator checkpoint. Its timestamp describes

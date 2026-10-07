@@ -503,3 +503,72 @@ manager shim invalid under empty HOME. Its private
 baseline-final-summary-failures.log retains that returned error. Keep the
 runnable class selector in the baseline ID file; hosted setup's real node/npm
 executables and this host's shim selection are different environments.
+
+Maintained binding locators for kind5 on main475127d4 are
+`manifests/stack.json:1100-1102` (component id and selected0.162.0),
+`evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json:2239`
+(native executable destination), and its maintained installer mirror
+`install.sh:638-643` (upstream binary-install source, selected archive and
+installation). The selector reads the manifest version directly; its portable
+fallback path mirrors the plan's maintained destination, rather than reading
+the plan dynamically. That destination is the stack's choice, not an upstream
+mandatory path. This dated amendment records the binding choice and pending
+disposition; it is not the authority for either the version or destination and
+does not promote the manifest's pending host acceptance into a measured pass.
+
+## Amendment (2026-10-07): native writer binding disposition
+
+The command center accepted optionA by name for
+tests.test_observability_writer_identity.NativeCollectorTests under
+task-ns2604-coop-20261007T171356Z. Its kind5 declaration follows the maintained
+collector pin at manifests/stack.json:1102 and native executable destination
+at evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json:2239;
+the prior7October amendment records the choice, not those maintained inputs.
+Keep the canonical/explicit-override routes, absent-canonical-only native
+destination fallback and unchanged-pin version eligibility. Kind1 and kind2a
+declarations above remain. This is a recorded disposition, not a new tool
+selection, test result, client configuration or host activation.
+
+Under task-ns2604-coop-20261007T172216Z, the command center also retained
+kind1 for the existing session/process test by name: compare against main's
+two totals, which remain asserted, and treat the two-point/no-agent-name
+assertions as an added inventory. The PR's earlier three-point assertion is
+not main's contract. This disposition changes no measured values or tests.
+
+## Amendment (2026-10-07): landing review C1 and V1–V4
+
+C1 exposed a source-integration gap: the maintained host merger rejected the
+new `transform/metric_export_privacy` processor in the reviewed ordinary
+metrics pipeline. The merger now copies that exact committed definition and
+permits one insertion immediately before `delta_to_cumulative`. It preserves
+the host's other settings, pipeline order, transform-statement multiplicity
+and existing guard settings; unknown additions, a misplaced or duplicate
+guard, a missing definition and conflicting host settings are refused. Other
+host metric routes remain outside this merger's existing migration scope.
+The maintained implementation is
+`evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py`;
+the demonstrated gap is the unchanged main host-merger suite, rather than a
+new exporter or client capability. Collector processor ordering follows
+[Contrib v0.162.0's transform processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/processor/transformprocessor/README.md).
+
+V1 is disposed by the preceding native-writer binding and assertion-inventory
+amendments: kind5 follows maintained pin/destination inputs, kind2a extends
+only synthetic fixtures, and kind1 retains every assertion from main. V2's
+baseline remains environment-dependent: this lane's empty-home run selects
+an invalid npm version-manager shim, while the co-op's launcher places the
+real node/npm directories first on PATH. It is retained as a baseline
+selector with its original failure log, not repaired by weakening a test.
+
+V3 is corrected by the dated, appended maintained-setting amendment in
+`docs/decisions/2026-10-05-disk-headroom-enospc.md`; its earlier observed
+one-second batch timeout remains unchanged. V4 is corrected in the current
+NativeStack2604 instructions in `observability/grand-dashboard/README.md`:
+manual progress calls name the explicit 21300 Loki push URL. These reference
+corrections apply no host or client configuration.
+
+The replay's eleven PyYAML-gated modules plus the four initial new merger
+controls ran 725 tests with 47 skips and no failures. Main475127d4's unchanged
+six test modules ran 150 tests with seven skips and no failures against the
+replayed tree. These are local integration checks, not host application or
+unchanged upstream acceptance. The earlier complete phase on main003804f2's
+base remains its own dated result; no second complete phase was run.
