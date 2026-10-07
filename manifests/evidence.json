@@ -46767,8 +46767,8 @@
     },
     {
       "path": "evidence/artifacts/skills-folds-20261007/overlaps.md",
-      "sha256": "e9e36870148f313c5423346227326bc06f1bde20dcd500ebb51527446cf90ec4",
-      "bytes": 5602
+      "sha256": "587779d071a16251b31b6a35c1576fd031e106bec73de07af0158779927bc931",
+      "bytes": 7365
     },
     {
       "path": "evidence/artifacts/skills-held-routing-20261006/dependency-inventory-correction.json",
@@ -47769,6 +47769,11 @@
       "path": "evidence/artifacts/skills-sdk-01601-20261007/inputs.json",
       "sha256": "06dee5b1dad4b0b3d7d16dd4e3883531718db830a1246e584cfa55d45d4a9c8b",
       "bytes": 1307
+    },
+    {
+      "path": "evidence/artifacts/skills-sdk-01601-20261007/provenance-addendum-20261007.json",
+      "sha256": "bb1c8e1f00a6cb346026826fff46dfc499a37f322972eff952c0ae420c91c9f3",
+      "bytes": 2445
     },
     {
       "path": "evidence/artifacts/skills-sdk-01601-20261007/receipt.json",
