@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "scope": "Selected original help/version excerpts only; no live session inventory, functional smoke or adoption.",
+  "observations": [
+    {
+      "id": "hcom-help",
+      "command": "rtk proxy hcom --help --name <agent-name>",
+      "exit_code": 0,
+      "returned_excerpt": "hcom (hook-comms) v0.7.27 - multi-agent communication\nUsage:"
+    },
+    {
+      "id": "hcom-kill-help",
+      "command": "rtk proxy hcom kill --help --name <agent-name>",
+      "exit_code": 0,
+      "returned_excerpt": "hcom kill <name>..."
+    },
+    {
+      "id": "hcom-term-help",
+      "command": "rtk proxy hcom term --help --name <agent-name>",
+      "exit_code": 0,
+      "returned_excerpt": "hcom term"
+    },
+    {
+      "id": "tmux-version",
+      "command": "rtk proxy tmux -V",
+      "exit_code": 0,
+      "returned_excerpt": "tmux 3.6"
+    },
+    {
+      "id": "claude-agents-help",
+      "command": "rtk proxy env CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude agents --help",
+      "exit_code": 0,
+      "returned_excerpt": "  --json                                Print active sessions (interactive and\n                                        background) as a JSON array and exit"
+    },
+    {
+      "id": "claude-version",
+      "command": "rtk proxy env CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude --version",
+      "exit_code": 0,
+      "returned_excerpt": "2.1.292 (Claude Code)"
+    }
+  ]
+}

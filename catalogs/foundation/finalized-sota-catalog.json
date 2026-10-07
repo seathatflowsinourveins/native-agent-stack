@@ -30,6 +30,14 @@
       "references": []
     },
     {
+      "id": "terminal-management",
+      "layer_id": "native-clients",
+      "role": "terminal-management",
+      "purpose": "Terminal frontend, program titles, escalation alerts, colour and lane PTY/session lifecycle. Deployment observations and synthesis candidates are recorded separately in the decision; no default repository is selected.",
+      "repositories": [],
+      "references": []
+    },
+    {
       "id": "skill-discovery",
       "layer_id": "instructions-skills",
       "role": "skill-discovery",

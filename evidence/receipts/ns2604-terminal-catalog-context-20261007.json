@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-terminal-catalog-context-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "source_review",
+  "claim": "A pending terminal-management catalog role distinguishes the command-center-reported deployment, read-only installed interface/version observations and unqualified synthesis candidates. It selects no repository or adoption status.",
+  "limitations": [
+    "The 79 roles are a proposed taxonomy, not a native readiness or qualified-tool count; the repository census remains null and selections empty.",
+    "Windows Terminal visual settings and sound are reported by the command center; September 28 native measurements retain their NativeStack host scope.",
+    "Help/version observations establish interface availability and installed versions only; no fresh-session functional smoke, organic use, inventory, launch, kill, injection or host setting change occurred.",
+    "The retained feature and orchestration records are dated owner observations/decisions; this lane performs no new model or session-lifecycle qualification.",
+    "Independent review of this new catalog context is pending; neither the current deployment report nor old outcomes establish a new SOTA selection."
+  ],
+  "slot_id": "terminal-management",
+  "layer_id": "native-clients",
+  "selection": null,
+  "projection_status": "pending_synthesis",
+  "taxonomy_role_count": 79,
+  "links_prior_contract": {
+    "path": "evidence/receipts/ns2604-finalized-catalog-contract-20261007.json",
+    "sha256": "f6eafe42f2a9a8cc476a981e33064ed0c385536bb3bc58d00feb2d62294e4526",
+    "commit": "fbb202239fb28d84078494216427e1a0722d2b86"
+  },
+  "deployment_report": {
+    "locator": "coordination:command-center/ITEM-ns2604-coop-20261007T003747Z.md:12-18",
+    "sha256": "0da4040f9c6c56d1e2d170b40fd792d0cb2d6e335db5de7f0c643848f329b5ed",
+    "evidence_class": "source_review",
+    "status": "command_center_reported_deployed_configuration",
+    "facets": [
+      {
+        "facet": "terminal_frontend",
+        "tool": "Windows Terminal",
+        "version": "1.24",
+        "policy": [
+          "program-driven tab titles",
+          "bell only on escalation",
+          "24-bit Claude colour via profile environment key"
+        ],
+        "policy_source": "native-agent-stack@fbb202239fb28d84078494216427e1a0722d2b86:docs/decisions/2026-09-28-terminal-experience.md:48-82,292"
+      },
+      {
+        "facet": "lane_pty_lifecycle",
+        "tool": "hcom",
+        "version": "0.7.27",
+        "backend": {
+          "tool": "tmux",
+          "version": "3.6"
+        },
+        "interfaces": [
+          "TUI dashboard",
+          "hcom kill",
+          "hcom term"
+        ]
+      },
+      {
+        "facet": "claude_session_inventory",
+        "tool": "Claude Code",
+        "interface": "claude agents --json"
+      },
+      {
+        "facet": "tab_relaunch",
+        "tool": "command-center owner-maintained relaunch scripts",
+        "ownership": "command-center"
+      }
+    ]
+  },
+  "official_release_records": [
+    {
+      "repository": "https://github.com/microsoft/terminal",
+      "tag": "v1.24.11911.0",
+      "published_at": "2026-07-16T21:56:12Z",
+      "prerelease": false,
+      "draft": false,
+      "url": "https://github.com/microsoft/terminal/releases/tag/v1.24.11911.0"
+    },
+    {
+      "repository": "https://github.com/aannoo/hcom",
+      "tag": "v0.7.27",
+      "commit": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b",
+      "published_at": "2026-10-01T02:11:55Z",
+      "prerelease": false,
+      "draft": false,
+      "url": "https://github.com/aannoo/hcom/releases/tag/v0.7.27"
+    },
+    {
+      "repository": "https://github.com/tmux/tmux",
+      "tag": "3.6",
+      "published_at": "2025-11-26T08:42:57Z",
+      "prerelease": false,
+      "draft": false,
+      "url": "https://github.com/tmux/tmux/releases/tag/3.6",
+      "disposition": "observed_deployed_backend_not_newly_qualified_current_selection"
+    },
+    {
+      "repository": "https://github.com/tmux/tmux",
+      "tag": "3.7c",
+      "published_at": "2026-08-17T12:53:48Z",
+      "url": "https://github.com/tmux/tmux/releases/tag/3.7c",
+      "disposition": "current_upstream_recheck_lead_no_pin_move"
+    }
+  ],
+  "native_read_only_observations": {
+    "evidence_class": "local_integration",
+    "scope": "installed help/version only",
+    "retained_artifact_sha256": "2ef3d774c622878f54b0b343f9fc8ee5a7337c05a1ab4d60c0270c79fe528c6f",
+    "commands": [
+      {
+        "id": "hcom-help",
+        "exit_code": 0,
+        "output_sha256": "f3b85162b2c096751fce47b16e159693e473bc860feda5d38fd8114f9af47677",
+        "command": "rtk proxy hcom --help --name <agent-name>",
+        "returned_excerpt": "hcom (hook-comms) v0.7.27 - multi-agent communication\nUsage:"
+      },
+      {
+        "id": "hcom-kill-help",
+        "exit_code": 0,
+        "output_sha256": "9303e2277cbb872bbe1a82312556aa9fd19fe11a084d595d9196b1a00f8dcd96",
+        "command": "rtk proxy hcom kill --help --name <agent-name>",
+        "returned_excerpt": "hcom kill <name>..."
+      },
+      {
+        "id": "hcom-term-help",
+        "exit_code": 0,
+        "output_sha256": "f59abfc19fb27c74ea6700d4eb91c74146ee11b9baceb28d31be340f0ee2ad2e",
+        "command": "rtk proxy hcom term --help --name <agent-name>",
+        "returned_excerpt": "hcom term"
+      },
+      {
+        "id": "tmux-version",
+        "exit_code": 0,
+        "output_sha256": "29759461d7c25e58312853b3e67735bd324875bca173baaa33c0662b411dd85a",
+        "command": "rtk proxy tmux -V",
+        "returned_excerpt": "tmux 3.6"
+      },
+      {
+        "id": "claude-agents-help",
+        "exit_code": 0,
+        "output_sha256": "4895bfe1bf2874fa7a3eaddd383e31d311b3cba9be58ac5c66e80c571dd60278",
+        "command": "rtk proxy env CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude agents --help",
+        "returned_excerpt": "  --json                                Print active sessions (interactive and\n                                        background) as a JSON array and exit"
+      },
+      {
+        "id": "claude-version",
+        "exit_code": 0,
+        "output_sha256": "46ef67828dfb9d34aef4d5df24d529825edb3cfa334f333e445fe5d0f1b14cc2",
+        "command": "rtk proxy env CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude --version",
+        "returned_excerpt": "2.1.292 (Claude Code)"
+      }
+    ],
+    "retained_artifact_locator": "owned-worktree:.local/catalog-evidence-checks/terminal-native-observations.json",
+    "published_selected_returned_output_locator": "evidence/artifacts/ns2604-terminal-context-20261007/native-interface-observations.json",
+    "published_selected_returned_output_sha256": "49458e4f987650db08666242d358a846c9a14202b328c54a605d295b8e4cc107"
+  },
+  "native_observed_versions": {
+    "hcom": "0.7.27",
+    "tmux": "3.6",
+    "claude-code": "2.1.292"
+  },
+  "synthesis_candidates": [
+    {
+      "tool": "Claude Code",
+      "version": "2.1.292",
+      "surfaces": [
+        "background sessions",
+        "agent view",
+        "attach",
+        "logs",
+        "respawn",
+        "worktree/tmux integration"
+      ],
+      "state": "ENABLED_UNUSED",
+      "disposition": "ADOPT_LATER",
+      "source": {
+        "locator": "coordination:e2e-truth-20261006/feature-gap-wf_2da8a9ff-307.json",
+        "sha256": "03fe89261d3213bdba26586046f61d9fb49f85fcd97d2ea853a420e8e916a1aa",
+        "json_pointer": "/result/final/features/9"
+      },
+      "comparison": "One bounded worker job against the terminal-tab launch and a coordinator-created owned worktree; exclude CC/co-op sessions. Decide worktree.bgIsolation first with Worktrunk ownership/hooks included.",
+      "retained_constraints": [
+        "CC and co-op sessions are excluded.",
+        "Decide worktree.bgIsolation before the worker comparison, considering Worktrunk WorktreeCreate/WorktreeRemove hooks and one-writer-per-branch ownership.",
+        "Workflow runs in a background session do not wait out usage limits."
+      ]
+    },
+    {
+      "tool": "WezTerm",
+      "disposition": "historical_not_adopted_no_documented_gap",
+      "date": "2026-09-28",
+      "source": "CC deployment/candidate report:18",
+      "overturn": "Reopen only when synthesis demonstrates a terminal-management gap."
+    },
+    {
+      "tool": "zellij",
+      "disposition": "historical_not_adopted_no_documented_gap",
+      "date": "2026-09-28",
+      "source": "CC deployment/candidate report:18",
+      "overturn": "Reopen only when synthesis demonstrates a terminal-management gap."
+    },
+    {
+      "tool": "Windows Terminal toast notifications",
+      "sources": [
+        "https://github.com/microsoft/terminal/pull/20010",
+        "https://github.com/microsoft/terminal/pull/20011",
+        "https://github.com/microsoft/terminal/pull/20012"
+      ],
+      "disposition": "release_watch_no_feature_claim_at_deployed_1.24",
+      "source": "native-agent-stack@fbb202239fb28d84078494216427e1a0722d2b86:docs/decisions/2026-09-28-terminal-experience.md:34-38,80-82",
+      "overturn": "A clean selected release and native consumer test establish the notification feature; no custom toast bridge."
+    }
+  ],
+  "owner_launcher_sources": [
+    {
+      "locator": "private-state:lanes/lane-relaunch.sh:17,49,68",
+      "sha256": "c1c6cd88e6493cf486e70244d28d4919cf6cad3e946512c6efc6747e1eeeff06",
+      "scope": "pinned hcom resume, tag lifecycle and same-thread wt-tmux launch; source only"
+    },
+    {
+      "locator": "private-state:lanes/relaunch-wave-mcp.py:5,97",
+      "sha256": "fce847f1aa36cb36e24c0f1366251f387985bc83d147dcf189ce3e0c32d518c9",
+      "scope": "owner wave delegates to lane launcher; source only"
+    },
+    {
+      "locator": "private-state:lanes/window-relaunch-20261007.py:6-9",
+      "sha256": "f1622542b230de67d86b152ce888e58c2b21f3bb6668fffac21f85d101eee87b",
+      "scope": "owner window/tab lifecycle; source only"
+    }
+  ],
+  "retained_orchestration_record": {
+    "locator": "coordination:ns2604-coop/orchestration-round2-20261006/receipt.md:102,107,112",
+    "sha256": "b60ad1c070bb03e409eb224e1eb35fb47dd5854ec304c140e305bac0f36133eb",
+    "scope": "dated owner operations and wt-tmux readback; not a new visual/client continuity test"
+  },
+  "recheck_triggers": [
+    "Native client, terminal frontend, hcom or tmux version/pin changes.",
+    "A demonstrated terminal gap reopens the candidate comparison.",
+    "tmux 3.6 exceeds the 180-day guideline while newer 3.7c exists: currency/owner qualification required before a change."
+  ],
+  "checks_pending": [
+    "independent terminal-context delta read"
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "tests": 40,
+      "returned_summary": "Ran 40 tests in 0.635s; OK.",
+      "retained_output_sha256": "4f18cf1b979832463ab90a5b8bb07979955be89e144b810417b0c26add7a0358"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "After initial terminal receipt/slot registration, before the selected-help artifact supplement.",
+      "returned_summary": "{\"components\": 69, \"hashed_files\": 10368, \"profiles\": 4, \"receipts\": 218, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "retained_output_sha256": "179d2f9ddf40bdcd5b8dd65d762c4216d3aa1392b130b29741f5950a1d5cd0bc"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "After the selected-help artifact registration and terminal context corrections.",
+      "returned_summary": "{\"components\": 69, \"hashed_files\": 10369, \"profiles\": 4, \"receipts\": 218, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "retained_output_sha256": "c6c1185a4962a8d968687e54856cde180e0026dc9e1fea58a3afcca98215fd57"
+    }
+  ],
+  "source_completeness_critic": {
+    "evidence_class": "source_review",
+    "independent_cross_family": false,
+    "final_unresolved_findings": 0,
+    "retained_corrections": [
+      "worker-only/CC-coop exclusion and worktree.bgIsolation-before-comparison",
+      "portable selected-help locator and actual --json returned option"
+    ]
+  }
+}

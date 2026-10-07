@@ -218,3 +218,57 @@ remain useful without qualifying the current selection: recorded qualification
 needs the original requirement's hash-bound repository, pin, commit and role.
 Historical superseded references bind the prior decision's identity, pin and
 scope; retained failures are not tested against today's selected pin.
+
+## Amendment (2026-10-07): terminal management and deployed context
+
+`terminal-management` is a fourth native-clients role. The two client roles
+and model gateway do not cover terminal presentation or lane PTY/session
+lifecycle. This adds one role to the original 78-role scaffold: 79 proposed
+roles across 20 layers, with empty selections and a null census. This taxonomy
+count is separate from any native qualification or readiness count.
+
+The [new terminal-context receipt](../../evidence/receipts/ns2604-terminal-catalog-context-20261007.json)
+keeps the reported deployment, installed-command observations and prospective
+candidates separate. The current deployment report is the command center's
+October 7 item, lines 12–18; September 28 measurements retain their original
+NativeStack host scope. The reported deployed configuration is:
+
+| Facet | Deployed context | Evidence boundary |
+| --- | --- | --- |
+| Terminal frontend | Windows Terminal 1.24, with program-controlled titles, escalation-only bells and Claude's 24-bit colour through the profile `environment` key. | CC-reported current configuration under the September 28 policy; no new visual or sound acceptance by this lane. |
+| Lane PTYs and controls | hcom 0.7.27 with tmux 3.6; hcom's TUI dashboard, `hcom kill` and `hcom term`. | Installed help/version confirms the interfaces and versions; the retained orchestration record describes prior operations separately. |
+| Claude session inventory | `claude agents --json`. | Installed Claude 2.1.292 documents the active interactive/background-session JSON inventory; this record performs no live inventory or session dispatch. |
+| Tab lifecycle | The command center's owner-maintained relaunch scripts, including `lane-relaunch.sh` and its wave/window callers. | Source references only; this lane does not execute or publish host-specific launcher contents. |
+
+These are facets of the deployed arrangement, not competing default repository
+assignments. The synthesis must assign each repository one owner and use
+non-owning dependency/interface references for the remaining facets.
+
+Claude Code 2.1.292's background sessions and agent view remain a synthesis
+candidate: the dated feature check records `ENABLED_UNUSED` and `ADOPT_LATER`,
+not adoption. Its proposed bounded comparison is for worker sessions only,
+excluding command-center and co-op sessions, against the existing terminal-tab
+and owned-worktree route. Resolve `worktree.bgIsolation` before that comparison
+and retain Worktrunk's ownership and hook behavior in both arms.
+Background workflow runs do not wait out usage limits; retain that restriction
+when assessing the worker comparison.
+WezTerm and zellij retain the September 28 no-documented-gap disposition; reopen
+their comparison only for a demonstrated gap. Windows Terminal's toast work
+in #20010–#20012 is a watch item for release verification, not a feature claimed
+in the deployed 1.24 pin.
+
+The installed tmux 3.6 backend is retained as an observed deployment fact. Its
+official release is dated 2025-11-26, while current upstream 3.7c is dated
+2026-08-17. The old backend exceeds the 180-day current-release guideline;
+currency and the owner must qualify any replacement through upstream tests
+and the actual hcom/client route. This record makes no pin move or upgrade.
+
+Sources: `native-agent-stack@fbb202239fb28d84078494216427e1a0722d2b86:docs/decisions/2026-09-28-terminal-experience.md:10,32-44,48-82,292`;
+`docs/decisions/2026-10-06-hcom-relaxation.md:60,84` at that pin;
+[Windows Terminal v1.24.11911.0](https://github.com/microsoft/terminal/releases/tag/v1.24.11911.0),
+[hcom v0.7.27](https://github.com/aannoo/hcom/releases/tag/v0.7.27) and its
+[pinned README](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/README.md#L282),
+[tmux 3.6](https://github.com/tmux/tmux/releases/tag/3.6) and
+[3.7c](https://github.com/tmux/tmux/releases/tag/3.7c).
+The receipt retains sanitized locators and hashes for the CC deployment item,
+the feature check, orchestration observations and owner launcher sources.
