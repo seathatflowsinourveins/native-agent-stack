@@ -870,7 +870,13 @@ class FinalizedSelectionTests(unittest.TestCase):
         self.refresh_refs()
         self.assertEqual(self.check()["repositories"], 4)
         cell["status"] = "recorded"
-        self.assert_invalid("canonical organic owner/validator is unavailable")
+        # #750 is now present: exercise unavailability explicitly, rather than
+        # depending on an absent optional module in the pre-fold checkout.
+        owner_path = Path(__file__).resolve().parents[1] / "scripts/organic_use.py"
+        is_file = Path.is_file
+        with patch.object(Path, "is_file", lambda path: False if path == owner_path else is_file(path)):
+            self.assert_invalid("canonical organic owner/validator is unavailable")
+        self.assert_invalid("organic reference is outside the canonical owner's carrier")
 
     def test_audit_grade_is_dated_bound_and_never_native_acceptance(self):
         row = self.default_row()

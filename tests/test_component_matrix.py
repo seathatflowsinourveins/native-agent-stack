@@ -1365,5 +1365,41 @@ class ConvergenceByLayerTests(unittest.TestCase):
         self.assertEqual((current["layer_state"], current["converged"]), ("recorded_reopened", 0))
 
 
+class OrganicObservationJoinTests(unittest.TestCase):
+    """An informational observation must not become acceptance or convergence."""
+
+    def test_pending_env_observation_leaves_all_existing_statuses_unchanged(self):
+        record = {"component_id": "widget", "component_pin": None, "layer_ids": ["foundation/layer-a"],
+                  "client": {"id": "codex", "version": "0.160.0"}, "arm": "env",
+                  "state": "pending", "verdict": None, "phases": {"P1": None, "P2": None, "pooled": None},
+                  "observed_at_utc": "2026-10-05T16:00:00Z", "receipt_ref": "evidence/receipts/organic.json"}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            _init_root(root, [_layer(winners=[_winner(macos="untested")])])
+            with mock.patch.object(cm.organic_use, "load_records", return_value=[]):
+                before, before_violations = cm.build_document(root)
+            with mock.patch.object(cm.organic_use, "load_records", return_value=[record]):
+                after, after_violations = cm.build_document(root)
+            observed = after["rows"][0].pop("organic_use")
+            self.assertEqual(observed, [record])
+            self.assertEqual(before, after)
+            self.assertEqual(before_violations, after_violations)
+
+    def test_alias_observation_keeps_recorded_identity_and_cannot_bind_winner(self):
+        record = {"component_id": "widget", "component_pin": "old-pin", "layer_ids": ["foundation/layer-a"],
+                  "state": "pending", "verdict": None}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            AliasReceiptTests()._root(root, with_alias_receipt=False)
+            with mock.patch.object(cm.organic_use, "load_records", return_value=[]):
+                before, _ = cm.build_document(root)
+            with mock.patch.object(cm.organic_use, "load_records", return_value=[record]):
+                after, _ = cm.build_document(root)
+            winner = after["rows"][0]["winners"][0]
+            self.assertNotIn("organic_use", winner)
+            self.assertEqual(after["rows"][0].pop("organic_use"), [record])
+            self.assertEqual(before, after)
+
+
 if __name__ == "__main__":
     unittest.main()

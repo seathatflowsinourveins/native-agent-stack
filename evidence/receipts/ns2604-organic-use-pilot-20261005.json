@@ -1,0 +1,466 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-organic-use-pilot-20261005",
+  "kind": "historical_inventory",
+  "component_ids": [
+    "jcodemunch-mcp",
+    "serena"
+  ],
+  "claim": "Sanitized source inventory for organic-e2e-v1-20261005 plus U1: four pending client/arm cells and eight terminal process records; no metrics, verdict or readiness change.",
+  "limitations": [
+    "Historical inventory only, not a live organic qualification, upstream acceptance or a new host execution.",
+    "Process rc/times do not establish exposure, selection, successful use, native telemetry joins or an organic verdict.",
+    "Protocol and run originals are private owner-held proof; the public digest retains logical locators and hashes without prompts, conversations or active host configuration.",
+    "Pilot metrics and verdicts remain null; independent verification, convergence-practice format review and command-center adjudication are pending.",
+    "The 30-day observational recheck limit reuses the existing freshness default and is not a protocol qualification threshold."
+  ],
+  "data": {
+    "organic_use": {
+      "schema_version": 1,
+      "protocol_id": "organic-e2e-v1-20261005",
+      "amendment": "U1",
+      "sources": [
+        {
+          "ref": "coord:organic-e2e-20261005/protocol-v1-adjudicated.json",
+          "sha256": "1154e17400c0bb675d17a414d676d604f2c3a6be35f2ef4111e058859c8bbb5a"
+        },
+        {
+          "ref": "coord:organic-e2e-20261005/suite-v1.json",
+          "sha256": "cd26427ae9cd7c89a8937322b0645c8959c6940f072d0980909730b36a2d6e8f"
+        },
+        {
+          "ref": "coord:organic-e2e-20261005/AMENDMENT-U1-native-arm.md",
+          "sha256": "db3ca7e1ef9aa4057147da7e23f70b6306ae66e818512416d9ff06ecffa9b1be"
+        },
+        {
+          "ref": "coordination-root:command-center/ITEM-ns2604-coop-20261005T144245Z.md",
+          "sha256": "668362fefab655ac8fb1e277424020862da0c02ed8e46086fbcb09aa6b6f949b"
+        },
+        {
+          "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl",
+          "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+        },
+        {
+          "ref": "coord:organic-e2e-20261005/pilot/run-pilot1env/manifest.jsonl",
+          "sha256": "c43014dfa033fea4af34311c63f50471d5ad9befcc302298a04ea9480d5eaab5"
+        }
+      ],
+      "records": [
+        {
+          "component_id": "jcodemunch-mcp",
+          "component_pin": null,
+          "layer_ids": [
+            "foundation/code-navigation"
+          ],
+          "client": {
+            "id": "claude-code",
+            "version": "2.1.289",
+            "mode": "headless",
+            "model": null,
+            "requested_effort": "max",
+            "effective_effort": null,
+            "config_sha256": null,
+            "route": null,
+            "effective_tier": null
+          },
+          "platform_id": "linux-wsl2-x86_64",
+          "arm": "env",
+          "observed_at_utc": "2026-10-05T16:16:09Z",
+          "task_scope": "Pilot P1 only: jCodeMunch scoped source retrieval",
+          "collection_scope": "Historical process metadata and U1 launch inventory only; exposure, R1 provenance, native joins, successful uses and effective effort are not reconciled. Observation time is the last retained process end, not a completed qualification window.",
+          "evidence_class": "source_review",
+          "stage": "pilot",
+          "state": "pending",
+          "phases": {
+            "P1": null,
+            "P2": null,
+            "pooled": null
+          },
+          "runs": [
+            {
+              "run_id": "pilot1env-jcodemunch.P1.r1-claude-env",
+              "started_at_utc": "2026-10-05T16:10:50Z",
+              "ended_at_utc": "2026-10-05T16:16:09Z",
+              "rc": 0
+            }
+          ],
+          "verdict": null,
+          "qualification": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null,
+            "negative_control": {
+              "status": "pending",
+              "ref": null,
+              "sha256": null
+            },
+            "rule": null
+          },
+          "review": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "adjudication": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "exclusion": null,
+          "proofs": [
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1env/manifest.jsonl#L1",
+              "sha256": "c43014dfa033fea4af34311c63f50471d5ad9befcc302298a04ea9480d5eaab5"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/suite-v1.json#/items/1",
+              "sha256": "cd26427ae9cd7c89a8937322b0645c8959c6940f072d0980909730b36a2d6e8f"
+            }
+          ],
+          "open_items": [
+            "Owner-frozen exposure and provenance joins, metrics, exact tool pin/configuration/effective effort, P2 and negative controls, qualification, independent review and adjudication pending."
+          ],
+          "recheck": {
+            "tool_pin": null,
+            "client_version": "2.1.289",
+            "landscape": {
+              "ref": "catalogs/landscape/foundation.json",
+              "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+            },
+            "sweep_id": "landscape-sweep-20260929",
+            "sweep_date_utc": "2026-09-29",
+            "max_age_days": 30
+          },
+          "record_id": "jcodemunch-mcp-claude-code-env-pilot1-p1",
+          "supersedes": null,
+          "protocol_status": "UNKNOWN",
+          "context_proof": null
+        },
+        {
+          "component_id": "jcodemunch-mcp",
+          "component_pin": null,
+          "layer_ids": [
+            "foundation/code-navigation"
+          ],
+          "client": {
+            "id": "codex",
+            "version": "0.160.0",
+            "mode": "headless",
+            "model": null,
+            "requested_effort": "max",
+            "effective_effort": null,
+            "config_sha256": null,
+            "route": null,
+            "effective_tier": null
+          },
+          "platform_id": "linux-wsl2-x86_64",
+          "arm": "native",
+          "observed_at_utc": "2026-10-05T16:12:47Z",
+          "task_scope": "Pilot P1 only: jCodeMunch scoped source retrieval",
+          "collection_scope": "Historical process metadata and U1 launch inventory only; exposure, R1 provenance, native joins, successful uses and effective effort are not reconciled. Observation time is the last retained process end, not a completed qualification window.",
+          "evidence_class": "source_review",
+          "stage": "pilot",
+          "state": "pending",
+          "phases": {
+            "P1": null,
+            "P2": null,
+            "pooled": null
+          },
+          "runs": [
+            {
+              "run_id": "pilot1-jcodemunch.P1.r1-codex-native",
+              "started_at_utc": "2026-10-05T16:07:58Z",
+              "ended_at_utc": "2026-10-05T16:12:47Z",
+              "rc": 0
+            },
+            {
+              "run_id": "pilot1-jcodemunch.P1.r2-codex-native",
+              "started_at_utc": "2026-10-05T16:08:14Z",
+              "ended_at_utc": "2026-10-05T16:12:34Z",
+              "rc": 0
+            },
+            {
+              "run_id": "pilot1-jcodemunch.P1.r3-codex-native",
+              "started_at_utc": "2026-10-05T16:08:40Z",
+              "ended_at_utc": "2026-10-05T16:12:40Z",
+              "rc": 0
+            }
+          ],
+          "verdict": null,
+          "qualification": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null,
+            "negative_control": {
+              "status": "pending",
+              "ref": null,
+              "sha256": null
+            },
+            "rule": null
+          },
+          "review": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "adjudication": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "exclusion": null,
+          "proofs": [
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L4",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L5",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L6",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/suite-v1.json#/items/1",
+              "sha256": "cd26427ae9cd7c89a8937322b0645c8959c6940f072d0980909730b36a2d6e8f"
+            }
+          ],
+          "open_items": [
+            "Owner-frozen exposure and provenance joins, metrics, exact tool pin/configuration/effective effort, P2 and negative controls, qualification, independent review and adjudication pending."
+          ],
+          "recheck": {
+            "tool_pin": null,
+            "client_version": "0.160.0",
+            "landscape": {
+              "ref": "catalogs/landscape/foundation.json",
+              "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+            },
+            "sweep_id": "landscape-sweep-20260929",
+            "sweep_date_utc": "2026-09-29",
+            "max_age_days": 30
+          },
+          "record_id": "jcodemunch-mcp-codex-native-pilot1-p1",
+          "supersedes": null,
+          "protocol_status": "UNKNOWN",
+          "context_proof": null
+        },
+        {
+          "component_id": "serena",
+          "component_pin": null,
+          "layer_ids": [
+            "foundation/code-navigation"
+          ],
+          "client": {
+            "id": "claude-code",
+            "version": "2.1.289",
+            "mode": "headless",
+            "model": null,
+            "requested_effort": "max",
+            "effective_effort": null,
+            "config_sha256": null,
+            "route": null,
+            "effective_tier": null
+          },
+          "platform_id": "linux-wsl2-x86_64",
+          "arm": "native",
+          "observed_at_utc": "2026-10-05T16:14:05Z",
+          "task_scope": "Pilot P1 only: Serena symbol and reference retrieval",
+          "collection_scope": "Historical process metadata and U1 launch inventory only; exposure, R1 provenance, native joins, successful uses and effective effort are not reconciled. Observation time is the last retained process end, not a completed qualification window.",
+          "evidence_class": "source_review",
+          "stage": "pilot",
+          "state": "pending",
+          "phases": {
+            "P1": null,
+            "P2": null,
+            "pooled": null
+          },
+          "runs": [
+            {
+              "run_id": "pilot1-serena.P1.r1-claude-native",
+              "started_at_utc": "2026-10-05T15:59:05Z",
+              "ended_at_utc": "2026-10-05T16:14:05Z",
+              "rc": 124
+            }
+          ],
+          "verdict": null,
+          "qualification": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null,
+            "negative_control": {
+              "status": "pending",
+              "ref": null,
+              "sha256": null
+            },
+            "rule": null
+          },
+          "review": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "adjudication": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "exclusion": null,
+          "proofs": [
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L7",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/suite-v1.json#/items/0",
+              "sha256": "cd26427ae9cd7c89a8937322b0645c8959c6940f072d0980909730b36a2d6e8f"
+            }
+          ],
+          "open_items": [
+            "Owner-frozen exposure and provenance joins, metrics, exact tool pin/configuration/effective effort, P2 and negative controls, qualification, independent review and adjudication pending.",
+            "Retained Claude-native process timeout rc124; no successful acceptance is inferred."
+          ],
+          "recheck": {
+            "tool_pin": null,
+            "client_version": "2.1.289",
+            "landscape": {
+              "ref": "catalogs/landscape/foundation.json",
+              "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+            },
+            "sweep_id": "landscape-sweep-20260929",
+            "sweep_date_utc": "2026-09-29",
+            "max_age_days": 30
+          },
+          "record_id": "serena-claude-code-native-pilot1-p1",
+          "supersedes": null,
+          "protocol_status": "UNKNOWN",
+          "context_proof": null
+        },
+        {
+          "component_id": "serena",
+          "component_pin": null,
+          "layer_ids": [
+            "foundation/code-navigation"
+          ],
+          "client": {
+            "id": "codex",
+            "version": "0.160.0",
+            "mode": "headless",
+            "model": null,
+            "requested_effort": "max",
+            "effective_effort": null,
+            "config_sha256": null,
+            "route": null,
+            "effective_tier": null
+          },
+          "platform_id": "linux-wsl2-x86_64",
+          "arm": "native",
+          "observed_at_utc": "2026-10-05T16:08:38Z",
+          "task_scope": "Pilot P1 only: Serena symbol and reference retrieval",
+          "collection_scope": "Historical process metadata and U1 launch inventory only; exposure, R1 provenance, native joins, successful uses and effective effort are not reconciled. Observation time is the last retained process end, not a completed qualification window.",
+          "evidence_class": "source_review",
+          "stage": "pilot",
+          "state": "pending",
+          "phases": {
+            "P1": null,
+            "P2": null,
+            "pooled": null
+          },
+          "runs": [
+            {
+              "run_id": "pilot1-serena.P1.r1-codex-native",
+              "started_at_utc": "2026-10-05T15:59:05Z",
+              "ended_at_utc": "2026-10-05T16:08:12Z",
+              "rc": 0
+            },
+            {
+              "run_id": "pilot1-serena.P1.r2-codex-native",
+              "started_at_utc": "2026-10-05T15:59:05Z",
+              "ended_at_utc": "2026-10-05T16:08:38Z",
+              "rc": 0
+            },
+            {
+              "run_id": "pilot1-serena.P1.r3-codex-native",
+              "started_at_utc": "2026-10-05T15:59:05Z",
+              "ended_at_utc": "2026-10-05T16:07:56Z",
+              "rc": 0
+            }
+          ],
+          "verdict": null,
+          "qualification": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null,
+            "negative_control": {
+              "status": "pending",
+              "ref": null,
+              "sha256": null
+            },
+            "rule": null
+          },
+          "review": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "adjudication": {
+            "status": "pending",
+            "ref": null,
+            "sha256": null
+          },
+          "exclusion": null,
+          "proofs": [
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L1",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L2",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/pilot/run-pilot1/manifest.jsonl#L3",
+              "sha256": "a92069e338451a6ca43c5318f451bcdf0d02d3b347516b04dfa0935984ca98ff"
+            },
+            {
+              "ref": "coord:organic-e2e-20261005/suite-v1.json#/items/0",
+              "sha256": "cd26427ae9cd7c89a8937322b0645c8959c6940f072d0980909730b36a2d6e8f"
+            }
+          ],
+          "open_items": [
+            "Owner-frozen exposure and provenance joins, metrics, exact tool pin/configuration/effective effort, P2 and negative controls, qualification, independent review and adjudication pending.",
+            "U1 reports Serena unavailable on Codex in both arms; availability and routing are separate, and the pilot issues no verdict."
+          ],
+          "recheck": {
+            "tool_pin": null,
+            "client_version": "0.160.0",
+            "landscape": {
+              "ref": "catalogs/landscape/foundation.json",
+              "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+            },
+            "sweep_id": "landscape-sweep-20260929",
+            "sweep_date_utc": "2026-09-29",
+            "max_age_days": 30
+          },
+          "record_id": "serena-codex-native-pilot1-p1",
+          "supersedes": null,
+          "protocol_status": "UNAVAILABLE",
+          "context_proof": null
+        }
+      ]
+    },
+    "snapshot_at_utc": "2026-10-05T17:01:40Z",
+    "publication_evidence_class": "source_review",
+    "execution_metadata_class": "historical_owner_observation",
+    "readiness_effect": null,
+    "review_request": "grand-catalog Q9; command-center draft read pending",
+    "method_locators": [
+      "protocol#/metrics/0-1,9",
+      "protocol#/decisions/1",
+      "protocol#/pilot",
+      "U1:15-20,61",
+      "rule(c):27-36"
+    ]
+  }
+}

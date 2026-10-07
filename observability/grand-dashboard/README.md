@@ -128,4 +128,4 @@ Primary interfaces: [Loki push/query API](https://grafana.com/docs/loki/latest/r
 
 - Keep the public grand-dashboard checkpoint current when accepted work changes a lane, worker or gate. Its timer publishes bounded metadata; emitter freshness is distinct from checkpoint age and process liveness.
 
-- Normal local observation uses Grafana anonymous Viewer on loopback; native model clients retain their own sign-ins. Keep Dagu operator authentication distinct from the passwordless observation path; auth:none is not a global Viewer role.
+- Normal local observation uses Grafana anonymous Viewer on loopback; native model clients retain their own sign-ins. On NativeStack2604, Dagu with `auth.mode: none` is a loopback operator path without authentication, rather than a Viewer role. Keep that operator access distinct from Grafana observation, and never expose it through another listener or a tunnel. The [dated Dagu record](../../docs/decisions/2026-10-06-dagu-loopback-auth-none.md) separates the command center's configuration report, native read-only observations and remaining limits.

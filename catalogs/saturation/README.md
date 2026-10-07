@@ -1,5 +1,15 @@
 # Saturation ledger
 
+Registered [organic-use observations](../../docs/decisions/2026-10-05-organic-use-catalog-records.md)
+are a separate informational input to the existing freshness report. Its
+`organic_use[]` rows retain client and arm, receipt reference, binding source,
+unknown inputs and recheck flags. The saturation report maps tool-pin changes to
+`pin_moved`, client-version changes or a later scoped landscape reopen to
+`comparison_changed`, and an exceeded observational age limit to
+`stale_receipt`. A real subsequent sweep records those report references in
+`reopen[]`; an observation alone appends no sweep and closes no layer. See the
+decision for native/env, pilot and exclusion boundaries.
+
 `ledger.json` is an append-only record of landscape sweeps, one record per sweep, with per-layer
 results. It answers one question per layer: how many consecutive sweeps have found nothing that
 survives review? It does not close a layer. A **saturation candidate** is an input to closure.
@@ -190,3 +200,29 @@ usage record) and `4a4c8a2` (the seed's base).
 **Consequence:** no seed layer counts as clean, and every layer is due. The loop's end-to-end
 acceptance is the first scoped manual sweep appended with `--append` with retained votes. Until
 then, only this seed exists.
+
+## Additive requirement binding, version 2
+
+The [binding decision](../../docs/decisions/2026-10-07-saturation-requirement-binding-v2.md)
+adds a text-and-identity snapshot without changing historical records.
+`--scope` retains its existing `requirement_sha256` map and adds
+`requirement_bindings`, keyed by catalog/layer. Each snapshot contains
+`binding_version: 2`, `identity: {catalog, layer_id}`, exact `requirement_text`,
+`requirement_hash` and `legacy_hash`. The new hash covers the version, identity
+and text using the existing canonical JSON/SHA256 implementation; the legacy
+digest and the skills lifecycle/requirement/overturn formula remain unchanged.
+
+A future sweep must retain its snapshot in the original discovery/source before
+evaluation. `--append` copies a supplied snapshot only when that retained source
+agrees; it does not manufacture a binding from current text for an older run.
+When present, the snapshot also enters the frozen v2 field digest. Both original
+and expanded source digests are verified. With no snapshot, the old formula and
+legacy record verification remain compatible.
+
+The report distinguishes current and recorded bindings and labels legacy or
+mixed counts without treating them as text-bound qualification. It changes no
+closure or readiness gate. The live sweep producers still need their owner's
+compatible propagation before new runs can claim this binding; no production
+sweep is qualified by this schema change alone.
+
+Source seams: `native-agent-stack@bed695bef593aa5a846611bb6cb4cf8ee2286760:scripts/saturation_ledger.py:122-132,524-531,575-580,1139-1162,1341-1346,1626-1708`.

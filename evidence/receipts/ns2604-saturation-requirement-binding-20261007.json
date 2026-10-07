@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-saturation-requirement-binding-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Additive versioned saturation requirement text/identity snapshots preserve all prior scope digests and records. Deterministic checker/fixture evidence only; no new sweep, trading text correction, native adoption or readiness change.",
+  "limitations": [
+    "Historical ledger records remain unchanged. Old requirement_sha256 values are retained as legacy_hash in new snapshots; they are not rehashed in place.",
+    "Local structural checks and synthetic fixtures are not upstream acceptance, an independent cross-family review or a new model-run qualification.",
+    "The actual model-run producer paths need convergence-practice custody and compatible propagation before any future run claims text-bound qualification; this publication does not claim those integrations are enabled.",
+    "Trading requirement text corrections remain the trading owner's work. No host operation, model execution, installation, closure or gating count changed."
+  ],
+  "method": {
+    "binding_version": 2,
+    "digest_algorithm": "SHA256",
+    "canonical_payload": {
+      "binding_version": 2,
+      "identity": [
+        "catalog",
+        "layer_id"
+      ],
+      "requirement_text": "exact captured text; no normalization"
+    },
+    "retained_legacy_fields": [
+      "requirement_sha256",
+      "legacy_hash"
+    ],
+    "historical_source_pin": "bed695bef593aa5a846611bb6cb4cf8ee2286760",
+    "legacy_hash_formula": {
+      "research": [
+        "next_action",
+        "decision_ref"
+      ],
+      "skills": [
+        "lifecycle_task",
+        "requirement",
+        "overturn_when"
+      ]
+    },
+    "freeze_rule": "Snapshot must be captured in original retained discovery/source; append cannot create it from current catalog text for an older run.",
+    "field_hash_rule": "The optional snapshot enters the original/expanded v2 field digest only when present. Absence retains the exact old digest formula."
+  },
+  "preserved_ledger": {
+    "path": "catalogs/saturation/ledger.json",
+    "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
+    "sweeps": 5,
+    "recorded_layer_scopes": 95,
+    "head_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2"
+  },
+  "checks": [
+    {
+      "id": "baseline-legacy-check",
+      "evidence_class": "local_integration",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3 python3 scripts/saturation_ledger.py --check --base bed695bef593aa5a846611bb6cb4cf8ee2286760",
+      "exit_code": 0,
+      "output": "ok: 5 sweep record(s), chain intact, bindings verified",
+      "output_sha256": "f3cd642d4e09da76efb9c15b2b90ee5120a5f0bda10830995b1e47119135d362"
+    },
+    {
+      "id": "touched-saturation-tests",
+      "evidence_class": "synthetic",
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3 python3 -m unittest tests.test_saturation_ledger",
+      "exit_code": 0,
+      "tests_run": 111,
+      "skipped": 1,
+      "skip_reason": "Optional jsonschema package unavailable; native checker still verifies the declared bindings and hash chain.",
+      "duration_seconds": 21.517,
+      "output": "Ran 111 tests in 21.517s; OK (skipped=1)",
+      "output_sha256": "47863bd6dc4a1da6b1e127b6e7123e8388054f7b7e2d317169b8308081fcfb0f"
+    },
+    {
+      "id": "updated-native-legacy-check",
+      "evidence_class": "local_integration",
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3 python3 scripts/saturation_ledger.py --check",
+      "exit_code": 0,
+      "output": "ok: 5 sweep record(s), chain intact, bindings verified",
+      "output_sha256": "f3cd642d4e09da76efb9c15b2b90ee5120a5f0bda10830995b1e47119135d362"
+    },
+    {
+      "id": "current-scope-declarations",
+      "evidence_class": "local_integration",
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3 python3 scripts/saturation_ledger.py --scope",
+      "exit_code": 0,
+      "output_sha256": "56e245c6b9e34f3de43f3aa91b0a8d4dd13a7a36176fd4264591457bf3fb1ad4"
+    },
+    {
+      "id": "current-report-declarations",
+      "evidence_class": "local_integration",
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3 python3 scripts/saturation_ledger.py --report --json",
+      "exit_code": 0,
+      "output_sha256": "0886fa450afec973bc2bed07fde8531ba28a39c7184d4157a258eb7bdcf1a10a"
+    },
+    {
+      "id": "publication-validator-first",
+      "evidence_class": "local_integration",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3 python3 scripts/validate.py",
+      "exit_code": 0,
+      "output": {
+        "components": 69,
+        "hashed_files": 10246,
+        "profiles": 4,
+        "receipts": 210,
+        "status": "passed"
+      },
+      "output_sha256": "ac7cb9f5633746af08fbbf724b61b598a6297d51c562c46e4e9f0549d0a4bf5e",
+      "scope": "Repository integrity/scope checks before adding this result metadata; final registered receipt and source checks are rerun before commit. No provider/GPU/model execution."
+    }
+  ],
+  "review": {
+    "same_family_completeness": {
+      "status": "completed",
+      "unresolved_findings": 0,
+      "evidence_class": "source_review",
+      "source_sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6",
+      "limitations": "Bounded same-family source critic only; not the independent command-center read."
+    },
+    "independent_cross_family": "pending",
+    "command_center": "pending",
+    "readiness_runner_addendum": "pending"
+  },
+  "decision_ref": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
+  "source_files": [
+    {
+      "path": "scripts/saturation_ledger.py",
+      "sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6"
+    },
+    {
+      "path": "catalogs/saturation/ledger.schema.json",
+      "sha256": "fb5f5002508a653860b5763dc2cc4a58fedcdf155f725813001025a184fafe09"
+    },
+    {
+      "path": "tests/test_saturation_ledger.py",
+      "sha256": "c2b52378cb817995be919f9e83dc175a619a62d8c127701a6f43555511d15f43"
+    }
+  ],
+  "preservation_comparison": {
+    "evidence_class": "local_integration",
+    "baseline_pin": "bed695bef593aa5a846611bb6cb4cf8ee2286760",
+    "legacy_scope_bytes_equal": true,
+    "historical_report_fields_equal": [
+      "catalog",
+      "layer_id",
+      "clean_count",
+      "saturation_candidate",
+      "due",
+      "last_sweep",
+      "last_counted",
+      "reset",
+      "current_triggers"
+    ],
+    "recorded_layer_scopes_verified": 95,
+    "output": "old scope bytes equal; historical report counts/candidates/due/scopes equal\nlegacy research digests 32 new bindings 45\nall historical layers verified 95\n",
+    "output_sha256": "3be09c3be14010faf1f60e9ef40585b684104fcd957ae062baa40f8d06046a6d",
+    "exit_code": 0,
+    "legacy_scope_fields_equal": [
+      "requirement_sha256",
+      "platform_profiles_sha256"
+    ]
+  },
+  "current_declaration_observation": {
+    "evidence_class": "local_integration",
+    "legacy_research_digests": 32,
+    "additive_requirement_bindings": 45,
+    "report_layers": 45,
+    "recorded_legacy_only_scopes": 45,
+    "recorded_text_bound_scopes": 0,
+    "text_bound_saturation_candidates": 0,
+    "counts_scope": "Declaration/report structure only; not native readiness or accepted research outcomes."
+  },
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "bed695bef593aa5a846611bb6cb4cf8ee2286760",
+      "path": "scripts/saturation_ledger.py",
+      "lines": "122-132,524-531,575-580,1139-1162,1341-1346,1626-1708"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "bed695bef593aa5a846611bb6cb4cf8ee2286760",
+      "path": "catalogs/saturation/ledger.schema.json",
+      "lines": "77-85"
+    }
+  ],
+  "producer_handoff": {
+    "owner": "convergence-practice",
+    "status": "pending_custody",
+    "paths": [
+      {
+        "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
+        "lines": "393,638-645"
+      },
+      {
+        "path": "tools/sota-convergence/landscape-sweep/convert.py",
+        "lines": "369,378,577"
+      },
+      {
+        "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+        "lines": "544"
+      }
+    ],
+    "source_pin": "bed695bef593aa5a846611bb6cb4cf8ee2286760",
+    "condition": "Compatible opt-in propagation is required before any actual future sweep claims text-bound qualification."
+  }
+}

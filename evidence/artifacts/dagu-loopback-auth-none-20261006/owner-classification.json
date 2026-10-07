@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+  "source_block_sha256": "f91759c7799db83300c96d13d295b115cfd1e8427a719dd996656d144437f81d",
+  "executor": "ns2604-coop",
+  "method_reported": "Read only installed DAG descriptions, comments and schedule lines; no params, env, steps or credential files",
+  "evidence_class": "source_review",
+  "claim_boundary": "Operator-reported header/purpose classification, corroborated by upstream sample names/public backup reminders; not execution or full installed-body identity",
+  "scope": "Eight DAG identities observed by grand-catalog through the loopback API",
+  "records": [
+    {
+      "name": "example-01-basic-sequential",
+      "reported_role": "bundled Dagu sample",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_header": "Basic Sequential Execution",
+      "source": "dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4:internal/persis/file/dag/examples_unix.go:10"
+    },
+    {
+      "name": "example-02-parallel-execution",
+      "reported_role": "bundled Dagu sample",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_header": "Parallel Execution",
+      "source": "dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4:internal/persis/file/dag/examples_unix.go:29"
+    },
+    {
+      "name": "example-03-scheduling",
+      "reported_role": "bundled Dagu sample",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_header": "Scheduled Workflows",
+      "source": "dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4:internal/persis/file/dag/examples_unix.go:67"
+    },
+    {
+      "name": "example-04-nested-workflows",
+      "reported_role": "bundled Dagu sample",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_header": "Nested Workflows",
+      "source": "dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4:internal/persis/file/dag/examples_unix.go:113"
+    },
+    {
+      "name": "example-05-template-and-file",
+      "reported_role": "bundled Dagu sample",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_header": "Template and File Actions",
+      "source": "dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4:internal/persis/file/dag/examples_unix.go:155"
+    },
+    {
+      "name": "restic-backup",
+      "reported_role": "foundation backups",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_description": "Nightly Restic backup of NativeStack2604 to an operator-selected backup target (wave 2)",
+      "sanitization": "Backup destination drive letter omitted",
+      "scope": "Whole-host backup includes trading state, but this is a foundation job, not a paper-lane workflow",
+      "source": "native-agent-stack@c1300c15:scripts/currency_due.py:800-801"
+    },
+    {
+      "name": "restic-restore-check",
+      "reported_role": "foundation backups",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_description": "Weekly Restic restore check of the canary (wave 2)",
+      "source": "native-agent-stack@c1300c15:scripts/currency_due.py:800-801"
+    },
+    {
+      "name": "tz-currency-check",
+      "reported_role": "foundation time practice",
+      "paper_lane_execution": false,
+      "paper_lane_support": false,
+      "reported_description": "Monthly read-only check of time zone data and the leap-second list (changes nothing)",
+      "reported_schedule": "CRON_TZ=America/New_York 15 21 1 * *",
+      "scope": "Foundational time correctness serves trading, without being a paper-lane workflow",
+      "repository_link_reported": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/775"
+    }
+  ],
+  "paper_lane_execution_count": 0,
+  "paper_lane_support_count": 0,
+  "paper_route_reported": "Current paper runs use NativeStack systemd timers, outside this Dagu service",
+  "limitations": [
+    "Reported classification does not prove inactive/inert runtime state, unchanged steps, backup success, read-only implementation or broker behavior",
+    "No samples are removed, no job is run and no host apply occurs in this records PR",
+    "Public backup description omits a machine-specific destination drive letter; no private DAG bodies or credentials are copied"
+  ]
+}

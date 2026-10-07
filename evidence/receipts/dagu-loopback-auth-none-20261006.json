@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "id": "dagu-loopback-auth-none-20261006",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "dagu"
+  ],
+  "claim": "The NativeStack2604 Dagu record distinguishes reported auth:none configuration from native loopback/version/credential-free inventory observations. Eight returned identities have separate operator-reported sample/foundation ownership; no paper execution or readiness status is promoted.",
+  "limitations": [
+    "Read-only observations only: no DAG, paper or broker operation, upstream suite, installation or role-completeness acceptance.",
+    "The configuration change/restart is the command center's report; this lane did not inspect dagu.env, backups, keys or the quarantined home, and changed no host configuration.",
+    "Direct SS/interface probes establish direct loopback reachability only; tunnels, reverse proxies and off-host forwarding paths were not tested.",
+    "Names/tags do not establish unchanged bodies or owners. The separate co-op A25 description/comment/schedule inspection classifies all eight outside paper execution/support; that is reported metadata, not workflow execution or body identity.",
+    "The first inventory GET did not disable default curl configuration; retain it as inventory evidence only. The later --disable-first GET supplies credential-free interface observation.",
+    "Raw API bodies, parameters/defaultParams, live DAG definitions, credential values and host-interface addresses are excluded from model context/artifact retention.",
+    "Independent publication review remains pending. Structural validation is not native application, provider or paper acceptance."
+  ],
+  "evidence_class": "source_review",
+  "source_date": "2026-10-06",
+  "base_commit": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "decision": "docs/decisions/2026-10-06-dagu-loopback-auth-none.md",
+  "native_observation_artifact": "evidence/artifacts/dagu-loopback-auth-none-20261006/native-observations.json",
+  "configuration_report": {
+    "source_id": "task-ns2604-coop-20261006T102431Z-prs",
+    "sha256": "aedbffe132af2017b918d3b3c6fc3011d746478fdaa60833e7142861b7ff3f33",
+    "reported_change_time": "2026-10-06 10:08Z (minute precision)",
+    "executor": "command center",
+    "reported_mode": "none",
+    "reported_listener": "127.0.0.1:21080",
+    "evidence_class": "source_review",
+    "interpretation": "Reported historical host execution, not execution by this lane or direct configuration-file verification"
+  },
+  "observations": [
+    {
+      "operation": "ss loopback listener snapshot",
+      "exit_code": 0,
+      "returned_stdout": "LISTEN 0      4096   127.0.0.1:21080 0.0.0.0:*",
+      "observed_utc": "2026-10-06T10:39:36.366927+00:00",
+      "evidence_class": "native_proven",
+      "scope": "Direct listener snapshot on port 21080"
+    },
+    {
+      "operation": "Direct host-interface TCP probes",
+      "address_discovery_exit_code": 0,
+      "addresses_tested": 3,
+      "results": [
+        {
+          "endpoint": "host non-loopback IPv4",
+          "port": 21080,
+          "connect_errno": 111,
+          "symbol": "ECONNREFUSED"
+        },
+        {
+          "endpoint": "host non-loopback IPv4",
+          "port": 21080,
+          "connect_errno": 111,
+          "symbol": "ECONNREFUSED"
+        },
+        {
+          "endpoint": "host non-loopback IPv4",
+          "port": 21080,
+          "connect_errno": 111,
+          "symbol": "ECONNREFUSED"
+        }
+      ],
+      "evidence_class": "native_proven",
+      "scope": "Three direct non-loopback IPv4 probes refused 111; no tunnel/proxy claim"
+    },
+    {
+      "operation": "GET /api/v1/health",
+      "http_status": 200,
+      "returned_fields": {
+        "version": "2.18.2",
+        "status": "healthy"
+      },
+      "observed_utc": "2026-10-06T10:41:05.563935+00:00",
+      "evidence_class": "native_proven",
+      "scope": "Public health/server version, not proof of operator auth mode"
+    },
+    {
+      "operation": "curl --disable first / jq DAG inventory",
+      "curl_exit_code": 0,
+      "jq_exit_code": 0,
+      "http_status": 200,
+      "returned": 8,
+      "total_records": 8,
+      "observed_utc": "2026-10-06T10:59:15.317623+00:00",
+      "evidence_class": "native_proven",
+      "scope": "Config-free/credential-free supported inventory; native tag presence captured explicitly, no null-to-empty normalization or owner inference"
+    },
+    {
+      "operation": "dagu version",
+      "exit_code": 0,
+      "returned_stdout": "2.18.2",
+      "evidence_class": "native_proven",
+      "scope": "PATH CLI version only; install/binary provenance not established by this command"
+    }
+  ],
+  "selection_boundary": {
+    "new_wsl_version": "2.18.2",
+    "new_wsl_source_pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+    "workstation_trading_stack_version": "2.16.6",
+    "source": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
+    "pin_move_in_this_pr": false,
+    "correction": "The earlier drift lead was superseded by the canonical scoped new-WSL selection and independent health/CLI observations."
+  },
+  "dag_inventory": {
+    "observed_returned": 8,
+    "observed_total_records": 8,
+    "source_class": "native_proven",
+    "paper_owner_mapping_status": "Recorded from ns2604-coop A25 at 2026-10-06T11:01:22Z",
+    "records": [
+      {
+        "name": "example-01-basic-sequential",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "bundled Dagu sample",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "example-02-parallel-execution",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "bundled Dagu sample",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "example-03-scheduling",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "bundled Dagu sample",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "example-04-nested-workflows",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "bundled Dagu sample",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "example-05-template-and-file",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "bundled Dagu sample",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "restic-backup",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "foundation backups",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "restic-restore-check",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "foundation backups",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      },
+      {
+        "name": "tz-currency-check",
+        "tags": [],
+        "tags_present": true,
+        "paper_lane_membership": "Outside paper execution/support by reported operator classification",
+        "definition_identity": "not inspected",
+        "reported_role": "foundation time practice",
+        "classification_source": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+        "paper_lane_execution": false,
+        "paper_lane_support": false
+      }
+    ],
+    "owner_classification_evidence_class": "source_review",
+    "paper_lane_execution_count": 0,
+    "paper_lane_support_count": 0
+  },
+  "housekeeping": {
+    "scope": "Public repository eligible source and explicitly scoped coordination lane *.sh/*.py/*.bash sources; no credential files, native DAG definitions or quarantine",
+    "credential_inventory": "No Dagu declaration found on the current main inventory/secret-storage sources; conditional builtin-auth edit not needed",
+    "loader_finding_status": "No demonstrated executable naive loader in scoped repository/lane-script sources; staged dispatcher match is instruction text, not an executed loader",
+    "private_script_changes": false,
+    "historical_receipts_changed": false,
+    "evidence_class": "source_review",
+    "corrections": [
+      "Initial private-script *.sh search was widened to *.py/*.bash",
+      "The dispatcher export/cat candidate was an AST string literal carrying the task; no shell execution of that literal was found",
+      "Archived installer value readers dot-source a shell assignment file through env -i/sh, so quotes are interpreted; their actual credential files were not read"
+    ],
+    "source_checks": [
+      {
+        "locators": [
+          "coordination-root:ns2604-coop/scratch-archive-20261005/platform-dagu-installer-v2.18.1.sh",
+          "coordination-root:ns2604-coop/scratch-archive-20261006T0155Z/platform-dagu-installer-v2.18.1.sh"
+        ],
+        "selected_bodies_sha256": "3152dedc8920ac57ed56cf495385eb631c92a7958b04cb3820b57f21db0f7768",
+        "finding": "Three selected helper bodies match the official installer; quotes are emitted/evaluated with native shell semantics"
+      },
+      {
+        "locator": "coordination-root:ns2604-coop/lanes/staged/dispatch-20261006T1032Z.py:54-60,84",
+        "selected_context_sha256": "0b387470538baa54a6d24ffd27a4f5b4cb3028a5041ece4cf03921d1c207ce18",
+        "finding": "AST string literal carries the task's find/export example; queue dispatch does not execute that literal in a shell"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "repository": "dagucloud/dagu",
+      "pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+      "version": "2.18.2",
+      "paths": [
+        "internal/service/frontend/api/v1/api.go:725,733-742",
+        "internal/service/frontend/api/v1/health.go:16-22",
+        "api/v1/api.yaml:789,12963,13037-13044",
+        "internal/persis/file/dag/examples_unix.go:10,29,67,113,155"
+      ],
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+      "paths": [
+        "blueprints/us-equities/hosting/README.md:95-106",
+        "docs/decisions/2026-10-05-dagu-mise-pin-move.md:7,15",
+        "docs/native-dashboards.md:63-68",
+        "observability/grand-dashboard/README.md:131",
+        "observability/backends/README.md:214-218",
+        "observability/grand-dashboard/receipt.json:159",
+        "scripts/currency_due.py:800-801",
+        "docs/lanes.md:96-128",
+        "docs/acceptance-evidence-policy.md:26-35"
+      ]
+    },
+    {
+      "url": "https://curl.se/docs/manpage.html",
+      "checked": "2026-10-06",
+      "scope": "--disable first, --noproxy, write-out stderr/http_code; installed curl 8.18.0"
+    },
+    {
+      "url": "https://jqlang.org/manual/v1.8/",
+      "checked": "2026-10-06",
+      "scope": "Maintained field filtering; installed jq 1.8.1"
+    },
+    {
+      "repository": "systemd/systemd",
+      "pin": "781d9d0789379d1ea1f2ecefb804d41e9c8b6c38",
+      "paths": [
+        "man/systemd.exec.xml:3107-3109,3145-3182"
+      ],
+      "scope": "Stable native EnvironmentFile semantics, no systemd runtime selection or host change"
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "pin": "v2.18.1",
+      "paths": [
+        "scripts/installer.sh:281-285,1036-1056,1647,1751,1763-1770"
+      ],
+      "url": "https://github.com/dagucloud/dagu/blob/v2.18.1/scripts/installer.sh#L281",
+      "scope": "Quoted env-value writer and shell-evaluated readers; matched selected archived source bodies, no env execution or host change"
+    },
+    {
+      "operator_report": "ns2604-coop A25, 2026-10-06T11:01:22Z",
+      "source_block_sha256": "f91759c7799db83300c96d13d295b115cfd1e8427a719dd996656d144437f81d",
+      "scope": "Installed DAG descriptions/comments/schedules only; no params, env, steps, credential files or full-body identity",
+      "record": "evidence/artifacts/dagu-loopback-auth-none-20261006/owner-classification.json"
+    }
+  ],
+  "review": {
+    "co_op_gpt_read": "pending",
+    "command_center_ack": "pending",
+    "paper_owner_mapping": "Recorded A25; independent publication read pending"
+  },
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/dagu-loopback-auth-none-20261006/native-observations.json",
+      "sha256": "54493115a1177753928afa9c7a74e117ed6eedf8110a6797aa4a9d3c010cb3ac",
+      "bytes": 7736
+    },
+    {
+      "path": "evidence/artifacts/dagu-loopback-auth-none-20261006/owner-classification.json",
+      "sha256": "2ecaa7cc48bfb25b2061695c910dcaee9ddf74abc2c14fc2651359cbb881b4a6",
+      "bytes": 4384
+    }
+  ],
+  "checks": [
+    {
+      "command": "rtk proxy nice -n 19 python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_stdout": "{\"components\": 69, \"hashed_files\": 10318, \"profiles\": 4, \"receipts\": 213, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "evidence_class": "local_integration",
+      "scope": "Initial publication integrity/scope check only; not host deployment, provider/GPU execution, paper acceptance or upstream tests"
+    },
+    {
+      "command": "rtk proxy nice -n 19 python3 scripts/validate.py",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "retained_failure": "Registry was copied from a newer shared origin/main while the worktree still contained c1300c15 files; unrelated new-main files were missing or had mismatched hashes",
+      "correction": "Rebase source commit onto immutable 1fa865066b4a9e82522170ca48759ffebc07ed0c, then derive registry from the same pinned main commit and re-register only owned files",
+      "scope": "Publication synchronization failure, not Dagu operation or owner classification"
+    },
+    {
+      "command": "rtk proxy nice -n 19 python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_stdout": "{\"components\": 69, \"hashed_files\": 10322, \"profiles\": 4, \"receipts\": 213, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "evidence_class": "local_integration",
+      "scope": "Passing rebased publication integrity/scope check on pinned main 1fa865066b4a9e82522170ca48759ffebc07ed0c; not host, provider, paper or upstream acceptance"
+    }
+  ],
+  "owner_classification_artifact": "evidence/artifacts/dagu-loopback-auth-none-20261006/owner-classification.json",
+  "publication_base_commit": "1fa865066b4a9e82522170ca48759ffebc07ed0c"
+}

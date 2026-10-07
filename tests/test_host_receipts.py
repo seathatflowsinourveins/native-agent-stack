@@ -1570,6 +1570,36 @@ class FlipRuleGatingTests(unittest.TestCase):
 
 
 
+class NullableSchemaTests(unittest.TestCase):
+    """JSON Schema 2020-12 null/type-array behavior uses the existing validator."""
+
+    def test_null_type_accepts_only_none(self):
+        for value in (None, False, 0, "", [], {}):
+            errors = []
+            hr.validate_against_schema(value, {"type": "null"}, "field", errors)
+            self.assertEqual(bool(errors), value is not None)
+
+    def test_nullable_object_still_checks_present_shapes(self):
+        schema = {"type": ["object", "null"], "required": ["count"],
+                  "properties": {"count": {"type": "integer"}}, "additionalProperties": False}
+        for value, valid in ((None, True), ({"count": 1}, True), ({}, False),
+                             ({"count": True}, False), ({"count": 1, "extra": 0}, False),
+                             ([], False), (False, False)):
+            errors = []
+            hr.validate_against_schema(value, schema, "field", errors)
+            self.assertEqual(not errors, valid, value)
+
+    def test_numeric_nullable_union_rejects_booleans_and_unknown_type_names(self):
+        for value, valid in ((None, True), (1, True), (0.5, True), (True, False), ("1", False)):
+            errors = []
+            hr.validate_against_schema(value, {"type": ["number", "null"]}, "field", errors)
+            self.assertEqual(not errors, valid, value)
+        for type_value in ("unknown", [], ["null", "null"], ["null", "unknown"], [True, "null"]):
+            errors = []
+            hr.validate_against_schema(None, {"type": type_value}, "field", errors)
+            self.assertTrue(errors)
+
+
 class JsonEqualityTests(unittest.TestCase):
     """A boolean must not satisfy a numeric const or enum (Python treats True == 1)."""
 

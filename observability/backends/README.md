@@ -213,9 +213,15 @@ does, then a Prometheus restart.
 
 Prometheus alerts when a normal scrape remains down for two minutes. Four
 Collector HTTP probes expect 2xx from the local OmniRoute, FreeLLMAPI, and
-Collector endpoints, and 401 from the protected Dagu API. Missing or unexpected
+Collector endpoints, and 401 from the protected Dagu API in the recorded backend
+configuration. Missing or unexpected
 responses alert after two minutes. These probes establish local transport and
-authentication protection only, not provider access or job execution.
+authentication protection only, not provider access or job execution. That
+protected-Dagu observation is historical for NativeStack2604: its
+[2026-10-06 Dagu record](../../docs/decisions/2026-10-06-dagu-loopback-auth-none.md)
+documents an unauthenticated operator path on loopback port 21080. An old probe
+expecting 401 needs owner re-qualification before it describes that mode; this
+records change does not alter deployed Collector probes or historical receipts.
 
 A separate `acceptance-fixture` scrape reads `acceptance-targets.json`, initially
 `[]`, every five seconds. `EcosystemAcceptanceTargetDown` fires after ten seconds

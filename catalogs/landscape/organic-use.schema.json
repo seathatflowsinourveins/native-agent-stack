@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "catalogs/landscape/organic-use.schema.json",
+  "title": "Historical organic-use observation",
+  "description": "Optional historical receipt data.organic_use, projected without changing native acceptance or convergence. Semantic constraints are checked by scripts/organic_use.py using the existing schema helper.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "protocol_id", "amendment", "sources", "records"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "protocol_id": {"const": "organic-e2e-v1-20261005"},
+    "amendment": {"const": "U1"},
+    "sources": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["ref", "sha256"],
+        "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+      }
+    },
+    "records": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["record_id", "supersedes", "component_id", "layer_ids", "component_pin", "client", "platform_id", "arm", "observed_at_utc", "task_scope", "collection_scope", "evidence_class", "stage", "state", "protocol_status", "context_proof", "proofs", "phases", "runs", "verdict", "qualification", "review", "adjudication", "exclusion", "recheck"],
+        "properties": {
+          "record_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "supersedes": {
+            "description": "Exact predecessor block locator; sha256 hashes the entire immutable predecessor receipt.",
+            "type": ["object", "null"], "additionalProperties": false, "required": ["ref", "sha256"],
+            "properties": {"ref": {"type": "string", "pattern": "^evidence/receipts/.+\\.json#/data/organic_use/records/[0-9]+$"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+          },
+          "component_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "layer_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^(foundation|us-equities)/[a-z0-9][a-z0-9._-]*$"}},
+          "component_pin": {"type": ["string", "null"], "minLength": 1},
+          "client": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "version", "mode", "model", "requested_effort", "effective_effort", "effective_tier", "route", "config_sha256"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "version": {"type": "string", "minLength": 1},
+              "mode": {"type": "string", "minLength": 1},
+              "model": {"type": ["string", "null"], "minLength": 1},
+              "requested_effort": {"type": ["string", "null"], "minLength": 1},
+              "effective_effort": {"type": ["string", "null"], "minLength": 1},
+              "effective_tier": {"type": ["string", "null"], "minLength": 1},
+              "route": {"type": ["string", "null"], "minLength": 1},
+              "config_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "platform_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "arm": {"enum": ["native", "env"]},
+          "observed_at_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"},
+          "task_scope": {"type": "string", "minLength": 1},
+          "collection_scope": {"type": "string", "minLength": 1},
+          "evidence_class": {"enum": ["source_review", "local_integration", "synthetic", "native_proven", "measured_comparison"]},
+          "stage": {"enum": ["pilot", "qualification"]},
+          "state": {"enum": ["pending", "complete"]},
+          "protocol_status": {"enum": ["SCREEN_PASS", "SCREEN_NEVER", "SCREEN_INCONCLUSIVE", "ORGANIC_OBSERVED", "RATE_QUALIFIED_ON_SUITE", "WIRING", "UNAVAILABLE", "EXPLICIT_ONLY", "INTEGRATION_VERIFIED", "UNKNOWN", "DEFERRED"]},
+          "context_proof": {
+            "description": "Owner manifest retaining task/instance and frozen labels, suite/detector/grader hashes, provenance strata, telemetry joins, outcomes, usage/cost unknowns and treatment identity.",
+            "type": ["object", "null"], "additionalProperties": false, "required": ["ref", "sha256"],
+            "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+          },
+          "proofs": {
+            "type": "array", "minItems": 1,
+            "items": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+          },
+          "open_items": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "phases": {
+            "type": "object", "additionalProperties": false, "required": ["P1", "P2", "pooled"],
+            "properties": {
+              "P1": {
+                "type": ["object", "null"], "additionalProperties": false,
+                "required": ["scope", "provenance", "interval_method", "interval_source", "assigned", "exposed", "valid", "eligible_exposed", "unavailable", "censored", "telemetry_invalid", "contamination_excluded", "quota_deferred", "uses", "selections", "oir", "wilson95_low", "wilson95_high", "selection_rate"],
+                "properties": {
+                  "scope": {"const": "should_use"},
+                  "interval_method": {"const": "wilson95"},
+                  "interval_source": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "provenance": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "assigned": {"type": "integer", "minimum": 0}, "exposed": {"type": "integer", "minimum": 0}, "valid": {"type": "integer", "minimum": 0}, "eligible_exposed": {"type": "integer", "minimum": 0},
+                  "unavailable": {"type": "integer", "minimum": 0}, "censored": {"type": "integer", "minimum": 0}, "telemetry_invalid": {"type": "integer", "minimum": 0}, "contamination_excluded": {"type": "integer", "minimum": 0}, "quota_deferred": {"type": "integer", "minimum": 0},
+                  "uses": {"type": "integer", "minimum": 0}, "selections": {"type": "integer", "minimum": 0},
+                  "oir": {"type": ["number", "null"]}, "wilson95_low": {"type": ["number", "null"]}, "wilson95_high": {"type": ["number", "null"]}, "selection_rate": {"type": ["number", "null"]}
+                }
+              },
+              "P2": {
+                "type": ["object", "null"], "additionalProperties": false,
+                "required": ["scope", "provenance", "interval_method", "interval_source", "assigned", "exposed", "valid", "eligible_exposed", "unavailable", "censored", "telemetry_invalid", "contamination_excluded", "quota_deferred", "uses", "selections", "oir", "wilson95_low", "wilson95_high", "selection_rate"],
+                "properties": {
+                  "scope": {"const": "should_use"},
+                  "interval_method": {"const": "wilson95"},
+                  "interval_source": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "provenance": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "assigned": {"type": "integer", "minimum": 0}, "exposed": {"type": "integer", "minimum": 0}, "valid": {"type": "integer", "minimum": 0}, "eligible_exposed": {"type": "integer", "minimum": 0},
+                  "unavailable": {"type": "integer", "minimum": 0}, "censored": {"type": "integer", "minimum": 0}, "telemetry_invalid": {"type": "integer", "minimum": 0}, "contamination_excluded": {"type": "integer", "minimum": 0}, "quota_deferred": {"type": "integer", "minimum": 0},
+                  "uses": {"type": "integer", "minimum": 0}, "selections": {"type": "integer", "minimum": 0},
+                  "oir": {"type": ["number", "null"]}, "wilson95_low": {"type": ["number", "null"]}, "wilson95_high": {"type": ["number", "null"]}, "selection_rate": {"type": ["number", "null"]}
+                }
+              },
+              "pooled": {
+                "type": ["object", "null"], "additionalProperties": false,
+                "required": ["scope", "provenance", "interval_method", "interval_source", "assigned", "exposed", "valid", "eligible_exposed", "unavailable", "censored", "telemetry_invalid", "contamination_excluded", "quota_deferred", "uses", "selections", "oir", "wilson95_low", "wilson95_high", "selection_rate"],
+                "properties": {
+                  "scope": {"const": "should_use"},
+                  "interval_method": {"const": "wilson95"},
+                  "interval_source": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "provenance": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "assigned": {"type": "integer", "minimum": 0}, "exposed": {"type": "integer", "minimum": 0}, "valid": {"type": "integer", "minimum": 0}, "eligible_exposed": {"type": "integer", "minimum": 0},
+                  "unavailable": {"type": "integer", "minimum": 0}, "censored": {"type": "integer", "minimum": 0}, "telemetry_invalid": {"type": "integer", "minimum": 0}, "contamination_excluded": {"type": "integer", "minimum": 0}, "quota_deferred": {"type": "integer", "minimum": 0},
+                  "uses": {"type": "integer", "minimum": 0}, "selections": {"type": "integer", "minimum": 0},
+                  "oir": {"type": ["number", "null"]}, "wilson95_low": {"type": ["number", "null"]}, "wilson95_high": {"type": ["number", "null"]}, "selection_rate": {"type": ["number", "null"]}
+                }
+              }
+            }
+          },
+          "runs": {
+            "type": "array",
+            "items": {
+              "type": "object", "additionalProperties": false, "required": ["run_id", "started_at_utc", "ended_at_utc", "rc"],
+              "properties": {
+                "run_id": {"type": "string", "minLength": 1},
+                "started_at_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"},
+                "ended_at_utc": {"type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"},
+                "rc": {"type": ["integer", "null"]}
+              }
+            }
+          },
+          "verdict": {"enum": [null, "READY", "NOT-READY", "EXCLUDED"]},
+          "qualification": {
+            "type": "object", "additionalProperties": false, "required": ["status", "rule", "ref", "sha256", "negative_control"],
+            "properties": {
+              "status": {"enum": ["pending", "complete"]},
+              "rule": {"enum": [null, "T6", "U1:61"], "description": "Owner qualification under T6, or U1:61's proven Codex native availability failure; the projection never substitutes T8 rate thresholds."},
+              "ref": {"type": ["string", "null"], "minLength": 1}, "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+              "negative_control": {
+                "type": "object", "additionalProperties": false, "required": ["status", "ref", "sha256"],
+                "properties": {"status": {"enum": ["pending", "passed", "failed"]}, "ref": {"type": ["string", "null"], "minLength": 1}, "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}}
+              }
+            }
+          },
+          "review": {
+            "type": "object", "additionalProperties": false, "required": ["status", "ref", "sha256"],
+            "properties": {"status": {"enum": ["pending", "reviewed", "needs_changes"]}, "ref": {"type": ["string", "null"], "minLength": 1}, "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}}
+          },
+          "adjudication": {
+            "type": "object", "additionalProperties": false, "required": ["status", "ref", "sha256"],
+            "properties": {"status": {"enum": ["pending", "adjudicated", "not_required"]}, "ref": {"type": ["string", "null"], "minLength": 1}, "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}}
+          },
+          "exclusion": {
+            "type": ["object", "null"], "additionalProperties": false, "required": ["rule_c", "predicates", "overturn_conditions"],
+            "properties": {
+              "rule_c": {
+                "type": "object", "additionalProperties": false, "required": ["ref", "sha256", "component_id", "task_scope"],
+                "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "component_id": {"type": "string", "minLength": 1}, "task_scope": {"type": "string", "minLength": 1}}
+              },
+              "predicates": {
+                "type": "object", "additionalProperties": false, "required": ["never_selected_full_run", "overlap_with_selected", "native_fix_rerun"],
+                "properties": {
+                  "never_selected_full_run": {"type": "object", "additionalProperties": false, "required": ["client_id", "arm", "selections", "ref", "sha256"], "properties": {"client_id": {"type": "string", "minLength": 1}, "arm": {"const": "native"}, "selections": {"const": 0}, "ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "overlap_with_selected": {"type": "object", "additionalProperties": false, "required": ["client_id", "selected_cover_component_id", "task_scope", "ref", "sha256"], "properties": {"client_id": {"type": "string", "minLength": 1}, "selected_cover_component_id": {"type": "string", "minLength": 1}, "task_scope": {"type": "string", "minLength": 1}, "ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "native_fix_rerun": {
+                    "type": "object", "additionalProperties": false, "required": ["client_id", "outcome", "fix", "rerun"],
+                    "properties": {
+                      "client_id": {"type": "string", "minLength": 1},
+                      "outcome": {"const": "unsuccessful"},
+                      "fix": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                      "rerun": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+                    }
+                  }
+                }
+              },
+              "overturn_conditions": {
+                "type": "object", "additionalProperties": false, "required": ["later_organic_selection", "covering_tool_regression", "better_upstream_harness_ab"],
+                "properties": {
+                  "later_organic_selection": {"type": "object", "additionalProperties": false, "required": ["condition", "status", "ref", "sha256"], "properties": {"condition": {"type": "string", "minLength": 1}, "status": {"enum": ["pending", "observed"]}, "ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "covering_tool_regression": {"type": "object", "additionalProperties": false, "required": ["condition", "status", "ref", "sha256"], "properties": {"condition": {"type": "string", "minLength": 1}, "status": {"enum": ["pending", "observed"]}, "ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+                  "better_upstream_harness_ab": {"type": "object", "additionalProperties": false, "required": ["condition", "status", "ref", "sha256"], "properties": {"condition": {"type": "string", "minLength": 1}, "status": {"enum": ["pending", "observed"]}, "ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+                }
+              }
+            }
+          },
+          "recheck": {
+            "type": "object", "additionalProperties": false, "required": ["tool_pin", "client_version", "landscape", "sweep_id", "sweep_date_utc", "max_age_days"],
+            "properties": {
+              "tool_pin": {"type": ["string", "null"], "minLength": 1}, "client_version": {"type": "string", "minLength": 1},
+              "landscape": {"type": "object", "additionalProperties": false, "required": ["ref", "sha256"], "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+              "sweep_id": {"type": ["string", "null"], "minLength": 1}, "sweep_date_utc": {"type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+              "max_age_days": {"type": "integer", "minimum": 1, "description": "Observation-window age policy; the initial policy is 30 days."}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -95,7 +95,7 @@ SWEEP_FIELDS = ("sweep_id", "date", "workflow_run", "status", "manifest_ref", "m
                 "returns_sha256", "record_ref", "lane_calls", "lost_workers", "not_retained", "notes",
                 "prev_sha256", "layers")
 LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "votes_note",
-                "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen")
+                "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen", "requirement_binding")
 V2_LAYER_FIELDS = (*LAYER_FIELDS, "contract_version", "field_sha256", "source_field_sha256", "eligible_field", "pending")
 # A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>
 LENS_POINTER = re.compile(r"/(foundation|trading)/(\d+)/candidates/(\d+)/adversarial_verification/votes/(\d+)")
@@ -129,6 +129,9 @@ def v2_field_sha256(layer: dict) -> str:
     binding["members"] = sorted(
         ({"candidate_key": row["candidate_key"], "repository": row["repository"]}
          for row in layer["eligible_field"]), key=lambda row: row["candidate_key"])
+    # Absent on every historical record: its canonical payload stays byte-exact.
+    if "requirement_binding" in layer:
+        binding["requirement_binding"] = layer["requirement_binding"]
     return hashlib.sha256(canonical(binding)).hexdigest()
 
 
@@ -522,13 +525,80 @@ def record_sha256(record: dict) -> str:
 
 
 def requirement_sha256(row: dict) -> str:
-    """The layer's frozen requirement: its research-state next_action and decision_ref."""
+    """Legacy scope digest, unchanged: research-state next_action and decision_ref.
+
+    New text/identity binding is additive; no historical digest is rehashed.
+    """
     return sha256_bytes(canonical({"next_action": row.get("next_action"), "decision_ref": row.get("decision_ref")}))
 
 
 def skills_requirement_sha256(task: dict) -> str:
     """A skills layer's frozen requirement: its skills lifecycle task's lifecycle_task, requirement and overturn_when."""
     return sha256_bytes(canonical({field: task.get(field) for field in SKILLS_REQUIREMENT_FIELDS}))
+
+
+def requirement_binding(catalog: str, layer_id: str, requirement_text: str, legacy_hash: str) -> dict:
+    """Versioned frozen TEXT+IDENTITY, using the existing canonical/hash helpers.
+
+    Source: native-agent-stack@bed695bef593aa5a846611bb6cb4cf8ee2286760:
+    scripts/saturation_ledger.py:118-136,524-532,1635-1650.
+    Do not normalize captured text or replace a recorded legacy hash.
+    """
+    if catalog not in (*MANIFEST_SECTION, SKILLS) or not isinstance(layer_id, str) or not layer_id.strip():
+        raise LedgerError("requirement binding needs a canonical catalog/layer identity")
+    if not isinstance(requirement_text, str) or not requirement_text.strip():
+        raise LedgerError("requirement binding needs exact nonempty requirement text")
+    if not isinstance(legacy_hash, str) or not HEX64.fullmatch(legacy_hash):
+        raise LedgerError("requirement binding legacy_hash must be 64 lowercase hex")
+    bound = {"binding_version": 2, "identity": {"catalog": catalog, "layer_id": layer_id},
+             "requirement_text": requirement_text}
+    return {**bound, "requirement_hash": sha256_bytes(canonical(bound)), "legacy_hash": legacy_hash}
+
+
+def validate_requirement_binding(value, catalog, layer_id, legacy_hash) -> None:
+    """Check captured inputs, never compare historical text with today's catalog."""
+    expected = {"binding_version", "identity", "requirement_text", "requirement_hash", "legacy_hash"}
+    if not isinstance(value, dict) or set(value) != expected:
+        raise LedgerError("requirement_binding needs exactly the versioned snapshot fields")
+    if type(value["binding_version"]) is not int or value["binding_version"] != 2:
+        raise LedgerError("requirement_binding binding_version must be 2")
+    if value["identity"] != {"catalog": catalog, "layer_id": layer_id}:
+        raise LedgerError("requirement_binding identity differs from captured catalog/layer")
+    if value["legacy_hash"] != legacy_hash:
+        raise LedgerError("requirement_binding legacy_hash differs from captured requirement_sha256")
+    computed = requirement_binding(catalog, layer_id, value["requirement_text"], value["legacy_hash"])
+    if value["requirement_hash"] != computed["requirement_hash"]:
+        raise LedgerError("requirement_binding requirement_hash does not bind captured text/identity")
+
+
+def layer_requirement_bindings(root: Path) -> dict:
+    """Current snapshots joined to actual landscape text, never next_action fallback."""
+    rows = research_rows(root)
+    catalogs = {}
+    for catalog in {key[0] for key in rows}:
+        relative = f"catalogs/landscape/{catalog}.json"
+        document = load_json(root, relative)
+        if not isinstance(document, dict) or not isinstance(document.get("layers"), list):
+            raise LedgerError(f"{relative}: expected a layers array for requirement text")
+        if document.get("catalog", catalog) != catalog:
+            raise LedgerError(f"{relative}: conflicting catalog identity")
+        indexed = {}
+        for row in document["layers"]:
+            if not isinstance(row, dict) or row.get("catalog", catalog) != catalog or not isinstance(row.get("layer_id"), str):
+                raise LedgerError(f"{relative}: malformed catalog/layer requirement identity")
+            if row["layer_id"] in indexed:
+                raise LedgerError(f"{relative}: duplicate requirement layer {row['layer_id']}")
+            indexed[row["layer_id"]] = row
+        catalogs[catalog] = indexed
+    bindings = {}
+    for (catalog, layer_id), row in rows.items():
+        actual = catalogs[catalog].get(layer_id)
+        if actual is None:
+            raise LedgerError(f"{catalog}/{layer_id}: actual landscape requirement is missing")
+        bindings[(catalog, layer_id)] = requirement_binding(catalog, layer_id, actual.get("requirement"), requirement_sha256(row))
+    for (catalog, layer_id), task in skills_rows(root).items():
+        bindings[(catalog, layer_id)] = requirement_binding(catalog, layer_id, task.get("requirement"), skills_requirement_sha256(task))
+    return bindings
 
 
 def platform_profiles_sha256(adoption: dict) -> str:
@@ -1001,6 +1071,13 @@ class Checker:
 
     def check_layer(self, sweep, layer, label, manifest, lane, earlier) -> None:
         key = (layer.get("catalog"), layer.get("layer_id"))
+        if "requirement_binding" in layer:
+            try:
+                validate_requirement_binding(layer["requirement_binding"], *key, layer.get("requirement_sha256"))
+            except LedgerError as error:
+                self.error(f"{label}: {error}")
+            if layer.get("votes") != "retained" or not layer.get("discovery_ref"):
+                self.error(f"{label}: strong requirement binding requires retained frozen discovery")
         if sweep.get("contract_version") == 2 and layer.get("contract_version") != 2:
             self.error(f"{label}: V2 sweep cannot project a layer into V1")
         if layer.get("contract_version") == 2:
@@ -1115,6 +1192,14 @@ class Checker:
             if target.get(field) != layer.get(field):
                 self.error(f"{label}: {field} differs from the frozen scope in {ref} "
                            f"({target.get(field)!r}); the scope changed after the sweep froze it")
+        if "requirement_binding" in target or "requirement_binding" in layer:
+            if target.get("requirement_binding") != layer.get("requirement_binding"):
+                self.error(f"{label}: requirement_binding differs from retained frozen discovery")
+            try:
+                validate_requirement_binding(target.get("requirement_binding"), layer.get("catalog"), layer.get("layer_id"),
+                                             target.get("requirement_sha256"))
+            except LedgerError as error:
+                self.error(f"{label}: {error}")
 
     def check_v2_layer(self, sweep, layer, label, manifest, lane, earlier) -> None:
         """Recompute each tri-state screen and partition from retained V2 evidence."""
@@ -1139,6 +1224,13 @@ class Checker:
                 "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")):
             self.error(f"{label}: original frozen field differs from layer scope")
             return
+        if "requirement_binding" in layer or "requirement_binding" in source:
+            if source.get("requirement_binding") != layer.get("requirement_binding"):
+                self.error(f"{label}: original source requirement_binding differs from captured expanded scope")
+            try:
+                validate_requirement_binding(source.get("requirement_binding"), catalog, layer_id, source.get("requirement_sha256"))
+            except LedgerError as error:
+                self.error(f"{label}: {error}")
         documents = target.get("screen_judgments")
         if not isinstance(documents, dict) or set(documents) != set(ROLES) \
                 or not all(isinstance(documents[role], list) for role in ROLES):
@@ -1466,6 +1558,36 @@ def external_triggers(baseline: dict | None, staleness: dict | None, freshness: 
                 for key, _ in layers:
                     triggers.setdefault(key, []).append(
                         {"trigger": trigger, "ref": f"receipt_staleness:{row.get('platform_id')}/{row.get('component_id')}"})
+        # Reuse existing reopen categories. An organic observation is not a sweep
+        # or acceptance receipt; this report only tells the next real sweep what
+        # needs rechecking, including the client-dependent comparison boundary.
+        organic_flags = {
+            "organic_tool_version_changed": "pin_moved",
+            "organic_client_version_changed": "comparison_changed",
+            "organic_landscape_reopened": "comparison_changed",
+            "organic_context_changed": "comparison_changed",
+            "organic_age_limit": "stale_receipt",
+        }
+        for row in staleness.get("organic_use") or []:
+            if row.get("saturation_trigger_active") is False:
+                continue
+            selected = {key for key, _ in mapping.get(row.get("component_id"), [])}
+            for flag in row.get("flags") or []:
+                trigger = organic_flags.get(flag)
+                if trigger is None:
+                    continue
+                for layer_ref in row.get("layer_ids") or []:
+                    key = tuple(layer_ref.split("/", 1))
+                    if key not in selected:
+                        notes.append(f"organic flag {flag} on {row.get('component_id')} is informational "
+                                     f"outside the baseline selection in {layer_ref}")
+                        continue
+                    triggers.setdefault(key, []).append({
+                        "trigger": trigger,
+                        "ref": f"organic_use:{row.get('block_ref', row.get('receipt_ref'))}:"
+                               f"{row.get('component_id')}/{(row.get('client') or {}).get('id')}/"
+                               f"{row.get('arm')}/{flag}",
+                    })
     if freshness is not None and baseline is not None:
         fresh = component_layers(freshness)
         for component_id, placements in fresh.items():
@@ -1522,6 +1644,7 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
     freshness_state, freshness_notes = freshness_input(freshness, freshness_status)
     notes = freshness_notes + notes
     requirements = layer_requirements(root)  # the research-state layers, then the skills layers (no research status)
+    bindings = layer_requirement_bindings(root)
     current = {"requirements": requirements,
                "platform_profiles_sha256": platform_profiles_sha256(adoption), "triggers": triggers}
     state = derive(ledger, current)
@@ -1529,12 +1652,23 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
     for key in requirements:
         entry = state.get(key) or {"count": 0, "saturation_candidate": False, "reset": [], "last_sweep": None,
                                    "last_counted": None}
+        recorded = [layer for sweep in ledger.get("sweeps") or [] for layer in sweep.get("layers") or []
+                    if (layer.get("catalog"), layer.get("layer_id")) == key]
+        snapshot = recorded[-1].get("requirement_binding") if recorded else None
+        counted = [layer for sweep in ledger.get("sweeps") or [] if sweep.get("sweep_id") in (entry.get("counted_sweeps") or [])
+                   for layer in sweep.get("layers") or [] if (layer.get("catalog"), layer.get("layer_id")) == key]
+        text_bound_count = bool(counted) and all(layer.get("requirement_binding") == bindings[key] for layer in counted)
         layers.append({
             "catalog": key[0], "layer_id": key[1], "research_status": (rows.get(key) or {}).get("status"),
             "clean_count": entry["count"], "saturation_candidate": entry["saturation_candidate"],
             "due": not entry["saturation_candidate"], "last_sweep": entry.get("last_sweep"),
             "last_counted": entry.get("last_counted"), "reset": entry.get("reset") or [],
             "current_triggers": entry.get("current_triggers") or [],
+            "requirement_binding": {"current": bindings[key], "recorded": snapshot,
+                                    "recorded_scope": "text_bound" if snapshot is not None else "legacy_only",
+                                    "current_matches_recorded": None if snapshot is None else snapshot == bindings[key],
+                                    "count_scope": "text_bound" if text_bound_count else "legacy_or_unestablished",
+                                    "text_bound_saturation_candidate": entry["saturation_candidate"] and text_bound_count},
         })
     completed = [s for s in ledger.get("sweeps") or [] if s.get("status") == "completed"]
     return {
@@ -1544,7 +1678,8 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
         "last_completed": {"sweep_id": completed[-1]["sweep_id"], "date": completed[-1]["date"]} if completed else None,
         "inputs": {"staleness": staleness is not None, "freshness": freshness_state,
                    "baseline_manifest": manifest_ref},
-        "notes": notes,
+        "notes": notes + ["Legacy clean counts remain unchanged. A current requirement-text snapshot does not "
+                          "upgrade legacy or mixed counted scopes into text-bound qualification."],
         "due": [f"{l['catalog']}/{l['layer_id']}" for l in layers if l["due"]],
         "saturation_candidates": [f"{l['catalog']}/{l['layer_id']}" for l in layers if l["saturation_candidate"]],
         "current_reopen_triggers": {f"{l['catalog']}/{l['layer_id']}": l["current_triggers"]
@@ -1575,7 +1710,7 @@ def render_markdown(report: dict) -> str:
         "A sweep is started by a person in an agent-lab coordinator session (recipes/saturation-sweep.md); "
         "this report makes no model calls.",
         "",
-        "| Layer | Research status | Clean count | Candidate | Last sweep | Reset / reopen |",
+        "| Layer | Research status | Legacy clean count | Legacy candidate | Last sweep | Reset / reopen |",
         "| --- | --- | --- | --- | --- | --- |",
     ]
     for layer in report["layers"]:
@@ -1599,7 +1734,9 @@ def scope_hashes(root: Path) -> dict:
     rows = research_rows(root)
     return {"platform_profiles_sha256": platform_profiles_sha256(load_json(root, ADOPTION)),
             "requirement_sha256": {f"{catalog}/{layer_id}": requirement_sha256(row)
-                                   for (catalog, layer_id), row in rows.items()}}
+                                   for (catalog, layer_id), row in rows.items()},
+            "requirement_bindings": {f"{catalog}/{layer_id}": binding
+                                     for (catalog, layer_id), binding in layer_requirement_bindings(root).items()}}
 
 
 def frozen_scope(root: Path, returns_ref, discovery_ref) -> dict | None:
@@ -1616,8 +1753,13 @@ def frozen_scope(root: Path, returns_ref, discovery_ref) -> dict | None:
         return None
     if not isinstance(target, dict):
         return None
-    return {field: target[field] for field in FROZEN_SCOPE_FIELDS
-            if isinstance(target.get(field), str) and HEX64.fullmatch(target[field])}
+    frozen = {field: target[field] for field in FROZEN_SCOPE_FIELDS
+              if isinstance(target.get(field), str) and HEX64.fullmatch(target[field])}
+    if "requirement_binding" in target:
+        validate_requirement_binding(target["requirement_binding"], target.get("catalog"), target.get("layer_id"),
+                                     target.get("requirement_sha256"))
+        frozen["requirement_binding"] = copy.deepcopy(target["requirement_binding"])
+    return frozen
 
 
 def complete_result(root: Path, ledger: dict, result: dict) -> dict:
@@ -1670,6 +1812,8 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
             # The workers evaluated the scope frozen before the run, not today's files: record that
             # scope, so a change during the sweep stands as a current requirement or platform trigger.
             ordered.update(frozen)
+        if "requirement_binding" in layer and layer["requirement_binding"] != ordered.get("requirement_binding"):
+            raise LedgerError("result layer requirement_binding must match explicit retained frozen discovery")
         for field in ("votes", "votes_note", "discovery_ref", "calls", "proposed"):
             if field in layer:
                 ordered[field] = layer[field]
