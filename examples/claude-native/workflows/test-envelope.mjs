@@ -465,7 +465,7 @@ function agentOptionLiterals(src) {
   // arguments (state changes need its explicit allow_state_change flag).
   const reviewerTools = reviewer.split(',').map((t) => t.trim()).filter(Boolean).sort()
   const expectedReviewerTools = ['Read', 'Glob', 'Grep', 'ToolSearch',
-    'mcp__serena__find_symbol', 'mcp__serena__find_referencing_symbols', 'mcp__serena__find_declaration', 'mcp__serena__find_implementations', 'mcp__serena__get_symbols_overview', 'mcp__serena__get_diagnostics_for_file',
+    'mcp__serena__initial_instructions', 'mcp__serena__find_symbol', 'mcp__serena__find_referencing_symbols', 'mcp__serena__find_declaration', 'mcp__serena__find_implementations', 'mcp__serena__get_symbols_overview', 'mcp__serena__get_diagnostics_for_file',
     'mcp__socraticode__codebase_search', 'mcp__socraticode__codebase_symbol', 'mcp__socraticode__codebase_impact', 'mcp__socraticode__codebase_flow',
     'mcp__jcodemunch__route', 'mcp__jcodemunch__order',
     'mcp__plugin_context-mode_context-mode__ctx_execute', 'mcp__plugin_context-mode_context-mode__ctx_execute_file', 'mcp__plugin_context-mode_context-mode__ctx_batch_execute', 'mcp__plugin_context-mode_context-mode__ctx_search',
@@ -510,14 +510,14 @@ function agentOptionLiterals(src) {
   const expectedResearcherTools = ['Read', 'Glob', 'Grep', 'Bash', 'WebSearch', 'ToolSearch',
     ctx('ctx_batch_execute'), ctx('ctx_execute'), ctx('ctx_execute_file'), ctx('ctx_fetch_and_index'), ctx('ctx_search'),
     'mcp__qmd__query', 'mcp__qmd__get', 'mcp__ai-memory__memory_query',
-    'mcp__serena__find_symbol', 'mcp__serena__find_referencing_symbols', 'mcp__serena__get_symbols_overview',
+    'mcp__serena__initial_instructions', 'mcp__serena__find_symbol', 'mcp__serena__find_referencing_symbols', 'mcp__serena__get_symbols_overview',
     'mcp__jcodemunch__route', 'mcp__jcodemunch__menu', 'mcp__jcodemunch__order'].sort()
   expect('agents: stack-researcher tool surface is exactly the reviewed list', JSON.stringify(toolsOf('stack-researcher')) === JSON.stringify(expectedResearcherTools))
   const expectedVerifierTools = ['Read', 'Glob', 'Grep', 'Bash', 'ToolSearch', ctx('ctx_batch_execute'), ctx('ctx_execute'), ctx('ctx_execute_file'), ctx('ctx_search')].sort()
   expect('agents: stack-verifier tool surface is exactly the reviewed list', JSON.stringify(toolsOf('stack-verifier')) === JSON.stringify(expectedVerifierTools))
   // Serena binds the parent session's project once at startup (--project-from-cwd; its claude-code context is
   // single-project), so a worktree builder's Serena edit would change that checkout, not the worktree.
-  const SERENA_READ = ['find_symbol', 'find_referencing_symbols', 'find_declaration', 'find_implementations', 'get_symbols_overview', 'get_diagnostics_for_file'].map((t) => 'mcp__serena__' + t)
+  const SERENA_READ = ['initial_instructions', 'find_symbol', 'find_referencing_symbols', 'find_declaration', 'find_implementations', 'get_symbols_overview', 'get_diagnostics_for_file'].map((t) => 'mcp__serena__' + t)
   expect('agents: isolated-builder grants only Serena read tools', toolsOf('isolated-builder').length > 0 && toolsOf('isolated-builder').filter((t) => t.startsWith('mcp__serena__')).every((t) => SERENA_READ.includes(t)))
   const bodyOf = (agent) => readOr(join(dir, agent + '.md')).split(/^---$/m)[2] || ''
   expect('agents: stack-researcher fetches pages through Context Mode and returns findings inline', /`ctx_fetch_and_index`/.test(bodyOf('stack-researcher')) && /inline/.test(bodyOf('stack-researcher')))

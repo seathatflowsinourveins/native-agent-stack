@@ -25,6 +25,9 @@ BUDGET_BYTES = 4_100  # 4,099 measured bytes; jCodeMunch-route-arguments addendu
 # route(execute=true) sends the whole task as the query; evidence/artifacts/jcodemunch-route-args-20260927/.
 JCODEMUNCH_MENU_CLAUSE = 'jcodemunch route(task, repo: ".") (no execute), menu(query?), order(action, own args) on indexed repos;'
 JCODEMUNCH_CLAUSE = 'jcodemunch route(task, repo: ".") (no execute), order(action, own args) on indexed repos;'
+JCODEMUNCH_RESTRICTED_CLAUSE = ('jcodemunch on indexed repos: first order(action="jcodemunch_guide",args={}); '
+                               'then route(task=...,model=<actual caller model>) (no execute); '
+                               'then granted read-only order actions with own args.')
 # Exact agent_type -> sibling block; every other non-blind type receives BLOCK.
 ROLE_BLOCKS = {
     "stack-researcher": "token-lanes-block.researcher.md",
@@ -81,6 +84,7 @@ NEEDS = (
     (r"\bctx_batch_execute\b", CTX + "ctx_batch_execute"),
     (r"\bctx_search\b", CTX + "ctx_search"),
     (r"\bctx_fetch_and_index\b", CTX + "ctx_fetch_and_index"),
+    (r"\binitial_instructions\b", "mcp__serena__initial_instructions"),
     (r"\bfind_symbol\b", "mcp__serena__find_symbol"),
     (r"\bfind_referencing_symbols\b", "mcp__serena__find_referencing_symbols"),
     (r"\broute\(", "mcp__jcodemunch__route"),
@@ -169,9 +173,9 @@ class TokenLanesHookTests(unittest.TestCase):
         clauses = {
             "workflow-subagent": JCODEMUNCH_MENU_CLAUSE,
             "stack-researcher": JCODEMUNCH_MENU_CLAUSE[:-1] + ".",
-            "isolated-builder": JCODEMUNCH_CLAUSE,
-            "evidence-reviewer": JCODEMUNCH_CLAUSE,
-            "security-reviewer": JCODEMUNCH_CLAUSE,
+            "isolated-builder": JCODEMUNCH_RESTRICTED_CLAUSE,
+            "evidence-reviewer": JCODEMUNCH_RESTRICTED_CLAUSE,
+            "security-reviewer": JCODEMUNCH_RESTRICTED_CLAUSE,
         }
         for agent_type, clause in clauses.items():
             with self.subTest(agent_type=agent_type):
@@ -183,6 +187,87 @@ class TokenLanesHookTests(unittest.TestCase):
                     self.assertIn("menu(query?)", rule)
                 else:
                     self.assertNotIn("menu(", rule)
+
+    def test_serena_manual_loader_and_role_grants_precede_navigation(self):
+        # Serena c6fbd1c5 workflow_tools.py:28-40 and config_tools.py:44-49:
+        # the manual establishes the session id; selecting symbols alone cannot replace it.
+        manual = "mcp__serena__initial_instructions"
+        roles = ("stack-researcher", "evidence-reviewer", "security-reviewer", "isolated-builder")
+        for role in roles:
+            with self.subTest(role=role):
+                context = self.injected(role)
+                bootstrap = next(line for line in context.splitlines() if "ToolSearch" in line)
+                selected = bootstrap.split('"select:', 1)[1].split('"', 1)[0].split(",")
+                self.assertEqual(selected.count(manual), 1)
+                self.assertLess(selected.index(manual), selected.index("mcp__serena__find_symbol"))
+                name, tools, _skills = frontmatter(AGENTS / f"{role}.md")
+                self.assertEqual(name, role)
+                self.assertIn(manual, tools)
+                body = (AGENTS / f"{role}.md").read_text(encoding="utf-8").split("---\n", 2)[2]
+                first = body.lstrip().splitlines()[0]
+                self.assertTrue(first.startswith("Before Serena navigation, read initial_instructions"))
+                self.assertIn("once per session", first)
+                self.assertIn("manual and session_id", first)
+                self.assertIn("authorized switch", first)
+
+        for role in ("stack-verifier", "source-scout"):
+            with self.subTest(no_manual_role=role):
+                context = self.injected(role)
+                _name, tools, _skills = frontmatter(AGENTS / f"{role}.md")
+                self.assertNotIn(manual, tools)
+                self.assertNotIn("initial_instructions", context)
+                needed = lambda text: {tool for pattern, tool in NEEDS if re.search(pattern, text)} - set(tools)
+                self.assertEqual(needed(context), set())
+                # Control: the new requirement catches an actual unauthorized manual prescription.
+                self.assertEqual(needed(context + "\ninitial_instructions"), {manual})
+
+    def test_native_navigation_front_doors_keep_manual_and_policy_sequence(self):
+        # jCodeMunch d94049d0 server.py:446-463,4724-4752: task/model schema and native guide.
+        restricted = ("evidence-reviewer", "security-reviewer", "isolated-builder")
+        for role in ("workflow-subagent", "stack-researcher", *restricted):
+            with self.subTest(role=role):
+                context = self.injected(role)
+                rule = next(line for line in context.splitlines() if line.startswith("- Use Serena"))
+                if role not in restricted:
+                    self.assertLess(rule.index("initial_instructions"), rule.index("find_symbol"))
+                    self.assertIn("before Serena navigation", rule)
+                    self.assertIn("read its manual", rule)
+                    self.assertIn("switches need returned session_id", rule)
+                self.assertLess(rule.index('order(action="jcodemunch_guide",args={})'),
+                                rule.index("route(task=...,model=<actual caller model>)"))
+                self.assertIn("(no execute)", rule)
+                self.assertIn("Missing index: owner", rule)
+                self.assertNotIn("before Python navigation", rule)
+                if role in restricted:
+                    def guide_precedes_first_route(text):
+                        guide_at = text.find('order(action="jcodemunch_guide",args={})')
+                        first_route = re.search(r"\broute\s*\(", text)
+                        return guide_at >= 0 and first_route is not None and guide_at < first_route.start()
+
+                    self.assertTrue(guide_precedes_first_route(rule))
+                    # Control: leaving the legacy route advice before warmup reproduces the reviewed defect.
+                    self.assertFalse(guide_precedes_first_route('jcodemunch route(task, repo: "."); ' + rule))
+                    self.assertLess(rule.index("route(task=...,model=<actual caller model>)"),
+                                    rule.index("then granted read-only order actions"))
+                    self.assertNotIn("menu(", rule)
+                    _name, tools, _skills = frontmatter(AGENTS / f"{role}.md")
+                    self.assertNotIn("mcp__jcodemunch__menu", tools)
+                    needed = lambda text: {tool for pattern, tool in NEEDS if re.search(pattern, text)} - set(tools)
+                    self.assertEqual(needed(context), set())
+                    # Control: a menu prescription is rejected by these unchanged grants.
+                    self.assertEqual(needed(context + "\nmenu("), {"mcp__jcodemunch__menu"})
+
+    def test_restricted_role_bodies_deliver_the_same_read_only_policy_sequence(self):
+        guide = 'order(action="jcodemunch_guide",args={})'
+        opening = "route(task=...,model=<actual caller model>)"
+        for role in ("evidence-reviewer", "security-reviewer", "isolated-builder"):
+            with self.subTest(role=role):
+                body = (AGENTS / f"{role}.md").read_text(encoding="utf-8").split("---\n", 2)[2]
+                self.assertLess(body.index(guide), body.index(opening))
+                self.assertLess(body.index(opening), body.index("then granted read-only `order` actions"))
+                self.assertIn(opening + "` (no execute)", body)
+                self.assertTrue(body.lstrip().startswith("Before Serena navigation, read initial_instructions"))
+                self.assertNotIn("menu(", body)
 
     def test_injected_web_rule_routes_fetches_and_quotes_to_source_text(self):
         # context-mode v1.0.169 src/server.ts L3423-3478; Claude WebFetch contract:
@@ -291,6 +376,23 @@ class TokenLanesHookTests(unittest.TestCase):
                            "semantic-evidence-reviewer ", "my-plugin:semantic-evidence-reviewer"):
             with self.subTest(agent_type=agent_type):
                 self.assertEqual(self.injected(agent_type), BLOCK.read_text(encoding="utf-8"))
+
+    def test_researcher_catalog_lane_hands_ungranted_semantic_retrieval_to_coordinator(self):
+        context = self.injected("stack-researcher")
+        _name, tools, _skills = frontmatter(AGENTS / "stack-researcher.md")
+        self.assertIn("Use qmd query for keyword search and document retrieval", context)
+        self.assertIn("Hand meaning-based catalog requests to the coordinator", context)
+        self.assertIn("never run qmd embed or qmd pull", context)
+        self.assertNotIn("mcp__socraticode__codebase_search", tools)
+        self.assertNotRegex(context, r"\bcodebase_search\b")
+        self.assertNotIn("mcp__socraticode__", context)
+
+        def ungranted(body):
+            return {tool for pattern, tool in NEEDS if re.search(pattern, body)} - set(tools)
+
+        self.assertEqual(ungranted(context), set())
+        # Control: naming the semantic tool would violate the unchanged grant boundary.
+        self.assertEqual(ungranted(context + "\ncodebase_search"), {"mcp__socraticode__codebase_search"})
 
     def test_injected_text_names_only_tools_each_shipped_allowlist_grants(self):
         # For each shipped agent with an exact `tools:` allowlist, every mcp__ id the hook injects for its

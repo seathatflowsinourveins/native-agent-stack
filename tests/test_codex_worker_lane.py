@@ -50,7 +50,10 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # The session-lanes local-time line is recorded in 2026-10-05-user-facing-local-time.md.
 # RTK's unchanged 0.51.0 awareness fixture is pinned to e001f773 and checked
 # byte for byte in the rendered block, with local exceptions kept separately.
-TOP_RULE_SHA256 = "d21bb3bc0a2e68fb362af1d085da3761a08cc5ccec18ebd7ed16dd83d80bb3cd"
+# Protected canonical block stops at the session-lanes marker. The current pre-RTK
+# prefix also includes the approved session guidance; those are separate scopes.
+TOP_RULE_SHA256 = "f4b66fb52b0fceeed8b6207e0003de792cabfaef5ece49b6f5d6a445ee2d26ef"
+PRE_RTK_SHA256 = "ae8784589d6a042b1feedfbdb746544ba547dac8a38dfb84991923af591764fc"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n'
 
@@ -413,7 +416,7 @@ def write_fixture_mcp_server(directory: Path) -> Path:
 
 
 def template_segments() -> tuple[str, str, str]:
-    """(top-rule block, upstream awareness text, exceptions block) of the rendered instructions."""
+    """(pre-RTK prefix, upstream awareness text, exceptions block) of the rendered instructions."""
     text = lane.agents_block()
     body = text.split("\n", 1)[1]  # after the begin marker line
     top, rest = body.split("\n" + UPSTREAM_MARKER, 1)
@@ -435,13 +438,17 @@ class TemplateTests(unittest.TestCase):
         self.assertNotIn(lane.managed_block.RTK_INCLUDE, rendered)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
         self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
-        # This local 8,192-byte check covers the compact source (7,798 bytes).
-        # The rendered Codex carrier is 8,864 bytes, counted by the startup budget.
+        # This local 8,192-byte check covers the compact source (8,076 bytes).
+        # The rendered Codex carrier is 9,142 bytes, counted by the startup budget.
         self.assertLess(len(text.encode("utf-8")), 8192)
 
     def test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source(self):
         top, upstream, _ = template_segments()
-        self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
+        self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), PRE_RTK_SHA256)
+        session_marker = "<!-- native-agent-stack:session-lanes -->"
+        self.assertEqual(top.count(session_marker), 1)
+        canonical = top.split(session_marker, 1)[0]
+        self.assertEqual(hashlib.sha256(canonical.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
         native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
         self.assertEqual(hashlib.sha256(native.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
         fragment = (ROOT / lane.managed_block.RTK_AWARENESS_REL).read_bytes()

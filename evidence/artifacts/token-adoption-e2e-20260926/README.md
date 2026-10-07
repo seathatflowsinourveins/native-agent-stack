@@ -877,3 +877,32 @@ those files against these digests before probes.
   sanitized baseline, both merge-before-run;
 - the Codex half of the collector join;
 - a sealed quiet window W.
+
+## Amendment 4 (2026-10-07): prospective current role-body replacement rows
+
+This append-only amendment records replacement source pins for three adopted
+role bodies at `3ba087b28ef4910d6208b8bc81d295badc5be087`, composed with the
+landed foundation at `b59337210a7a1cdf9fada8a6c7d135d4793ad023`. These rows
+are re-derived from the candidate before the authorized source push. The command
+center records the actual landing head and merge chronology at landing.
+It supersedes only the `isolated-builder.md`, `stack-researcher.md` and
+`evidence-reviewer.md` body-hash requirements in Amendment 2, Amendment 3 and
+RUNBOOK's Freeze and preflight role-body paragraph. The other two Amendment 2
+body rows remain required; identity across adoption, project and installed user
+copies still blocks a future launch on a missing or differing copy.
+
+| Role body | SHA256 after Amendment 4 |
+| --- | --- |
+| `isolated-builder.md` | `e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096` |
+| `stack-researcher.md` | `5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240` |
+| `evidence-reviewer.md` | `84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399` |
+
+All prior text and seals remain history. The sealed protocol, runner, RUNBOOK
+and fixture bytes are unchanged, so their existing Amendment 3 seal still
+applies. Previous executions retain their original body identities and
+interpretation; no earlier record is rewritten or recoded.
+
+Current execution/result status was not established by this structural CI
+repair. The owner must resolve that status before any future execution, using
+the command center's landing chronology. This amendment is not a run,
+qualification, result or execution authorization.

@@ -53,15 +53,15 @@ tokens; behavior and exit code are unchanged.
 
 <!-- native-agent-stack:rtk-exceptions -->
 
-The exceptions below override RTK's blanket prefix and output/exit-status assurances.
-rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses its exclusion list. Preserve output and exit status for the forms below with native commands or `rtk proxy <command>`:
+RTK prefix/output/exit exceptions:
+rtk 0.51.0 needs `--shell` for positional expansion; explicit `rtk` prefix bypasses exclusions. For the forms below use native commands or `rtk proxy <command>`:
 - A skill's `SKILL.md`: read it with plain `sed -n '1,400p' <path>` (no `rtk` prefix, not `cat`/`head`/`tail`) so Codex counts the load as `codex.skill.injected`.
-- `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
+- `git show REV:path` (any; `git -C DIR show REV:path` too): ~8 KiB cap.
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
-- `git branch`: rtk can list a branch checked out in another worktree as remote-only.
-- `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
-- `jq`: rtk keeps 40 lines of at most 120 characters.
-- `find` on a path that may not exist: rtk exits 0 with no output.
+- `git branch`: may mark other-worktree branches remote-only.
+- `git log` full: silent 10-commit cap; no merges.
+- `jq`: <=40 lines of <=120 chars.
+- `find`, path may be absent: exit 0, no output.
 
-Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
+Never `rtk` shell builtins (`cd`/`export`/`source`): exit 127 stops `&&`.
 '''

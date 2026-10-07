@@ -3299,7 +3299,7 @@
    "key": "codex:config:otel.environment",
    "disposition": "enabled",
    "reason": "set in the configuration of both hosts (read 2026-10-04); the cited record names it",
-    "source": "examples/codex-native/README.md:188",
+     "source": "examples/codex-native/README.md:214",
    "carrier": "host configuration",
    "value": null,
    "scope": "both",

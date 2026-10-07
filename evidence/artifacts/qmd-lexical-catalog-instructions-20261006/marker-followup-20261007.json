@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "unit": "qmd-instructions-release-marker-followup",
+  "lane": "foundation",
+  "evidence_class": [
+    "source-review",
+    "local-integration-check",
+    "structural-validation"
+  ],
+  "authorization": {
+    "co_op_answer": "A12, 2026-10-07T00:30:09Z",
+    "decision": "The two minimal notes are this PR's required release contract; foundation document overlap is resolved at the single landing rebase, without reserving these paths.",
+    "queued_branch_boundary": "A13 leaves PR803 to its landing writer; this lane changes only its QMD instruction branch."
+  },
+  "source_contract": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "pin": "6bf29814eae0d23fb8e99185e7df073fdce79583",
+    "path": "tests/test_adoption_docs_consistency.py",
+    "lines": "459-505",
+    "release_tag": "v2026.10.05.1",
+    "release_commit": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9",
+    "claim": "Current pages mentioning a changed install input must identify that it changed after the selected release."
+  },
+  "changes": [
+    {
+      "path": "adoption/bootstrap.md",
+      "line": 438,
+      "indent_spaces": 5,
+      "line_count_preserved": true,
+      "note": "The catalog retrieval instructions in these blocks changed after `v2026.10.05.1`."
+    },
+    {
+      "path": "adoption/platforms/linux-wsl2-new-distro.md",
+      "line": 1117,
+      "indent_spaces": 0,
+      "line_count_preserved": true,
+      "note": "The catalog retrieval instructions in `adoption/hooks/claude/` changed after `v2026.10.05.1`."
+    }
+  ],
+  "prior_receipt": {
+    "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819-followup-20261007.json",
+    "sha256": "426613d02256fa1330964043294eaf36019c6d82adfa67d55103dbb5bd2fe37d",
+    "retained_unchanged": true
+  },
+  "retained_prior_results": [
+    {
+      "raw_log": "j819-tests.first.log",
+      "sha256": "2dab24339d2db69d8356c13d12f20c2ef26ca569c0b4c4c055f626f0191268fb",
+      "tests": 486,
+      "exit_code": 1,
+      "failures": 1,
+      "skips": 20,
+      "scope": "The earlier bounded run failed this PR's missing release-marker contract."
+    },
+    {
+      "raw_log": "j819-docs-qualified.log",
+      "sha256": "f88d242090010f68fab5052433f4458c58c65d401e15b05f6849f7b39860bc39",
+      "tests": 39,
+      "exit_code": 0,
+      "skips": 1,
+      "scope": "Conditional run with uncommitted proposed notes; the result is retained separately from the new approved source."
+    }
+  ],
+  "qualification": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_adoption_docs_consistency",
+    "umask": "022",
+    "tests": 39,
+    "exit_code": 0,
+    "skips": 1,
+    "duration_seconds": 16.886,
+    "raw_log": "j819-marker-docs.log",
+    "raw_log_sha256": "e7e6964d268335dec8507a3ac9bde4311d5a741cc50f630a54655c342260d756",
+    "log_lifecycle": "The fresh a12-marker-docs.log was renamed to j819-marker-docs.log without changing its bytes; no prior log was overwritten."
+  },
+  "readback": {
+    "six_preexisting_artifacts_byte_identical": true,
+    "existing_decision_byte_identical": true,
+    "original_note_anchor_indentation_preserved": true,
+    "no_grant_model_effort_or_rtk_change": true,
+    "unpublished_hot_commit_fold": {
+      "previous": "2b8d15f1ddea63ecca632193721563cae9ae3d45",
+      "unchanged_source_parent": "6bf29814eae0d23fb8e99185e7df073fdce79583",
+      "scope": "Only the owned unpublished hot-file commit is folded into the final checksum/registry commit; no published history or base is changed."
+    }
+  },
+  "host_changes": false,
+  "limits": [
+    "This is a local release-contract check on current documentation, not upstream tool acceptance or a live catalog cutover.",
+    "No new 486-test matrix was run; the new check covers only the approved marker repair.",
+    "Historical receipts, prior failed/conditional logs and decided text remain unchanged.",
+    "The root publishes one content head for review; the landing rebase waits for the co-op's notice after PR803 lands."
+  ]
+}

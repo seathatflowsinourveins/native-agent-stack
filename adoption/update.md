@@ -220,19 +220,22 @@ CI validates public artifacts and code behavior. It does not log in, place broke
 
 ## Refresh only adopted retrieval
 
-On a host that already adopted the named index:
+Run this workflow only after the configuration owner has applied and read back
+the `native-agent-stack-catalog-lex` cutover in both clients. An older adopted
+index is not that prerequisite: leave its migration to the owner. For this
+catalog, never run `qmd embed` or `qmd pull`.
 
 ```sh
-qmd --index native-agent-stack-catalog update
-qmd --index native-agent-stack-catalog status   # read "Vectors: N embedded"
-qmd --index native-agent-stack-catalog embed    # only when N is above 0
-qmd --index native-agent-stack-catalog search "native worker" \
+qmd --index native-agent-stack-catalog-lex update
+qmd --index native-agent-stack-catalog-lex status   # confirm the lexical index has no vectors
+qmd --index native-agent-stack-catalog-lex search "native worker" \
   -c us-equities-foundation -n 3 --format json
+qmd --index native-agent-stack-catalog-lex get "$RETURNED_QMD_URI:1:40"
 ```
 
-`update` re-indexes changed files and computes no vectors. Where the index carries embeddings (`status` reports `Vectors:` above 0), `embed` then embeds only the documents still lacking current vectors, such as new or changed ones (`embed -f` would re-embed everything); without it, the `vec` and `hyde` arms of `query` miss those documents. The lexical profile of [native catalog setup](../catalogs/us-equities/native-workflows.md) carries no vectors and skips `embed`; it also avoids a plain `query`, which expands the text with one model and reranks with another, both downloaded on first use. A `query` made of typed lexical searches with `rerank` off is model-free ([recipes](../recipes/README.md)). `update`'s closing "Run 'qmd embed'" notice prints on any index with unembedded documents, lexical ones included, so it is not the signal. Sources, qmd `v2.8.3`: README [L556](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L556), [L644-L651](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L644-L651) and [L1016-L1018](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1016-L1018); `src/cli/qmd.ts` [L561](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L561) and [L994-L1002](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L994-L1002); `src/store.ts` [L1974-L1978](https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1974-L1978).
+`update` re-indexes changed files and computes no vectors. Its closing embedding notice is not authorization to embed or pull a model. The owner's ruled lexical index keeps BM25 retrieval, query expansion and reranking; meaning-based catalog search uses `codebase_search` with the main checkout's explicit `projectPath`. A typed lexical MCP request can optionally set `rerank: false`; it is not a catalog-wide policy, and the owner's cutover acceptance keeps reranking on and requires no "Reranker unavailable" warning. Sources: QMD `v2.8.3` [MCP typed searches and optional reranking, `src/mcp/server.ts:321-335`](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L321-L335), [bounded CLI retrieval, `README.md:1033-1037`](https://github.com/tobi/qmd/blob/v2.8.3/README.md#L1033-L1037), and the [dated catalog decision clarification](../docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md#2026-10-07-clarification-kept-reranking-and-current-maintenance).
 
-Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. A host that adopted the index before 2026-09-27 adds the two foundation collections, `foundation-adoption` and `foundation-docs`, once with the commands there; the carrier names all four collections in every `query`. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
+Set `RETURNED_QMD_URI` to an exact URI returned by the scoped search, then retrieve a bounded range. The configuration owner sets up the four named collections during cutover; this refresh procedure adds none. Do not index the whole home or authentication directories. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change retrieval quality.
 
 ## Apply the skills manifest
 
@@ -410,15 +413,19 @@ use or add a tested receipt-aware selective synchronization path there. A
 source render/check is separate from installing the resulting registry. No
 selective installed-registry command is supplied by this repository.
 
-For an adopted catalog QMD index, verify its selected collection roots point to
-this source revision first. Follow [catalog retrieval](../docs/catalog-retrieval.md)
-for a path-only relocation that preserves masks, contexts, models and unrelated
-collections; `update` alone does not move an old root. Then:
+After the configuration owner applies and reads back the lexical cutover,
+verify `native-agent-stack-catalog-lex` collection roots point to this source
+revision. An older catalog index waits for the owner's migration. Follow
+[catalog retrieval](../docs/catalog-retrieval.md) for an authorized path-only
+relocation preserving masks, contexts and unrelated collections; `update` alone
+does not move a root. Never run `qmd embed` or `qmd pull`. Then:
 
 ```sh
-qmd --index native-agent-stack-catalog update
-qmd --index native-agent-stack-catalog status
-qmd --index native-agent-stack-catalog embed   # only if this adopted index already carries vectors
+qmd --index native-agent-stack-catalog-lex update
+qmd --index native-agent-stack-catalog-lex status
+qmd --index native-agent-stack-catalog-lex search "native worker" \
+  -c us-equities-foundation -n 3 --format json
+qmd --index native-agent-stack-catalog-lex get "$RETURNED_QMD_URI:1:40"
 ```
 
 A source/text/index refresh is not a runtime re-pin or promotion. Retain reported

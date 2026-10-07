@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "unit": "qmd-instructions-j819-followup",
+  "lane": "foundation",
+  "base": "5e2b661c4396cba3692de79f95968327674d7634",
+  "evidence_class": [
+    "source-review",
+    "local-integration-check",
+    "structural-validation"
+  ],
+  "sources": [
+    {
+      "repository": "tobi/qmd",
+      "pin": "v2.8.3",
+      "path": "src/mcp/server.ts",
+      "lines": "321-335",
+      "claim": "Typed lexical subqueries are supported and rerank is optional with default true."
+    },
+    {
+      "repository": "tobi/qmd",
+      "pin": "v2.8.3",
+      "path": "README.md",
+      "lines": "1033-1037",
+      "claim": "The CLI get command supports a bounded line-range suffix."
+    },
+    {
+      "ruling": "local-models-rulings-wf_96bbdf83-4f5.json",
+      "sha256": "cc8dec6a8981966fdc6dfcb2929b6722843e30bd526c3b981e9289cdedd8059a",
+      "lines": "22,34,160,181",
+      "claim": "The lexical index keeps BM25, query expansion and reranking; owner acceptance uses reranking on with no Reranker unavailable warning."
+    }
+  ],
+  "repairs": {
+    "P2a": "Both current adoption/update.md maintenance workflows wait for the owner-applied lexical cutover and use native-agent-stack-catalog-lex update/status/search/get; no executable embed or pull branch remains.",
+    "P2b": "Current carriers make rerank:false optional for each request; the exact routing rule and researcher coordinator handoff remain intact.",
+    "decision_clarification": "An explicitly requested dated addendum preserves the ruled reranker and rerank-on acceptance; original decided text is retained unchanged above it."
+  },
+  "retained_decision_prefix": {
+    "file": "docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md",
+    "bytes": 4672,
+    "sha256": "b56f527fa2f2e71d0b4ebebc95b4fa8d09707039d236856e43575f1478d0d6d8",
+    "prefix_unchanged": true
+  },
+  "prior_receipts": [
+    {
+      "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/receipt.json",
+      "sha256": "acdffe5707ba8f652f5d08a4e432d714afb5c302815131a3756c158753860c73",
+      "retained_unchanged": true
+    },
+    {
+      "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/citation-followup.json",
+      "sha256": "7be0ec4b9a2b0fd490e2d856d3550db0d6dbffd4eb0bb165fa705d2c6c7ebc0a",
+      "retained_unchanged": true
+    },
+    {
+      "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/researcher-availability-followup.json",
+      "sha256": "81b87d0bfa5b79229d77abe9ff92635d4d1723676af62f2fedfdf5ca8598b2e1",
+      "retained_unchanged": true
+    }
+  ],
+  "readback": {
+    "native_render_matches_codex_user_copy": true,
+    "all_ten_roles_retain_exact_base_f4": true,
+    "rtk_exception_count": 7,
+    "non_instruction_role_fields_preserved": true,
+    "compact_template_bytes": 7787,
+    "rendered_template_bytes": 8853,
+    "top_rule_sha256": "7226fa50a1cfed70b8dcf28eddbd3786c71a035294af6e488e1a9725cb2ac31f",
+    "researcher_sha256": "bcce9561bfe2cb8476376b47a9a32cecdd056ec725156027506c54a5ae831627",
+    "README_otel_environment_source_remains_line_192": true,
+    "historical_client_configuration_record_unchanged_and_matches": true
+  },
+  "retained_failed_run": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_codex_agents tests.test_codex_roles tests.test_managed_block tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_new_wsl_client_config.RecordTests tests.test_adoption_docs_consistency tests.test_upstream_surface_watch",
+    "umask": "022",
+    "exit_code": 1,
+    "tests": 486,
+    "failures": 1,
+    "skips": 20,
+    "duration_seconds": 84.847,
+    "failed_test": "tests.test_adoption_docs_consistency.UnreleasedStepMarkerTests.test_pages_mentioning_a_changed_install_input_say_so",
+    "cause": "Two current pages lack the release-marker notes required for the original PR819 Claude carrier change; this predates J819 but is caused by this PR, not main or PR803.",
+    "release_tag": "v2026.10.05.1",
+    "release_commit": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9",
+    "source_contract": "tests/test_adoption_docs_consistency.py:459-505",
+    "raw_log": "Retained privately as j819-tests.first.log in the lane's durable QMD instruction directory."
+  },
+  "proposed_notes_check": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_adoption_docs_consistency",
+    "exit_code": 0,
+    "tests": 39,
+    "skips": 1,
+    "duration_seconds": 16.301,
+    "source_condition": "Ran WITH two uncommitted proposed release-marker notes; both were subsequently restored before registration and validation pending owner-file clearance.",
+    "raw_log": "Retained privately as j819-docs-qualified.log in the same directory.",
+    "proposed_patch_sha256": "0fef4cec369e438aca5ab5b120cbe3e9d94d175262bdc66dc8fa96e9b41c3aca",
+    "publication_held": true
+  },
+  "retained_validation_attempt": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B scripts/validate.py",
+    "exit_code": 1,
+    "cause": "Removing the proposed bootstrap note accidentally retained one extra indentation space; the unchanged-file hash and byte checks rejected it.",
+    "correction": "Restore the exact original indentation with apply_patch; leave both held documents and their registry entries unchanged.",
+    "raw_log": "Retained privately as j819-validate.log."
+  },
+  "host_changes": false,
+  "limits": [
+    "No all-green test or final CI claim: the two release-marker notes await clearance on overlapping owner files.",
+    "The 39-test success belongs only to the proposed-notes source condition, not this restored checkpoint.",
+    "Known historical receipts and frozen catalog snapshots remain unchanged; the decision receives only the explicitly requested dated clarification.",
+    "No host cutover, QMD operation, model inference, credential read, index build or gateway change occurred.",
+    "The configuration owner still performs fresh-session rerank-on acceptance after the cutover."
+  ]
+}
