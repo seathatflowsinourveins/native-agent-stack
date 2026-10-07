@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "model_currency_j826_delta_checks",
+  "observed_at": "2026-10-07T04:42:08Z",
+  "reviewed_scaffold_head": "e1d439a4ccc2dacc266e1741964df60354ce7088",
+  "preparation_checkpoint": "7740e74aa4fd7ca465ccb568fcc095e56e2d2024",
+  "inventory_status": "pending",
+  "model_rows": 21,
+  "package_rows": 7,
+  "unresolved_groups": 8,
+  "scope": "Offline declaration fixes, source-reviewed partial inventory and proposed MinerU unit; no host activation, model inference or complete inventory acceptance.",
+  "commands": [
+    {
+      "command": "python3 -B -m unittest tests.test_model_currency tests.test_model_currency_propose tests.test_validate",
+      "exit_code": 0,
+      "returned_summary": "Ran 113 tests in 0.944s; OK",
+      "evidence_class": "synthetic_and_local_integration",
+      "stderr_sha256": "7b5452c3cc56cdf65c2e78f03e2b0af2593c7065a3205e4cc6d85350c1def300"
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_mineru_user_unit",
+      "exit_code": 0,
+      "returned_summary": "Ran 8 tests in 0.001s; OK after the dated guard-gap clarification",
+      "evidence_class": "synthetic_and_structural_validation",
+      "stderr_sha256": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a"
+    },
+    {
+      "command": "Offline actual-catalog policy check with today=2026-10-07 and component/decision-prefix comparisons",
+      "exit_code": 0,
+      "returned_summary": "21 models; seven packages; pending; zero policy errors; stack components unchanged from e1d439a4; decision prefix from 7740e74a byte-identical.",
+      "evidence_class": "structural_validation"
+    },
+    {
+      "command": "Recursive JSON Schema object-closure check",
+      "exit_code": 0,
+      "returned_summary": "11 complete object definitions; zero unclosed objects.",
+      "evidence_class": "structural_validation"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_summary": "No whitespace errors.",
+      "evidence_class": "structural_validation"
+    }
+  ],
+  "fixes": {
+    "P2a": "Package-bound models retain release_line origin metadata; Hub revisions require an exact 40-character SHA independently of package age. Valid and main-revision controls are included.",
+    "P2b": "Every complete schema object is closed and the offline validator rejects unknown fields. Positive and typo controls cover root, policy, model, package, binding, landscape, candidate and release-line objects.",
+    "P2c": "HTTPS sources reject whitespace, C0/C1 controls and invalid parsed ports. Both release and landscape authority controls are included."
+  },
+  "sources": [
+    "https://docs.python.org/3.13/library/urllib.parse.html#urllib.parse.urlsplit",
+    "https://json-schema.org/understanding-json-schema/reference/object#additionalproperties",
+    "native-agent-stack@7740e74aa4fd7ca465ccb568fcc095e56e2d2024:scripts/validate_foundation.py:49-53"
+  ],
+  "background_ruling": {
+    "evidence_class": "source_review_and_command_center_ruling",
+    "ruling_at_utc": "2026-10-07T04:15:00Z",
+    "current_source_packet_sha256": "941c0061085c030d1484809a5726088fa584e83ce2b336ac9d1bf106efcd74cb",
+    "previous_source_packet_sha256": "44679fd1d26dfec36b3b57cdbde2df4290d1b068118562cb8811bf3eb7cd6941",
+    "proposal_sha256": "cc8e79beebc274671c006ef0accb9ccaa96f02843329653dcc6995b01c162975",
+    "model_id": "claude-haiku-4-5-20251001",
+    "release_date": "2025-10-15",
+    "date_basis": "Vendor public launch date; the earlier model-ID suffix identifies its snapshot.",
+    "landscape_check_date": "2026-10-07",
+    "decision": "Keep the latest Haiku-line release for suitable simple background tasks; publication of a Haiku 5.x ID reopens this dated exception.",
+    "sources": [
+      "https://www.anthropic.com/news/claude-haiku-4-5",
+      "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
+      "https://platform.claude.com/docs/en/models/model-ids-and-versions"
+    ],
+    "host_boundary": "Removal of the earlier Sonnet override is a command-center observation. This lane reads no client settings and makes no background model request. Other frontier rows remain unchanged by J826b."
+  },
+  "mineru_guard": {
+    "state": "gap_dated",
+    "date": "2026-10-07",
+    "finding": "No documented embedded n_gpu_layers ingress in the inspected installed engine and pinned runtime; the maintained external wrapper route is available to the CC with its own lifecycle.",
+    "sources": [
+      "installed mineru_llama_cpp/engine.py:46-52,107-108",
+      "opendatalab/MinerU@c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93:mineru/model/vlm/runtime.py:175-180",
+      "opendatalab/MinerU@c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93:mineru/kit/vlm_server/llama_cpp_server.py:263-273"
+    ],
+    "scope": "Unit ships without an undocumented embedded guard. CPU qualification is a CC window precondition before activation, not a unit property."
+  },
+  "remaining_gates": [
+    "FILL item 7: fixwave owns the prerequisite six-field ai-memory plan patch, routed through #810 after finding 2. The original U2 generator was never committed and was not located in the bounded owner sources; this lane neither recreates it nor hand-edits its generated installer.",
+    "ai-memory 2.5.2 prefix support remains required; stack component 2.4.1 stays with its pin, saturation-audit and qualification owner.",
+    "Eight unresolved inventory groups remain as recorded in fill-source-review.json; vendor-page adapters and cross-repository discovery remain source-review gaps.",
+    "CC MinerU activation, CPU/alert-handler preconditions, native status and one fresh-shell public PDF smoke remain unaccepted by this source change.",
+    "Native daily timer execution with the filled inventory, whole-unit timeout recovery and upstream source failures remain unaccepted."
+  ],
+  "completeness_critic": {
+    "evidence_class": "independent_source_review",
+    "result": "No remaining P1/P2 in the inspected J826 declaration fixes; preserve pending coverage and native lifecycle boundaries.",
+    "next_landscape_inputs": ["Eight unresolved inventory groups", "Unsupported vendor-page adapters"]
+  },
+  "execution": {
+    "prefix": "rtk env TMPDIR=<owned-private-scratch> nice -n 19 ionice -c3",
+    "raw_outputs": "Mode-0600 private coordination files; hashes above. No unchanged upstream harness or model acceptance is claimed."
+  }
+}

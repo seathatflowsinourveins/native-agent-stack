@@ -475,7 +475,11 @@ GitHub-hosted macOS runner; see
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
      mcp get <name>` already reports a matching transport, command/URL, args
      and env variable names (values are not compared -- the running host owns
-     them). A same-named server with a different config is reported and left
+     them). `adoption/mcp/claude-user.json` changed after `v2026.10.05.1`:
+     SocratiCode's model and dimensions name Nemotron-3-Embed-8B/4096; its
+     endpoint values retain the portable host-example defaults. A target
+     host's registration supplies its own Qdrant and embedding endpoints.
+     A same-named server with a different config is reported and left
      unchanged unless `--replace-mcp` is given. That flag re-registers every
      differing server, including an `ai-memory` entry that names this host's
      own port. To change one server, remove it and rerun without the flag:

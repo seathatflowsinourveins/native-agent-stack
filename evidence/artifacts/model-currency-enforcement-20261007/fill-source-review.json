@@ -1,0 +1,462 @@
+{
+  "schema_version": 1,
+  "kind": "model_currency_fill_source_review",
+  "source_packet_sha256": "44679fd1d26dfec36b3b57cdbde2df4290d1b068118562cb8811bf3eb7cd6941",
+  "proposal_sha256": "12d36eb2c38bb02c88fb4fbd67e1f86ce435372835ebc52678f660d7e6839868",
+  "evidence_class": "source_review",
+  "inventory_status": "pending",
+  "model_rows": 20,
+  "package_rows": 7,
+  "ruling_timestamp_utc": "2026-10-07T01:35:00Z",
+  "prepared_at_utc": "2026-10-07T02:14:16Z",
+  "row_provenance": {
+    "claude-opus-5-5": {
+      "packet_role_index": 14,
+      "date_basis": "Anthropic's dated product-release entry, September 22, 2026; entry and exact ID re-read from the official page.",
+      "revision_basis": "The official Model IDs and versioning page states dateless IDs from the 4.6 generation onward identify a fixed snapshot.",
+      "sources": [
+        "https://platform.claude.com/docs/en/release-notes/overview#september-22-2026",
+        "https://platform.claude.com/docs/en/models/model-ids-and-versions"
+      ],
+      "host_observation": "Source packet only; no private settings or sign-in stores read by this child."
+    },
+    "claude-sonnet-5-5": {
+      "packet_role_index": 15,
+      "date_basis": "Anthropic's dated product-release entry, September 28, 2026; exact ID independently re-read.",
+      "revision_basis": "Canonical dateless snapshot ID, per the vendor's versioning page.",
+      "sources": [
+        "https://platform.claude.com/docs/en/release-notes/overview#september-28-2026",
+        "https://platform.claude.com/docs/en/models/model-ids-and-versions"
+      ]
+    },
+    "claude-fable-5-1": {
+      "packet_role_index": 16,
+      "date_basis": "Anthropic's September 1, 2026 release announcement, independently re-read.",
+      "revision_basis": "claude-fable-5-1 is the canonical pinned model ID; the client's [1m] suffix is not part of that model ID.",
+      "sources": [
+        "https://platform.claude.com/docs/en/release-notes/overview#september-1-2026",
+        "https://platform.claude.com/docs/en/models/model-ids-and-versions"
+      ],
+      "host_observation": "Consumer selection is a dated command-center observation, not a new child read-back."
+    },
+    "gpt-6-1-sol": {
+      "packet_role_index": 17,
+      "date_basis": "OpenAI's dated September 29, 2026 product-release entry.",
+      "revision_basis": "The official model page lists gpt-6.1-sol in Snapshots and instructs callers to select that exact ID. No stronger immutable-serving guarantee is inferred.",
+      "sources": [
+        "https://developers.openai.com/api/docs/changelog",
+        "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+        "https://github.com/diegosouzapw/OmniRoute/pull/15167"
+      ]
+    },
+    "gpt-6-astra": {
+      "packet_role_index": 18,
+      "date_basis": "OpenAI's September 3, 2026 release entry; September 29 is an Ultrafast serving-mode entry and does not reset this release date.",
+      "revision_basis": "Exact model ID listed by the official model page's Snapshots section.",
+      "sources": [
+        "https://developers.openai.com/api/docs/changelog",
+        "https://developers.openai.com/api/docs/models/gpt-6-astra"
+      ]
+    },
+    "nemotron-3-embed-8b": {
+      "packet_role_index": 0,
+      "date_basis": "Pinned NVIDIA model card explicitly says Release Date 07/16/2026 at lines 99-101. The selected shard's upload is July 14 and the repository's August README change is neither product release date.",
+      "artifact": {
+        "path": "model-00001-of-00004.safetensors",
+        "last_commit": "dd9d06b1852ef836d3dc2fbd2b71a34356912759",
+        "upload_utc": "2026-07-14T07:39:23Z",
+        "lfs_sha256": "9f76c1359913d8bd47a00b84fa00e078369beed6eee4eec8bcd9662b59f79257"
+      },
+      "landscape_basis": "Command-center workflow KEEP at the ruled timestamp, with retained refuter corrections; this child is not a new benchmark or exhaustive sweep."
+    },
+    "qmd-qwen3-reranker": {
+      "packet_role_index": 1,
+      "date_basis": "Selected GGUF artifact upload on October 3, 2025, not its repository creation timestamp or the base model's May 29 publication.",
+      "artifact": {
+        "path": "qwen3-reranker-0.6b-q8_0.gguf",
+        "last_commit": "ff8a9aaee9ddbcdf483ec1b17bc62e864bcb8b04",
+        "upload_utc": "2025-10-03T10:14:15Z",
+        "lfs_sha256": "22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48"
+      },
+      "landscape_basis": "The source packet's KEEP/NAMED_EXCEPTION review, with primary candidate cards re-read; no native A/B by this child."
+    },
+    "qmd-query-expansion": {
+      "packet_role_index": 2,
+      "date_basis": "q4_k_m artifact upload timestamp, not repository creation.",
+      "artifact": {
+        "path": "qmd-query-expansion-1.7B-q4_k_m.gguf",
+        "last_commit": "148feabcee27dc0bada51c655f55a3245b4027c9",
+        "upload_utc": "2026-01-29T00:12:26Z",
+        "lfs_sha256": "000dfb1c06efa6a049e9f64ba921c3740e2454f62abab6fa10e77bd30bb2bcc0"
+      },
+      "landscape_basis": "Source packet KEEP/NAMED_EXCEPTION; exact candidate SHA independently confirmed."
+    },
+    "potion-code-16m-v2": {
+      "packet_role_index": 3,
+      "date_basis": "Selected safetensor upload July 4, 2026. July 13 repository metadata reflects a later README edit.",
+      "artifact": {
+        "path": "model.safetensors",
+        "last_commit": "133fa7b7d24c9ddcbe25b4a8ca8bb74469300101",
+        "upload_utc": "2026-07-04T12:24:52Z",
+        "lfs_sha256": "75cf7a6c2171b230ad19b1e7d8e0b1aee86da5a02af8e7cacedd9921d227623c"
+      },
+      "landscape_basis": "Corrected source packet KEEP, not a new complete sweep. The generic miru-codev3 family name was resolved to actual published repositories by the installed HF CLI."
+    },
+    "mineru-vlm-gguf": {
+      "packet_role_index": 5,
+      "date_basis": "Selected third-party GGUF/mmproj artifact publication August 13, 2026. The packet separately records base safetensors upload May 20 and card announcement May 21; those dates are not conflated.",
+      "artifacts": [
+        {
+          "path": "MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
+          "last_commit": "af4da6ef09ac121aa238a19c0c098d464002352f",
+          "upload_utc": "2026-08-13T01:51:22Z",
+          "lfs_sha256": "3f3523429c880d675c0330cb3de78240452bc40a961d037e24f91ab8488f03e7"
+        },
+        {
+          "path": "mmproj-MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
+          "last_commit": "b6d53393200d6656643c1f5a22c704168c260b31",
+          "upload_utc": "2026-08-13T01:51:28Z",
+          "lfs_sha256": "b6c08ab50352677f7396af45ee60682f353f55488e26911d8154bfc37514d3f8"
+        }
+      ],
+      "landscape_basis": "Command-center source packet KEEP; no child PDF/model run."
+    },
+    "mineru-onnx-bundle": {
+      "packet_role_index": 5,
+      "date_basis": "Maintainer-published ONNX export bundle: seven selected ONNX artifacts uploaded at 13:50:09Z September 10; the validated FormulaNet replacement at this selected SHA uploaded at 16:38:36Z the same day. This is export publication, not original Paddle/FormulaNet training or product release.",
+      "selected_onnx_file_count": 8,
+      "artifact_sources": {
+        "layout": "PaddlePaddle/PP-DocLayoutV2_onnx@7d44592493df02e28110d99de8ca4b1fbc7309bd",
+        "ocr_small_rec": "PaddlePaddle/PP-OCRv6_small_rec_onnx@b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+        "ocr_tiny_det": "PaddlePaddle/PP-OCRv6_tiny_det_onnx@2ba1506c0380b8f0b03dd142459aac66d4421f6c",
+        "other_exports": "opendatalab/MinerU-4_models_torch@2b3afb86f4d23fa623f6b2f4b2279ed4ef93a89d"
+      },
+      "original_checkpoints": "PP-DocLayoutV2, PP-OCRv6 Tiny Det/Small Rec, PP-OCRv4 seal, PP-FormulaNet_plus-M, PP-LCNet_x1_0_table_cls, SLANet_plus and unet need separately scoped original-source rows before completeness."
+    },
+    "headroom-kompress-int8-wo": {
+      "packet_role_index": 6,
+      "date_basis": "The selected int8-wo ONNX artifact's June 10 upload commit; both selected pin and September HEAD return the same last modifying commit and LFS SHA.",
+      "artifact": {
+        "path": "onnx/kompress-int8-wo.onnx",
+        "last_commit": "b1563631b35bfdcee37587ad530147497d820d4c",
+        "upload_utc": "2026-06-10T05:35:23Z",
+        "lfs_sha256": "c47ddd764dec5cf91fd1f10cf69e5538dd2a49d913828da7f6a993931cc7904f"
+      },
+      "landscape_basis": "Source packet KEEP/GATED with exact artifact metadata read at both revisions; no native compression run."
+    },
+    "kompress-modernbert-tokenizer": {
+      "packet_role_index": 6,
+      "date_basis": "Selected tokenizer configuration update, not a model-weight/product release. tokenizer_config.json's 8192-length change is January 15; tokenizer.json and special_tokens_map.json remain December 17, 2024.",
+      "artifacts": [
+        {
+          "path": "tokenizer_config.json",
+          "last_commit": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "upload_utc": "2025-01-15T20:11:48Z"
+        },
+        {
+          "path": "tokenizer.json",
+          "last_commit": "2b01747fbbcbd4e45df534b6328dd0fab9194b77",
+          "upload_utc": "2024-12-17T08:27:16Z"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "last_commit": "2b01747fbbcbd4e45df534b6328dd0fab9194b77",
+          "upload_utc": "2024-12-17T08:27:16Z"
+        }
+      ],
+      "requires_parent_scope": "Keep this row's role explicitly tokenizer configuration; do not describe January 15 as the ModernBERT product or weight release."
+    },
+    "headroom-bge-onnx": {
+      "packet_role_index": 9,
+      "date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "artifact": {
+        "path": "model_optimized.onnx",
+        "last_commit": "c32e6154d1bb7a0e47c5e745fd895e7700f44385",
+        "lfs_sha256": "51f1bd0addd6e859e42c2c8021a5e5461385bb676a649f4b269aa445449f2431"
+      },
+      "effective_age_basis": "Latest primary shipping package headroom-ai 0.40.0, published October 6, 2026. No package install or pin change is proposed.",
+      "base_model_date_leads": "The packet gives BGE base September 12, 2023 and MiniLM weights August 30, 2021; those product/base dates were not independently re-read by this child and are not substituted for selected ONNX export dates."
+    },
+    "headroom-minilm-onnx": {
+      "packet_role_index": 9,
+      "date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "artifact": {
+        "path": "model.onnx",
+        "last_commit": "cb27c1f221563ca44e58ad2a694965db39c8153d",
+        "lfs_sha256": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5"
+      },
+      "effective_age_basis": "Latest primary shipping package headroom-ai 0.40.0, published October 6, 2026. No package install or pin change is proposed.",
+      "base_model_date_leads": "The packet gives BGE base September 12, 2023 and MiniLM weights August 30, 2021; those product/base dates were not independently re-read by this child and are not substituted for selected ONNX export dates."
+    },
+    "headroom-technique-router-onnx": {
+      "packet_role_index": 9,
+      "date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "artifact": {
+        "path": "model_quantized.onnx",
+        "last_commit": "09241fb56a95c8db29a36a3d54489b9f5a138cb7",
+        "lfs_sha256": "c9b2fcc7431de3371bca8706ebcec43ceb096ae225cf086149e9b4f7b62305f6"
+      },
+      "effective_age_basis": "Latest primary shipping package headroom-ai 0.40.0, published October 6, 2026. No package install or pin change is proposed.",
+      "base_model_date_leads": "The packet gives BGE base September 12, 2023 and MiniLM weights August 30, 2021; those product/base dates were not independently re-read by this child and are not substituted for selected ONNX export dates."
+    },
+    "headroom-siglip-onnx": {
+      "packet_role_index": 9,
+      "date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "artifact": {
+        "path": "image_encoder_int8.onnx",
+        "last_commit": "8ac179c7408be8fa5eaa43db0ad306ef0e5391c4",
+        "lfs_sha256": "b0627132ef6965920a6c7f022d3881456489e756e0d5ee84652fd07a58c0e596"
+      },
+      "effective_age_basis": "Latest primary shipping package headroom-ai 0.40.0, published October 6, 2026. No package install or pin change is proposed.",
+      "base_model_date_leads": "The packet gives BGE base September 12, 2023 and MiniLM weights August 30, 2021; those product/base dates were not independently re-read by this child and are not substituted for selected ONNX export dates."
+    },
+    "magika-standard-v3-3": {
+      "packet_role_index": 7,
+      "date_basis": "Maintainer model changelog and introducing commit dated April 11, 2025; May 4, 2026 is the separate latest package date.",
+      "artifact": {
+        "git_blob": "e669a1120903d93417f57a1aedd1bc0000819b8b",
+        "size_bytes": 3163737,
+        "source_packet_sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c"
+      },
+      "effective_age_basis": "Latest Magika package release is older than 42 days, so this row carries the October 7 landscape exception."
+    },
+    "markitdown-magika-standard-v3-3": {
+      "packet_role_index": 7,
+      "date_basis": "Same immutable standard_v3_3 model publication; shipping converter package has its own latest release date September 21, 2026.",
+      "effective_age_basis": "Latest enclosing MarkItDown package, not a fabricated Magika 0.6.3 latest record.",
+      "limits": "Other venv/CLI copies are packet observations. Their enclosing package bindings need separate coverage before a complete host inventory."
+    },
+    "codebase-memory-static-nomic": {
+      "packet_role_index": 8,
+      "artifact_identity_basis": "The package's complete pinned Git tree names vendored/nomic/code_vectors.bin with the exact Git blob. Pinned NOTICE states these 40,856x768 int8 vectors are derived from nomic-ai/nomic-embed-code; this is a derived package artifact ID, not an invented Hugging Face checkpoint ID.",
+      "artifact": {
+        "package_commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+        "vendored_tree": "72dd5db1081d60b1c4273082a0565de35862ba49",
+        "git_blob": "6889c7cfe9a29beb87a8b63db9cbdc8f5eb34a38",
+        "size_bytes": 31377416
+      },
+      "date_basis": "Original upstream source-weight publication March 24, 2025 is verified by the first source safetensor shard's last modifying commit. The vendor's product announcement is March 27, separately recorded; neither comes from repository creation.",
+      "source_weight": {
+        "model_id": "nomic-ai/nomic-embed-code",
+        "main_sha_at_read": "11114029805cee545ef111d5144b623787462a52",
+        "path": "model-00001-of-00006.safetensors",
+        "upload_commit": "9a0457648f060c4279d4a3982d2d27a4df6fac59",
+        "upload_utc": "2025-03-24T15:43:52Z",
+        "vendor_announcement_date": "2025-03-27",
+        "vendor_announcement": "https://www.nomic.ai/news/introducing-state-of-the-art-nomic-embed-code"
+      },
+      "sources": [
+        "https://github.com/DeusData/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/vendored/nomic/NOTICE",
+        "https://github.com/DeusData/codebase-memory-mcp/tree/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/vendored/nomic"
+      ],
+      "requires_parent_scope": "Keep the row explicitly a package-derived static artifact and retain the original source-weight date. Do not claim it is the full 7B checkpoint or a new semantic invocation."
+    }
+  },
+  "unresolved": [
+    {
+      "group": "interim-live-qmd-embedding",
+      "packet_role_index": 21,
+      "known": {
+        "model_id": "Qwen/Qwen3-Embedding-0.6B-GGUF",
+        "revision": "370f27d7550e0def9b39c1f16d3fbaa13aa67728",
+        "selected_artifact": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+        "artifact_publication_date": "2025-07-14",
+        "artifact_upload_commit": "d20cf9c16f82914a21dbd9c645f56895fb1d7750",
+        "artifact_upload_utc": "2025-07-14T23:08:59Z",
+        "lfs_sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439",
+        "status_until_cc_cutover": "in_use",
+        "source": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/blob/370f27d7550e0def9b39c1f16d3fbaa13aa67728/Qwen3-Embedding-0.6B-Q8_0.gguf"
+      },
+      "missing": [
+        "A sourced within-seven-days landscape exception or the applied-and-read-back CC retirement. The source packet's own critic explicitly says no refresh unit evaluated this interim line/newer loadable alternatives."
+      ],
+      "reason": "Pending inventory does not waive the strict row age contract. Do not fabricate a landscape check merely from the planned qmd-to-lex cutover.",
+      "next": "CC supplies the scoped interim exception or records the actual cutover. Until then preserve the live consumer observation and corrected artifact date outside the strict model-row subset."
+    },
+    {
+      "group": "omniroute-local-loaders",
+      "packet_role_index": 10,
+      "known": {
+        "package_id": "omniroute",
+        "installed_and_latest": "v3.8.51",
+        "model_ids": [
+          "minishlab/potion-base-8M",
+          "Xenova/all-MiniLM-L6-v2",
+          "atjsh/llmlingua-2-js-tinybert-meetingbank"
+        ],
+        "behavior": "Source packet says resolve/main floats at first use; no weights observed on disk. Enablement was outside the allowed read surface."
+      },
+      "missing": [
+        "Exact selected weight revisions for the three loader defaults.",
+        "Primary product/artifact dates rather than MiniLM repository creation.",
+        "An allowed observation or owner decision settling whether these inert loaders are enabled."
+      ],
+      "next": "Retain PACKAGE_BOUND disposition as an explicit unresolved default set. Do not invent SHA revisions or fetch weights; CC controls configuration and any first-use qualification."
+    },
+    {
+      "group": "headroom-unpinned-torch-defaults",
+      "packet_role_index": 9,
+      "known": {
+        "package_id": "headroom-ai",
+        "latest_version": "0.40.0",
+        "model_ids": [
+          "sentence-transformers/all-MiniLM-L6-v2",
+          "google/siglip-base-patch16-224",
+          "chopratejas/technique-router",
+          "en_core_web_sm"
+        ],
+        "disposition": "Dormant package defaults; the source packet's [mcp]-only runtime lacks their extras."
+      },
+      "missing": [
+        "Exact revisions and original primary date/source for each unpinned default.",
+        "Distinct complete consumer bindings for torch, relevance, image and spaCy paths."
+      ],
+      "next": "Keep the four verified SHA-pinned ONNX defaults in the strict subset and these unpinned optional defaults explicitly pending."
+    },
+    {
+      "group": "speechrecognition-pocketsphinx",
+      "packet_role_index": 11,
+      "known": {
+        "artifact": "Uberi/speech_recognition:speech_recognition/pocketsphinx-data/en-US/language-model.lm.bin",
+        "source_commit": "77f2925a74bda79948dbdb7bf34517071b7ade27",
+        "source_commit_date": "2016-01-28",
+        "source": "https://github.com/Uberi/speech_recognition/commit/77f2925a74bda79948dbdb7bf34517071b7ade27",
+        "installed_shipping_package": "SpeechRecognition 3.16.1",
+        "latest_package": "3.17.0",
+        "latest_package_date": "2026-06-17",
+        "consumer": "Packet says no PocketSphinx package is installed and MarkItDown uses recognize_google; bundled data is inert."
+      },
+      "missing": [
+        "Exact file blob/digest for the bundled language model at the installed package.",
+        "Owner treatment of installed 3.16.1 versus latest 3.17.0: the current join contract would reject binding 3.16.1 to the latest package record.",
+        "A landscape exception if a current shipping package older than 42 days is retained."
+      ],
+      "next": "Route package drift to the existing owner; do not represent 3.16.1 as latest, install 3.17.0, or claim speech recognition acceptance."
+    },
+    {
+      "group": "trading-image-spacy",
+      "packet_role_index": 12,
+      "known": {
+        "model_ids": [
+          "en_core_web_sm",
+          "en_core_web_md"
+        ],
+        "revision": "3.8.0",
+        "release_date": "2024-09-30",
+        "primary_sources": [
+          "https://github.com/explosion/spacy-models/releases/tag/en_core_web_sm-3.8.0",
+          "https://github.com/explosion/spacy-models/releases/tag/en_core_web_md-3.8.0"
+        ],
+        "image_digest": "sha256:70071d1bbb90385deb60c7d20bc3830c7f4c79f6c09c5d1ade9196c009f68861",
+        "image_created_date_lead": "2026-10-01",
+        "state": "Packet reports the selected LEAN image is not running."
+      },
+      "missing": [
+        "Primary latest shipping-image release record and supported release-line identity; image creation is not automatically product release.",
+        "Exact artifact identities/digests for each pipeline as baked in that selected image.",
+        "Trading owner's package-bound treatment and any landscape exception."
+      ],
+      "next": "Hand to Trading/5f. No image pull, rebuild, container start or trading-file edit by this child."
+    },
+    {
+      "group": "mineru-original-companion-checkpoints",
+      "packet_role_index": 5,
+      "known": {
+        "selected_bundle": "opendatalab/MinerU-4_models_onnx@358310b4f64b95f9fefc372ad899356e4111f376",
+        "manifest": "https://huggingface.co/opendatalab/MinerU-4_models_onnx/blob/358310b4f64b95f9fefc372ad899356e4111f376/manifest.json",
+        "checkpoint_names": [
+          "PP-DocLayoutV2",
+          "PP-OCRv6 Tiny Det",
+          "PP-OCRv6 Small Rec",
+          "PP-OCRv4 seal",
+          "PP-FormulaNet_plus-M",
+          "PP-LCNet_x1_0_table_cls",
+          "SLANet_plus",
+          "unet"
+        ]
+      },
+      "missing": [
+        "Separate original checkpoint release dates/primary sources for all companions, if the inventory contract requires a row per underlying model rather than the selected export-bundle row.",
+        "The PP-DocLayoutV3 candidate's exact full identity/revision and original release-date source before its retained package-bound sub-exception is expanded."
+      ],
+      "next": "Keep the pinned export bundle row; make no complete-inventory claim. Reuse the manifest's exact source repository/revision fields for the follow-up, without model downloads."
+    },
+    {
+      "group": "legacy-magika-consumer-bindings",
+      "packet_role_index": 7,
+      "known": {
+        "model": "google/magika standard_v3_3",
+        "same_blob": "e669a1120903d93417f57a1aedd1bc0000819b8b",
+        "packet_observation": "The source packet reports fourteen identical model copies across venvs, Rust binaries and Headroom core."
+      },
+      "missing": [
+        "Latest enclosing-package records and exact consumer versions for every legacy/CLI copy. The verified Magika 1.0.3 and MarkItDown 0.1.8 joins cover two declared package routes, not all fourteen host observations."
+      ],
+      "next": "Do not collapse all old Magika 0.6.3 or crate copies into a fabricated latest-package claim."
+    },
+    {
+      "group": "other-source-packet-unresolved-roles",
+      "packet_role_indices": [
+        4,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "known_roles": [
+        "jCodeMunch semantic checkpoint not yet wired",
+        "TypeSafe Jev 1.13.0 release date/landscape",
+        "Jev P1 planned NLI candidates",
+        "Side-project Docling/rapidocr models",
+        "GPT Researcher default text-embedding-3-small",
+        "Trading catalog TimesFM/Chronos conditional models",
+        "Other-host Mac embedding selection",
+        "Codex auxiliary approvals-reviewer model"
+      ],
+      "missing": [
+        "These refresh-critic leads require their own scoped source/owner review before inventory_status can be complete. They are not silently resolved or included with invented dates."
+      ],
+      "next": "Parent/CC routes the remaining scopes; no model invocation or private model-cache/settings read by this child."
+    }
+  ],
+  "source_corrections": [
+    {
+      "claim": "Interim Qwen Q8_0 date derived from repository creation 2025-06-05.",
+      "correction": "Selected Q8_0 bytes were uploaded 2025-07-14T23:08:59Z in d20cf9c16f82914a21dbd9c645f56895fb1d7750. This is artifact publication; repo creation remains only a repository timestamp.",
+      "verification": "HfApi.get_paths_info at exact selected SHA, expand=True, token=False; main SHA independently still 370f27d...; exit 0."
+    },
+    {
+      "claim": "ModernBERT 2025-01-15 labels the tokenizer/model weights without distinguishing files.",
+      "correction": "tokenizer.json and special_tokens_map.json date from 2024-12-17; tokenizer_config.json's max-length update dates from 2025-01-15. The proposed paired-tokenizer row preserves January 15 specifically as configuration publication, not model product/weight release.",
+      "verification": "Native HfApi.get_paths_info on all three files at 8949b909...; current main SHA matches; exits 0."
+    },
+    {
+      "claim": "Nomic March 24 and announcement date are interchangeable.",
+      "correction": "The original source safetensor upload is March 24, 2025; Nomic's dated product announcement is March 27. The compiled package artifact has its own exact Git blob and shipping-package release date.",
+      "verification": "Source safetensor last_commit 9a045764... plus official Nomic announcement page and pinned Codebase Memory NOTICE/Git tree; exits 0."
+    },
+    {
+      "claim": "Takara-DS1/miru-codev3 is a single exact published repository.",
+      "correction": "It is a family label. Native HF CLI first returned not found for that name; publisher listing resolves tokenlearn@56cfb2cb..., distill-fuse@0d895da0... and dual@44af3347....",
+      "verification": "hf models list --author Takara-DS1 --search miru-codev3 --limit 12; exit 0, retaining the first lookup exit 1."
+    },
+    {
+      "claim": "OmniRoute vendor repository guessed as omniroute/omniroute.",
+      "correction": "The repository manifest's maintained source is diegosouzapw/OmniRoute. Its latest release remains v3.8.51, September 30, 2026.",
+      "verification": "Initial guessed GitHub latest-release endpoint returned HTTP 404/exit 1; exact manifests/stack.json source locator and official cached endpoint returned exit 0."
+    }
+  ],
+  "limitations": [
+    "inventory_status remains pending. The twenty proposed strict rows and seven package snapshots are a source-only subset, not a census of every installed/default/planned or other-host model.",
+    "Landscape dates refer to the command center's verified October 7 workflow KEEP decisions. This child re-read identity/date/candidate primary sources; it did not rerun those landscape votes, benchmark harnesses or native consumers.",
+    "No payload claims CC-applied configuration, model switch, model acceptance, package alignment, cryptographic artifact verification, or organic use.",
+    "HF file metadata proves selected artifact identity and the last modifying commit timestamp. It does not by itself prove first public availability, an official product launch, benchmark quality or complete history.",
+    "The Magika model-file GitHub Contents read was metadata-only for the above-1MB artifact; no base64 weight payload or model binary was returned to this child.",
+    "Hosted vendor_page lines remain source-review proposals in the current collector. Filling their rows does not qualify a new native newest-model adapter.",
+    "The incomplete original MinerU checkpoint decomposition and unresolved interim/default consumers must remain visible when the parent renders the pending inventory.",
+    "The package snapshots record upstream latest releases at read time and no install recommendation or cooldown waiver. Actual bumps retain security, integrity and qualification gates."
+  ]
+}

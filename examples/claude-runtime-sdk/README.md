@@ -8,28 +8,38 @@ bundles Claude Code 2.1.285. The SDK owns the agent loop, tool execution,
 native context/cache/compaction and sessions. Our script supplies worker-scoped
 transport, a bounded lifecycle and value-free observations.
 
-The default candidate `dva/claude-opus-5-max` is an advertised OmniRoute Claude
-route, pending live qualification. Its name does not attest the serving provider
-or model, and advertised Opus 5 is different from the native coordinator's
-Opus 5.5. This integration does not select a framework winner or certify every
+The former implicit candidate `dva/claude-opus-5-max` is superseded. This gateway
+example requires an explicit `--model` from the selected gateway's advertised
+Claude-family catalog; it does not choose an Opus default. At the pinned
+[OmniRoute Devin catalog](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/config/providers/registry/devin/catalog.ts#L48-L76),
+Opus routes name Opus 5, while the current Opus-role selection is native Opus 5.5.
+For that role use the existing native CLI, for example
+`claude -p --model claude-opus-5-5 --effort max`; this is a proposed invocation,
+not a new provider run. Replacing a gateway model string does not change this
+script's OmniRoute transport. This integration does not select a framework winner or certify every
 installed skill, hook, plugin, MCP server or background workflow. The coordinator
 retains its native session and authentication.
 
 ## Installation and configuration
 
-Use the installed uv 0.12.17 and the committed PEP 723 script lock. These are the
+Use the install plan's selected uv and the committed PEP 723 script lock. These are the
 [supported uv script commands](https://docs.astral.sh/uv/guides/scripts/#locking-dependencies);
 the package installation is the SDK's
 [official PyPI installation](https://github.com/anthropics/claude-agent-sdk-python/blob/f2204bb956bab02907aaf3cb88eb9dead28eaa35/README.md#installation).
 
 ```sh
 rtk uv lock --script examples/claude-runtime-sdk/worker.py --check
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight \
+  --gateway http://127.0.0.1:21128 --model "$ADVERTISED_CLAUDE_MODEL"
 ```
 
 Preflight makes no provider request. It reports selected options, package pin,
 loopback port and capability configuration without printing paths, settings or
-credentials. `CLAUDE_CODE_EFFORT_LEVEL` must be absent from the launcher process:
+credentials. Set `ADVERTISED_CLAUDE_MODEL` to an explicitly reviewed model ID.
+The examples name NativeStack2604's 21128 gateway; another host uses its own
+gateway root. The code's generic fallback remains unchanged, so every invocation
+on NativeStack2604 supplies `--gateway http://127.0.0.1:21128`.
+`CLAUDE_CODE_EFFORT_LEVEL` must be absent from the launcher process:
 the native variable can override the explicit `effort="max"`. Remove it only from
 the worker launch environment when needed; do not change the coordinator's
 environment or settings. The standalone worker adopts OmniRoute's pinned
@@ -95,6 +105,7 @@ their own completion and usage qualification.
 
 ```sh
 rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py \
+  --gateway http://127.0.0.1:21128 --model "$ADVERTISED_CLAUDE_MODEL" \
   --cwd "$WORKER_CHECKOUT" --setting-source project \
   --skill search-first --allow-tool Read --timeout 180 \
   --result-output "$PRIVATE_RUN/returned.txt" < "$PRIVATE_RUN/prompt.txt"
@@ -146,7 +157,8 @@ wrong-family, token-binding, missing-result, cancellation and cumulative-snapsho
 are not unchanged upstream tests or live provider evidence.
 
 ```sh
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight \
+  --gateway http://127.0.0.1:21128 --model "$ADVERTISED_CLAUDE_MODEL"
 rtk uv run --with claude-agent-sdk==0.2.162 \
   python -m unittest discover -s examples/claude-runtime-sdk/tests -v
 rtk uv run --with claude-agent-sdk==0.2.162 \

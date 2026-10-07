@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-profile-integration",
+  "observed_at": "2026-10-07T07:24:55Z",
+  "source_main": "3d7d4a4b2640c8583d8855670111ef5d023d3e03",
+  "source_head": "5a6842f1700520b94b78b74ade8b010b84c663ce",
+  "evidence_class": "local_integration",
+  "supersedes": {
+    "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+    "sha256": "ef3cc8d69fe92ae8a50c97dd2b5fa43d028edd8b0f751dbd4ab497136b3eeedf",
+    "scope": "Current generated-byte binding only; every old observation remains in the original receipt."
+  },
+  "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+  "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
+  "outputs": {
+    "docs/new-wsl-handbook.md": "b8e025dfc962856efa65e9c50abdaddbe4e79ba454585620b48764dbb02c5149",
+    "docs/new-wsl-handbook.json": "00ce932f64197e54fd4bf464379bdcb11b70b99cf0f41a8d909ad42042d21da4"
+  },
+  "inventory": {
+    "layers": 37,
+    "profile_entries": 78,
+    "projected_tools": 82,
+    "canonical_package_ids": 25
+  },
+  "validation": [
+    {
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "returned_status": "written",
+      "scope": "Existing repository generator; no installation, upstream model run or target-host acceptance."
+    }
+  ],
+  "source_contract": "native-agent-stack@5a6842f1700520b94b78b74ade8b010b84c663ce:tests/test_new_wsl_handbook.py:1672-1689",
+  "failed_conditions_retained": [
+    {
+      "command": "python3 -B -m unittest tests.test_new_wsl_handbook tests.test_stack_lifecycle tests.test_foundation_stack_pins",
+      "native_exit_code": 1,
+      "tests": 95,
+      "failure": "Stale generated handbook after current setup-page disclosures",
+      "stderr_sha256": "c7e6e64e58ef68d55fc59f4d312ba526741f9234b15b92471e1696d2494d0bcd"
+    },
+    {
+      "command": "Same 95-case suite after regeneration",
+      "native_exit_code": 1,
+      "tests": 95,
+      "failure": "Strict current-output test still referenced the immutable prior projection hashes",
+      "stderr_sha256": "6b69e4b4945fb7d3043c1f02529da690cbb6450b96052fbc93f531299f746ad3"
+    }
+  ]
+}

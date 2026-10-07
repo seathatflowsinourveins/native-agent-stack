@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "kind": "model_currency_scaffold_checks",
+  "observed_at": "2026-10-07T01:19:27Z",
+  "base_commit": "3d7d4a4b2640c8583d8855670111ef5d023d3e03",
+  "inventory_status": "pending",
+  "model_rows": 0,
+  "package_rows": 0,
+  "scope": "Offline declared-policy enforcement and synthetic proposal integration; no current deployed-model or complete inventory claim.",
+  "policy": {
+    "max_release_age_days": 42,
+    "max_landscape_age_days": 7,
+    "refresh_lead_days": 2,
+    "package_bound_age_basis": "latest recorded shipping package release",
+    "utc_today_injectable": true
+  },
+  "commands": [
+    {
+      "command": "python3 -B -m unittest tests.test_model_currency tests.test_model_currency_propose tests.test_validate",
+      "execution_prefix": "rtk env TMPDIR=<owned-private-scratch> nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "returned_summary": "Ran 105 tests in 0.970s; OK",
+      "evidence_class": "synthetic_and_local_integration",
+      "stdout": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+      "stderr": {"bytes": 205, "sha256": "2bb910932954f513112864106400830d0456123c33121b3acb79dec7265d9e34"}
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_catalog_freshness_propose tests.test_currency_due.UnitTemplateTests",
+      "execution_prefix": "rtk env TMPDIR=<owned-private-scratch> nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "returned_summary": "Ran 91 tests in 72.597s; OK",
+      "evidence_class": "local_integration",
+      "stdout": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+      "stderr": {"bytes": 191, "sha256": "4543d2c4ee3c040de99b193b037c3701a2dccb2b8f1e86727584d6a209b83e1f"}
+    },
+    {
+      "command": "python3 -B scripts/freshness_propose.py --model-currency --offline --dry-run --checked-at-utc 2026-10-07T01:00:00Z",
+      "execution_prefix": "rtk env TMPDIR=<owned-private-scratch> nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "returned_summary": {"inventory_status": "pending", "coverage": {"models": 0, "packages": 0, "unknown": 0}, "review_required": true, "proposal_actions": ["complete_inventory"], "proposal_paths": []},
+      "evidence_class": "local_integration",
+      "stdout": {"bytes": 550, "sha256": "845692c2216620672812f5073291a92b0b0ddf03b5569436fb75f57388d6ed68"},
+      "stderr": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+    },
+    {
+      "command": "systemd-analyze --user verify stack-currency.service stack-currency.timer upstream-surface-watch.service",
+      "fixture": "Copies under the owned ignored cache; @REPOSITORY@ substituted with the owned checkout. No unit installed or loaded.",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "stdout": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+      "stderr": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+    },
+    {
+      "command": "python3 -B scripts/validate.py",
+      "execution_prefix": "rtk env TMPDIR=<owned-private-scratch> nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "phase": "Before this new immutable summary and final registry commit; final validation is separately recorded in lane status.",
+      "returned_summary": {"components": 69, "hashed_files": 10394, "profiles": 4, "receipts": 223, "status": "passed"},
+      "evidence_class": "structural_validation",
+      "stdout": {"bytes": 162, "sha256": "4ad1c6863293193e9dd07199e7a911797990077bd9951a864a3c9bac562cdaf3"},
+      "stderr": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+    }
+  ],
+  "discriminating_controls": [
+    "Age 42 passes; age 43 without a landscape exception fails.",
+    "A sourced seven-day exception passes; an eight-day exception fails.",
+    "Missing primary URL, malformed/future date and missing package join fail.",
+    "The real existing validate CLI rejects stale rows at an injected UTC date.",
+    "Package-bound checks follow the shipping package even with a retained weight line; stray nonbinding metadata cannot crash collection.",
+    "A selected Hub SHA or immutable tag cannot be the latest-line ref.",
+    "An existing landscape check refreshes from day five, including before the model crosses age 42.",
+    "Unknown source results retain their failure; revision changes cannot reset a weight's release date.",
+    "Offline dry-run starts no source child and writes no proposal; live-mode fixture proposals are private, append-only and outside Git."
+  ],
+  "primary_sources": [
+    {"repository": "huggingface/huggingface_hub", "tag": "v2.1.1", "commit": "bd4a76030582d118e28dc9ad6c7a5911ea76176b", "paths": ["src/huggingface_hub/cli/models.py:223-237", "src/huggingface_hub/constants.py:60", "src/huggingface_hub/utils/_headers.py:147-151", "src/huggingface_hub/hf_api.py:799-819"]},
+    {"url": "https://docs.github.com/en/rest/releases/releases#get-the-latest-release", "read_date": "2026-10-07"},
+    {"url": "https://docs.pypi.org/api/json/#get-a-project", "read_date": "2026-10-07"},
+    {"repository": "systemd/systemd", "tag": "v259.5", "commit": "b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a", "path": "man/systemd.service.xml:1443", "installed_version_observation": "259.5-0ubuntu3.4"}
+  ],
+  "retained_attempts_and_corrections": [
+    "Worker legacy suite first returned 1: 85 passing checks and one old registry hash mismatch for the two owned changed files; parent re-registration then full touched suite returned 0.",
+    "One worker integration fixture omitted the required overturn field and failed; the source policy was retained and the fixture corrected.",
+    "Context-mode refused the separate owned worktree; narrow exact source reads were used without changing host allow rules.",
+    "Graph coverage excluded scripts and did not track the new files; exact source fallback is qualified, with no graph completeness/absence claim.",
+    "Public systemd HTML fetches returned internal/403 errors; official v259.5 tagged XML through the cached GitHub API supplied the verified source.",
+    "A documentation patch with an unmatched second context failed before completion; the intended current guide edit was applied alone and verified."
+  ],
+  "completeness_review": {
+    "evidence_class": "source_review",
+    "remaining_material_findings": 0,
+    "fixed": ["package release-line precedence", "nonbinding metadata lookup", "immutable Hub currency refs", "landscape refresh before the 42-day transition"],
+    "next_landscape_inputs": ["hosted/vendor-page release adapters", "non-Hub model registries", "cross-repository/family candidates", "complete shipped and in-use host model inventory", "native filled-inventory timer timeout behavior"]
+  },
+  "limitations": [
+    "Zero pending rows establish no deployed-model currency, inventory coverage or native timer acceptance.",
+    "Model metadata, native source review and local fixture tests are not an unchanged upstream model harness, weight-integrity check or inference.",
+    "Vendor pages and unsupported lines remain unknown and request source review; Hub SHA changes are revision candidates only.",
+    "The timer has per-source 30-second bounds and a 900-second unit timeout; large-inventory completion and timeout recovery require native activation evidence.",
+    "No model switch, package bump, weight download, host timer/configuration edit, GitHub PR or automatic release adoption occurred.",
+    "Commands above omit private scratch/log locators; complete returned stdout/stderr are retained in private coordination state, keyed by the hashes."
+  ]
+}

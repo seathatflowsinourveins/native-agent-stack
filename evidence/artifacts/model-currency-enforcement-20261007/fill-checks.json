@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "model_currency_partial_fill_checks",
+  "observed_at": "2026-10-07T02:47:51Z",
+  "scaffold_head": "e1d439a4ccc2dacc266e1741964df60354ce7088",
+  "inventory_status": "pending",
+  "model_rows": 20,
+  "package_rows": 7,
+  "unresolved_groups": 8,
+  "scope": "Source-reviewed partial inventory, current carrier integration and proposed MinerU user unit; no host/model activation or complete inventory acceptance.",
+  "commands": [
+    {
+      "command": "uv run --no-project --with claude-agent-sdk==0.2.162 python3 -B -m unittest discover -s examples/claude-runtime-sdk/tests",
+      "exit_code": 0,
+      "returned_summary": "Ran 27 tests in 0.385s; OK",
+      "evidence_class": "synthetic_and_local_integration",
+      "stderr_sha256": "bdc726e2847fae66f9a03095b7c92ddf928e114e3b7d519f3a3de19f2e2e4316"
+    },
+    {
+      "command": "uv run --no-project --with claude-agent-sdk==0.2.162 python3 -B examples/claude-runtime-sdk/tests/check_controls.py --disarm-route",
+      "exit_code": 1,
+      "returned_summary": "Same synthetic route oracle fails with its guard disarmed; five ValueError-not-raised assertions.",
+      "evidence_class": "synthetic",
+      "stderr_sha256": "ec276b557375ceb85122cab9a57ed1870df43b4f4cb245f69591288e55f6dcf7"
+    },
+    {
+      "command": "uv run --no-project --with claude-agent-sdk==0.2.162 python3 -B examples/claude-runtime-sdk/tests/check_controls.py",
+      "exit_code": 0,
+      "returned_summary": "Ran 1 test in 0.003s; OK",
+      "evidence_class": "synthetic",
+      "stderr_sha256": "b725c6d3046883da7212a9e0132a0037a4f32a3ea1890efa5bf13df3dcaa4a45"
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_model_currency tests.test_model_currency_propose tests.test_mineru_user_unit tests.test_render_config tests.test_runtime_worker_openhands tests.test_new_wsl_client_config tests.test_wsl_new_distro_recipe",
+      "exit_code": 0,
+      "returned_summary": "Ran 516 tests in 102.354s; OK",
+      "evidence_class": "synthetic_and_local_integration",
+      "stderr_sha256": "69b1f8ce01b8985d2972694ae687288128b4711551ca16366e0972e8285902eb"
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_new_wsl_handbook tests.test_stack_lifecycle tests.test_foundation_stack_pins",
+      "exit_code": 0,
+      "returned_summary": "Ran 95 tests in 36.737s; OK",
+      "evidence_class": "local_integration_and_structural_validation",
+      "stderr_sha256": "5bf653b9934a9b680caa10be6738b0d0ebbf6612afd1bcd3d8b53e890777d29d"
+    },
+    {
+      "command": "systemd-analyze --user verify adoption/templates/systemd/mineru.service",
+      "exit_code": 0,
+      "returned_summary": "No stdout or stderr; syntax only, no unit loaded or started.",
+      "evidence_class": "structural_validation",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_mineru_user_unit",
+      "exit_code": 0,
+      "returned_summary": "Ran 8 tests in 0.001s; OK after recipe gate clarification",
+      "evidence_class": "synthetic_and_structural_validation",
+      "stderr_sha256": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a"
+    },
+    {
+      "command": "python3 -B scripts/validate.py",
+      "exit_code": 0,
+      "phase": "Preparation, before the recipe clarification/new immutable summary/final registry commit; later results remain in lane status.",
+      "returned_summary": {"components": 69, "hashed_files": 10400, "profiles": 4, "receipts": 223, "status": "passed"},
+      "evidence_class": "structural_validation",
+      "stdout_sha256": "b91fe9073c80514910cfbbd2429c47b9ad30013e1b4055e8fc1860e57b6a24fb"
+    },
+    {
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "exit_code": 0,
+      "returned_summary": "Native generator completed; handbook output bytes unchanged.",
+      "evidence_class": "structural_validation"
+    }
+  ],
+  "execution": {
+    "prefix": "rtk env TMPDIR=<owned-private-scratch> nice -n 19 ionice -c3",
+    "raw_outputs": "Returned stdout/stderr retained in mode-0600 private coordination state; locators redacted, output hashes above.",
+    "dependency_environment": "Cached isolated uv SDK test environment only; no shared-host installation or package pin change."
+  },
+  "independent_observations": [
+    "Component records compare unchanged against e1d439a4; only stack models metadata changes.",
+    "Every old Qwen other-host field/value is unchanged; new scope/retired-here metadata is additive.",
+    "The existing model-currency decision prefix is byte-identical; the fill extension is a dated appended Amendment.",
+    "Both previous notification scan receipts and the #790 producer stayed unchanged in the separate J790b worktree.",
+    "No model result, hosted-account availability or native CPU-only behavior is inferred from these checks."
+  ],
+  "completeness_critic": {
+    "evidence_class": "source_review",
+    "fixed": [
+      "CC managed-parser/local-mode and selected-tier read-back gate: a pre-existing self-hosted parser does not inherit this unit's source environment.",
+      "CPU-only guard must be settled before activation because managed parser startup can occur immediately.",
+      "OnFailure scope is DocLib/unit failure; parser retry exhaustion can disable the parser without failing DocLib."
+    ],
+    "sources": [
+      "opendatalab/MinerU@c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93:mineru/doclib/app.py:126-147",
+      "opendatalab/MinerU@c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93:mineru/doclib/background/parse_server_health.py:469-472"
+    ]
+  },
+  "remaining_gates": [
+    "The original maintained U2 install-script generator or #723 owner's regenerated memory configuration fold; install.sh and its input have not been hand-edited.",
+    "Component/installer alignment for ai-memory 2.5.2 prefix support and the selected runtime remains with their owners.",
+    "All eight source-review unresolved groups, including the interim QMD landscape exception/actual cutover and older package/default bindings.",
+    "The CC's effective embedded-engine CPU guard, alert-handler preflight, fresh user-unit application, native status and one fresh-shell public PDF parse.",
+    "The co-op's GPT-read findings for e1d439a4; this prepared delta must combine them before its single push."
+  ]
+}

@@ -2084,17 +2084,6 @@
   ],
   "models": [
     {
-      "id": "gpt-6-astra",
-      "route": "Native Codex account",
-      "distribution": "Hosted; no local weights or CI calls"
-    },
-    {
-      "id": "claude-opus-5[1m]",
-      "canonical_id": "claude-opus-5",
-      "route": "Native Claude account",
-      "distribution": "Hosted; no local weights or CI calls"
-    },
-    {
       "id": "nvidia/Nemotron-3-Embed-1B-BF16",
       "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
       "release_date": "2026-07-16",
@@ -2106,7 +2095,338 @@
       "evidence_ids": [
         "native-rag",
         "hf-memory-models-20260921"
-      ]
+      ],
+      "selection_scope": "Other-host historical embedding record; retired on NativeStack2604",
+      "native_stack_2604_status": "retired",
+      "superseded_on_native_stack_2604_by": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "consumer_limit": "Retained source-host architecture and acceptance references only; no NativeStack2604 embedding fallback"
+    },
+    {
+      "id": "claude-opus-5-5",
+      "revision": "claude-opus-5-5",
+      "release_date": "2026-09-22",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#september-22-2026",
+      "release_date_basis": "Anthropic's dated product-release entry, September 22, 2026; entry and exact ID re-read from the official page.",
+      "role": "frontier judgment and subagents",
+      "consumer_limit": "Claude Code opus alias and reviewed workflow agent definitions; consumer assignment follows the 01:35Z source packet.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "claude-opus-5-5"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "route": "Native Claude account",
+      "distribution": "Hosted canonical model ID; no local weights or CI calls"
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "revision": "claude-sonnet-5-5",
+      "release_date": "2026-09-28",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#september-28-2026",
+      "release_date_basis": "Anthropic's dated product-release entry, September 28, 2026; exact ID independently re-read.",
+      "role": "frontier fan-out",
+      "consumer_limit": "Claude Code sonnet alias for fan-out agents, as recorded in the source packet.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "claude-sonnet-5-5"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "route": "Native Claude account",
+      "distribution": "Hosted canonical model ID; no local weights or CI calls"
+    },
+    {
+      "id": "claude-fable-5-1",
+      "revision": "claude-fable-5-1",
+      "release_date": "2026-09-01",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#september-1-2026",
+      "release_date_basis": "Anthropic's September 1, 2026 release announcement, independently re-read.",
+      "role": "frontier main and advisor",
+      "consumer_limit": "Claude Code main and advisor selections reported by the command center's model-refresh packet.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "claude-fable-5-1"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "route": "Native Claude account",
+      "distribution": "Hosted canonical model ID; no local weights or CI calls"
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "revision": "gpt-6.1-sol",
+      "release_date": "2026-09-29",
+      "release_source": "https://developers.openai.com/api/docs/changelog",
+      "release_date_basis": "OpenAI's dated September 29, 2026 product-release entry.",
+      "role": "frontier coordination and workers",
+      "consumer_limit": "Native Codex and the reviewed OmniRoute/stack-worker profiles; gateway-routed research and worker consumers named by the source packet.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "gpt-6-1-sol"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "route": "Native Codex account",
+      "distribution": "Hosted selected model ID; no immutable-serving guarantee inferred; gateway availability is a separate owner gate"
+    },
+    {
+      "id": "gpt-6-astra",
+      "revision": "gpt-6-astra",
+      "release_date": "2026-09-03",
+      "release_source": "https://developers.openai.com/api/docs/changelog",
+      "release_date_basis": "OpenAI's September 3, 2026 release entry; September 29 is an Ultrafast serving-mode entry and does not reset this release date.",
+      "role": "frontier consequential judgment",
+      "consumer_limit": "Codex judgment and complex-workflow coordination; landscape-sweep codex_job.py default and the gateway aliases recorded by the source packet.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "gpt-6-astra"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "route": "Native Codex account",
+      "distribution": "Hosted selected model ID; no immutable-serving guarantee inferred; gateway availability is a separate owner gate"
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+      "release_date": "2026-07-16",
+      "release_source": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+      "release_date_basis": "Pinned NVIDIA model card explicitly says Release Date 07/16/2026 at lines 99-101. The selected shard's upload is July 14 and the repository's August README change is neither product release date.",
+      "role": "dense text embedding endpoint",
+      "consumer_limit": "vLLM 0.31.0 OpenAI-compatible endpoint; ai-memory and SocratiCode send plain prefixed strings. No re-embedding is proposed.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "nemotron-3-embed-8b"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "NVIDIA publishes a successor or official FP8/NVFP4 checkpoint; or a released compatible dense text model fits the declared budget and has admissible LMEB/RTEB superiority. Re-open EmbeddingGemma 2 when its benchmark submissions and released server support meet the recorded gates.",
+      "runtime": "vllm",
+      "dimensions": 4096,
+      "query_prefix": "query: ",
+      "document_prefix": "passage: ",
+      "model_max_tokens": 32768,
+      "deployed_server_limit": 8192,
+      "socraticode_context_limit": 4096,
+      "configuration_prerequisite": "ai-memory 2.5.2 and selected vLLM 0.31.0; component pin alignment remains with their owners",
+      "endpoint": "http://127.0.0.1:28231/v1"
+    },
+    {
+      "id": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+      "revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
+      "release_date": "2025-10-03",
+      "release_source": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/qwen3-reranker-0.6b-q8_0.gguf",
+      "release_date_basis": "Selected GGUF artifact upload on October 3, 2025, not its repository creation timestamp or the base model's May 29 publication.",
+      "role": "qmd rank GGUF reranker",
+      "consumer_limit": "qmd 2.8.3 node-llama-cpp 3.20.0 rank-pooling loader; CPU fallback is a dated packet observation, not an enforced registration read-back.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "qmd-qwen3-reranker"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "Qwen/ggml-org publishes a newer stock-loadable rank GGUF, qmd changes its loader/default or remote rerank support, or an upstream-harness CPU comparison accepts the 4B candidate's latency and quality.",
+      "runtime": "qmd"
+    },
+    {
+      "id": "tobil/qmd-query-expansion-1.7B-gguf",
+      "revision": "7816de0b72572c6c860ca1eddf97ba9e7fb8cc65",
+      "release_date": "2026-01-29",
+      "release_source": "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/qmd-query-expansion-1.7B-q4_k_m.gguf",
+      "release_date_basis": "q4_k_m artifact upload timestamp, not repository creation.",
+      "role": "qmd lex/vec/hyde query expansion",
+      "consumer_limit": "qmd 2.8.3 generate slot and its fixed expansion prompt/grammar. The packet observes a floating URI resolving to these bytes; pin wiring goes live only through CC apply.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "qmd-query-expansion"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "tobil or qmd changes the expansion GGUF/default/loader, or a maintainer-harness or promptfoo comparison favors another compatible GGUF. Compare the LFM2.5 candidate first and preserve cache/config migration gates.",
+      "runtime": "qmd"
+    },
+    {
+      "id": "minishlab/potion-code-16M-v2",
+      "revision": "e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b",
+      "release_date": "2026-07-04",
+      "release_source": "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/model.safetensors",
+      "release_date_basis": "Selected safetensor upload July 4, 2026. July 13 repository metadata reflects a later README edit.",
+      "role": "static semantic code retrieval",
+      "consumer_limit": "Semble 0.6.2 StaticModel/model2vec 0.9.0 fused with BM25; pinned model copy reported by the source packet.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "potion-code-16m-v2"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "MinishLab publishes a newer code model, Semble changes its default, or Semble's own same-protocol benchmark finds a complete compatible static code model better. A switch requires cached-repository reindexing."
+    },
+    {
+      "id": "jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF",
+      "revision": "9185688a0495e1577d521a757c7c0b62dd38ca48",
+      "release_date": "2026-08-13",
+      "release_source": "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/blob/9185688a0495e1577d521a757c7c0b62dd38ca48/MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
+      "release_date_basis": "Selected third-party GGUF/mmproj artifact publication August 13, 2026. The packet separately records base safetensors upload May 20 and card announcement May 21; those dates are not conflated.",
+      "role": "document parsing VLM",
+      "consumer_limit": "MinerU 4.0.10 standard tier, llama-cpp VLM engine and its protocol-specific prompts/layout tokens; Q8_0 model and matching mmproj.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "mineru-vlm-gguf"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "OpenDataLab publishes a newer protocol-compatible parsing VLM or MinerU changes its registry; a compatible GGUF/mmproj candidate earns same-scorer ParseBench evidence; the registry adopts PP-DocLayoutV3; or a qualified runtime/memory route changes the fit."
+    },
+    {
+      "id": "opendatalab/MinerU-4_models_onnx",
+      "revision": "358310b4f64b95f9fefc372ad899356e4111f376",
+      "release_date": "2026-09-10",
+      "release_source": "https://huggingface.co/opendatalab/MinerU-4_models_onnx/blob/358310b4f64b95f9fefc372ad899356e4111f376/manifest.json",
+      "release_date_basis": "Maintainer-published ONNX export bundle: seven selected ONNX artifacts uploaded at 13:50:09Z September 10; the validated FormulaNet replacement at this selected SHA uploaded at 16:38:36Z the same day. This is export publication, not original Paddle/FormulaNet training or product release.",
+      "role": "document layout OCR formula and table export bundle",
+      "consumer_limit": "MinerU 4.0.10 standard-tier ONNX companion set. This bundle row does not complete the separate original-checkpoint inventory.",
+      "currency_status": "in_use",
+      "currency_rows": [
+        "mineru-onnx-bundle"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance"
+    },
+    {
+      "id": "chopratejas/kompress-v2-base",
+      "revision": "b1563631b35bfdcee37587ad530147497d820d4c",
+      "release_date": "2026-06-10",
+      "release_source": "https://huggingface.co/chopratejas/kompress-v2-base/blob/b1563631b35bfdcee37587ad530147497d820d4c/onnx/kompress-int8-wo.onnx",
+      "release_date_basis": "The selected int8-wo ONNX artifact's June 10 upload commit; both selected pin and September HEAD return the same last modifying commit and LFS SHA.",
+      "role": "token compression selected ONNX artifact",
+      "consumer_limit": "Headroom 0.40.0 Python ONNX CPU loader. Held: the packet reports the [mcp]-only environment lacks onnxruntime/transformers; no local execution or remote enablement is claimed.",
+      "currency_status": "held",
+      "currency_rows": [
+        "headroom-kompress-int8-wo"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "Headroom's selected extra or native backend changes; the maintainer publishes another compatible Kompress export; a Headroom release changes HF_MODEL_ID/_PINNED_REVISIONS; or an explicitly authorized qualified remote route is selected.",
+      "runtime": "headroom"
+    },
+    {
+      "id": "answerdotai/ModernBERT-base",
+      "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+      "release_date": "2025-01-15",
+      "release_source": "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
+      "release_date_basis": "Selected tokenizer configuration update, not a model-weight/product release. tokenizer_config.json's 8192-length change is January 15; tokenizer.json and special_tokens_map.json remain December 17, 2024.",
+      "role": "paired tokenizer configuration",
+      "consumer_limit": "Headroom 0.40.0 selected Python Kompress tokenizer; held with the unavailable Kompress runtime extra.",
+      "currency_status": "held",
+      "currency_rows": [
+        "kompress-modernbert-tokenizer"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "Headroom's selected extra or native backend changes; the maintainer publishes another compatible Kompress export; a Headroom release changes HF_MODEL_ID/_PINNED_REVISIONS; or an explicitly authorized qualified remote route is selected.",
+      "runtime": "headroom"
+    },
+    {
+      "id": "Qdrant/bge-small-en-v1.5-onnx-Q",
+      "revision": "52398278842ec682c6f32300af41344b1c0b0bb2",
+      "release_date": "2024-01-15",
+      "release_source": "https://huggingface.co/Qdrant/bge-small-en-v1.5-onnx-Q/blob/52398278842ec682c6f32300af41344b1c0b0bb2/model_optimized.onnx",
+      "release_date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "role": "relevance embedding default",
+      "consumer_limit": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "currency_status": "package_bound",
+      "currency_rows": [
+        "headroom-bge-onnx"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "runtime": "headroom"
+    },
+    {
+      "id": "Qdrant/all-MiniLM-L6-v2-onnx",
+      "revision": "5f1b8cd78bc4fb444dd171e59b18f3a3af89a079",
+      "release_date": "2024-01-16",
+      "release_source": "https://huggingface.co/Qdrant/all-MiniLM-L6-v2-onnx/blob/5f1b8cd78bc4fb444dd171e59b18f3a3af89a079/model.onnx",
+      "release_date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "role": "memory embedding default",
+      "consumer_limit": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "currency_status": "package_bound",
+      "currency_rows": [
+        "headroom-minilm-onnx"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "runtime": "headroom"
+    },
+    {
+      "id": "chopratejas/technique-router-onnx",
+      "revision": "27b0b4bfa510a1cff66d888072c0b807082721a8",
+      "release_date": "2026-04-09",
+      "release_source": "https://huggingface.co/chopratejas/technique-router-onnx/blob/27b0b4bfa510a1cff66d888072c0b807082721a8/model_quantized.onnx",
+      "release_date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "role": "image technique routing default",
+      "consumer_limit": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "currency_status": "package_bound",
+      "currency_rows": [
+        "headroom-technique-router-onnx"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "runtime": "headroom"
+    },
+    {
+      "id": "chopratejas/siglip-image-encoder-onnx",
+      "revision": "d0a9fbd66d4bd8c761bff592d44831f7c2ae184e",
+      "release_date": "2026-04-09",
+      "release_source": "https://huggingface.co/chopratejas/siglip-image-encoder-onnx/blob/d0a9fbd66d4bd8c761bff592d44831f7c2ae184e/image_encoder_int8.onnx",
+      "release_date_basis": "Original selected ONNX export upload, not the newer package publication, a README/tokenizer edit, or the base checkpoint's earlier training/publication date.",
+      "role": "image encoder default",
+      "consumer_limit": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "currency_status": "package_bound",
+      "currency_rows": [
+        "headroom-siglip-onnx"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "runtime": "headroom"
+    },
+    {
+      "id": "google/magika:assets/models/standard_v3_3/model.onnx",
+      "revision": "git-blob:e669a1120903d93417f57a1aedd1bc0000819b8b",
+      "release_date": "2025-04-11",
+      "release_source": "https://github.com/google/magika/blob/3f2cb8537dce123587bfb3535a402145adcba2c7/assets/models/CHANGELOG.md",
+      "release_date_basis": "Maintainer model changelog and introducing commit dated April 11, 2025; May 4, 2026 is the separate latest package date.",
+      "role": "file-type model bundled in Magika",
+      "consumer_limit": "Magika 1.0.3 as used by MinerU/docvortex, with the same model identity reported in the source packet's Rust consumers.",
+      "currency_status": "package_bound",
+      "currency_rows": [
+        "magika-standard-v3-3",
+        "markitdown-magika-standard-v3-3"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "Google Magika ships a newer model than standard_v3_3, or the enclosing consumer changes its model/library contract."
+    },
+    {
+      "id": "DeusData/codebase-memory-mcp:vendored/nomic/code_vectors.bin",
+      "revision": "git-blob:6889c7cfe9a29beb87a8b63db9cbdc8f5eb34a38",
+      "release_date": "2025-03-24",
+      "release_source": "https://huggingface.co/nomic-ai/nomic-embed-code/commit/9a0457648f060c4279d4a3982d2d27a4df6fac59",
+      "release_date_basis": "Original upstream source-weight publication March 24, 2025 is verified by the first source safetensor shard's last modifying commit. The vendor's product announcement is March 27, separately recorded; neither comes from repository creation.",
+      "role": "package-derived static semantic token vectors",
+      "consumer_limit": "Codebase Memory MCP v0.11.0 optional semantic pass; source packet reports registrations leave the semantic option unset. No daemon environment or native semantic pass was read or run by this child.",
+      "currency_status": "package_bound",
+      "currency_rows": [
+        "codebase-memory-static-nomic"
+      ],
+      "selection_scope": "NativeStack2604 ruled selection metadata; no new installation or execution acceptance",
+      "runtime": "codebase-memory-mcp"
+    },
+    {
+      "id": "claude-haiku-4-5-20251001",
+      "revision": "claude-haiku-4-5-20251001",
+      "release_date": "2025-10-15",
+      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "release_date_basis": "Vendor public release date; the identifier suffix is its earlier snapshot date.",
+      "role": "Simple Claude Code background tasks",
+      "consumer_limit": "Titles, safety checks and quick summaries; latest Haiku line retained as the owner's dated exception, without heavier-line promotion for currency.",
+      "currency_status": "in_use",
+      "currency_rows": ["background-haiku"],
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "An Anthropic Haiku 5.x model ID becomes available.",
+      "selection_scope": "Owner ruling and reported application at 2026-10-07T04:15Z; no new configuration read-back or model run by this wave.",
+      "route": "Native Claude account",
+      "distribution": "Hosted dated snapshot ID; no local weights or CI calls"
     },
     {
       "id": "unsloth/Qwen3.8-27B-GGUF",
@@ -2144,29 +2464,11 @@
       "note": "Corrected on 2026-09-26 to the artifact production serves: the path was read from the unit's ExecStart and the file hashed. This replaces the ggml-org/Qwen3.8-27B-GGUF Q4_K_M entry at efbb3b1f70a21d97fd4495240648405f7228554f (file sha256 c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747), the 2026-09-20 trial file of native-gpu-patch-20260920, which production does not serve. The llama-cpp component pin stays b11057 (0.4.1-dev), while production runs b11146.",
       "evidence_ids": [
         "local-inference-c2-serving-switch-20260926"
-      ]
-    },
-    {
-      "id": "sentence-transformers/all-MiniLM-L6-v2",
-      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-      "license": "Apache-2.0",
-      "runtime": "ai-memory",
-      "dimensions": 384,
-      "role": "Supported symmetric memory baseline, not latest SOTA",
-      "distribution": "Three files pinned by upstream ai-memory loader; other repository formats are not installed",
-      "evidence_ids": [
-        "native-memory-rag-alignment-20260921",
-        "hf-memory-models-20260921"
-      ]
-    },
-    {
-      "id": "claude-fable-5-1",
-      "route": "Native Claude account",
-      "distribution": "Hosted; observed configured default in bounded read-only trial. Historical Opus research remains separate.",
-      "evidence_ids": [
-        "native-ultracode-20260921",
-        "full-stack-convergence-20260921"
-      ]
+      ],
+      "selection_scope": "Other-host historical serving profile; retired on NativeStack2604",
+      "native_stack_2604_status": "retired",
+      "release_date_status": "Other-host artifact/product date requires its owning review; existing observed values are retained",
+      "consumer_limit": "Existing nativestack-5975wx profile only; no NativeStack2604 generation fallback"
     }
   ],
   "policy": {

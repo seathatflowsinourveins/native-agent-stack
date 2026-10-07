@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import os
 import sys
 import tempfile
 import unittest
 import uuid
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -54,7 +56,7 @@ class ConfigurationTests(unittest.TestCase):
         self.addCleanup(self.environment.stop)
 
     def options(self, *args):
-        return worker.build_options(worker.parser().parse_args(["--cwd", str(self.cwd), *args]))
+        return worker.build_options(worker.parser().parse_args(["--cwd", str(self.cwd), "--model", "dva/claude-fixture", *args]))
 
     def command(self, options):
         # Build SDK argv only. This synthetic executable is never launched.
@@ -64,7 +66,7 @@ class ConfigurationTests(unittest.TestCase):
     def test_native_transport_has_full_preset_and_scoped_route(self):
         options = self.options()
         command = self.command(options)
-        self.assertEqual(command[command.index("--model") + 1], worker.DEFAULT_MODEL)
+        self.assertEqual(command[command.index("--model") + 1], "dva/claude-fixture")
         self.assertEqual(command[command.index("--effort") + 1], "max")
         self.assertNotIn("--tools", command)
         self.assertEqual(options.system_prompt, {"type": "preset", "preset": "claude_code"})
@@ -74,6 +76,15 @@ class ConfigurationTests(unittest.TestCase):
         self.assertNotIn("ANTHROPIC_API_KEY", options.env)
         self.assertIsNone(options.fallback_model)
         self.assertNotIn("190000", str(options))
+
+    def test_missing_model_fails_before_a_client_exists(self):
+        stderr = io.StringIO()
+        with patch.object(worker, "ClaudeSDKClient") as client, redirect_stderr(stderr):
+            with self.assertRaises(SystemExit) as missing:
+                worker.parser().parse_args(["--preflight", "--cwd", str(self.cwd)])
+        self.assertEqual(missing.exception.code, 2)
+        self.assertIn("--model", stderr.getvalue())
+        client.assert_not_called()
 
     def test_exact_skills_use_native_permissions_without_body_preload(self):
         options = self.options("--skill", "search-first", "--skill", "context-mode:context-mode")

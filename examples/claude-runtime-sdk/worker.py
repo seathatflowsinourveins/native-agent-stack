@@ -42,7 +42,6 @@ from claude_agent_sdk import (
 SDK_VERSION = "0.2.162"
 SDK_COMMIT = "f2204bb956bab02907aaf3cb88eb9dead28eaa35"
 OMNIROUTE_LAUNCH_COMMIT = "2f42a9ac19d1a247ec9ce5473b790843724b3061"
-DEFAULT_MODEL = "dva/claude-opus-5-max"
 DEFAULT_GATEWAY = "http://127.0.0.1:20128"
 MODEL_ID = re.compile(r"(?:[A-Za-z0-9_.:-]+/)?claude-[A-Za-z0-9_.:-]+\Z")
 USAGE_COUNTERS = {
@@ -395,8 +394,8 @@ def parser() -> argparse.ArgumentParser:
     )
     cli.add_argument(
         "--model",
-        default=DEFAULT_MODEL,
-        help="explicit advertised Claude-family candidate",
+        required=True,
+        help="explicit advertised Claude-family gateway candidate; no implicit Opus route",
     )
     cli.add_argument("--setting-source", action="append", choices=["user", "project", "local"])
     cli.add_argument(
