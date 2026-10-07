@@ -95,3 +95,33 @@ Carrier bytes, hash bindings, native rendering, grant controls and workflow fixt
 evidence. They do not substitute for a live client/server smoke. Host setup, hook format/trust and the staged
 jCodeMunch executable remain command-center work. Fresh-session smokes and the working-day organic sample
 follow that apply and remain pending here.
+
+## Amendment 2026-10-07 — J819f delivery to reviewers and builder
+
+The delta read at `aa4250a90f8fd3ed3dac4e3f7f692f5ce9a8da8f` found that the dedicated reviewer and builder
+variants still lacked the jCodeMunch sequence. The production hook selects those variants for
+`evidence-reviewer`, `security-reviewer` and `isolated-builder`, so the updated full block did not supply
+their guidance. Their role bodies also retained only the earlier route/order advice.
+
+Deliver the same native guide-first and actual-model rule through both variant code lines, their existing
+handbook counterpart and the three role bodies with six byte-identical mirrors. The first call is
+`order(action="jcodemunch_guide",args={})`; next open `route(task=...,model=<actual caller model>)`
+with execute off, followed by the already granted read-only `order` actions. These roles still have no
+`menu` grant. Their tool allowlists, models, effort and manual-first preambles stay unchanged.
+The existing sequence checks now cover all five jCodeMunch-consuming role cases; a menu-prescription
+control proves that the restricted consumers' unchanged grants still reject that instruction.
+
+The restricted carrier's old unsequenced route enumeration is replaced with one ordered sequence.
+Its current exact-clause expectation follows the ruled spelling, keeps execution off and requires caller-owned
+arguments for the read-only action. A first-route ordering control rejects a legacy route prepended before
+the guide, even when the later guide and typed route remain present. Earlier negative controls remain intact.
+
+The upstream API evidence stays `jgravelle/jcodemunch-mcp@d94049d03e3ec21a90253c9a619598211157f00b`:
+`src/jcodemunch_mcp/server.py:446-463,4724-4752,7041-7050`, identical at live330
+`288033668f0425ab0547f420dd647c14bd186c7f`. Repository delivery is grounded at
+`native-agent-stack@aa4250a9:adoption/hooks/claude/token-lanes-subagent-start.py:18-20,37`.
+This amendment changes delivery through existing interfaces; it installs no service or new grant.
+
+The [J819f follow-up](../../evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819f-followup-20261007.json)
+records actual new repository checks separately from the retained J819e checks and pending host/client smoke.
+Earlier decided text and all observed runs remain intact.

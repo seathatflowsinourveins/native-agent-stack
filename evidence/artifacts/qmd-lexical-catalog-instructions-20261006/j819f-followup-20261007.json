@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "restricted-role-native-policy-delivery-followup",
+  "date": "2026-10-07",
+  "evidence_class": "repository_integration_checks",
+  "source_head": "aa4250a90f8fd3ed3dac4e3f7f692f5ce9a8da8f",
+  "decision": "docs/decisions/2026-10-07-serena-jcodemunch-native-navigation-wiring.md",
+  "prior_receipt": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819e-followup-20261007.json",
+  "direction": "J819f: close the reviewer/builder guide-first delivery P2 without new grants or changed budgets",
+  "source_classes": {
+    "primary_source": "Existing guide via order, task/model route schema and execution-off contract at jCodeMunch331; same integration files at330",
+    "delivery_gap": "Production hook routes both reviewers and isolated-builder to dedicated variants missing the approved sequence",
+    "local_checks": "Repository-owned carrier/body/grant controls and native render/checksum/registry consistency",
+    "hosted_ci": "Co-op reported in progress at the prior aa4250a9 head; not observed by this source unit",
+    "native_client_smokes_and_organic_usage": "pending owner application and separate client observation"
+  },
+  "sources": [
+    "jgravelle/jcodemunch-mcp@d94049d03e3ec21a90253c9a619598211157f00b:src/jcodemunch_mcp/server.py:446-463,4724-4752,7041-7050",
+    "jgravelle/jcodemunch-mcp@288033668f0425ab0547f420dd647c14bd186c7f:src/jcodemunch_mcp/server.py (same integration content)",
+    "native-agent-stack@aa4250a90f8fd3ed3dac4e3f7f692f5ce9a8da8f:adoption/hooks/claude/token-lanes-subagent-start.py:18-20,37"
+  ],
+  "source_scope": {
+    "roles": ["evidence-reviewer", "security-reviewer", "isolated-builder"],
+    "canonical_role_bodies": 3,
+    "mirrors": 6,
+    "changed_carriers": ["token-lanes-block.reviewer.md", "token-lanes-block.builder.md"],
+    "model_effort_grants_manual_first": "unchanged",
+    "menu": "ungranted and not prescribed",
+    "sequence": "guide via order, opening route with task and actual caller model and execution off, granted read-only order actions"
+  },
+  "actual_carrier_bytes": {
+    "reviewer": {"bytes": 2257, "limit": 4100},
+    "builder": {"bytes": 3046, "limit": 4100}
+  },
+  "checks": [
+    {
+      "kind": "repository-owned pinned module and grant/body controls",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane tests.test_install_claude_profile tests.test_managed_block tests.test_new_wsl_client_config.RecordTests",
+      "exit_code": 0,
+      "tests": 515,
+      "skips": 14,
+      "elapsed_seconds": 116.916,
+      "retained_log": "final-modules.log",
+      "retained_log_sha256": "19cf93cad6fa527abbf18066787d78da01db4a130bbb70255524d85038b5d6f6",
+      "condition": "Includes the exact eight J819c modules plus affected profile/managed-block/record checks; one fixture ResourceWarning retained, its process absent after completion"
+    },
+    {
+      "kind": "repository-owned workflow protocol and exact-grant fixtures",
+      "command": "CI=true nice -n 19 ionice -c3 node examples/claude-native/workflows/test-envelope.mjs",
+      "exit_code": 0,
+      "passed": 254,
+      "failed": 0,
+      "total": 254,
+      "retained_log": "node-envelope.log",
+      "retained_log_sha256": "e137100e406134a5c5a236c738814d001ff31739d6682f20bd113b3fbd7a04ec"
+    }
+  ],
+  "scope_limits": "No host/client configuration, model call, hook install/trust, index mutation, new grant, model/effort/sandbox change, merge or rebase; previous observations retained"
+}
