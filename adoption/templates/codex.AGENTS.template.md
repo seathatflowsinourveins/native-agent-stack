@@ -26,6 +26,7 @@ Long commands: set `yield_time_ms` 30000; while a `session_id` returns, poll `wr
 Web research: if the stack installs GPT Researcher, run `bash ~/code/native-agent-stack/tools/research/gpt_researcher.sh "<short current-month query>"` as a long command (stops at 1,500 s); use short, unseeded current-month queries; reports are leads: re-read facts in primary sources.
 Message Claude Code in one long command: set `msg` via a quoted heredoc (`msg=$(cat <<'MSG'`, text, `MSG`, `)` each on its own line), then `printf '%s\n\nreply: codex queue --thread %s\n' "$msg" "$CODEX_THREAD_ID" | claude -p -n "codex-$(printf '%.8s' "$CODEX_THREAD_ID")" --permission-mode bypassPermissions --max-turns 3 --output-format stream-json --verbose "Send the text on stdin, complete and verbatim, to the session named <name> with exactly one SendMessage call, then stop."`.
 Codex receives queued messages only between turns; idle delay is up to ~20 s.
+When you tell the user a time, give it first in the host's local time zone (read it with `timedatectl` or `date`), with UTC beside it, for example "4:00 PM EDT (20:00Z)". Write timestamps in ledger rows, receipts, evidence and commit messages in UTC (RFC 3339 with `Z`); Git author/committer metadata retains its native format.
 
 <!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->
 <!-- native-agent-stack:include-rtk-awareness-full -->

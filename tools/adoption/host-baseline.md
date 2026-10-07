@@ -48,7 +48,7 @@ attestation.
 
 The passwd record retains field 7 only, and the sudoers marker retains existence,
 mode and size only. Its owner column is discarded. Passwordless sudo remains
-`unknown`: `adoption/platforms/linux-wsl2-new-distro.md:624` is a recipe criterion,
+`unknown`: `adoption/platforms/linux-wsl2-new-distro.md:645` is a recipe criterion,
 not a per-host acceptance record. No such acceptance is linked by these receipts.
 PR-1 must label root rows `status-unknown` until it has that separate evidence;
 neither an absent marker nor a denied stat proves those rows unreachable.
