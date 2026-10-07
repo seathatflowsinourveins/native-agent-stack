@@ -4652,8 +4652,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
-      "bytes": 2884
+      "sha256": "07d214a6c51d30ce264c92be7f09d1e0cf3df7ec4562b6d649602a2c974eb063",
+      "bytes": 2863
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
@@ -4972,8 +4972,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "1a5533bfcb028ef8c952fc1ebd08a2ca36dd22f7c3538bae7717e78e44501761",
-      "bytes": 68841
+      "sha256": "275b125d44878cbe679226e4fbd8374846066f49b6a220a7af54cd90cb4da6ea",
+      "bytes": 68988
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5232,8 +5232,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a0e293941482230a1ccaaf8a3206a5c7e72b73690d47e3a211883e9dd6279abc",
-      "bytes": 12948
+      "sha256": "0c0a9f48396d59571b18f6070cd0b3b49a61edf12330f6642daf6f12a3a1be94",
+      "bytes": 12927
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -16528,7 +16528,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "67aa04ee3eae8fd9e6b3c5e4d85bece27dd4a715cbf5c6957850b03f4f307fa7",
+      "sha256": "b229e8cb289fa87efcfa4e4651a4b223600eb2b3d41335e96476deb7b13cf22c",
       "bytes": 158922
     },
     {
@@ -17142,6 +17142,11 @@
       "bytes": 158403
     },
     {
+      "path": "docs/decisions/2026-09-23-max-effort-default.md",
+      "sha256": "535ca5dc1a56921afe80d35b8f1d5f3df8e2c22b6484002d70c3540a1446f955",
+      "bytes": 27827
+    },
+    {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
       "sha256": "2976b2d2f245ecb3129ff14e7758b7131e779fee04b71e7828099f2ecb89935c",
       "bytes": 33407
@@ -17297,6 +17302,11 @@
       "bytes": 93607
     },
     {
+      "path": "docs/decisions/2026-09-29-max-default-effort.md",
+      "sha256": "d0b5c89f61cd983dcccdab01544e3b00d65d2fc99968a5565664b583b1a79e66",
+      "bytes": 26492
+    },
+    {
       "path": "docs/decisions/2026-09-29-retire-polaris.md",
       "sha256": "77a716f97b8bc5a2ed0ed372a9ffbbf179a56407d32eb557b49706d06130187c",
       "bytes": 5291
@@ -17368,8 +17378,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "908789292c7d5919e1d4cff2cf552a0d254dea5af363d8c00cfee908b7583a24",
-      "bytes": 136295
+      "sha256": "368b6394a2d5a2e3ef796eba6797d26b5c7a477ff2f410dc66bb14628741994e",
+      "bytes": 137069
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -53908,8 +53918,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "466817eba6c4c99d3bc7620cf0b241e14f7d031abfa825dc84de6f028c91901f",
-      "bytes": 110684
+      "sha256": "52666102d1c8cf3cf599cd46926180e4539ae49f98ea2bb841862fb108b1286c",
+      "bytes": 112169
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -54638,8 +54648,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "27f43c56d1f1a70f065a5d313b9273a8b55709362b15ed4a56b83da1e3c37437",
-      "bytes": 39979
+      "sha256": "2794cb99f8bbf153a4903b9adf03628ef85fdf581c24aab400fe583020f34ace",
+      "bytes": 40938
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -55183,8 +55193,8 @@
     },
     {
       "path": "tests/test_apply_claude_settings.py",
-      "sha256": "4c40b74a699fa29a307935c1b309edc7869e7b50e390c5b5d8613ae74ea6a5d3",
-      "bytes": 47548
+      "sha256": "25c2f51cddd2323638ffd42effe7c5263d62c181e2836e8ac25d23f840cf8509",
+      "bytes": 49435
     },
     {
       "path": "tests/test_architecture_pin_source.py",
@@ -55543,8 +55553,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "c4b2815e0e51086aeeb9da24a88bba918b81812bf33c433f473e3619bdfdec80",
-      "bytes": 132552
+      "sha256": "5823c67db9aac571c567e661d138b84ac25168677981d31bd255e3dee69d7009",
+      "bytes": 133138
     },
     {
       "path": "tests/test_install_skills.py",
