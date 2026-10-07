@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "unit": "rtk-f4-custody-content-repair",
+  "lane": "foundation",
+  "target_pr": 709,
+  "source_head": "b0b9f7522f27661a000a9f28f2a86dbca3ac6628",
+  "evidence_class": [
+    "source-review",
+    "structural-render",
+    "independent-observation",
+    "local-integration-check",
+    "synthetic-fixture"
+  ],
+  "sources": [
+    "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026:src/cmds/system/find_cmd.rs:134-147",
+    "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026:src/cmds/git/git_cmd.rs:1816-1824",
+    "native-agent-stack@b0b9f7522f27661a000a9f28f2a86dbca3ac6628:tools/adoption/codex_roles.py:284-287",
+    "native-agent-stack@b0b9f7522f27661a000a9f28f2a86dbca3ac6628:docs/lanes.md:94-128"
+  ],
+  "scope": [
+    "Repair only the otel.environment README citation, retaining its recorded observation and review metadata.",
+    "Scope the local RTK proxy recommendation to the exceptions; retain the upstream blanket prefix and awareness bytes.",
+    "Protect bare non-directory find names including existing regular files, in the common F4 block and both exact-shape role clauses.",
+    "Refresh the existing repository F4 producer projections, independent role golden rows and checksum manifests; preserve model and effort keys.",
+    "Append the dated decision clarification, without changing historical measured values or decided text."
+  ],
+  "retained_ci_failure": {
+    "head": "b0b9f7522f27661a000a9f28f2a86dbca3ac6628",
+    "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37259975681/job/111604971974",
+    "test_count": 10942,
+    "failures": 2,
+    "skips": 1034,
+    "cause": "Both DispositionCitationTests reference examples/codex-native/README.md:170, while the actual otel.environment launch is at line 199."
+  },
+  "review_threads": [
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/709#discussion_r4180366534",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/709#discussion_r4180366541"
+  ],
+  "read_edit_phase": {
+    "remote_assigned_head_verified": true,
+    "remote_head": "b0b9f7522f27661a000a9f28f2a86dbca3ac6628",
+    "native_client_block_render": {
+      "command": "nice -n 19 ionice -c3 python3 -B tools/adoption/new_wsl_client_config.py --write-blocks",
+      "exit_code": 0,
+      "result": "Codex instructions refreshed; Claude instructions unchanged."
+    },
+    "compact_template_bytes": 8191,
+    "compact_template_limit": "strictly less than 8192; unchanged",
+    "embedded_role_f4_producer": "tools/adoption/codex_roles.py:f4_block",
+    "embedded_role_count": 10,
+    "model_effort_or_other_role_keys_changed": false
+  },
+  "source_protection": {
+    "original_decision_prefix": {
+      "path": "docs/decisions/2026-10-04-rtk-051-f4-exceptions.md",
+      "bytes": 16010,
+      "sha256": "f317dd5e4f24d37250c6549b391b72e13943167e20103f4722145497bea67c88",
+      "byte_identical": true,
+      "change": "dated amendment appended after the original bytes"
+    },
+    "historical_probe_files": [
+      {
+        "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json",
+        "sha256": "d5251099fa4a0d42b13e988e3b16aa66a45ab0d36a13521e1f9ee55834368789",
+        "byte_identical": true
+      },
+      {
+        "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json",
+        "sha256": "3d7b5a0e527113a7e3ef13413dd35d5e15b3913ba8e87c96dcca6ee7888713e4",
+        "byte_identical": true
+      },
+      {
+        "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/scratch-supplement.json",
+        "sha256": "840cb31e2fe3e596e0f358a7cdd1e11de241e218f3cf0209b95a39f3ebfeae15",
+        "byte_identical": true
+      }
+    ],
+    "upstream_awareness_sha256": "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc",
+    "top_before_upstream_byte_identical": true,
+    "role_count": 10,
+    "all_role_keys_other_than_developer_instructions_identical": true,
+    "all_instruction_bytes_outside_f4_and_exact_shape_correction_identical": true,
+    "catalog_changed_leaf": "rows[272].source",
+    "catalog_observation_value_and_review_date_unchanged": true,
+    "readme_otel_environment_line": 199,
+    "light_git_diff_check_exit": 0
+  },
+  "qualification": {
+    "status": "local-tests-and-native-render-checks-completed",
+    "tests": {
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_codex_agents tests.test_codex_worker_lane tests.test_managed_block tests.test_codex_roles tests.test_new_wsl_client_config tests.test_upstream_surface_watch",
+      "umask": "022",
+      "scratch": "durable outside-checkout private scratch; no work in /tmp",
+      "exit_code": 0,
+      "test_count": 502,
+      "skips": 18,
+      "duration_seconds": 133.918,
+      "native_log": "touched-modules.log",
+      "native_log_sha256": "67a6701b69e5a4694fc387279a04cd602864b7687029474b2eddd310a5e9f624",
+      "scope": "One combined run of the six existing modules, including both originally failing DispositionCitationTests; no duplicate focused rerun or new benchmark runner."
+    },
+    "checksum_checks": [
+      {
+        "directory": "adoption/agents/codex",
+        "command": "sha256sum --check --strict SHA256SUMS",
+        "exit_code": 0,
+        "files": 2
+      },
+      {
+        "directory": "adoption/agents/codex/workers",
+        "command": "sha256sum --check --strict SHA256SUMS",
+        "exit_code": 0,
+        "files": 3
+      }
+    ],
+    "client_repository_check": {
+      "command": "nice -n 19 ionice -c3 python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit_code": 0,
+      "stdout_bytes": 51415,
+      "stdout_sha256": "a00b1e84acee3d631039c59f3425b8a63d3b3cba4a3e91586a58eb59986c2fb3",
+      "warnings": "Inherited mcp-inspector manifest/install-plan wiring warnings only."
+    },
+    "validate": null,
+    "validate_reporting": "The actual final validator result is recorded externally in the coordinator handoff/status and PR body after registration; no future success is asserted inside this receipt."
+  },
+  "host_changes": false,
+  "model_calls": 0,
+  "limits": [
+    "Existing native probe JSON and decided text retain their original bytes; this follow-up is a new record.",
+    "Rendered-source consistency and local structural tests do not qualify native hook trust, installation or provider behavior.",
+    "No #705 trust/install duplication, host apply, index, model run, push, merge or rebase occurs in this worker phase.",
+    "The coordinator owns the living PR description, review-thread replies/resolution and the single content push; later overlay/rebase belongs to 5f."
+  ]
+}

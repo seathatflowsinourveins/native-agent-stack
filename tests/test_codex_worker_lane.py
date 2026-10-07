@@ -473,16 +473,16 @@ class TemplateTests(unittest.TestCase):
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
                        "`jq`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
-        self.assertIn("With installed rtk exclusions config (`fixtures/rtk-hook-exclusions.toml`)", exceptions)
-        self.assertIn("rewrite/installed hooks keep the first four native; else rewrite them", exceptions)
-        self.assertIn("Explicit `rtk` bypasses exclusions: use `rtk proxy <command>`, never prefix", exceptions)
+        self.assertIn("With rtk exclusions (`fixtures/rtk-hook-exclusions.toml`) installed", exceptions)
+        self.assertIn("rewrite/hooks keep the first four native; else rewrite them", exceptions)
+        self.assertIn("Explicit `rtk` bypasses exclusions: use `rtk proxy <command>` for these exceptions", exceptions)
         self.assertIn("`diff`: rtk changes diagnostics; both exit 2 on missing files", exceptions)
         self.assertIn("bare: max 10 commits, no notice", exceptions)
         self.assertIn("`--stat`: max 10, notice, keeps merges", exceptions)
         self.assertIn("Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges", exceptions)
         self.assertIn("History/merges: `-n <count>` or `rtk proxy git log`", exceptions)
-        self.assertIn("`find NAME`: rtk uses patterns for missing bare names; no match exits 0", exceptions)
-        self.assertIn("Use `./NAME` or `rtk proxy find` for status", exceptions)
+        self.assertIn("`find NAME`: bare non-directory names are patterns in rtk; no match exits 0", exceptions)
+        self.assertIn("Use `./NAME` or `rtk proxy find` for paths/status", exceptions)
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex

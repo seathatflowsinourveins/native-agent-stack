@@ -57,8 +57,8 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f` |",
-    "| `stack-verifier.toml` | `d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561` |",
+    "| `stack-researcher.toml` | `a2f4d1c2df821d36850486c424cb3fee466bba087d7d81e2a8dee0faa4f0b618` |",
+    "| `stack-verifier.toml` | `f78fbf58252ac699b4dd9ad9825450512748c6be82ebca748b98cacdae76d0b3` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each
@@ -86,13 +86,13 @@ CITE_SENTENCE = ("Cite the source (file:line, the recorded pin or the docs) for 
 EXACT_SHAPES = {
     "stack-researcher": (
         "For an exact blob from `git show REV:path`, raw `diff` diagnostics, `git branch`, a complete `git log`, "
-        "`jq` output, or `find NAME` on a bare name that may not exist, use the native command or "
+        "`jq` output, or `find NAME` on a bare non-directory name, use the native command or "
         "`rtk proxy <command>` (the RTK exceptions below)."
     ),
     "stack-verifier": (
         "Use the native command or `rtk proxy <command>` for an exact blob from `git show REV:path`, raw `diff` "
-        "diagnostics, `git branch`, a complete `git log`, `jq` output, and `find NAME` on a bare name that may "
-        "not exist (the RTK exceptions below)."
+        "diagnostics, `git branch`, a complete `git log`, `jq` output, and `find NAME` on a bare non-directory "
+        "name (the RTK exceptions below)."
     ),
 }
 # Claude-only tool, frontmatter, hook and file names. Case-sensitive, as identifiers: a lowercase "bash" or

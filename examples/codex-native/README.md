@@ -143,8 +143,8 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f` |
-| `stack-verifier.toml` | `d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561` |
+| `stack-researcher.toml` | `a2f4d1c2df821d36850486c424cb3fee466bba087d7d81e2a8dee0faa4f0b618` |
+| `stack-verifier.toml` | `f78fbf58252ac699b4dd9ad9825450512748c6be82ebca748b98cacdae76d0b3` |
 
 ### 2026-10-04: RTK pin guidance amendment
 
@@ -164,9 +164,9 @@ merge retention with an explicit count ([src/cmds/git/git_cmd.rs:1550](https://g
 Both exact-command sentences preserve raw diff diagnostics; missing-file diff
 returns 2 natively and through rtk ([src/cmds/git/diff_cmd.rs:38](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/diff_cmd.rs#L38),
 [src/cmds/git/diff_cmd.rs:64](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/diff_cmd.rs#L64)).
-Both retain the narrow bare-name find exception: a missing bare name is a pattern
-and exits 0 silently; use an explicit path or `rtk proxy find` when status matters
-([src/cmds/system/find_cmd.rs:147](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L147),
+Both protect bare non-directory find names: even an existing regular file is a
+pattern. Use an explicit path or `rtk proxy find` for path semantics and status
+([src/cmds/system/find_cmd.rs:134-147](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L134-L147),
 [src/cmds/system/find_cmd.rs:417](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L417)).
 For complete log history or merges use `-n <count>` or `rtk proxy git log`; a
 plain command can be rewritten by an installed hook.

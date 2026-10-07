@@ -164,3 +164,29 @@ No client hook or exclusions configuration is installed by this change. Targeted
 acceptance and the final registration are reported in the builder's JSON handoff;
 CI owns the full suite. The historical manifest/revert commits remain for the
 coordinator to squash or rebase; this builder has no commit or push authorization.
+
+## Amendment (2026-10-07): scope and bare-file custody repair
+
+The prior decision and recorded measurements above remain unchanged. The current
+instruction carrier scopes its proxy recommendation to the listed exceptions;
+ordinary commands retain the verbatim upstream RTK prefix rule. The find warning
+now covers every bare non-directory name, including an existing regular file:
+RTK 0.51.0's [dispatch at e001f773:134-147](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L134-L147)
+selects legacy pattern syntax for that form. Explicit paths or the native proxy
+preserve path semantics and status. The same clause is carried by both stack
+roles through `codex_roles.EXACT_SHAPES`; models, effort, upstream awareness bytes
+and existing structural controls stay unchanged.
+
+The living PR description also needs its compact-log claim corrected:
+[git_cmd.rs:1816-1824 at the same pin](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1816-L1824)
+uses a default 50-commit limit for compact formats without an explicit count.
+The historical 16-commit observations are retained; they are not an unlimited
+history qualification. This repair reruns no native RTK or model comparison.
+
+The `otel.environment` disposition now points to the launch line in the current
+README, rather than its position before this branch's earlier insertion. Its
+underlying observation, value and review date are untouched. Rendered carriers,
+checksum projections and generated client blocks are refreshed from the existing
+repository helpers. New local checks and their scope belong in the linked
+[custody follow-up](../../evidence/artifacts/rtk-f4-custody-20261007/receipt.json).
+No trust tool, hook installer, install-plan row or host configuration changes.

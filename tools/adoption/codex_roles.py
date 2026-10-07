@@ -103,13 +103,13 @@ WORKTREE_SENTENCES = (
 EXACT_SHAPES = {
     "stack-researcher": (
         "For an exact blob from `git show REV:path`, raw `diff` diagnostics, `git branch`, a complete `git log`, "
-        "`jq` output, or `find NAME` on a bare name that may not exist, use the native command or "
+        "`jq` output, or `find NAME` on a bare non-directory name, use the native command or "
         "`rtk proxy <command>` (the RTK exceptions below)."
     ),
     "stack-verifier": (
         "Use the native command or `rtk proxy <command>` for an exact blob from `git show REV:path`, raw `diff` "
-        "diagnostics, `git branch`, a complete `git log`, `jq` output, and `find NAME` on a bare name that may "
-        "not exist (the RTK exceptions below)."
+        "diagnostics, `git branch`, a complete `git log`, `jq` output, and `find NAME` on a bare non-directory "
+        "name (the RTK exceptions below)."
     ),
 }
 # Claude-only tool, frontmatter, hook and file names. Case-sensitive, as identifiers: a lowercase "bash" or
