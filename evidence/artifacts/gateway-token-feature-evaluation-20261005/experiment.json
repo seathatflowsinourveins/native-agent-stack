@@ -1,0 +1,434 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "research-application",
+  "task_and_failure": "Compare exact interpretation of frozen research/coding evidence under native input preprocessing. First formatter oracle and underspecified label failed; native bounded requalification retained all earlier attempts.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/src/app/api/compression/preview/route.ts",
+      "revision": "23a11484862b3bb589a55e85b00e4ac53ffeb234"
+    },
+    {
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/assertions/index.ts",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+    },
+    {
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/util/transform.ts#L135-L149",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed CLI help/version, official vendor source/release first, maintained landscape and native public GPT Researcher report leads reread from primary sources.",
+    "Existing vendor benchmark/evaluation inspected; incomplete usage prevents complete-task acceptance. Native promptfoo used without custom runner or provider callback.",
+    "A3 selected supported native transformVars after exact inspection showed both earlier configurations used static strings. Root reread pinned transform/process/evaluator sources; read-only completeness critic verified all frozen input/reference hashes."
+  ],
+  "license_and_compatibility": "Use existing released npm runtime and installed native gateway CLI through supported configuration; no fork, rebuild or vendored upstream code. Synthetic fixture data belongs to this repository.",
+  "baseline_and_candidate": {
+    "baseline": "Raw native-preview input artifacts",
+    "candidate": "Native RTK and Caveman request-local preprocessing, separately labelled arm roles; no shared setting activation"
+  },
+  "frozen_inputs": {
+    "base_revision": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+    "tasks": [
+      "frozen-text-corpus"
+    ],
+    "roles": [
+      "raw-answer",
+      "rtk-answer",
+      "caveman-answer"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/plan.json",
+        "sha256": "d2f2cb3319592d55a9501fab1c802783da3997d4392daeb0a03575affaba38c0"
+      },
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/plan.json",
+        "sha256": "54a48aad3c15298d58d06de148e4023d3a1205776c6cc095d6461fecc1df25b6"
+      },
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/plan.json",
+        "sha256": "0b1cacddcb97e94a8adc8e0ee1cb686b42889ee6482c8efc8883cd70298de312"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/promptfoo.json",
+        "sha256": "4cee95c1ca56a270d9a0d29de6915134369c37092592029d68a08fffae2fd1b8"
+      },
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/promptfoo.json",
+        "sha256": "0b596a115a7ef7941ecc8094154250c5680b3bca80be052b57b5606c825f5c7d"
+      },
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/promptfoo.json",
+        "sha256": "cf5c556a784fa56fed6af38693c917a0d46fddf8ff39964db57eca03a6158feb"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/freeze.json",
+        "sha256": "5d2d9215cb3d078d3789a41c7e0d1b06e297b07028da27dbb33ff5980510e595"
+      },
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/freeze.json",
+        "sha256": "a3cec1a999bef3657b026991cb219fba3e1cb339b91acb9c1f93a1656466698d"
+      },
+      {
+        "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/freeze.json",
+        "sha256": "f059ababd41653bc9ec145042646039d80835fe6c783ec77e60d9b4e980a9af4"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "All exact raw final answers and native preview/reference gates pass in the separately preregistered native-transform phase; static pilot/qualification retained unchanged. Input-preprocessing evidence only, eight synthetic cases/two repeats per arm.",
+    "usage_rule": "Count all 144 distinct benchmark model calls once; native input includes cache, output includes reasoning. Keep 24 native-transform preview invocations separate; preparation/review/recovery and backend retries remain unknown."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux WSL NativeStack2604",
+    "tools": [
+      {
+        "name": "promptfoo",
+        "version": "0.123.1"
+      },
+      {
+        "name": "OmniRoute",
+        "version": "3.8.52 canary base23a plus owner overlays"
+      }
+    ],
+    "isolation": "Owned cache state/outputs and worktree static fixtures; preview request-local, compression header off during inference, one provider call at a time. Shared settings/combos/keys unchanged."
+  },
+  "commands": [
+    "omniroute --output json --quiet --no-color compression preview --file frozen-fixture.json",
+    "promptfoo eval --config evidence/artifacts/gateway-token-feature-evaluation-20261005/promptfoo.json --repeat 2 --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output private-pilot-results.json",
+    "promptfoo eval --config evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/promptfoo.json --repeat 2 --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output private-qualification-results.json",
+    "promptfoo eval --config evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/promptfoo.json --repeat 2 --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output private-transform-vars-results.json"
+  ],
+  "observations": [
+    {
+      "id": "pilot-raw",
+      "task": "frozen-text-corpus",
+      "role": "raw-answer",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "Input-preprocessing evidence only. 16 provider calls within actual native CLI phase; raw artifacts; shared phase CLI exit code retained; synthetic text interpretation only",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/pilot-calls.json",
+          "sha256": "2b0bdc1a387a205c55de0faaeddc96b4e3eb8866c5c0d1c00d2981b1115baa91"
+        }
+      ],
+      "usage": {
+        "uncached_input": 17602,
+        "cache_creation": 0,
+        "cache_read": 3456,
+        "output": 2491,
+        "reasoning_in_output": 2201,
+        "total": 23549,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "pilot-rtk",
+      "task": "frozen-text-corpus",
+      "role": "rtk-answer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "Input-preprocessing evidence only. 16 provider calls within actual native CLI phase; rtk artifacts; shared phase CLI exit code retained; synthetic text interpretation only",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/pilot-calls.json",
+          "sha256": "2b0bdc1a387a205c55de0faaeddc96b4e3eb8866c5c0d1c00d2981b1115baa91"
+        }
+      ],
+      "usage": {
+        "uncached_input": 8242,
+        "cache_creation": 0,
+        "cache_read": 3456,
+        "output": 2373,
+        "reasoning_in_output": 2087,
+        "total": 14071,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "pilot-caveman",
+      "task": "frozen-text-corpus",
+      "role": "caveman-answer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "Input-preprocessing evidence only. 16 provider calls within actual native CLI phase; caveman artifacts; shared phase CLI exit code retained; synthetic text interpretation only",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/pilot-calls.json",
+          "sha256": "2b0bdc1a387a205c55de0faaeddc96b4e3eb8866c5c0d1c00d2981b1115baa91"
+        }
+      ],
+      "usage": {
+        "uncached_input": 7234,
+        "cache_creation": 0,
+        "cache_read": 13824,
+        "output": 2520,
+        "reasoning_in_output": 2229,
+        "total": 23578,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-raw",
+      "task": "frozen-text-corpus",
+      "role": "raw-answer",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "Input-preprocessing evidence only. 16 provider calls within actual native CLI phase; raw artifacts; shared phase CLI exit code retained; synthetic text interpretation only",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/calls.json",
+          "sha256": "beaf60a36253875af114a32c06932d0fe742d4316e62d588e1fe62b7a1b98def"
+        }
+      ],
+      "usage": {
+        "uncached_input": 12190,
+        "cache_creation": 0,
+        "cache_read": 5760,
+        "output": 1575,
+        "reasoning_in_output": 1331,
+        "total": 19525,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-rtk",
+      "task": "frozen-text-corpus",
+      "role": "rtk-answer",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "Input-preprocessing evidence only. 16 provider calls within actual native CLI phase; rtk artifacts; shared phase CLI exit code retained; synthetic text interpretation only",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/calls.json",
+          "sha256": "beaf60a36253875af114a32c06932d0fe742d4316e62d588e1fe62b7a1b98def"
+        }
+      ],
+      "usage": {
+        "uncached_input": 8542,
+        "cache_creation": 0,
+        "cache_read": 4608,
+        "output": 1684,
+        "reasoning_in_output": 1440,
+        "total": 14834,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-caveman",
+      "task": "frozen-text-corpus",
+      "role": "caveman-answer",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "Input-preprocessing evidence only. 16 provider calls within actual native CLI phase; caveman artifacts; shared phase CLI exit code retained; synthetic text interpretation only",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/calls.json",
+          "sha256": "beaf60a36253875af114a32c06932d0fe742d4316e62d588e1fe62b7a1b98def"
+        }
+      ],
+      "usage": {
+        "uncached_input": 10846,
+        "cache_creation": 0,
+        "cache_read": 6912,
+        "output": 1535,
+        "reasoning_in_output": 1291,
+        "total": 19293,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-raw",
+      "task": "frozen-text-corpus",
+      "role": "raw-answer",
+      "condition": "baseline",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Experiment phase/attempt 3, first native-transform execution. Input-preprocessing evidence only: 16 actual native CLI-phase provider calls; supported transformVars invokes request-local preview before repeat expansion. No integrated worker/output-style or complete-task acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/calls.json",
+          "sha256": "a41e70cddd159c8c4c4cb21cbf6581452bf5bcdd42b36cad03f8376074553b8d"
+        }
+      ],
+      "usage": {
+        "uncached_input": 15646,
+        "cache_creation": 0,
+        "cache_read": 2304,
+        "output": 1646,
+        "reasoning_in_output": 1402,
+        "total": 19596,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-rtk",
+      "task": "frozen-text-corpus",
+      "role": "rtk-answer",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Experiment phase/attempt 3, first native-transform execution. Input-preprocessing evidence only: 16 actual native CLI-phase provider calls; supported transformVars invokes request-local preview before repeat expansion. No integrated worker/output-style or complete-task acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/calls.json",
+          "sha256": "a41e70cddd159c8c4c4cb21cbf6581452bf5bcdd42b36cad03f8376074553b8d"
+        }
+      ],
+      "usage": {
+        "uncached_input": 11998,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 1588,
+        "reasoning_in_output": 1344,
+        "total": 14738,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-caveman",
+      "task": "frozen-text-corpus",
+      "role": "caveman-answer",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Experiment phase/attempt 3, first native-transform execution. Input-preprocessing evidence only: 16 actual native CLI-phase provider calls; supported transformVars invokes request-local preview before repeat expansion. No integrated worker/output-style or complete-task acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/calls.json",
+          "sha256": "a41e70cddd159c8c4c4cb21cbf6581452bf5bcdd42b36cad03f8376074553b8d"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13150,
+        "cache_creation": 0,
+        "cache_read": 4608,
+        "output": 1516,
+        "reasoning_in_output": 1272,
+        "total": 19274,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "pilot-raw",
+      "reason": "Retained native phase exited 100: exact rendered-output oracle included reasoning and gate label was underspecified; all returned usage retained. RTK also has a failed pilot citation diagnostic."
+    },
+    {
+      "run_id": "pilot-rtk",
+      "reason": "Retained native phase exited 100: exact rendered-output oracle included reasoning and gate label was underspecified; all returned usage retained. RTK also has a failed pilot citation diagnostic."
+    },
+    {
+      "run_id": "pilot-caveman",
+      "reason": "Retained native phase exited 100: exact rendered-output oracle included reasoning and gate label was underspecified; all returned usage retained. RTK also has a failed pilot citation diagnostic."
+    }
+  ],
+  "limitations": [
+    "Only synthetic plain-text artifact interpretation, not preserved tool protocols, multimodal bodies, SDK worker homes or outputstyle.",
+    "Preview diagnostic fallback flag is not rollback proof; preview estimates use a different tokenizer scope.",
+    "Actual max forwarding/backend retries and preparation/review/recovery usage not independently observed.",
+    "Two repeats do not establish general research noninferiority or a global SOTA winner.",
+    "Native transform phase launched from owned repository root; 24 unique previews precede 48 repeat-expanded actual model calls. Valid/reference-matching output does not establish absence of fallback/no-op.",
+    "Native result export masks artifact hashes; independent retained-text comparison against frozen config constants is derived evidence. Reported gateway header 3.8.51 remains separate from installed canary/source metadata."
+  ],
+  "decision_and_scope": {
+    "decision": "defer",
+    "scope": "Retain shared settings and gateway-owner control; all three phases are input-preprocessing evidence only. Option 1 owner-isolated integrated route/settings readback/retry and complete-usage acceptance remain pending.",
+    "qualification_run_ids": []
+  },
+  "rollback": "No shared configuration change; retain previous gateway defaults. Delete only lane-owned scratch through the native lifecycle if later requested.",
+  "next_decision_changing_test": "Owner-isolated matched integrated worker/input/tool/outputstyle A/B with full protocol retention, source recovery, native provider usage and internal retries plus all preparatory cost.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "pilot-raw",
+      "pilot-rtk",
+      "pilot-caveman",
+      "qualification-raw",
+      "qualification-rtk",
+      "qualification-caveman",
+      "transform-vars-raw",
+      "transform-vars-rtk",
+      "transform-vars-caveman"
+    ],
+    "coverage_artifact": null
+  }
+}

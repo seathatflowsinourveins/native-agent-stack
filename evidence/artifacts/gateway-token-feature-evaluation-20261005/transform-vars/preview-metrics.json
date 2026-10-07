@@ -1,0 +1,850 @@
+{
+  "evidence_scope": "input-preprocessing evidence only",
+  "native_cli_invocations": 24,
+  "underlying_http_retries": null,
+  "scope": "24 source-stage transformations reused across 48 repeat-expanded model calls; diagnostic validity/reference hashes do not establish absence of engine fallback/no-op",
+  "rows": [
+    {
+      "id": "citation-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "citation",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "f43d2ae08a291cdf352003eda0271f768f50518e937a07fe905f18c021a29335",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 875,
+      "compressedTokens": 851,
+      "tokensSaved": 24,
+      "savingsPct": 3,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1495x1447 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 875,
+          "compressedTokens": 851,
+          "savingsPercent": 3,
+          "techniquesUsed": [
+            "caveman-rules"
+          ],
+          "rulesApplied": [
+            "polite_framing"
+          ],
+          "durationMs": 1.68
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "27fc4cfe9e3b9209ed0bad694bbfff27cbbf4a4266939abbaa081b9deb5d24fb",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "citation-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "citation",
+      "arm": "raw",
+      "native_invocation_id_sha256": "5b7cf87e8338dfaea0e1f191586ce3aa41360612f49d49d10e457024b60c7407",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 875,
+      "compressedTokens": 875,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1495x1495 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "b120ce5c751f840c9d7f25db2cea90859e07441126f2e92cedcf2540506b5e7d",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "citation-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "citation",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "75666892995a69d48faaa7a8f2eab3d5a673a89a4169fc545d805fe6a95f7aef",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 875,
+      "compressedTokens": 875,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "rtk: skipped (no eligible content)",
+          "Preview diff omitted because token product 1495x1495 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 875,
+          "compressedTokens": 875,
+          "savingsPercent": 0,
+          "techniquesUsed": []
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "b120ce5c751f840c9d7f25db2cea90859e07441126f2e92cedcf2540506b5e7d",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "diff-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "diff",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "859eeba7158467108b78b90beb7897d8c38a025e342bd9f37ee906df7b74d118",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1241,
+      "compressedTokens": 1241,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 1241,
+          "compressedTokens": 1241,
+          "savingsPercent": 0,
+          "techniquesUsed": [],
+          "durationMs": 0.04
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "8edacb0a29f03dc6cc915dafa6a0f2a1f8990d7d1e83523a0b6cc627ad2ce39d",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "diff-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "diff",
+      "arm": "raw",
+      "native_invocation_id_sha256": "cb6dfc9825fb0eb4b1920a131c60e337ab665dc9fb405dc5da2c416069841342",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1241,
+      "compressedTokens": 1241,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "8edacb0a29f03dc6cc915dafa6a0f2a1f8990d7d1e83523a0b6cc627ad2ce39d",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "diff-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "diff",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "cb67661f7ea5595e6feb62f8512f3f3808ca66c138094b4df88ea18dcd825001",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1241,
+      "compressedTokens": 1241,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": true,
+        "fallbackReason": "compression-fallback"
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 1241,
+          "compressedTokens": 1241,
+          "savingsPercent": 0,
+          "techniquesUsed": [
+            "rtk-filter"
+          ],
+          "rulesApplied": [
+            "docker-logs:keep",
+            "docker-logs:collapse"
+          ],
+          "durationMs": 0.64,
+          "rejected": true,
+          "rejectReason": "n\u00famero \"1\" ausente no output"
+        }
+      ],
+      "fallbackApplied": true,
+      "fallbackReasons": [
+        "n\u00famero \"1\" ausente no output"
+      ],
+      "derived_artifact_sha256": "8edacb0a29f03dc6cc915dafa6a0f2a1f8990d7d1e83523a0b6cc627ad2ce39d",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "gate-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "gate",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "5b6a6198653a1550c897b35c732be77185a5b77d457d5718860706354b618440",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 871,
+      "compressedTokens": 847,
+      "tokensSaved": 24,
+      "savingsPct": 3,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1517x1469 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 871,
+          "compressedTokens": 847,
+          "savingsPercent": 3,
+          "techniquesUsed": [
+            "caveman-rules"
+          ],
+          "rulesApplied": [
+            "polite_framing"
+          ],
+          "durationMs": 0.75
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "e5420ea5520f2dc918ac54385ff5c6dbf05aa75e9ee143c3314555723b8c5cd9",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "gate-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "gate",
+      "arm": "raw",
+      "native_invocation_id_sha256": "526dd069106c375c962039828ec0f63f4303a788a4275c0130b86140244214a3",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 871,
+      "compressedTokens": 871,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1517x1517 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "6e16e887ff35ecb509f993c04aec97aa212d5b2ebf8a9950f84d098d2d7d9225",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "gate-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "gate",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "2ebc6ddfc2bea4b8b2c0633f7bfce82e39f431b6ab98c899dc21b701caecf84e",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 871,
+      "compressedTokens": 871,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "rtk: skipped (no eligible content)",
+          "Preview diff omitted because token product 1517x1517 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 871,
+          "compressedTokens": 871,
+          "savingsPercent": 0,
+          "techniquesUsed": []
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "6e16e887ff35ecb509f993c04aec97aa212d5b2ebf8a9950f84d098d2d7d9225",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "instruction-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "instruction",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "f4c6786cc5d4a4c98eed112bf809dab2130deaa5336ee4ec5165a954d5ef72fe",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 876,
+      "compressedTokens": 852,
+      "tokensSaved": 24,
+      "savingsPct": 3,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1513x1465 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 876,
+          "compressedTokens": 852,
+          "savingsPercent": 3,
+          "techniquesUsed": [
+            "caveman-rules"
+          ],
+          "rulesApplied": [
+            "polite_framing"
+          ],
+          "durationMs": 0.79
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "8a7b9065d66a1497792ceab7314ff0ea06c0aaf65ec08f455ba52bc5482c7367",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "instruction-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "instruction",
+      "arm": "raw",
+      "native_invocation_id_sha256": "f0a12acda8ab5d076ffab1b1527a6ecc7a55d9afdf25ac3f99a94abad6d51e14",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 876,
+      "compressedTokens": 876,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1513x1513 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "182714cd59443b603a5245fb698e22e625218cb73248f42d5125763f20202271",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "instruction-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "instruction",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "8c18c280cecf6951ca2ebad553c8bcf9669fb61a7780953172acb83c95e56b36",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 876,
+      "compressedTokens": 876,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "rtk: skipped (no eligible content)",
+          "Preview diff omitted because token product 1513x1513 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 876,
+          "compressedTokens": 876,
+          "savingsPercent": 0,
+          "techniquesUsed": []
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "182714cd59443b603a5245fb698e22e625218cb73248f42d5125763f20202271",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "json-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "json",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "29c7d240c4e487e1c12cde2d473436c9d2a744b9ad29ffb470a7cd73ddf44bb9",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1229,
+      "compressedTokens": 1229,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1123x1123 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 1229,
+          "compressedTokens": 1229,
+          "savingsPercent": 0,
+          "techniquesUsed": [],
+          "durationMs": 0.03
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "ebdcf429ac37db18e9a74aacdadeebcf0fffdf0c6f4f8148a146d3d334a1a350",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "json-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "json",
+      "arm": "raw",
+      "native_invocation_id_sha256": "db7a32a955d154c20b93168ed097420b07f8cf384252db9d01699b4b0491ddcd",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1229,
+      "compressedTokens": 1229,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1123x1123 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "ebdcf429ac37db18e9a74aacdadeebcf0fffdf0c6f4f8148a146d3d334a1a350",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "json-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "json",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "387bdddf0cd98f4f3a7a4f9705bd4a441f1094c4e669da7dee4d997265303962",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1229,
+      "compressedTokens": 30,
+      "tokensSaved": 1199,
+      "savingsPct": 98,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 1229,
+          "compressedTokens": 30,
+          "savingsPercent": 98,
+          "techniquesUsed": [
+            "rtk-filter"
+          ],
+          "rulesApplied": [
+            "docker-logs:keep",
+            "docker-logs:collapse"
+          ],
+          "durationMs": 0.62
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "c7aa00eb76bf52336877df23683165254073fc2735db1e9504ed10ba8422c419",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "log-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "log",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "62cbb4b9e3ea5d93ed770396d0fd0249c1e35881ed85a29b04322293c6f805e7",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1223,
+      "compressedTokens": 1223,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1131x1131 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 1223,
+          "compressedTokens": 1223,
+          "savingsPercent": 0,
+          "techniquesUsed": [],
+          "durationMs": 0.14
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "b2feff7ac19632f97963c20391d93c175815de82d502abcc345437798cee429c",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "log-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "log",
+      "arm": "raw",
+      "native_invocation_id_sha256": "96abb6a610003234e27dceb0dfd010ecdd15c2334720fd61a51299f7fc3532bb",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1223,
+      "compressedTokens": 1223,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1131x1131 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "b2feff7ac19632f97963c20391d93c175815de82d502abcc345437798cee429c",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "log-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "log",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "67db4a7e3af64fb971207d37d7d80977b8742e54f9a15094da22a7e9d2b62388",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1223,
+      "compressedTokens": 23,
+      "tokensSaved": 1200,
+      "savingsPct": 98,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 1223,
+          "compressedTokens": 23,
+          "savingsPercent": 98,
+          "techniquesUsed": [
+            "rtk-filter"
+          ],
+          "rulesApplied": [
+            "docker-logs:keep",
+            "docker-logs:collapse"
+          ],
+          "durationMs": 1.41
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "69414d06b29fd9a55cebc95a718fd4024439deca2e53c10660e5a58f25e58b98",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "revision-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "revision",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "010ae168eb83e3e94b0051dcaa9bae7a9eadc63a95a4fde06b9b3a3c930227d4",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1264,
+      "compressedTokens": 1264,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 1264,
+          "compressedTokens": 1264,
+          "savingsPercent": 0,
+          "techniquesUsed": [],
+          "durationMs": 0.03
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "1aa0c8d129a78f588504add6520c45c620dd168982c9f09f5dc10b25a233e702",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "revision-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "revision",
+      "arm": "raw",
+      "native_invocation_id_sha256": "d73b37023aa55bd53ae074f1b29a53da0f0f6f2a606cf275560950c33d0ccf59",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1264,
+      "compressedTokens": 1264,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "1aa0c8d129a78f588504add6520c45c620dd168982c9f09f5dc10b25a233e702",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "revision-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "revision",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "e5113366ff3887e135167223e54327a3f52de907c4ddaf5d83271c443fb6737d",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 1264,
+      "compressedTokens": 1264,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": true,
+        "fallbackReason": "compression-fallback"
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 1264,
+          "compressedTokens": 1264,
+          "savingsPercent": 0,
+          "techniquesUsed": [
+            "rtk-filter"
+          ],
+          "rulesApplied": [
+            "docker-logs:keep",
+            "docker-logs:collapse"
+          ],
+          "durationMs": 0.65,
+          "rejected": true,
+          "rejectReason": "n\u00famero \"01\" ausente no output"
+        }
+      ],
+      "fallbackApplied": true,
+      "fallbackReasons": [
+        "n\u00famero \"01\" ausente no output"
+      ],
+      "derived_artifact_sha256": "1aa0c8d129a78f588504add6520c45c620dd168982c9f09f5dc10b25a233e702",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "semantic-caveman",
+      "evidence_scope": "input_preprocessing",
+      "case": "semantic",
+      "arm": "caveman",
+      "native_invocation_id_sha256": "200ccfa289332aafdb1ce03ca2bc0e84e39eb81cc776f8b84425dcab964301e7",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 867,
+      "compressedTokens": 843,
+      "tokensSaved": 24,
+      "savingsPct": 3,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1509x1461 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "caveman",
+          "originalTokens": 867,
+          "compressedTokens": 843,
+          "savingsPercent": 3,
+          "techniquesUsed": [
+            "caveman-rules"
+          ],
+          "rulesApplied": [
+            "polite_framing"
+          ],
+          "durationMs": 0.75
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "0556ee0271fc0038bdad3d4e8ff8afdfd6806f9f55226a4594bfb2209a5afd2b",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "semantic-raw",
+      "evidence_scope": "input_preprocessing",
+      "case": "semantic",
+      "arm": "raw",
+      "native_invocation_id_sha256": "4cc838e36eeff91beff63b73d7a2b2453462b30db638a34ba001c42f25eab43d",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 867,
+      "compressedTokens": 867,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "Preview diff omitted because token product 1509x1509 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "70958e5eb6b6eea7620baf8c698971b7a78897ec572a85f6240bc502dddd8745",
+      "native_export_hash_fields_redacted": true
+    },
+    {
+      "id": "semantic-rtk",
+      "evidence_scope": "input_preprocessing",
+      "case": "semantic",
+      "arm": "rtk",
+      "native_invocation_id_sha256": "8ebc9a28e3f771fbe89ce086d4fb55ba9278cc433ce322aea266c3da97ba9eba",
+      "cli_exit_code": 0,
+      "artifact_sha256": "[REDACTED]",
+      "artifact_matches_reference": true,
+      "originalTokens": 867,
+      "compressedTokens": 867,
+      "tokensSaved": 0,
+      "savingsPct": 0,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "rtk: skipped (no eligible content)",
+          "Preview diff omitted because token product 1509x1509 exceeds safe limit 1000000."
+        ],
+        "fallbackApplied": false
+      },
+      "engineBreakdown": [
+        {
+          "engine": "rtk",
+          "originalTokens": 867,
+          "compressedTokens": 867,
+          "savingsPercent": 0,
+          "techniquesUsed": []
+        }
+      ],
+      "fallbackApplied": false,
+      "fallbackReasons": [],
+      "derived_artifact_sha256": "70958e5eb6b6eea7620baf8c698971b7a78897ec572a85f6240bc502dddd8745",
+      "native_export_hash_fields_redacted": true
+    }
+  ]
+}

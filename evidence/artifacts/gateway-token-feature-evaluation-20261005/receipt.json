@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-05",
+  "evidence_scope": "Every phase, preview measurement, model-call result and usage comparison is input-preprocessing evidence only; no integrated worker route, enabled gateway pipeline or output-style acceptance",
+  "evidence_class": "actual provider execution with synthetic frozen tasks through native promptfoo",
+  "status": "text_interpretation_qualified_integrated_adoption_deferred",
+  "versions": {
+    "promptfoo": "0.123.1",
+    "gateway": "3.8.52 canary, base23a11484 plus owner overlays",
+    "returned_model": "gpt-6.1-sol-max"
+  },
+  "pilot": {
+    "exit_code": 100,
+    "duration_ms": 349434,
+    "by_arm": {
+      "raw": {
+        "calls": 16,
+        "passes": 9,
+        "input": 21058,
+        "output": 2491,
+        "total": 23549,
+        "cache_read_subset": 3456,
+        "cache_write": 0,
+        "reasoning_output_subset": 2201
+      },
+      "rtk": {
+        "calls": 16,
+        "passes": 11,
+        "input": 11698,
+        "output": 2373,
+        "total": 14071,
+        "cache_read_subset": 3456,
+        "cache_write": 0,
+        "reasoning_output_subset": 2087
+      },
+      "caveman": {
+        "calls": 16,
+        "passes": 9,
+        "input": 21058,
+        "output": 2520,
+        "total": 23578,
+        "cache_read_subset": 13824,
+        "cache_write": 0,
+        "reasoning_output_subset": 2229
+      }
+    },
+    "calls_file": "pilot-calls.json",
+    "raw_sha256": "83ba1b0dd3e25776fb57c49ce85602a9ca80992a3fc2d3742de6961acce81a94"
+  },
+  "qualification": {
+    "exit_code": 0,
+    "duration_ms": 271851,
+    "by_arm": {
+      "raw": {
+        "calls": 16,
+        "passes": 16,
+        "input": 17950,
+        "output": 1575,
+        "total": 19525,
+        "cache_read_subset": 5760,
+        "cache_write": 0,
+        "reasoning_output_subset": 1331
+      },
+      "rtk": {
+        "calls": 16,
+        "passes": 16,
+        "input": 13150,
+        "output": 1684,
+        "total": 14834,
+        "cache_read_subset": 4608,
+        "cache_write": 0,
+        "reasoning_output_subset": 1440
+      },
+      "caveman": {
+        "calls": 16,
+        "passes": 16,
+        "input": 17758,
+        "output": 1535,
+        "total": 19293,
+        "cache_read_subset": 6912,
+        "cache_write": 0,
+        "reasoning_output_subset": 1291
+      }
+    },
+    "calls_file": "qualification/calls.json",
+    "raw_sha256": "dd909b5740a1beaf09b508f1234fb5028cea4bf9792a3b015365c7f5b1d9ac80"
+  },
+  "native_transform_vars": {
+    "exit_code": 0,
+    "duration_ms": 300947,
+    "calls": 48,
+    "passes": 48,
+    "failures": 0,
+    "errors": 0,
+    "unique_preview_invocations": 24,
+    "by_arm": {
+      "raw": {
+        "calls": 16,
+        "passes": 16,
+        "input": 17950,
+        "output": 1646,
+        "total": 19596,
+        "cache_read_subset": 2304,
+        "cache_write": 0,
+        "reasoning_output_subset": 1402
+      },
+      "rtk": {
+        "calls": 16,
+        "passes": 16,
+        "input": 13150,
+        "output": 1588,
+        "total": 14738,
+        "cache_read_subset": 1152,
+        "cache_write": 0,
+        "reasoning_output_subset": 1344
+      },
+      "caveman": {
+        "calls": 16,
+        "passes": 16,
+        "input": 17758,
+        "output": 1516,
+        "total": 19274,
+        "cache_read_subset": 4608,
+        "cache_write": 0,
+        "reasoning_output_subset": 1272
+      }
+    },
+    "raw_sha256": "17e3de872fd5c969476a11bd127660ab3d00887c06e1715c56171a60743cea35",
+    "reported_gateway_versions": [
+      "3.8.51"
+    ],
+    "gateway_compression_headers": [
+      "off; source=off"
+    ],
+    "evidence_scope": "input_preprocessing",
+    "calls_file": "transform-vars/calls.json",
+    "preview_metrics_file": "transform-vars/preview-metrics.json",
+    "actual_launch_cwd": "owned repository root, as recorded privately in lane status",
+    "artifact_reference_check": "Native export masks both artifact hash fields. Retained result.vars.artifact was independently SHA256-checked against frozen public config constants for all 48 rows; masked returned fields remain masked."
+  },
+  "provider_calls": 144,
+  "usage_coverage": {
+    "provider_terminal_usage": "all 144 distinct benchmark calls returned input/output/cache-write/cache-read/reasoning/total; 24 native transformVars preview invocations are separate",
+    "gateway_internal_retries": null,
+    "preparation_usage": null,
+    "review_usage": null,
+    "original_recovery_usage": null,
+    "whole_task_coverage": "partial",
+    "whole_task_token_savings_claim": false
+  },
+  "controls": {
+    "shared_gateway_changes": false,
+    "shared_combos_or_keys_changes": false,
+    "real_codex_hook_apply": false,
+    "native_harness": true,
+    "self_written_runner": false,
+    "provider_cache": "preserved",
+    "promptfoo_cache": false,
+    "max_concurrency": 1,
+    "harness_max_retries": 0,
+    "effort": "max source-supported; actual forwarding trace remains owner gate"
+  },
+  "failed_conditions": [
+    "First preview request used boolean gates and received HTTP400; corrected to exact source schema before frozen model input.",
+    "Pilot exact-output grader included reasoning summaries and gate question omitted exact label; retained 19 failures and their complete returned usage.",
+    "Pilot citation/RTK diagnostic valid=false with merged fallback flag; returned changed artifact, no rollback proof. All pilot diagnostics retained."
+  ],
+  "limits": [
+    "Preview flattens role/content; does not prove structured tool/body semantics.",
+    "Preview tokenizer estimates are separate from provider native usage.",
+    "Qualification has four tool and four user-prose fixtures, two repeats; does not establish general research noninferiority.",
+    "Input/cache/reasoning/provider subsets are counted once; pilot, static qualification and native transformVars are three distinct actual phases.",
+    "Native transformVars uses root-cwd relative fixtures; 24 pre-repeat CLI previews are separate from 48 model calls and unknown backend HTTP retries. Valid diagnostics/reference checks do not establish absence of fallback or no-op.",
+    "The native inference response header reports gateway 3.8.51; installed CLI/source metadata names a 3.8.52 canary with owner overlays. Header/installed-source identities are retained separately, with no integrated deployment identity acceptance.",
+    "Worker homes/container routes, outputstyle, triggered compaction, actual effort/backend retries and complete task/recovery usage require owner-isolated acceptance."
+  ]
+}

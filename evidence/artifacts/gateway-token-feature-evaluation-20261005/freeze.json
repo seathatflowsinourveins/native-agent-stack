@@ -1,0 +1,11 @@
+{
+  "frozen_before_model_execution": true,
+  "frozen_bundle_sha256": "b930ba5650a257456d5ded31bad193cc91ee7f0d64a0927046ded9a2a27abe00",
+  "bundle_algorithm": "SHA256 of sorted relative-path NUL file-SHA256 newline entries for the 27 JSON files present before this freeze file",
+  "files": 27,
+  "promptfoo_sha256": "4cee95c1ca56a270d9a0d29de6915134369c37092592029d68a08fffae2fd1b8",
+  "plan_sha256": "d2f2cb3319592d55a9501fab1c802783da3997d4392daeb0a03575affaba38c0",
+  "model_command": "promptfoo eval --config promptfoo.json --repeat 2 --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output private-results.json",
+  "usage_boundaries": "Provider-call native usage only where returned; preparation, gateway internal retries and worker traces unknown. No complete-task savings claim.",
+  "failed_preparation": "First preview rejected boolean safety-gate fields with HTTP 400; exact upstream schema requires objects with enabled=true. Corrected before freezing/model execution."
+}

@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "scope": "foundation / codex-token-parity",
+  "status": "profile_repair_checked_host_apply_blocked_rtk_owned_by_705",
+  "ownership": {
+    "codex_rtk_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/705",
+    "reviewed_head": "e6321c0b8cfa56a57dbc045f1e79ccf6a4dd00c6",
+    "rtk_evidence_scope": "historical isolated execution before later user binding; overlapping adoption changes removed",
+    "rtk_future_actions": "read-only review; tests only through PR 705 scratch harness; no real-home init or apply"
+  },
+  "repository_checks": {
+    "final_targeted_command": "python3 -m unittest -v tests.test_new_wsl_client_config tests.test_adoption_docs_consistency",
+    "final_targeted_tests": 217,
+    "final_targeted_skipped": 1,
+    "final_targeted_seconds": 70.913,
+    "final_targeted_exit_code": 0,
+    "final_targeted_log_sha256": "c3b59811b1f79c36024ae18bdba7977b466cb4a1b215b0e028730e3e876a7fd0",
+    "validate_command": "python3 scripts/validate.py",
+    "validate_exit_code": 0,
+    "validate_output": "status passed; integrity and scope checks only; no live provider or GPU execution",
+    "plan_consistency_exit_code": 0,
+    "client_config_check_exit_code": 0,
+    "docs_unit_tests": 39,
+    "docs_unit_tests_skipped": 1,
+    "docs_unit_tests_exit_code": 0
+  },
+  "versions": {
+    "codex": "0.160.0",
+    "rtk": "0.51.0"
+  },
+  "sources": {
+    "rtk": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026:hooks/codex/README.md:7-24",
+    "codex_hooks": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/tui/src/hooks_rpc.rs:58-91",
+    "codex_mcp": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/mcp_tool_call.rs:2466-2495"
+  },
+  "synthetic": {
+    "unit_command": "python3 -m unittest -v tests.test_new_wsl_client_config tests.test_codex_hook_trust tests.test_token_stack_cards tests.test_native_token_ci",
+    "exit_code": 0,
+    "tests": 262,
+    "seconds": 63.943,
+    "upstream_suite": false
+  },
+  "native_local_integration": {
+    "isolation": "separate CODEX_HOME and RTK_DB_PATH; non-git working directory",
+    "exclusions": "both agents, five excluded commands exit 1 with exact No rewrite output; git status positive control exit 0",
+    "post_install_command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only command-output --stage post_install",
+    "post_install_exit_code": 0,
+    "post_install_output": "command-output | post_install | 0",
+    "global_show": [
+      "[ok] Global RTK.md",
+      "[ok] Global hook",
+      "[ok] Global AGENTS.md",
+      "local artifacts absent"
+    ],
+    "trust_readback": "nothing to do: every named hook is trusted",
+    "trust_apply_exit_code": 0,
+    "trust_scope_note": "The alternate process name was used only for the isolated scratch home; the live-home process guard was not bypassed."
+  },
+  "fresh_provider_execution": {
+    "command": "codex exec --json --ephemeral --skip-git-repo-check -p stack-worker -c model_reasoning_effort=max",
+    "exit_code": 0,
+    "native_shell_item": {
+      "command": "/bin/bash -lc 'rtk ls .'",
+      "exit_code": 0,
+      "requested_unprefixed": "ls .",
+      "observation_limit": "The native stream exposes the final command, not original tool arguments. This proves RTK use; it does not independently distinguish hook rewriting from model prefixing."
+    },
+    "mcp": [
+      {
+        "server": "headroom",
+        "tool": "headroom_compress",
+        "transport": "completed",
+        "semantic": "passed API; router noop",
+        "original_tokens": 29,
+        "compressed_tokens": 29,
+        "tokens_saved": 0,
+        "limitation": "Configured standalone offline route has no reachable proxy; warning retained."
+      },
+      {
+        "server": "headroom",
+        "tool": "headroom_retrieve",
+        "transport": "completed",
+        "semantic": "passed; exact original fixture returned"
+      },
+      {
+        "server": "socraticode",
+        "tool": "codebase_list_projects",
+        "transport": "completed",
+        "semantic": "failed prerequisite",
+        "returned_text": "Could not connect to Qdrant. Run codebase_health to check infrastructure status."
+      },
+      {
+        "server": "codebase-memory",
+        "tool": "list_projects",
+        "transport": "completed",
+        "semantic": "passed; one project returned; no blanket approval override"
+      },
+      {
+        "server": "context-mode",
+        "tool": "ctx_execute",
+        "transport": "completed",
+        "semantic": "passed; PARITY-CONTEXT-OK returned"
+      }
+    ],
+    "usage": {
+      "input_tokens": 67188,
+      "cached_input_tokens": 47744,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1332,
+      "reasoning_output_tokens": 744
+    },
+    "classification": "actual native provider execution with a synthetic fixture in isolated configuration; not deployed-host acceptance or upstream test acceptance"
+  },
+  "rtk_counter_delta": {
+    "database_scope": "isolated native RTK database; snapshots counted once",
+    "before": {
+      "total_commands": 0,
+      "total_input": 0,
+      "total_output": 0,
+      "total_saved": 0
+    },
+    "after": {
+      "total_commands": 1,
+      "total_input": 2,
+      "total_output": 2,
+      "total_saved": 0
+    },
+    "claim": "one RTK command used; zero measured token savings; separate from provider usage"
+  },
+  "runtime_prerequisite_observation": {
+    "qdrant_direct_health_exit_code": 28,
+    "qdrant_observation": "connection timed out; no selected-service listener observed by read-only inventory",
+    "service_start_attempted": false,
+    "classification": "expected pending configuration and owner frozen qualification, not a fault or successful retrieval acceptance",
+    "source": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json:1031-1032,1073; docs/decisions/2026-10-04-token-full-stack-owner-default.md:131-140",
+    "owner_route": "frozen semble 0.6.1 versus SocratiCode 1.15.0 comparison decides the arm; no supporting-service installation or separate readiness handoff from this lane"
+  },
+  "host_application": {
+    "command": "python3 tools/adoption/new_wsl_client_config.py --apply --host nativestack2604 --with-authorization-settings --skip claude-hooks --skip claude-agents --skip claude-mcp --skip claude-settings --skip claude-launcher --skip claude-md --skip codex-md --skip login-path --skip verify",
+    "exit_code": 1,
+    "result": "refused config and profile writes: 14 Codex processes running",
+    "worker_profile_bytes_unchanged": true,
+    "rtk_host_install_and_trust": "not attempted after writer refusal; existing host RTK hook absent",
+    "next_step": "Historical command only, not a lane retry instruction. No host apply from this lane in any window: no client-config apply, real-home RTK init or hook trust apply. The command center or user owns host configuration; session 99/PR 705 exclusively owns RTK adoption. Draft 716 cannot land before the v2026.10.05 re-pin and command-center cross-family read."
+  },
+  "failed_development_attempts": [
+    {
+      "check": "first targeted unit run",
+      "result": "60-second timeout, final result unknown"
+    },
+    {
+      "check": "complete development unit run",
+      "tests": 197,
+      "seconds": 64.096,
+      "failures": 14
+    },
+    {
+      "check": "focused development unit run",
+      "tests": 36,
+      "seconds": 31.505,
+      "failures": 3
+    },
+    {
+      "check": "plan consistency during edit",
+      "exit_code": 1,
+      "result": "accept.sh / install-plan.json mismatch; corrected and final check passed"
+    },
+    {
+      "check": "scratch trust preparation",
+      "exit_code": 4,
+      "result": "disabled MCP transports were incorrectly omitted; corrected before provider launch"
+    }
+  ],
+  "private_raw_artifact_hashes": {
+    "unit-final.log": "abdde13be67563140834493d57215ac12ecee02c70ffc60b9ee50485a4470531",
+    "fresh-codex.jsonl": "ccdb7e6cc81c05cc7be6f543e91b1f67119105aca1efd06e6a02b2a01c014ad4",
+    "fresh-codex.stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "gain-before.json": "f20d39dd79bddab4c8c2096a0c28dd3668329768e5400bc40e51dcf1bd20b74b",
+    "gain-after.json": "acd49103d293eda3a77445a50aaa10a1369a61bb21394c9d41663722edcd8536",
+    "rtk-show.txt": "d4cdbd964cf34836f0a4217c3abee0be776e7737abf6eb0d452a37cce1c58f65",
+    "rtk-trust-readback.txt": "e4877f8cfc8a7c9c990ad69c8cb46f71d68cf0767d77837e5e1300d00c5423d9",
+    "host-apply.log": "0add38da1aa7b4789df44fbaadb0a1c5a64f378fe2dcd1d6ddcc5d6ddf43aef2"
+  },
+  "limits": [
+    "No unchanged upstream suite was run.",
+    "Native usage, RTK counters and Headroom artifact counts are separate boundaries, not additive savings.",
+    "Token-lane instruction carriers remain held out.",
+    "F4 exceptions are owned by PR #709."
+  ]
+}

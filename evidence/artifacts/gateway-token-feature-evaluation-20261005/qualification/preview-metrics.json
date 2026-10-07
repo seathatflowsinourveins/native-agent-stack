@@ -1,0 +1,648 @@
+[
+  {
+    "case": "log",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 1223,
+    "compressedTokens": 1223,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1131x1131 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "log",
+    "arm": "rtk",
+    "artifact_matches_original": false,
+    "originalTokens": 1223,
+    "compressedTokens": 23,
+    "tokensSaved": 1200,
+    "savingsPct": 98,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1223,
+        "compressedTokens": 23,
+        "savingsPercent": 98,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.61
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "log",
+    "arm": "caveman",
+    "artifact_matches_original": true,
+    "originalTokens": 1223,
+    "compressedTokens": 1223,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1131x1131 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1223,
+        "compressedTokens": 1223,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.02
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "diff",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "diff",
+    "arm": "rtk",
+    "artifact_matches_original": true,
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": true,
+      "fallbackReason": "compression-fallback"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1241,
+        "compressedTokens": 1241,
+        "savingsPercent": 0,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.85,
+        "rejected": true,
+        "rejectReason": "número \"1\" ausente no output"
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "diff",
+    "arm": "caveman",
+    "artifact_matches_original": true,
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1241,
+        "compressedTokens": 1241,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.03
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "json",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 1229,
+    "compressedTokens": 1229,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1123x1123 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "json",
+    "arm": "rtk",
+    "artifact_matches_original": false,
+    "originalTokens": 1229,
+    "compressedTokens": 30,
+    "tokensSaved": 1199,
+    "savingsPct": 98,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1229,
+        "compressedTokens": 30,
+        "savingsPercent": 98,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.7
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "json",
+    "arm": "caveman",
+    "artifact_matches_original": true,
+    "originalTokens": 1229,
+    "compressedTokens": 1229,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1123x1123 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1229,
+        "compressedTokens": 1229,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.03
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "revision",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 1264,
+    "compressedTokens": 1264,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "revision",
+    "arm": "rtk",
+    "artifact_matches_original": true,
+    "originalTokens": 1264,
+    "compressedTokens": 1264,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": true,
+      "fallbackReason": "compression-fallback"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1264,
+        "compressedTokens": 1264,
+        "savingsPercent": 0,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.69,
+        "rejected": true,
+        "rejectReason": "número \"01\" ausente no output"
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "revision",
+    "arm": "caveman",
+    "artifact_matches_original": true,
+    "originalTokens": 1264,
+    "compressedTokens": 1264,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1264,
+        "compressedTokens": 1264,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.02
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "citation",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 875,
+    "compressedTokens": 875,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1495x1495 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "citation",
+    "arm": "rtk",
+    "artifact_matches_original": true,
+    "originalTokens": 875,
+    "compressedTokens": 875,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "rtk: skipped (no eligible content)",
+        "Preview diff omitted because token product 1495x1495 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 875,
+        "compressedTokens": 875,
+        "savingsPercent": 0,
+        "techniquesUsed": []
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "citation",
+    "arm": "caveman",
+    "artifact_matches_original": false,
+    "originalTokens": 875,
+    "compressedTokens": 851,
+    "tokensSaved": 24,
+    "savingsPct": 3,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1495x1447 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 875,
+        "compressedTokens": 851,
+        "savingsPercent": 3,
+        "techniquesUsed": [
+          "caveman-rules"
+        ],
+        "rulesApplied": [
+          "polite_framing"
+        ],
+        "durationMs": 7.24
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "semantic",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 867,
+    "compressedTokens": 867,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1509x1509 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "semantic",
+    "arm": "rtk",
+    "artifact_matches_original": true,
+    "originalTokens": 867,
+    "compressedTokens": 867,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "rtk: skipped (no eligible content)",
+        "Preview diff omitted because token product 1509x1509 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 867,
+        "compressedTokens": 867,
+        "savingsPercent": 0,
+        "techniquesUsed": []
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "semantic",
+    "arm": "caveman",
+    "artifact_matches_original": false,
+    "originalTokens": 867,
+    "compressedTokens": 843,
+    "tokensSaved": 24,
+    "savingsPct": 3,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1509x1461 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 867,
+        "compressedTokens": 843,
+        "savingsPercent": 3,
+        "techniquesUsed": [
+          "caveman-rules"
+        ],
+        "rulesApplied": [
+          "polite_framing"
+        ],
+        "durationMs": 0.6
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "gate",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 871,
+    "compressedTokens": 871,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1517x1517 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "gate",
+    "arm": "rtk",
+    "artifact_matches_original": true,
+    "originalTokens": 871,
+    "compressedTokens": 871,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "rtk: skipped (no eligible content)",
+        "Preview diff omitted because token product 1517x1517 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 871,
+        "compressedTokens": 871,
+        "savingsPercent": 0,
+        "techniquesUsed": []
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "gate",
+    "arm": "caveman",
+    "artifact_matches_original": false,
+    "originalTokens": 871,
+    "compressedTokens": 847,
+    "tokensSaved": 24,
+    "savingsPct": 3,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1517x1469 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 871,
+        "compressedTokens": 847,
+        "savingsPercent": 3,
+        "techniquesUsed": [
+          "caveman-rules"
+        ],
+        "rulesApplied": [
+          "polite_framing"
+        ],
+        "durationMs": 0.63
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "instruction",
+    "arm": "raw",
+    "artifact_matches_original": true,
+    "originalTokens": 876,
+    "compressedTokens": 876,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1513x1513 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "instruction",
+    "arm": "rtk",
+    "artifact_matches_original": true,
+    "originalTokens": 876,
+    "compressedTokens": 876,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "rtk: skipped (no eligible content)",
+        "Preview diff omitted because token product 1513x1513 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 876,
+        "compressedTokens": 876,
+        "savingsPercent": 0,
+        "techniquesUsed": []
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "instruction",
+    "arm": "caveman",
+    "artifact_matches_original": false,
+    "originalTokens": 876,
+    "compressedTokens": 852,
+    "tokensSaved": 24,
+    "savingsPct": 3,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1513x1465 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 876,
+        "compressedTokens": 852,
+        "savingsPercent": 3,
+        "techniquesUsed": [
+          "caveman-rules"
+        ],
+        "rulesApplied": [
+          "polite_framing"
+        ],
+        "durationMs": 0.68
+      }
+    ],
+    "fallbackApplied": false
+  }
+]

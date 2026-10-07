@@ -1,0 +1,1833 @@
+{
+  "phase": "native_transform_vars",
+  "evidence_scope": "input-preprocessing evidence only; no integrated worker route or output-style acceptance",
+  "exit_code": 0,
+  "raw_sha256": "17e3de872fd5c969476a11bd127660ab3d00887c06e1715c56171a60743cea35",
+  "duration_ms": 300947,
+  "rows": [
+    {
+      "id": "transform-vars-log-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 0,
+      "case": "log",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "log-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 88,
+        "total_tokens": 1392,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 67
+        }
+      },
+      "usage": {
+        "uncached_input": 1304,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 88,
+        "reasoning_in_output": 67,
+        "total": 1392,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-log-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 1,
+      "case": "log",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "log-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 101,
+        "total_tokens": 1405,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 80
+        }
+      },
+      "usage": {
+        "uncached_input": 1304,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 101,
+        "reasoning_in_output": 80,
+        "total": 1405,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-log-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 2,
+      "case": "log",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "log-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 104,
+        "output_tokens": 98,
+        "total_tokens": 202,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 77
+        }
+      },
+      "usage": {
+        "uncached_input": 104,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 98,
+        "reasoning_in_output": 77,
+        "total": 202,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-log-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 3,
+      "case": "log",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "log-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 104,
+        "output_tokens": 93,
+        "total_tokens": 197,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 72
+        }
+      },
+      "usage": {
+        "uncached_input": 104,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 93,
+        "reasoning_in_output": 72,
+        "total": 197,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-log-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 4,
+      "case": "log",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "log-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 98,
+        "total_tokens": 1402,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 77
+        }
+      },
+      "usage": {
+        "uncached_input": 1304,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 98,
+        "reasoning_in_output": 77,
+        "total": 1402,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-log-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 5,
+      "case": "log",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "log-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 94,
+        "total_tokens": 1398,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 73
+        }
+      },
+      "usage": {
+        "uncached_input": 152,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 94,
+        "reasoning_in_output": 73,
+        "total": 1398,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-diff-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 6,
+      "case": "diff",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "diff-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 72,
+        "total_tokens": 1393,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 63
+        }
+      },
+      "usage": {
+        "uncached_input": 1321,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 72,
+        "reasoning_in_output": 63,
+        "total": 1393,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-diff-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 7,
+      "case": "diff",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "diff-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 38,
+        "total_tokens": 1359,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 29
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 38,
+        "reasoning_in_output": 29,
+        "total": 1359,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-diff-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 8,
+      "case": "diff",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "diff-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 56,
+        "total_tokens": 1377,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 47
+        }
+      },
+      "usage": {
+        "uncached_input": 1321,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 56,
+        "reasoning_in_output": 47,
+        "total": 1377,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-diff-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 9,
+      "case": "diff",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "diff-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 57,
+        "total_tokens": 1378,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 48
+        }
+      },
+      "usage": {
+        "uncached_input": 1321,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 57,
+        "reasoning_in_output": 48,
+        "total": 1378,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-diff-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 10,
+      "case": "diff",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "diff-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 44,
+        "total_tokens": 1365,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 35
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 44,
+        "reasoning_in_output": 35,
+        "total": 1365,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-diff-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 11,
+      "case": "diff",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "diff-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 53,
+        "total_tokens": 1374,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 44
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 53,
+        "reasoning_in_output": 44,
+        "total": 1374,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-json-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 12,
+      "case": "json",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "json-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 74,
+        "total_tokens": 1384,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 53
+        }
+      },
+      "usage": {
+        "uncached_input": 1310,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 74,
+        "reasoning_in_output": 53,
+        "total": 1384,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-json-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 13,
+      "case": "json",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "json-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 97,
+        "total_tokens": 1407,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 76
+        }
+      },
+      "usage": {
+        "uncached_input": 158,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 97,
+        "reasoning_in_output": 76,
+        "total": 1407,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-json-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 14,
+      "case": "json",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "json-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 110,
+        "output_tokens": 94,
+        "total_tokens": 204,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 73
+        }
+      },
+      "usage": {
+        "uncached_input": 110,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 94,
+        "reasoning_in_output": 73,
+        "total": 204,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-json-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 15,
+      "case": "json",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "json-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 110,
+        "output_tokens": 90,
+        "total_tokens": 200,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 69
+        }
+      },
+      "usage": {
+        "uncached_input": 110,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 90,
+        "reasoning_in_output": 69,
+        "total": 200,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-json-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 16,
+      "case": "json",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "json-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 98,
+        "total_tokens": 1408,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 77
+        }
+      },
+      "usage": {
+        "uncached_input": 1310,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 98,
+        "reasoning_in_output": 77,
+        "total": 1408,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-json-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 17,
+      "case": "json",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "json-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 114,
+        "total_tokens": 1424,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 93
+        }
+      },
+      "usage": {
+        "uncached_input": 1310,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 114,
+        "reasoning_in_output": 93,
+        "total": 1424,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-revision-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 18,
+      "case": "revision",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "revision-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 85,
+        "total_tokens": 1423,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 75
+        }
+      },
+      "usage": {
+        "uncached_input": 1338,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 85,
+        "reasoning_in_output": 75,
+        "total": 1423,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-revision-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 19,
+      "case": "revision",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "revision-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 67,
+        "total_tokens": 1405,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 57
+        }
+      },
+      "usage": {
+        "uncached_input": 1338,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 67,
+        "reasoning_in_output": 57,
+        "total": 1405,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-revision-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 20,
+      "case": "revision",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "revision-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 64,
+        "total_tokens": 1402,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 54
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 64,
+        "reasoning_in_output": 54,
+        "total": 1402,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-revision-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 21,
+      "case": "revision",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "revision-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 63,
+        "total_tokens": 1401,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 53
+        }
+      },
+      "usage": {
+        "uncached_input": 1338,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 63,
+        "reasoning_in_output": 53,
+        "total": 1401,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-revision-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 22,
+      "case": "revision",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "revision-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 55,
+        "total_tokens": 1393,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 45
+        }
+      },
+      "usage": {
+        "uncached_input": 1338,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 55,
+        "reasoning_in_output": 45,
+        "total": 1393,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-revision-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 23,
+      "case": "revision",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "revision-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 60,
+        "total_tokens": 1398,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 50
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 60,
+        "reasoning_in_output": 50,
+        "total": 1398,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-citation-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 24,
+      "case": "citation",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "citation-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 168,
+        "total_tokens": 1089,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 135
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 168,
+        "reasoning_in_output": 135,
+        "total": 1089,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-citation-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 25,
+      "case": "citation",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "citation-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 140,
+        "total_tokens": 1061,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 107
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 140,
+        "reasoning_in_output": 107,
+        "total": 1061,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-citation-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 26,
+      "case": "citation",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "citation-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 175,
+        "total_tokens": 1096,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 142
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 175,
+        "reasoning_in_output": 142,
+        "total": 1096,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-citation-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 27,
+      "case": "citation",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "citation-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 143,
+        "total_tokens": 1064,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 110
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 143,
+        "reasoning_in_output": 110,
+        "total": 1064,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-citation-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 28,
+      "case": "citation",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "citation-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 897,
+        "output_tokens": 144,
+        "total_tokens": 1041,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 111
+        }
+      },
+      "usage": {
+        "uncached_input": 897,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 144,
+        "reasoning_in_output": 111,
+        "total": 1041,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-citation-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 29,
+      "case": "citation",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "citation-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 897,
+        "output_tokens": 151,
+        "total_tokens": 1048,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 118
+        }
+      },
+      "usage": {
+        "uncached_input": 897,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 151,
+        "reasoning_in_output": 118,
+        "total": 1048,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-semantic-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 30,
+      "case": "semantic",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "semantic-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 220,
+        "total_tokens": 1138,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 209
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 220,
+        "reasoning_in_output": 209,
+        "total": 1138,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-semantic-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 31,
+      "case": "semantic",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "semantic-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 248,
+        "total_tokens": 1166,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 237
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 248,
+        "reasoning_in_output": 237,
+        "total": 1166,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-semantic-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 32,
+      "case": "semantic",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "semantic-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 215,
+        "total_tokens": 1133,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 204
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 215,
+        "reasoning_in_output": 204,
+        "total": 1133,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-semantic-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 33,
+      "case": "semantic",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "semantic-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 217,
+        "total_tokens": 1135,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 206
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 217,
+        "reasoning_in_output": 206,
+        "total": 1135,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-semantic-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 34,
+      "case": "semantic",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "semantic-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 894,
+        "output_tokens": 157,
+        "total_tokens": 1051,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 146
+        }
+      },
+      "usage": {
+        "uncached_input": 894,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 157,
+        "reasoning_in_output": 146,
+        "total": 1051,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-semantic-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 35,
+      "case": "semantic",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "semantic-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 894,
+        "output_tokens": 164,
+        "total_tokens": 1058,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 153
+        }
+      },
+      "usage": {
+        "uncached_input": 894,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 164,
+        "reasoning_in_output": 153,
+        "total": 1058,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-gate-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 36,
+      "case": "gate",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "gate-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 72,
+        "total_tokens": 1003,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 64
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 72,
+        "reasoning_in_output": 64,
+        "total": 1003,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-gate-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 37,
+      "case": "gate",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "gate-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 61,
+        "total_tokens": 992,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 53
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 61,
+        "reasoning_in_output": 53,
+        "total": 992,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-gate-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 38,
+      "case": "gate",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "gate-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 68,
+        "total_tokens": 999,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 60
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 68,
+        "reasoning_in_output": 60,
+        "total": 999,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-gate-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 39,
+      "case": "gate",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "gate-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 55,
+        "total_tokens": 986,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 47
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 55,
+        "reasoning_in_output": 47,
+        "total": 986,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-gate-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 40,
+      "case": "gate",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "gate-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 907,
+        "output_tokens": 77,
+        "total_tokens": 984,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 69
+        }
+      },
+      "usage": {
+        "uncached_input": 907,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 77,
+        "reasoning_in_output": 69,
+        "total": 984,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-gate-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 41,
+      "case": "gate",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "gate-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 907,
+        "output_tokens": 60,
+        "total_tokens": 967,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 52
+        }
+      },
+      "usage": {
+        "uncached_input": 907,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 60,
+        "reasoning_in_output": 52,
+        "total": 967,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-instruction-raw-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 42,
+      "case": "instruction",
+      "arm": "raw",
+      "repeat": 1,
+      "preview_id": "instruction-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 50,
+        "total_tokens": 982,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 41
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 50,
+        "reasoning_in_output": 41,
+        "total": 982,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-instruction-raw-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 43,
+      "case": "instruction",
+      "arm": "raw",
+      "repeat": 2,
+      "preview_id": "instruction-raw",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 65,
+        "total_tokens": 997,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 56
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 65,
+        "reasoning_in_output": 56,
+        "total": 997,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-instruction-rtk-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 44,
+      "case": "instruction",
+      "arm": "rtk",
+      "repeat": 1,
+      "preview_id": "instruction-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 39,
+        "total_tokens": 971,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 30
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 39,
+        "reasoning_in_output": 30,
+        "total": 971,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-instruction-rtk-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 45,
+      "case": "instruction",
+      "arm": "rtk",
+      "repeat": 2,
+      "preview_id": "instruction-rtk",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 61,
+        "total_tokens": 993,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 52
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 61,
+        "reasoning_in_output": 52,
+        "total": 993,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-instruction-caveman-1",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 46,
+      "case": "instruction",
+      "arm": "caveman",
+      "repeat": 1,
+      "preview_id": "instruction-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 908,
+        "output_tokens": 63,
+        "total_tokens": 971,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 54
+        }
+      },
+      "usage": {
+        "uncached_input": 908,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 63,
+        "reasoning_in_output": 54,
+        "total": 971,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "transform-vars-instruction-caveman-2",
+      "evidence_scope": "input_preprocessing",
+      "source_row": 47,
+      "case": "instruction",
+      "arm": "caveman",
+      "repeat": 2,
+      "preview_id": "instruction-caveman",
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "gateway_headers": {
+        "version": "3.8.51",
+        "compression": "off; source=off",
+        "cache": "MISS"
+      },
+      "native_usage": {
+        "input_tokens": 908,
+        "output_tokens": 84,
+        "total_tokens": 992,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 75
+        }
+      },
+      "usage": {
+        "uncached_input": 908,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 84,
+        "reasoning_in_output": 75,
+        "total": 992,
+        "native_retries": null
+      }
+    }
+  ]
+}

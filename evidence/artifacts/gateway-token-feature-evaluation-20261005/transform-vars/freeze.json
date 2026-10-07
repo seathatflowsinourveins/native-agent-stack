@@ -1,0 +1,119 @@
+{
+  "frozen_before_model_execution": true,
+  "evidence_scope": "input-preprocessing evidence only",
+  "files": 27,
+  "bundle_sha256": "84435c91b177ab422b2eae944f7d35bd6c9e92d1bad949ac9af335c25f52903d",
+  "bundle_algorithm": "SHA256 of sorted repository-relative-path NUL file-SHA256 newline entries",
+  "sources": [
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-caveman.json",
+      "sha256": "c914c8208371883b30f5bcb1bbf49adbd995e92ec9cd0bb317b6b27d0ed2fcd0"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-raw.json",
+      "sha256": "cf455a71c6e9fa4973fe90fbd0478a46c20d768d8b9b0a6d28f37d9859901410"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-rtk.json",
+      "sha256": "617bfb842d15520e8a0a7eb2a9582d316956f13e992501fa67027ea3fb172f2c"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-caveman.json",
+      "sha256": "bb3cfd65b086749c4bb4df3a4393f8aa5ef4c488bbb6c71770416880f3bd1655"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-raw.json",
+      "sha256": "5ce4bd6890c8ea09dc41568d1e1413bb0e65340808284851ffb2831375f78c1b"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-rtk.json",
+      "sha256": "cc71be83cf82dbe71dbec4f2290a140950ce67ab929e3fb8c214e4f817ef52a6"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-caveman.json",
+      "sha256": "30d8f6b2ded60465131cf3a86479040a0093af39e64d5ce2c72288ffafd7ed65"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-raw.json",
+      "sha256": "b4dfb3dc08e2883a5dd53205db26d18b68736e8f50f467b7162ea3ebf857a393"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-rtk.json",
+      "sha256": "454126d72e88a4df04351f4a3e7a2b838043e4c982d1457eeb7b86d8e57ff69c"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-caveman.json",
+      "sha256": "6e48553d48331d805ffd48c32421e15358d2298c50705c391b0ef9a5ea04cd8f"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-raw.json",
+      "sha256": "4e84ce0fbf11e9805ce047f33ff8469036df92b3dca8dfc2ceb141b117037a79"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-rtk.json",
+      "sha256": "7e5b715aca4e8d5a4809fbf14930df23f3ae8be19b38498c3a5d0169baa5bd77"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-caveman.json",
+      "sha256": "1dd97b6c7cfafb5b3fd2a9c57295add9f70dd4d7ee1a531c0c0ca705b871982b"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-raw.json",
+      "sha256": "8108a177b599c0771e5b0a2c7441f9603968668da158d409c328c50c4fb4634f"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-rtk.json",
+      "sha256": "33b79b2c874ddf785e16ead1f796e2ab9e4b0260eef2292f92fcb24a71052adf"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-caveman.json",
+      "sha256": "f028392661eebe9c59945bb5b69e074ce7ed7efa88c8492e9ffa27cc8637058f"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-raw.json",
+      "sha256": "d2ce2071add7a5c165b86bb86a639b8bd0937e95b5034abdfc4dd31dfd14f6e6"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-rtk.json",
+      "sha256": "031bd19b5bc66f5857c75b993b7e0ed4c261f9f280aa747ce75d4dfb0c92880b"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-caveman.json",
+      "sha256": "c67109a2562f5e2a16ae88c9471f0589e3991ed1e4f204688daed719342c7dcd"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-raw.json",
+      "sha256": "8f0a98bd0f72da8ace1344ed04adc3f6021b77c9bcba916c8bfa75331248a4f6"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-rtk.json",
+      "sha256": "3e0cd751f95d074ecd8fee9e6a8ea06103371452764e14be82646eafbc3c57ed"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-caveman.json",
+      "sha256": "aa73b97b984bce4998ed126867d0e856532872494a0a19aa4dd830a88947636c"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-raw.json",
+      "sha256": "1bf02693f4bfeb32dc37c0cca445917ef36e6737065208e88ae1f27c66fecb25"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-rtk.json",
+      "sha256": "4c6b00015557b14111d4fd270bb143ece5b6533673ed5cc68f1f91442c57ea40"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/plan.json",
+      "sha256": "54a48aad3c15298d58d06de148e4023d3a1205776c6cc095d6461fecc1df25b6"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/plan.json",
+      "sha256": "0b1cacddcb97e94a8adc8e0ee1cb686b42889ee6482c8efc8883cd70298de312"
+    },
+    {
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/promptfoo.json",
+      "sha256": "cf5c556a784fa56fed6af38693c917a0d46fddf8ff39964db57eca03a6158feb"
+    }
+  ],
+  "model_execution": "48 planned new native promptfoo calls; 24 native transformVars CLI previews precede repeat expansion; no result replay or integrated worker/output-style claim",
+  "frozen_at_utc": "2026-10-05 05:56:22 UTC"
+}

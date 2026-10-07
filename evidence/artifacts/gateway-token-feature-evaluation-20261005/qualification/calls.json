@@ -1,0 +1,1496 @@
+{
+  "phase": "qualification",
+  "exit_code": 0,
+  "raw_sha256": "dd909b5740a1beaf09b508f1234fb5028cea4bf9792a3b015365c7f5b1d9ac80",
+  "duration_ms": 271851,
+  "rows": [
+    {
+      "id": "qualification-log-raw-1",
+      "source_row": 0,
+      "case": "log",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 98,
+        "total_tokens": 1402,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 77
+        }
+      },
+      "usage": {
+        "uncached_input": 152,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 98,
+        "reasoning_in_output": 77,
+        "total": 1402,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-log-raw-2",
+      "source_row": 1,
+      "case": "log",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 99,
+        "total_tokens": 1403,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 78
+        }
+      },
+      "usage": {
+        "uncached_input": 152,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 99,
+        "reasoning_in_output": 78,
+        "total": 1403,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-log-rtk-1",
+      "source_row": 2,
+      "case": "log",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 104,
+        "output_tokens": 119,
+        "total_tokens": 223,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 98
+        }
+      },
+      "usage": {
+        "uncached_input": 104,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 119,
+        "reasoning_in_output": 98,
+        "total": 223,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-log-rtk-2",
+      "source_row": 3,
+      "case": "log",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 104,
+        "output_tokens": 97,
+        "total_tokens": 201,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 76
+        }
+      },
+      "usage": {
+        "uncached_input": 104,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 97,
+        "reasoning_in_output": 76,
+        "total": 201,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-log-caveman-1",
+      "source_row": 4,
+      "case": "log",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 97,
+        "total_tokens": 1401,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 76
+        }
+      },
+      "usage": {
+        "uncached_input": 152,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 97,
+        "reasoning_in_output": 76,
+        "total": 1401,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-log-caveman-2",
+      "source_row": 5,
+      "case": "log",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1304,
+        "output_tokens": 95,
+        "total_tokens": 1399,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 74
+        }
+      },
+      "usage": {
+        "uncached_input": 152,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 95,
+        "reasoning_in_output": 74,
+        "total": 1399,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-diff-raw-1",
+      "source_row": 6,
+      "case": "diff",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 62,
+        "total_tokens": 1383,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 53
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 62,
+        "reasoning_in_output": 53,
+        "total": 1383,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-diff-raw-2",
+      "source_row": 7,
+      "case": "diff",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 53,
+        "total_tokens": 1374,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 44
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 53,
+        "reasoning_in_output": 44,
+        "total": 1374,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-diff-rtk-1",
+      "source_row": 8,
+      "case": "diff",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 75,
+        "total_tokens": 1396,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 66
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 75,
+        "reasoning_in_output": 66,
+        "total": 1396,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-diff-rtk-2",
+      "source_row": 9,
+      "case": "diff",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 73,
+        "total_tokens": 1394,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 64
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 73,
+        "reasoning_in_output": 64,
+        "total": 1394,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-diff-caveman-1",
+      "source_row": 10,
+      "case": "diff",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 45,
+        "total_tokens": 1366,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 36
+        }
+      },
+      "usage": {
+        "uncached_input": 1321,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 45,
+        "reasoning_in_output": 36,
+        "total": 1366,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-diff-caveman-2",
+      "source_row": 11,
+      "case": "diff",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1321,
+        "output_tokens": 43,
+        "total_tokens": 1364,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 34
+        }
+      },
+      "usage": {
+        "uncached_input": 169,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 43,
+        "reasoning_in_output": 34,
+        "total": 1364,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-json-raw-1",
+      "source_row": 12,
+      "case": "json",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 97,
+        "total_tokens": 1407,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 76
+        }
+      },
+      "usage": {
+        "uncached_input": 1310,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 97,
+        "reasoning_in_output": 76,
+        "total": 1407,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-json-raw-2",
+      "source_row": 13,
+      "case": "json",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 70,
+        "total_tokens": 1380,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 49
+        }
+      },
+      "usage": {
+        "uncached_input": 1310,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 70,
+        "reasoning_in_output": 49,
+        "total": 1380,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-json-rtk-1",
+      "source_row": 14,
+      "case": "json",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 110,
+        "output_tokens": 127,
+        "total_tokens": 237,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 106
+        }
+      },
+      "usage": {
+        "uncached_input": 110,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 127,
+        "reasoning_in_output": 106,
+        "total": 237,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-json-rtk-2",
+      "source_row": 15,
+      "case": "json",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 110,
+        "output_tokens": 101,
+        "total_tokens": 211,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 80
+        }
+      },
+      "usage": {
+        "uncached_input": 110,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 101,
+        "reasoning_in_output": 80,
+        "total": 211,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-json-caveman-1",
+      "source_row": 16,
+      "case": "json",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 91,
+        "total_tokens": 1401,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 70
+        }
+      },
+      "usage": {
+        "uncached_input": 1310,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 91,
+        "reasoning_in_output": 70,
+        "total": 1401,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-json-caveman-2",
+      "source_row": 17,
+      "case": "json",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1310,
+        "output_tokens": 104,
+        "total_tokens": 1414,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 83
+        }
+      },
+      "usage": {
+        "uncached_input": 158,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 104,
+        "reasoning_in_output": 83,
+        "total": 1414,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-revision-raw-1",
+      "source_row": 18,
+      "case": "revision",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 67,
+        "total_tokens": 1405,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 57
+        }
+      },
+      "usage": {
+        "uncached_input": 1338,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 67,
+        "reasoning_in_output": 57,
+        "total": 1405,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-revision-raw-2",
+      "source_row": 19,
+      "case": "revision",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 77,
+        "total_tokens": 1415,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 67
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 77,
+        "reasoning_in_output": 67,
+        "total": 1415,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-revision-rtk-1",
+      "source_row": 20,
+      "case": "revision",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 63,
+        "total_tokens": 1401,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 53
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 63,
+        "reasoning_in_output": 53,
+        "total": 1401,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-revision-rtk-2",
+      "source_row": 21,
+      "case": "revision",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 61,
+        "total_tokens": 1399,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 51
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 61,
+        "reasoning_in_output": 51,
+        "total": 1399,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-revision-caveman-1",
+      "source_row": 22,
+      "case": "revision",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 80,
+        "total_tokens": 1418,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 70
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 80,
+        "reasoning_in_output": 70,
+        "total": 1418,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-revision-caveman-2",
+      "source_row": 23,
+      "case": "revision",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 1338,
+        "output_tokens": 73,
+        "total_tokens": 1411,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1152
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 63
+        }
+      },
+      "usage": {
+        "uncached_input": 186,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 73,
+        "reasoning_in_output": 63,
+        "total": 1411,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-citation-raw-1",
+      "source_row": 24,
+      "case": "citation",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 125,
+        "total_tokens": 1046,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 92
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 125,
+        "reasoning_in_output": 92,
+        "total": 1046,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-citation-raw-2",
+      "source_row": 25,
+      "case": "citation",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 144,
+        "total_tokens": 1065,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 111
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 144,
+        "reasoning_in_output": 111,
+        "total": 1065,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-citation-rtk-1",
+      "source_row": 26,
+      "case": "citation",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 165,
+        "total_tokens": 1086,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 132
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 165,
+        "reasoning_in_output": 132,
+        "total": 1086,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-citation-rtk-2",
+      "source_row": 27,
+      "case": "citation",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 921,
+        "output_tokens": 158,
+        "total_tokens": 1079,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 125
+        }
+      },
+      "usage": {
+        "uncached_input": 921,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 158,
+        "reasoning_in_output": 125,
+        "total": 1079,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-citation-caveman-1",
+      "source_row": 28,
+      "case": "citation",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 897,
+        "output_tokens": 140,
+        "total_tokens": 1037,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 107
+        }
+      },
+      "usage": {
+        "uncached_input": 897,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 140,
+        "reasoning_in_output": 107,
+        "total": 1037,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-citation-caveman-2",
+      "source_row": 29,
+      "case": "citation",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 897,
+        "output_tokens": 135,
+        "total_tokens": 1032,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 102
+        }
+      },
+      "usage": {
+        "uncached_input": 897,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 135,
+        "reasoning_in_output": 102,
+        "total": 1032,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-semantic-raw-1",
+      "source_row": 30,
+      "case": "semantic",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 252,
+        "total_tokens": 1170,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 241
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 252,
+        "reasoning_in_output": 241,
+        "total": 1170,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-semantic-raw-2",
+      "source_row": 31,
+      "case": "semantic",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 171,
+        "total_tokens": 1089,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 160
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 171,
+        "reasoning_in_output": 160,
+        "total": 1089,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-semantic-rtk-1",
+      "source_row": 32,
+      "case": "semantic",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 173,
+        "total_tokens": 1091,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 162
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 173,
+        "reasoning_in_output": 162,
+        "total": 1091,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-semantic-rtk-2",
+      "source_row": 33,
+      "case": "semantic",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 918,
+        "output_tokens": 196,
+        "total_tokens": 1114,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 185
+        }
+      },
+      "usage": {
+        "uncached_input": 918,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 196,
+        "reasoning_in_output": 185,
+        "total": 1114,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-semantic-caveman-1",
+      "source_row": 34,
+      "case": "semantic",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 894,
+        "output_tokens": 183,
+        "total_tokens": 1077,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 172
+        }
+      },
+      "usage": {
+        "uncached_input": 894,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 183,
+        "reasoning_in_output": 172,
+        "total": 1077,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-semantic-caveman-2",
+      "source_row": 35,
+      "case": "semantic",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 894,
+        "output_tokens": 185,
+        "total_tokens": 1079,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 174
+        }
+      },
+      "usage": {
+        "uncached_input": 894,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 185,
+        "reasoning_in_output": 174,
+        "total": 1079,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-gate-raw-1",
+      "source_row": 36,
+      "case": "gate",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 78,
+        "total_tokens": 1009,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 70
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 78,
+        "reasoning_in_output": 70,
+        "total": 1009,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-gate-raw-2",
+      "source_row": 37,
+      "case": "gate",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 66,
+        "total_tokens": 997,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 58
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 66,
+        "reasoning_in_output": 58,
+        "total": 997,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-gate-rtk-1",
+      "source_row": 38,
+      "case": "gate",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 60,
+        "total_tokens": 991,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 52
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 60,
+        "reasoning_in_output": 52,
+        "total": 991,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-gate-rtk-2",
+      "source_row": 39,
+      "case": "gate",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 931,
+        "output_tokens": 111,
+        "total_tokens": 1042,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 103
+        }
+      },
+      "usage": {
+        "uncached_input": 931,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 111,
+        "reasoning_in_output": 103,
+        "total": 1042,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-gate-caveman-1",
+      "source_row": 40,
+      "case": "gate",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 907,
+        "output_tokens": 95,
+        "total_tokens": 1002,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 87
+        }
+      },
+      "usage": {
+        "uncached_input": 907,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 95,
+        "reasoning_in_output": 87,
+        "total": 1002,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-gate-caveman-2",
+      "source_row": 41,
+      "case": "gate",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 907,
+        "output_tokens": 90,
+        "total_tokens": 997,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 82
+        }
+      },
+      "usage": {
+        "uncached_input": 907,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 90,
+        "reasoning_in_output": 82,
+        "total": 997,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-instruction-raw-1",
+      "source_row": 42,
+      "case": "instruction",
+      "arm": "raw",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 57,
+        "total_tokens": 989,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 48
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 57,
+        "reasoning_in_output": 48,
+        "total": 989,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-instruction-raw-2",
+      "source_row": 43,
+      "case": "instruction",
+      "arm": "raw",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 59,
+        "total_tokens": 991,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 50
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 59,
+        "reasoning_in_output": 50,
+        "total": 991,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-instruction-rtk-1",
+      "source_row": 44,
+      "case": "instruction",
+      "arm": "rtk",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 61,
+        "total_tokens": 993,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 52
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 61,
+        "reasoning_in_output": 52,
+        "total": 993,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-instruction-rtk-2",
+      "source_row": 45,
+      "case": "instruction",
+      "arm": "rtk",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 932,
+        "output_tokens": 44,
+        "total_tokens": 976,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 35
+        }
+      },
+      "usage": {
+        "uncached_input": 932,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 44,
+        "reasoning_in_output": 35,
+        "total": 976,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-instruction-caveman-1",
+      "source_row": 46,
+      "case": "instruction",
+      "arm": "caveman",
+      "repeat": 1,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 908,
+        "output_tokens": 41,
+        "total_tokens": 949,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 32
+        }
+      },
+      "usage": {
+        "uncached_input": 908,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 41,
+        "reasoning_in_output": 32,
+        "total": 949,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "qualification-instruction-caveman-2",
+      "source_row": 47,
+      "case": "instruction",
+      "arm": "caveman",
+      "repeat": 2,
+      "oracle_passed": true,
+      "http_status": 200,
+      "model": "gpt-6.1-sol-max",
+      "native_usage": {
+        "input_tokens": 908,
+        "output_tokens": 38,
+        "total_tokens": 946,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 29
+        }
+      },
+      "usage": {
+        "uncached_input": 908,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 38,
+        "reasoning_in_output": 29,
+        "total": 946,
+        "native_retries": null
+      }
+    }
+  ]
+}
