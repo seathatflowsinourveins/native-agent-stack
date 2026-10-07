@@ -636,19 +636,24 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         ]
 
     def test_a_every_line_is_a_fingerprint_naming_a_narrative_file_and_rule(self):
-        """Every non-comment, non-blank line must be a well-formed gitleaks
-        fingerprint naming one of the two review-narrative files and one of
-        the two rules that matched them -- not a stray line, a literal
-        secret, or an entry for some other file this fix round did not
-        review."""
+        """Only explicitly reviewed fingerprints may exempt non-narrative metadata."""
+        reviewed_metadata = {
+            "4662bf29b39ebf84cfca90eb1a60c628be2ba356:evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/scope.json:generic-api-key:19",
+            "4662bf29b39ebf84cfca90eb1a60c628be2ba356:evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/scope.json:generic-api-key:21",
+            "40fe662f1a4d9cfee68cd732b860fb2e69f89906:catalogs/sota-convergence/manifest-20261006-roles.json:generic-api-key:5221",
+            "dc6ce45db51ff05400bd18ba21319cd968ce0e19:evidence/artifacts/landscape-sweep-20261006-roles/returns.json:generic-api-key:6490",
+        }
         lines = self._ignore_lines()
         self.assertGreater(len(lines), 0, ".gitleaksignore must contain at least one fingerprint")
+        self.assertTrue(reviewed_metadata.issubset(lines), "all four reviewed metadata fingerprints must be present")
         for line in lines:
             match = self.FINGERPRINT_RE.match(line)
             self.assertIsNotNone(
                 match,
                 f"not a gitleaks fingerprint (commit:path:rule:line or path:rule:line): {line!r}",
             )
+            if line in reviewed_metadata:
+                continue
             if line in self.REVIEWED_OUT_OF_ANCESTRY:
                 continue  # checked separately in test_a2
             self.assertIn(

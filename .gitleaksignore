@@ -95,3 +95,16 @@
 # the default all-refs acceptance command reach 0 findings without editing
 # .gitleaks.toml (owned by another PR) or that sibling branch.
 34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255
+
+# 2026-10-07, #804 reviewed metadata (CC review 020317Z): scope.json's two
+# requirement_sha256 values bind the original research-state inputs; the roles
+# manifest line names the public advisory GHSA-8q5r-mmjf-575q. None is a secret.
+# Exact fingerprints preserve detection if a later commit changes these lines.
+4662bf29b39ebf84cfca90eb1a60c628be2ba356:evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/scope.json:generic-api-key:19
+4662bf29b39ebf84cfca90eb1a60c628be2ba356:evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/scope.json:generic-api-key:21
+40fe662f1a4d9cfee68cd732b860fb2e69f89906:catalogs/sota-convergence/manifest-20261006-roles.json:generic-api-key:5221
+
+# 2026-10-07, #804 SCANNER-804-F4-GO reviewed the roles-sweep return's
+# /raw/git-github-automation/followup/claude_discover/proposed/4/demonstrated_gap
+# as public advisory metadata from the model return retained by convert.
+dc6ce45db51ff05400bd18ba21319cd968ce0e19:evidence/artifacts/landscape-sweep-20261006-roles/returns.json:generic-api-key:6490
