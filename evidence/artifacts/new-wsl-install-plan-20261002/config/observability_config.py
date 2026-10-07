@@ -159,6 +159,8 @@ def main():
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--tools-root", type=Path)
     parser.add_argument("--plan-file", type=Path)
+    parser.add_argument("--installed-units", action="store_true",
+                        help="grafana-check: also verify the installed user units match the rendered candidates")
     # The emitter unit runs progress.py from this checkout. Default: three levels above the plan folder, as
     # install.sh derives repo_root.
     parser.add_argument("--repo-root", type=Path)
@@ -354,7 +356,7 @@ def main():
             rendered = (root / "systemd" / name).read_text()
             if re.search(r"@[A-Z_]+@", rendered):
                 raise ValueError(f"{name} has an unrendered placeholder")
-            if not (units / name).is_file() or (units / name).read_text() != rendered:
+            if args.installed_units and (not (units / name).is_file() or (units / name).read_text() != rendered):
                 raise ValueError(f"{name} is not installed as rendered; rerun install.sh --only grafana")
     else:
         if args.action == "alerting":

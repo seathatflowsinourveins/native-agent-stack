@@ -122,12 +122,6 @@ Pinned Loki3.7.8 last_over_time/filter/vector/on-label behavior and Grafana13.2.
 axis/value-mapping forms follow the native documentation/source. Config, query,
 browser and threshold-override read-backs remain unverified until deployment.
 
-Source correction: the first clock extraction statements used bare YAML
-scalars containing a regex colon followed by whitespace. A config data read
-raised a YAML ScannerError; the clock processor's statements now use quoted
-YAML scalars, preserving the OTTL expressions. This correction changes source
-serialization only. Native Collector/schema/query/browser checks remain pending.
-
 The Lanes dashboard uses uid `cc-lanes`, the existing file provider, and native
 conversation/session identities with the hcom name lookup. An `ecosystem_lane`
 environment label is not authoritative identity: a historical sampled label
@@ -323,3 +317,148 @@ negotiation and newly born single-turn reconciliation follow activation; they
 are not landing gates. Lower-bound token qualifications remain until that
 acceptance passes. Native evidence of an OTLP writer is a compatibility issue
 for the activation owner, not permission to reactivate the superseded drop-in.
+
+## Amendment (2026-10-07): clock serialization correction
+
+The following correction is appended under the landing read's F3 requirement;
+its wording is retained verbatim rather than inserted into an earlier section.
+
+Source correction: the first clock extraction statements used bare YAML
+scalars containing a regex colon followed by whitespace. A config data read
+raised a YAML ScannerError; the clock processor's statements now use quoted
+YAML scalars, preserving the OTTL expressions. This correction changes source
+serialization only. Native Collector/schema/query/browser checks remain pending.
+
+## Amendment (2026-10-07): landed privacy contracts and invoke-column sources
+
+This records the F1 compatibility changes and their limits at the reviewed
+head `41d1249f319b5d1f77480b8065be9ea6093401a5`; it does not change the recorded
+native observations or declare host activation. The landing read's first
+suggestion to restore the dotted metric dimensions was superseded by the
+co-op's execution of main's tests. Main's contract is authoritative for this
+compatibility repair; green CI alone is not an acceptance of a changed policy.
+
+Compared with f2cab814, the ordinary and plural-hook aggregation and retention
+lists in both collector copies drop `skill.name`, `agent.name`, `plugin.name`,
+`mcp_server.name`, and `mcp_tool.name`. Main at `53f90edc` requires the four
+registry/agent removals through `tests/test_observability_tool_names.py:39,42`
+and `:161-168` (introduced at a464d2884); the aggregate and keep lists must
+agree and those categories must not be metric datapoint labels. `plugin.name`
+is not literally in those two test lists: its removal was additional alignment
+with main's native metric/log separation, not an individually mandated
+assertion. The native bounded `server`, `tool`, `tool_name`, `skill`, status and
+plural-hook lifecycle fields remain. Validated dotted names remain on logs.
+
+The SDK-receipt deletion statement at `collector.yaml:128` and plan
+`config/otel.yaml:131` retains the original 15 exclusions and adds 18
+source/hook/count/timing/connection fields. This is required by main's
+`test_derived_keys_cannot_be_supplied_and_receipts_carry_no_names`,
+`tests/test_observability_tool_names.py:142-152`: the receipt exclusion plus
+derived-key clearing must cover the complete shared log-allowlist tail and
+call_id. Registry-shaped values alone do not prove native-client provenance.
+The new fields therefore remain available to native logs, while a file-based
+SDK receipt cannot forge hook executions or registry names through them.
+
+The #775-added native writer expectation changes three agent-labelled streams
+to two session streams: session-a's workflow-subagent and general-purpose
+streams collapse when agent.name is dropped; session-b remains a different
+writer. `tests/test_observability_writer_identity.py:515-527` asserts two
+points without an agent-name label, Claude totals 60/14, Codex totals
+2000/4000 and startup-phase counts 4/4. The latter totals are unchanged from
+main at `1f658673:487,490,493`; no landed total assertion is relaxed.
+
+The table below uses the focused read's definition: each column has a
+configured surviving carrier. It does not assert that every client emits every
+field, that recorded prefixes prove actual rewritten execution, that a skill
+activation proves successful organic execution, or that invocation rows join
+one-to-one to token usage. Unlabelled SDK/exec activity and unavailable native
+identity remain unknown. These LogQL/PromQL examples are source queries, not
+new live measurements. G means `observability/collector/collector.yaml` at
+41d1249f; its plan copy carries the same keys (log keeper P:301 versus G:298,
+metric keepers P:359-360 versus G:356-357). NativeStack2604 metric names below
+have no ecosystem_ prefix; the workstation exporter adds that namespace.
+
+| Column | Surviving native carrier and key; keeper | Query reading it | Move and privacy scope |
+| --- | --- | --- | --- |
+| lane | resource ecosystem.lane, normalized ecosystem_lane; G:241 logs,309 metrics,454 exporter | `sum by (ecosystem_lane) (increase(codex_mcp_call_total[1h]))` | No lost lane dimension; only supplied/valid lane tags are attributable. Missing SDK tags are unknown. |
+| client | tool_result/codex.tool_result resource service.name and derived client; G:159,193-194,241,298 | `sum by (client) (count_over_time({service_name=~"claude-code|codex-app-server|codex_exec|codex_cli_rs"} | event_name=~"tool_result|codex.tool_result" [1h]))` | Log source before and after; client was already excluded from metric attributes by main's derived-key contract. |
+| MCP server | result logs mcp_server.name -> mcp_server_name; G:142,174,199,298; server is permitted in native metrics G:343,356 but emission is not proven | `sum by (client,mcp_server_name) (count_over_time({service_name=~"claude-code|codex-app-server|codex_exec|codex_cli_rs"} | event_name=~"tool_result|codex.tool_result" | mcp_server_name!="" [1h]))` | Dotted metric identity moves to validated logs. The retained native MCP metric read-back has no server label, so metric attribution by server is unproven; a keep-list alone is not an emitting source. Main registry list:39 and metric exclusion:167-168 do not remove the log carrier. |
+| tool | result logs tool_name/tool_namespace and mcp_tool.name -> mcp_tool_name; G:143,175,200,298; native tool/tool_name remains G:343,356 | `sum by (tool_namespace,tool_name,mcp_tool_name) (count_over_time({service_name=~"claude-code|codex-app-server|codex_exec|codex_cli_rs"} | event_name=~"tool_result|codex.tool_result" [1h]))` | Dotted MCP tool metric name moves to validated logs; ordinary native tool labels remain. Same main registry exclusion applies only to metrics. |
+| skill | native Claude skill_activated skill.name -> skill_name, guarded G:201 and retained298; metric skill is permitted343,356, with no proven named emitting source | `sum by (skill_name,invocation_trigger) (count_over_time({service_name="claude-code"} | event_name="skill_activated" | skill_name!="" [1h]))` | Dotted metric identity moves to activation logs; model-typed Skill input is not exported (README:532). Codex aggregate injection/shadow counters have no proven named successful-use identity; neither a skill metric nor an identity is manufactured from the permitted key. |
+| hook runs | Codex codex.hooks.run/duration with bounded hook_name,source,status,handler_type,execution_mode; G:316-325,346,357; Claude hook_execution_complete num_hooks/outcomes G:281-286,298 | `sum by (ecosystem_lane,hook_name,status) (increase(codex_hooks_run_total[1h]))`; `sum by (ecosystem_lane,hook_event) (sum_over_time({service_name="claude-code"} | event_name="hook_execution_complete" | unwrap num_hooks | __error__="" [1h]))` | No native hook-count dimension removed. Lifecycle is not script/repository identity; a configuration-derived join remains separate and ambiguous matches unknown. |
+| shell through rtk | recorded tool-result shell_rtk boolean, derived G:145-146/177-178, bounded212 and kept298 | `sum by (service_name,shell_rtk) (count_over_time({service_name=~"claude-code|codex-app-server|codex_exec|codex_cli_rs"} | event_name=~"tool_result|codex.tool_result" | shell_rtk=~"true|false" [1h]))` | No metric move. This is submitted-parameter/prefix classification, not proof of actual Claude hook rewrites or every shell form; actual execution requires the vendor audit/native-record join. |
+| tokens | configured codex.sse_event/response.completed input_token_count/output_token_count/cached_token_count and Claude api_request input/output/cache fields; G:298,343,356; event queries lanes_dashboard.py:124-135 | `sum by (conversation_id) (sum_over_time({service_name=~"codex-app-server|codex_exec|codex_cli_rs"} | event_name="codex.sse_event" | event_kind="response.completed" | unwrap input_token_count | __error__="" [1h]))`; Claude uses api_request/input_tokens | Configured token categories/model labels survive; this table does not re-measure the native field schema. Cache categories keep their client's counter contract; no native/cache/tool-estimate summation and no invented per-invocation token join. |
+
+COLUMNS: all derivable
+
+That conclusion is configured-carrier coverage only, as in the focused read.
+Named successful Codex skill use, per-repository hook-script identity and actual
+Claude rewrite share are not established by these surviving fields and remain
+explicitly unmeasured. Those limits existed independently of the five dotted
+metric removals. Organic acceptance still needs the qualified native oracle.
+The Lanes MCP queries at lanes_dashboard.py:119-122,169 use retained Loki names;
+the complete INVOKE-RATES report/panels remain separately prepared, not claimed
+deployed by this source table.
+
+The source-table critic corrected two allowlist-to-emission promotions in this
+amendment: retained `server` and `skill` keys are permissions, not evidence that
+the provider supplies them. The retained MCP metric read-back
+`native-readback-20261007T014848Z.json` (sha256
+`c463e768ac6d85e52a2eaddd82e069b1ce8fe4f3d285458cca38495181556e2f`)
+has no server label; the prepared invoke design already records generic-tool
+ambiguity. Server attribution uses validated logs. Named Claude skill
+activation also uses logs; Codex aggregate skill counters do not establish
+named successful skill use. No new live measurement is claimed by the queries.
+
+HOOK-LABELS-2 patch ce50ed8c is a log-guard/allowlist patch, not a metric-list
+patch. Read-only git apply --check at 41d1249f returned 0: these metric removals
+did not make its context fail. Semantic composition is still required: that
+patch introduces ten additional log keys without extending SDK exclusions.
+A newly prepared follow-up must retain the current 33-key exclusion and clear
+the new provenance keys from receipts, with forgery controls, rather than
+resurrect the removed metric dimensions. No patch or host configuration was
+applied during this check; CC owns the reviewed merged-base composition.
+
+## Amendment (2026-10-07): run-metric privacy and isolated render acceptance
+
+Finding F2 is repaired in configuration, with main's run-correlation test
+restored byte-for-byte. The contract landed in #408 at
+`ec8a48927c5d2536a57884f7f163c2d13770e7e2`,
+`observability/collector/README.md:109-114`: metrics gain no run,
+tool-invocation or cost labels. The task key therefore leaves the span resource
+keeper, Prometheus exporter resource-label list and all four derived-metric
+connector resource lists in both collector copies. A native OTTL guard on
+every Prometheus metric export path also removes prohibited resource, scope
+and datapoint dimensions before conversion and batching; an exporter cannot
+restore the run key from another signal context. Task metadata remains on
+logs, where the collector README's existing exact and whole-run LogQL filters
+read `ecosystem_task_id`.
+
+This removes per-task filtering of the newly derived response/phase metrics.
+None of #775's provisioned dashboard queries selects `ecosystem_task_id`,
+`ecosystem.task.id` or `task_id`; their lane/client/token queries keep their
+sources. A caller requiring a per-task response or usage view must use a
+supplied native log event, for example
+`{service_name=~"codex-app-server|codex_exec|codex_cli_rs"} | ecosystem_task_id="<run>"`,
+then select that event's kind, count or native usage field. Per-task phase
+timing supplied only as a metric becomes unavailable; a missing phase log is
+unknown, not re-created from the unlabelled series. No per-task metric label
+or invented log-to-metric join is retained. The command center confirmed
+that its fresh-session run-key queries already use log events only
+(item task-ns2604-coop-20261007T132835Z).
+
+Findings F6 and F7 remove an unnecessary agentsview version literal from the
+new health-check comment. The canonical pin remains in the stack manifest;
+the health route is unchanged and no new repin location is introduced.
+
+Finding F8 preserves the landed isolated-render contract at
+`tests/test_new_wsl_client_config.py:639-654`. The Grafana renderer and its
+render-only checker can validate a private candidate without inspecting a
+live user-unit installation. `grafana-check --installed-units` explicitly adds
+the existing byte comparison for installation acceptance; all three acceptance
+calls and their plan mirrors opt in. Placeholder and dashboard checks remain
+unconditional, and the installed check rejects both absent and differing unit
+bytes. The service and timer templates are unchanged from reviewed f2cab814.
+This follows the existing repository render/install split in
+`install.sh:722-725` and `observability/grand-dashboard/install.py:25-29`;
+it neither installs nor activates a host unit.

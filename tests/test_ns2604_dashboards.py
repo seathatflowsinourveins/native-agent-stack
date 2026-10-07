@@ -137,14 +137,24 @@ class Ns2604DashboardTests(unittest.TestCase):
             self.assertNotRegex(service, r"@[A-Z_]+@")
             ledger = json.loads((config / ".g4-source-digests.json").read_text())
             self.assertIn("systemd/ns2604-research-progress.timer", ledger)
-            # grafana-check also requires the units where install.sh puts them.
-            self.assertEqual(1, run("grafana-check").returncode)
+            # Render validation remains isolated; install acceptance explicitly
+            # opts into the unit byte comparison where install.sh puts them.
+            result = run("grafana-check")
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(1, run("grafana-check", "--installed-units").returncode)
             units = root / "xdg/systemd/user"
             units.mkdir(parents=True)
             for name in ("ns2604-research-progress.service", "ns2604-research-progress.timer"):
                 shutil.copy(config / "systemd" / name, units / name)
-            result = run("grafana-check")
+            result = run("grafana-check", "--installed-units")
             self.assertEqual(0, result.returncode, result.stderr)
+            installed_service = units / "ns2604-research-progress.service"
+            correct_service = installed_service.read_text()
+            installed_service.write_text(correct_service.replace("TimeoutStartSec=60", "TimeoutStartSec=61"))
+            result = run("grafana-check", "--installed-units")
+            self.assertEqual(1, result.returncode)
+            self.assertIn("not installed as rendered", result.stderr)
+            installed_service.write_text(correct_service)
             # A filename stem is not a provisioned UID: reject the exact earlier checker mismatch.
             correct_lanes = lanes.read_text()
             wrong_uid = json.loads(correct_lanes)

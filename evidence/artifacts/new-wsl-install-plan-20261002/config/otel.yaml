@@ -48,8 +48,8 @@ receivers:
       # dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4 scripts/installer.sh:1987-1989. The initial metrics
       # probe reported 401; a repair-time unauthenticated GET returned 200 (body discarded), so no current login
       # requirement is inferred from the access-log path list. Ollama v0.35.0:
-      # ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84 server/routes.go:2022-2023. agentsview v0.43.0, an
-      # on-demand daemon (observed only, no alert rule): kenn-io/agentsview@9be7745ad1906ee24e04eb05bb86c872ef0939a1
+      # ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84 server/routes.go:2022-2023. agentsview, an
+      # on-demand daemon (observed only, no alert rule): kenn-io/agentsview (pin: manifests/stack.json, agentsview)
       # internal/server/huma_routes_health.go:19-23. A refused connection records httpcheck.error and status 0 without
       # a scrape error (receiver/httpcheckreceiver/scraper.go:407-451 at v0.162.0).
       - endpoint: http://127.0.0.1:21128/api/health
@@ -80,6 +80,75 @@ receivers:
     include: ["${env:NS2604_OBSERVABILITY_DATA}/harbor-otel/*.jsonl"]
     start_at: beginning
 processors:
+  # #408 no-run-label contract; opentelemetry-collector-contrib v0.162.0
+  # processor/transformprocessor/README.md and pkg/ottl/ottlfuncs/func_delete_matching_keys.go.
+  # Applied to every exported metric route before conversion/batching; writer identity and values stay intact.
+  transform/metric_export_privacy:
+    error_mode: propagate
+    metric_statements:
+      - context: resource
+        statements:
+          - delete_matching_keys(attributes, "^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")
+      - context: scope
+        statements:
+          - delete_matching_keys(attributes, "^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")
+      - context: datapoint
+        statements:
+          - delete_matching_keys(attributes, "^(ecosystem[._]task[._]id|workflow[._]run[._]id|tool_use_id|cost_usd)$")
+  # Level and reason of a clock-offset-check line, from the script's fixed vocabulary; an optional <0-7> syslog prefix
+  # is tolerated. Error lines name chronyd_not_observe_only, chronyc_failed, chronyc_malformed or chronyc_empty; every
+  # other line is a sample. The count connector keeps only level/reason dimensions; bounded numeric sample fields
+  # also reach Loki as structured metadata. Native checker defaults: bound > 0.050 s is WARN, |offset| > 0.100 s
+  # is CRIT, reference age > 1200 s is WARN. Preserve its printed state: other native reasons can produce WARN.
+  # opentelemetry-collector-contrib v0.162.0 pkg/ottl/ottlfuncs: ExtractPatterns, merge_maps, Double, Int, set, keep_keys.
+  # Native checker source SHA-256 f36a950f8f113f99064d0e824cc3c4228a6ef579444c17d4786955ca697bc03b.
+  transform/clock_offset_check:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(attributes, [])
+          - 'set(attributes["level"], "other")'
+          - 'set(attributes["level"], "ok") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?OK ")'
+          - 'set(attributes["level"], "warn") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?WARN ")'
+          - 'set(attributes["level"], "crit") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT ")'
+          - 'set(attributes["reason"], "sample")'
+          - 'set(attributes["reason"], "chronyd_not_observe_only") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyd_not_observe_only ")'
+          - 'set(attributes["reason"], "chronyc_failed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_failed ")'
+          - 'set(attributes["reason"], "chronyc_malformed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_malformed ")'
+          - 'set(attributes["reason"], "chronyc_empty") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_empty ")'
+          # State/presence are derived bounded log attributes, not new Prometheus gauges. Failed native rows
+          # retain their CRIT state and offset_present=0; no zero offset substitutes for a missing sample.
+          - 'set(attributes["state_code"], 3)'
+          - 'set(attributes["state_code"], 0) where attributes["level"] == "ok"'
+          - 'set(attributes["state_code"], 1) where attributes["level"] == "warn"'
+          - 'set(attributes["state_code"], 2) where attributes["level"] == "crit"'
+          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )offset_s=(?P<offset_s>[-+][0-9]+[.][0-9]{6})(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
+          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )bound_s=(?P<bound_s>[-+]?[0-9]+[.][0-9]{6})(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
+          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )ref_age_s=(?P<ref_age_s>-?[0-9]+)(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
+          - 'set(attributes["offset_s"], Double(attributes["offset_s"])) where attributes["offset_s"] != nil'
+          - 'set(attributes["bound_s"], Double(attributes["bound_s"])) where attributes["bound_s"] != nil'
+          - 'set(attributes["ref_age_s"], Int(attributes["ref_age_s"])) where attributes["ref_age_s"] != nil'
+          - 'set(attributes["offset_present"], 0)'
+          - 'set(attributes["offset_present"], 1) where attributes["offset_s"] != nil'
+  # Journal MESSAGE and metadata may contain reference addresses, process fields and raw error text. This
+  # separate processor must complete before either exporter receives a clock row. A privacy error drops the
+  # payload (v0.162.0 processor/transformprocessor/README.md, error_mode propagate). No raw journal body leaves.
+  transform/clock_export_privacy:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(resource.attributes, [])
+          - set(resource.attributes["service.name"], "clock-offset-check")
+          - set(resource.schema_url, "")
+          - keep_keys(instrumentation_scope.attributes, [])
+          - set(instrumentation_scope.name, "clock-offset-check")
+          - set(instrumentation_scope.version, "")
+          - set(instrumentation_scope.schema_url, "")
+          - keep_keys(attributes, ["level", "reason", "state_code", "offset_present", "offset_s", "bound_s", "ref_age_s"])
+          - set(body, attributes["level"])
+          - set(severity_text, attributes["level"])
   memory_limiter:
     check_interval: 1s
     limit_mib: 256
@@ -360,60 +429,6 @@ processors:
           - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code", "hook_name", "source", "handler_type", "execution_mode", "server", "skill", "invoke_type", "plugin_id"]) where metric.name == "codex.hooks.run" or metric.name == "codex.hooks.run.duration_ms"
           - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
           - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
-  # Level and reason of a clock-offset-check line, from the script's fixed vocabulary; an optional <0-7> syslog prefix
-  # is tolerated. Error lines name chronyd_not_observe_only, chronyc_failed, chronyc_malformed or chronyc_empty; every
-  # other line is a sample. The count connector keeps only level/reason dimensions; bounded numeric sample fields
-  # also reach Loki as structured metadata. Native checker defaults: bound > 0.050 s is WARN, |offset| > 0.100 s
-  # is CRIT, reference age > 1200 s is WARN. Preserve its printed state: other native reasons can produce WARN.
-  # opentelemetry-collector-contrib v0.162.0 pkg/ottl/ottlfuncs: ExtractPatterns, merge_maps, Double, Int, set, keep_keys.
-  # Native checker source SHA-256 f36a950f8f113f99064d0e824cc3c4228a6ef579444c17d4786955ca697bc03b.
-  transform/clock_offset_check:
-    error_mode: ignore
-    log_statements:
-      - context: log
-        statements:
-          - keep_keys(attributes, [])
-          - 'set(attributes["level"], "other")'
-          - 'set(attributes["level"], "ok") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?OK ")'
-          - 'set(attributes["level"], "warn") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?WARN ")'
-          - 'set(attributes["level"], "crit") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT ")'
-          - 'set(attributes["reason"], "sample")'
-          - 'set(attributes["reason"], "chronyd_not_observe_only") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyd_not_observe_only ")'
-          - 'set(attributes["reason"], "chronyc_failed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_failed ")'
-          - 'set(attributes["reason"], "chronyc_malformed") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_malformed ")'
-          - 'set(attributes["reason"], "chronyc_empty") where IsMatch(body["MESSAGE"], "^(<[0-7]>)?CRIT \\S+ chronyc_empty ")'
-          # State/presence are derived bounded log attributes, not new Prometheus gauges. Failed native rows
-          # retain their CRIT state and offset_present=0; no zero offset substitutes for a missing sample.
-          - 'set(attributes["state_code"], 3)'
-          - 'set(attributes["state_code"], 0) where attributes["level"] == "ok"'
-          - 'set(attributes["state_code"], 1) where attributes["level"] == "warn"'
-          - 'set(attributes["state_code"], 2) where attributes["level"] == "crit"'
-          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )offset_s=(?P<offset_s>[-+][0-9]+[.][0-9]{6})(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
-          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )bound_s=(?P<bound_s>[-+]?[0-9]+[.][0-9]{6})(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
-          - 'merge_maps(attributes, ExtractPatterns(body["MESSAGE"], "(?:^| )ref_age_s=(?P<ref_age_s>-?[0-9]+)(?: |$)"), "upsert") where attributes["reason"] == "sample" and attributes["level"] != "other"'
-          - 'set(attributes["offset_s"], Double(attributes["offset_s"])) where attributes["offset_s"] != nil'
-          - 'set(attributes["bound_s"], Double(attributes["bound_s"])) where attributes["bound_s"] != nil'
-          - 'set(attributes["ref_age_s"], Int(attributes["ref_age_s"])) where attributes["ref_age_s"] != nil'
-          - 'set(attributes["offset_present"], 0)'
-          - 'set(attributes["offset_present"], 1) where attributes["offset_s"] != nil'
-  # Journal MESSAGE and metadata may contain reference addresses, process fields and raw error text. This
-  # separate processor must complete before either exporter receives a clock row. A privacy error drops the
-  # payload (v0.162.0 processor/transformprocessor/README.md, error_mode propagate). No raw journal body leaves.
-  transform/clock_export_privacy:
-    error_mode: propagate
-    log_statements:
-      - context: log
-        statements:
-          - keep_keys(resource.attributes, [])
-          - set(resource.attributes["service.name"], "clock-offset-check")
-          - set(resource.schema_url, "")
-          - keep_keys(instrumentation_scope.attributes, [])
-          - set(instrumentation_scope.name, "clock-offset-check")
-          - set(instrumentation_scope.version, "")
-          - set(instrumentation_scope.schema_url, "")
-          - keep_keys(attributes, ["level", "reason", "state_code", "offset_present", "offset_s", "bound_s", "ref_age_s"])
-          - set(body, attributes["level"])
-          - set(severity_text, attributes["level"])
   # Upstream v0.162.0 processor/transformprocessor: spans are converted, never stored raw.
   transform/span_privacy:
     error_mode: silent
@@ -421,8 +436,7 @@ processors:
       - context: resource
         statements:
           - delete_key(attributes, "ecosystem.lane") where attributes["ecosystem.lane"] != nil and not IsMatch(attributes["ecosystem.lane"], "^[a-z][a-z0-9_-]{0,31}$")
-          - delete_key(attributes, "ecosystem.task.id") where attributes["ecosystem.task.id"] != nil and not IsMatch(attributes["ecosystem.task.id"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
-          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "ecosystem.lane", "ecosystem.task.id", "ecosystem.client.scope"])
+          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "ecosystem.lane", "ecosystem.client.scope"])
       - context: span
         statements:
           - delete_key(attributes, "gen_ai.prompt")
@@ -453,7 +467,7 @@ exporters:
     # default; configuring both is a validation error (opentelemetry-collector-contrib v0.161.0,
     # exporter/prometheusexporter/README.md:30-35, config.go:76-77).
     resource_constant_labels:
-      included: ["ecosystem.lane", "ecosystem.task.id"]
+      included: ["ecosystem.lane"]
   otlphttp/loki:
     endpoint: http://127.0.0.1:21300/otlp
     sending_queue:
@@ -486,7 +500,6 @@ connectors:
         include_resource_attributes:
           - {key: service.name, optional: true}
           - {key: ecosystem.lane, optional: true}
-          - {key: ecosystem.task.id, optional: true}
         sum:
           value: Int(attributes["gen_ai.usage.input_tokens"])
           monotonic: true
@@ -496,7 +509,6 @@ connectors:
         include_resource_attributes:
           - {key: service.name, optional: true}
           - {key: ecosystem.lane, optional: true}
-          - {key: ecosystem.task.id, optional: true}
         sum:
           value: Int(attributes["gen_ai.usage.output_tokens"])
           monotonic: true
@@ -506,7 +518,6 @@ connectors:
         include_resource_attributes:
           - {key: service.name, optional: true}
           - {key: ecosystem.lane, optional: true}
-          - {key: ecosystem.task.id, optional: true}
         sum:
           value: Int(attributes["llm.token_count.prompt"])
           monotonic: true
@@ -516,7 +527,6 @@ connectors:
         include_resource_attributes:
           - {key: service.name, optional: true}
           - {key: ecosystem.lane, optional: true}
-          - {key: ecosystem.task.id, optional: true}
         sum:
           value: Int(attributes["llm.token_count.completion"])
           monotonic: true
@@ -561,11 +571,11 @@ service:
       exporters: [otlphttp/loki, file/events]
     metrics:
       receivers: [otlp]
-      processors: [memory_limiter, groupbyattrs/session, transform/privacy, delta_to_cumulative, batch]
+      processors: [memory_limiter, groupbyattrs/session, transform/privacy, transform/metric_export_privacy, delta_to_cumulative, batch]
       exporters: [prometheus]
     metrics/health:
       receivers: [http_check/ecosystem]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, transform/metric_export_privacy, batch]
       exporters: [prometheus]
     logs/sdk_receipts:
       receivers: [file_log/sdk_receipts]
@@ -577,11 +587,11 @@ service:
       exporters: [span_metrics, signal_to_metrics]
     metrics/spans:
       receivers: [span_metrics, signal_to_metrics]
-      processors: [memory_limiter, delta_to_cumulative, batch]
+      processors: [memory_limiter, transform/metric_export_privacy, delta_to_cumulative, batch]
       exporters: [prometheus]
     metrics/host:
       receivers: [host_metrics]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, transform/metric_export_privacy, batch]
       exporters: [prometheus]
     # Only sanitized clock rows reach Loki. service.name becomes the service_name index label; bounded log
     # attributes remain structured metadata (grafana/loki v3.7.8 docs/sources/shared/otel.md). Counts stay parallel.
@@ -591,5 +601,5 @@ service:
       exporters: [count/clock_offset_check, otlphttp/loki]
     metrics/clock_offset_check:
       receivers: [count/clock_offset_check]
-      processors: [memory_limiter, delta_to_cumulative, batch]
+      processors: [memory_limiter, transform/metric_export_privacy, delta_to_cumulative, batch]
       exporters: [prometheus]

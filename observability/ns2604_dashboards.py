@@ -6,9 +6,10 @@ from which the plan's `observability_config.py grafana` provisions them; this sc
 
 NativeStack2604's Grafana (127.0.0.1:21301, anonymous Viewer) has the datasources `ns2604-prometheus` and
 `ns2604-loki` (plan config/grafana-datasources.yaml), and its OTel Collector's Prometheus exporter sets no
-`namespace` (plan config/otel.yaml:270-278; opentelemetry-collector-contrib v0.162.0
+`namespace` (plan config/otel.yaml, exporters.prometheus; opentelemetry-collector-contrib v0.162.0
 exporter/prometheusexporter/README.md:27, "namespace (no default)"), so its metrics carry no `ecosystem_`
-prefix. The workstation's collector sets `namespace: ecosystem` (observability/collector/collector.yaml:276).
+prefix. The workstation's collector sets `namespace: ecosystem`
+(observability/collector/collector.yaml, exporters.prometheus).
 Each dashboard is rendered by its own workstation renderer and then retargeted: datasource UIDs, and metric
 names in Prometheus queries only. `ecosystem_lane` is a label (resource_constant_labels), not a metric, and
 stays.

@@ -1157,12 +1157,12 @@ grafana() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/administration/provisioning/index.md#L324
-      check grafana 'smoke' 'python3 "$plan_dir/config/observability_config.py" grafana-check --config-root "$config_root"
+      check grafana 'smoke' 'python3 "$plan_dir/config/observability_config.py" grafana-check --installed-units --config-root "$config_root"
 grafana cli -v'
       ;;
     service_health)
       # Kind: health; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657
-      check grafana 'health' 'python3 "$plan_dir/config/observability_config.py" grafana-check --config-root "$config_root"
+      check grafana 'health' 'python3 "$plan_dir/config/observability_config.py" grafana-check --installed-units --config-root "$config_root"
 curl -fsS http://127.0.0.1:21301/api/health | jq -e '\''.database == "ok"'\'' >/dev/null
 curl -fsS http://127.0.0.1:21301/api/dashboards/uid/token-layer | jq -e '\''.dashboard.uid == "token-layer" and (.meta.provisioned == true)'\'' >/dev/null
 curl -fsS http://127.0.0.1:21301/api/datasources/proxy/uid/ns2604-alertmanager/api/v2/status | jq -e '\''.versionInfo.version == "0.34.1"'\'' >/dev/null
@@ -1177,7 +1177,7 @@ curl -fsS -G http://127.0.0.1:21300/loki/api/v1/query --data-urlencode '\''query
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657
-      check grafana 'smoke' 'python3 "$plan_dir/config/observability_config.py" grafana-check --config-root "$config_root"
+      check grafana 'smoke' 'python3 "$plan_dir/config/observability_config.py" grafana-check --installed-units --config-root "$config_root"
 export NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}"
 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null </dev/null
 uv run --locked --script "$repo_root/examples/omniroute-codex-sdk/worker.py" --workspace "$repo_root" --sandbox read-only --prompt "Reply exactly NS2604_GRAFANA_SDK_ACCEPTANCE" | python3 -c '\''
