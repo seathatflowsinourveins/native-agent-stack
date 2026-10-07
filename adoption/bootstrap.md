@@ -446,7 +446,7 @@ GitHub-hosted macOS runner; see
      into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`), and the main-session pair
      [`adoption/hooks/claude/token-lanes-session-start.py`](hooks/claude/token-lanes-session-start.py) and
      [`adoption/hooks/claude/token-lanes-block.main.md`](hooks/claude/token-lanes-block.main.md) beside them
-     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)).
+     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)). The catalog retrieval instructions in these blocks changed after `v2026.10.05.1`.
      The hook supplies token-lane guidance before each non-blind subagent's first prompt
      through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart):
      a shipped role with a `tools:` allowlist receives the role block that names only the lanes it grants,
