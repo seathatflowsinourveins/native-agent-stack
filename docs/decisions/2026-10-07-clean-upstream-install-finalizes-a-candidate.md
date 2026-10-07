@@ -53,8 +53,10 @@ and [paper policy](../paper-lane-policy.md) keep their own gates.
    a hook on every tool call is run in its documented selective form unless
    that tool is the single owner of its job, and a route that moves a client's
    model traffic or sign-in through another process is taken only on the
-   owner's word. On Claude Code a vendor's plugin is the route where one
-   exists; host-specific server settings ride on a user-scope server entry
+   owner's word. On Claude Code, use the vendor's plugin where it supports the
+   selected host configuration; otherwise use its documented manual route and
+   record the source-backed exception. Host-specific server settings ride on a
+   user-scope server entry
    with the same command line, which the client's precedence rule makes the
    one that connects, and never in the client's environment.
 3. **A row is ready when the vendor's install is checked.** READY needs the
