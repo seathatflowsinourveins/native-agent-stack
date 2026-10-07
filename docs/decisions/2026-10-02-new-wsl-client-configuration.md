@@ -928,6 +928,20 @@ settings and the project agents' gaps) and the list of dropped units after them;
 ```text
 ```
 
+## Amendment (2026-10-07): current instruction line inventory after CI8
+
+The shared top rule is unchanged. Moving the catalog rule outside its marker adds one current Codex instruction line. The native `new_wsl_client_config.py --check --markdown` render (exit 0) supplies this generated line inventory; previous tables and observations above are retained. This is source/render consistency, not a host apply.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 71 of 71 lines stay):
+
+```text
+```
+
 `adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 65 of 65 lines stay):
 
 ```text

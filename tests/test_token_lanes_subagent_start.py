@@ -292,6 +292,23 @@ class TokenLanesHookTests(unittest.TestCase):
             with self.subTest(agent_type=agent_type):
                 self.assertEqual(self.injected(agent_type), BLOCK.read_text(encoding="utf-8"))
 
+    def test_researcher_catalog_lane_hands_ungranted_semantic_retrieval_to_coordinator(self):
+        context = self.injected("stack-researcher")
+        _name, tools, _skills = frontmatter(AGENTS / "stack-researcher.md")
+        self.assertIn("Use qmd query for keyword search and document retrieval", context)
+        self.assertIn("Hand meaning-based catalog requests to the coordinator", context)
+        self.assertIn("never run qmd embed or qmd pull", context)
+        self.assertNotIn("mcp__socraticode__codebase_search", tools)
+        self.assertNotRegex(context, r"\bcodebase_search\b")
+        self.assertNotIn("mcp__socraticode__", context)
+
+        def ungranted(body):
+            return {tool for pattern, tool in NEEDS if re.search(pattern, body)} - set(tools)
+
+        self.assertEqual(ungranted(context), set())
+        # Control: naming the semantic tool would violate the unchanged grant boundary.
+        self.assertEqual(ungranted(context + "\ncodebase_search"), {"mcp__socraticode__codebase_search"})
+
     def test_injected_text_names_only_tools_each_shipped_allowlist_grants(self):
         # For each shipped agent with an exact `tools:` allowlist, every mcp__ id the hook injects for its
         # agent_type is granted, and so is every tool a line names or needs (Bash for RTK, ToolSearch,
