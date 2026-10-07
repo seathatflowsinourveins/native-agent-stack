@@ -496,6 +496,9 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
                             args, "fixture", sdk_factory=Client, on_event=provider_forbidden)
                         result = asyncio.run(invocation)
                         self.assertEqual(result["status"], "gateway_refused")
+                        if providers:
+                            self.assertIn("http://127.0.0.1:20128/v1", result["error"])
+                            self.assertIn(E0, result["error"])
                         self.assertFalse(result["model_inference_submitted"])
                         self.assertEqual(calls, ["start", "config/read", "close"])
                         self.assertFalse(output.exists())
@@ -507,3 +510,22 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
                         finally:
                             method.__kwdefaults__.clear()
                             method.__kwdefaults__.update(defaults)
+
+    def test_t27_invalid_effective_url_diagnostic_keeps_fixture_credentials_opaque(self):
+        worker = self.workers["codex"]
+        for endpoint in (
+            "http://fixture-user:opaque-fixture@127.0.0.1:20128/v1",
+            "http://127.0.0.1:20128/v1?token=opaque-fixture",
+        ):
+            with self.subTest(endpoint=endpoint), self.host(worker):
+                args = worker.parse_args(self.argv("codex"))
+                class Client:
+                    async def request(self, *args, **kwargs):
+                        return SimpleNamespace(config=SimpleNamespace(
+                            model_provider=worker.PROVIDER,
+                            model_extra={"model_providers": {
+                                worker.PROVIDER: {"base_url": endpoint}}},
+                        ))
+                with self.assertRaises(worker.GatewayRefused) as raised:
+                    asyncio.run(worker.read_effective_gateway(Client(), args))
+                self.assertNotIn("opaque-fixture", str(raised.exception))

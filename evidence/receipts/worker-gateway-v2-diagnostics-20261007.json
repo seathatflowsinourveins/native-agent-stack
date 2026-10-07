@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "worker-gateway-v2-diagnostics-20261007",
+  "recorded_at_utc": "2026-10-07T04:01:41Z",
+  "evidence_class": "synthetic_local_integration",
+  "base_revision": "12e4fef965b0d8ac275499ef4225607870a533fa",
+  "purpose": "The approved T17d control needs V2 to refuse and name a differing effective endpoint.",
+  "changes": [
+    "Only canonical validated loopback endpoints appear in the config/read mismatch diagnostic.",
+    "Invalid config/read URLs produce a value-free refusal, without userinfo or query content.",
+    "The shared host-gateway contract block and routing policy are unchanged."
+  ],
+  "checks": [
+    {
+      "suite": "T27 mismatch/missing-key and invalid effective-URL diagnostics",
+      "attempt": "initial",
+      "tests": 2,
+      "exit_code": 1,
+      "failures": 2,
+      "failure_class": "Two synthetic invalid-URL cases showed the canonical normalizer's error echoed fixture userinfo/query values.",
+      "real_credential_values": false
+    },
+    {
+      "suite": "The same two focused T27 tests after translating invalid config/read errors",
+      "attempt": "corrected",
+      "tests": 2,
+      "exit_code": 0,
+      "reported_seconds": 0.062,
+      "result": "OK"
+    }
+  ],
+  "sources": [
+    "Approved gateway-default-resolution revision3.1 changeset section6:T17d/T27",
+    "native-agent-stack@12e4fef965b0d8ac275499ef4225607870a533fa:examples/omniroute-codex-sdk/worker.py:769-771 (private provider errors remain outside public results)",
+    "openai/codex@rust-v0.160.0:openai_codex/async_client.py:132 (native typed config/read request)"
+  ],
+  "retained_output": "Exact commands and initial/corrected outputs remain in the lane's durable private logs; no invalid URL values are copied into this receipt.",
+  "claim_boundary": "Inert-client fixtures only; no live host config, provider/model call, current deployment, T17 transport, P15 or GW-01 qualification. The previous checkpoint observations and receipts remain unchanged."
+}

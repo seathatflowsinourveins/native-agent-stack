@@ -538,8 +538,19 @@ async def read_effective_gateway(client, args: argparse.Namespace):
     endpoint = definition.get("base_url") if isinstance(definition, dict) else None
     if endpoint is None:
         raise GatewayRefused("config/read did not report the effective provider base_url")
-    if gateway_endpoint(endpoint) != args.gateway["endpoint"]:
-        raise GatewayRefused("config/read effective provider base_url differs from this run's gateway")
+    try:
+        normalized = gateway_endpoint(endpoint)
+    except GatewayRefused:
+        # Config/read is provider data: never echo an invalid URL's userinfo
+        # or query in the public refusal. Same boundary as run_worker's errors.
+        raise GatewayRefused(
+            "config/read effective provider base_url is outside the host-gateway contract"
+        ) from None
+    if normalized != args.gateway["endpoint"]:
+        raise GatewayRefused(
+            f"config/read effective provider base_url {normalized} differs from "
+            f"this run's gateway {args.gateway['endpoint']}"
+        )
     return effective
 
 
