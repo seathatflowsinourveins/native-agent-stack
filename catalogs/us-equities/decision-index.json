@@ -27,6 +27,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+      "collection": "/repository_decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/foundation/memory-stack-20260925.json",
       "collection": "/repository_decisions",
       "repository_field": "repository",
@@ -410,13 +416,13 @@
     "repositories": 875,
     "public_star_repositories": 357,
     "beyond_public_stars": 518,
-    "references": 2054,
+    "references": 2072,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
       "legacy_candidate": 34,
       "public_star": 357,
-      "research_supplement": 581,
+      "research_supplement": 584,
       "star_review": 357
     }
   },
@@ -1110,6 +1116,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/5",
+          "id": "memory-rag-20261007-akitaonrails-ai-memory",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -5083,9 +5097,18 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/4",
+          "id": "memory-rag-20261007-comet-ml-opik",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -6070,6 +6093,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/2",
+          "id": "memory-rag-20261007-deepset-ai-haystack",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
           "pointer": "/candidates/117",
           "decision": "discovery_only",
@@ -6265,6 +6296,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/6",
+          "id": "memory-rag-20261007-deusdata-codebase-memory-mcp",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
@@ -6633,6 +6672,14 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/1",
+          "id": "memory-rag-20261007-docling-project-docling",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -8362,6 +8409,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/7",
+          "id": "memory-rag-20261007-giancarloerra-socraticode",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/6/candidates/0",
           "disposition": "selected"
@@ -9468,6 +9523,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/12",
+          "id": "memory-rag-20261007-hkuds-rag-anything",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
           "pointer": "/candidates/177",
           "decision": "discovery_only",
@@ -10024,6 +10087,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/9",
+          "id": "memory-rag-20261007-infiniflow-ragflow",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -12454,6 +12525,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/8",
+          "id": "memory-rag-20261007-mem0ai-mem0",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
           "pointer": "/repository_decisions/6",
           "id": "memory-stack-mem0-oss",
@@ -12599,6 +12678,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/16",
+          "id": "memory-rag-20261007-mempalace-mempalace",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14597,9 +14684,18 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/10",
+          "id": "memory-rag-20261007-onyx-dot-app-onyx",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -17190,6 +17286,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/3",
+          "id": "memory-rag-20261007-qdrant-qdrant",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
           "pointer": "/candidates/310",
           "decision": "discovery_only",
@@ -18223,6 +18327,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/15",
+          "id": "memory-rag-20261007-rohitg00-agentmemory",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -20016,6 +20128,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/17",
+          "id": "memory-rag-20261007-supermemoryai-supermemory",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
           "pointer": "/repository_decisions/12",
           "id": "memory-stack-supermemory",
@@ -21098,6 +21218,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/14",
+          "id": "memory-rag-20261007-topoteretes-cognee",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
           "pointer": "/repository_decisions/13",
           "id": "memory-stack-cognee",
@@ -22166,9 +22294,18 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/11",
+          "id": "memory-rag-20261007-vectifyai-pageindex",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -22205,6 +22342,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/0",
+          "id": "memory-rag-20261007-vectorize-io-hindsight",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -22741,6 +22886,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
+          "pointer": "/repository_decisions/13",
+          "id": "memory-rag-20261007-volcengine-openviking",
+          "disposition": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/foundation/memory-stack-20260925.json",

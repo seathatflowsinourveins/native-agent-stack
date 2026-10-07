@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "kind": "coordinator_assignment_metadata",
+  "assignment": "The currency lane owns the upstream-surface resolver loop on NativeStack2604.",
+  "source": {
+    "kind": "direct_user_queued_direction",
+    "command_center_item": "task-ns2604-coop-20261006T210047Z",
+    "sections": [
+      2,
+      4
+    ],
+    "message_label": "RESOLVER-OWNER",
+    "received_utc": "2026-10-06T21:44:45Z"
+  },
+  "scope": "Catalog row review and resolver ownership documentation; configuration, credentials, merge and live acceptance are separate scopes.",
+  "review_boundary": "Preserve unrelated rows, update the three existing document rows by key, and append only newly reviewed name rows.",
+  "record_class": "Task/ownership provenance, not native execution evidence."
+}

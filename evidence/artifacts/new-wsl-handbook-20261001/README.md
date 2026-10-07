@@ -1,0 +1,1 @@
+`receipt.json` is the maintained current-state publication binding updated on every handbook regeneration; its historical validation, regeneration and previous-output entries and separately dated records are retained.

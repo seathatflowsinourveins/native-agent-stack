@@ -14,3 +14,16 @@ group whose StructuredOutput sentence is also restored in the user block.
 top-rule marker is its section boundary) before comparing raw bytes. The
 fixtures and byte counts are reviewed contracts, never regenerated from current
 destination content by the test.
+
+## Agent-team accuracy correction (2026-10-06)
+
+The [separate dated decision](../../../docs/decisions/2026-10-06-agent-teams-carrier-corrections.md)
+links this correction to the preserved October 5 decision and snapshots.
+
+The feature check's approved effort and 5.5 task-tool corrections supersede only
+the active contracts for passages 09 and 10. Their October 5 snapshots remain
+unchanged in `09.txt` and `10.txt`. The dated `09-20261006.txt` and
+`10-20261006.txt` bind the corrected passages, including their terminating line
+ending, to the same destination section. All other contracts retain their original
+bytes. Sources are the README's agent-team docs and pinned changelog citations;
+the tests still compare frozen expected bytes, rather than regenerate them.

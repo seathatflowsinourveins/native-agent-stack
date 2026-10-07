@@ -1,0 +1,33 @@
+{
+  "schema": "native-agent-stack/evidence-relabel/v1",
+  "written_utc": "2026-10-07T03:51:07Z",
+  "item": "~/.local/share/new-wsl-native-stack/observability/sdk-receipts/grafana-acceptance-b070f995bfdc42f59b17baa2b7da3a64.json",
+  "item_sha256": "cb65ef97cff4864c4c4419573202ac281570d77f551107d0d4372d10b4740983",
+  "class": "old-gateway-inferred",
+  "label": "E1; old gateway inferred from the flagless 20128 default; no URL recorded in the SDK receipt. Completed status remains unchanged. This SDK receipt does not establish the new gateway's execution; separate local Grafana service proof is unaffected.",
+  "basis": [
+    {
+      "path": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:examples/omniroute-codex-sdk/worker.py",
+      "line": 42,
+      "quote": "DEFAULT_BASE_URL = \"http://127.0.0.1:20128/v1\"",
+      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea"
+    },
+    {
+      "path": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:examples/omniroute-codex-sdk/worker.py",
+      "line": 544,
+      "quote": "    parser.add_argument(\"--base-url\", type=gateway_url, default=DEFAULT_BASE_URL)",
+      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea"
+    },
+    {
+      "path": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "line": 1003,
+      "quote": "uv run --locked --script \"$repo_root/examples/omniroute-codex-sdk/worker.py\" --workspace \"$repo_root\" --sandbox read-only --prompt \"Reply exactly NS2604_GRAFANA_SDK_ACCEPTANCE\" | python3 -c '\\''",
+      "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79"
+    }
+  ],
+  "consumers": [
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:evidence/artifacts/ns2604-requalification-20261005/slots.json#/slots/observation-inference~1grafana",
+    "native-agent-stack@d7dfe84713a7c294a370d05558f00e7e5acd0d1e:evidence/artifacts/ns2604-native-bar-20261006/board.json#/slots/43"
+  ],
+  "requalifies_by": "GW-04b authorized window at merged code only after C0/C1/A merge and GW-01 passes; fresh SDK receipt must record endpoint21128. Before/after call-log pages are leads only. No qualifying re-run occurred here."
+}

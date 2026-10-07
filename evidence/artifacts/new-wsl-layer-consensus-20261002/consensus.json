@@ -1433,7 +1433,7 @@
    },
    "round2_extract": {
     "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-    "sha256": "aaaa99019d486ed3e2c3313dddb3e1495315ef2a2c5d5be2285f448226bae148"
+    "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7"
    }
   },
   "acknowledgements": [],

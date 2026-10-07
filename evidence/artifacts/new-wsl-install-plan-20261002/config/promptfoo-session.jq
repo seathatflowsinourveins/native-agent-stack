@@ -22,6 +22,7 @@ def accepted:
   .data.results.stats.successes == 2 and
   .data.results.stats.failures == 0 and .data.results.stats.errors == 0 and
   ([.data.results.results[].provider.id] | unique | length) == 2 and
+  ([.data.results.results[].provider.id] | sort) == ($expected | sort) and
   all(.data.results.results[];
       .eval.success == true and (.provider.id | startswith("openai:chat:")));
 if $client == "claude" then

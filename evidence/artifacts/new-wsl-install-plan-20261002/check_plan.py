@@ -10,6 +10,7 @@ usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH]
 """
 import argparse
 import collections
+import hashlib
 import json
 import pathlib
 import re
@@ -585,6 +586,36 @@ def main():
         if r["route"] == "mise" and not r.get("mise_tool"):
             bad("mise", f"row {r['slot']} has route mise but names no mise_tool")
 
+    # D-ollama: owner-approved native user-unit adaptation; no host apply here.
+    # Source: Ollama v0.35.0 docs/linux.mdx:57-89; D-ollama-2 on-demand/30m owner ruling.
+    ollama = by_slot.get("local-model-server", {})
+    if not ollama.get("needs", {}).get("systemd_user_unit"):
+        bad("local-model-server", "lasting GPU owner requires its user-unit prerequisite")
+    native_enable = "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
+    if native_enable not in ollama.get("commands", []):
+        bad("local-model-server", "missing native daemon-reload and boot enable/start command")
+    health = (ollama.get("acceptance", {}).get("service_health") or {}).get("command") or ""
+    if "systemctl --user is-enabled ollama.service" not in health.splitlines():
+        bad("local-model-server", "service_health must require boot-enabled ollama.service")
+    if (health.splitlines()[:2] != ["systemctl --user is-enabled ollama.service",
+                                    "systemctl --user is-active ollama.service"]
+            or health.count("/api/embed") != 1 or health.count("/api/ps") != 1
+            or health.index("/api/embed") > health.index("/api/ps")
+            or '.size_vram == .size' not in health
+            or 'qwen3-embedding-8k:latest' not in health):
+        bad("local-model-server", "service_health must load the embedder on demand before its positive GPU-residency gate")
+    if any("ollama-warmup.sh" in value for value in ollama.get("commands", []) + ollama.get("config_paths", [])):
+        bad("local-model-server", "D-ollama-2 removes the warmup asset and all installer references")
+    assets = {
+        "ollama.service": "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db",
+    }
+    for name, expected in assets.items():
+        path = plan_dir / "config" / name
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            bad("local-model-server", f"{name} differs from its designated owner-approved bytes")
+        if f"copy_config '{name}'" not in install_funcs.get("local-model-server", ""):
+            bad("local-model-server", f"install function must place {name} through copy_config")
+
     # G4: these are plan contracts, not a claim that a host or a notification receiver passed.
     # Source: OTel v0.162.0 otelcol/command_validate.go:15; Grafana v13.2.3 query-editor/_index.md:47;
     # Alertmanager v0.34.1 docs/configuration.md:1939; Prometheus v3.15.0 unit_testing_rules.md:6.
@@ -614,10 +645,11 @@ def main():
 
     # Config files: service copy_config calls and direct, preserving tool-config installs both consume plan files.
     # Ports do not collide between rows. Only the install source operand counts, never an arbitrary filename mention.
-    config = {p.name for p in (plan_dir / "config").iterdir()}
+    config = {p.relative_to(plan_dir / "config").as_posix()
+              for p in (plan_dir / "config").rglob("*") if p.is_file()}
     copied = set(re.findall(r"copy_config '([^']+)'", install_text))
     commands = "\n".join(command for row in rows for command in row["commands"])
-    copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._@-]+)" "[^"\n]+"', commands))
+    copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._@/-]+)" "[^"\n]+"', commands))
     # MinerU consumes its scoped skill manifest directly through the installer's native --manifest argument.
     if '--manifest "$plan_dir/config/mineru-skills-manifest.json"' in "\n".join(by_slot.get("mineru", {}).get("commands", [])):
         copied.add("mineru-skills-manifest.json")
@@ -630,10 +662,11 @@ def main():
         bad("base-distribution", "base-image acceptance must consume config/base-distribution-accept.sh")
     for name in sorted(copied - config):
         bad("config", f"install.sh copies config/{name}, which does not exist")
-    # Round-2 gpt-gateway-topology excludes local carries from the clean default.
+    # Historical canary assets remain available to their original regression tests.
     # Source: https://github.com/diegosouzapw/OmniRoute/pull/15167
     # These retained historical artifacts still support the canary regression
-    # tests, but the published release row must neither install nor accept them.
+    # tests, but neither the published package nor a supplied prebuilt composition
+    # installs them or treats their source-tree checker as prebuilt identity proof.
     historical_gateway_configs = set()
     gateway = by_slot.get("gpt-gateway", {})
     if gateway.get("release") == "3.8.51" and not gateway.get("source_build"):
@@ -641,7 +674,7 @@ def main():
             "omniroute-canary-check.py", "omniroute-canary-evidence.json", "omniroute-canary-install.sh",
         }
         if historical_gateway_configs & copied:
-            bad("gpt-gateway", "published clean release must not install historical canary assets")
+            bad("gpt-gateway", "selected prebuilt release must not install historical canary assets")
     for name in sorted(config - copied - historical_gateway_configs):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
@@ -657,7 +690,8 @@ def main():
         if (r.get("service") or {}).get("port") is not None:
             claims[r["service"]["port"]].add(r["slot"])
         for path in r["config_paths"]:
-            name = path.rsplit("/", 1)[-1]
+            name = next((asset for asset in sorted(config, key=len, reverse=True)
+                         if path.endswith("/" + asset)), path.rsplit("/", 1)[-1])
             if name in config:
                 config_text = (plan_dir / "config" / name).read_text()
                 if r["slot"] == "research-harnesses" and name == "deer-flow-config.yaml":

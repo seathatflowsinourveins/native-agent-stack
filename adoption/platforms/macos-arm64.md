@@ -73,6 +73,9 @@ release, the note is history and the step is in your checkout (`test -e
    Serena and jcodemunch-mcp into the ecosystem prefix, registers the
    user-scope MCP servers (`ai-memory` and `serena`) and gives jCodeMunch's
    per-project opt-in. The MCP template `adoption/mcp/claude-user.json`
+   changed after `v2026.10.05.1`: SocratiCode's model/dimensions are
+   Nemotron-3-Embed-8B/4096, with portable endpoint defaults retained; the
+   target host registers its own endpoints. The earlier template
    changed after `v2026.09.24.1`: the tag's `serena` entry names a
    `serena-context` wrapper that nothing installs, and main's runs
    `${ECO_ROOT}/bin/serena`; the tag also registers `jcodemunch` at user

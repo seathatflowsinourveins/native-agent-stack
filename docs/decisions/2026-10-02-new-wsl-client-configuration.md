@@ -928,6 +928,20 @@ settings and the project agents' gaps) and the list of dropped units after them;
 ```text
 ```
 
+## Amendment (2026-10-07): current instruction line inventory after CI8
+
+The shared top rule is unchanged. Moving the catalog rule outside its marker adds one current Codex instruction line. The native `new_wsl_client_config.py --check --markdown` render (exit 0) supplies this generated line inventory; previous tables and observations above are retained. This is source/render consistency, not a host apply.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 71 of 71 lines stay):
+
+```text
+```
+
 `adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 65 of 65 lines stay):
 
 ```text
@@ -1089,7 +1103,7 @@ After the refresh onto main 9e9553277, which carries wave 5's four browser-regis
 ```text
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 69 of 69 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 70 of 70 lines stay):
 
 ```text
 ```
@@ -1104,6 +1118,56 @@ The [local-time decision](2026-10-05-user-facing-local-time.md) adds one sentenc
 ```
 
 `adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 70 of 70 lines stay):
+
+```text
+```
+
+## Amendment 2026-10-07: #803 landing projection
+
+The one authorized landing rebase combines the existing local-time instruction with the SKILL.md
+RTK exception. The native managed-block renderer measures 7,798 compact bytes and 8,864 rendered
+bytes; the protected pre-RTK prefix and its local-time provenance stay as main pinned them.
+The current source-only `new_wsl_client_config.py --check --markdown` inventory follows.
+All earlier decided text, local-time addendum and historical projections remain intact.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 59 of 59 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 71 of 71 lines stay):
+
+```text
+```
+
+### Amendment 2026-10-07 — J819e current instruction inventory
+
+The native `new_wsl_client_config.py --check --markdown` now counts the two navigation lines
+outside the unchanged top-rule block. This current generated inventory supersedes earlier
+line-count projections. The decided configuration policy and historical inventories remain intact.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 73 of 73 lines stay):
+
+```text
+```
+
+### Amendment 2026-10-07 — #819 landing current instruction inventory
+
+The authorized landing composition preserves main's local-time addendum and every earlier
+decided projection. The native source-only formatter below reflects the accepted
+post-exception trim and unchanged navigation guidance; it supplies no host apply.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 59 of 59 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 74 of 74 lines stay):
 
 ```text
 ```

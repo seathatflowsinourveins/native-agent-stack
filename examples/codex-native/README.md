@@ -102,7 +102,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   spawn, message or follow up with other agents); working directory (a task's own instruction wins, and `cwd` goes to context-mode only for a
   directory other than the launch directory, which the server is already bound to: the "Codex workers" bullet of
   [the handbook](../../docs/token-session-handbook.md#context-mode-executor-and-session-store); the frozen M13 leg reads sentinel files with
-  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list six commands). The verifier also says that it
+  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list seven entries). The verifier also says that it
   does not use web search.
 - **Registration.** Discovery only. Codex loads every `*.toml` under `$CODEX_HOME/agents/` (`load_agent_roles` in
   [`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)), so the roles carry no
@@ -143,8 +143,38 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 
 | File | SHA-256 |
 | --- | --- |
-| `stack-researcher.toml` | `52620afd5a6ded09adeffcfa652007c04f413c18d200ff0c2ae268b5f310fe52` |
-| `stack-verifier.toml` | `aab3b1f7980344adac583bb74ceb5f7d3b1cb98f75b552d993cb4b77626bfc34` |
+| `stack-researcher.toml` | `bcce9561bfe2cb8476376b47a9a32cecdd056ec725156027506c54a5ae831627` |
+| `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |
+
+## 2026-10-07: #819 landing RTK exception bindings
+
+This current binding supersedes the earlier carrier hash inventory after the authorized
+landing rebase onto #803 and the accepted exception-prose trim. The stack-researcher and
+stack-verifier roles keep their model, effort, abilities and all guidance outside that trim.
+As before, no new role or installer is needed.
+The rendered pre-RTK prefix includes main's local-time sentence, and the canonical top rule
+and upstream RTK awareness stay unchanged. Seven exception entries keep the same facts;
+the SKILL.md line remains exact. The three dated project worker examples receive only
+the same exception fragment, preserving their inherited model and effort fields.
+
+Sources: [the SKILL.md exception record](../../docs/decisions/2026-10-06-codex-skill-read-exception.md),
+[the pinned F4 exception findings](../../docs/decisions/2026-09-26-token-practice-f1-f9.md),
+and the 2026-10-07 landing cue and accepted scope variant recorded in the new landing receipt.
+These bindings are source integrity and repository integration evidence; they supply no
+host apply, model execution or fresh-session acceptance.
+
+| File | SHA-256 |
+| --- | --- |
+| `stack-researcher.toml` | `1c76164a7afefbf4a02f673e5cd07d806418dc57c966fc7e5a2738965b1a1802` |
+| `stack-verifier.toml` | `77c08cf1ae42ab4ad1dca9d88f14a9d5c0602862c7ec72b458ccb5b7ac6363fb` |
+
+### 2026-10-06: SKILL.md read exception
+
+The current table and carrier checksums include the plain-sed skill-document exception. The six existing RTK exceptions, role grants and verbatim awareness bytes are preserved. This is a source-backed instruction/render read-back, not a new frozen E2E or role-use trial. The native `codex.skill.injected` counter identifies an invocation attempt before execution; it does not prove a successful/full read or application. See [the decision](../../docs/decisions/2026-10-06-codex-skill-read-exception.md).
+
+### 2026-10-06: Lexical catalog retrieval
+
+The current researcher checksum includes the catalog's lexical QMD route and meaning-based `codebase_search` route with the main checkout's explicit `projectPath`. QMD MCP calls select lexical searches and may optionally disable reranking before bounded document retrieval. The seven RTK exceptions and all role grants, models and effort are preserved. The verifier and three worker-role copies have identical bytes to the base. This instruction change applies no client configuration or index; see [the catalog-lane decision](../../docs/decisions/2026-10-06-qmd-lexical-catalog-instructions.md).
 
 ### 2026-10-04: RTK pin guidance amendment
 
@@ -232,3 +262,25 @@ repair they were `9b8838cf074223e302061e1953f687223b62163b637421801ccd37f8b2633e
 (researcher) and `7bc14292b6a4c2a5eb8f9eea7ebd2275309b6008020cd1afe2a745a89404f448`
 (verifier). Historical freeze artifacts remain unchanged. This is a structural
 repair, with no new spawned-role or model acceptance.
+
+## 2026-10-07: J819e native navigation bindings
+
+This current binding supersedes the earlier carrier hash inventory; no new role or installer is needed.
+The dated inventories above remain historical snapshots. The researcher uses a focused read for a known
+exact path and line, and the native navigation lane for unfamiliar code, symbols, callers and references.
+Before using Serena it reads `initial_instructions` once per session; switching projects requires the
+returned session id and authorization. For jCodeMunch it obtains the current policy through
+`order(action="jcodemunch_guide",args={})`, opens `route(task=...,model=<actual caller model>)`
+with execute off, then uses its granted menu/order actions on an owner-indexed repository.
+
+Sources: [Serena's manual-first contract at c6fbd1c5](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/workflow_tools.py#L28),
+[project-switch session id](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/config_tools.py#L44),
+and [jCodeMunch's task/model route schema at d94049d0](https://github.com/jgravelle/jcodemunch-mcp/blob/d94049d03e3ec21a90253c9a619598211157f00b/src/jcodemunch_mcp/server.py#L446).
+The [dated wiring record](../../docs/decisions/2026-10-07-serena-jcodemunch-native-navigation-wiring.md)
+separates repository integration checks from the command center's later client apply and fresh-session smoke.
+The models, effort, role abilities, sandbox inheritance and seven RTK exceptions retain their existing pins.
+
+| File | SHA-256 |
+| --- | --- |
+| `stack-researcher.toml` | `9578c60c279d1e319935ba2ab25e4157176446a1a7011df94a6a81c51e0ad3d3` |
+| `stack-verifier.toml` | `f4b32e5a8f480f80ac57c30b611a1a2d161780d15fd0fc99f10398ce0a93cda3` |

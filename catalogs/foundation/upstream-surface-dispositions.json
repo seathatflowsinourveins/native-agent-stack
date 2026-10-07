@@ -190,8 +190,8 @@
   {
    "key": "claude:env:CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-runtime-sdk/tests/test_worker.py:73 names it",
-   "source": "examples/claude-runtime-sdk/tests/test_worker.py:73",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at examples/claude-runtime-sdk/tests/test_worker.py:75 names it",
+   "source": "examples/claude-runtime-sdk/tests/test_worker.py:75",
    "carrier": null,
    "value": null,
    "scope": null,
@@ -225,15 +225,15 @@
   },
   {
    "key": "claude:env:CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS",
-   "disposition": "adopt-pending",
-   "reason": "User order 2026-10-04 (rule 3). NativeStack has 1, 2604 unset. Additions env merges key by key (new_wsl_client_config.py:466-467).",
-   "source": "https://code.claude.com/docs/en/env-vars.md",
+   "disposition": "enabled",
+   "reason": "CC rule 18: \"The CC leads at most 3 teammates\"; switch set. command-center/cc-tools/CC-RULES-ADDENDUM-20261006.md:9-23.",
+   "source": "https://code.claude.com/docs/en/env-vars.md#L293",
    "carrier": "adoption/new-wsl/templates/claude.settings.additions.json",
    "value": "1",
-   "scope": "NativeStack2604",
-   "overturn": "User revokes the 10-04 order, or teams leave experimental under another switch.",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "2.1.289"
+   "scope": "\"The CC leads at most 3 teammates\"; \"forbids writes\" by brief",
+   "overturn": "The CC changes rule 18's \"The CC leads at most 3 teammates\" or \"forbids writes\" scope, or upstream changes the switch.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:env:CLAUDE_CODE_EXTRA_BODY",
@@ -693,15 +693,15 @@
   },
   {
    "key": "claude:env:MCP_PROTOCOL_NEGOTIATION",
-   "disposition": "declined",
-   "reason": "Unset already probes HTTP servers, and stdio servers as Anthropic rolls that out (v2.1.285+); forcing auto has no measured gain.",
-   "source": "https://code.claude.com/docs/en/mcp.md",
+   "disposition": "default-on",
+   "reason": "Upstream 2.1.292 defaults stdio to revision 2026-07-28 on every install; unset keeps the default and legacy opts out.",
+   "source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L76",
    "carrier": null,
    "value": null,
    "scope": null,
-   "overturn": "a token-stack stdio server needs revision 2026-07-28 before the rollout reaches us",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "2.1.289"
+   "overturn": "A server compatibility failure requires the documented legacy opt-out, or upstream changes the protocol default.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:env:MCP_SDK_GENERATION",
@@ -1065,39 +1065,39 @@
   },
   {
    "key": "claude:hook:TaskCompleted",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:333 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:333",
+   "disposition": "not-applicable",
+   "reason": "Opus/Sonnet 5.5 Task tools are withdrawn without TODO opt-in (CHANGELOG 2.1.268 L1986); TaskCompleted cannot fire in that scope.",
+   "source": "https://code.claude.com/docs/en/hooks.md#L2509-L2513",
    "carrier": null,
    "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "scope": "5.5 models without TODO opt-in",
+   "overturn": "A team needs ordered tasks and the owner enables CLAUDE_CODE_ENABLE_TODO_TOOLS before launch.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:hook:TaskCreated",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:333 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:333",
+   "disposition": "not-applicable",
+   "reason": "Current Opus/Sonnet 5.5 runs omit Task tools; TaskCreated does not fire without TaskCreate.",
+   "source": "https://code.claude.com/docs/en/hooks.md#L2455-L2457",
    "carrier": null,
    "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "scope": "5.5 models without TODO opt-in",
+   "overturn": "A team needs ordered tasks and the owner enables CLAUDE_CODE_ENABLE_TODO_TOOLS before launch.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:hook:TeammateIdle",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:333 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:333",
-   "carrier": null,
+   "disposition": "adopt-pending",
+   "reason": "Pending a claim-locator exit-2 gate after the first real team run; no installed handler or lifecycle acceptance is recorded.",
+   "source": "https://code.claude.com/docs/en/hooks.md#L2699-L2728",
+   "carrier": "Claude user settings hooks.TeammateIdle (planned)",
    "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "scope": "CC-led agent teams",
+   "overturn": "After the first real team run, the owner installs the bounded locator gate; an upstream hook change reopens the recipe.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:hook:UserPromptExpansion",
@@ -1137,15 +1137,15 @@
   },
   {
    "key": "claude:mod:cc-plugin-you-should-know",
-   "disposition": "adopt-pending",
-   "reason": "User order 2026-10-04 (rule 3): 2604 and the shared template. Side-agent tokens counted separately. Needs telemetry on; 2604 env sets no DISABLE_TELEMETRY.",
-   "source": "https://code.claude.com/docs/en/plugins/mods/overview.md",
-   "carrier": "adoption/templates/claude.settings.template.json",
+   "disposition": "enabled",
+   "reason": "Configured enabled; side-agent activity and costs remain unattributed. Keep separate native usage when an event identifies it.",
+   "source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L421",
+   "carrier": "adoption/new-wsl/templates/claude.settings.additions.json",
    "value": "true",
    "scope": "NativeStack2604",
-   "overturn": "User withdraws the order, or its measured side-agent cost outweighs its flags.",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "2.1.289"
+   "overturn": "The owner disables the mod, or changed upstream evidence warrants a different choice.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:setting:advisorModel",
@@ -1389,15 +1389,15 @@
   },
   {
    "key": "claude:setting:crossSessionInbound",
-   "disposition": "adopt-pending",
-   "reason": "The user's 2026-10-02 yes on messaging and his 2026-10-04 directive overturn the wave-2 ruling: an authorization piece on 2604",
-   "source": "https://code.claude.com/docs/en/settings-reference.md",
+   "disposition": "enabled",
+   "reason": "The accept delivery policy is applied; the previous pending disposition was stale.",
+   "source": "https://code.claude.com/docs/en/cross-session-messaging.md#L191-L199",
    "carrier": "adoption/new-wsl/templates/claude.settings.additions.json (authorization class)",
    "value": "accept",
    "scope": "NativeStack2604",
    "overturn": "a measured unwanted delivery without a hold, or the user asks for hold",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:setting:deniedMcpServers",
@@ -2240,6 +2240,18 @@
    "version": "2.1.289"
   },
   {
+   "key": "claude:setting:teammateMode",
+   "disposition": "default-on",
+   "reason": "Unset uses documented in-process display; split panes remain outside this narrow adoption.",
+   "source": "https://code.claude.com/docs/en/agent-teams.md#L107-L111",
+   "carrier": null,
+   "value": null,
+   "scope": "Claude agent teams",
+   "overturn": "The owner selects another display mode, or upstream changes the documented default.",
+   "reviewed_utc": "2026-10-06T22:15:38Z",
+   "version": "2.1.292"
+  },
+  {
    "key": "claude:setting:theme",
    "disposition": "enabled",
    "reason": "set in the user settings of both hosts (read 2026-10-04)",
@@ -2614,8 +2626,8 @@
   {
    "key": "codex:feature:context_management",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at docs/convergence-architecture.md:132 names it",
-   "source": "docs/convergence-architecture.md:132",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at docs/convergence-architecture.md:134 names it",
+   "source": "docs/convergence-architecture.md:134",
    "carrier": null,
    "value": null,
    "scope": null,
@@ -3287,7 +3299,7 @@
    "key": "codex:config:otel.environment",
    "disposition": "enabled",
    "reason": "set in the configuration of both hosts (read 2026-10-04); the cited record names it",
-   "source": "examples/codex-native/README.md:184",
+     "source": "examples/codex-native/README.md:214",
    "carrier": "host configuration",
    "value": null,
    "scope": "both",
@@ -3646,44 +3658,116 @@
   {
    "key": "claude:doc:memory",
    "disposition": "enabled",
-   "reason": "Watch this instruction document body; a changed digest reopens the October 5 harness context audit.",
+   "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
    "source": "https://code.claude.com/docs/en/memory",
-   "carrier": "docs/decisions/2026-10-05-harness-context-budget.md",
+   "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
    "value": {
-    "sha256": "fe99e50e312feae327c1e16847bc5853c71aaf2755fa554f9014c9008850e2cb"
+    "sha256": "b4e76ef1a2356fe39d5b5a70368a884e4128f1fc77a70e3556af9d4f84940562"
    },
    "scope": "startup-instructions",
-   "overturn": "Any fetched body change requires re-reading the document and rerunning the harness context audit before updating this digest.",
-   "reviewed_utc": "2026-10-05T00:00:00Z",
-   "version": "2.1.289"
+   "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "2.1.292"
   },
   {
    "key": "claude:doc:skills",
    "disposition": "enabled",
-   "reason": "Watch this instruction document body; a changed digest reopens the October 5 harness context audit.",
+   "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
    "source": "https://code.claude.com/docs/en/skills",
-   "carrier": "docs/decisions/2026-10-05-harness-context-budget.md",
+   "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
    "value": {
-    "sha256": "acdf96599200090206dd21327022aa58b21e23dfebdaffaa974b2fdb25077e00"
+    "sha256": "cf869f4c734b4094b0eaacb308b79447c9ebd5587ec30e186fc54441e8b11147"
    },
    "scope": "startup-instructions",
-   "overturn": "Any fetched body change requires re-reading the document and rerunning the harness context audit before updating this digest.",
-   "reviewed_utc": "2026-10-05T00:00:00Z",
-   "version": "2.1.289"
+   "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "2.1.292"
   },
   {
    "key": "codex:doc:agents-md",
    "disposition": "enabled",
-   "reason": "Watch this instruction document body; a changed digest reopens the October 5 harness context audit.",
-   "source": "https://developers.openai.com/codex/guides/agents-md",
-   "carrier": "docs/decisions/2026-10-05-harness-context-budget.md",
+   "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+   "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
+   "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
    "value": {
-    "sha256": "af22c038b1e5ce2fdf28cacdc996c2790232e13cb90a39f7d325d352256e412c"
+    "sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e"
    },
    "scope": "startup-instructions",
-   "overturn": "Any fetched body change requires re-reading the document and rerunning the harness context audit before updating this digest.",
-   "reviewed_utc": "2026-10-05T00:00:00Z",
-   "version": "rust-v0.159.3"
+   "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "rust-v0.160.1"
+  },
+  {
+   "key": "claude:setting:idleCompaction",
+   "disposition": "declined",
+   "reason": "Leave the native rollout/default alone; true cannot force rollout and false is an opt-out, so no override is justified.",
+   "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/23d4366e26910ae43783518bd6807625a9e5e409/evidence/artifacts/ns2604-context-audit-20261006/review.json#L113",
+   "carrier": null,
+   "value": null,
+   "scope": "native setting; no override",
+   "overturn": "A measured idle-compaction problem or changed vendor guidance justifies a supported explicit override.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "2.1.292"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS",
+   "disposition": "declined",
+   "reason": "Do not set globally; opt in only for a consumer needing native SDK/print stream-json session-state events.",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": null,
+   "value": null,
+   "scope": "environment",
+   "overturn": "A named SDK or print/stream-json consumer demonstrates a need for these native events.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "2.1.292"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_GZIP_REQUEST_BODIES",
+   "disposition": "declined",
+   "reason": "Leave the tri-state unset; preserve native body-size/rollout and proxy, mTLS and custom-CA transport decisions.",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": null,
+   "value": null,
+   "scope": "environment",
+   "overturn": "A measured transport incompatibility or documented supported need warrants a scoped override.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "2.1.292"
+  },
+  {
+   "key": "claude:env:NODE_EXTRA_CA_CERTS",
+   "disposition": "declined",
+   "reason": "Do not set globally without an evidenced additional-CA requirement; use the vendor's scoped trust configuration when needed.",
+   "source": "https://code.claude.com/docs/en/network-config#ca-certificate-store",
+   "carrier": null,
+   "value": null,
+   "scope": "environment",
+   "overturn": "The intended endpoint demonstrates a trust requirement addressed by a supported additional CA file.",
+   "reviewed_utc": "2026-10-06T20:51:07Z",
+   "version": "2.1.292"
+  },
+  {
+   "key": "codex:feature:guardian_conversation_history_tools",
+   "disposition": "declined",
+   "reason": "Under-development Guardian history retrieval requires Apps and is native-off in 0.160.1; no host adoption need demonstrated.",
+   "source": "https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/features/src/lib.rs#L1686",
+   "carrier": null,
+   "value": false,
+   "scope": "native feature; no override",
+   "overturn": "A supported upstream release and concrete host need are qualified through unchanged upstream Guardian history scenarios.",
+   "reviewed_utc": "2026-10-06T22:55:30Z",
+   "version": "rust-v0.160.1"
+  },
+  {
+   "key": "codex:feature:guardian_root_handoff_context",
+   "disposition": "declined",
+   "reason": "Under-development worker Guardian evidence windowing is native-off in 0.160.1; no host adoption need demonstrated.",
+   "source": "https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/features/src/lib.rs#L1668",
+   "carrier": null,
+   "value": false,
+   "scope": "native feature; no override",
+   "overturn": "A supported upstream release and concrete host need are qualified through unchanged upstream Guardian root-handoff scenarios.",
+   "reviewed_utc": "2026-10-06T22:55:30Z",
+   "version": "rust-v0.160.1"
   }
  ]
 }

@@ -82,9 +82,37 @@ fetch_verified() {
 copy_config() {
   # Refresh plan-owned helpers and reviewed rules; preserve operator configuration.
   local name="$1"
-  mkdir -p -- "$config_root"
+  mkdir -p -- "$(dirname -- "$config_root/$name")"
   case "$name" in
-    *.sh|*.py|*.rules|*.service|omniroute-canary-evidence.json)
+    gpt-gateway-topology.json|gpt-gateway-client-accept.sh|omniroute.service|omniroute-serve.sh|omniroute-lsof-shim-v2.sh|omniroute.service.d/10-show-log.conf)
+      # PR #744 composition custody: unfamiliar gateway assets belong to their owner.
+      # Known previous plan bytes: 44ac761 and main #713 at 1796303f957c522e78b92667e553c06840fae3a2,
+      # evidence/artifacts/new-wsl-install-plan-20261002/config/{gpt-gateway-client-accept.sh,gpt-gateway-topology.json,omniroute.service}.
+      if [[ -e "$config_root/$name" || -L "$config_root/$name" ]]; then
+        local gateway_old_sha=''
+        case "$name" in
+          gpt-gateway-client-accept.sh) gateway_old_sha='d317011252d368578ad1da4008c6d80118c4c95c0f641d2ba18342f45b3eecc2' ;;
+          gpt-gateway-topology.json) gateway_old_sha='fb4664f629e15351454ed448963bcd1057d934c1657a3c317bfe508d6cabcc0e' ;;
+          omniroute.service) gateway_old_sha='d5d71850d72c8e85c01df82a3fc4265d452e891333d197ced14c0ca26df6b074' ;;
+        esac
+        if [[ -L "$config_root/$name" || ! -f "$config_root/$name" ]]; then
+          printf 'needs_owner: existing gateway asset %s differs; retained.\n' "$name" >&2
+          return 1
+        fi
+        if ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
+          if [[ -z "$gateway_old_sha" ]] || ! printf '%s  %s\n' "$gateway_old_sha" "$config_root/$name" | sha256sum --check --status; then
+            printf 'needs_owner: existing gateway asset %s differs; retained.\n' "$name" >&2
+            return 1
+          fi
+          install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
+        fi
+      else
+        install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
+      fi
+      return ;;
+  esac
+  case "$name" in
+    *.sh|*.py|*.rules|*.service|omniroute-canary-evidence.json|acceptance-execution-instructions.txt)
       if ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
         printf 'Updating plan-owned %s.\n' "$name" >&2
         install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
@@ -98,7 +126,7 @@ copy_config() {
   fi
 }
 inspector_chromium_host_dependencies() {
-  # Inspector@2.9.0 clients/web/package-lock.json:7471; Playwright@v1.62.1 browsers.md:81.
+  # Inspector@2.9.0 clients/web/package-lock.json:7471; Playwright@v1.62.1 browsers.md:104.
   # Playwright's supported install-deps command requests privilege itself.
   npx -y playwright@1.62.1 install-deps chromium
 }
@@ -298,6 +326,7 @@ sandbox-runtime-srt() {
   # Planned. Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14
   run_command 'npm install -g @anthropic-ai/sandbox-runtime@0.0.78' || return "$?"
   copy_config 'srt-client-accept.sh' || return "$?"
+  copy_config 'acceptance-execution-instructions.txt' || return "$?"
 }
 
 serena() {
@@ -590,16 +619,17 @@ trace-viewer() {
 token-lane-carriers() {
   # token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks) | repository-recipe | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  printf '%s\n' 'UNRUN. The client configuration writes the carriers after this plan runs (tools/adoption/new_wsl_client_config.py, then its --check); this plan installs nothing for them and has nothing to check. Recipe/source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/docs/token-session-handbook.md#L197'
+  printf '%s\n' 'The current clean default holds out the repository token-lane carriers: the shared Claude template registers neither carrier hook, and the default profile install copies no carrier files. This retained historical owner row installs nothing and has no post-install check. Recipe/source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/4c897418fe35a030a1188ae447eaf31c893f8eff/docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md#L24'
 }
 
 session-analytics() {
+  # Operational artifact v0.44.0; catalog label preserves the historical selection.
   # G5 plan repair 2026-10-04; execution remains for the host coordinator.
-  # Planned. Source: https://github.com/kenn-io/agentsview/releases/download/v0.43.0/SHA256SUMS
-  run_command 'fetch_verified https://github.com/kenn-io/agentsview/releases/download/v0.43.0/agentsview_0.43.0_linux_amd64.tar.gz 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz"' || return "$?"
-  # Planned. Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md#L25; https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L1920 (owned launcher/placement glue)
-  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/agentsview-0.43.0" "$e/bin" "$HOME/.local/bin"; for alias in "$e/bin/agentsview" "$HOME/.local/bin/agentsview"; do if [[ -e "$alias" || -L "$alias" ]]; then [[ -L "$alias" && "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/launcher")" ]] || { printf "Existing agentsview alias belongs to another installation; retained.\n" >&2; exit 1; }; fi; done; tar -xf "$e/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz" -C "$e/tools/agentsview-0.43.0"; [[ -x "$e/tools/agentsview-0.43.0/agentsview" ]]; install -m 0600 -- "$plan_dir/config/agentsview.sh" "$e/tools/agentsview-0.43.0/launcher"; chmod 0755 "$e/tools/agentsview-0.43.0/launcher"; ln -sfn "$e/tools/agentsview-0.43.0/launcher" "$e/bin/agentsview"; ln -sfn "$e/tools/agentsview-0.43.0/launcher" "$HOME/.local/bin/agentsview"' || return "$?"
-  # Planned. Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L688 (owned archive config)
+  # Planned. Source: https://github.com/kenn-io/agentsview/releases/download/v0.44.0/SHA256SUMS
+  run_command 'fetch_verified https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz 037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz"' || return "$?"
+  # Planned. Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142; https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051 (owned launcher/placement glue)
+  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/agentsview-0.44.0" "$e/bin" "$HOME/.local/bin"; for alias in "$e/bin/agentsview" "$HOME/.local/bin/agentsview"; do if [[ -e "$alias" || -L "$alias" ]]; then [[ -L "$alias" && ( "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.44.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.44.0/agentsview")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/agentsview")" ) ]] || { printf "Existing agentsview alias belongs to another installation; retained.\n" >&2; exit 1; }; fi; done; tar -xzf "$e/downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz" -C "$e/tools/agentsview-0.44.0"; [[ -x "$e/tools/agentsview-0.44.0/agentsview" ]]; install -m 0600 -- "$plan_dir/config/agentsview.sh" "$e/tools/agentsview-0.44.0/launcher"; chmod 0755 "$e/tools/agentsview-0.44.0/launcher"; ln -sfn "$e/tools/agentsview-0.44.0/launcher" "$e/bin/agentsview"; ln -sfn "$e/tools/agentsview-0.44.0/launcher" "$HOME/.local/bin/agentsview"' || return "$?"
+  # Planned. Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051 (owned archive config)
   run_command 'd="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"; install -d -m 0700 "$d"; if [[ ! -e "$d/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/agentsview.toml" "$d/config.toml"; elif ! cmp -s "$plan_dir/config/agentsview.toml" "$d/config.toml"; then printf "Existing agentsview config retained; review local archive settings before starting.\n" >&2; fi' || return "$?"
 }
 
@@ -627,6 +657,12 @@ prometheus() {
   # Planned. Source: https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/getting_started.md#L18
   run_command 'install -m 0755 "$tool_root/prometheus/prometheus-3.15.0.linux-amd64/prometheus" "$HOME/.local/bin/prometheus"' || return "$?"
   copy_config 'prometheus.yaml' || return "$?"
+  # Render-only candidate from observability/backends/configure.py:100; G4:103–109.
+  copy_config 'ns2604-prometheus.service.example' || return "$?"
+  # Planned. Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/f946c6d4ca988a17b6fa4392ecb488909f147883/observability/backends/configure.py#L100 (A27 render only).
+  run_command 'install -m 0600 -- "$plan_dir/config/observability_config.py" "$config_root/observability_config.py"' || return "$?"
+  # Planned. Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/f946c6d4ca988a17b6fa4392ecb488909f147883/observability/backends/configure.py#L100 (A27 render only).
+  run_command 'NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}" python3 "$config_root/observability_config.py" prometheus --config-root "$config_root" --source-root "$plan_dir/config" --tools-root "$tool_root" --plan-file "$plan_dir/install-plan.json"' || return "$?"
 }
 
 alerting() {
@@ -685,6 +721,12 @@ local-model-server() {
   run_command 'mise use -g ollama@0.35.0' || return "$?"
   refresh_path || return "$?"
   copy_config 'ollama.env.example' || return "$?"
+  # D-ollama: lasting GPU owner; local-model decision254–257; upstream0.35.0 linux.mdx:57–89; D-ollama-2 native30m/on-demand unit.
+  copy_config 'ollama.service' || return "$?"
+  # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57 (user-unit adaptation; D-ollama).
+  run_command 'ollama_unit_path="$HOME/.config/systemd/user/ollama.service"; if [[ -L "$ollama_unit_path" ]] || { [[ -e "$ollama_unit_path" ]] && ! cmp -s -- "$config_root/ollama.service" "$ollama_unit_path"; }; then   printf '\''needs_owner: retained differing Ollama unit.\n'\'' >&2;   exit 3; fi; install -d -m 0700 -- "$HOME/.config/systemd/user" && install -m 0600 -- "$config_root/ollama.service" "$ollama_unit_path"' || return "$?"
+  # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L88 (native user-unit startup adaptation).
+  run_command 'systemctl --user daemon-reload && systemctl --user enable --now ollama.service' || return "$?"
 }
 
 local-generation-model() {
@@ -705,15 +747,11 @@ local-generation-model() {
 }
 
 inspect-ai() {
-  # G5 plan repair 2026-10-04; execution remains for the host coordinator.
-  # Planned. Source: https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/docs/index.qmd#L38; https://docs.astral.sh/uv/guides/tools/; https://pypi.org/pypi/openai/3.24.0/json
-  # Source: https://pypi.org/pypi/inspect-scout/0.5.3/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl"' || return "$?"
-  # Source: https://pypi.org/pypi/harbor/0.23.0/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
-  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L225
-  run_command 'uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==3.24.0 --with "inspect-scout @ file://$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl" --with-executables-from inspect-scout --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
-  # Planned. Source: https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/examples/theory_of_mind.py#L7
+  # Source: https://pypi.org/pypi/inspect-ai/0.3.273/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/91/88/4f60d412a9c37c9627619ab76574364c9cd33c2229e4f248fdd80e70b0a5/inspect_ai-0.3.273-py3-none-any.whl 8a8594237e3281bcb02b9be7638757f8693b78cbdef76eab348f6cdc6c6996f1 "$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
+  run_command 'uv tool install --no-build --reinstall --python 3.13 "$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl" --with openai==3.24.0 --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
+  # Source: https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/docs/index.qmd#L38
   run_command 'checkout_tag https://github.com/UKGovernmentBEIS/inspect_ai.git 0.3.273 "$tool_root/inspect-ai-0.3.273"; [[ "$(git -C "$tool_root/inspect-ai-0.3.273" rev-parse HEAD)" == 9e44f1b77ed7c912bf58baf30db8560937e7ce53 ]]' || return "$?"
 }
 
@@ -736,6 +774,8 @@ promptfoo() {
   copy_config 'promptfoo-0.123.1-basic.yaml' || return "$?"
   copy_config 'promptfoo-0.123.1-failing.yaml' || return "$?"
   copy_config 'promptfoo-gateway.yaml' || return "$?"
+  # Source: https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/util/config/load.ts#L383
+  copy_config 'promptfoo-gateway.cjs' || return "$?"
   copy_config 'promptfoo-codex-env.py' || return "$?"
   copy_config 'promptfoo-session.jq' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/installation.md#L19; https://docs.npmjs.com/cli/v11/commands/npm-install
@@ -863,17 +903,21 @@ restic() {
 }
 
 gpt-gateway() {
-  # Published OmniRoute 3.8.51 pool/fallback; native Codex owns Sol/max.
+  # Supplied 3.8.51 + PR15167 + affinity composition; source-only parity, UNRUN.
+  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31
+  run_command 'gateway_asset_known() { [[ -f "$2" && ! -L "$2" ]] || return 1; cmp -s -- "$plan_dir/config/$1" "$2" && return 0; local gateway_old_sha=""; case "$1" in gpt-gateway-client-accept.sh) gateway_old_sha="d317011252d368578ad1da4008c6d80118c4c95c0f641d2ba18342f45b3eecc2" ;; gpt-gateway-topology.json) gateway_old_sha="fb4664f629e15351454ed448963bcd1057d934c1657a3c317bfe508d6cabcc0e" ;; omniroute.service) gateway_old_sha="d5d71850d72c8e85c01df82a3fc4265d452e891333d197ced14c0ca26df6b074" ;; *) return 1 ;; esac; printf '"'"'%s  %s\n'"'"' "$gateway_old_sha" "$2" | sha256sum --check --status; }; gateway_needs_owner() { printf '"'"'needs_owner: %s\n'"'"' "$1" >&2; exit 1; }; gateway_prefix="$HOME/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167"; gateway_package="$gateway_prefix/lib/node_modules/omniroute"; gateway_tarball="${OMNIROUTE_COMPOSITION_TARBALL:-$HOME/.local/state/native-agent-stack/coordination/cc-handover-staging/omniroute-artifacts-20261005/omniroute-3.8.51.tgz}"; [[ -f "$gateway_tarball" ]] || gateway_needs_owner "supply the cited composition tarball through OMNIROUTE_COMPOSITION_TARBALL"; [[ "$(stat -c %s -- "$gateway_tarball")" == "137823643" ]] || gateway_needs_owner "composition tarball size differs"; printf '"'"'%s  %s\n'"'"' "d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2" "$gateway_tarball" | sha256sum --check --status || gateway_needs_owner "composition tarball digest differs"; printf '"'"'%s  %s\n'"'"' "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc" "$plan_dir/config/omniroute-serve.sh" "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854" "$plan_dir/config/omniroute-lsof-shim-v2.sh" | sha256sum --check --status || gateway_needs_owner "supplied wrapper or shim source differs"; for gateway_dir in "$gateway_prefix" "$gateway_prefix/shim" "$config_root/omniroute.service.d" "$HOME/.config/systemd/user/omniroute.service.d"; do if [[ -L "$gateway_dir" || ( -e "$gateway_dir" && ! -d "$gateway_dir" ) ]]; then gateway_needs_owner "gateway directory belongs to another installation"; fi; done; if [[ -e "$gateway_prefix" ]]; then [[ -d "$gateway_package" && ! -L "$gateway_package" && -f "$gateway_package/package.json" && ! -L "$gateway_package/package.json" && -f "$gateway_package/dist/BUILD_SHA" && ! -L "$gateway_package/dist/BUILD_SHA" ]] || gateway_needs_owner "existing prefix has no recognized package identity"; node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$gateway_package/package.json" || gateway_needs_owner "existing prefix package differs"; [[ "$(cat "$gateway_package/dist/BUILD_SHA")" == "5f4b3d577" ]] || gateway_needs_owner "existing prefix build differs"; [[ "$(readlink -f -- "$gateway_prefix/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]] || gateway_needs_owner "existing prefix executable differs"; fi; gateway_alias="$HOME/.local/bin/omniroute"; if [[ -e "$gateway_alias" || -L "$gateway_alias" ]]; then [[ -L "$gateway_alias" ]] || gateway_needs_owner "gateway alias is a foreign regular file"; case "$(readlink -f -- "$gateway_alias")" in "$gateway_package/bin/omniroute.mjs"|"$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/bin/omniroute.mjs"|"$tool_root"/omniroute-canary-*/prefix/lib/node_modules/omniroute/bin/omniroute.mjs|"$HOME/.local/share/omniroute-builds/omniroute-3.8.52-23a11484-pr13788-pr15167/lib/node_modules/omniroute/bin/omniroute.mjs") ;; *) gateway_needs_owner "gateway alias belongs to another installation" ;; esac; fi; for gateway_name in "gpt-gateway-topology.json" "gpt-gateway-client-accept.sh" "omniroute.service" "omniroute-serve.sh" "omniroute-lsof-shim-v2.sh" "omniroute.service.d/10-show-log.conf" "omniroute.env.example"; do gateway_target="$config_root/$gateway_name"; if [[ -e "$gateway_target" || -L "$gateway_target" ]]; then if [[ "$gateway_name" == "omniroute.env.example" ]]; then [[ -f "$gateway_target" && ! -L "$gateway_target" ]] || gateway_needs_owner "existing gateway example is not a regular file"; else gateway_asset_known "$gateway_name" "$gateway_target" || gateway_needs_owner "existing staged gateway asset differs: $gateway_name"; fi; fi; done; for gateway_name in omniroute-serve.sh omniroute-lsof-shim-v2.sh omniroute.service omniroute.service.d/10-show-log.conf; do case "$gateway_name" in omniroute-serve.sh) gateway_target="$gateway_prefix/omniroute-serve.sh" ;; omniroute-lsof-shim-v2.sh) gateway_target="$gateway_prefix/shim/lsof" ;; *) gateway_target="$HOME/.config/systemd/user/$gateway_name" ;; esac; if [[ -e "$gateway_target" || -L "$gateway_target" ]]; then gateway_asset_known "$gateway_name" "$gateway_target" || gateway_needs_owner "existing installed gateway asset differs: $gateway_name"; fi; done' || return "$?"
   copy_config 'gpt-gateway-topology.json' || return "$?"
   copy_config 'gpt-gateway-client-accept.sh' || return "$?"
   copy_config 'omniroute.service' || return "$?"
+  copy_config 'omniroute-serve.sh' || return "$?"
+  copy_config 'omniroute-lsof-shim-v2.sh' || return "$?"
+  copy_config 'omniroute.service.d/10-show-log.conf' || return "$?"
   copy_config 'omniroute.env.example' || return "$?"
-  # Source: https://registry.npmjs.org/omniroute/3.8.51
-  run_command '[[ "$(npm view omniroute@3.8.51 dist.integrity)" == "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==" ]]' || return "$?"
-  # Source: https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/guides/SETUP_GUIDE.md#L28
-  run_command 'npm install --global --include=optional --prefix "$tool_root/omniroute-3.8.51" omniroute@3.8.51; install -d -m 0700 -- "$HOME/.local/bin"; ln -sfn "$tool_root/omniroute-3.8.51/bin/omniroute" "$HOME/.local/bin/omniroute"' || return "$?"
-  # Source: https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
-  run_command 'install -d -m 0700 -- "$HOME/.config/systemd/user" "$HOME/.local/share/omniroute"; unit="$HOME/.config/systemd/user/omniroute.service"; if [[ ! -e "$unit" ]]; then install -m 0600 -- "$config_root/omniroute.service" "$unit"; elif ! cmp -s -- "$config_root/omniroute.service" "$unit"; then printf "needs_user: existing OmniRoute unit differs; review the destination unit before replacement.\n" >&2; exit 1; fi; systemctl --user daemon-reload' || return "$?"
+  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31
+  # Supported handoff README.txt:10; exact supplied bytes, no download/rebuild.
+  run_command 'gateway_prefix="$HOME/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167"; gateway_package="$gateway_prefix/lib/node_modules/omniroute"; gateway_tarball="${OMNIROUTE_COMPOSITION_TARBALL:-$HOME/.local/state/native-agent-stack/coordination/cc-handover-staging/omniroute-artifacts-20261005/omniroute-3.8.51.tgz}"; if [[ ! -e "$gateway_prefix" ]]; then install -d -m 0700 -- "$HOME/.local/share/omniroute-builds"; npm install -g --prefix "$gateway_prefix" --no-audit --no-fund "$gateway_tarball"; fi; node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$gateway_package/package.json"; [[ "$(cat "$gateway_package/dist/BUILD_SHA")" == "5f4b3d577" ]]; [[ "$(readlink -f -- "$gateway_prefix/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]; install -d -m 0700 -- "$gateway_prefix/shim" "$HOME/.local/bin"; install -m 0755 -- "$config_root/omniroute-serve.sh" "$gateway_prefix/omniroute-serve.sh"; install -m 0755 -- "$config_root/omniroute-lsof-shim-v2.sh" "$gateway_prefix/shim/lsof"; printf '"'"'%s  %s\n'"'"' "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc" "$gateway_prefix/omniroute-serve.sh" "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854" "$gateway_prefix/shim/lsof" | sha256sum --check --status; ln -sfn -- "$gateway_prefix/bin/omniroute" "$HOME/.local/bin/omniroute"' || return "$?"
+  # Source: https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html
+  run_command 'gateway_asset_known() { [[ -f "$2" && ! -L "$2" ]] || return 1; cmp -s -- "$plan_dir/config/$1" "$2" && return 0; local gateway_old_sha=""; case "$1" in gpt-gateway-client-accept.sh) gateway_old_sha="d317011252d368578ad1da4008c6d80118c4c95c0f641d2ba18342f45b3eecc2" ;; gpt-gateway-topology.json) gateway_old_sha="fb4664f629e15351454ed448963bcd1057d934c1657a3c317bfe508d6cabcc0e" ;; omniroute.service) gateway_old_sha="d5d71850d72c8e85c01df82a3fc4265d452e891333d197ced14c0ca26df6b074" ;; *) return 1 ;; esac; printf '"'"'%s  %s\n'"'"' "$gateway_old_sha" "$2" | sha256sum --check --status; }; install -d -m 0700 -- "$HOME/.config/systemd/user/omniroute.service.d" "$HOME/.local/share/omniroute"; for gateway_name in omniroute.service omniroute.service.d/10-show-log.conf; do gateway_target="$HOME/.config/systemd/user/$gateway_name"; if [[ -e "$gateway_target" || -L "$gateway_target" ]]; then gateway_asset_known "$gateway_name" "$gateway_target" || { printf '"'"'needs_owner: existing gateway unit/drop-in differs; retained.\n'"'"' >&2; exit 1; }; if ! cmp -s -- "$config_root/$gateway_name" "$gateway_target"; then install -m 0600 -- "$config_root/$gateway_name" "$gateway_target"; fi; else install -m 0600 -- "$config_root/$gateway_name" "$gateway_target"; fi; done; systemctl --user daemon-reload' || return "$?"
 }
 
 agent-runtime-worker() {
@@ -900,8 +944,8 @@ agent-runtime-worker() {
 }
 
 research-gpt-researcher() {
-  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
-  run_command 'checkout_tag https://github.com/assafelovic/gpt-researcher.git v3.7.0 "$tool_root/gpt-researcher"' || return "$?"
+  # Source: https://github.com/assafelovic/gpt-researcher/tree/0957c301ed06c2a5857b834358c7227c739041d4
+  run_command 'checkout_tag https://github.com/assafelovic/gpt-researcher.git v3.7.0 "$tool_root/gpt-researcher" && [[ "$(git -C "$tool_root/gpt-researcher" rev-parse HEAD)" == "0957c301ed06c2a5857b834358c7227c739041d4" ]]' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
   run_command 'ensure_venv "$tool_root/gpt-researcher/.venv"' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files (this PR: tools/research/gpt_researcher.sh:27)
@@ -911,8 +955,8 @@ research-gpt-researcher() {
 }
 
 research-deer-flow() {
-  # Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/Install.md#L38
-  run_command 'checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 "$tool_root/deer-flow"' || return "$?"
+  # Source: https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/Install.md#L38
+  run_command 'checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 "$tool_root/deer-flow" && [[ "$(git -C "$tool_root/deer-flow" rev-parse HEAD)" == "345f08be00c8a9495079b732a39b46aa9af1584e" ]]' || return "$?"
   # Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/Install.md#L38
   run_command '(cd "$tool_root/deer-flow" && if [[ ! -e config.yaml && ! -e .env && ! -e frontend/.env ]]; then make config; elif [[ ! -e config.yaml || ! -e .env || ! -e frontend/.env ]]; then printf "Partial DeerFlow config; repair from upstream recipe.\n" >&2; exit 1; fi)' || return "$?"
   # Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/Makefile#L96
@@ -970,16 +1014,26 @@ skill-vetting() {
 
 # Round2 wave5: trajectory-analysis; destination installation UNRUN.
 trajectory-analysis() {
-  # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/README.md#L1
+  # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/index.qmd#L28
   run_command 'checkout_tag https://github.com/meridianlabs-ai/inspect_scout.git 0.5.3 "$tool_root/inspect-scout-source-0.5.3"; [[ "$(git -C "$tool_root/inspect-scout-source-0.5.3" rev-parse HEAD)" == 0e8fc055a3cebba1a14c11bc35856767b6405173 ]]' || return "$?"
-  # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/examples/scanner/grep_examples.py#L102
+  # Source: https://pypi.org/pypi/inspect-scout/0.5.3/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl"' || return "$?"
+  # Source: https://pypi.org/pypi/inspect-ai/0.3.273/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/91/88/4f60d412a9c37c9627619ab76574364c9cd33c2229e4f248fdd80e70b0a5/inspect_ai-0.3.273-py3-none-any.whl 8a8594237e3281bcb02b9be7638757f8693b78cbdef76eab348f6cdc6c6996f1 "$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl"' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.23.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
+  run_command 'scout_alias="$(uv tool dir --bin)/scout"; scout_tools="$(uv tool dir)"; if [[ -e "$scout_alias" || -L "$scout_alias" ]]; then scout_target="$(readlink -f -- "$scout_alias")"; if [[ ! -L "$scout_alias" ]] || { [[ "$scout_target" != "$scout_tools/inspect-ai/bin/scout" ]] && [[ "$scout_target" != "$scout_tools/inspect-scout/bin/scout" ]]; }; then printf '"'"'needs_owner: retained foreign Scout executable.\n'"'"' >&2; exit 3; fi; fi; uv tool install --force --no-build --reinstall --python 3.13 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "inspect-ai @ file://$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl" --with litellm==1.92.0 --with "openai>=2.20.0,<3.0.0" --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
   run_command 'install -d -m 0700 -- "$config_root"; install -m 0600 -- "$plan_dir/config/scout-round2-delegation.py" "$config_root/scout-round2-delegation.py"' || return "$?"
-  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/inspection.md#L18
-  run_command 'umask 077; receipt="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/trajectory-analysis"; install -d -m 0700 -- "$receipt"; uv pip freeze --python "$(uv tool dir)/inspect-ai/bin/python" > "$receipt/resolved.txt"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
+  run_command 'umask 077; receipt="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/trajectory-analysis"; install -d -m 0700 -- "$receipt"; uv pip freeze --python "$(uv tool dir)/inspect-scout/bin/python" > "$receipt/resolved.txt"' || return "$?"
 }
 
 # Round2 wave5: mcp-protocol-conformance; destination installation UNRUN.
 mcp-protocol-conformance() {
+  # Lifecycle integration uses native util-linux namespaces and owned groups.
+  copy_config 'mcp-conformance-accept.sh' || return "$?"
   # Source: https://registry.npmjs.org/@modelcontextprotocol%2Fconformance/0.2.0-alpha.11
   run_command '[[ "$(npm view @modelcontextprotocol/conformance@0.2.0-alpha.11 dist.integrity)" == sha512-imPK9tx5gQsL6ZKQq4MrsyDYfSaIwpRmX6+ogjbeAXs9LGvxkBxWcY7KcS7TvwaBk/ZiVWl6b/naF4q83UwDRA== ]]; npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28' || return "$?"
   # Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L26
@@ -1069,7 +1123,7 @@ if $list; then
   printf '%s\n' 'convergence-validators | Convergence practice and its validators | repository-recipe | planned'
   printf '%s\n' 'lm-program-optimization | DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency) | uv-project | planned'
   printf '%s\n' 'skill-vetting | SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook) | uv-tool | planned'
-  printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.23.0 for ATIF import) | uv-tool-owner-extension | planned'
+  printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.23.0 for ATIF import) | uv-tool | planned'
   printf '%s\n' 'mcp-protocol-conformance | MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08) | npx-on-demand | planned'
   exit 0
 fi
@@ -1165,7 +1219,6 @@ if selected 'trace-viewer'; then run_slot 'trace-viewer'; fi
 if selected 'token-lane-carriers'; then run_slot 'token-lane-carriers'; fi
 if selected 'session-analytics'; then run_slot 'session-analytics'; fi
 if selected 'playwright-cli'; then run_slot 'playwright-cli'; fi
-if [[ "$only" == trajectory-analysis ]]; then run_slot 'inspect-ai'; fi
 if selected 'inspect-ai'; then run_slot 'inspect-ai'; fi
 if selected 'harbor-containerized-agent-e2e-runner'; then run_slot 'harbor-containerized-agent-e2e-runner'; fi
 if selected 'promptfoo'; then run_slot 'promptfoo'; fi

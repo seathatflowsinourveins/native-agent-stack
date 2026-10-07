@@ -1,0 +1,512 @@
+{
+  "schema_version": 1,
+  "kind": "memory_rag_source_stack_recommendations",
+  "checked_at": "2026-10-07",
+  "baseline_commit": "e712bae606e8d27f010af8e3c13ded6b7a7c207a",
+  "selection_policy": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+  "selection_policy_commit": "79619936926576576e5d011eec19e3790e55f457",
+  "decision_record": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+  "evidence": "evidence/artifacts/memory-rag-stacks-20261007/review.json",
+  "qualification_evidence": "evidence/artifacts/memory-rag-stacks-20261007-followup/source-qualification.json",
+  "scope": "Proposed source-review architectural recommendations by use case from the user's starred repositories and three explicitly identified additions. This completed bounded review supports research and engineering infrastructure; it does not qualify strategy, market data, execution or brokers.",
+  "recommendation_status": "proposed_source_review",
+  "evidence_class": "source_review",
+  "review_scoped_states": {
+    "installation": "not_performed_in_this_review",
+    "client_smoke": "not_performed_in_this_review",
+    "organic_use": "not_observed_in_this_review"
+  },
+  "publication_policy": {
+    "universal_sota_claim": false,
+    "complete_stack_verified": false,
+    "automatic_install_or_promotion": false,
+    "adoption_effect": "None. Existing deployed selections and manifests/stack.json pins are unchanged. Historical trial artifacts are preserved. This record selects no memory owner for this host.",
+    "catalog_synthesis_effect": "Additive dated input; does not finalize the separate 79-slot catalog consolidation or replace any owner's result.",
+    "release_policy": "Observed upstream releases and reviewed default/develop branch commits are distinct. These records are not deployment lockfiles or accepted release artifacts.",
+    "source_review_policy": "The original review applied the October 6 upstream-evidence policy. These proposed architectures supply inputs to MEMORY-SCREEN, preselect no memory-h2h winner and replace no independently owned measurement. The separately directed memory screen and head-to-head remain outside this record; this record queues no experiment. Installation, client smoke and organic-use observation were not performed by this review.",
+    "responsibility_semantics": "Every stack role and repository recommendation below is proposed, not an accepted host assignment or a measured winner."
+  },
+  "stacks": [
+    {
+      "id": "general-agent-memory-rag",
+      "title": "General agent memory and document RAG",
+      "recommendation": "Proposed primary modular architecture",
+      "required_repositories": [
+        "vectorize-io/hindsight",
+        "docling-project/docling",
+        "deepset-ai/haystack",
+        "qdrant/qdrant",
+        "comet-ml/opik"
+      ],
+      "responsibilities": {
+        "memory": "Hindsight is proposed for agent knowledge and temporal/entity context.",
+        "ingestion": "Docling is proposed for structured source-document extraction.",
+        "retrieval": "Qdrant is proposed for searchable document evidence; Haystack is proposed for indexing, hybrid retrieval, ranking and answer context.",
+        "measurement": "Opik is proposed for traces, datasets and upstream-tested evaluation integrations; none was executed in this review."
+      },
+      "why": "Strong role separation, public source/evaluation paths and documented component integrations; substantial database and pipeline test coverage.",
+      "operating_requirements": [
+        "Hindsight's supported PostgreSQL/vector backend and model configuration.",
+        "A separately scoped document collection in Qdrant and Docling ingestion resources.",
+        "Pinned Docling/Haystack/Qdrant integrations, generation and embedding/reranking providers.",
+        "One tracing owner; Opik's failing Ragas adapter is not assumed usable."
+      ],
+      "qualification": "Proposed composition; documented pairwise integrations do not establish an executed full stack."
+    },
+    {
+      "id": "coding-agent-continuity",
+      "title": "Codex/Claude coding continuity",
+      "recommendation": "Proposed coding architecture on reviewed upstream engineering merits",
+      "required_repositories": [
+        "akitaonrails/ai-memory",
+        "DeusData/codebase-memory-mcp"
+      ],
+      "optional_repositories": [
+        "giancarloerra/SocratiCode"
+      ],
+      "responsibilities": {
+        "memory": "ai-memory is proposed for durable project knowledge and typed handoffs; this review assigns no host memory owner.",
+        "code_structure": "codebase-memory is proposed for structural graph context.",
+        "optional_semantics": "SocratiCode is proposed for conceptual/mixed code-and-infrastructure retrieval when that requirement is present."
+      },
+      "why": "Recovery and cross-client continuity have a distinct owner; code structure is retrieved from source. Optional semantic infrastructure must have a separate role.",
+      "operating_requirements": [
+        "Verified project identity and access scope.",
+        "One owner per memory service and index.",
+        "Compatible official artifacts and backup/recovery procedure; SocratiCode adds vector/embedding infrastructure."
+      ],
+      "qualification": "Does not upgrade a deployed ai-memory pin or settle independently owned memory/code-search experiments."
+    },
+    {
+      "id": "personalized-application",
+      "title": "Personalized application with document evidence",
+      "recommendation": "Proposed application-memory SDK architecture",
+      "required_repositories": [
+        "mem0ai/mem0",
+        "docling-project/docling",
+        "deepset-ai/haystack",
+        "qdrant/qdrant",
+        "comet-ml/opik"
+      ],
+      "responsibilities": {
+        "personalization": "Mem0 is proposed for user/session/agent memories.",
+        "documents": "Docling, Haystack and Qdrant are proposed for independently scoped source evidence.",
+        "measurement": "Opik is proposed for traces and task-specific upstream-tested evaluation integrations; none was executed in this review."
+      },
+      "why": "Mem0's application APIs and the original review's observed upstream SDK checks support a personalization proposal. In this proposed architecture it would occupy the general stack's Hindsight memory role rather than add a second owner; no replacement is accepted here.",
+      "operating_requirements": [
+        "User/tenant isolation and deletion semantics.",
+        "Explicit separation of personalization stores and document collections.",
+        "An OSS configuration whose capabilities and benchmarks are not borrowed from proprietary managed optimizations."
+      ],
+      "qualification": "Models, package lock and full application evaluation remain unspecified."
+    },
+    {
+      "id": "packaged-document-rag",
+      "title": "Packaged document-RAG application",
+      "recommendation": "Proposed integrated document capability",
+      "required_repositories": [
+        "infiniflow/ragflow"
+      ],
+      "responsibilities": {
+        "application": "RAGFlow's supported parsing, retrieval, citation and application services are proposed as one product stack."
+      },
+      "why": "Strong packaged OCR/layout/table handling and inspectable source chunks/citations.",
+      "operating_requirements": [
+        "Upstream-supported multi-service deployment and model configuration.",
+        "Evaluate established v0.27.2 separately from the Go v1.0.0-rc1 transition; neither is accepted for installation by this review."
+      ],
+      "qualification": "Reviewed Go-era main has failing backend integration tests; those failures are not attributed to the older release without evidence."
+    },
+    {
+      "id": "connected-workplace-knowledge",
+      "title": "Connected workplace knowledge",
+      "recommendation": "Proposed packaged enterprise-search architecture",
+      "required_repositories": [
+        "onyx-dot-app/onyx"
+      ],
+      "responsibilities": {
+        "application": "Onyx is proposed for connectors, permission-aware ingestion, indexing and the search/agent application."
+      },
+      "why": "Connector and permission requirements favor the application designed around those operations.",
+      "operating_requirements": [
+        "Standard indexing mode; Lite cannot index documents.",
+        "Confirm needed features against MIT core and separately licensed Enterprise directories.",
+        "Upstream-supported worker, database and model services."
+      ],
+      "qualification": "Observed image-build network failure is not a retrieval-quality failure or release acceptance."
+    }
+  ],
+  "specialists": [
+    {
+      "repository": "VectifyAI/PageIndex",
+      "use_when": "Long text-heavy documents need hierarchical reasoning retrieval with page references.",
+      "limit": "The inspected local OSS lacks OCR/image understanding. In the separately pinned 2026-10-07 benchmark README check, the maintainer describes a running-text-only set excluding charts, tables, figures, counting, arithmetic and refused documents; this is a vendor scope claim, not a comparative result."
+    },
+    {
+      "repository": "HKUDS/RAG-Anything",
+      "use_when": "Images, tables, equations or multimedia need integrated retrieval.",
+      "limit": "Parser/model integration remains application work; complete reproduction was not audited."
+    },
+    {
+      "repository": "volcengine/OpenViking",
+      "use_when": "One inspectable context system spanning memory, knowledge and skills is an explicit architectural requirement.",
+      "limit": "AGPL scope and its own lifecycle must be considered; no matched quality lead was shown."
+    },
+    {
+      "repository": "topoteretes/cognee",
+      "use_when": "Explicit graph relationships, ontologies and connected organizational knowledge dominate the requirement.",
+      "limit": "Separate licensing on some production paths and current failed cloud/image checks."
+    }
+  ],
+  "unresolved": [
+    "Embedding, sparse-retrieval, reranking and generation model choices and exact model revisions.",
+    "Cross-component package locks, deployment configuration and immutable release-image digests.",
+    "Representative ingest/retrieve/rerank/generate/cite/evaluate/remember lifecycle, latency, recovery and complete cost.",
+    "Independent matched comparative evaluation; vendor benchmark methodologies differ."
+  ],
+  "overturn_rule": "A cited upstream regression, licensing/compatibility gap, independent matched result, the separately owned memory-h2h result or a simpler architecture meeting the same requirements can revise the relevant proposal. Preserve the original dated review and its failures when superseding it; no winner is preselected here.",
+  "repository_decisions": [
+    {
+      "id": "memory-rag-20261007-vectorize-io-hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "9269b88417ed263e5a8350f2e416ca2b322756b1",
+      "observed_release": "v0.10.2",
+      "recommendation": "Proposed general agent-memory architecture.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/0"
+      ],
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/blob/9269b88417ed263e5a8350f2e416ca2b322756b1/.github/workflows/test.yml",
+        "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+        "https://github.com/vectorize-io/agent-memory-benchmark/tree/5ad91b0ae9f5d338a747eee40d5ee1a584222d26",
+        "https://github.com/vectorize-io/hindsight/actions/runs/37579277981/job/112655016523",
+        "https://github.com/vectorize-io/hindsight/actions/runs/37577486883/job/112649536610",
+        "https://hindsight.vectorize.io/developer/installation"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-docling-project-docling",
+      "repository": "https://github.com/docling-project/docling",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "4d4f6f7d123d221195fb64775c796c4de1f81c3b",
+      "observed_release": "v2.134.0",
+      "recommendation": "Proposed structured document ingestion component for the modular stack.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/1"
+      ],
+      "sources": [
+        "https://github.com/docling-project/docling/blob/4d4f6f7d123d221195fb64775c796c4de1f81c3b/.github/workflows/checks.yml",
+        "https://github.com/docling-project/docling/tree/4d4f6f7d123d221195fb64775c796c4de1f81c3b/tests",
+        "https://github.com/docling-project/docling/actions/runs/37579435000",
+        "https://github.com/docling-project/docling/actions/runs/37575899428",
+        "https://github.com/docling-project/docling/releases/tag/v2.134.0",
+        "https://docs.haystack.deepset.ai/docs/doclingconverter"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-deepset-ai-haystack",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "234fc68f9c7bb7c156a5495f89b72d7aa27a907e",
+      "observed_release": "v3.3.0",
+      "recommendation": "Proposed explicit retrieval/pipeline orchestration for the modular stack.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/2"
+      ],
+      "sources": [
+        "https://github.com/deepset-ai/haystack/blob/234fc68f9c7bb7c156a5495f89b72d7aa27a907e/.github/workflows/tests.yml",
+        "https://github.com/deepset-ai/haystack/actions/runs/37510310966",
+        "https://github.com/deepset-ai/haystack/releases/tag/v3.3.0",
+        "https://docs.haystack.deepset.ai/docs/qdranthybridretriever",
+        "https://docs.haystack.deepset.ai/docs/doclingconverter"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-qdrant-qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "016542aa5deb6c66380bb137badf73d54f742bde",
+      "observed_release": "v1.19.2",
+      "recommendation": "Proposed hybrid document-retrieval store for the modular stack.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/3"
+      ],
+      "sources": [
+        "https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/.github/workflows/integration-tests.yml",
+        "https://github.com/qdrant/qdrant/actions/runs/37294061449",
+        "https://github.com/qdrant/qdrant/actions/runs/37294077687/job/111711078888",
+        "https://github.com/qdrant/qdrant/releases/tag/v1.19.2",
+        "https://docs.haystack.deepset.ai/docs/qdranthybridretriever"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-comet-ml-opik",
+      "repository": "https://github.com/comet-ml/opik",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "f217a863ea3cbfcef7f9ab8217c543049bdff095",
+      "observed_release": "2.2.92",
+      "recommendation": "Proposed tracing/evaluation component, limited to integrations tested in the upstream CI observed by the original review; none was executed in this review.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/4"
+      ],
+      "sources": [
+        "https://github.com/comet-ml/opik/blob/f217a863ea3cbfcef7f9ab8217c543049bdff095/.github/workflows/lib-haystack-tests.yml",
+        "https://github.com/comet-ml/opik/actions/runs/37554602464",
+        "https://github.com/comet-ml/opik/actions/runs/37551972141/job/112569384020",
+        "https://github.com/comet-ml/opik/actions/runs/37482806043/job/112335829772",
+        "https://github.com/comet-ml/opik/releases/tag/2.2.92",
+        "https://www.comet.com/docs/opik/integrations/haystack"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-akitaonrails-ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "observed_release": "v2.6.0",
+      "recommendation": "Proposed cross-client coding-continuity component on reviewed upstream engineering merits.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/5"
+      ],
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/docs/ARCHITECTURE.md",
+        "https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/docs/benchmarks/README.md",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.0"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-deusdata-codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "e71f23ecf40e473a3e0a49cff1ffebcccead384d",
+      "observed_release": "v0.11.0",
+      "recommendation": "Proposed lightweight structural code-context complement.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/6"
+      ],
+      "sources": [
+        "https://github.com/DeusData/codebase-memory-mcp/blob/e71f23ecf40e473a3e0a49cff1ffebcccead384d/.github/workflows/_test.yml",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/e71f23ecf40e473a3e0a49cff1ffebcccead384d/docs/EVALUATION_PLAN.md",
+        "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-giancarloerra-socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "1e829bf7ddf1e34c4cc6713227f00422cee791cc",
+      "observed_release": "v1.16.0",
+      "recommendation": "Proposed optional semantic code-context component when a distinct need justifies its infrastructure.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/7"
+      ],
+      "sources": [
+        "https://github.com/giancarloerra/SocratiCode/blob/1e829bf7ddf1e34c4cc6713227f00422cee791cc/.github/workflows/ci.yml",
+        "https://github.com/giancarloerra/SocratiCode/blob/1e829bf7ddf1e34c4cc6713227f00422cee791cc/package.json",
+        "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-mem0ai-mem0",
+      "repository": "https://github.com/mem0ai/mem0",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "c93420c49a6b14c3d446bdb156d96811908fd90a",
+      "observed_release": "ts-v3.3.1",
+      "recommendation": "Proposed application personalization memory API/SDK.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/8"
+      ],
+      "sources": [
+        "https://github.com/mem0ai/mem0/blob/c93420c49a6b14c3d446bdb156d96811908fd90a/README.md",
+        "https://github.com/mem0ai/mem0/actions/runs/37332380424",
+        "https://github.com/mem0ai/mem0/actions/runs/37332380515",
+        "https://github.com/mem0ai/memory-benchmarks/tree/4b61c5d31b9c668a12b4f5e78064248a02c82d2b",
+        "https://github.com/mem0ai/mem0/releases/tag/ts-v3.3.1"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-infiniflow-ragflow",
+      "repository": "https://github.com/infiniflow/ragflow",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "cc72ecb0af18ade5d58f84d107af7cd59a88c39f",
+      "observed_release": "v1.0.0-rc1",
+      "recommendation": "Proposed packaged document-RAG capability; established and RC release lines need distinct qualification.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/9"
+      ],
+      "sources": [
+        "https://github.com/infiniflow/ragflow/blob/cc72ecb0af18ade5d58f84d107af7cd59a88c39f/.github/workflows/sep-tests.yml",
+        "https://github.com/infiniflow/ragflow/actions/runs/37494996969",
+        "https://github.com/infiniflow/ragflow/releases/tag/v0.27.2",
+        "https://github.com/infiniflow/ragflow/releases/tag/v1.0.0-rc1"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-onyx-dot-app-onyx",
+      "repository": "https://github.com/onyx-dot-app/onyx",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "68dd959648704e0000b7bb070a699355bac11733",
+      "observed_release": "v4.8.4",
+      "recommendation": "Proposed packaged connected-workplace knowledge application.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/10"
+      ],
+      "sources": [
+        "https://github.com/onyx-dot-app/onyx/blob/68dd959648704e0000b7bb070a699355bac11733/README.md",
+        "https://github.com/onyx-dot-app/onyx/blob/68dd959648704e0000b7bb070a699355bac11733/backend/ee/LICENSE",
+        "https://github.com/onyx-dot-app/onyx/actions/runs/37562057810",
+        "https://github.com/onyx-dot-app/onyx/releases/tag/v4.8.4"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-vectifyai-pageindex",
+      "repository": "https://github.com/VectifyAI/PageIndex",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "6d23caf416858f2ca136840305d1f479a86f6ef7",
+      "observed_release": "v0.2.21",
+      "recommendation": "Proposed specialist for long text-document reasoning retrieval, not a general multimodal replacement.",
+      "source_note": "The original review did not retain the separate benchmark revision; it remains unrecovered in the checked retained materials. A new primary README check on 2026-10-07 pins PageIndex-OSS-Benchmark at ad4c0b92970a6f4801f09ff2e647389e8f5874fa and labels its 62-question/34-PDF description as vendor-published scope, not recovery of the old pin or a new benchmark run.",
+      "benchmark_source_commit": "ad4c0b92970a6f4801f09ff2e647389e8f5874fa",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/11",
+        "evidence/artifacts/memory-rag-stacks-20261007-followup/source-qualification.json#/pageindex_benchmark"
+      ],
+      "sources": [
+        "https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/.github/workflows/tests.yml",
+        "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md#L6-L15",
+        "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.21"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-hkuds-rag-anything",
+      "repository": "https://github.com/HKUDS/RAG-Anything",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "8664e8b318a3ed651fe62dfcfddfb1f1d633d5be",
+      "observed_release": "v1.4.2",
+      "recommendation": "Proposed specialist multimodal framework when image/table/equation retrieval is required.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/12"
+      ],
+      "sources": [
+        "https://github.com/HKUDS/RAG-Anything/blob/8664e8b318a3ed651fe62dfcfddfb1f1d633d5be/.github/workflows/test.yaml",
+        "https://github.com/HKUDS/RAG-Anything/tree/8664e8b318a3ed651fe62dfcfddfb1f1d633d5be/reproduce",
+        "https://github.com/HKUDS/RAG-Anything/releases/tag/v1.4.2"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-volcengine-openviking",
+      "repository": "https://github.com/volcengine/OpenViking",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "87de989c5a18dc1f9fe2710cd60dbc48f1324527",
+      "observed_release": "v0.4.23",
+      "recommendation": "Proposed alternative unified inspectable memory/knowledge/skills architecture.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/13"
+      ],
+      "sources": [
+        "https://github.com/volcengine/OpenViking/blob/87de989c5a18dc1f9fe2710cd60dbc48f1324527/README.md",
+        "https://github.com/volcengine/OpenViking/tree/87de989c5a18dc1f9fe2710cd60dbc48f1324527/benchmark",
+        "https://github.com/volcengine/OpenViking/releases/tag/v0.4.23"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-topoteretes-cognee",
+      "repository": "https://github.com/topoteretes/cognee",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "b32d8afc59e1064d9291b9828a8a147be9cc8bab",
+      "observed_release": "v1.6.2",
+      "recommendation": "Proposed specialist for explicit graph/ontology requirements.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/14"
+      ],
+      "sources": [
+        "https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/README.md",
+        "https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/cognee/eval_framework/beam/REPORT.md",
+        "https://github.com/topoteretes/cognee/releases/tag/v1.6.2"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-rohitg00-agentmemory",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "007a1a7fe8646a03d8652eb0712400cc6f0fcca3",
+      "observed_release": "v0.9.30",
+      "recommendation": "Proposed coding-memory challenger; retrieval-only metrics do not establish an end-to-end lead.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/15"
+      ],
+      "sources": [
+        "https://github.com/rohitg00/agentmemory/blob/007a1a7fe8646a03d8652eb0712400cc6f0fcca3/benchmark/LONGMEMEVAL.md",
+        "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.30"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-mempalace-mempalace",
+      "repository": "https://github.com/MemPalace/mempalace",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "d439d1e6d01e2680d79fe3f5de5a336722cec779",
+      "observed_release": "v3.10.0",
+      "recommendation": "Proposed local raw-memory retrieval challenger; tuned recall is not general QA superiority.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/16"
+      ],
+      "sources": [
+        "https://github.com/MemPalace/mempalace/blob/d439d1e6d01e2680d79fe3f5de5a336722cec779/benchmarks/BENCHMARKS.md",
+        "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0"
+      ]
+    },
+    {
+      "id": "memory-rag-20261007-supermemoryai-supermemory",
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "disposition": "conditional",
+      "evidence_level": "source_review",
+      "source_commit": "3535ff700da85134d1867e5eac1b649e8735e3af",
+      "observed_release": "server-v0.0.8",
+      "recommendation": "Proposed product/integration alternative; public-source core parity remains unestablished.",
+      "scope": "Upstream architecture recommendation only; deployed selections and pins are unchanged. Historical trial artifacts are preserved.",
+      "evidence_refs": [
+        "evidence/artifacts/memory-rag-stacks-20261007/review.json#/inspected_repositories/17"
+      ],
+      "sources": [
+        "https://github.com/supermemoryai/supermemory/blob/3535ff700da85134d1867e5eac1b649e8735e3af/apps/mcp/src/server/client/index.ts",
+        "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"
+      ]
+    }
+  ]
+}

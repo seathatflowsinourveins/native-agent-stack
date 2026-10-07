@@ -1,0 +1,20 @@
+#!/bin/sh
+# Start OmniRoute on loopback port 20128, announcing the installed Codex CLI's version as CODEX_CLIENT_VERSION.
+# The gateway sends that version on its live Codex catalog query, so the catalog offers every model the installed
+# Codex supports (a gateway announcing an older version never sees a newer model). The version is read at every start;
+# the plist's CODEX_CLIENT_VERSION stays as the fallback when the installed Codex cannot be read.
+set -eu
+PREFIX="$(cd "$(dirname "$0")" && pwd)"
+CODEX_BIN="${CODEX_BIN:-$HOME/.local/bin/codex}"
+v="$("$CODEX_BIN" --version 2>/dev/null | awk '{print $NF}' || true)"
+case "$v" in
+  [0-9]*.[0-9]*.[0-9]*) CODEX_CLIENT_VERSION="$v"; export CODEX_CLIENT_VERSION ;;
+esac
+state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack"
+mkdir -p "$state"
+umask 077
+printf '{"announced_codex_client_version": "%s", "started_at": "%s", "build": "%s"}\n' \
+  "${CODEX_CLIENT_VERSION:-}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(basename "$PREFIX")" > "$state/omniroute-gateway.json"
+# lsof shim v2 first on PATH (evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt; remove when upstream serve preflight ignores clients)
+PATH="$PREFIX/shim:$PATH"; export PATH
+exec "$PREFIX/bin/omniroute" serve --port 21128 --no-open --no-tray

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-fixwave-verdict-rebase-20261006",
+  "kind": "historical_inventory",
+  "component_ids": ["claude-code", "codex", "omniroute", "agentsview"],
+  "claim": "The install-plan repair sources were rebased onto landed hcom relaxation #771; the exact canonical Sol-max gate, five P2 corrections and AgentsView0.44 operational input were integrated. Static plan/client-map/handbook checks and the four touched fixture modules passed locally. No new destination-host acceptance or provider run is claimed.",
+  "evidence_class": "local_integration",
+  "limitations": [
+    "This historical documentary record is not live verification or a new host execution. It records only the stated local source/fixture checks.",
+    "Local source consistency and synthetic/integration fixtures only; not an unchanged upstream suite, native-client qualification or gateway wire-effort proof.",
+    "The first fixture attempt failed21 errors due to its undeclared PyYAML dependency; that attempt is preserved separately from the successful dependency-free fixture retry.",
+    "Three pre-existing suite skips remain explicit. No fixture was skipped to repair the failure.",
+    "Local-model finding2 is deferred while its owner's PR810 remains open; it is an independent source checkpoint, not part of this critical-head claim.",
+    "Host re-apply and one smoke per row/client remain the co-op's work after landing. Earlier failed native attempts and observed values are unchanged."
+  ],
+  "base": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "source_preservation": {
+    "published_previous_head": "2de892b0443efc98c70d553277556cd9c1d5d655",
+    "backup_branch": "codex/ns2604-fixwave-2de892b0-backup-20261006",
+    "retained_source_commits": ["631d92b2", "67259e32", "48e3deed", "789fa05d", "1dd5c99a", "95ce4059", "cb7ee036"],
+    "dropped_verified_registry_only": ["70989367", "dd9b06ba", "b3969b21", "86268eb1", "64f11b10", "44ac761b"],
+    "dropped_obsolete_generated": ["84c79f7f", "2de892b0"],
+    "superseded_a50_source": "15f24fe1b9a3c3ad61786f184c75cc5df375c319",
+    "a50_reason": "Its historical-only hcom adapter declaration and tests conflict with #771's operational relaxed adapter and deleted deny file. No unchanged A50 history control was retained. The independent first-marker naming repair remains.",
+    "p1_2_source": "9b2ad2ef",
+    "p1_2_rebased_commit": "85009d51",
+    "verdict_other_fields_equal_main_without_note": true,
+    "verdict_sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
+    "original_decision_prefix_preserved": true
+  },
+  "sources": [
+    "native-agent-stack@e28d0eec:docs/decisions/2026-10-06-hcom-relaxation.md",
+    "native-agent-stack@84c79f7f:install.sh:82-126; systemd/systemd@v259:man/systemctl.xml:421-433,1317-1327 for owner custody/reload/restart",
+    "util-linux/util-linux@v2.41.3:sys-utils/flock.1.adoc:80-81; installed flock2.41.3 --help",
+    "Claude native foreground/background environment controls, https://code.claude.com/docs/en/env-vars (2026-10-06)",
+    "bytedance/deer-flow@v2.1.0:config.example.yaml:225; #744 suffix precedence at0fb32ee5:decision:37-38,82; metadata is distinct from wire effort",
+    "kenn-io/agentsview@413a87f7bfbd67b2815b1119ac51abc1efbeeaba:scripts/install.sh; published v0.44.0 archive SHA037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "CPython3.13 JSON/YAML subset, https://docs.python.org/3.13/library/json.html#module-json; adjacent maintained ModuleType/stdin fixture pattern"
+  ],
+  "local_checks": {
+    "plan_check": {"first_exit": 1, "first_reason": "Merged hcom acceptance kind label differed between plan and script", "repaired_exit": 0, "rows": 84, "commands": 192, "acceptance_entries": 113},
+    "client_config_check": {"exit": 0, "warnings": ["claude MCP_AUTO_OPEN_ENABLED owner/install mismatch", "codex MCP_AUTO_OPEN_ENABLED owner/install mismatch"], "applied": false},
+    "definitive_builder": {"exit": 0, "foundation_rows": 84, "total_slots": 104, "scope": "Derived install decisions, not live readiness counts"},
+    "handbook_render": {"exit": 0},
+    "handbook_check": {"exit": 0},
+    "diff_check": {"exit": 0},
+    "fixture_modules": ["tests.test_new_wsl_client_config", "tests.test_new_wsl_definitive_defaults", "tests.test_new_wsl_gateway_composition", "tests.test_new_wsl_mcp_conformance_lifecycle"],
+    "fixture_attempts": [
+      {"exit": 1, "tests": 379, "errors": 21, "skipped": 3, "seconds": 126.585, "cause": "The synthetic DeerFlow fixture imported undeclared PyYAML in the exact CI venv"},
+      {"exit": 0, "test_method": "FixwaveAcceptanceRepairs.test_deer_flow_synthetic_stream_oracle_and_cold_native_argv", "case_count": 21, "scope": "Fixture-local JSON/YAML subset double; all existing assertions unchanged"},
+      {"exit": 0, "tests": 379, "skipped": 3, "seconds": 120.182}
+    ],
+    "fixture_conditions": "Private CI Python3.13 interpreter; CI-style umask022, private logs077, regenerable short TMPDIR, nice19/ionice3, AGENTSVIEW_NO_DAEMON=1. No production or peer dependency change."
+  },
+  "privacy": "Public source pins and sanitized outcome counts only. Native raw streams, host paths, client configuration and credential values are not copied."
+}

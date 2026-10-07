@@ -53,7 +53,7 @@ def cached_artifact(test: unittest.TestCase, source: str) -> bytes:
 DOCUMENTS = {
     "https://code.claude.com/docs/en/memory": b"# Memory\nSynthetic instruction imports.\n",
     "https://code.claude.com/docs/en/skills": b"# Skills\nSynthetic listing defaults.\n",
-    "https://developers.openai.com/codex/guides/agents-md": b"# AGENTS.md\nSynthetic project instructions.\n",
+    "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md": b"# AGENTS.md\nSynthetic project instructions.\n",
 }
 
 # ----------------------------------------------------------------------------------------------- fixture builders
@@ -487,7 +487,7 @@ class InstructionDocumentWatchTests(unittest.TestCase):
                 changed = [r for r in result["documents"] if r["changed"]]
                 self.assertEqual([r["source"] for r in changed], [url])
                 self.assertEqual(result["unreviewed"], [changed[0]["key"]])
-                self.assertEqual(changed[0]["carrier"], "docs/decisions/2026-10-05-harness-context-budget.md")
+                self.assertEqual(changed[0]["carrier"], "docs/decisions/2026-10-06-harness-context-budget-completion.md")
                 self.assertEqual(result["new"], [])
                 self.assertIn("instruction doc change", result["summary_line"])
                 # --write-baseline cannot silently accept a document change either.

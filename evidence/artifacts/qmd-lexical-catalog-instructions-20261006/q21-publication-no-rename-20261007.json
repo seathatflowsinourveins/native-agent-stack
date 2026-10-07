@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "kind": "q21-publication-choice-no-rename",
+  "date": "2026-10-07",
+  "evidence_class": "repository_source_checks_and_native_local_integration",
+  "source_head": "3ba087b28ef4910d6208b8bc81d295badc5be087",
+  "then_current_main": "18150f10b061ca3fb74a63cdb783dbaaf31c4057",
+  "local_rebase_checkpoint": "4b0fb38bfcccb2f8bb6a2f68731596bb51a31ead",
+  "direction": {
+    "id": "review-ns2604-coop-20261007T081016Z",
+    "sha256": "077920cc645ba0865afa29eb5d93d25c19eb8c9140b3ce06563424e9150d44a7"
+  },
+  "decision": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
+  "prior_receipts": [
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/landing-composition-20261007.json",
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/q20-prepared-option1-20261007.json"
+  ],
+  "namespace_choice": "keep then-main exact keys, maps, fixtures and carrier IDs; complete canonical correction deferred to owner word",
+  "main_namespace_and_fixture_proofs": [
+    {
+      "path": "adoption/mcp/claude-user.json",
+      "same_as_then_main": true
+    },
+    {
+      "path": "adoption/templates/codex.config.template.toml",
+      "same_as_then_main": true
+    },
+    {
+      "path": "adoption/templates/codex.stack-worker.config.toml",
+      "same_as_then_main": true
+    },
+    {
+      "path": "adoption/new-wsl/client-config-map.json",
+      "same_as_then_main": true
+    },
+    {
+      "path": "tests/test_task_model_routing.py",
+      "same_as_then_main": true
+    },
+    {
+      "path": "tests/test_new_wsl_client_config.py",
+      "same_as_then_main": true
+    },
+    {
+      "path": "tests/test_install_claude_profile.py",
+      "namespace_classes_identical_to_then_main": true,
+      "approved_unrelated_catalog_snapshot_contract_preserved": true
+    }
+  ],
+  "actual_byte_counts": {
+    "compact": 8076,
+    "rendered": 9142,
+    "startup": 20101,
+    "startup_limit": 20103,
+    "compact_limit_exclusive": 8192,
+    "claude_full": 4087,
+    "claude_full_limit": 4100
+  },
+  "protected_prefix_sha256": "a292568fb0ded7773357e1b30b10ece020fa11b34e1034a28c57d888d8599ea0",
+  "three_amendment4_rows_rederived": [
+    "| `isolated-builder.md` | `e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096` |",
+    "| `stack-researcher.md` | `5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240` |",
+    "| `evidence-reviewer.md` | `84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399` |"
+  ],
+  "hashes_relative_to_prior_source": "same",
+  "separate_unapplied_rename_patch_sha256": "df3da37389d1f61abe0c7327658571493b3a63eba5966f4048580d97663b79f7",
+  "separate_proposal_files": 32,
+  "known_limitations": [
+    "Claude codegraph carrier uses the vendor hook channel only; old explicit IDs remain wrong for the live registration",
+    "No host/client apply, repaired graph routing, model run or organic usage is supplied"
+  ],
+  "checks": [
+    {
+      "kind": "repository-owned bounded qualification before tools window",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane tests.test_token_e2e_preregistration tests.test_new_wsl_client_config.RecordTests tests.test_install_claude_profile tests.test_managed_block tests.test_task_model_routing tests.test_new_wsl_client_config.MapTests tests.test_new_wsl_client_config.AgentGapTests tests.test_new_wsl_client_config.RenderTests tests.test_new_wsl_client_config.ApplyTests.test_the_first_run_writes_what_the_wired_pieces_name_and_nothing_else",
+      "native_exit_code": 0,
+      "tests": 595,
+      "elapsed_seconds": 109.929,
+      "skipped": 14,
+      "returned_footer": "Ran 595 tests in 109.929s; OK (skipped=14)",
+      "source_base": "18150f10b061ca3fb74a63cdb783dbaaf31c4057",
+      "raw_log_name": "q21-final-python-modules.log",
+      "reuse_boundary": "Own source and all test assertions unchanged after relaunch; c449 relocation fixtures/workflow README inputs rechecked in focused modules below.",
+      "raw_log_sha256": "3a18f7de396b1dcb302abb9f0db218a8085f06f9a68dbc8c42ea47f327cdb97f"
+    },
+    {
+      "kind": "post-relaunch checks for concrete new-base relocation and workflow-document inputs",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_install_claude_profile tests.test_adoption_docs_consistency tests.test_new_wsl_client_config.RecordTests",
+      "native_exit_code": 0,
+      "tests": 150,
+      "elapsed_seconds": 16.306,
+      "skipped": 2,
+      "returned_footer": "Ran 150 tests in 16.306s; OK (skipped=2)",
+      "source_base": "c44993b379da25fae923dbbe70188978af5104aa",
+      "raw_log_name": "post-relaunch-focused-modules.log",
+      "raw_log_sha256": "f82390ffd075f99b650c791d93f058a49241a4bce3e9e51a3f62b0ede8aa102e"
+    },
+    {
+      "kind": "post-relaunch unchanged Node grant/body/workflow envelope fixtures",
+      "command": "CI=true nice -n 19 ionice -c3 node examples/claude-native/workflows/test-envelope.mjs",
+      "native_exit_code": 0,
+      "passed": 254,
+      "failed": 0,
+      "returned_footer": "SUMMARY passed=254 failed=0 total=254",
+      "source_base": "c44993b379da25fae923dbbe70188978af5104aa",
+      "raw_log_name": "post-relaunch-node-envelope.log",
+      "raw_log_sha256": "e137100e406134a5c5a236c738814d001ff31739d6682f20bd113b3fbd7a04ec"
+    },
+    {
+      "kind": "source-only native client-configuration check",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B tools/adoption/new_wsl_client_config.py --check --markdown",
+      "native_exit_code": 0,
+      "raw_log_name": "q21-client-config-markdown.log",
+      "raw_log_sha256": "648499b877e8d7381c32493d4d8030e98d8bd95e077c596ef7a39debb8419491"
+    },
+    {
+      "kind": "native generated-byte consistency",
+      "command": "CI=true nice -n 19 ionice -c3 python3 -B scripts/build_new_wsl_handbook.py --check",
+      "native_exit_code": 0
+    },
+    {
+      "kind": "native strict sha256sum identity",
+      "command": "sha256sum --check --strict SHA256SUMS in adoption/agents/codex, adoption/agents/codex/workers and adoption/hooks/claude",
+      "native_exit_code": 0,
+      "codex_carriers": 2,
+      "codex_workers": 3,
+      "claude_hook_files": 12
+    },
+    {
+      "kind": "Git whitespace consistency",
+      "command": "git diff --check",
+      "native_exit_code": 0
+    }
+  ],
+  "recovery_observations": {
+    "native_stash": "ae5b27a8727a01e9e914349358008c6c1db2a54d",
+    "rebase_exit_code": 0,
+    "stash_apply_exit_code": 1,
+    "stash_apply_condition": "Only registry conflict; exact then-main copy resolves it, with source hash inventory preserved",
+    "stash_retained": true
+  },
+  "post_relaunch_publication_provenance": {
+    "recorded_at_utc": "2026-10-07T09:14:30.525356+00:00",
+    "then_current_main": "c44993b379da25fae923dbbe70188978af5104aa",
+    "source_rebase_checkpoint": "4b9938b96187304f6655c1c55b933b78eec74546",
+    "source_stash_retained": "0437164b9dc64f3ba240f49460006ec1e373f0de",
+    "own_source_snapshot_preserved": true,
+    "native_rebase_exit_code": 0,
+    "stash_apply_exit_code": 1,
+    "stash_apply_condition": "Only registry conflict; exact c449 main copy used, own rows re-registered through native API. Prior18150/4b0 observations retained.",
+    "qualification_classes": "Repository-owned integration/synthetic fixtures and structural source/hash checks; no provider or installed-client use acceptance",
+    "final_validation_command": "CI=true nice -n 19 ionice -c3 python3 -B scripts/validate.py",
+    "validation_result_record": "Final lane handoff and PR body, recorded after actual completion without mutating these input bindings"
+  }
+}

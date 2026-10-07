@@ -2163,8 +2163,8 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `67d53c69ab322a37437aeaaceaec73655710657abc08ec269d5e5bbb115abdfb` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee` |
-| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `da18d556933993c2308e68b7cdefa63b2f32e875a80a97c047482b750cfd1b34` |
-| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `ac44cbe2e51590ef256b69d7cb5c360b764b483c53cbdbdf128d4d8d789aade9` |
+| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `d79da9e44ea865913f3dc9d78a0dcc2dc235ae02d7873ff60ed7ebcdd72d3781` |
+| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `79487183570d6d875dfaebea9e6c7b9a207b1f91ea6b65a931b5a57793472ab8` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |
 | [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md) | `44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d` |
@@ -2193,13 +2193,13 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/preregistration.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/preregistration.json) | `eec6b4c65649062443cfe421ae30301e43f8019172e5708e2dfd4db6e201652f` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json) | `2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb` |
 | [evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json) | `2c1df503112cb02816e80231728a3d54d57165190dc863e15e0d15c2118f9c45` |
-| [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) | `ce52b6a34c58f93938adef7bf775c439f568001dcb5c444534e3b29a73e2ed32` |
+| [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) | `e8f90d3e6826de0bedb2dda0efc89c8f41795fb59f812504acc3bd6b235935a7` |
 | [evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json) | `d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2` |
 | [evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json) | `90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3` |
 | [evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json) | `dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081` |
 | [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md) | `3a638294fd3f818f032fd226eddde760f40fcbc0f3313af64ff09e96130f65e6` |
 | [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json) | `8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25` |
-| [evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json](../evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json) | `736c6141639225bb33e2ed142ebdfdcf5816e745cd48cead7cb03b76bdecb9d9` |
+| [evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json](../evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json) | `31589b8d0547b3302913595c3bae76d8e740b5eab8ec2da76c8ec89127f603d3` |
 | [evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json](../evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json) | `09ce43141deaaa59c6f0da5119d3668833dc2ac9f48c26646059ffc050459a71` |
 | [evidence/receipts/ns2604-e2e-20261004.json](../evidence/receipts/ns2604-e2e-20261004.json) | `4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705` |
 | [evidence/receipts/ns2604-requalification-20261005.json](../evidence/receipts/ns2604-requalification-20261005.json) | `1d0afd73a954e448eb00bac14dbe0f2c7384d65a51efd0ad0c5e990f7ae3273b` |

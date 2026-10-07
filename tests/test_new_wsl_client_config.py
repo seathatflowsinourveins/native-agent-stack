@@ -165,11 +165,48 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                  "model": "gpt-6.1-sol", "requestedModel": "cx/gpt-6.1-sol"}]
         self.assertEqual(gate.observed_routes(rows), {"cx/gpt-6.1-sol"})
         for field, value in (("status", 503), ("path", "/v1/embeddings"),
-                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max")):
+                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-unlisted")):
             with self.subTest(field=field), self.assertRaises(ValueError):
                 gate.observed_routes([dict(rows[0], **{field: value})])
         with self.assertRaisesRegex(ValueError, "no call log"):
             gate.observed_routes([])
+
+    def test_gateway_metadata_accepts_only_documented_codex_id_and_alias(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        for prefix in ("cx", "codex"):
+            for model, effort in (("gpt-6.1-sol", "xhigh"), ("gpt-6.1-sol-high", "high"),
+                                  ("gpt-6.1-sol-max", "max")):
+                route = f"{prefix}/{model}"
+                row = {"status": 200, "path": "/v1/chat/completions", "model": model,
+                       "requestedModel": route, "provider": "codex"}
+                with self.subTest(route=route):
+                    self.assertEqual(gate.observed_routes([row]), {route})
+                    self.assertEqual(gate.ROUTES[route], effort)
+                for field, value in (("requestedModel", f"other/{model}"),
+                                     ("requestedModel", f"{prefix}/{model}-unlisted"),
+                                     ("requestedModel", f"{prefix}/gpt-6.1-sol-high" if model == "gpt-6.1-sol" else f"{prefix}/gpt-6.1-sol"),
+                                     ("provider", "other"), ("status", 503), ("active", True),
+                                     ("path", "/v1/embeddings"), ("path", "/v1/unlisted-inference")):
+                    with self.subTest(route=route, field=field, value=value), self.assertRaises(ValueError):
+                        gate.observed_routes([dict(row, **{field: value})])
+
+    def test_gateway_session_join_includes_canonical_deerflow_max_route_without_wire_claim(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        started, finished = "2026-10-05T04:00:00+00:00", "2026-10-05T04:01:00+00:00"
+        rows = [
+            {"id": "synthetic-gptr", "timestamp": "2026-10-05T04:00:10Z", "sessionTag": "synthetic-research",
+             "status": 200, "path": "/v1/chat/completions", "model": "gpt-6.1-sol-high",
+             "requestedModel": "cx/gpt-6.1-sol-high", "provider": "codex"},
+            {"id": "synthetic-deerflow", "timestamp": "2026-10-05T04:00:20Z", "sessionTag": "synthetic-research",
+             "status": 200, "path": "/v1/responses", "model": "gpt-6.1-sol-max",
+             "requestedModel": "codex/gpt-6.1-sol-max", "provider": "codex"},
+        ]
+        with mock.patch.object(gate, "get_json", return_value=rows), contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(gate.main("synthetic-research", started, finished), 0)
+        self.assertIn("join=session", out.getvalue())
+        self.assertIn("high, max", out.getvalue())
+        self.assertIn("not observed wire", out.getvalue())
+        self.assertIn("Delivered wire effort is not asserted", out.getvalue())
 
     def test_gateway_paging_stops_at_old_persisted_rows_and_joins_the_run(self):
         gate = self.source_module("gateway-effort-accept.py")
@@ -246,17 +283,27 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                 self.assertEqual(done.returncode, expected)
 
     def test_cross_family_review_receives_the_bounded_diff_on_stdin(self):
-        line, = [line for line in (PLAN / "accept.sh").read_text().splitlines()
-                 if line.startswith("claude -p --model opus --effort max --permission-mode plan")]
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        row = next(r for r in plan["owners"] if r["slot"] == "cross-family-review")
+        lines = row["acceptance"]["after_sign_in"]["command"].splitlines()
+        assignment, = [line for line in lines if line.startswith("claude_review_argv=(")]
+        invocation, = [line for line in lines if 'flock -w 3600' in line and
+                       '"${claude_review_argv[@]}"' in line]
         with tempfile.TemporaryDirectory() as scratch:
             path = Path(scratch)
+            binary = path / "bin" / "claude"
+            binary.parent.mkdir()
+            binary.write_text("#!/bin/sh\ncat > \"$run_dir/seen.diff\"\n")
+            binary.chmod(0o755)
             diff = "diff --git a/example b/example\n-old\n+new\n"
             (path / "gpt-authored.diff").write_text(diff)
-            script = 'claude() { cat > "$run_dir/seen.diff"; }\n' + line
-            done = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
-                                  env={"PATH": os.environ["PATH"], "run_dir": scratch,
-                                       "gpt_base": "synthetic-base", "gpt_head": "synthetic-head"}, capture_output=True)
-            self.assertEqual(done.returncode, 0)
+            done = subprocess.run(["bash", "-euo", "pipefail", "-c", assignment + "\n" + invocation],
+                                  env={"PATH": str(binary.parent) + os.pathsep + os.environ["PATH"],
+                                       "run_dir": scratch, "plan_dir": str(PLAN),
+                                       "gpt_base": "synthetic-base", "gpt_head": "synthetic-head",
+                                       "NATIVE_STACK_CLAUDE_SESSION_LOCK": str(path / "private-fixture.lock")},
+                                  capture_output=True, timeout=20)
+            self.assertEqual(done.returncode, 0, done.stderr)
             self.assertEqual((path / "seen.diff").read_text(), diff)
 
     def test_chrome_acceptance_allows_updates_and_requires_the_google_origin(self):
@@ -382,6 +429,90 @@ class Round3AlertReceiverRepairTests(unittest.TestCase):
 class ObservabilityMigrationRepairTests(unittest.TestCase):
     """Synthetic integration control; does not claim native collector acceptance."""
 
+    def test_prometheus_unit_render_consumes_plan_and_preserves_custody(self):
+        import copy
+        original_plan = json.loads((PLAN / "install-plan.json").read_text())
+        cases = ("valid", "changed_owned", "edited", "symlink", "operator_custody",
+                 "empty_features", "string_features", "duplicate_features", "unsafe_feature",
+                 "string_port", "invalid_release", "unsafe_path")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                config = root / ("config space" if case == "unsafe_path" else "config")
+                config.mkdir()
+                source_plan = root / "plan.json"
+                plan = copy.deepcopy(original_plan)
+                row = next(r for r in plan["owners"] if r["slot"] == "prometheus")
+                source_plan.write_text(json.dumps(plan))
+                data = root / "data"
+                tools = root / "tools"
+                tools.mkdir()
+                systemctl = tools / "systemctl"
+                systemctl.write_text("#!/bin/sh\nprintf activated > " + str(root / "activation") + "\nexit 99\n")
+                systemctl.chmod(0o700)
+                active = root / "active-user-units" / "ns2604-prometheus.service"
+                active.parent.mkdir()
+                active.write_text("Existing operator-owned active unit\n")
+                env = {**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                       "PATH": str(tools) + os.pathsep + os.environ["PATH"],
+                       "NS2604_OBSERVABILITY_DATA": str(data)}
+                command = [sys.executable, str(PLAN / "config/observability_config.py"), "prometheus",
+                           "--config-root", str(config), "--source-root", str(PLAN / "config"),
+                           "--tools-root", str(tools), "--plan-file", str(source_plan)]
+                target = config / "ns2604-prometheus.service"
+                ledger = config / ".g4-source-digests.json"
+                if case in ("valid", "changed_owned", "edited", "symlink", "operator_custody"):
+                    first = subprocess.run(command, env=env, capture_output=True, text=True)
+                    self.assertEqual(first.returncode, 0, first.stderr)
+                    unit = target.read_text()
+                    required = ",".join(row["service"]["enable_features"])
+                    self.assertIn("--enable-feature=" + required, unit)
+                    self.assertIn("--web.listen-address=127.0.0.1:" + str(row["service"]["port"]), unit)
+                    self.assertIn(str(tools / "prometheus/prometheus-3.15.0.linux-amd64/prometheus"), unit)
+                    self.assertIn("WorkingDirectory=" + str(data / "prometheus"), unit)
+                    self.assertNotIn("@PROMETHEUS_", unit)
+                    self.assertEqual(json.loads(ledger.read_text())["ns2604-prometheus.service"],
+                                     hashlib.sha256(unit.encode()).hexdigest())
+                    if case == "changed_owned":
+                        row["service"]["enable_features"].reverse()
+                    elif case == "edited":
+                        target.write_text("Operator-edited candidate unit\n")
+                    elif case == "symlink":
+                        target.unlink()
+                        target.symlink_to(active)
+                    elif case == "operator_custody":
+                        ledger.write_text(json.dumps({"operator_migrations": {"ns2604-prometheus.service": "operator"}}))
+                else:
+                    target.write_text("Retained unit fixture\n")
+                    ledger.write_text(json.dumps({"fixture": "retain"}))
+                    if case == "empty_features":
+                        row["service"]["enable_features"] = []
+                    elif case == "string_features":
+                        row["service"]["enable_features"] = "created-timestamp-zero-ingestion"
+                    elif case == "duplicate_features":
+                        row["service"]["enable_features"] *= 2
+                    elif case == "unsafe_feature":
+                        row["service"]["enable_features"] = ["bad feature\nExecStart=injected"]
+                    elif case == "string_port":
+                        row["service"]["port"] = str(row["service"]["port"])
+                    elif case == "invalid_release":
+                        row["release"] = "v3.15.0\nExecStart=injected"
+                source_plan.write_text(json.dumps(plan))
+                before_target, before_ledger = target.read_bytes(), ledger.read_bytes()
+                checked = subprocess.run(command, env=env, capture_output=True, text=True)
+                passed = case in ("valid", "changed_owned")
+                self.assertEqual(checked.returncode == 0, passed, checked.stderr)
+                if passed:
+                    self.assertIn("--enable-feature=" + ",".join(row["service"]["enable_features"]), target.read_text())
+                else:
+                    self.assertEqual(target.read_bytes(), before_target)
+                    self.assertEqual(ledger.read_bytes(), before_ledger)
+                    if case in ("edited", "symlink", "operator_custody"):
+                        self.assertIn("needs_owner:", checked.stderr)
+                self.assertEqual(active.read_text(), "Existing operator-owned active unit\n")
+                self.assertFalse((root / "activation").exists())
+                self.assertFalse(data.exists(), "render-only publisher must not prepare service runtime state")
+
     def test_migrated_operator_pipelines_survive_reruns_and_are_never_owned(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -393,12 +524,14 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
             original = "extensions:\n  file_storage:\n    directory: /otelcol/queue\nservice:\n  pipelines:\n    operator-custom: {}\n"
             target = config / "otel.yaml"
             target.write_text(original)
-            env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+            env = {**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                   "PATH": str(root) + os.pathsep + os.environ["PATH"],
                    "NS2604_OBSERVABILITY_DATA": str(root / "data")}
             command = [sys.executable, str(PLAN / "config/observability_config.py"), "otel",
                        "--config-root", str(config), "--source-root", str(PLAN / "config")]
             first = subprocess.run(command, env=env, capture_output=True, text=True)
-            self.assertEqual(first.returncode, 0, first.stderr)
+            self.assertEqual(first.returncode, 3, first.stderr)
+            self.assertIn("needs_owner:", first.stderr)
             migrated = target.read_text()
             self.assertIn("operator-custom", migrated)
             self.assertNotIn("/otelcol/queue\n", migrated)
@@ -406,13 +539,15 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
             ledger = json.loads(ledger_path.read_text())
             self.assertNotIn("otel.yaml", ledger)
             second = subprocess.run(command, env=env, capture_output=True, text=True)
-            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(second.returncode, 3, second.stderr)
+            self.assertIn("needs_owner:", second.stderr)
             self.assertEqual(target.read_text(), migrated)
             # Recover the old erroneous ownership ledger using the retained migration backup.
             ledger["otel.yaml"] = hashlib.sha256(migrated.encode()).hexdigest()
             ledger_path.write_text(json.dumps(ledger))
             third = subprocess.run(command, env=env, capture_output=True, text=True)
-            self.assertEqual(third.returncode, 0, third.stderr)
+            self.assertEqual(third.returncode, 3, third.stderr)
+            self.assertIn("needs_owner:", third.stderr)
             self.assertEqual(target.read_text(), migrated)
             self.assertNotIn("otel.yaml", json.loads(ledger_path.read_text()))
 
@@ -441,10 +576,220 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
                     else:
                         target.write_text(text)
                     result = subprocess.run(command, capture_output=True, text=True,
-                                            env={**os.environ, "NS2604_OBSERVABILITY_DATA": str(root / "data")})
-                    self.assertEqual(result.returncode, 0, result.stderr)
+                                            env={**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                                                 "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+                    self.assertEqual(result.returncode, 3, result.stderr)
+                    self.assertIn("needs_owner:", result.stderr)
                     self.assertNotIn("otel.yaml", json.loads(ledger_path.read_text()))
                     self.assertEqual(target.read_text() if target.exists() else None, text)
+
+    def test_historical_plan_render_digest_is_exact_and_operator_custody_wins(self):
+        historical = {
+            "otel.yaml": "d928bbb9dbd61a5245933e94c4e371289e8b7bf0013488116c6d76de5c346a1e",
+            "prometheus.yaml": "1568a5025ee2e6cab6e0a853031e438d7f04ae03a0d700aa5eb6a406b3e89e65",
+        }
+        source = (PLAN / "config/observability_config.py").read_text()
+        for name, known in historical.items():
+            earlier = "service:\n  pipelines: {}\n# synthetic earlier render\n" if name == "otel.yaml" else (
+                "global:\n  scrape_interval: 15s\nscrape_configs: []\n# synthetic earlier render\n")
+            self.assertEqual(source.count(known), 1)
+            for case in ("known", "one_byte_edit", "unknown", "empty_unknown", "operator_custody", "dangling_backup"):
+                if case == "dangling_backup" and name != "otel.yaml":
+                    continue
+                with self.subTest(name=name, case=case), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    config = root / "config"
+                    config.mkdir()
+                    script = root / "observability_config.py"
+                    # Locally designated stand-in for a historical render; this is
+                    # synthetic ownership-transition evidence, never native acceptance.
+                    script.write_text(source.replace(known, hashlib.sha256(earlier.encode()).hexdigest()))
+                    target = config / name
+                    original = earlier + " " if case == "one_byte_edit" else (
+                        "" if case == "empty_unknown" else
+                        "# unknown valid configuration\nservice: {}\n" if case == "unknown" else earlier)
+                    target.write_text(original)
+                    ledger_path = config / ".g4-source-digests.json"
+                    if case == "dangling_backup":
+                        target.with_name("otel.yaml.pre-g4-observability").symlink_to(config / "absent-backup")
+                    if case == "operator_custody":
+                        ledger_path.write_text(json.dumps({"operator_migrations": {name: "fixture-owner"}}))
+                    env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                    env.update({"NS2604_OBSERVABILITY_DATA": str(root / "data"),
+                                "XDG_CONFIG_HOME": str(root / "isolated-config"),
+                                "NATIVE_STACK_ALERT_RECEIVER": "on-host"})
+                    result = subprocess.run(
+                        [sys.executable, str(script), "otel" if name == "otel.yaml" else "alerting",
+                         "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                        env=env, capture_output=True, text=True, timeout=10)
+                    if case == "known":
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(target.read_text(), (PLAN / "config" / name).read_text())
+                        self.assertEqual(json.loads(ledger_path.read_text())[name],
+                                         hashlib.sha256(target.read_bytes()).hexdigest())
+                    else:
+                        self.assertNotEqual(result.returncode, 0, result.stderr)
+                        self.assertIn("needs_owner:", result.stderr)
+                        self.assertEqual(target.read_text(), original)
+                        if ledger_path.exists():
+                            self.assertNotIn(name, json.loads(ledger_path.read_text()))
+                        else:
+                            self.assertNotEqual(case, "operator_custody")
+
+    def test_grafana_absent_legacy_paths_allow_publish_and_check(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            unrelated = config / "owner-backup/ns2604.yaml"
+            unrelated.parent.mkdir(parents=True)
+            unrelated.write_bytes(b"unrelated owner bytes\n")
+            env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+            env["NS2604_OBSERVABILITY_DATA"] = str(root / "data")
+            for action in ("grafana", "grafana-check"):
+                result = subprocess.run(
+                    [sys.executable, str(PLAN / "config/observability_config.py"), action,
+                     "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                    env=env, capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(unrelated.read_bytes(), b"unrelated owner bytes\n")
+            self.assertTrue((config / "grafana-provisioning/datasources/native-stack.yaml").is_file())
+            self.assertTrue((config / "grafana-provisioning/dashboards/native-stack.yaml").is_file())
+            self.assertTrue((config / "grafana-dashboards/token-layer.json").is_file())
+
+    def test_grafana_legacy_preflight_preserves_every_path_before_publish_or_check(self):
+        legacy_paths = (
+            "grafana-provisioning/datasources/ns2604.yaml",
+            "grafana-provisioning/dashboards/token-layer.yaml",
+            "grafana-dashboards/token-layer/token-layer.json",
+        )
+
+        def snapshot(root):
+            result = {}
+            for path in root.rglob("*"):
+                info = path.lstat()
+                payload = (os.readlink(path) if path.is_symlink() else
+                           path.read_bytes() if path.is_file() else None)
+                result[path.relative_to(root).as_posix()] = (
+                    info.st_mode, info.st_ino, info.st_mtime_ns, payload)
+            return result
+
+        for name in legacy_paths:
+            for case in ("file", "empty", "ledger_owned", "directory", "live_symlink", "dangling_symlink", "loop_symlink"):
+                for action in ("grafana", "grafana-check"):
+                    with self.subTest(name=name, case=case, action=action), tempfile.TemporaryDirectory() as tmp:
+                        root = Path(tmp)
+                        config = root / "config"
+                        env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                        env["NS2604_OBSERVABILITY_DATA"] = str(root / "data")
+                        command = [sys.executable, str(PLAN / "config/observability_config.py"),
+                                   "--config-root", str(config), "--source-root", str(PLAN / "config")]
+                        initial = subprocess.run(command + ["grafana"], env=env, capture_output=True, text=True, timeout=10)
+                        self.assertEqual(initial.returncode, 0, initial.stderr)
+                        target = config / name
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        if case == "directory":
+                            target.mkdir()
+                            (target / "preserved").write_bytes(b"directory-owned bytes\n")
+                        elif case.endswith("symlink"):
+                            linked = root / "linked-owner-file"
+                            if case == "live_symlink":
+                                linked.write_bytes(b"symlink target bytes\n")
+                            target.symlink_to(target.name if case == "loop_symlink" else linked)
+                        else:
+                            target.write_bytes(b"" if case == "empty" else b"legacy owner bytes\n")
+                            if case == "ledger_owned":
+                                ledger = config / ".g4-source-digests.json"
+                                values = json.loads(ledger.read_text())
+                                values[name] = hashlib.sha256(target.read_bytes()).hexdigest()
+                                ledger.write_text(json.dumps(values))
+                        before = snapshot(root)
+                        env["NS2604_OBSERVABILITY_DATA"] = str(root / "never-created-data")
+                        result = subprocess.run(command + [action], env=env, capture_output=True, text=True, timeout=10)
+                        self.assertNotEqual(result.returncode, 0, result.stderr)
+                        self.assertIn("needs_owner:", result.stderr)
+                        self.assertIn(name, result.stderr)
+                        self.assertEqual(snapshot(root), before)
+                        self.assertFalse((root / "never-created-data").exists())
+
+    def test_all_grafana_acceptance_stages_preflight_current_source_before_native_work(self):
+        row = next(row for row in json.loads((PLAN / "install-plan.json").read_text())["owners"]
+                   if row["slot"] == "grafana")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            legacy = config / "grafana-provisioning/datasources/ns2604.yaml"
+            legacy.parent.mkdir(parents=True)
+            legacy.write_bytes(b"synthetic legacy configuration\n")
+            marker = root / "unexpected-native-work"
+            installed = config / "observability_config.py"
+            installed.write_text("from pathlib import Path\nPath(" + repr(str(marker)) + ").touch()\n")
+            bin_dir = root / "bin"
+            bin_dir.mkdir()
+            for name in ("grafana", "curl", "flock", "uv", "claude"):
+                stub = bin_dir / name
+                stub.write_text("#!/bin/sh\ntouch \"$NATIVE_FIXTURE_MARKER\"\nexit 93\n")
+                stub.chmod(0o700)
+            env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+            env.update({"PATH": str(bin_dir) + os.pathsep + os.environ["PATH"],
+                        "plan_dir": str(PLAN), "config_root": str(config),
+                        "NATIVE_FIXTURE_MARKER": str(marker),
+                        "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+            for stage, entry in row["acceptance"].items():
+                with self.subTest(stage=stage):
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", entry["command"]],
+                                            env=env, capture_output=True, text=True, timeout=10)
+                    self.assertNotEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("needs_owner:", result.stderr)
+                    self.assertFalse(marker.exists(), "preflight must precede installed helpers and native work")
+                    self.assertFalse((root / "data").exists())
+                    self.assertEqual(legacy.read_bytes(), b"synthetic legacy configuration\n")
+
+    def test_grafana_uninspectable_legacy_path_needs_owner_before_any_output(self):
+        adapter = Round2RepairIntegrationTests.source_module("observability_config.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            original_lstat = Path.lstat
+
+            def unreadable(path, *args, **kwargs):
+                if path == root / "grafana-provisioning/datasources/ns2604.yaml":
+                    raise PermissionError("synthetic metadata denial")
+                return original_lstat(path, *args, **kwargs)
+
+            for action in ("grafana", "grafana-check"):
+                with self.subTest(action=action), mock.patch.object(Path, "lstat", unreadable), \
+                        mock.patch.object(sys, "argv", ["observability_config.py", action, "--config-root", str(root)]), \
+                        mock.patch.object(adapter, "atomic") as writer:
+                    with self.assertRaisesRegex(ValueError, "needs_owner: cannot verify legacy Grafana path"):
+                        adapter.main()
+                    writer.assert_not_called()
+
+    def test_validator_refusal_preserves_operator_config_and_ledger(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            config.mkdir()
+            binary = root / "otelcol-contrib"
+            binary.write_text("#!/bin/sh\nexit 29\n")
+            binary.chmod(0o700)
+            original = "extensions:\n  file_storage:\n    directory: /otelcol/queue\nservice:\n  pipelines:\n    operator-custom: {}\n"
+            target = config / "otel.yaml"
+            target.write_text(original)
+            ledger_path = config / ".g4-source-digests.json"
+            ledger = {"prometheus.yaml": "unrelated-fixture-digest"}
+            ledger_path.write_text(json.dumps(ledger))
+            env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+            env.update({"PATH": str(root) + os.pathsep + os.environ["PATH"],
+                        "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+            result = subprocess.run(
+                [sys.executable, str(PLAN / "config/observability_config.py"), "otel",
+                 "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                env=env, capture_output=True, text=True, timeout=10)
+            self.assertNotEqual(result.returncode, 0, result.stderr)
+            self.assertIn("upstream validator refused", result.stderr)
+            self.assertEqual(target.read_text(), original)
+            self.assertEqual(json.loads(ledger_path.read_text()), ledger)
+
+
 
 
 class GatewayCanaryBindingRepairTests(unittest.TestCase):
@@ -2526,6 +2871,12 @@ class ApplyTests(ApplyCase):
         self.assertEqual((codex / "stack-worker.config.toml").read_text(), "model = 'mine'\n")
         self.assertIn("stack-worker.config.toml: differs from the render and is never overwritten", out)
         self.assertTrue((codex / "omniroute.config.toml").exists())
+        self.assertIn("codex-files applied; differs, not written", out.split("summary: ")[1])
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual((codex / "stack-worker.config.toml").read_text(), "model = 'mine'\n")
+        self.assertIn("codex-files differs, not written", out.split("summary: ")[1])
+        self.assertNotIn("codex-files current", out.split("summary: ")[1])
 
     def test_a_settings_file_of_the_destinations_shape_keeps_its_marketplace_and_theme_and_gains_the_wired_settings(self):
         self.installed_state()
@@ -2683,7 +3034,7 @@ class AuthorizationTests(ApplyCase):
                     "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                     "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                     "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
-                    "file lacks)")
+                    "file lacks, except existing create-only profile files)")
 
     def render(self, *extra: str):
         with tempfile.TemporaryDirectory() as tmp:
@@ -2825,15 +3176,118 @@ class AuthorizationTests(ApplyCase):
             self.assertEqual(config["mcp_servers"][server]["default_tools_approval_mode"], "approve", server)
         # The stack-worker profile is created only when absent, so the profile the plain run created stays as it was.
         line = self.authorization_line(out)
-        self.assertEqual(line, f"authorization settings: applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
-                               f"{self.CODEX_CONFIG}; kept your value: {self.STACK_WORKER})")
-        # A second run with the option has nothing left to add: the settings are the same, and the line says kept.
+        self.assertEqual(line, f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
+                               f"{self.CODEX_CONFIG}; not reached, its step codex-files ended differs, not written: "
+                               f"{self.STACK_WORKER})")
+        # Main configuration settings are now present; missing keys in create-only profiles remain not reached.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
         line = self.authorization_line(out)
-        self.assertEqual(line, f"authorization settings: kept (--with-authorization-settings; kept your value: "
-                               f"{self.STACK_WORKER}; already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
-                               f"{self.CODEX_CONFIG})")
+        self.assertEqual(line, f"authorization settings: not applied (--with-authorization-settings; already the same: "
+                               f"{self.ADDED_CLAUDE[len('added: '):]}, {self.CODEX_CONFIG}; "
+                               f"not reached, its step codex-files ended differs, not written: {self.STACK_WORKER})")
+
+    def test_profile_formatting_and_model_drift_do_not_change_equal_authorization_values(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        original = profile.read_text()
+        for text in ("# different formatting\n" + original,
+                     original.replace('default_tools_approval_mode = "approve"',
+                                      "default_tools_approval_mode = 'approve'"),
+                     original.replace('model = "gpt-6.1-sol"', 'model = "local-choice"', 1)):
+            with self.subTest(format_only=text.startswith("# different formatting")):
+                self.assertNotEqual(text, original)
+                parsed, baseline = tomllib.loads(text), tomllib.loads(original)
+                for server in ("ai-memory", "socraticode", "headroom"):
+                    self.assertEqual(parsed["mcp_servers"][server]["default_tools_approval_mode"],
+                                     baseline["mcp_servers"][server]["default_tools_approval_mode"])
+                profile.write_text(text, encoding="utf-8")
+                code, out, _ = self.apply(self.OPTION)
+                self.assertEqual(code, 0, out[-800:])
+                self.assertEqual(profile.read_text(), text)
+                line = self.authorization_line(out)
+                self.assertIn("already the same: ", line)
+                self.assertIn(self.STACK_WORKER, line.split("already the same: ", 1)[1])
+                self.assertNotIn("kept your value:", line)
+                self.assertNotIn("not reached", line)
+                self.assertIn("codex-files differs, not written", out.split("summary: ")[1])
+
+    def test_only_the_changed_profile_authorization_key_is_kept(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        original = profile.read_text()
+        text = original.replace('[mcp_servers.ai-memory]\ndefault_tools_approval_mode = "approve"',
+                                '[mcp_servers.ai-memory]\ndefault_tools_approval_mode = false', 1)
+        self.assertNotEqual(text, original)
+        self.assertIs(tomllib.loads(text)["mcp_servers"]["ai-memory"]["default_tools_approval_mode"], False)
+        profile.write_text(text, encoding="utf-8")
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(profile.read_text(), text)
+        line = self.authorization_line(out)
+        kept = line.split("kept your value: ", 1)[1].split(";", 1)[0]
+        self.assertEqual(kept, "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode")
+        self.assertIn("Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode",
+                      line.split("already the same: ", 1)[1])
+        self.assertIn("Codex stack-worker profile mcp_servers.headroom.default_tools_approval_mode",
+                      line.split("already the same: ", 1)[1])
+        self.assertNotIn("not reached", line)
+
+    def test_an_absent_key_in_an_existing_profile_is_not_reported_as_kept(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        original = profile.read_text()
+        text = original.replace('[mcp_servers.ai-memory]\ndefault_tools_approval_mode = "approve"',
+                                '[mcp_servers.ai-memory]', 1)
+        self.assertNotEqual(text, original)
+        self.assertNotIn("default_tools_approval_mode", tomllib.loads(text)["mcp_servers"]["ai-memory"])
+        profile.write_text(text, encoding="utf-8")
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(profile.read_text(), text)
+        line = self.authorization_line(out)
+        self.assertTrue(line.startswith("authorization settings: not applied "), line)
+        self.assertNotIn("kept your value:", line)
+        self.assertIn("not reached, its step codex-files ended differs, not written: "
+                      "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode", line)
+        self.assertIn("Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode",
+                      line.split("already the same: ", 1)[1])
+
+    def test_malformed_profile_authorization_is_failed_and_preserved(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        profile = self.home / ".codex/stack-worker.config.toml"
+        for data in (b"[invalid\n", b"\xff"):
+            with self.subTest(data=data):
+                profile.write_bytes(data)
+                code, out, _ = self.apply(self.OPTION)
+                self.assertEqual(code, 1, out[-800:])
+                self.assertEqual(profile.read_bytes(), data)
+                self.assertIn("codex-files failed", out.split("summary: ")[1])
+                line = self.authorization_line(out)
+                self.assertIn("not reached, its step codex-files failed: " + self.STACK_WORKER, line)
+                self.assertNotIn("kept your value:", line)
+
+    def test_dry_run_with_a_stale_profile_reports_both_creation_and_preservation(self):
+        self.seed()
+        profile = self.home / ".codex/stack-worker.config.toml"
+        profile.parent.mkdir(mode=0o700)
+        profile.write_text("model = 'local-choice'\n", encoding="utf-8")
+        before = tree(self.home)
+        code, out, _ = self.apply(self.OPTION, dry=True)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tree(self.home), before)
+        self.assertFalse(self.marker.exists())
+        self.assertIn("codex-files planned; differs, not written", out.split("summary: ")[1])
+        self.assertTrue(self.authorization_line(out).startswith("authorization settings: would be partly applied "), out)
+        self.assertIn("not reached, its step codex-files ended planned; differs, not written: " + self.STACK_WORKER, out)
 
     def test_a_new_codex_home_with_the_option_keeps_the_trust_grant_and_a_second_run_finds_it_the_same(self):
         # codex_home.py --keep-project-trust: the grant the render holds survives the creation of config.toml, so the
@@ -2911,11 +3365,12 @@ class AuthorizationTests(ApplyCase):
                     self.assertIn("codex-config merged with conflicts kept", out.split("summary: ")[1])
                     # The person's four values stay; what the files lack (the allow rules and approval modes) is added.
                     line = self.authorization_line(out)
-                    self.assertTrue(line.startswith("authorization settings: applied (--with-authorization-settings; "
+                    self.assertTrue(line.startswith("authorization settings: partly applied (--with-authorization-settings; "
                                                     f"added: {self.ALLOW_LABELS}, "), line)
                     # The stack-worker profile the plain run created is kept too (profiles are created only when absent).
                     self.assertIn("kept your value: Claude Code permissions.defaultMode, Claude Code "
-                                  "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode, "
+                                  "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode", line)
+                    self.assertIn("not reached, its step codex-files ended differs, not written: "
                                   f"{self.STACK_WORKER})", line)
                 else:
                     self.assertNotIn("kept your permissions.defaultMode", out)
@@ -3403,6 +3858,76 @@ class RenderedScanTests(unittest.TestCase):
         for text in ("Use RTK here", "artkb and rtks", "rtk-default", "(ai-memory), socraticode.", "xheadroom headroom_x",
                      "CONTEXT-MODE:context-mode", "rtk2 2rtk rtk", "promptfoo/Promptfoo", "ai-memoryx", "no name here"):
             self.assertEqual(cfg.name_hits(text, names), independent_name_hits(text, names), text)
+
+
+class McpEndpointRepairTests(unittest.TestCase):
+    """Local integration regressions for co-op D02, not upstream acceptance.
+
+    Native formats: https://code.claude.com/docs/en/mcp and
+    https://developers.openai.com/codex/mcp. SocratiCode's endpoint variables:
+    giancarloerra/SocratiCode@f6191f076a42405f0d5508139f3a8b505cfef93a:README.md,
+    Configuration (QDRANT_URL and LMSTUDIO_URL, including the /v1 suffix).
+    """
+
+    def test_alternate_host_render_uses_the_same_endpoints_and_keeps_other_env(self):
+        host = render_config.load_host_values(EXAMPLE_HOST)
+        host.update(QDRANT_URL="127.0.0.1:21633", EMBED_URL="127.0.0.1:28231")
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
+                render_config, "load_host_values", return_value=host):
+            code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp)
+            self.assertEqual((code, err), (0, ""))
+            claude = json.loads((Path(tmp) / "mcp-servers.json").read_text())["mcpServers"]["socraticode"]
+            codex = tomllib.loads((Path(tmp) / "codex.config.toml").read_text())["mcp_servers"]["socraticode"]
+        self.assertEqual(claude["env"]["QDRANT_URL"], "http://127.0.0.1:21633")
+        self.assertEqual(claude["env"]["LMSTUDIO_URL"], "http://127.0.0.1:28231/v1")
+        for key in ("QDRANT_URL", "LMSTUDIO_URL"):
+            self.assertEqual(claude["env"][key], codex["env"][key], key)
+        # A partial host override must retain the native provider/model/dimension settings.
+        template = json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"]["socraticode"]
+        self.assertEqual({k: v for k, v in claude["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")},
+                         {k: v for k, v in template["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")})
+
+    def test_check_accepts_matching_host_endpoints_with_client_specific_cache_paths(self):
+        code, out, err = run_main("--check")
+        self.assertEqual((code, err), (0, ""), out[-300:])
+        self.assertIn("check passed", out)
+
+    def test_check_rejects_the_missing_env_override_even_when_the_example_matches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+
+            def remove_host_env(data):
+                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/socraticode"])
+                entry["override"].pop("env", None)
+
+            edit_json(root / cfg.MAP_REL, remove_host_env)
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        for field in ("env.QDRANT_URL", "env.LMSTUDIO_URL"):
+            self.assertIn(f"MCP server socraticode {field} differs between Claude and Codex renders", err)
+
+    def test_check_rejects_a_hardcoded_http_url_for_another_shared_server(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+
+            def freeze_host_url(data):
+                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/ai-memory"])
+                host = render_config.load_host_values(EXAMPLE_HOST)
+                entry["override"]["url"] = f"http://{host['AI_MEMORY_URL']}/mcp"
+
+            edit_json(root / cfg.MAP_REL, freeze_host_url)
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("MCP server ai-memory url differs between Claude and Codex renders", err)
+
+    def test_check_rejects_a_host_endpoint_missing_from_one_client(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            path = root / cfg.TEMPLATES["codex/config"]
+            path.write_text(path.read_text().replace('QDRANT_URL = "http://${QDRANT_URL}"\n', ""))
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("MCP server socraticode env.QDRANT_URL differs between Claude and Codex renders", err)
 
 
 ONLY_CODEX_CONFIG = tuple(arg for step in cfg.STEPS if step != "codex-config" for arg in ("--skip", step))

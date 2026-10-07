@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-profile-integration",
+  "observed_at": "2026-10-07T11:38:34Z",
+  "prepared_only": true,
+  "source_base": "1f65867315b12138e09add6e443f42ad5dcd2274",
+  "reviewed_pr_head": "de7a7f2b6b6d7eac4241701b5c06a63b3265cbe0",
+  "evidence_class": "local_integration",
+  "supersedes": {
+    "path": "evidence/artifacts/model-currency-enforcement-20261007/handbook-projection.json",
+    "sha256": "1175705fe0bde64181217733f384f64036b1f648664abe5913ca75c9a57d336e",
+    "scope": "Current local prepared generated-byte binding only; previous observations unchanged. Not hosted landing CI."
+  },
+  "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+  "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
+  "outputs": {
+    "docs/new-wsl-handbook.md": "a1a0cb17fb9df414c02577d04fd3f120f7ee59447bc89ace44bf2f662180d19c",
+    "docs/new-wsl-handbook.json": "a42c89153ce6b91da53699342caa75217e3efacdda565c0ce6648f2298345467"
+  },
+  "inventory": {
+    "layers": 37,
+    "profile_entries": 78,
+    "projected_tools": 82,
+    "canonical_package_ids": 25
+  },
+  "validation": [
+    {
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "returned_status": "written",
+      "scope": "Authorized local preparation on #790 landing head; no #826 push or host/model acceptance."
+    }
+  ],
+  "source_contract": "native-agent-stack@de7a7f2b6b6d7eac4241701b5c06a63b3265cbe0:tests/test_new_wsl_handbook.py:1672-1689"
+}

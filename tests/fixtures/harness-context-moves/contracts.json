@@ -48,16 +48,16 @@
     "bytes": 782
   },
   {
-    "fixture": "09.txt",
+    "fixture": "09-20261006.txt",
     "to": "examples/claude-native/workflows/README.md",
     "heading": "## Native workflow mechanics relocated (2026-10-05)",
-    "bytes": 385
+    "bytes": 865
   },
   {
-    "fixture": "10.txt",
+    "fixture": "10-20261006.txt",
     "to": "examples/claude-native/workflows/README.md",
     "heading": "## Native workflow mechanics relocated (2026-10-05)",
-    "bytes": 1668
+    "bytes": 2034
   },
   {
     "fixture": "11.txt",

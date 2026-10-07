@@ -2001,7 +2001,26 @@ class PortableTopRuleTests(unittest.TestCase):
                 else:
                     content = self.section(content, contract["heading"])
                 self.assertEqual(len(passage), contract["bytes"])
-                self.assertIn(passage, content)
+                if contract["fixture"] == "04.txt":
+                    # The 2026-10-06 owner ruling supersedes this one active catalog instruction.
+                    # Preserve the old relocation bytes/hash and check the NEW linked snapshot.
+                    import hashlib
+                    record = ROOT / "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/catalog-lookup-supersession.json"
+                    supersession = json.loads(record.read_text())
+                    old = supersession["supersedes"]
+                    self.assertEqual(old["file"], "tests/fixtures/harness-context-moves/04.txt")
+                    self.assertEqual(old["bytes"], contract["bytes"])
+                    self.assertEqual(old["sha256"], "63371ccabaa9fd58734c55a114f7c4cfd4ad30c12126d513429b70a94c1e9b73")
+                    self.assertEqual(hashlib.sha256(passage).hexdigest(), old["sha256"])
+                    active = supersession["replacement"]
+                    self.assertEqual((active["to"], active["heading"]), (contract["to"], contract["heading"]))
+                    replacement = (ROOT / active["file"]).read_bytes()
+                    self.assertEqual(len(replacement), active["bytes"])
+                    self.assertEqual(hashlib.sha256(replacement).hexdigest(), active["sha256"])
+                    self.assertIn(replacement, content)
+                    self.assertNotIn(passage, content)
+                else:
+                    self.assertIn(passage, content)
 
     def test_the_check_rejects_a_missing_step_and_a_repository_path(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")

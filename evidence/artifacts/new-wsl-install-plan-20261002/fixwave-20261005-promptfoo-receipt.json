@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "kind": "native-stack2604-promptfoo-topology-defect-repair",
+  "evidence_class": "structural_validation",
+  "recorded_at_utc": "2026-10-05T11:28:34Z",
+  "base_commit": "7b017d5666bee22ba51691f599cb01bf4cdcb883",
+  "scope": "Defect 13 native Promptfoo CommonJS configuration, canonical topology seam and exact returned provider-pair assertions. No provider/model run in this receipt.",
+  "north_star_action": "Reliable gateway acceptance for north-star research and historical simulation.",
+  "decision_record": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md#defect-13-canonical-promptfoo-gateway-configuration",
+  "upstream": {
+    "repository": "promptfoo/promptfoo",
+    "release": "0.123.1",
+    "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "release_date": "2026-09-18",
+    "installed_version": "0.123.1",
+    "sources": [
+      "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/util/config/load.ts#L383",
+      "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/openai.md#L233",
+      "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/credentials.ts#L19",
+      "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/commands/validate.ts#L470"
+    ]
+  },
+  "source_inputs": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs",
+      "sha256": "d2c33fa3a4262faed8349ec61c0b7df3316b33695022119f075a0d5da03ae2e0"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-session.jq",
+      "sha256": "cd91ce7adef162076fc7f65ccdabd47f9ebcca98549e36a9853c7d4907edc211"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "7b319e7ce8938a00b92c8c5d36fb02183b5e5010c6cf50a266954a327928dabf"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "d8e3566c64152e0244acf6d64c8a9fe9c47195e7ec878f9877a7cf8178f10389"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "sha256": "24302f2b538c0663685a6e7c709462ad42e096efb7d4f23cd90e3be80199e2f0"
+    }
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 277,
+      "skipped": 3,
+      "seconds": 65.34,
+      "evidence_class": "local_structural_tests"
+    },
+    {
+      "command": "python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "initial_exit_code": 1,
+      "initial_failure": "Native CJS was copied by no install function.",
+      "repair": "Add installer copy_config for the new public config.",
+      "final_exit_code": 0,
+      "rows": 80,
+      "commands": 161,
+      "acceptance_entries": 100,
+      "evidence_class": "structural_validation"
+    },
+    {
+      "command": "python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit_code": 0,
+      "evidence_class": "structural_validation"
+    },
+    {
+      "command": "node --check evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs",
+      "exit_code": 0,
+      "evidence_class": "syntax_validation"
+    },
+    {
+      "command": "bash -n evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "exit_code": 0,
+      "evidence_class": "syntax_validation"
+    },
+    {
+      "command": "promptfoo validate config --config <synthetic-topology-config.cjs>",
+      "positive_exit_code": 0,
+      "missing_claude_exit_code": 1,
+      "evidence_class": "native_structural_validation_with_synthetic_input",
+      "provider_calls": 0,
+      "input_origin": "Locally constructed nonsecret endpoint and opaque fixture model IDs; not real routes.",
+      "provider_calls_basis": "source_review: tagged src/commands/validate.ts:470-499 performs configuration/schema validation; inference tests are a separate validate target path.",
+      "provider_usage": null
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "seconds": 26.545916217,
+      "components": 69,
+      "hashed_files": 10099,
+      "profiles": 4,
+      "receipts": 202,
+      "evidence_class": "structural_validation",
+      "scope": "After native API evidence registration on the pre-#713 branch; final registry-only publication validation follows."
+    },
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 277,
+      "skipped": 3,
+      "seconds": 66.405,
+      "evidence_class": "local_structural_tests",
+      "scope": "Final source after narrowing placeholder rejection and adding the native HTTPS-template control."
+    },
+    {
+      "command": "promptfoo validate config --config <synthetic-topology-config.cjs>",
+      "positive_exit_code": 0,
+      "missing_claude_exit_code": 1,
+      "evidence_class": "native_structural_validation_with_synthetic_input",
+      "provider_calls": 0,
+      "provider_calls_basis": "source_review_only: validate.ts:470-499; not a native usage counter.",
+      "provider_usage": null,
+      "scope": "Final CommonJS source, same frozen synthetic topology inputs.",
+      "module_sha256": "d2c33fa3a4262faed8349ec61c0b7df3316b33695022119f075a0d5da03ae2e0"
+    },
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 277,
+      "skipped": 3,
+      "seconds": 65.729,
+      "evidence_class": "local_structural_tests",
+      "scope": "Final acceptance uses the active worktree result filter, preventing an older installed copy from qualifying another pair."
+    },
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 278,
+      "skipped": 3,
+      "seconds": 67.729,
+      "evidence_class": "local_structural_tests",
+      "scope": "Synthetic Node helper carries only public PATH/TMPDIR and explicitly supplied fixture variables; negative control excludes unrelated synthetic ambient variable."
+    }
+  ],
+  "artifacts": [
+    {
+      "private_artifact_basename": "promptfoo-topology-native-valid.log",
+      "exit_code": 0,
+      "evidence_class": "native_structural_validation_with_synthetic_input",
+      "sha256": "35264b45bc291456d4003b273842644bf510a4035bfff9747747810ff71a4106",
+      "bytes": 192
+    },
+    {
+      "private_artifact_basename": "promptfoo-topology-native-missing-claude.log",
+      "exit_code": 1,
+      "evidence_class": "native_structural_failing_control_with_synthetic_input",
+      "sha256": "3951196eedf59f6a3970f069514e64124a8ab7ee012abeb3b676506e090f8207",
+      "bytes": 759
+    },
+    {
+      "private_artifact_basename": "promptfoo-touched-tests.log",
+      "exit_code": 0,
+      "evidence_class": "local_structural_tests",
+      "sha256": "f9aec66d1e8aaa9959b4eb310ccc3f33585148e05d8ae0654aca896af106a9d7",
+      "bytes": 390
+    },
+    {
+      "private_artifact_basename": "promptfoo-first-validate.log",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "sha256": "644a339fedb4a6e357a42a3a449768515c5951d69646000fe7643c56ee78ddbb",
+      "bytes": 162
+    },
+    {
+      "private_artifact_basename": "promptfoo-topology-native-valid-final.log",
+      "exit_code": 0,
+      "evidence_class": "native_structural_validation_with_synthetic_input",
+      "sha256": "b1257a61a8a953701973baf49efc5580d4b705da4e5cf46bdd6ceb8f61c7d4dc",
+      "bytes": 192
+    },
+    {
+      "private_artifact_basename": "promptfoo-topology-native-missing-claude-final.log",
+      "exit_code": 1,
+      "evidence_class": "native_structural_failing_control_with_synthetic_input",
+      "sha256": "806ae960e1f240b22ca105140d493e79cf1f96ee834c0039c7475946bbc2b3c7",
+      "bytes": 759
+    },
+    {
+      "private_artifact_basename": "promptfoo-touched-tests-final.log",
+      "exit_code": 0,
+      "evidence_class": "local_structural_tests",
+      "sha256": "0441f699827fbdc3a00a8022a48f21b5f5b037f7ab62b4d800b5826880848d8d",
+      "bytes": 390
+    },
+    {
+      "private_artifact_basename": "promptfoo-touched-tests-source-oracle.log",
+      "exit_code": 0,
+      "evidence_class": "local_structural_tests",
+      "sha256": "dfa7efe2c0e543ebee3ca5a75e9a73931d2f8401d88ac244135ee9d401bb800a",
+      "bytes": 390
+    },
+    {
+      "private_artifact_basename": "promptfoo-isolated-env-touched-tests.log",
+      "exit_code": 0,
+      "evidence_class": "local_structural_tests",
+      "sha256": "109ce200f396c8a47d9f0e7e0bfb92993fe574c9f03261807725e645c3901647",
+      "bytes": 391
+    }
+  ],
+  "credentials": {
+    "inventory_id": "omniroute",
+    "apiKeyEnvar": "OMNIROUTE_API_KEY",
+    "store_or_value_read_by_lane": false,
+    "value_serialized_to_config": false,
+    "keyless_gateway": true,
+    "vendor_key_fallback": false,
+    "native_mcp_forwarding": "Per-call Codex env_vars name override; no global client write."
+  },
+  "pending_dependencies": [
+    {
+      "kind": "canonical_model_choice",
+      "verification": "command-center item task-ns2604-coop-20261005T053703Z section 6",
+      "state": "Prospective topology in open #713 lacks a Claude route; Q16 requests its governing exact ID.",
+      "prospective_topology_revision": "cde8a0de060ca37fee6a2353f494f15a4bbdede1",
+      "native_catalog_observation": {
+        "http_status": 200,
+        "catalog_ids": 597,
+        "declared_gpt_id_present": true,
+        "opus_5_5_id_observed": false,
+        "evidence_class": "native_metadata_only",
+        "provider_acceptance": false
+      },
+      "criterion": "An explicit existing Claude-family route; no Opus5.5 backing-version requirement for this provider regression.",
+      "alias_caution": "Pinned built-in auto/claude-opus maps to smart without a family constraint; operator stored-combo overrides and native provider availability are unobserved."
+    },
+    {
+      "kind": "required_main_rebase",
+      "state": "Wait until #713 lands, then rebase and re-register the lane from main."
+    },
+    {
+      "kind": "native_after_sign_in",
+      "state": "Not run against the missing canonical pair; native configuration tests are not model acceptance."
+    }
+  ],
+  "not_claimed": [
+    "Native provider acceptance",
+    "Claude route/backing model/version selection",
+    "Promptfoo paired skill acceptance",
+    "Unchanged upstream test-suite acceptance",
+    "Whole-plan acceptance",
+    "Provider usage or latency improvements"
+  ],
+  "privacy": "Public receipt includes source hashes, synthetic input provenance, exit codes and bounded counts only. Original logs remain private in owned lane cache; no conversations, credentials, personal paths or active client config are published.",
+  "initial_source_inputs": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-gateway.cjs",
+      "sha256": "089c638d716d96e51b35dc91fddb6185e25e5be2ebda779192b8bc2642889860"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-session.jq",
+      "sha256": "cd91ce7adef162076fc7f65ccdabd47f9ebcca98549e36a9853c7d4907edc211"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "387db64ae74773d40796d0fc3c66236b9edfb2907ad4de0da8a7bece21d274b8"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "d8e3566c64152e0244acf6d64c8a9fe9c47195e7ec878f9877a7cf8178f10389"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "sha256": "fcf2f21de320b4d6a26fea70a62152876e99d635abd59379f8e219b03485b7be"
+    }
+  ],
+  "source_inputs_scope": "Current final source bytes; initial_source_inputs preserve the pre-placeholder-guard state for the first config checks.",
+  "initial_native_fixture_source": {
+    "private_artifact_basename": "initial-config.cjs",
+    "sha256": "089c638d716d96e51b35dc91fddb6185e25e5be2ebda779192b8bc2642889860",
+    "basis": "Exact previously staged native CommonJS source; preserved separately before final fixture changes."
+  },
+  "synthetic_child_environment": {
+    "allowed_public_runtime_variables": [
+      "PATH",
+      "TMPDIR"
+    ],
+    "additional_variables": "Explicitly supplied synthetic fixture variables only.",
+    "source": "https://docs.python.org/3/library/subprocess.html#subprocess.Popen",
+    "initial_source_risk": "The test helper copied the ambient environment; actual credential presence or exposure was not established.",
+    "negative_control": "Unrelated synthetic ambient variable is absent from child env."
+  }
+}

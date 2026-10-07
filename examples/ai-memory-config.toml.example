@@ -1,10 +1,16 @@
 # Merge these top-level fields into the default data directory's config.toml.
 # Leave llm_provider and reranker unset; literal llm_provider="none" is invalid.
-# Upstream keyless semantic-memory default: checksum-pinned local MiniLM,
-# 384 dimensions; first start downloads about 87 MiB and embeds existing pages.
-# Use "none" for a deliberately FTS-only profile. This is separate from the
-# SocratiCode/Nemotron code index and does not enable LLM consolidation.
-embedding_provider = "local"
+# Requires ai-memory 2.5.2: upstream query/document prefix support at 7580b74d.
+# NativeStack2604's declared selection is the separately operated Nemotron 8B
+# endpoint; this example neither starts it nor re-embeds an existing datastore.
+# Changing the document prefix changes stored embedding identity. Keep its space.
+# Use "none" for a deliberately FTS-only profile. LLM consolidation stays separate.
+embedding_provider = "openai-compat"
+embedding_base_url = "http://127.0.0.1:28231/v1"
+embedding_model = "nvidia/Nemotron-3-Embed-8B-BF16"
+embedding_dim = 4096
+embedding_query_prefix = "query: "
+embedding_document_prefix = "passage: "
 backfill_on_start = false
 capture_assistant = false
 consolidate_on_session_end = false

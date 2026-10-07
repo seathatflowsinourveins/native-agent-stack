@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "unit": "qmd-instructions-ci8-followup",
+  "lane": "foundation",
+  "base": "75c0d6d9672c758687e2eb4e42b7d0ac963fb611",
+  "evidence_class": ["source-review", "local-integration-check", "synthetic-fixture", "structural-validation"],
+  "prior_receipts_retained": [
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/receipt.json",
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/citation-followup.json",
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/researcher-availability-followup.json",
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/j819-followup-20261007.json",
+    "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/marker-followup-20261007.json"
+  ],
+  "hosted_failure": {
+    "run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37553322269",
+    "head": "75c0d6d9672c758687e2eb4e42b7d0ac963fb611",
+    "tests": 11377,
+    "duration_seconds": 1957.741,
+    "exit_state": "failed",
+    "failures": 8,
+    "skips": 1026,
+    "provenance": "The root read the native hosted log; its sanitized report retains eight failing cases across six methods. This is not a new worker replay."
+  },
+  "eight_case_repairs": [
+    {"case": "generated-handbook-current", "status": "passed", "repair": "Native --write updates both generated outputs and their mutable producer/output binding; prior observed fields and audit entries remain intact."},
+    {"case": "canonical-top-rule-parity", "status": "passed", "repair": "Template top-rule restored exactly to the immutable scaffold; catalog wording is after the session-lanes marker."},
+    {"case": "main-qmd-query-phrase", "status": "passed", "repair": "Unchanged qmd query command literal retained."},
+    {"case": "researcher-injected-qmd-query", "status": "passed", "repair": "Unchanged qmd query command literal retained in the injected role block."},
+    {"case": "researcher-granted-tools", "status": "passed", "repair": "Semantic catalog requests are handed to the coordinator without naming an ungranted tool; existing NEEDS checks and allowlists are unchanged."},
+    {"case": "full-block-byte-budget", "status": "passed", "repair": "Trim unpinned prose to 4093 UTF-8 bytes; retain the unchanged 4100-byte limit and all pinned phrases."},
+    {"case": "researcher-qmd-query-text-pin", "status": "passed", "repair": "Keyword lookup is expressed around the pinned command."},
+    {"case": "researcher-handbook-line-binding", "status": "passed", "repair": "The exact role-specific line is present in its handbook section; all carrier guidance lines are bound."}
+  ],
+  "ruling_reconciliation": {
+    "unchanged_full_rule": true,
+    "researcher_adaptation": "The shipped researcher lacks SocratiCode. The role-specific carrier preserves keyword retrieval, no embed/pull and semantic handoff without the ungranted tool name; the full literal rule remains in the unrestricted carriers and handbook.",
+    "permission_test": "A new discriminating handoff test confirms the unchanged grants and rejects an injected codebase_search name. No existing assertion, NEEDS mapping, budget or allowlist is relaxed."
+  },
+  "readback": {
+    "canonical_AGENTS_files_unchanged": true,
+    "all_role_model_effort_and_grants_unchanged": true,
+    "seven_rtk_exceptions_preserved": true,
+    "full_block_bytes": 4093,
+    "researcher_block_bytes": 3174,
+    "main_block_bytes": 2066,
+    "subagent_budget_unchanged": 4100,
+    "main_budget_unchanged": 2600,
+    "compact_codex_template_bytes": 7750,
+    "rendered_codex_template_bytes": 8816,
+    "top_segment_sha256": "d80240892f3b9230f589a0b57400f1244da9ba912e7dfa5f8b016562d6b20a29",
+    "native_f9_inventory": "Append-only dated amendment in the client-configuration decision; prior decided text and observed results are unchanged.",
+    "handbook_binding": "Only generator-owned hashes/inventory and appended regeneration audits changed; all observed fields and preexisting audit entries are unchanged.",
+    "audit_annotation_correction": "One new regeneration cause says 4092 bytes; that prose annotation is mistaken. Actual native len(read_bytes()) is 4093, as recorded here and verified by the unchanged budget test. The earlier audit text is retained."
+  },
+  "retained_local_failures": [
+    {"raw_log": "ci8-exact-modules.first.log", "exit_code": 1, "tests": 359, "failures": 5, "skips": 13, "duration_seconds": 115.658, "cause": "The first compacting pass removed pinned bootstrap, fetch and cwd wording. Restore it without changing assertions."},
+    {"raw_log": "ci8-exact-modules.qualified.log", "exit_code": 1, "tests": 359, "failures": 1, "skips": 13, "duration_seconds": 114.783, "cause": "The emitted full block was 4105 bytes. Trim only its unpinned introduction and measure the actual file before the final rerun."}
+  ],
+  "qualification": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_token_lanes_session_start tests.test_token_lanes_subagent_start tests.test_scaffold_repo tests.test_new_wsl_handbook tests.test_adoption_docs_consistency tests.test_codex_agents tests.test_codex_roles tests.test_codex_worker_lane",
+    "umask": "022",
+    "exit_code": 0,
+    "tests": 359,
+    "skips": 13,
+    "duration_seconds": 110.597,
+    "raw_log": "ci8-exact-modules.final.log",
+    "additional_binding_check": {"command": "python3 -B -m unittest tests.test_new_wsl_client_config.RecordTests", "exit_code": 0, "reason": "The added outside-rule line exposed a concrete generated dropped-list count mismatch; the new dated native inventory fixes that binding."}
+  },
+  "verdict_review_gate": {
+    "state": "stacked-base-not-main",
+    "source": ".github/workflows/validate.yml:292-294 at 75c0d6d9",
+    "scope": "The root verified the returned guard error. No gate edit or early retarget; it must be green on the retargeted landing head."
+  },
+  "wiring": {
+    "state": "pending-grant-decision",
+    "fallback": "J819d CI-only content push",
+    "reason": "All four Claude roles naming Serena lack initial_instructions; A14 requires their manual-first sequence, but the lane cannot widen grants.",
+    "proposal": "Private four-role manual-only grant diff prepared for the command center; no grant or new wiring line is committed or applied."
+  },
+  "host_changes": false,
+  "limits": [
+    "Local repository checks do not establish host cutover, native tool smoke, organic use or token saving.",
+    "No new full hosted suite is claimed; the root checks exact-head CI after the content push.",
+    "No client setup, index operation, model inference, credential read, branch rebase or gate change occurred.",
+    "Historical observations and failed/conditional logs remain unchanged; native generator-owned bindings and append-only dated metadata are kept distinct."
+  ]
+}

@@ -446,7 +446,7 @@ GitHub-hosted macOS runner; see
      into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`), and the main-session pair
      [`adoption/hooks/claude/token-lanes-session-start.py`](hooks/claude/token-lanes-session-start.py) and
      [`adoption/hooks/claude/token-lanes-block.main.md`](hooks/claude/token-lanes-block.main.md) beside them
-     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)).
+     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)). The catalog retrieval instructions in these blocks changed after `v2026.10.05.1`.
      The hook supplies token-lane guidance before each non-blind subagent's first prompt
      through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart):
      a shipped role with a `tools:` allowlist receives the role block that names only the lanes it grants,
@@ -475,7 +475,11 @@ GitHub-hosted macOS runner; see
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
      mcp get <name>` already reports a matching transport, command/URL, args
      and env variable names (values are not compared -- the running host owns
-     them). A same-named server with a different config is reported and left
+     them). `adoption/mcp/claude-user.json` changed after `v2026.10.05.1`:
+     SocratiCode's model and dimensions name Nemotron-3-Embed-8B/4096; its
+     endpoint values retain the portable host-example defaults. A target
+     host's registration supplies its own Qdrant and embedding endpoints.
+     A same-named server with a different config is reported and left
      unchanged unless `--replace-mcp` is given. That flag re-registers every
      differing server, including an `ai-memory` entry that names this host's
      own port. To change one server, remove it and rerun without the flag:

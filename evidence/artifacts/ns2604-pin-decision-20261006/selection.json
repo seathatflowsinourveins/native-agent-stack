@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "kind": "source_review_and_dated_installed_version_observation",
+  "recorded_at_utc": "2026-10-06T20:45:51Z",
+  "base_commit": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "amendment_table_verified_at_main": "4ce7632b865a19fe806f12442f64d7157f08f18c",
+  "transfer_mise_verified_at_pr_head": "8d4f16be8903f313bc96d555cebf4f593a6faf36",
+  "purpose": "One logical host default; coordinated executable consumer amendments remain pending owners.",
+  "source_class": "maintainer release/tag metadata; installed version observations; no new install or native qualification",
+  "command_and_observation_semantics": "command strings are readable labels, not full argv; installed version values are normalized observations, not raw stdout. Exit codes refer to the corresponding native version/metadata checks.",
+  "defaults": [
+    {
+      "tool": "node",
+      "version": "24.21.0",
+      "release_url": "https://nodejs.org/en/blog/release/v24.21.0",
+      "release_date_utc": "2026-09-08",
+      "source_commit": "955266bfdd854cd280dffd47548673914484e4c0",
+      "installed_observation": "24.21.0",
+      "command": "node --version",
+      "exit_code": 0
+    },
+    {
+      "tool": "uv",
+      "version": "0.12.22",
+      "release_url": "https://github.com/astral-sh/uv/releases/tag/0.12.22",
+      "published_at_utc": "2026-10-02T00:20:42Z",
+      "source_commit": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+      "installed_observation": "0.12.22",
+      "command": "uv --version",
+      "exit_code": 0
+    },
+    {
+      "tool": "gh",
+      "version": "2.102.0",
+      "release_url": "https://github.com/cli/cli/releases/tag/v2.102.0",
+      "published_at_utc": "2026-09-30T02:40:02Z",
+      "source_commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "installed_observation": "2.102.0",
+      "command": "gh --version",
+      "exit_code": 0
+    },
+    {
+      "tool": "host-python",
+      "version": "3.13.16",
+      "release_url": "https://www.python.org/downloads/release/python-31316/",
+      "release_date_utc": "2026-09-30",
+      "source_commit": "cbc944f4bc59639a444dd971c737788ba2283a91",
+      "installed_observation": "3.13.16",
+      "command": "python3 --version",
+      "exit_code": 0
+    },
+    {
+      "tool": "codex",
+      "version": "0.160.1",
+      "release_url": "https://github.com/openai/codex/releases/tag/rust-v0.160.1",
+      "published_at_utc": "2026-10-05T18:29:37Z",
+      "source_commit": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "installed_observation": "0.160.1",
+      "command": "codex --version",
+      "exit_code": 0
+    },
+    {
+      "tool": "claude-code",
+      "version": "2.1.292",
+      "release_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.292",
+      "published_at_utc": "2026-10-06T18:59:30Z",
+      "release_repository_commit": "fbe20e00e2851fc01506f54f98a8f0b875af3847",
+      "installed_observation": "2.1.292",
+      "command": "claude --version",
+      "exit_code": 0,
+      "promotion_not_before_utc": "2026-10-07T18:59:30Z"
+    },
+    {
+      "tool": "harbor",
+      "version": "0.24.0",
+      "release_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+      "published_at_utc": "2026-10-05T05:04:52Z",
+      "source_commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "installed_observation": "0.23.0",
+      "command": "harbor --version",
+      "exit_code": 0,
+      "qualification": "pending owner"
+    },
+    {
+      "tool": "otelcol-contrib",
+      "version": "0.162.0",
+      "release_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
+      "published_at_utc": "2026-09-29T10:11:33Z",
+      "source_commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "distribution_commit": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+      "installed_observation": "0.162.0",
+      "command": "otelcol-contrib --version",
+      "exit_code": 0
+    },
+    {
+      "tool": "vllm",
+      "version": "0.31.0",
+      "release_url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0",
+      "published_at_utc": "2026-10-05T06:44:55Z",
+      "source_commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "installed_observation": {
+        "retained_environments": [
+          "0.30.0",
+          "0.31.0"
+        ],
+        "active_selection": "not established",
+        "gpu_qualification": "not established by version metadata"
+      },
+      "command": "Each retained tool environment: python -c importlib.metadata version lookup; no vllm/torch imports",
+      "exit_code": 0,
+      "qualification": "pending owner"
+    }
+  ],
+  "historical_records_rewritten": false,
+  "trading_project_python_changed": false,
+  "installed_state_changed": false,
+  "instruction_files_changed": false,
+  "consumer_alignment": "pending owner amendments",
+  "local_validation": "pending after 2026-10-07T00:10:00Z; remote CI may run before",
+  "cooldown_and_integrity": "selection does not imply promotion; owners retain native verifier and qualification gates"
+}

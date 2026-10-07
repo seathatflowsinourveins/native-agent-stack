@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "unit": "codex-skill-read-exception",
+  "lane": "foundation",
+  "base": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "decision": "docs/decisions/2026-10-06-codex-skill-read-exception.md",
+  "evidence_class": "pinned-source review and repository integration read-back",
+  "sources": [
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/shell-command/src/parse_command.rs:1567-1629,1636-1652,2708-2737",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/skills/src/invocation.rs:129-143",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/skills.rs:153-197",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/tools/handlers/unified_exec/exec_command.rs:254-263",
+    "repository@0d5e6506434fab598dee861c749a22e628beb75a:tools/adoption/codex_roles.py:286-290",
+    "repository@0d5e6506434fab598dee861c749a22e628beb75a:tools/adoption/managed_block.py:169-197"
+  ],
+  "readback": {
+    "exact_authorized_skill_line": true,
+    "exception_entries": 7,
+    "existing_exception_entries_preserved": 6,
+    "native_render_compute_exit": 0,
+    "rendered_embedded_files": 11,
+    "carrier_checksum_files": 2,
+    "models_effort_permissions_unchanged": true
+  },
+  "retained_failed_attempts": [
+    {"step": "initial renderer import", "exit": 1, "cause": "module import path; corrected to the repository helper import path before rendering"},
+    {"step": "first focused suites", "exit_codes": [1, 1, 0, 1], "cause": "stale independent hash literals/README rows plus fixture modes affected by the private-log wrapper umask"},
+    {"step": "after test-literal pin refresh", "exit_codes": [1, 1, 0, 0], "cause": "README hash rows still stale; worker fixtures created under umask 077 instead of CI's 022"}
+  ],
+  "qualification": {
+    "test_command": "python3 -B -m unittest -v <module>, sequentially at nice 19 with CI=true and umask 022",
+    "modules": ["tests.test_codex_agents", "tests.test_codex_worker_lane", "tests.test_managed_block", "tests.test_codex_roles"],
+    "exit_codes": [0, 0, 0, 0],
+    "validate_exit": 0,
+    "diff_check_exit": 0
+  },
+  "overlap_prs": [709, 758, 615],
+  "host_changes": false,
+  "rebase_readback": {
+    "reviewed_head": "82c06cbabd3252bacebb8209de6d2bc2d26ffc5c",
+    "rebased_on": "e28d0eec112527ac02659ac23753533b8ed39a73",
+    "main_overlap": ["manifests/evidence.json"],
+    "reviewed_source_bytes_preserved": true,
+    "native_check_markdown_exit": 0,
+    "native_tables_and_dropped_list_match_record": true,
+    "native_f4_matches_all_11_embedded_copies": true,
+    "both_checksum_files_recomputed_and_match": true,
+    "hot_files_committed_last": true,
+    "test_scope": "Prior four-module and client-config qualifications remain historical. Original source/carriers are preserved; main's map/manifest/tests advanced. The newly authorized upstream-surface module passes at this rebase; fresh full CI is still required."
+  },
+  "prior_rebase": {
+    "head": "8a21f9160b3dc8781312ac2368b6009fd3f547f4",
+    "rebased_on": "7fa43065ab859d96c7eee23ca02e39c259534f49",
+    "integrity_exit": 0,
+    "superseded_because": "Native Git merge preview confirmed a new registry-only conflict as main advanced."
+  },
+  "citation_followup": {
+    "failed_ci_head": "8a21f9160b3dc8781312ac2368b6009fd3f547f4",
+    "failed_ci_run": 37534519052,
+    "failed_ci_tests": 11376,
+    "failed_ci_failures": 2,
+    "cause": "README insertion moved the otel.environment command beyond its disposition source line.",
+    "key": "codex:config:otel.environment",
+    "old_source": "examples/codex-native/README.md:184",
+    "new_source": "examples/codex-native/README.md:188",
+    "native_module": "tests.test_upstream_surface_watch",
+    "module_exit": 0,
+    "other_owner_rows_preserved": true,
+    "assertions_changed": false
+  },
+  "review_followup": {
+    "prior_head": "86fad3e254bc1681e66c5d2b292bb16ad277b4e7",
+    "verdict": "ACK_AFTER with descriptive-count P3",
+    "ci_run": 37521798903,
+    "ci_failure_caused_by_this_change": "The generated dropped-list line count in the client-configuration decision record was not refreshed.",
+    "native_check_markdown_exit": 0,
+    "native_generated_record_readback": true,
+    "client_config_module_exit": 0,
+    "client_config_module_tests": 205,
+    "client_config_module_seconds": 71.459,
+    "descriptive_repairs": [
+      "Seven exception entries in README and test comments/docstring.",
+      "Compact/rendered byte descriptions 7470 and 8536.",
+      "The record contains the native markdown tables and dropped list."
+    ],
+    "assertions_changed": false,
+    "four_original_modules_qualified_at_prior_head": [0, 0, 0, 0],
+    "paper_window_scope": "Only the explicitly authorized client-config module and light native render/integrity readbacks; no full suite or other trial."
+  },
+  "limits": [
+    "No installed-client Rust source comparison or new native provider run claimed.",
+    "codex.skill.injected is emitted before shell execution and requires a registered canonical skill document path; it is not a successful-load/application count.",
+    "Existing role models, effort, permissions, top-rule and verbatim upstream RTK awareness hashes are preserved.",
+    "The host apply belongs to the command center after its review; this PR applies no client or RTK configuration.",
+    "Raw integration logs remain private and durable; historical model/E2E evidence is not reclassified."
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "kind": "ns2604-fixwave-retained-review-research-transport-failures",
+  "recorded_at_utc": "2026-10-05T16:14:00Z",
+  "previous_published_revision": "bf2c6f85b7708d261cc2dd0a6b69a1738d71787f",
+  "north_star_action": "Reliable delivered native review and completed upstream research gathering for engineering work.",
+  "evidence_classes": {
+    "source_review": "Pinned upstream and installed-client contracts, independently reread.",
+    "synthetic_integration": "Repository fixtures and local consistency checks; not upstream or provider acceptance.",
+    "native_attempts": "Original client event streams and actual failed whole-stage gates; private originals, no completion substitution."
+  },
+  "native_attempts": [
+    {
+      "slot": "cross-family-review",
+      "stage": "after_sign_in",
+      "input_revision": "bf2c6f85b7708d261cc2dd0a6b69a1738d71787f",
+      "recipe_sha256": "9bd38bca82746ccce3c0ac9df6f1276fee1a3ed1e8adaba138ab2ca9faeead68",
+      "wrapper_exit_code": 1,
+      "row_exit_code": 1,
+      "acceptance": false,
+      "immutable_claude_authored_head": "8c32a84b246da66e43a6188c973741b09329e223",
+      "immutable_gpt_authored_head": "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4",
+      "gpt": {
+        "terminal": "turn.completed",
+        "delivered_agent_message_bytes": 322,
+        "immutable_git_show_exit_code": 0,
+        "native_review_children": 1,
+        "native_child_model": "gpt-6.1-sol",
+        "native_child_effort": "max",
+        "parent_terminal_usage": {
+          "input_tokens": 0,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "child_final_cumulative_usage": {
+          "input_tokens": 932156,
+          "cached_input_tokens": 840960,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 13098,
+          "reasoning_output_tokens": 8462,
+          "total_tokens": 945254
+        },
+        "counter_scope": "Final child cumulative snapshot once; cache/reasoning subsets. Parent zero counters are separate and do not mean zero reviewer usage.",
+        "native_stream": {
+          "bytes": 272048,
+          "sha256": "9cccf0476795e0b64f63a838a4431ac69c745ec48c17b611f140824c973cc0da"
+        }
+      },
+      "claude": {
+        "terminal": "error_max_turns",
+        "is_error": true,
+        "num_turns": 49,
+        "duration_ms": 1050684,
+        "configured_max_turns": 48,
+        "configured_model": "opus",
+        "configured_effort": "max",
+        "native_init_model": "claude-opus-5-5",
+        "native_effort": null,
+        "actual_argv_permission_mode": "plan",
+        "enter_plan_mode_calls": 0,
+        "tool_calls": {
+          "Bash": 43,
+          "Read": 5,
+          "Write": 1
+        },
+        "structured_review_delivered": false,
+        "usage": {
+          "input_tokens": 98,
+          "cache_creation_input_tokens": 202198,
+          "cache_read_input_tokens": 6297327,
+          "output_tokens": 88056,
+          "service_tier": "standard",
+          "inference_geo": "not_available",
+          "speed": "standard"
+        },
+        "counter_scope": "Unique native terminal top-level fields once; nested iteration/advisor figures are not added.",
+        "native_stream": {
+          "bytes": 852042,
+          "sha256": "3aa899dab60f053ab55c39ee4a92f6e4dd6e41e401412247338c05e297b96281"
+        },
+        "argv_record": {
+          "bytes": 1522,
+          "sha256": "c63373f4fb1e2408a46611ad7e31ea51e405b988fb51475b9882c8bc2a0f801b"
+        }
+      },
+      "attribution": "Native turn-limit failure. Exact argv selected plan mode; no EnterPlanMode call. Planning is a likely contributor, not a proven cause. No native session-limit or timeout outcome."
+    },
+    {
+      "slot": "research-harnesses",
+      "stage": "after_sign_in",
+      "input_revision": "bf2c6f85b7708d261cc2dd0a6b69a1738d71787f",
+      "recipe_sha256": "3a5467900f4d4ff2c2fad38edb560bf98c7559ca683bbc915aaba3326f141c6d",
+      "wrapper_exit_code": 1,
+      "row_exit_code": 1,
+      "acceptance": false,
+      "direct_prerequisites_completed": true,
+      "claude": {
+        "terminal": "success",
+        "is_error": false,
+        "num_turns": 21,
+        "duration_ms": 1024594,
+        "linked_gptr_completion": true,
+        "linked_deerflow_completion": true,
+        "usage": {
+          "input_tokens": 34,
+          "cache_creation_input_tokens": 107362,
+          "cache_read_input_tokens": 1093977,
+          "output_tokens": 29207,
+          "service_tier": "standard",
+          "inference_geo": "not_available",
+          "speed": "standard"
+        },
+        "native_stream": {
+          "bytes": 390066,
+          "sha256": "e93b93d7cd81c8b1fd89ed7bdc63791e34e792d23dbf41f4286457445caf0342"
+        }
+      },
+      "codex": {
+        "terminal": "turn.completed",
+        "usage": {
+          "input_tokens": 720162,
+          "cached_input_tokens": 661760,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10162,
+          "reasoning_output_tokens": 6355
+        },
+        "requested_ctx_timeout_ms": 600000,
+        "failed_mcp_tool": "context-mode/ctx_execute",
+        "native_error": "timed out awaiting tools/call after 300s",
+        "linked_gptr_completion": false,
+        "deerflow_called": false,
+        "later_report_is_client_completion": false,
+        "native_stream": {
+          "bytes": 87828,
+          "sha256": "4c1c9fcbf0909fcae32d409ff8d7ffc917ab5f498e058f95956bc27ac47fc5d0"
+        }
+      },
+      "attribution": "Client MCP deadline; no completed native GPT Researcher call. Later output retained separately. No provider switch, retry or new gatherer/provider failure attribution."
+    }
+  ],
+  "repairs": {
+    "claude_review": "Native Read/Glob/Grep, dontAsk and Workflow/Agent/mcp__* denial; unchanged prompt/fixture/schema/48/1200 and shared flock; captured argv and observed forbidden tools checked.",
+    "codex_research": "Native exec_command yield30000 and empty write_stdin polls until exit; unchanged exact commands/query/keyless provider/execute-once/no-retry/private state; Claude prompt byte-identical.",
+    "native_acceptance_pending": true,
+    "upstream_rebuild": false,
+    "host_apply": false
+  },
+  "checks": {
+    "focused_contract_tests": {
+      "exit_code": 0,
+      "tests": 6,
+      "seconds": 1.766,
+      "scope": "Before observed-tool critic repair"
+    },
+    "final_touched_tests": {
+      "exit_code": 0,
+      "tests": 290,
+      "skipped": 3,
+      "seconds": 82.923,
+      "scope": "After observed-tool critic repair; actual final touched suites"
+    },
+    "check_plan_exit_code": 0,
+    "client_config_check_exit_code": 0,
+    "shell_syntax_exit_code": 0,
+    "diff_check_exit_code": 0
+  },
+  "source_identities": {
+    "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json": {
+      "bytes": 367050,
+      "sha256": "b58290f20ca06c56f9766a93625b2b7703c805531ea1ff3af31e35457c6e39e3"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh": {
+      "bytes": 163228,
+      "sha256": "0edb29ea2e238270396f3aefc97daf1fdc9e2ba123e574fa2dba2178f93ace07"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md": {
+      "bytes": 163009,
+      "sha256": "9998ecfdba2c55543fede4bc6b5df763fd369edee87f95578ae59c012ec27dc9"
+    },
+    "tests/test_new_wsl_definitive_defaults.py": {
+      "bytes": 241606,
+      "sha256": "1ddf7f1e0fcc1b0d7e049d3e55819b2717e6517e02f29d2abaa2d1cc05c5c1c5"
+    },
+    "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md": {
+      "bytes": 68123,
+      "sha256": "016d9d978b3ff5340c6dc0dc61c801ea31ae79db6155cedbc3006faf482de6a6"
+    }
+  },
+  "upstream_sources": [
+    "anthropics/claude-code@v2.1.289 installed binary sha256 a186b99e4a9c88366cd49df2f7dad56c61fc306ef0140b19ee64b7c42a8d1348:205735300,216934252,217226707",
+    "https://code.claude.com/docs/en/cli-reference#cli-flags",
+    "https://code.claude.com/docs/en/permissions#tool-name-wildcards",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/tools/handlers/shell_spec.rs:30,117,210",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/unified_exec/process_manager.rs:1013,1068",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/codex-mcp/src/rmcp_client.rs:106",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/codex-mcp/src/connection_manager.rs:360,1014"
+  ],
+  "privacy": "No credentials, private paths, native session IDs, conversations, gateway response payloads or active client configuration published. Private originals retained; bounded observations and digests only."
+}

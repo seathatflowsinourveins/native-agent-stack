@@ -1,0 +1,705 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-06T02:50:39.852596Z",
+  "scope": "J-713 gate-1 row repairs and J-MCPCONF; no shared host plan apply",
+  "integration_base": "44ac761b9b0542cb75f9b7529d223c0ef4d40b35",
+  "decision": "docs/decisions/2026-10-06-native-plan-gate1-repairs.md",
+  "north_star_action": "Reliable foundation acceptance before research and independently qualified broker paper operation",
+  "commands_policy": {
+    "heavy_nice": 19,
+    "max_concurrent_heavy": 1,
+    "scratch": "owned private cache; never /tmp",
+    "shared_host_install_sh": "not executed",
+    "fresh_cross_or_research_allowances_consumed": 0
+  },
+  "attempts": [
+    {
+      "command_log": "j713-hcom-red.log",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "observation": "Duplicated identity regression failed before repair.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-hcom-red.log",
+        "bytes": 5834,
+        "sha256": "bd50a88bcba678e064c53adf8963f3adc6baddf7d56b578de06584b0b6d51227"
+      }
+    },
+    {
+      "command_log": "j713-hcom-green.log",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "observation": "Eleven identity cases passed.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-hcom-green.log",
+        "bytes": 98,
+        "sha256": "0c2c3bd7960954ee6e3c0b5d7d18b97761e67312ca1952149dc38f372aa0a641"
+      }
+    },
+    {
+      "command_log": "j713-hcom-native-post.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Messaging gates reached final missing mapped config.toml; quiet host apply owed.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-hcom-native-post.log",
+        "bytes": 99,
+        "sha256": "916150bf0f3564a9612a26df42ad5134b5c920e137df61298b30a8c8d3d2831f"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-red.log",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "observation": "Explicit native model carrier absent before repair.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-red.log",
+        "bytes": 5708,
+        "sha256": "d0a79cc33b6f85bea35f1c0d3bc079f4e981fa0e7b0f3c2a097dd2a9d49ba313"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-green.log",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "observation": "Both scans receive model; invalid topology and incomplete reports fail.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-green.log",
+        "bytes": 98,
+        "sha256": "9504eb328a174bf63d406b50a6fa20c56a1db14486a9770c160db617c744d9e2"
+      }
+    },
+    {
+      "command_log": "j713-conformance-native-post.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Private npm user/global config mistakenly pointed to the same /dev/null; no upstream-test acceptance.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-conformance-native-post.log",
+        "bytes": 571,
+        "sha256": "6f188b42a68e0c6540b2093ebf25850a19f06db8359ec4cb14a307a937aef54f"
+      }
+    },
+    {
+      "command_log": "j713-conformance-native-post-retry.log",
+      "exit_code": 0,
+      "evidence_class": "unchanged_upstream_tests",
+      "observation": "44 files/524 tests passed, but the independent lifecycle FAILED with 18 owned leftovers and six listeners, three wildcard.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-conformance-native-post-retry.log",
+        "bytes": 24137,
+        "sha256": "ec931c320502e0d930a77d594268668fb2abb10f2bffa96b38e8b065b9c1a5d6"
+      }
+    },
+    {
+      "command_log": "j713-env-qualification.log",
+      "exit_code": 2,
+      "evidence_class": "local_integration",
+      "observation": "Three Inspect and seven Scout install commands exited0; Inspect post0; first Scout post2 from authored shell quote. Install success does not erase failed post.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-env-qualification.log",
+        "bytes": 13194,
+        "sha256": "129fdd0d047262160bd555ca0223e8f42510758473b153f6e5de04025ac68d81"
+      },
+      "exit_code_scope": "Observed Scout post-install stage; ten preceding install commands0 and Inspect post0; driver exit not asserted."
+    },
+    {
+      "command_log": "j713-scout-native-post.log",
+      "exit_code": 0,
+      "evidence_class": "unchanged_upstream_tests",
+      "observation": "Corrected post in same isolated environment: 93 tests passed, no skips.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-scout-native-post.log",
+        "bytes": 333,
+        "sha256": "3003fa04959a6efb4129a67a0a42653ef72d39d17649e951aaf9db6026f3e6ed"
+      }
+    },
+    {
+      "command_log": "j713-scout-dispatch-red.log",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "observation": "Selecting Scout previously also selected Inspect.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-scout-dispatch-red.log",
+        "bytes": 1158,
+        "sha256": "3c877d0182412d2ad97c3632d86374cf0e13b34b9c2321b460a998b845162997"
+      }
+    },
+    {
+      "command_log": "j713-scout-dispatch-green.log",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "observation": "Scout selection keeps its own environment only.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-scout-dispatch-green.log",
+        "bytes": 98,
+        "sha256": "c3dc4ce80790d0a5a68dcff2d3009be59564c24dfe01144e0f6b50051e539cc3"
+      }
+    },
+    {
+      "command_log": "j713-scout-alias-controls.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Six real filesystem alias controls preserve foreign content and metadata.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-scout-alias-controls.log",
+        "bytes": 98,
+        "sha256": "40d4b09cb29a31c3453c5b3200de67e77c949254a5f480e8c3925d5436a49e54"
+      }
+    },
+    {
+      "command_log": "j713-scout-wrong-environment-control.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "The control driver exits0 because actual Scout post rejects the Inspect-only wrong SDK environment with1.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-scout-wrong-environment-control.log",
+        "bytes": 147,
+        "sha256": "d649281917adcbdbd77300f0b87fbd83a9daa6767f7e50bcd8d2872824434b18"
+      }
+    },
+    {
+      "command_log": "j713-research-metadata-red.log",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "observation": "Live public metadata reproduced mismatched old model assertion.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-research-metadata-red.log",
+        "bytes": 1165,
+        "sha256": "a0c97b6a809fb4f9a1af5d91ad5e238a74e4986669f8aea3b15d17b6a61abab0"
+      }
+    },
+    {
+      "command_log": "j713-research-metadata-green.log",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "observation": "Exact landed route and five mismatch controls passed.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-research-metadata-green.log",
+        "bytes": 98,
+        "sha256": "8609c9264654ba0859f7e2a0d8c9d47bd9cd70efa5f62ea9fcdfa482740bfbf6"
+      }
+    },
+    {
+      "command_log": "mcpconf-contained-native-post.log",
+      "exit_code": 1,
+      "evidence_class": "unchanged_upstream_tests",
+      "observation": "First contained run failed: 161-byte IPC path, 3 failed files/41 passed,469 passed/55 skipped; cleanup zero. Not upstream acceptance.",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-contained-native-post.log",
+        "bytes": 39113,
+        "sha256": "cbd784196d6fb5e9d4b920a9f6638a01148ef5e3988bfdb844e80c5891493994"
+      }
+    },
+    {
+      "command_log": "mcpconf-namespace-server-diagnostic.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Short-path pinned server listens only inside private namespace and closes on exit.",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-namespace-server-diagnostic.log",
+        "bytes": 158,
+        "sha256": "2a5c5705792659564ff0a4f6087fcd27b95281589c11973b82ce7af42ab55fe1"
+      }
+    },
+    {
+      "command_log": "mcpconf-contained-native-post-shorttmp.log",
+      "exit_code": 0,
+      "evidence_class": "unchanged_upstream_tests",
+      "observation": "Corrected short cache path:44 files/524 tests passed, cleanup zero.",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-contained-native-post-shorttmp.log",
+        "bytes": 24058,
+        "sha256": "703b3cafdf15c0ad96235e857e9f728d272fc22290d564a12e27d8af9c938a5e"
+      }
+    },
+    {
+      "command_log": "mcpconf-wired-native-post.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Actual plan post-install succeeds against private XDG root; raw test count is not inferred from suppressed stdout.",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-wired-native-post.log",
+        "bytes": 1029,
+        "sha256": "108a243e307b9abcb94b2923db418e42876c31322a64d9cdf39cdd77297589c2"
+      }
+    },
+    {
+      "command_log": "mcpconf-final-native-post.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Actual plan post-install succeeds with raw upstream stdout retained and independent cleanup proof.",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-final-native-post.log",
+        "bytes": 287,
+        "sha256": "cf4151dd4f6eb84aa4974dbfc6d38b565aa56c79931a833448cd4b5c2ce145c6"
+      }
+    },
+    {
+      "command_log": "mcpconf-startup-controls.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Six kernel lifecycle fixtures cover success/failure/INT/TERM/startup TERM/missing snapshot.",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-startup-controls.log",
+        "bytes": 104,
+        "sha256": "579acc2ecc08977aac0b347f57bb5d3a85aaaf64baa89198483c554e577fe3ec"
+      }
+    },
+    {
+      "command_log": "j713-mcpconf-touched-tests.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "333 touched tests passed, three existing skips; pre-final test-only teardown refinement.",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-mcpconf-touched-tests.log",
+        "bytes": 446,
+        "sha256": "af201c7bd29aa5aacba0a48b578cc1bec61b7cb6169e2ea9d9630d8bbd8df2a0"
+      }
+    },
+    {
+      "command_log": "mcpconf-final-critic-controls.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Six lifecycle controls after critic teardown repair",
+      "retained_private_output": {
+        "artifact": "lane-cache/mcpconf-final-critic-controls.log",
+        "bytes": 104,
+        "sha256": "989f142cfe4a2b00bcfa3013765ac6e5227fcfd2183be0eab295f75ba2098c44"
+      }
+    },
+    {
+      "command_log": "j713-research-native-post.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Actual research-harnesses post-install; metadata only, no fresh whole research",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-research-native-post.log",
+        "bytes": 38,
+        "sha256": "a242a00c747a05c4df2f8c89d10bd7b42086c50a5cbbe5f5a3c0efdfb8fe535c"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-native-after.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Missing installed topology before model calls",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-native-after.log",
+        "bytes": 232,
+        "sha256": "b2b27208f2a1fc70a19fa6f56a2e2218f233a1cd989830dcdf71dddb71943e25"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-native-canonical-plan-after.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Native malicious output uses issues; obsolete findings predicate failed",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-native-canonical-plan-after.log",
+        "bytes": 3654,
+        "sha256": "67856ad87d5e76b0a20ceac98aee0e5e6e9e933b0248367df5b0fb7b36e63b88"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-native-schema-after.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "Bad report complete14issues/5of5calls; safe complete0issues/3of3calls with valid meta_analysis_applied=false",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-native-schema-after.log",
+        "bytes": 6746,
+        "sha256": "9b24572b4be27e4e742037f2b1adb531f2d8af6b6e89e89816d41144ccac403c"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-native-completion-after.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Actual corrected whole native semantic stage",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-native-completion-after.log",
+        "bytes": 6658,
+        "sha256": "f0f52e8f3848e2a8bddb0437f865b53b7fb6764f487cc5e4ffa450633986ccae"
+      }
+    },
+    {
+      "command_log": "j713-skillspector-completion-controls.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Typed native model, issues schema, all successful-call and no-meta safe fixture controls",
+      "retained_private_output": {
+        "artifact": "lane-cache/j713-skillspector-completion-controls.log",
+        "bytes": 98,
+        "sha256": "7e7ddd8beac87f55cf54d90a26252cdb7a1215ac40952c750ea6587f82b82f05"
+      }
+    },
+    {
+      "command_log": "j744-gateway-initial-tests.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Fourteen initial source/synthetic gateway tests; subsequent critic custody repairs still require final rerun",
+      "retained_private_output": {
+        "artifact": "lane-cache/j744-gateway-initial-tests.log",
+        "bytes": 113,
+        "sha256": "7f266d55b7ff0997a1e56f2c4b29abd43c379cb912128cc7e6658e78329ff336"
+      }
+    },
+    {
+      "command_log": "gate1-j744-postrestart-touched-tests.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "444 tests/3 skips,3 stale-derived failures after directed dated verdict note/catalog/plan edits",
+      "retained_private_output": {
+        "artifact": "lane-cache/gate1-j744-postrestart-touched-tests.log",
+        "bytes": 87387,
+        "sha256": "f3c2e3d0bbf2103a7b48987b9fd38291b0d732ec3fa4fdb53ac29efa8d3a8a86"
+      }
+    },
+    {
+      "command_log": "gate1-j744-postrestart-touched-tests-fixed.log",
+      "exit_code": 1,
+      "evidence_class": "local_integration",
+      "observation": "444 tests/3 skips,one artifact text-scan error from authored ignored bytecode cache; no remaining stale-derived failure",
+      "retained_private_output": {
+        "artifact": "lane-cache/gate1-j744-postrestart-touched-tests-fixed.log",
+        "bytes": 86030,
+        "sha256": "43087cd73879ac09333c60f61c69665978356099efa5a42a9d3e283bdd53e8d2"
+      }
+    },
+    {
+      "command_log": "gate1-j744-postrestart-touched-tests-final.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "444 tests passed with3 existing skips; bytecode disabled and authored ignored artifact cache removed",
+      "retained_private_output": {
+        "artifact": "lane-cache/gate1-j744-postrestart-touched-tests-final.log",
+        "bytes": 84927,
+        "sha256": "faf80123a8d1425cbd0cd7c566b3cf49147d3ddbbde622a750016d4308aa8c42"
+      }
+    },
+    {
+      "command_log": "gate1-j744-final-check-plan.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "84 rows/192 commands/113 acceptance entries; scripts and plan agree",
+      "retained_private_output": {
+        "artifact": "lane-cache/gate1-j744-final-check-plan.log",
+        "bytes": 202,
+        "sha256": "c6fb93f29c90347cb729083507122d804843699aaa88076b369908a66adafc22"
+      }
+    },
+    {
+      "command_log": "gate1-j744-final-client-config.log",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "observation": "Client-config check passed; existing Inspector-install warnings retained",
+      "retained_private_output": {
+        "artifact": "lane-cache/gate1-j744-final-client-config.log",
+        "bytes": 52675,
+        "sha256": "5ad7e5c031fc86d0ae2ecce708c307e6a2d995c2d7630aa7573f82801fa4337b"
+      }
+    },
+    {
+      "command_log": "gate1-j744-final-touched-tests.log",
+      "exit_code": null,
+      "evidence_class": "local_integration",
+      "observation": "Restart interrupted pre-restart suite; partial failure markers/trailingNUL, no finalsummary/exit. Never passed.",
+      "retained_private_output": {
+        "artifact": "lane-cache/gate1-j744-final-touched-tests.log",
+        "bytes": 430,
+        "sha256": "70ecfcacc2ef4cd42897cd42cbc0ae5c8876493e0c67be0ba5723fa0eae39e7c"
+      }
+    }
+  ],
+  "retained_uncontained_failure": {
+    "owned_processes": 18,
+    "owned_process_group": 3555118,
+    "listeners": [
+      3004,
+      3005,
+      3006,
+      3007,
+      25738,
+      24212
+    ],
+    "wildcard_listener_count": 3,
+    "cleanup": "Exact verified owned group TERM, then independent zero owned processes and used-port listeners; unrelated processes untouched",
+    "qualified": false
+  },
+  "latest_contained_native_post": {
+    "command": "nice -n 19 env <private XDG config/data/state/cache bindings and owned TMPDIR> bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-protocol-conformance --stage post_install </dev/null",
+    "stage_exit_code": 0,
+    "evidence_class": "local_integration",
+    "upstream_tests": {
+      "evidence_class": "unchanged_upstream_tests",
+      "files_passed": 44,
+      "tests_passed": 524,
+      "seconds": 29.18,
+      "actual_output": {
+        "artifact": "private-conformance-run/upstream-tests.log",
+        "bytes": 658,
+        "sha256": "1f45dfb021400a4c4b9facb2a2be9f618e18053140f570a7d36d27ea97359c13"
+      }
+    },
+    "independent_cleanup": {
+      "owned_namespace_processes_remaining": 0,
+      "owned_group_processes_remaining": 0,
+      "run_port_listeners_remaining": 0,
+      "observed_namespace_ports": [
+        3004,
+        3005,
+        3006,
+        3007,
+        38187,
+        43471
+      ],
+      "listener_observation_available": true,
+      "host_services_on_observed_ports": [],
+      "scope": "owned run; unchanged upstream tests and host acceptance are separate"
+    },
+    "retained_proof": {
+      "artifact": "private-conformance-run/cleanup.json",
+      "bytes": 344,
+      "sha256": "d2a5b8fc615845d5ca1e2e3f62233c44a4271e1507088565994c1d051a2b6cc1"
+    }
+  },
+  "recipe_identities": [
+    {
+      "slot": "agent-messaging",
+      "stage": "post_install",
+      "bytes": 2268,
+      "sha256": "874073f51605cf43115f9515b589149bac9344bbdd966147de8ff94985303279"
+    },
+    {
+      "slot": "agent-messaging",
+      "stage": "after_sign_in",
+      "bytes": 578,
+      "sha256": "be17c2bd8134806f97db8127035cbda7ae69bbba0aa49aee017bed49aeaa5817"
+    },
+    {
+      "slot": "inspect-ai",
+      "stage": "post_install",
+      "bytes": 17,
+      "sha256": "01052f6f58a649fe55eaba2e956b86bbb194c7516292586c73c3e97477c7384b"
+    },
+    {
+      "slot": "inspect-ai",
+      "stage": "after_sign_in",
+      "bytes": 1724,
+      "sha256": "d0b0b70749f1e6ceb10b5f6d1035d9dc7ef4bb6132ddb7568c45389e29ec68b8"
+    },
+    {
+      "slot": "gpt-gateway",
+      "stage": "post_install",
+      "bytes": 1856,
+      "sha256": "61ad6f1d66f4512fa7df279b895839961cdff5516414cd7f040e0fe4df71333a"
+    },
+    {
+      "slot": "gpt-gateway",
+      "stage": "service_health",
+      "bytes": 2254,
+      "sha256": "5b1a9655708b252f559ba5efc2e826b794eb51cba14164ea5fdc8074a4651370"
+    },
+    {
+      "slot": "gpt-gateway",
+      "stage": "after_sign_in",
+      "bytes": 2070,
+      "sha256": "d9974f3a51cfd5777c618ecf4990af70ddecafa21f3218089664aa09d28a7e8d"
+    },
+    {
+      "slot": "research-harnesses",
+      "stage": "post_install",
+      "bytes": 1706,
+      "sha256": "d4a1e97b6acbd8f9cd1d6acc65bdd9441a0543e3d570102da707e695efb1d801"
+    },
+    {
+      "slot": "research-harnesses",
+      "stage": "after_sign_in",
+      "bytes": 11132,
+      "sha256": "37787df4bfe729eb64db29416b7d60819b333e2a58a57e6b20d19124dd610690"
+    },
+    {
+      "slot": "skill-vetting",
+      "stage": "post_install",
+      "bytes": 475,
+      "sha256": "29002c302fb82e1046f0a7b7620ada26db76cf466d1ef2f2d0280b59f1f4a925"
+    },
+    {
+      "slot": "skill-vetting",
+      "stage": "after_sign_in",
+      "bytes": 2487,
+      "sha256": "53a18827c5d5220620954d080c12d6868d70da792dbf5d3fb5d04ae849afa4be"
+    },
+    {
+      "slot": "trajectory-analysis",
+      "stage": "post_install",
+      "bytes": 879,
+      "sha256": "b2677428891aae7cab97d989c3ab0805354ef37138d6cee7e3e2213d000ac14d"
+    },
+    {
+      "slot": "trajectory-analysis",
+      "stage": "after_sign_in",
+      "bytes": 1781,
+      "sha256": "1ec675ce40d361f532af28ef13204792ccf43077c28e3536c0bd0a88386db544"
+    },
+    {
+      "slot": "mcp-protocol-conformance",
+      "stage": "post_install",
+      "bytes": 62,
+      "sha256": "ffc90e6d90e0b6518c6c5f2bd45749021cfd2adbb8f4db9a18ec53fab482d296"
+    },
+    {
+      "slot": "mcp-protocol-conformance",
+      "stage": "after_sign_in",
+      "bytes": 63,
+      "sha256": "10d71df44ce1a661b90295dec08ba728fa287d1c4923a0660a9ff52b593cf4b4"
+    }
+  ],
+  "source_identities": [
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+      "bytes": 9333,
+      "sha256": "8c9e062c8056c72534986d635dfe80b8fe4c7ef31971654234785726c011feb2"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-config.yaml",
+      "bytes": 853,
+      "sha256": "385ca138f5f02b9e971aa2593f35fa3f6705a92b9fc5952b455b0d2b6d924e17"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json",
+      "bytes": 4253,
+      "sha256": "60c4c714cca3df46ec2c666d991e5461e1530123e3b3bc3099e5095fa440d2e8"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-client-accept.sh",
+      "bytes": 2145,
+      "sha256": "b4688f9c56ba3a0d943f4fdfaafeb6c4805d034cc8683ccf59a264c341727866"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute.service",
+      "bytes": 1520,
+      "sha256": "27430616a4c7537eeb5925ed09b69b064cb47fb9e112880b9801b24574ae684b"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-serve.sh",
+      "bytes": 1289,
+      "sha256": "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-lsof-shim-v2.sh",
+      "bytes": 1369,
+      "sha256": "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854"
+    },
+    {
+      "artifact": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute.service.d/10-show-log.conf",
+      "bytes": 43,
+      "sha256": "b1480d92fc33c65b27d168e983233aff8d8d58d9e43146cb9fe34e54d6f517c0"
+    }
+  ],
+  "critic": {
+    "review": "Independent read-only source/caller/lifecycle completeness critic",
+    "resolved": [
+      "Missing listener snapshots must remain unknown and fail success",
+      "Leader/PGID/SID identity must be revalidated before escalation",
+      "Startup interruption must allow bounded ownership registration",
+      "Test cleanup must signal exact Popen helper, not a numeric group file"
+    ],
+    "remaining_blockers": []
+  },
+  "limits": [
+    "External on-demand conformance targets remain unqualified; missing-target78 is needs_user and generic outer0 is not protocol acceptance",
+    "Canonical in-namespace SDK startup adapter/fixture remains owner input; no host-network fallback/bridge",
+    "Shared hcom quiet install and mapped posture apply remain co-op-owned after landing",
+    "SkillSpector model fixture does not qualify a gateway profile or delivered effort",
+    "DeerFlow metadata does not qualify delivered wire effort or a whole research run",
+    "No new whole cross-family/research session; observer apply and frozen retries remain owed after landing",
+    "Published wheel/tool resolution and integration fixtures are separate from unchanged upstream test execution and full shared-host acceptance"
+  ],
+  "preparatory_failures": [
+    "First documentation patch generator failed before source mutation because JSON Unicode spelling did not match; corrected with JSONDecoder.raw_decode locations.",
+    "Initial source citation filename guessed incorrectly; independently verified #744 decision is 2026-10-05-omniroute-gateway-composition.md at0fb32ee5:36 and corrected before publication.",
+    "Incremental worker patch used plain unified diff, not diff--git; first converter failed before edits, corrected parser applied exact four-file patch.",
+    "First handbook import missed supported scripts module search path and failed before output mutation; corrected maintained imports and dependent generation order.",
+    "Importing artifact assembler without -B generated one ignored .pyc inside text-scanned artifact; removed exact authored runtime file and final whole suite passes with bytecode disabled."
+  ],
+  "skillspector_native_completion": {
+    "stage_exit_code": 0,
+    "evidence_class": "local_integration",
+    "actual_reports": [
+      {
+        "artifact": "bad-report.json",
+        "complete": true,
+        "execution_successful": true,
+        "issues": 14,
+        "llm_calls_attempted": 5,
+        "llm_calls_succeeded": 5,
+        "meta_analysis_applied": true,
+        "retained_private_output": {
+          "artifact": "private-semantic-run/bad-report.json",
+          "bytes": 30797,
+          "sha256": "7988031be24036509f66947b7235f8050e7aa2f9b0f9e06a951ff297ead28140"
+        }
+      },
+      {
+        "artifact": "report.json",
+        "complete": true,
+        "execution_successful": true,
+        "issues": 0,
+        "llm_calls_attempted": 3,
+        "llm_calls_succeeded": 3,
+        "meta_analysis_applied": false,
+        "retained_private_output": {
+          "artifact": "private-semantic-run/report.json",
+          "bytes": 12365,
+          "sha256": "7de065353829d8c728ee053f035151fb2944180a285fd7510009e807284dad38"
+        }
+      }
+    ],
+    "qualification_limit": "No gateway-profile or delivered-effort claim"
+  },
+  "gateway_composition": {
+    "evidence_class": "source_review",
+    "decision_commit": "0fb32ee583589f1a0809b20d18dff40ce2f65a1c",
+    "merge_commit": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+    "supplied_tarball_sha256": "d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2",
+    "independent_artifact_critic": {
+      "sha256_matches": true,
+      "archive_entries": 26762,
+      "unsafe_archive_paths": 0,
+      "git_metadata_paths": 0
+    },
+    "co_op_readback_evidence_class": "historical integration; original header/effort false plus one exact joined Sol-max row; not native-profile qualification",
+    "co_op_readback_sha256": "eb0f7bba69eb57de563771639762457753b58ba9336b2a9d4685bc0724bd530c",
+    "co_op_readback_join_sha256": "c9fb0333c1c18daef586090ea70ebfb35fd0ea94fe1098cf05532b621ac35ce2",
+    "new_native_profile_run": false,
+    "critic_gaps": "Resolved: exact known-plan byte migration, every-stage regular non-symlink identity and active loaded-unit binding;17 focused source/synthetic methods passed within444-test whole suite.",
+    "historical_verdict_provenance": {
+      "original_commit": "44ac761b9b0542cb75f9b7529d223c0ef4d40b35",
+      "original_sha256": "aaaa99019d486ed3e2c3313dddb3e1495315ef2a2c5d5be2285f448226bae148",
+      "current_note_bearing_sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
+      "all_original_fields_equal": true,
+      "added_field": "verdicts[7].supersession_note",
+      "derived_digest_binding": "Only consensus.wave5.records.round2_extract.sha256 refreshed, then maintained manifest/handbook regenerated; no new verdict or acceptance."
+    }
+  },
+  "final_local_checks": {
+    "touched_tests": {
+      "exit_code": 0,
+      "tests": 444,
+      "skips": 3,
+      "seconds": 128.967
+    },
+    "check_plan": {
+      "exit_code": 0,
+      "rows": 84,
+      "commands": 192,
+      "acceptance_entries": 113,
+      "configuration_assets": 66
+    },
+    "client_config_check": {
+      "exit_code": 0
+    },
+    "validator": "Recorded after final file registration in lane status and PR body; not self-certified by this receipt."
+  }
+}

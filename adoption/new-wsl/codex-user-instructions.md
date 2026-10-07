@@ -20,6 +20,9 @@ No audits, trials or network at startup; the daily currency timer's one read-onl
 Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
 
 <!-- native-agent-stack:session-lanes -->
+Before Serena use, read initial_instructions once/session; project-from-cwd activates this worktree; switches need returned session_id.
+Code navigation: first order(action="jcodemunch_guide",args={}); open route(task=...,model=<actual caller model>) (no execute), then menu/order; missing indexes go to owner.
+Catalog: qmd for keyword search and document retrieval; codebase_search with the main checkout's projectPath for meaning-based search of the catalog; never run qmd embed or qmd pull. Use qmd query with typed lex and named collections; get a line window; rerank:false is optional.
 Run large command output via `context-mode` (`ctx_execute`, `ctx_batch_execute`); set `cwd` to your working directory (a writer's owned worktree).
 If `semble` MCP is connected, use `search` for conceptual/natural-language code queries with the absolute repo path; omit `content`, which overrides the code default per call. `find_related` gives embedding-similar chunks only; get callers, implementations and references from Serena.
 Long commands: set `yield_time_ms` 30000; while a `session_id` returns, poll `write_stdin` (empty `chars`) until exit, then read output.
@@ -57,14 +60,15 @@ tokens; behavior and exit code are unchanged.
 
 <!-- native-agent-stack:rtk-exceptions -->
 
-The exceptions below override RTK's blanket prefix and output/exit-status assurances.
-rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses its exclusion list. Preserve output and exit status for the forms below with native commands or `rtk proxy <command>`:
-- `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
+RTK prefix/output/exit exceptions:
+rtk 0.51.0 needs `--shell` for positional expansion; explicit `rtk` prefix bypasses exclusions. For the forms below use native commands or `rtk proxy <command>`:
+- A skill's `SKILL.md`: read it with plain `sed -n '1,400p' <path>` (no `rtk` prefix, not `cat`/`head`/`tail`) so Codex counts the load as `codex.skill.injected`.
+- `git show REV:path` (any; `git -C DIR show REV:path` too): ~8 KiB cap.
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
-- `git branch`: rtk can list a branch checked out in another worktree as remote-only.
-- `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
-- `jq`: rtk keeps 40 lines of at most 120 characters.
-- `find` on a path that may not exist: rtk exits 0 with no output.
+- `git branch`: may mark other-worktree branches remote-only.
+- `git log` full: silent 10-commit cap; no merges.
+- `jq`: <=40 lines of <=120 chars.
+- `find`, path may be absent: exit 0, no output.
 
-Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
+Never `rtk` shell builtins (`cd`/`export`/`source`): exit 127 stops `&&`.
 <!-- native-agent-stack:codex-user-instructions:end -->

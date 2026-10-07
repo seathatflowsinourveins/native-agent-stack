@@ -102,7 +102,7 @@ WORKTREE_SENTENCES = (
     "brief's base, and ask the coordinator for an owned worktree instead.",
     "Do not merge into another worker's branch.",
 )
-# Each role's own exact-shape sentence. `jq` output is in both: the F4 exceptions list six commands, jq included.
+# Each role's own exact-shape sentence. `jq` output is in both: the F4 exceptions list seven entries, jq included.
 EXACT_SHAPES = {
     "stack-researcher": (
         "For an exact blob from `git show REV:path`, a `diff` whose exit status matters, `git branch`, a complete "
@@ -378,7 +378,7 @@ def _rule_worktree(role, stem, data):
 # whose lines the role-file rules cite, are byte-identical at rust-v0.159.2 and the selected Linux pin rust-v0.160.0
 # (sha256 70ba8cf41c7339a0... and 0311e6438eda278a..., both tags compared 2026-10-03), so those citations hold at the pin; a check
 # returns True when the rule is violated. The carriers' rules reach the worker roles
-# through ALL_ROLES; exact_shapes stays with the carriers, whose E2E measured it, and the worker roles carry the same six
+# through ALL_ROLES; exact_shapes stays with the carriers, whose E2E measured it, and the worker roles carry the same seven
 # exceptions in their F4 block.
 RULES = (
     ("keys", ALL_ROLES,
@@ -434,7 +434,7 @@ RULES = (
      "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
      _rule_cwd),
     ("exact_shapes", ROLES,
-     "adoption/templates/codex.AGENTS.template.md, the six exceptions after its rtk-exceptions marker (jq included; "
+     "adoption/templates/codex.AGENTS.template.md, the seven exceptions after its rtk-exceptions marker (jq included; "
      "cited by marker because the rule text above them moves their lines) and "
      "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
      _rule_exact_shapes),
