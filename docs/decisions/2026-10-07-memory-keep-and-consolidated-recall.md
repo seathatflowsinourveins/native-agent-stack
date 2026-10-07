@@ -236,3 +236,33 @@ workflow `wf_5053494c-265` supplies the verified landscape record when its
 critic completes. The recorded date is a locator for that review, not a fresh
 current-release attestation or independently measured served-weight identity.
 No observation is rewritten and no new start gate or model switch is claimed.
+
+## Amendment (2026-10-07): dated consolidation limit
+
+From2026-10-07T01:47Z, the CC reports degraded steady-state ai-memory
+consolidation and auto-improve calls through the21128 pooled Codex route:
+roughly one in four to one in three Sol calls succeeds pending the owner's
+pool decision. This is the CC's reported bounded finding, not a fresh count
+or success-rate measurement by this publishing lane.
+
+CC review `review-ns2604-coop-20261007T015759Z` reports that the nine-connection
+pool includes one free-plan ChatGPT account without Sol entitlement. Chat and
+Responses calls assigned there can return HTTP400; the sibling-account fallback
+reported as upstream8307 covers images rather than those calls. Its01:47–01:52Z
+sample describes six Sol rows, four assigned to that connection, with three
+explicit400s and one explicit200 on another connection. The remaining row
+outcomes are not invented here. Source locators are that CC review, dispatch
+`task-ns2604-coop-20261007T014716Z`, and its allowlisted
+`/api/usage/call-logs` observations on21128. The subsequent ruled dispatch
+canceled this lane's count; no gateway count or `/api/settings` access ran.
+
+The alias `cx/gpt-6.1-sol-max` remains correct under the
+[composition decision](2026-10-05-omniroute-gateway-composition.md).
+No model or alias change is proposed. The owner decides whether to disable
+the free connection; the CC applies any pool configuration change. This lane
+changes no account, route, model, service or credentials.
+
+The retained23:47Z C2X PASS remains a single successful run, not proof of healthy
+steady-state consolidation after01:47Z. Original observations/receipts remain
+unchanged. This is a **dated operational limit, not a new gating row**; it does
+not authorize a second C2X smoke, local selection campaign or host change.
