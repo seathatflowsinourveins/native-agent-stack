@@ -1,68 +1,46 @@
-# CC/5f handoff: primary state rule, accepted first notice
+# CC/5f sender handoff, design C
 
-Owned targets remain CC/5f's; this PR edits none of them:
-- `~/.config/systemd/user/paper-alert@.service.d/10-alertmanager.conf`
-- `~/.config/systemd/user/stack-alert@.service`
-- their installer and SHA256 pins.
+CC022242Z supersedes the shared-fingerprint/A-prime proposals. Keep the staged
+v3 senders byte-identical. Unit EVENT Failed routes to a name-only receiver with
+no integrations; STATE Down alone sends unit-failure firing/recovery. No inhibitor.
+Dagu's distinct event route is unchanged. Source applies nothing; CC/5f owns
+units, installer hashes, user bus, roster and native reloads.
 
-## Registration and exact label contract
-
-Supply the complete concrete managed-unit policy before activating the source.
-Retain host, unit, severity and alertname as stable identity. The current POSTs
-use NativeStack2604 and severity critical for both classes. The paper first notice
-must match the effective Prometheus alert after external labels/relabeling, not
-just its rule expression. Do not assume deduplication without that returned check.
-Register future concrete job instances before launch; template/glob names are not
-incident identities. The DRILL-only policy is not a production inventory.
-
-The same roster generates both receiver units and recurring configuration
-expectations, independent of disappeared telemetry. Match all active legacy
-fingerprints before cutover so a forgotten manual lease cannot expire as a
-false recovery.
-
-## Sender changes under the later CC rulings
-
-Preserve C1b's accepted paper POST without EndsAt. Prometheus is the PRIMARY
-state lifecycle and refreshes that same fingerprint. Do not add a no-resolved
-route for PaperLaneUnitFailed or StackUnitFailed.
-
-For the Stack template, remove only its old ntfy ExecStart hop (legacy18080).
-Keep its existing local Alertmanager POST and Type=oneshot, including these
-unchanged labels in the POST body:
-
-```json
-{"alertname":"StackUnitFailed","severity":"critical","unit":"%i","host":"NativeStack2604"}
-```
-
-The target is the owned NativeStack2604 Alertmanager21093 route. The owner updates
-SHA pins from its exact new bytes and uses its supported install/read-back.
-Do not add per-unit OnFailure drop-ins for coverage supplied by the state rule.
-The lane neither edits these files nor fabricates their new hashes.
-
-Genuine event-style DaguDagFailed uses the separate no-resolved route in
-alertmanager-events.example.json. A job event contains no continuous recovery
-observation. The state classes retain send_resolved=true.
-
-## One-offs and silent stops
-
-Contrib0.162 state classification does not expose service Result. Inactive alone
-therefore never qualifies recovery in this policy. For unique one-off units whose
-successful completion must stay healthy under this state rule, the unit owner
-uses the systemd-native retained-success form:
+Paper source SHA3578e8b4580601425afb2277f6f8604a7a0d2da4dd131799de9d1f1e2510eb23:
 
 ```ini
-[Service]
-Type=oneshot
-RemainAfterExit=yes
+ExecStart=/usr/bin/curl -fsS -m 10 -H "Content-Type: application/json" -d '[{"labels":{"alertname":"PaperLaneUnitFailed","severity":"critical","unit":"%i","host":"NativeStack2604"},"annotations":{"summary":"paper lane: %i failed","description":"see journalctl --user -u %i on NativeStack2604"}}]' http://127.0.0.1:21093/api/v2/alerts
 ```
 
-Successful completion remains active; failure remains failed. Do not impose this
-on recurring reused timer services without checking their start contract. Such
-event-style jobs need their own explicit completion/event semantics. An inactive
-unit without completion proof stays recovery-unverified, catching silent stops.
-No hidden-dependency class is declared accepted from an unobserved Result value.
+Stack source SHAfd67734ce3cfaa57a1f67113ebe70b1b2df23037cd0eee02782878d55a17a138:
 
-CC owns same-user bus access, port allocation, full roster and native reloads.
-No unresolved roster identity or class/severity is removed/changed merely to
-silence it; that changes a fingerprint, not health. Preserve the original
-Telegram delivery receipt and append new semantic/cutover evidence.
+```ini
+ExecStart=/usr/bin/curl -fsS -m 10 -H "Content-Type: application/json" -d '[{"labels":{"alertname":"StackUnitFailed","severity":"critical","unit":"%i","host":"NativeStack2604"},"annotations":{"summary":"stack unit failed: %i","description":"see journalctl --user -u %i on NativeStack2604"}}]' http://127.0.0.1:21093/api/v2/alerts
+```
+
+No ntfy hop/endsAt is added. EVENT and STATE alertname families intentionally
+differ; do not pretend they share renewal fingerprints. Register concrete
+unit/host/class/severity from the same owner input that renders observations
+and independent expectations. Missing/stale state cannot qualify recovery.
+Clearing failed is not readiness/completion/cadence; G2 remains separate.
+
+Register the explicit unit kind, armed flag, recovery contract and completion
+contract. Continuous services may require latest-active recovery; the named W2
+drill requires failure-cleared for reset-failed. Reused one-shot/timer services
+remain unarmed with both contracts unknown. Neither their successful inactive
+state nor a last-trigger timestamp is proof of successful completion. Do not
+expand the armed roster from a version check or an example entry.
+
+W2's proposed paper-drill-w2.service uses Type=oneshot, ExecStart=/bin/false,
+OnFailure=paper-alert@%n.service. The handler is
+paper-alert@paper-drill-w2.service.service and %i equals paper-drill-w2.service.
+Read EVENT/STATE host and unit side by side. The old handler-only attempt had no
+origin and is not state qualification. CC alone installs/starts one deliberate
+failure, holds fifteen minutes, resets failed, records fresh source and actual
+STATE recovery, then removes the scratch scope. No second drill or production
+unit change. See WINDOW.md; prior receipts are retained.
+
+First human notice is delayed by collection/for; shorter unobserved failures can
+have EVENT record only. Native amtool accepts C's integration-free receiver.
+FallbackA stays a separate source variant for GPT refutation, not live at once.
+[Pinned receiver/route contract](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/configuration.md).

@@ -1,160 +1,90 @@
-# User-unit alert lifecycle (F09)
+# User-unit failed-state lifecycle (F09), design C
 
-F09's one-shot Alertmanager posts can expire while the originating unit is still
-failed. This integration gives the existing Collector and Prometheus one state
-policy for the configured user units. It preserves the existing two alert names,
-but the message says a unit needs attention because failure **or unknown state**
-is possible. A missing exporter, bus observation or unit is never called recovery.
+CC022242Z supersedes A/A-prime. Unit EVENT PaperLaneUnitFailed/StackUnitFailed
+uses a name-only receiver without integrations: immediate Alertmanager record,
+no human notice. STATE PaperLaneUnitDown/StackUnitDown notifies with resolved
+delivery enabled. No inhibitor. Dagu keeps its distinct event-only route.
+C and fallbackA pass native amtool; A is enabled only if the GPT read refutes C.
+[Alertmanager0.34.1 receivers/routes](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/configuration.md).
 
-This is source and configuration work. Deployment and the **one** real Telegram
-DRILL belong to the CC-authorized window in [WINDOW.md](WINDOW.md). No host,
-client, sender template or installer is changed by this directory.
+Reuse installed Contrib0.162 user-scope systemd receiver. Preserve its
+systemd.unit.state name/native unit, using no-suffix Prometheus rendering as
+systemd_unit_state. The dedicated timestamp-preserving exporter and registered
+configuration expectations prevent stale/exporter/bus/missing data from being
+recovery. Expectations are not observed states. No new collector, binary,
+runtime watcher, client configuration or exporter is installed by this source.
+[Native receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/README.md),
+[metric/enum](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/metadata.yaml),
+[exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md).
 
-## Native owners and source contracts
+The roster names each recovery contract. `active` requires fresh active evidence
+strictly newer than every contradictory fresh non-active observation; ties are
+conservative and fresh failed evidence always wins. `failure-cleared` accepts
+a fresh recognized nonfailed state, including inactive, but does not prove
+application readiness, success, job completion or cadence. The named W2 drill
+uses this latter contract for the CC's reset-failed recovery. Empty/unknown/
+foreign/future/old observations do not qualify either contract. Recording rules
+carry the original observation timestamp as a value; a recording rule's own
+evaluation timestamp is not the source observation time. Data loss stays
+needs-attention while the evaluator works. Whole sender/evaluator outage still
+has finite protocol leases; disabled deadman is not independent protection.
 
-Reuse Collector Contrib **0.162.0**, already selected by the stack:
-[systemd receiver user scope](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/README.md),
-[session-bus implementation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/scraper.go#L44).
-The receiver is alpha; source support is not a newly passed WSL/user-bus test.
+The native receiver emits one for the current state and zero for each other
+enumerated state on every successful scrape. The contradictory cached-series
+fixtures therefore defend against transport/cache overlap; they are not a claim
+that a normal successful receiver scrape omits those zeros.
+[Contrib0.162 state emission](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/scraper.go#L150).
+[systemd259.5 reset](https://github.com/systemd/systemd/blob/v259.5/man/systemctl.xml),
+[native rules/staleness](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/alerting_rules.md).
 
-Its [state metric](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/metadata.yaml#L89)
-uses resource `systemd.unit.name` and point `systemd.unit.active_state`.
-The dedicated pipeline copies them into `unit` and `state`, adds the configured
-`host`, drops other fields and exports only `ns2604_user_unit_state` as a gauge.
-[Ordered transforms](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/processor/transformprocessor/internal/metrics/processor.go#L39)
-copy the resource identity before clearing resource attributes. It never feeds
-these points through the base privacy allowlist that would remove unit identity.
+render.py only compiles the complete CC-owned concrete roster into native
+receiver/rule/scrape JSON; it neither observes units nor invents timer metrics.
+Use its absolute rules-template and supported second Collector --config through
+the CC's existing provisioning path. Port21890 is allocated, with custody
+rechecked. The example is not production coverage; unregistered units remain
+outside scope. Do not remove failed identities just to silence them.
 
-The Collector exporter normally caches old points for five minutes and omits
-timestamps. Here a separate exporter uses `send_timestamps: true`,
-`metric_expiration: 1m` and `UnderscoreEscapingWithoutSuffixes`; the Prometheus
-scrape honors timestamps. Existing exporters and pipelines are unaffected.
-[Pinned exporter contract](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md#L29),
-[timestamp implementation/test](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/collector_test.go#L755).
+The first unit human notice follows collection/for, roughly a minute. A shorter
+unobserved failure may leave only its EVENT record. Native source tests and
+config validation are integration evidence, not real delivery or organic use.
+Earlier active-only/A-prime observations remain unchanged in separate records.
 
-The configured roster produces recurring `vector(1)` recording rules named
-`ns2604_user_unit_expected`. These are **configuration expectations**, not unit
-observations. They remain present when the exporter vanishes.
-[Native recording rules](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/recording_rules.md).
+WINDOW.md specifies the one pending CC-only W2 origin paper-drill-w2.service,
+oneshot/binfalse/OnFailure=paper-alert@%n.service, with reset-failed recovery.
+EVENT/STATE unit and host are read back side by side. Record actual fifteen-minute
+STATE firing/recovery sequence and no EVENT notice, then reviewed removal.
+Install nothing from a lane. Private bot/chat files stay under existing custody;
+never fetch the credential-bearing status/config endpoint.
 
-## Recovery and unknown state
+G2 completion/cadence remains unknown: Contrib's selected receiver supplies no
+LastTriggerUSec metric. No custom or aged exporter is added. Watchdog/deadman
+stay disabled pending the owner's independent account and CC decision. Historical
+delivery/false-RESOLVED values stay unchanged; correct them with new evidence.
 
-A source point is fresh only if its observed timestamp is between now and
-45 seconds ago (three 15-second collection periods) and its scrape target is up.
-A fresh value1 for active is recovery evidence. Inactive alone does not prove a
-successful completion: this receiver does not export the service Result field.
-Fresh failed evidence
-takes precedence over a contradictory cached healthy state. Otherwise the
-configured identity stays in the alert vector, including after ten minutes or
-longer of exporter/bus failure while Prometheus continues evaluating.
+The policy enumerates continuous services, reused one-shots, timer-triggered
+services and the named W2 drill. Reused one-shot/timer entries have
+`completion_contract: unknown`, `recovery_contract: unknown`, and `armed: false`.
+Their configuration expectation is zero, so neither successful inactive
+completion nor failed completion manufactures a resolution. No last-trigger
+gauge would itself prove successful completion. These held examples are not
+additional managed-unit coverage; the CC must supply the actual contract before
+arming them. W2's armed failure-clearing contract is separate from completion.
 
-Alert labels are only host, unit, severity and the rule's alertname. State,
-reason, timestamps and scrape labels do not change that fingerprint. The
-30-second `for` is initial debounce and `keep_firing_for` is recovery debounce;
-neither is the outage guard. Filtering comparisons are intentional: a zero-valued
-`bool` comparison still leaves an element that an alert could interpret as active.
-[Alert rules](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/alerting_rules.md#L35),
-[comparison/set operators](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/operators.md#L159).
+## Supporting pipeline and disabled independent heartbeat assets
 
-Active here qualifies the manager's retained state, not application readiness.
-Unique one-off units need their owner's supported RemainAfterExit=yes policy so
-successful completion remains active; recurring event-style jobs use their own
-success/event contract. Until explicit success is represented, inactive and an
-unloaded or forgotten unit remain recovery-unverified. Default CollectMode retains failed units;
-other collect modes can forget them. [systemd v260](https://github.com/systemd/systemd/blob/v260/man/systemd.unit.xml#L1073).
+`pipeline-scrape.example.json` declares Alertmanager21093, Grafana21301 and
+Loki21300. `alerting-pipeline.rules.example.json` retains the native15-minute
+notification-failure ratio and5-minute hold; it does not prove delivery during
+zero traffic or sender death. The window merges these through the existing
+owner provisioning path and reads back targets/rule identity.
+[Alertmanager73c6bfe7 mixin](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/doc/alertmanager-mixin/alerts.libsonnet#L42).
 
-The roster must cover **every concrete managed unit** whose old sender is retired,
-including future job instances. CC/5f owns that installation registration and
-same-identity classification. Never deploy the DRILL-only example as the production
-roster, remove an unresolved unit from it, or change its severity/class to silence
-an incident. An unregistered unit is explicitly outside coverage.
-
-## Render supported native configuration
-
-Use a complete CC/5f-owned policy with concrete service names and the old senders'
-matching host/class/severity. The proposed 21890 loopback port needs CC allocation.
-
-```bash
-rtk proxy nice -n 19 ionice -c3 python3 observability/alert-lifecycle/render.py \
-  --policy <complete-owned-policy.json> \
-  --rules-template "$PWD/observability/alert-lifecycle/user-unit-alerts.rules.json" \
-  --output-dir <durable-private-staging-directory>
-```
-
-Outputs are JSON, which the native YAML loaders accept: receiver.json, rules.json,
-and scrape.json. The same roster drives the receiver and independent expectations.
-The small renderer fills that multi-format configuration gap; it is not an
-exporter, agent, observer, runtime watcher or custom test harness. It rejects
-duplicate units, templates/globs, unsupported fields/classes and non-loopback binds.
-
-Append the unique Collector components through its supported second `--config`
-file, not by editing #775's base YAML. Add the generated scrape job and rule file
-through the CC-owned Prometheus provisioning/configuration path. Stage and validate
-the merged configuration before its reviewed reload.
-[Collector merge](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/confmap/confmap.go),
-[Prometheus configuration/reload](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/configuration.md).
-
-## Sender retirement and protocol boundaries
-
-Prometheus refreshes active alerts and supplies EndsAt; at3.15 it uses evaluation
-time plus four times the maximum evaluation/resend interval for active validity.
-It sends ResolvedAt only after the alert becomes inactive. Alertmanager's
-`resolve_timeout` applies only when EndsAt is omitted.
-[Prometheus sender](https://github.com/prometheus/prometheus/blob/v3.15.0/rules/manager.go#L497),
-[validity](https://github.com/prometheus/prometheus/blob/v3.15.0/rules/alerting.go#L618),
-[Alertmanager0.34.1 contract](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/alerts_api.md#L44).
-
-The CC's later hidden-dependency ruling preserves the accepted paper one-shot
-first notice (C1b). Its host/unit/severity/alertname fingerprint must match the
-registered state rule, which then owns renewal and recovery. Stack's ntfy hop is
-removed by its owner; no additional per-unit drop-ins are added for covered scope.
-Only genuinely event-style failures such as DaguDagFailed use a no-resolved route.
-Do not lengthen leases or hide unit-rule resolutions. The owner handoff is
-[5F-HANDOFF.md](5F-HANDOFF.md); this PR does not edit those pinned files.
-
-An entire Prometheus/sender/link outage can still expire its finite protocol
-lease. This rule guards exporter/bus/state staleness while the evaluator and
-sender work; it cannot prove recovery during complete sender loss. Sender health
-needs independent observation, and an expired Alertmanager lease alone is never
-a service-health receipt. No sender-loss guarantee is claimed.
-
-## Evidence and acceptance
-
-The fourteen current rule groups are **locally authored synthetic cases** executed by the
-unchanged upstream promtool harness. Renderer tests are local integration checks;
-native Collector validation is configuration-only. None is the real notification
-DRILL or an unchanged upstream test suite. The single real DRILL remains not run
-until the CC applies the window and signals acceptance.
-
-```bash
-rtk proxy nice -n 19 ionice -c3 <promtool-3.15.0> test rules observability/alert-lifecycle/user-unit-alerts.test.json
-rtk proxy nice -n 19 ionice -c3 python3 -m unittest tests.test_user_unit_alert_renderer
-rtk proxy nice -n 19 ionice -c3 python3 observability/alert-lifecycle/render.py --check
-```
-
-Preserve past false-RESOLVED observations and the proven Telegram delivery receipt.
-Correct their interpretation with a new linked record; do not rewrite their values.
-
-## Event and independent heartbeat examples
-
-`alertmanager-events.example.json` is a CC-rendered route/receiver example: only
-the genuinely event-style DaguDagFailed route suppresses resolved notifications.
-Unit-state classes keep resolution delivery and the accepted paper first notice.
-Private bot/chat file paths must be supplied through existing custody; this
-repository contains neither their values nor a live receiver configuration.
-
-`alerting-pipeline.rules.example.json` adapts the pinned upstream notification-
-failure ratio with its native15-minute window/5-minute hold. It does not prove
-delivery during zero traffic or complete sender death.
-[Alertmanager mixin at73c6bfe7](https://github.com/prometheus/alertmanager/blob/73c6bfe7/doc/alertmanager-mixin/alerts.libsonnet#L42).
-`pipeline-scrape.example.json` declares the native Alertmanager21093, Grafana21301
-and Loki21300 targets; configured source does not assert current endpoint health.
-
-Watchdog's vector1 rule and deadman route fragments are **disabled examples**.
-Enable them together only after CC chooses and provisions the independent
-heartbeat receiver using url_file. A configured Telegram-failure warning inhibits
-Watchdog so that the external receiver detects failed delivery. No local component
-can report Alertmanager's own death; a disabled example provides no live coverage.
+`watchdog.disabled.rules.example.json` and
+`deadman.disabled.fragments.example.json` remain disabled, paired examples.
+Enable both only after the owner's independent heartbeat account/receiver and
+private url_file exist under CC custody. A native Telegram-delivery-failure
+condition may inhibit Watchdog so an external receiver detects loss; no local
+component reports its own host/Alertmanager death. No new account or live
+coverage is implied by these source assets.
 [Pinned Watchdog](https://github.com/prometheus-operator/kube-prometheus/blob/799f3d73/jsonnet/kube-prometheus/components/mixin/alerts/general.libsonnet#L19),
-[native url_file](https://github.com/prometheus/alertmanager/blob/73c6bfe7/docs/configuration.md#L1943).
-No external account, secret URL, service or paid hosting is created by this PR.
+[native webhook url_file](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/configuration.md).

@@ -127,3 +127,51 @@ disabled paired Watchdog/deadman examples, with external custody owned byCC.
 Disabled examples are not independent failure detection. No new start-gating
 row or old-distribution dependency is adopted; stale live-guidance edits that
 overlap #775 wait for that owned landing chain.
+
+## Amendment (2026-10-07): design C and W2 origin, CC022242Z
+
+This supersedes the earlier A/A-prime notification proposals, without editing
+the decided text or observed outcomes. STATE Down is the sole unit-failure
+human notification route, send_resolved=true. The v3 unit EVENT Failed push
+routes to a name-only receiver with no integrations: immediate record, no human
+notice. No inhibitor. Dagu's separate event semantics remain unchanged. Native
+amtool accepts C's integration-free receiver; fallbackA is retained only for
+GPT refutation of that source contract.
+[Pinned receiver/routes](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/configuration.md).
+
+The CC accepts delayed first human notice after collection/for and event-only
+recording for shorter unobserved incidents. It avoids the proved A-prime loss
+of short STATE recovery without inventing a resolve-only notifier. Failure
+clearing remains fresh known nonfailed state; readiness/completion/cadence
+remain unknown. Missing/stale state never qualifies recovery.
+
+W2's single proposed origin is exactly paper-drill-w2.service, oneshot/binfalse
+with OnFailure=paper-alert@%n.service, and reset-failed recovery. Both EVENT and
+STATE carry unit=paper-drill-w2.service and the same host. CC alone installs,
+starts the one deliberate failure, holds15m, records actual STATE firing/recovery
+and no EVENT notice, then removes the unit after qualified cleanup. Source
+integration tests are not this real drill; attempts remain zero in preparation.
+
+The timer LastTriggerUSec idea needs another qualified native source: Contrib0.162
+does not expose it. No exporter or custom metric is added; the command center
+decides the separate currency/quality comparison. The organic report's approved
+provenance path consumes grand-catalog's qualified carrier receipt; until that
+oracle proves every exclusion/dedup rule, counts remain not_yet_measured.
+
+## Addendum (2026-10-07): exact-head review and explicit contracts
+
+The review of 0f06f4d8 found a cached-active recovery ambiguity, an unqualified
+reused one-shot/timer completion contract, and no failure assertion strictly
+beyond six minutes. This proposed source separates recovery contracts instead
+of altering the earlier decided text or its observations. Continuous `active`
+recovery requires active observation time strictly newer than contradictory
+fresh non-active observations; ties stay conservative and fresh failed wins.
+Recording rules retain original source timestamps as values. The named W2
+drill explicitly uses `failure-cleared` for the CC's reset-failed recovery.
+
+Reused one-shot and timer-service entries are explicit, unarmed, and unknown for
+both completion and recovery. They cannot resolve an incident from an inactive
+completion; no new exporter or fabricated result metric is added. The selected
+Contrib receiver's state metric does not supply a timer completion contract.
+The CC's later source ACK and window read-back remain required. Native fixtures
+are synthetic integration checks, not a live failure, delivery or adoption.

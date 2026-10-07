@@ -7,6 +7,14 @@ processor/filterprocessor and transformprocessor; OTTL metric/datapoint contexts
 Prometheus recording rules: prometheus v3.15.0 native rule-file format.
 JSON is native YAML input. This renders config only; it never starts a receiver.
 Expected records are configuration, never observed unit state or recovery.
+Unit kind, arming and recovery contracts are explicit policy. Reused one-shot
+and timer services remain unarmed while completion is unknown; inactive is
+not evidence that a job completed successfully. The native receiver supplies
+unit active state, not a last-success or timer completion contract.
+The DRILL example is synthetic configuration, not W2 qualification. The 15s
+collection/scrape and rule-evaluation intervals describe observation metadata,
+not a service/job/timer cadence. Native last-success evidence is not provided
+by this receiver; cadence and W2 identity remain subject to the CC answer.
 """
 from __future__ import annotations
 
@@ -20,8 +28,12 @@ import re
 HERE = Path(__file__).resolve().parent
 JOB = "ns2604-user-unit-state"
 EXPECTED = "ns2604_user_unit_expected"
-CLASSES = {"PaperLaneUnitFailed", "StackUnitFailed"}
+CLASSES = {"PaperLaneUnitDown", "StackUnitDown"}
 SEVERITIES = {"warning", "critical"}
+UNIT_KINDS = {"continuous", "oneshot", "timer-service", "drill"}
+RECOVERY_CONTRACTS = {"active", "failure-cleared", "unknown"}
+UNIT_FIELDS = {"name", "failure_class", "severity", "unit_kind", "armed",
+               "recovery_contract", "completion_contract"}
 UNIT_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:@-]{0,230}\.service\Z")
 
 
@@ -40,8 +52,9 @@ def validate_policy(value):
         raise ValueError("units must be a nonempty configured roster")
     names = set()
     for unit in units:
-        if not isinstance(unit, dict) or set(unit) != {"name", "failure_class", "severity"}:
-            raise ValueError("unit permits only name, failure_class, severity")
+        if not isinstance(unit, dict) or set(unit) != UNIT_FIELDS:
+            raise ValueError("unit requires name, failure_class, severity, unit_kind, armed, "
+                             "recovery_contract, completion_contract")
         name = unit["name"]
         if not isinstance(name, str) or not UNIT_NAME.fullmatch(name) or name.endswith("@.service") or name.count("@") > 1:
             raise ValueError("unit requires a concrete safe .service name, no template/glob")
@@ -50,6 +63,25 @@ def validate_policy(value):
         names.add(name)
         if not isinstance(unit["failure_class"], str) or not isinstance(unit["severity"], str) or unit["failure_class"] not in CLASSES or unit["severity"] not in SEVERITIES:
             raise ValueError("unsupported failure_class or severity")
+        if not isinstance(unit["unit_kind"], str) or unit["unit_kind"] not in UNIT_KINDS:
+            raise ValueError("unsupported unit_kind")
+        if not isinstance(unit["armed"], bool):
+            raise ValueError("armed must be an explicit boolean")
+        if not isinstance(unit["recovery_contract"], str) or unit["recovery_contract"] not in RECOVERY_CONTRACTS:
+            raise ValueError("unsupported recovery_contract")
+        if unit["completion_contract"] != "unknown":
+            raise ValueError("completion_contract is unknown until an upstream-backed contract exists")
+        if unit["armed"] and unit["recovery_contract"] == "unknown":
+            raise ValueError("an unknown recovery contract cannot be armed")
+        if unit["unit_kind"] == "continuous" and unit["recovery_contract"] == "failure-cleared":
+            raise ValueError("continuous services require active recovery; failure-cleared is W2-only")
+        if unit["unit_kind"] in {"oneshot", "timer-service"}:
+            if unit["armed"] or unit["recovery_contract"] != "unknown":
+                raise ValueError("reused one-shot/timer services remain unarmed with unknown completion/recovery")
+        if unit["unit_kind"] == "drill" and unit["recovery_contract"] != "failure-cleared":
+            raise ValueError("drill requires the explicit failure-cleared recovery contract")
+        if unit["unit_kind"] == "drill" and name != "paper-drill-w2.service":
+            raise ValueError("only the CC-named W2 origin may use the drill contract")
     return deepcopy(value)
 
 
@@ -82,8 +114,6 @@ def receiver_config(policy):
                 {"context": "resource", "statements": ['keep_keys(attributes, [])']},
                 {"context": "metric", "statements": [
                     'convert_sum_to_gauge() where type == METRIC_DATA_TYPE_SUM',
-                    'set(name, "ns2604_user_unit_state")',
-                    'set(unit, "1")',
                 ]},
             ]},
         },
@@ -112,9 +142,11 @@ def prometheus_rules(policy, template):
             raise ValueError("rules require native rule objects with an expression")
         if any(rule.get("record") == EXPECTED for rule in group["rules"]):
             raise ValueError("expected roster records belong only to the renderer")
-    rules = [{"record": EXPECTED, "expr": "vector(1)", "labels": {
+    rules = [{"record": EXPECTED, "expr": f'vector({int(unit["armed"])})', "labels": {
         "host": policy["host"], "unit": unit["name"],
         "failure_class": unit["failure_class"], "severity": unit["severity"],
+        "unit_kind": unit["unit_kind"], "recovery_contract": unit["recovery_contract"],
+        "completion_contract": unit["completion_contract"],
     }} for unit in policy["units"]]
     return {"groups": [{"name": "ns2604-f09-configured-roster", "interval": "15s", "rules": rules},
                        *deepcopy(template["groups"])]}
@@ -178,7 +210,11 @@ def main():
             raise ValueError("provide --check or --output-dir and --rules-template")
     except (ValueError, OSError, TypeError) as error:
         parser.exit(2, f"F09 render refused: {error}\n")
-    print(json.dumps({"configured_units": len(policy["units"]), "host": policy["host"],
+    print(json.dumps({"configured_units": len(policy["units"]),
+                      "armed_units": sum(unit["armed"] for unit in policy["units"]),
+                      "held_completion_units": sum(unit["unit_kind"] in {"oneshot", "timer-service"}
+                                                   for unit in policy["units"]),
+                      "host": policy["host"],
                       "scrape_job": JOB, "mode": "config-only", "checked": args.check}, sort_keys=True))
 
 

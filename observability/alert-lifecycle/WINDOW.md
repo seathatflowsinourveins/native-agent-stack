@@ -1,134 +1,115 @@
-# ALERT-F09 window and single DRILL acceptance — 2026-10-07
+# F09/W2 window — design C, 2026-10-07
 
-Owner: overlap-token source; host/configuration cue: CC. Sender/installer changes:
-CC/5f under [5F-HANDOFF.md](5F-HANDOFF.md). Do not apply this item from a lane
-before the source's GPT read, required green CI and CC ACK. Queue the PR after
-#775 and its ordered #723 rebase. No paper clock holds apply; heavy commands use
-nice19/idleIO. Announce the normal brief park five minutes ahead.
+CC022242Z supersedes the earlier A/A-prime proposals. Apply only the exact
+co-op GPT-read, green-CI, CC-ACKed source after #775. The CC/5f owns host units,
+sender pins, registry, user bus and reloads. Lanes install nothing. Announce
+the five-minute park; heavy source checks run nice19/ionice3. Keep backups,
+queues/cursors, existing config and every recorded observation.
 
-## Scope and readiness
+## Source and routing preflight
 
-The window configures an existing Contrib0.162.0 receiver/pipeline, one new
-loopback metrics endpoint and a native Prometheus scrape/rule file. It installs
-no new collector process, exporter binary, client hook or agent. Proposed21890
-requires CC allocation and a repeated value-free listener/ownership check.
+CC supplies the complete concrete managed roster and checks allocated21890
+ownership. Render with render.py and an absolute rules-template to private0700
+durable stage. Native Collector validates existing base plus second--config
+overlay; native promtool validates the full staged config/rules. Use the
+supported existing Prometheus writer/reload, not a second process. Record gaps.
+Native systemd.unit.state stays unchanged and renders systemd_unit_state, with
+real observed timestamps and unit/host/state labels; up1 is not this proof.
 
-The caller must supply a complete registered managed-unit roster, stable old
-class/severity labels and final source head. The committed policy.example.json
-is DRILL-only. The unit name, same-user bus access, exact metric name/labels and
-observation timestamps are read-back gates. Validate/review is not their proof.
+C's unit EVENT Failed routes use an integration-free name-only receiver; the
+events remain visible in Alertmanager/metrics and send no human notification.
+STATE PaperLaneUnitDown/StackUnitDown alone notify for unit failure with
+send_resolved=true. No inhibitor. Dagu's distinct event-only route stays
+separate. Quote v3 ExecStart lines unchanged in 5F-HANDOFF.md; no endsAt or ntfy
+hop is added. Native amtool must accept the name-only receiver. FallbackA is
+retained only if the GPT read refutes C, not simultaneously enabled.
 
-Do not fetch Alertmanager's status/config endpoint or read receiver credentials.
-Allowed acceptance routes: Prometheus21090 query/alerts and Alertmanager21093
-filtered alerts/metrics. Keep all returned bodies/counters private/durable.
-Never print bot tokens, chat IDs or unit environment.
+The first unit human notice follows collection plus the rule's for, roughly a
+minute. A failure clearing before collection/for can leave only the EVENT record
+and no human notice. Missing/stale observations remain needs-attention, never
+an inferred recovery; do not claim a brief incident was observed if it was not.
+The roster explicitly distinguishes `active` from `failure-cleared` recovery.
+Active requires strictly newer active observation time than contradictory fresh
+non-active states, with conservative ties and failed precedence. W2 specifically
+uses failure-cleared for reset-failed. Application readiness, success, completion
+and cadence stay unknown; the separate G2 rows are not covered here. Keep reused
+one-shot/timer entries unarmed with their completion/recovery contracts unknown.
+Read back configured and armed counts separately; the examples are not coverage.
 
-## Stage with native tools; preserve all live configuration
+Never fetch Alertmanager's credential-bearing status/config endpoint or print
+unit environment, bot values or chat IDs. Acceptance reads scoped Prometheus
+query/alerts and Alertmanager alerts/metrics on21090/21093 plus receiver witness.
+Counter deltas alone cannot attribute this drill amid other notifications.
 
-1. Retain value-free hashes and private backups of the CC-owned Collector unit,
-   its base config and Prometheus config/rules. Preserve queues/cursors and all
-   historical data. No lane deletes or rewrites records.
-2. Render the full owned roster to a durable0700 stage:
+## The one real W2 attempt, CC only
 
-```bash
-rtk proxy nice -n 19 ionice -c3 python3 observability/alert-lifecycle/render.py \
-  --policy <complete-owned-policy.json> \
-  --rules-template "$PWD/observability/alert-lifecycle/user-unit-alerts.rules.json" \
-  --output-dir <private-durable-stage>
-rtk proxy nice -n 19 ionice -c3 <otelcol-0.162.0> validate \
-  --config=<ACKed-existing-base.yaml> --config=<private-durable-stage/receiver.json>
-rtk proxy nice -n 19 ionice -c3 <promtool-3.15.0> check rules <private-durable-stage/rules.json>
-```
+The handler-only old start had no origin. The new proposed source is exactly
+paper-drill-w2.service: Type=oneshot, ExecStart=/bin/false,
+OnFailure=paper-alert@%n.service. Do not enable it. Verify absence of a conflicting
+origin and native syntax before the reviewed installation. Its handler is
+paper-alert@paper-drill-w2.service.service; %i is paper-drill-w2.service, matching
+the STATE unit label. Keep unit/host label read-back for both families side by side.
 
-3. Through CC's supported provisioning path, add the overlay as a **second**
-   Collector --config argument; preserve the original base and arguments.
-   The native confmap merge adds uniquely named components/pipeline, not a
-   hand-merged #775 YAML. Confirm the same user's session bus; if necessary CC
-   adds only the nonsecret `DBUS_SESSION_BUS_ADDRESS=unix:path=%t/bus` to the
-   owned user unit. Preserve its existing observability data/queue location.
-4. Prepare the healthy scratch baseline in stageA below BEFORE enabling any
-   expectation/rule entry for DRILL: mode file must already contain healthy,
-   the unit must be active and its fresh source point must exist. Do not start
-   it against a missing control file. Add the scrape job first and warm its
-   observations; keep DRILL rules disarmed until that gate passes. Then add
-   the generated rule file through the supported config writer. Preserve
-   existing jobs/rules. Validate
-   the complete staged config with native promtool before the reviewed reload.
-   Use Prometheus's documented SIGHUP or existing reload path, not a second
-   Prometheus instance. Record any Collector restart's exact UTC gap.
-5. Warm source observations and compare the complete roster with installed
-   managed sender scope. Before cutover the new endpoint must yield
-   ns2604_user_unit_state with host/unit/state, real observation timestamps
-   and declared gauge semantics; up1 alone is insufficient. No fabricated
-   observations or renamed guesses qualify this gate.
-6. Apply only the CC/5f-approved sender changes after full registration and state
-   path read-back. Preserve C1b's accepted paper first-notice sender; its matching
-   fingerprint is renewed by the primary state rule. Remove Stack's ntfy hop
-   through its owner. Correct Telegram text must include unit identity and the summary/
-   description so failure-versus-unknown and DRILL are visible. Retain native
-   route/receiver custody and resolved delivery; do not copy its secrets.
+A. Stage the receiver/scrape and baseline counters without starting the failing
+unit. Keep the scratch expectation disarmed until source readiness is established;
+do not start an always-false fixture as a fake healthy baseline. Preserve other
+production expectations. Coordinate its registration/arming so missing pre-start
+state cannot be mistaken for a measured failure or emit a premature notice.
 
-## ONE real deliberate failure; no rerun by default
+B. Start the origin exactly once. Retain the actual command exit and require
+failed/exit-code/ExecMainStatus=1 from the native unit observation. Do not manually
+start an additional handler. Observe the EVENT and fresh failed source point,
+then the registered STATE alert. Record the exact two-label equality. Stop on
+unmatched labels or missing source; no substitute unit or second attempt.
 
-Do this only after all above gates pass. Source tests are not this drill.
-Use `ns2604-F09-DRILL.service.example` as the persistent scratch user unit;
-no transient unit or /tmp state. Its only native command is grep of an owned
-nonsecret control file. Its OnFailure calls the accepted paper first-notice
-sender so this ONE fault also tests renewal of the original missing-EndsAt alert.
-The policy uses PaperLaneUnitFailed/critical, matching its current labels. Match
-effective external labels before arming; otherwise stop before any real message.
+C. Hold actual FAILED fifteen minutes from the observed STATE firing notice,
+using bounded<=60s operator waits. The expected C sequence is:
 
-A. **Establish healthy baseline without a failure, before stage4 arms DRILL.** Install the scratch unit
-via the reviewed owner operation. Using native Write/Edit, create
-`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/overlap-token-durable/f09-alert-lifecycle-20261007/drill-mode`
-with exactly `healthy\n` BEFORE its first start. Start the unit; it must return0 and stay active with
-RemainAfterExit. Observe its fresh active state and absence of its alert before
-arming this roster/rules entry. After the rules are armed, confirm no DRILL alert
-and snapshot Telegram notification success/failure
-counters and the filtered native evaluator/Alertmanager state.
+1. EVENT recorded, with no user notice.
+2. One PaperLaneUnitDown firing notice, visibly labelled DRILL by the reviewed
+   unit/annotation template. STATE stays firing after6m and15m while the origin
+   remains failed; capture refreshed EndsAt, evaluator/Alertmanager states and
+   actual notification success/failure counters with UTC times.
+3. No EVENT RESOLVED notice. No STATE recovery notice while failed or unknown.
 
-B. **Fail it exactly once.** Edit that control file to exactly `fail\n`,
-then restart only the DRILL unit. Record the expected nonzero exit, actual
-ActiveState=failed, Result=exit-code and ExecMainStatus. Do not call a production
-paper/embedding service and do not create another failed unit. The first real
-firing message must visibly contain DRILL.
+D. CC runs systemctl --user reset-failed paper-drill-w2.service. Record native
+unit state and the actual fresh known nonfailed exporter point; a successful
+reset command alone does not supply a metric. If the source disappears, keep
+needs-attention and retain the partial result instead of inventing recovery.
+After freshness/recovery debounce and group timing, record the actual STATE
+recovery notice, returned state and counters. No returned RESOLVED object is
+fabricated if the API omits ended alerts. Completion/success is not inferred.
 
-C. **Wait at least six minutes from observed firing delivery.** Use bounded
-<=60-second waits in the operator's native communication/clock tool; no
-background watcher. At the six-minute point capture again:
-- the scratch unit is still failed;
-- Prometheus's matching alert is firing;
-- Alertmanager's matching EndsAt is still in the future/active;
-- the receiver saw the DRILL firing message and no DRILL RESOLVED in that span;
-- notification success/failure counters with observation timestamps.
-Do not use global counter differences as proof of this one unit when other
-alerts were delivered. Unit-filtered states and the receiver witness bind it.
+Record exactly the real message sequence and receiver witness as a NEW receipt.
+Source/config checks are not this drill. If any stage fails, preserve its result
+and stop; no repeated real Telegram failure without a new cue.
 
-D. **Recover once.** Edit control back to `healthy\n` and restart the same
-unit. Record exit0, ActiveState=active and a fresh active observation. The alert
-may stay firing through its deliberate30-second keep_firing_for and notification
-group delay; record them. A real DRILL RESOLVED must arrive only after this
-confirmed recovery. Snapshot returned states and counters again.
+## Cleanup and rollback
 
-Do not invent a returned RESOLVED object if a native API omits ended alerts:
-retain its actual response/empty result plus the real resolved notification and
-the earlier firing responses. Alertmanager resolved is protocol lifecycle; it is
-not by itself the unit's healthy-state witness. Keep the one-drill ledger, exact
-unit/callback timestamps, sender states and receiver observation as a NEW receipt.
-If a stage fails, preserve its partial result and stop; a second live drill needs
-an explicit new cue. Never rewrite this attempt as passed.
+Only after confirmed recovery, CC decommissions the scratch expectation through
+the supported writer, verifies it is absent/no scratch firing alert remains,
+then removes the scratch unit. Retain all receipts/backups. Never remove a
+failed production identity just to silence it. No timer or runtime watcher is
+enabled. Restore reviewed config/health on failed application while preserving
+data and unknown-state protection. Deadman stays disabled until the owner's
+account/receiver exists. Whole evaluator/sender loss still has finite native
+leases and is not covered by an in-process immortality claim.
 
-## Rollback and unknown state
+## Supporting pipeline rule and heartbeat read-back
 
-A failed staged validation changes nothing. If the receiver/cutover fails after
-application, CC restores the prior Collector unit/config and health, preserving
-all files and data. Keep the expected-roster/unknown-state protection while
-observations are unavailable; removing rules merely to hide failure can itself
-send a false resolution. Do not silently restore the defective one-shot lifecycle
-POSTs. CC chooses an explicit administrative fallback with its source/observations
-recorded; no affected unit is declared recovered without fresh evidence.
+Through the same reviewed owner provisioning path, merge
+`pipeline-scrape.example.json` for Alertmanager21093/Grafana21301/Loki21300 and
+`alerting-pipeline.rules.example.json`. Preserve existing scrape jobs/rules,
+validate the complete staged configuration with native promtool, then use the
+existing reload. Read back each target/job and the notification-failure rule
+identity/health; configured endpoints alone do not prove target coverage.
 
-Exporter/bus outages are covered by the rule fixtures. A complete evaluator or
-sender-link outage still has finite Alertmanager leases; this item does not claim
-an impossible in-process guarantee across that loss. Independent sender health
-observation remains with CC. No such outage or extra live drill is induced here.
+Keep `watchdog.disabled.rules.example.json` and
+`deadman.disabled.fragments.example.json` disabled until the owner supplies the
+independent account/receiver. Neither an empty integration-free EVENT receiver
+nor a disabled Watchdog covers host/VM/Alertmanager death. No extra delivery-
+failure or down-server drill is run under the single W2 failure authorization.
+
+[Native receiver/routes](https://github.com/prometheus/alertmanager/blob/73c6bfe7393929211294c1954f30d8ed78e4d0ad/docs/configuration.md),
+[failed-state reset](https://github.com/systemd/systemd/blob/v259.5/man/systemctl.xml),
+[Contrib0.162 state schema](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/systemdreceiver/metadata.yaml).

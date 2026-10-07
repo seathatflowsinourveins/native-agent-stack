@@ -3,9 +3,31 @@
   "listen": "127.0.0.1:21890",
   "units": [
     {
-      "name": "ns2604-F09-DRILL.service",
-      "failure_class": "PaperLaneUnitFailed",
-      "severity": "critical"
+      "name": "paper-drill-w2.service",
+      "failure_class": "PaperLaneUnitDown",
+      "severity": "critical",
+      "unit_kind": "drill",
+      "armed": true,
+      "recovery_contract": "failure-cleared",
+      "completion_contract": "unknown"
+    },
+    {
+      "name": "example-reused-oneshot.service",
+      "failure_class": "StackUnitDown",
+      "severity": "warning",
+      "unit_kind": "oneshot",
+      "armed": false,
+      "recovery_contract": "unknown",
+      "completion_contract": "unknown"
+    },
+    {
+      "name": "example-timer-run.service",
+      "failure_class": "StackUnitDown",
+      "severity": "warning",
+      "unit_kind": "timer-service",
+      "armed": false,
+      "recovery_contract": "unknown",
+      "completion_contract": "unknown"
     }
   ]
 }

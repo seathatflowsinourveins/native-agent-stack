@@ -12,9 +12,9 @@
     "routes": [
       {
         "matchers": [
-          "alertname=~\"^(PaperLaneUnitFailed|StackUnitFailed)$\""
+          "alertname=~\"^(PaperLaneUnitFailed|StackUnitFailed|DaguDagFailed)$\""
         ],
-        "receiver": "unit-event-record-only",
+        "receiver": "telegram-event",
         "group_wait": "0s"
       },
       {
@@ -22,20 +22,10 @@
           "alertname=~\"^(PaperLaneUnitDown|StackUnitDown)$\""
         ],
         "receiver": "telegram-state"
-      },
-      {
-        "matchers": [
-          "alertname=\"DaguDagFailed\""
-        ],
-        "receiver": "telegram-event",
-        "group_wait": "0s"
       }
     ]
   },
   "receivers": [
-    {
-      "name": "unit-event-record-only"
-    },
     {
       "name": "telegram-state",
       "telegram_configs": [

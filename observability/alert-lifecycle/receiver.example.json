@@ -41,9 +41,7 @@
         {
           "context": "metric",
           "statements": [
-            "convert_sum_to_gauge() where type == METRIC_DATA_TYPE_SUM",
-            "set(name, \"ns2604_user_unit_state\")",
-            "set(unit, \"1\")"
+            "convert_sum_to_gauge() where type == METRIC_DATA_TYPE_SUM"
           ]
         }
       ]
@@ -71,7 +69,9 @@
       },
       "scope": "user",
       "units": [
-        "ns2604-F09-DRILL.service"
+        "paper-drill-w2.service",
+        "example-reused-oneshot.service",
+        "example-timer-run.service"
       ]
     }
   },
