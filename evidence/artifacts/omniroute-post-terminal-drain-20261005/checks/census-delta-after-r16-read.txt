@@ -1,4 +1,4 @@
-# The complete diff of the window census between the head that 5f's delta check r16 read (51e446ddf; superseded/window-census-r27.py.txt, sha256 4229f076f1dcbf1e4562c523402252ad90ca7e87da964498b5f57d8ee4b07c47) and this head (scripts/window-census.py.txt, sha256 bf72161cde42033ca838896ebd0e1b42a8a7a82db90b4240f73bb0abf5b4d75a), as `diff -u` with one line of context. Nothing else of the census differs. Every statement of parse_guard of the census that the delta check r16 read (and so of the one that the read r15 read) is intact in this one; the diff adds the new statements and functions and removes 2 text lines (the docstring line (iv) and the report string IDLE-MEANING, both rewritten).
+# The complete diff of the window census between the head that 5f's delta check r16 read (51e446ddf; superseded/window-census-r27.py.txt, sha256 4229f076f1dcbf1e4562c523402252ad90ca7e87da964498b5f57d8ee4b07c47) and this head (scripts/window-census.py.txt, sha256 90d5ceeb09fddfe67699dc4f1c60fc1b844c1f5a7b63c6d45f3f2dc9b57a88c5), as `diff -u` with one line of context. Nothing else of the census differs. Every statement of parse_guard of the census that the delta check r16 read (and so of the one that the read r15 read) is intact in this one; the diff adds the new statements and functions and removes 2 text lines (the docstring line (iv) and the report string IDLE-MEANING, both rewritten).
 # The cause: 5f's delta check r16 (r16-P2-1) and the command center's ruling J757-R16-FIX: the refusal of round 27 read the guard receipt's INFO line only when its three pending-counter fields stood consecutively in one order, so `INFO pending_changed=True` alone, two unequal totals without the flag and a reordered line passed. The activity-bearing fields of every line of the guard receipt (the INFO line and the sample lines) are now read BY NAME, in any order: the gateway's own pending-request counter (pending_total_before, pending_total_after, pending_changed) must be complete, readable and UNCHANGED, no client connection may be active (connections_active, active_so_far), no process of another lane may run (workers) and no call_logs row may be younger than 120 s (last_call_log_age_s); a repeated, missing, unreadable or contradictory field is refused instead of being taken as absent. REFUSALS only (every window that PASSes now PASSed on the census that the delta check r16 read: checks/census-negative-controls.txt). The controls are G17e-G17q. Since the push of e5c8a7fd the same diff also holds the changes that answer 5f's delta check r17 (the fail-closed grammar): their own diff is checks/census-delta-after-r17-read.txt.
 
 --- superseded/window-census-r27.py.txt
@@ -6,9 +6,9 @@
 @@ -11,3 +11,3 @@
    (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad, and exactly (the pad alone leaves a sliver at its edge) every call row that is not this run's and could own a usage row an own call row can claim (the candidate query seen from the usage row, the same association) is a problem wherever it lies;
 -  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and an INFO line (if the receipt has one) that shows no change of the gateway's own pending-request counter during the observation (round 27, the command center's second condition on the item (2) residual: a window whose idle receipt shows a foreign arrival is INCONCLUSIVE; the flag `pending_changed=True`, or two different totals, shows one); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
-+  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and, on the receipt's INFO and sample lines (each parsed against the guard's exact line grammar, fail-closed: a line that does not match exactly, a field with an empty value and a second counter summary are refused; the activity fields are then read by their own names), the gateway's own pending-request counter complete, readable and UNCHANGED (pending_total_before, pending_total_after, pending_changed), no active client connection, no process of another lane and no call_logs row younger than 120 s (rounds 27 to 29, the command center's second condition on the item (2) residual and its ruling J757-R17-FIX: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE; a repeated, missing, empty, unreadable or contradictory field is refused); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
++  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and, on the receipt's INFO and sample lines (each parsed against the guard's exact line grammar, fail-closed: a line that does not match exactly, a field with an empty value and a second counter summary are refused; the activity fields are then read by their own names), the gateway's own pending-request counter complete, readable and UNCHANGED (pending_total_before, pending_total_after, pending_changed), no active client connection, no process of another lane and no call_logs row younger than 120 s (rounds 27 to 30, the command center's second condition on the item (2) residual and its rulings J757-R17-FIX and RULING-757-R19: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE; a repeated, missing, empty, unreadable or contradictory field is refused, the IDENTITY line's pending_total, the same counter read at the identity read-back, must agree with both INFO readings, and the canary gate needs exactly one INFO line and an IDENTITY line that gives its pending_total); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
          no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
-@@ -1156,2 +1156,98 @@
+@@ -1156,2 +1156,102 @@
  
 +ACTIVITY_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed", "connections_active", "active_so_far", "workers", "last_call_log_age_s")
 +COUNTER_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed")
@@ -28,6 +28,8 @@
 +GUARD_INFO_LINE = re.compile(r"INFO unrelated_remote_records=[0-9]+ connections_seen=[0-9]+ connections_tolerated=[0-9]+ connections_active=[0-9]+ connections_idle=-?[0-9]+ "
 +                             r"pending_total_before=(?:[0-9]+|None) pending_total_after=(?:[0-9]+|None) pending_changed=(?:True|False) hindsight_processes=[0-9]+")
 +GUARD_SAMPLE_LINE = re.compile(r" {3}sample [0-9]+ at [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z: connections=[0-9]+ tolerated_so_far=[0-9]+ active_so_far=[0-9]+ workers=[0-9]+ last_call_log_age_s=(?:none|-?[0-9]+)")
++GUARD_IDENTITY_LINE = re.compile(r" {3}IDENTITY label=idle-only time=[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z unit=\S+ MainPID=[0-9]+ ExecMainStartTimestamp=\S+ NRestarts=(?:[0-9]+|None) running_prefix=\S+ BUILD_SHA=\S+ health=\S+ pending_total=([0-9]+|None)")   # the group is the IDENTITY line's reading of the counter: the same pattern validates the line and extracts the reading
++IDENTITY_COUNTER = re.compile(r"(?<![A-Za-z0-9_])pending_total(?![A-Za-z0-9_])", re.I)   # the IDENTITY line's reading of the gateway's pending-request counter (pending_total_before and pending_total_after are the INFO line's)
 +
 +
 +def receipt_grammar_problem(line):
@@ -38,12 +40,14 @@
 +        kind, grammar = "INFO", GUARD_INFO_LINE
 +    elif re.match(r"\s*sample\b", line, re.I):
 +        kind, grammar = "sample", GUARD_SAMPLE_LINE
++    elif re.match(r"\s*IDENTITY\b", line) and IDENTITY_COUNTER.search(line):
++        kind, grammar = "IDENTITY", GUARD_IDENTITY_LINE
 +    elif activity_values(line):
 +        return (f"a line of the idle receipt carries an activity field but is neither the guard's INFO line nor one of its sample lines (fail-closed): {stripped[:120]!r} "
 +                "(the command center's ruling J757-R17-FIX)")
 +    else:
 +        return ""
-+    if grammar.fullmatch(line):
++    if grammar.fullmatch(line) and (kind != "IDENTITY" or len(IDENTITY_COUNTER.findall(line)) == 1):   # an IDENTITY line may name pending_total once (a value such as running_prefix=pending_total=7 would otherwise hide a second reading)
 +        return ""
 +    return (f"the {kind} line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fail-closed): {stripped[:140]!r} "
 +            "(the command center's ruling J757-R17-FIX)")
@@ -107,7 +111,7 @@
 +
 +
  def parse_guard(path):
-@@ -1161,2 +1257,10 @@
+@@ -1161,2 +1261,18 @@
      for line in read_text(path, "guard receipt").splitlines():
 +        grammar_problem = receipt_grammar_problem(line)   # round 29 (ruling J757-R17-FIX): fail-closed grammar of the activity-bearing lines, on every line of the receipt
 +        if grammar_problem:
@@ -117,15 +121,40 @@
 +            if g["counter_lines"] == 2:
 +                g["problems"].append("the idle receipt carries more than one pending-request counter summary (a second line with pending_total_before, pending_total_after or pending_changed): the guard prints one, two summaries cannot be reconciled "
 +                                     "(the command center's second condition on the item (2) residual and its ruling J757-R17-FIX; review r17, r16-P2-1)")
++        id_total = GUARD_IDENTITY_LINE.fullmatch(line)   # round 30 (RULING-757-R19): the identity read-back's reading of the gateway's pending-request counter, taken from the native line only (and only when the name occurs once on it), kept for the reconciliation after the loop
++        if id_total and len(IDENTITY_COUNTER.findall(line)) == 1 and "identity_pending" not in g:
++            g["identity_pending"] = id_total.group(1)
++        if GUARD_INFO_LINE.fullmatch(line):
++            g["info_lines"] = g.get("info_lines", 0) + 1
++            if "info_totals" not in g:
++                info_totals = re.search(r"\bpending_total_before=(\S+) pending_total_after=(\S+)", line)
++                g["info_totals"] = (info_totals.group(1), info_totals.group(2))
          if re.match(r"^\s*GUARD(?![A-Za-z0-9_-])", line):
-@@ -1202,2 +1306,6 @@
+@@ -1202,2 +1318,16 @@
                                       "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX)")
 +        line_problems, line_changed = activity_problems(line)   # round 28: the activity-bearing fields of every line (the INFO line, the sample lines), read by name, in any order; the round-27 statement above is kept as it stands (a complete line in the normal order)
 +        g["problems"].extend(line_problems)
 +        if line_changed is not None:
 +            g["pending_changed"] = True if (line_changed or g.get("pending_changed")) else False
++    if g.get("identity_pending") is not None:   # round 30 (5f's delta check r18, P1; RULING-757-R19): the IDENTITY line's pending_total is the same counter that INFO reads before and after the observation (the guard reads it at the identity read-back, then pend0, then pend1)
++        id_reading = g["identity_pending"]
++        if not re.fullmatch(r"[0-9]{1,18}", id_reading):
++            g["problems"].append(f"the IDENTITY line's pending_total={id_reading!r} is not a readable number: an unknown observation of the gateway's own pending-request counter is not proof of quiet (5f's delta check r18; RULING-757-R19)")
++        elif g.get("info_totals"):
++            readable = [v for v in (id_reading, *g["info_totals"]) if re.fullmatch(r"[0-9]{1,18}", v)]
++            if len({int(v) for v in readable}) > 1:
++                g["pending_changed"] = True
++                g["problems"].append(f"the gateway's own pending-request counter is not the same at the identity read-back (pending_total={id_reading}) and in the INFO line (pending_total_before={g['info_totals'][0]}, pending_total_after={g['info_totals'][1]}): a request arrived or finished "
++                                     "between the readings, inside the receipt's interval (5f's delta check r18, P1; RULING-757-R19; the command center's second condition on the item (2) residual)")
      if g.get("guard_lines", 0) != 1 or g.get("identity_lines", 0) > 1:
-@@ -1399,3 +1507,3 @@
+@@ -1375,2 +1505,6 @@
+             rep.bad("the guard receipt has no identity line (MainPID and ExecMainStartTimestamp): the canary gate must compare the process of the idle check with that of every arm")
++        if canary_gate and guard.get("info_lines", 0) != 1:
++            rep.bad(f"the idle receipt has {guard.get('info_lines', 0)} INFO line(s) of the guard's grammar: the canary gate needs exactly one (it carries the gateway's own pending-request counter before and after the observation) (RULING-757-R19)")
++        if canary_gate and guard.get("identity_pending") is None:
++            rep.bad("the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt without it cannot be accepted (RULING-757-R19)")
+         if canary_gate and compared != len(arms):
+@@ -1399,3 +1533,3 @@
              f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
 -    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO line, if it has one, shows no change of the gateway's pending-request counter) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
 +    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO and sample lines show the gateway's pending-request counter complete and unchanged, no active connection and no recent row) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")

@@ -1,14 +1,14 @@
-# Offline controls of the window census gate (scripts/window-census.py.txt, version 1, sha256 bf72161cde42033ca838896ebd0e1b42a8a7a82db90b4240f73bb0abf5b4d75a; new in this round, not frozen), 2026-10-07 UTC: scripts/acceptance-controls/census-controls.py.txt, run with `uv run --with scipy==1.18.1 --with numpy==2.5.3` so that the cross-check X3 runs.
+# Offline controls of the window census gate (scripts/window-census.py.txt, version 1, sha256 90d5ceeb09fddfe67699dc4f1c60fc1b844c1f5a7b63c6d45f3f2dc9b57a88c5; new in this round, not frozen), 2026-10-07 UTC: scripts/acceptance-controls/census-controls.py.txt, run with `uv run --with scipy==1.18.1 --with numpy==2.5.3` so that the cross-check X3 runs.
 # Synthetic fixtures (a scratch store with the gateway's table definitions, arm outputs in the frozen scripts' formats, guard receipts): evidence class `local_integration`; no gateway request was sent. Scenarios: P1-P4 exact matches (the wrapper's lines, a direct run with the journal line a runner adds, a unique 2x2, the canary's four arms in the canary's order with the default `--require-arms 4`), R1-R3 the replacement case (R3 is the RESIDUAL and is expected to PASS), R4-R5 a wrong number of arms, K1-K2 a wrong canary shape and a baseline header,
 # I1-I7 (one row short, a foreign call row, the provider-test rows, two candidates, a complete 2x2, an orphan, a restart between the idle receipt and an arm), U1-U4 an unreadable store, G1-G10c the guard receipt (missing, stale, after the first arm, not clean, version 4, full mode, a 10 s observation, whole-second stamps, `--diagnostic` with and without a receipt, another port, unit or tolerated unit), A1-A12 the inputs, C1-C7 clocks, tiling and the window's edges, F1 the timestamp format, N1-N3 NULL token counts, an own row without milliseconds and a non-numeric latency, Y1-Y10b the reproductions of an adversarial fuzz review (a replacement through the 3 s pad, off-format timestamps, a duplicated usage row, an unparsable RESULT line, a hand-concatenated file, identity fields in another order, NULL columns, a stamp of year 9999, clean_for=nan, a path with a space), Y11-Y12c the reproductions of the delta read r10 and the exact boundary check (a foreign call row at T-0.1 s replacing an own usage row, the pad's own edge on both sides, the same case inside the window), D1-D6 the canary gate's contract (direct outputs, missing identity lines or headers, three of four identities, a guard receipt without an identity line, a trial's scope), G11-G11g the receipt's observed interval, W1-W3b the declared interval in real time (a census started 1 s after the last arm waits, a row written during the wait is found, an interval an hour ahead is refused; the other fixtures lie in the past, 2026-10-06T12:00Z), J1-J21 the gateway journal as the independent record of every inbound request (a foreign request's line closes the substitution that R3 shows without it, also one that arrived up to 3.1 s before the window; a lost line, journalctl failing or reporting skipped data on stderr, every journal form that cannot be read (J13a-J13j), a line outside the window, a line in the settle tail, a lost line balanced by a foreign one with the pairing's limit and chain width (J10, J15), the pairing by path (J16), the leftovers of a maximum matching (J17), an overflowing duration (J18), the exact command in the receipt (J14), labels with a newline or a lone surrogate (J20), and the receipt's verbatim statement of the residual with its evidence classes (J21a, J21b)); X1 the predicates of the census against the frozen scripts' source (by AST: those scripts run main at import and are never imported),
 # X2 `associated()` against raw script 2.2's own on 40,000 pairs, X3 the matching functions against a brute force over all permutations and against scipy's maximum_bipartite_matching (with the edge-removal uniqueness test) on 8,000 random graphs. Raw output, home directory written $HOME.
 
 # Offline controls of the window census gate, version 1 (new, not frozen); python 3.14.7; scipy 1.18.1, numpy 2.5.3
-# census: sha256 bf72161cde42033ca838896ebd0e1b42a8a7a82db90b4240f73bb0abf5b4d75a
-# this controls script: sha256 23a9c08590f7abc56a88bee27e60ecc356ce97d32dfcb9e5aa722688d165d841
+# census: sha256 90d5ceeb09fddfe67699dc4f1c60fc1b844c1f5a7b63c6d45f3f2dc9b57a88c5
+# this controls script: sha256 91b6449d2751743fe5facb546d1d7287cb6e187a832cfcc1e5a823c84ce16ce8
 # the fixtures guard receipts carry the guard script sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b
 # raw script 2.2 (frozen, parsed never imported): sha256 52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75; native script 2.1: sha256 db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd
-# started 2026-10-07T16:53:11Z
+# started 2026-10-07T19:44:03Z
 
 CONTROL-RESULT P1 expected_exit=0 observed_exit=0 OK :: exact match: 3 raw requests and 3 native call rows, each with its usage row, guard clean, no foreign row: PASS, and the receipt holds the exact queries, the window, the clocks, the counts and no full id
     CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
@@ -173,7 +173,8 @@ CONTROL-RESULT G4 expected_exit=2 observed_exit=2 OK :: the guard was not clean
 CONTROL-RESULT G17a expected_exit=2 observed_exit=2 OK :: r15, the command center's second condition: a CLEAN idle receipt whose INFO line shows the gateway's own pending-request counter rising during the observation (0 to 1, pending_changed=True): INCONCLUSIVE (r26 PASSed: the census read only IDLE-RESULT)
     PROBLEM guard receipt: the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before=0, pending_total_after=1, pending_changed=True): a request arrived or finished while the lane was to be idle, so
     PROBLEM guard receipt: the idle receipt shows foreign activity, or cannot show its absence (pending_changed=True; the totals differ (0 and 1)): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, proces
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial-fixture
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=0, pending_total_after=1): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=trial-fixture
 
 CONTROL-RESULT G17b expected_exit=0 observed_exit=0 OK :: the same receipt with the counter unchanged at the stale value of the unpatched build (92 and 92, pending_changed=False, as the live trial's receipts print it): PASS
     CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
@@ -181,12 +182,14 @@ CONTROL-RESULT G17b expected_exit=0 observed_exit=0 OK :: the same receipt with 
 CONTROL-RESULT G17c expected_exit=2 observed_exit=2 OK :: the counter falling during the observation (3 to 2, pending_changed=True: a request that was in flight at its start finished): INCONCLUSIVE
     PROBLEM guard receipt: the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before=3, pending_total_after=2, pending_changed=True): a request arrived or finished while the lane was to be idle, so
     PROBLEM guard receipt: the idle receipt shows foreign activity, or cannot show its absence (pending_changed=True; the totals differ (3 and 2)): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, proces
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial-fixture
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=3, pending_total_after=2): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=trial-fixture
 
 CONTROL-RESULT G17d expected_exit=2 observed_exit=2 OK :: the totals differ (0 and 1) while the flag says False: INCONCLUSIVE (the totals decide)
     PROBLEM guard receipt: the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before=0, pending_total_after=1, pending_changed=False): a request arrived or finished while the lane was to be idle, s
     PROBLEM guard receipt: the idle receipt shows foreign activity, or cannot show its absence (the totals differ (0 and 1)): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, process of another lane or r
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial-fixture
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=0, pending_total_after=1): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=trial-fixture
 
 CONTROL-RESULT G17e expected_exit=2 observed_exit=2 OK :: 5f's r16 (an unknown observation is not proof of quiet): the counter could not be read (None and None, pending_changed=False): INCONCLUSIVE (r27 PASSed it)
     PROBLEM guard receipt: the idle receipt shows foreign activity, or cannot show its absence (pending_total_before=None is not a readable number; pending_total_after=None is not a readable number): the gateway's own pending-request counter must be complete, read
@@ -273,7 +276,8 @@ CONTROL-RESULT G17v expected_exit=2 observed_exit=2 OK :: 5f's r17 (b): two comp
 
 CONTROL-RESULT G17w expected_exit=2 observed_exit=2 OK :: two IDENTICAL complete counter summaries (5 5 False twice): INCONCLUSIVE (the guard prints one; a concatenated receipt is not reconciled)
     PROBLEM guard receipt: the idle receipt carries more than one pending-request counter summary (a second line with pending_total_before, pending_total_after or pending_changed): the guard prints one, two summaries cannot be reconciled (the command center's seco
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=trial-fixture
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=5, pending_total_after=5): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial-fixture
 
 CONTROL-RESULT G17x expected_exit=2 observed_exit=2 OK :: a key written in quotes (JSON style) with an active connection (`INFO {"connections_active": 2}`; r28 did not read it): INCONCLUSIVE
     PROBLEM guard receipt: the INFO line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fail-cl
@@ -306,7 +310,8 @@ CONTROL-RESULT G18e expected_exit=2 observed_exit=2 OK :: a sample line with an 
 
 CONTROL-RESULT G18f expected_exit=2 observed_exit=2 OK :: an activity field on the IDENTITY line (`pending_changed=True`; the old code left the line after its first read and never scanned it, r28 PASSed): INCONCLUSIVE
     PROBLEM guard receipt: a line of the idle receipt carries an activity field but is neither the guard's INFO line nor one of its sample lines (fail-closed): 'IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=trial-fixture
+    PROBLEM guard receipt: the idle receipt carries more than one pending-request counter summary (a second line with pending_total_before, pending_total_after or pending_changed): the guard prints one, two summaries cannot be reconciled (the command center's seco
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial-fixture
 
 CONTROL-RESULT G18g expected_exit=2 observed_exit=2 OK :: an activity field on the CHECK line (`workers=2`): INCONCLUSIVE
     PROBLEM guard receipt: a line of the idle receipt carries an activity field but is neither the guard's INFO line nor one of its sample lines (fail-closed): 'CHECK nothing in flight for 30 s (7 samples): ok (0 idle and 0 tolerated connection(s)) workers=2' (the
@@ -332,6 +337,65 @@ CONTROL-RESULT G18k expected_exit=2 observed_exit=2 OK :: the complete, quiet IN
 CONTROL-RESULT G18l expected_exit=2 observed_exit=2 OK :: an activity field on the GUARD line (`workers=0`, quiet but not in the guard's grammar; the old code left the line after its first read, r28 PASSed): INCONCLUSIVE
     PROBLEM guard receipt: a line of the idle receipt carries an activity field but is neither the guard's INFO line nor one of its sample lines (fail-closed): 'GUARD version=5 mode=idle-only script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=trial-fixture
+
+CONTROL-RESULT G19a expected_exit=2 observed_exit=2 OK :: RULING-757-R19, 5f's r18 P1, native format, canary scope: the identity read-back reads the gateway's pending-request counter at 0, then the INFO line 1 and 1 (a visible increase inside the receipt's interval; r29 kept only MainPID and ExecMainStartTimestamp from the IDENTITY line and PASSed): INCONCLUSIVE
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=1, pending_total_after=1): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
+
+CONTROL-RESULT G19b expected_exit=0 observed_exit=0 OK :: native format, canary scope: equal values in all three readings (identity 92, INFO 92 and 92, False: the unpatched build's stale counter as its receipts print it): PASS
+    CENSUS-RESULT PASS exit=0 problems=0 scope=canary-fixture
+
+CONTROL-RESULT G19c expected_exit=2 observed_exit=2 OK :: the other direction at trial scope (identity 1, INFO 0 and 0, False: a request finished between the readings): INCONCLUSIVE (the reconciliation holds at every scope)
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=1) and in the INFO line (pending_total_before=0, pending_total_after=0): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=trial-fixture
+
+CONTROL-RESULT G19d expected_exit=0 observed_exit=0 OK :: an equal non-zero counter in all three readings (3, 3, 3), trial scope: PASS
+    CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
+
+CONTROL-RESULT G19e expected_exit=2 observed_exit=2 OK :: canary scope: the identity read-back could not read the counter (`pending_total=None`) beside a quiet INFO line: INCONCLUSIVE (an unknown observation is not proof of quiet)
+    PROBLEM guard receipt: the IDENTITY line's pending_total='None' is not a readable number: an unknown observation of the gateway's own pending-request counter is not proof of quiet (5f's delta check r18; RULING-757-R19)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
+
+CONTROL-RESULT G19f expected_exit=2 observed_exit=2 OK :: canary scope: an EMPTY pending_total on the IDENTITY line (`pending_total=`): INCONCLUSIVE (not the guard's IDENTITY line; an empty value)
+    PROBLEM guard receipt: the IDENTITY line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fai
+    PROBLEM the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
+
+CONTROL-RESULT G19g expected_exit=2 observed_exit=2 OK :: canary scope: an IDENTITY line that carries pending_total but is not the guard's native line (NRestarts missing): INCONCLUSIVE (fail-closed, as the INFO and sample lines)
+    PROBLEM guard receipt: the IDENTITY line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fai
+    PROBLEM the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
+
+CONTROL-RESULT G19h expected_exit=2 observed_exit=2 OK :: RULING-757-R19, canary scope: a receipt with NO INFO line (the identity counter alone cannot show the observation): INCONCLUSIVE (the canary gate needs exactly one INFO line; r29 PASSed it)
+    PROBLEM the idle receipt has 0 INFO line(s) of the guard's grammar: the canary gate needs exactly one (it carries the gateway's own pending-request counter before and after the observation) (RULING-757-R19)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
+
+CONTROL-RESULT G19i expected_exit=0 observed_exit=0 OK :: trial scope: a receipt with NO INFO line: PASS (the rule is the canary gate's; a trial is not canary acceptance)
+    CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
+
+CONTROL-RESULT G19j expected_exit=2 observed_exit=2 OK :: canary scope: TWO identical INFO lines: INCONCLUSIVE (the canary gate needs exactly one, and a second counter summary is refused at every scope)
+    PROBLEM guard receipt: the idle receipt carries more than one pending-request counter summary (a second line with pending_total_before, pending_total_after or pending_changed): the guard prints one, two summaries cannot be reconciled (the command center's seco
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=92, pending_total_after=92): a request arrived or finished between the readings, inside the 
+    PROBLEM the idle receipt has 2 INFO line(s) of the guard's grammar: the canary gate needs exactly one (it carries the gateway's own pending-request counter before and after the observation) (RULING-757-R19)
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=canary-fixture
+
+CONTROL-RESULT G19k expected_exit=2 observed_exit=2 OK :: canary scope: the native IDENTITY line (0) beside an INFO line that changes by itself (0, 1, True): INCONCLUSIVE (the INFO change and the disagreement are both named)
+    PROBLEM guard receipt: the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before=0, pending_total_after=1, pending_changed=True): a request arrived or finished while the lane was to be idle, so
+    PROBLEM guard receipt: the idle receipt shows foreign activity, or cannot show its absence (pending_changed=True; the totals differ (0 and 1)): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, proces
+    PROBLEM guard receipt: the gateway's own pending-request counter is not the same at the identity read-back (pending_total=0) and in the INFO line (pending_total_before=0, pending_total_after=1): a request arrived or finished between the readings, inside the re
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=canary-fixture
+
+CONTROL-RESULT G19l expected_exit=2 observed_exit=2 OK :: canary scope: an IDENTITY line that names pending_total twice (a value `running_prefix=pending_total=7` in front of the real field `pending_total=0`; the line still matches the native pattern, and the first occurrence would have hidden the increase beside INFO 7, 7, False): INCONCLUSIVE (the name may occur once)
+    PROBLEM guard receipt: the IDENTITY line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fai
+    PROBLEM the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
+
+CONTROL-RESULT G19m expected_exit=2 observed_exit=2 OK :: RULING-757-R19 made fail-closed, canary scope: an IDENTITY line that gives no pending_total (the short line of the earlier fixtures; a receipt could omit the counter that the gate reconciles with the INFO readings): INCONCLUSIVE
+    PROBLEM the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
+
+CONTROL-RESULT G19n expected_exit=0 observed_exit=0 OK :: trial scope: the same short IDENTITY line (no pending_total): PASS (the requirement is the canary gate's; a trial is not canary acceptance)
+    CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
 
 CONTROL-RESULT G5 expected_exit=2 observed_exit=2 OK :: a guard version 4 receipt (GUARD-RESULT, no IDLE-RESULT)
     PROBLEM guard receipt: the receipt is not from guard version 5 (GUARD version='4')
@@ -665,8 +729,9 @@ CONTROL-RESULT D5 expected_exit=2 observed_exit=2 OK :: the guard receipt has no
     PROBLEM arm 3 (d5-arm-3-native.txt) carries the wrapper's identity line but the guard receipt has none: the process cannot be compared
     PROBLEM arm 4 (d5-arm-4-last.txt) carries the wrapper's identity line but the guard receipt has none: the process cannot be compared
     PROBLEM the guard receipt has no identity line (MainPID and ExecMainStartTimestamp): the canary gate must compare the process of the idle check with that of every arm
+    PROBLEM the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt
     PROBLEM the gateway process identity was compared for 0 of 4 arm(s): the canary gate needs every comparison to succeed
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=6 scope=canary-fixture
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=7 scope=canary-fixture
 
 CONTROL-RESULT D6 expected_exit=0 observed_exit=0 OK :: a trial of fewer arms (the two direct arms, --require-arms 2) still PASSes and says it is a trial, not canary acceptance
     CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
@@ -704,18 +769,18 @@ CONTROL-RESULT G11g expected_exit=2 observed_exit=2 OK :: a GUARD line without a
     PROBLEM guard receipt: the receipt has no parsable start time (GUARD start=): the observed interval cannot be measured
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=7 scope=trial-fixture
 
-CONTROL-RESULT W1 expected_exit=0 observed_exit=0 OK :: r10 P2-2: the census is started 1 s after the last arm ended (the declared interval ends 8 s later, +2 s settling): it WAITS, then reads (took 8.0 s) and PASSes; the receipt says how long after the interval's end the store was read
+CONTROL-RESULT W1 expected_exit=0 observed_exit=0 OK :: r10 P2-2: the census is started 1 s after the last arm ended (the declared interval ends 8 s later, +2 s settling): it WAITS, then reads (took 8.3 s) and PASSes; the receipt says how long after the interval's end the store was read
     CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
 
-CONTROL-RESULT W1b OK :: it did wait (7.8 s announced, at least 5 s were due: the interval had 1 s of its 10 s behind it; the run took 8.0 s) and read the store at least 2 s after the interval's end (2.0 s)
+CONTROL-RESULT W1b OK :: it did wait (8.2 s announced, at least 5 s were due: the interval had 1 s of its 10 s behind it; the run took 8.3 s) and read the store at least 2 s after the interval's end (2.0 s)
 
-CONTROL-RESULT W2 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took 8.6 s)
+CONTROL-RESULT W2 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a foreign request is written into the declared tail (3 s after the last arm's end) WHILE the census waits (it was started 1 s after the last arm ended, the row went in at about +3.5 s): the census, which reads only after the interval, sees it: INCONCLUSIVE (took 8.7 s)
     PROBLEM 1 foreign call row(s) in the window (any call row without an own tag, read from 3 s before the window's start): a foreign request ran, so a foreign usage row could stand in for an own one
     PROBLEM 1 orphan usage row(s) in the window (no own call row is associated with them): foreign traffic or a call row that was never written
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=trial-fixture
 
 CONTROL-RESULT W3 expected_exit=2 observed_exit=2 OK :: r10 P2-2: a declared interval that ends an hour AHEAD of the host clock (a wrong stamp or clock): no wait, INCONCLUSIVE with the reason
-    PROBLEM the declared interval ends 3610 s ahead of the host clock (the usage rows' pad ends 2026-10-07T17:54:34.000Z, +2 s of settling): more than the 30 s the census waits for, so the stamps or the clock are wrong or the run is not over; the store was read an
+    PROBLEM the declared interval ends 3610 s ahead of the host clock (the usage rows' pad ends 2026-10-07T20:45:28.000Z, +2 s of settling): more than the 30 s the census waits for, so the stamps or the clock are wrong or the run is not over; the store was read an
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=trial-fixture
 
 CONTROL-RESULT W3b OK :: it did not wait (took 0.1 s)
@@ -747,8 +812,9 @@ CONTROL-RESULT D7 expected_exit=2 observed_exit=2 OK :: r11 P2-6: the guard rece
     PROBLEM arm 3 (d7-arm-3-native.txt) has no usable wrapper identity line (MainPID and ExecMainStartTimestamp): the canary gate must establish that the gateway stayed the same process in every arm
     PROBLEM arm 4 (d7-arm-4-last.txt) has no usable wrapper identity line (MainPID and ExecMainStartTimestamp): the canary gate must establish that the gateway stayed the same process in every arm
     PROBLEM the guard receipt has no identity line (MainPID and ExecMainStartTimestamp): the canary gate must compare the process of the idle check with that of every arm
+    PROBLEM the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt
     PROBLEM the gateway process identity was compared for 0 of 4 arm(s): the canary gate needs every comparison to succeed
-    CENSUS-RESULT INCONCLUSIVE exit=2 problems=10 scope=canary-fixture
+    CENSUS-RESULT INCONCLUSIVE exit=2 problems=11 scope=canary-fixture
 
 CONTROL-RESULT D8 expected_exit=2 observed_exit=2 OK :: r11 P2-6: four arms without a wrapper header AND without identity lines: INCONCLUSIVE
     PROBLEM arm 1 (d8-arm-1-raw.txt) holds 0 wrapper identity line(s): the wrapper reads the identity before and after the run, so a cut-off output cannot establish that the gateway stayed the same process
@@ -1082,19 +1148,19 @@ CONTROL-RESULT F11 expected_exit=2 observed_exit=2 OK :: review F11: an arm file
 CONTROL-RESULT J12a expected_exit=2 observed_exit=2 OK :: review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)
     PROBLEM the gateway's journal shows 44 inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds 43 own call row(s): more lines than rows: a request that left no call row (dropped, or another client's) cannot be excl
     PROBLEM the gateway's journal and the own call rows do not pair one to one by estimated start and path: 0 own call row(s) have no inbound line of their path within 3 s of their estimated start and 1 inbound line(s) have no own call row (a lost line balanced by
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.098Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.086Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     PROBLEM usage row 44cb730c (matched to own call row caf6b1b2) started -2.90 s from its call row's own start (its timestamp - its latency against the call row's timestamp - duration: both rows come from ONE duration clock and differ by milliseconds for one requ
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=4 scope=canary-fixture
 
 CONTROL-RESULT J12b expected_exit=2 observed_exit=2 OK :: review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE
     PROBLEM the gateway's journal shows 44 inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds 43 own call row(s): more lines than rows: a request that left no call row (dropped, or another client's) cannot be excl
     PROBLEM the gateway's journal and the own call rows do not pair one to one by estimated start and path: 0 own call row(s) have no inbound line of their path within 3 s of their estimated start and 1 inbound line(s) have no own call row (a lost line balanced by
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.097Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.095Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     PROBLEM usage row 44cb730c (matched to own call row 523e4262) started -2.90 s from its call row's own start (its timestamp - its latency against the call row's timestamp - duration: both rows come from ONE duration clock and differ by milliseconds for one requ
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=4 scope=canary-fixture
 
 CONTROL-RESULT J12c expected_exit=2 observed_exit=2 OK :: r12-P1-1, the reviewer's own world (it used to be expected to PASS: its foreign line lay outside the counted arrival range): a foreign request that arrived 4.5 s before the window stands in for an own one whose clock started 2.9 s later: INCONCLUSIVE, through the clock-start agreement of the claimed usage row (row only: no journal line needed)
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.093Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.092Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     PROBLEM usage row 44cb730c (matched to own call row f3332c1c) started -2.90 s from its call row's own start (its timestamp - its latency against the call row's timestamp - duration: both rows come from ONE duration clock and differ by milliseconds for one requ
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
@@ -1183,28 +1249,28 @@ CONTROL-RESULT J21b expected_exit=2 observed_exit=2 OK :: the same two lines in 
 
 CONTROL-RESULT J22a expected_exit=2 observed_exit=2 OK :: r12-P1-1 (P1): the reviewer's leading-edge substitution with a nonzero arrival-to-clock delay: the foreign request ARRIVED 4.5 s before the run's origin (outside the counted arrival range: its line is not counted), started its duration clock 5 s later (0.15 s after the own request's) and streamed: two stream-end lines for one own call row: INCONCLUSIVE (it used to PASS with scope=canary)
     PROBLEM the stream-end lines and the own call rows do not pair one to one: 0 own call row(s) have no stream-end line of their provider and model with an implied start within 0.25 s of theirs, and 1 stream-end controller(s) in the counted range have no own call
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.104Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.092Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J22b expected_exit=2 observed_exit=2 OK :: r12-P1-1: the same world, the foreign request arrived 25 s before the run's origin (any arrival-to-clock delay): INCONCLUSIVE through its stream-end line
     PROBLEM the stream-end lines and the own call rows do not pair one to one: 0 own call row(s) have no stream-end line of their provider and model with an implied start within 0.25 s of theirs, and 1 stream-end controller(s) in the counted range have no own call
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.109Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.096Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J22c expected_exit=2 observed_exit=2 OK :: r12-P1-1: the same world, the foreign request arrived 2 minutes before the run's origin (any arrival-to-clock delay): INCONCLUSIVE through its stream-end line
     PROBLEM the stream-end lines and the own call rows do not pair one to one: 0 own call row(s) have no stream-end line of their provider and model with an implied start within 0.25 s of theirs, and 1 stream-end controller(s) in the counted range have no own call
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.109Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.097Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J22d expected_exit=2 observed_exit=2 OK :: r12-P1-1: the same world, the foreign request arrived just before its clock (inside the counted arrival range as well) the run's origin (any arrival-to-clock delay): INCONCLUSIVE through its stream-end line
     PROBLEM the gateway's journal shows 44 inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds 43 own call row(s): more lines than rows: a request that left no call row (dropped, or another client's) cannot be excl
     PROBLEM the gateway's journal and the own call rows do not pair one to one by estimated start and path: 0 own call row(s) have no inbound line of their path within 3 s of their estimated start and 1 inbound line(s) have no own call row (a lost line balanced by
     PROBLEM the stream-end lines and the own call rows do not pair one to one: 0 own call row(s) have no stream-end line of their provider and model with an implied start within 0.25 s of theirs, and 1 stream-end controller(s) in the counted range have no own call
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.105Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.096Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=4 scope=canary-fixture
 
 CONTROL-RESULT J22e expected_exit=2 observed_exit=2 OK :: r13-P1 (was the residual that stayed, expected PASS): the same world with a NON-STREAMING foreign request (no stream-end line, no call row): its arrival line (0.7 s after the run's origin, 5 s before its duration clock) has no call row of its path: INCONCLUSIVE in the canary's scope (J36a-J36e: every lead)
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.110Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.088Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J22f expected_exit=0 observed_exit=0 OK :: the completion residual in its narrowest form (expected PASS): the own request's stream-end line is lost AND the foreign request's line (same provider and model, implied start 0.1 s from the own's) takes its place, and the foreign request's arrival line is not in the journal either (item (1) of the ruling: not logged or not kept): the pairing cannot tell them apart
@@ -1423,7 +1489,7 @@ CONTROL-RESULT J27b expected_exit=2 observed_exit=2 OK :: the same world with th
 
 CONTROL-RESULT J27c expected_exit=2 observed_exit=2 OK :: the pairing's edge: the foreign line 3.01 s after the estimate does not pair: INCONCLUSIVE (the arrival count)
     PROBLEM the gateway's journal and the own call rows do not pair one to one by estimated start and path: 1 own call row(s) have no inbound line of their path within 3 s of their estimated start and 1 inbound line(s) have no own call row (a lost line balanced by
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.100Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.093Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     PROBLEM 1 call row(s) on paths with arrival lines have no inbound line of their own (no arrival line is matched to them) since the serving process started ({'/v1/responses': 1}): a request whose arrival line was not logged or not kept, or a further attempt row
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=canary-fixture
 
@@ -1644,24 +1710,24 @@ CONTROL-RESULT J35c expected_exit=0 observed_exit=0 OK :: P3-6: journald stamps 
     CENSUS-RESULT PASS exit=0 problems=0 scope=trial-fixture
 
 CONTROL-RESULT J36a expected_exit=2 observed_exit=2 OK :: P1 (r13), the former residual J22e: a NON-STREAMING foreign request that arrived 0.7 s after the run's origin (4.6 s before the first arm's script start, just outside the counted arrival range; 5 s before its duration clock), its usage row standing in for the own one (its call row never written, no stream-end line): its arrival line has no call row of its path: INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.111Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.095Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J36b expected_exit=2 observed_exit=2 OK :: P1 (r13), the former residual J22e: a NON-STREAMING foreign request that arrived 20 s before the run's origin (25 s before its duration clock), its usage row standing in for the own one (its call row never written, no stream-end line): its arrival line has no call row of its path: INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.107Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.094Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J36c expected_exit=2 observed_exit=2 OK :: P1 (r13), the former residual J22e: a NON-STREAMING foreign request that arrived 2 minutes before the run's origin, its usage row standing in for the own one (its call row never written, no stream-end line): its arrival line has no call row of its path: INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.102Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.096Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J36d expected_exit=2 observed_exit=2 OK :: P1 (r13), the former residual J22e: a NON-STREAMING foreign request that arrived 50 minutes before the run's origin (any lead over the duration clock), its usage row standing in for the own one (its call row never written, no stream-end line): its arrival line has no call row of its path: INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.099Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.101Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J36e expected_exit=2 observed_exit=2 OK :: P1 (r13): the same world with a STREAMING foreign request (its stream-end line is there) that arrived 50 minutes before its clock: INCONCLUSIVE through both records
     PROBLEM the stream-end lines and the own call rows do not pair one to one: 0 own call row(s) have no stream-end line of their provider and model with an implied start within 0.25 s of theirs, and 1 stream-end controller(s) in the counted range have no own call
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.113Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.091Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J36f expected_exit=0 observed_exit=0 OK :: the narrowest residual, item (1) of the ruling: the same non-streaming world, but the foreign request's arrival line is NOT in the journal (not logged or not kept): PASS
@@ -1674,23 +1740,23 @@ CONTROL-RESULT J37b expected_exit=0 observed_exit=0 OK :: the same legitimate re
     CENSUS-RESULT PASS exit=0 problems=0 scope=canary-fixture
 
 CONTROL-RESULT J37c expected_exit=2 observed_exit=2 OK :: an inbound line 40 minutes before the window with no call row at all (a request that the gateway rejected before its call log, or whose row was lost): INCONCLUSIVE, stated: the incarnation is not fully accounted for
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.103Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.093Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J37d expected_exit=2 observed_exit=2 OK :: two arrival lines before the window and one call row (one request left no row): INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.096Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.108Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J37e expected_exit=0 observed_exit=0 OK :: the residual, item (2) of the ruling: a lost arrival line balanced by a spare call row of the same path without an arrival line (a request whose line was not kept, and one whose row is the spare): matched: PASS
     CENSUS-RESULT PASS exit=0 problems=0 scope=canary-fixture
 
 CONTROL-RESULT J37f expected_exit=2 observed_exit=2 OK :: a request on another path (the arrival line says /v1/chat/completions, the only spare call row is /v1/responses): matched by path, so INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.099Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.102Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     PROBLEM 1 call row(s) on paths with arrival lines have no inbound line of their own (no arrival line is matched to them) since the serving process started ({'/v1/responses': 1}): a request whose arrival line was not logged or not kept, or a further attempt row
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J37g expected_exit=2 observed_exit=2 OK :: a call row with an unreadable duration since the start (its estimated start is unknown): INCONCLUSIVE
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.099Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.094Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     PROBLEM 1 call row(s) since the serving process started have a duration that cannot be read: their estimated start is unknown, so the lines cannot all be matched
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
@@ -1756,7 +1822,7 @@ CONTROL-RESULT J39d expected_exit=2 observed_exit=2 OK :: the INCONCLUSIVE resul
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=trial-fixture
 
 CONTROL-RESULT J40a expected_exit=2 observed_exit=2 OK :: r13-P1-2 (5f): a foreign successful stream whose usage row stands in for an own one (its call row never written), its arrival line 40 s before the run's origin and its stream-end line 1000 s after its usage row (an unread downstream queue: far beyond the counted range, so the completion record never sees it): INCONCLUSIVE through its arrival line over the whole incarnation
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.099Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.090Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=1 scope=canary-fixture
 
 CONTROL-RESULT J40b expected_exit=0 observed_exit=0 OK :: the same world with the foreign arrival line not in the journal (not logged or not kept: item (1) of the ruling): the late stream-end line is outside the counted range and nothing else sees the request: PASS (the residual, stated)
@@ -1768,7 +1834,7 @@ CONTROL-RESULT J40c expected_exit=2 observed_exit=2 OK :: the same world with th
 
 CONTROL-RESULT J40d expected_exit=2 observed_exit=2 OK :: the same, with the arrival line: INCONCLUSIVE through both records
     PROBLEM the stream-end lines and the own call rows do not pair one to one: 0 own call row(s) have no stream-end line of their provider and model with an implied start within 0.25 s of theirs, and 1 stream-end controller(s) in the counted range have no own call
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.102Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.096Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J40e expected_exit=2 observed_exit=2 OK :: an OWN request whose stream-end line comes 1000 s after its rows (beyond the counted range): the line is not read, so its call row has no stream-end line: INCONCLUSIVE (fail closed: the late line of an own request is not evidence)
@@ -1807,7 +1873,7 @@ CONTROL-RESULT J44a expected_exit=2 observed_exit=2 OK :: review 5 L1-2 (P2): a 
     PROBLEM 2 supervisor restart diagnostic(s) or child startup banner(s) in the journal range (['child startup: next', 'child startup: ready']): the serving child was (re)started while the idle receipt and the window were observed
     PROBLEM listener pid(s) [1326] have a journal entry dated on the monotonic clock more than 1 s before the process started: the entries are of another process (a reused pid) or the start is mis-read
     PROBLEM the journal holds no startup banner (Next.js or Ready) of listener pid(s) [1326] within [their start - 1 s, their start + 120 s] on the monotonic clock: the read does not reach the process's birth (the `[DB] Driver` line is printed at every database op
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.107Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.090Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=7 scope=canary-fixture
 
 CONTROL-RESULT J44b expected_exit=2 observed_exit=2 OK :: the same step without the stand-in (the step alone): INCONCLUSIVE, the incarnation cannot be established
@@ -1820,7 +1886,7 @@ CONTROL-RESULT J44b expected_exit=2 observed_exit=2 OK :: the same step without 
 
 CONTROL-RESULT J44f expected_exit=2 observed_exit=2 OK :: our check of the repair before the push (round 24): a forward clock step of 0.9 s, under the 1 s tolerance of the listener-entry check (its banners pass it): the non-streaming stand-in's arrival line, logged 0.3 s before the computed start, is dropped as dated before it: a request line of a listener dated before its own start is INCONCLUSIVE (it PASSed)
     PROBLEM listener pid(s) [1326] wrote request lines (arrival or stream-end) dated before their own process start: a request cannot reach a process that has not started, so the wall clock stepped against the boot clock (a host resume, an NTP step; a step under 1
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.092Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:25.099Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=2 scope=canary-fixture
 
 CONTROL-RESULT J44c expected_exit=2 observed_exit=2 OK :: review 5 L1-3 (P3): coverage is a startup BANNER of the listener, not any entry: the banners are not in the journal and an ordinary listener line 60 s after the start is: INCONCLUSIVE (it PASSed)
@@ -1889,19 +1955,19 @@ CONTROL-RESULT J46e expected_exit=2 observed_exit=2 OK :: a call row of a path w
 CONTROL-RESULT J47a expected_exit=2 observed_exit=2 OK :: 5f's r14 P1-2 (the reviewer's world, rebuilt; it PASSed on r24): the wall clock stepped forward by 600 s at process age 30 s, a journalctl that honours --since and --until: the true startup banners and a foreign request's arrival line (age 10 s, no call row, its usage row standing in for an own one) are dated before the computed start and are not in the bounded read, and a later genuine `[DB] Driver` line (age 31 s) satisfied the banner rule: INCONCLUSIVE by the read by boot and pid
     PROBLEM the journal read holds no startup banner (Next.js or Ready) of listener pid(s) [1326] from [their start - 1 s, their start + 120 s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded t
     PROBLEM the realtime minus monotonic offset of the journal entries of listener pid(s) [(1326, 600.0)] varies by more than 1 s (seconds, largest minus smallest): the wall clock stepped since the process's birth, so the wall-clock stamps of the incarnation are n
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.113Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.092Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=canary-fixture
 
 CONTROL-RESULT J47b expected_exit=2 observed_exit=2 OK :: the same world without the later `[DB] Driver` line (INCONCLUSIVE on r24 too: the bounded read holds no banner): INCONCLUSIVE
     PROBLEM the journal read holds no startup banner (Next.js or Ready) of listener pid(s) [1326] from [their start - 1 s, their start + 120 s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded t
     PROBLEM the realtime minus monotonic offset of the journal entries of listener pid(s) [(1326, 600.0)] varies by more than 1 s (seconds, largest minus smallest): the wall clock stepped since the process's birth, so the wall-clock stamps of the incarnation are n
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.100Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.089Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=canary-fixture
 
 CONTROL-RESULT J47c expected_exit=2 observed_exit=2 OK :: the same world with the foreign request streaming and its stream-end line 1,500 s after the origin (it PASSed on r24): INCONCLUSIVE
     PROBLEM the journal read holds no startup banner (Next.js or Ready) of listener pid(s) [1326] from [their start - 1 s, their start + 120 s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded t
     PROBLEM the realtime minus monotonic offset of the journal entries of listener pid(s) [(1326, 600.0)] varies by more than 1 s (seconds, largest minus smallest): the wall clock stepped since the process's birth, so the wall-clock stamps of the incarnation are n
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.104Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.091Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=3 scope=canary-fixture
 
 CONTROL-RESULT J47d expected_exit=2 observed_exit=2 OK :: the same world read by a journalctl that prints the whole journal, bounds or not (INCONCLUSIVE on r24 too): INCONCLUSIVE
@@ -1910,7 +1976,7 @@ CONTROL-RESULT J47d expected_exit=2 observed_exit=2 OK :: the same world read by
     PROBLEM the journal read holds no startup banner (Next.js or Ready) of listener pid(s) [1326] from [their start - 1 s, their start + 120 s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded t
     PROBLEM 2 supervisor restart diagnostic(s) or child startup banner(s) in the journal range (['child startup: next', 'child startup: ready']): the serving child was (re)started while the idle receipt and the window were observed
     PROBLEM the realtime minus monotonic offset of the journal entries of listener pid(s) [(1326, 600.0)] varies by more than 1 s (seconds, largest minus smallest): the wall clock stepped since the process's birth, so the wall-clock stamps of the incarnation are n
-    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.100Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
+    PROBLEM 1 inbound POST line(s) since the serving process started (2026-10-06T10:59:35.096Z) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock
     CENSUS-RESULT INCONCLUSIVE exit=2 problems=6 scope=canary-fixture
 
 CONTROL-RESULT J47e expected_exit=2 observed_exit=2 OK :: a clean canary (nothing foreign) after a BACKWARD step of the wall clock by 90 s at process age 30 s (the banners are stamped 90 s late, inside the old banner window; it PASSed on r24): the journal's realtime and monotonic spans disagree: INCONCLUSIVE
@@ -1989,4 +2055,4 @@ CONTROL-RESULT S1 OK :: the census's store connection is ONE read transaction: a
 
 CONTROL-RESULT X3 OK :: matching_status() against a brute force over all permutations on 8000 random bipartite graphs (components of up to 7+7 nodes), outcomes seen {'multiple': 2181, 'none': 775, 'unequal': 6340, 'unique': 3876}; scipy cross-check RAN (maximum_bipartite_matching with the edge-removal uniqueness test agrees with the brute force on every component); disagreements: []
 
-# finished 2026-10-07T16:56:32Z; scenarios not as expected: none
+# finished 2026-10-07T19:47:12Z; scenarios not as expected: none
