@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "nautilus_rc6_gate_rulings",
+  "recorded_date_utc": "2026-10-07",
+  "gate_owner": "Claude session native-agent-stack-5f (trading custody, the NautilusTrader destination qualification's gate owner)",
+  "decided_by": [
+    "the command center's item task-native-agent-stack-5f-20261006T194228Z (section 2, the grand-catalog lane's question Q26)",
+    "the gate owner's report of 2026-10-07T00:35:54Z",
+    "the command center's item task-native-agent-stack-5f-20261007T003642Z (rulings 1 and 2)"
+  ],
+  "candidate": {
+    "pr": 761,
+    "source_pin": "577101588db61764773bdb1651d60e88eeb24025",
+    "decision_record": "docs/decisions/2026-10-06-nautilus-rc6-runtime-candidate.md at the source pin"
+  },
+  "rulings": {
+    "G3": {
+      "status": "QUALIFIED_BY_RETAINED_FIRST_REPLAY",
+      "ruling": "(a): the retained first replay is G3's qualifying result, with its original date and its pre-C5 scope. No replay runs for G3.",
+      "result": {
+        "attempt_id": "first-rc6-spy-20261006T055742Z",
+        "host": "NativeStack2604",
+        "case": "one_zero",
+        "run_started_utc": "2026-10-06T06:00:00Z",
+        "run_finished_utc": "2026-10-06T06:00:05Z",
+        "run_exit_code": 0,
+        "compare_exit_code": 0,
+        "verdict": "PASS",
+        "check_counts": {"PASS": 136},
+        "execution_checks_subset": {"pass": 106, "fail": 0, "skipped": 0},
+        "count_rule": "The 106 execution checks are a subset of the 136 total checks; the two counts are never added.",
+        "reviewed_source_commit": "910351ff0472fe90d97e92a1ade0b69d30c1e7d7",
+        "actual_checkout_commit": "9af14ecd8d5574aeca88c2ebfcd404c6c6500f24",
+        "receipt": "evidence/receipts/nautilus-rc6-spy-first-replication-20261006.json at the source pin"
+      },
+      "scope": "Exactly the seven reviewed rc6 files at the hashes in blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-rc6.json (reviewed_harness_local_source_sha256) at the source pin: convert.py, fixture_strategy.py, distribution_module.py, run-rc6.py, compare-rc6.py, mapping-manifest-rc6.json and PREREGISTRATION-ADDENDUM-rc6-20261006.md. The seal there admits only the first replay; no retry qualifies.",
+      "reopen_condition": "(b): if any of the seven reviewed files changes, a new qualification record comes first, before any new qualifying run. C5 (the preregistered SMART order-cap check, PREREGISTRATION-ADDENDUM-C5-20261006.md) is a separate check in its own slot, not a G3 replay."
+    },
+    "G4": {
+      "status": "EXCLUDED",
+      "excluded_date_utc": "2026-10-07",
+      "cases": ["AAPL baseline", "AAPL fee_slippage_stress"],
+      "reason": "qualifying inputs not present on any live host; no reacquisition without a hash gate",
+      "required_inputs": {
+        "source": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json (input block) at the source pin",
+        "alpaca_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+        "selected_rows_private_sha256": "adb2a240727bcd0c309c0c0ae34c649387ba23a0eba3da5d99c067d25bb06ad0",
+        "sessions": 15,
+        "start": "2020-08-10",
+        "end": "2020-08-28"
+      },
+      "search": {
+        "host": "NativeStack",
+        "searched_utc": "2026-10-07T00:33Z",
+        "scope": "the paper-lane and Alpaca state under the native-agent-stack state root, this session's worktrees and the user cache, by SHA-256 of every candidate file; private stores outside the session's scope were not opened",
+        "files_hashed": {"alpaca_path_json": 7785, "receipt_or_aapl_named": 46980},
+        "matches": 0,
+        "NativeStack2604": "holds no trading data by design"
+      },
+      "overturn_route": "A dated deviation for a hash-gated reacquisition of the 15 AAPL sessions 2020-08-10..2020-08-28, qualifying only if the reacquired selected rows hash to adb2a240727bcd0c309c0c0ae34c649387ba23a0eba3da5d99c067d25bb06ad0. A new Alpaca receipt cannot reproduce a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd. It runs in the trading lane's next data wave, not now.",
+      "standing_note": "When the Mac host is next online, its lane searches for the two hashes first; a match there restores the original inputs without any reacquisition.",
+      "launcher": "No rc6 launcher vector is written without the inputs; equity-replay/receipt.json's command template still names the rc5 launch.py.",
+      "effect": "rc6's other checks proceed. The exclusion is dated, not open-ended: it ends when the overturn route or the standing note produces hash-matching inputs."
+    }
+  },
+  "limitations": [
+    "This record rules on the gates; it runs nothing, reacquires nothing and changes no rc6 source, oracle or launcher.",
+    "The search proves absence only within its stated scope on NativeStack; the Mac host was not searched."
+  ]
+}
