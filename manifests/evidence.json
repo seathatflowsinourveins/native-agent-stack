@@ -4631,8 +4631,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
-      "bytes": 2884
+      "sha256": "dcdf3fc4eef8246792ab37eaa931d6304238f7db11d2c268316d383ef2cf63b0",
+      "bytes": 3031
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
@@ -17596,6 +17596,11 @@
       "bytes": 21371
     },
     {
+      "path": "docs/decisions/2026-10-06-claude-template-memory-exclusions.md",
+      "sha256": "ba8df41d943afd05401cd487bf3dcf1da22d5b1eb7bec77e82ab34a8af2ab07f",
+      "bytes": 6054
+    },
+    {
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
@@ -19069,6 +19074,11 @@
       "path": "evidence/artifacts/claude-spend-window-compare.py.txt",
       "sha256": "ae21ed6f92ec91dd7567db0bdaac631dfdc5083173c1c3c7b3e855040e0b6770",
       "bytes": 6309
+    },
+    {
+      "path": "evidence/artifacts/claude-template-memory-exclusions-20261006/receipt.json",
+      "sha256": "d0635f170e65d631fe592a0a29fc4636f632d2b7936863c7c8ddb412b5575d04",
+      "bytes": 6716
     },
     {
       "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
@@ -38639,6 +38649,11 @@
       "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
       "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2",
       "bytes": 2466
+    },
+    {
+      "path": "evidence/artifacts/native-startup-snapshots-20261006/fold822-20261007.json",
+      "sha256": "d704fbff47e210c175808cf109143a99328e84d8983d702b1c0186e5cca16a2c",
+      "bytes": 1992
     },
     {
       "path": "evidence/artifacts/native-startup-snapshots-20261006/receipt.json",
