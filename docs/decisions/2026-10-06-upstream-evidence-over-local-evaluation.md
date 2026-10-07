@@ -3,6 +3,11 @@
 Date: 2026-10-06. Lane: foundation. Status: decided on the owner's direction;
 repository record awaiting independent GPT review and CC acknowledgement.
 
+Amended on 2026-10-07 by the
+[clean-install decision](2026-10-07-clean-upstream-install-finalizes-a-candidate.md):
+organic counters are still collected and published (rule 3), but READY (rule 4)
+no longer waits on them.
+
 ## Context and authority
 
 Long local comparisons had become prerequisites for finishing the native

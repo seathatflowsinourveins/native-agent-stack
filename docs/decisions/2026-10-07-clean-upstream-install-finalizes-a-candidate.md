@@ -53,7 +53,10 @@ and [paper policy](../paper-lane-policy.md) keep their own gates.
    a hook on every tool call is run in its documented selective form unless
    that tool is the single owner of its job, and a route that moves a client's
    model traffic or sign-in through another process is taken only on the
-   owner's word.
+   owner's word. On Claude Code a vendor's plugin is the route where one
+   exists; host-specific server settings ride on a user-scope server entry
+   with the same command line, which the client's precedence rule makes the
+   one that connects, and never in the client's environment.
 3. **A row is ready when the vendor's install is checked.** READY needs the
    source-backed selection, the vendor's installation, and the vendor's own
    check or one named operation passing in each client the row applies to.
@@ -94,29 +97,35 @@ locators, not files added by this change.
   (SHA256 `7b583fceee521fae4683f82d96b96bb672a39a31db693c639cc7f9374bb8fbaf`).
 - Both clients' own server listings, read 2026-10-07T16:44Z: every registration
   named below is present; no hook handler names any of the last five rows.
-- Claude Code use: the transcripts of the twelve fresh sessions that ran with
-  the stack installed on 2026-10-07 (the as-installed and advisor-off arms of
-  the paired check cited below) show calls to context-mode, Serena and semble,
-  and none to qmd, jCodeMunch, Headroom or SocratiCode.
+- Claude Code use: the eighteen fresh sessions that ran with the stack
+  installed on 2026-10-07 (the as-installed and advisor-off arms, nine each,
+  of the paired check cited below), counted from each session's transcript at
+  2026-10-07T18:05Z. A call is one tool-use block that names a server's tool
+  or a skill. context-mode: 81 calls in 12 sessions; Serena: 21 in 2; semble:
+  2 in 1; none to qmd, jCodeMunch, Headroom or SocratiCode.
+  `coordination/e2e-truth-20261006/claude-with-stack-calls-20261007T180540Z.json`
+  (SHA256 `6c09c0d723b884853c4a779f5a691461834c9bdaa625514aabcc2794963d9347`).
 
-State words in the table: **final** means the component is selected,
-installed by a route its vendor documents and checked in each client, which is
-rule 3's READY for that component. **Install owed** names the part of the
-vendor's route that is still to be installed. Use is given beside each row as
-information.
+State words in the table: **final** means the component is selected, installed
+by a route its vendor documents at the vendor's latest release of that date (or
+at a pinned commit recorded as a deviation), and checked in each client, which
+is rule 3's READY for that component. **Release owed** means the same except
+that a newer release, named in the row, is still to be installed. **Install
+owed** names a part of the vendor's route that is still to be installed. Use is
+given beside each row as information.
 
 | Component | Job | Install against the vendor's route | Use in the fleet window | State |
 | --- | --- | --- | --- | --- |
 | context-mode | context supply | plugin and hooks, as the vendor ships them | called by 12 of 12 lanes | final |
 | RTK | command output | the vendor's global init | 89% of the lanes' Codex shell calls | final |
-| ai-memory | durable memory | the vendor's installer on both clients | called by 10 lanes, fed by hook in 2 | final; its own upgrade to the release of 2026-10-07 follows |
+| ai-memory | durable memory | the vendor's installer on both clients | called by 10 lanes, fed by hook in 2 | release owed: 2.6.0 of 2026-10-07 (2.5.2 installed) |
 | codebase-memory-mcp | code graph | registration, agents and hooks | called by 1 lane, fed by hook in 11 | final |
-| Serena | code navigation | registration and the vendor's hooks | called by 5 lanes | final |
-| qmd | document search | the vendor's release, its skill on both clients and its documented manual server entry | called by 1 lane on Codex; none in the twelve Claude Code sessions | final |
+| Serena | code navigation | registration and the vendor's hooks | called by 5 lanes | final, at a pinned development commit ahead of release 1.7.0 (a recorded deviation) |
+| qmd | document search | the vendor's release, its skill on both clients and its documented manual server entry | called by 1 lane on Codex; none in the eighteen Claude Code sessions | final |
 | semble | code search in any local or remote repository | the vendor's tool install, its search agent on both clients (byte-identical to what its installer writes) and its documented manual server entry with the vendor's model and cache options | called by 1 lane; 2 calls in one Claude Code session | final |
-| jCodeMunch | symbol retrieval on demand | the vendor's documented manual registration on both clients; its installer's exclusive policy and per-call hooks are not installed (rule 2's selective form) | none | final; the release of 2026-10-07 follows |
+| jCodeMunch | symbol retrieval on demand | the vendor's documented manual registration on both clients; its installer's exclusive policy and per-call hooks are not installed (rule 2's selective form) | none | release owed: 1.108.332 of 2026-10-07 (1.108.330 installed) |
 | Headroom | output compression on demand | the vendor's server route on both clients; no traffic proxy (rule 2: only on the owner's word) | none | final |
-| SocratiCode | code search and graph for indexed projects | the vendor's server-only route at 1.15.0, healthy by the vendor's own check; its skills and agent are not installed | none | install owed: release 1.16.0 with the vendor's skills and agent |
+| SocratiCode | code search and graph for indexed projects | the vendor's server-only route at 1.15.0, healthy by the vendor's own check; its plugin (two skills, an agent, a hook) is not installed | none | install owed: release 1.16.0 with the vendor's plugin |
 
 The two code-search engines have one job each: SocratiCode for indexed projects
 on the local embedding model, semble for any other local or remote repository.
@@ -125,11 +134,26 @@ If upstream evidence shows one of them covering both jobs, rule 6 settles it.
 Reading each vendor's installer the same day refined two of the three partial
 installs named above. jCodeMunch's installer, run in a throwaway home, appends
 a policy that makes it the only code-navigation tool and registers hooks on six
-events, one of them on every Read, Grep, Glob and Bash call (about 0.7 s each,
-measured on this host). Serena owns symbols and references here, so the
+events, one of them on every Read, Grep, Glob and Bash call. That hook's
+command took a median 0.58 s per call on this host (seven runs, 0.54 to
+0.62 s, tool version 1.108.330). The capture, which also lists the
+registrations the installer wrote, is
+`coordination/e2e-truth-20261006/jcodemunch-installer-capture-20261007T180613Z.json`
+(SHA256 `78210a40751445a57c9ccb327e49c2f22208bcd64488df737d16db549acd915c`).
+Serena owns symbols and references here, so the
 selective form of rule 2 applies and jCodeMunch stays as on-demand symbol
 retrieval. Headroom's full route is a proxy in front of the client's model
 traffic; the owner's direction of 7 October is its server route only.
+
+The two plugin questions were settled the same day under rule 2's last
+sentence. SocratiCode takes its vendor's plugin, paired with one user-scope
+server entry that has the same command line and carries this host's settings.
+qmd keeps its vendor's documented manual entry: its plugin's server command is
+fixed and serves only the default index, and the vendor's source marks the one
+environment override for the index path as for testing. The client's rule was
+confirmed on the installed client in a throwaway home
+(`coordination/e2e-truth-20261006/plugin-precedence-trial-20261007T180643Z.json`,
+SHA256 `c8fd2cfcad07495cb760b120f9f76b3190c2f2bed98f5bc8bfabc2bdda149ecd`).
 
 One measurement of 7 October stays on record as information for rule 7. On
 three short tasks, 27 fresh headless Claude Code sessions on this host (Sonnet
@@ -146,7 +170,12 @@ the always-loaded instruction text is kept short.
 ## What this amends
 
 - [Upstream evidence over local evaluation](2026-10-06-upstream-evidence-over-local-evaluation.md):
-  rules 1 to 5 stand. This record adds how a zero is handled (rule 4), when a
+  rules 1, 2, 3 and 5 stand. Its rule 4, "Close from the recorded evidence",
+  is amended by rule 3 here: READY requires the source-backed selection, the
+  installation and the integration check in each client. Organic counters are
+  still collected and published as that record's rule 3 says; they no longer
+  determine READY. The older record now carries a pointer to this amendment.
+  This record also adds how a zero is handled (rule 4), when a
   component leaves (rule 5) and what the monitor is for (rules 7 and 8).
 - The five dated exclusions of 7 October (jCodeMunch, semble, SocratiCode,
   Headroom, and qmd on Claude Code) are withdrawn. They were never applied to
@@ -183,5 +212,10 @@ the always-loaded instruction text is kept short.
 - Claude Code, [Monitoring](https://code.claude.com/docs/en/monitoring-usage)
   (read 2026-10-07): the client's own OpenTelemetry metrics and events for
   usage, cost and tool activity, which rule 7 reads.
+- Claude Code, [MCP: scope hierarchy and precedence](https://code.claude.com/docs/en/mcp#scope-hierarchy-and-precedence)
+  (read 2026-10-07): user scope ranks above plugin-provided servers, the whole
+  entry from the higher source is used, and a plugin's server that points at
+  the same command as an enabled server counts as a duplicate. This is why a
+  vendor's plugin and host-specific settings can coexist under rule 2.
 - Each component's own installation guide at its release is the source for
   rule 2; the per-component packets cite the file and line.
