@@ -57,18 +57,18 @@
       },
       "by_state": {
         "definitive": 30,
-        "measurement": 6,
+        "measurement": 3,
         "open": 25,
-        "resolved": 40,
+        "resolved": 43,
         "split": 3
       },
       "definitive": 30,
-      "installed": 79,
+      "installed": 77,
       "interim": 2,
       "layers": 37,
       "measurements_pending": 6,
-      "measurements_returned": 3,
-      "not_installed": 25,
+      "measurements_returned": 0,
+      "not_installed": 27,
       "owner_amendments": 7,
       "slots": 104
     },
@@ -138,13 +138,13 @@
         },
         "by_state": {
           "definitive": 30,
-          "measurement": 6,
+          "measurement": 3,
           "open": 25,
-          "resolved": 40,
+          "resolved": 43,
           "split": 3
         },
         "definitive": 30,
-        "installed": 79,
+        "installed": 77,
         "interim": 2,
         "layers": 37,
         "slots": 104
@@ -226,7 +226,7 @@
         },
         "settlements": {
           "file": "settlements.json",
-          "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
+          "sha256": "2be48d48805198d261094845cb94117abf38e89f8308c6df3fda961100abb61c"
         },
         "us-equities": {
           "file": "trading/trading-definitive.compact.json",
@@ -1628,66 +1628,118 @@
           "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
-            "claude": "not judged in the first round",
+            "claude": "current source ruling; no new blind-family verdict recorded here",
             "coincides_with_lane_record": null,
-            "default": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
-            "definitive": false,
-            "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": false,
-            "job": "local embedding model",
-            "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",
-            "layer_id": "semantic-rag",
-            "measurement": {
+            "current_ruling": {
+              "date_utc": "2026-10-06",
+              "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+              "default": {
+                "name": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text endpoint, 4096 dimensions, query: / passage: prefixes)",
+                "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16"
+              },
+              "dimensions": 4096,
+              "document_prefix": "passage: ",
+              "evidence_class": "source_review",
+              "installs_nothing_extra": false,
+              "label": "2026-10-06 current source choice: shared Nemotron 8B; application and independent execution acceptance are separate",
+              "query_prefix": "query: ",
               "receipts": [
                 {
-                  "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
-                  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
-                },
-                {
-                  "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
-                  "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
+                  "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+                  "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5"
                 }
               ],
-              "returned": true
+              "resolution": {
+                "by": "command-center dated local-model ruling",
+                "outcome": "kept",
+                "reason": "Select the already shared text-embedding role; this publication performs no model run or migration."
+              },
+              "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+              "state": "resolved"
             },
-            "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+            "default": "nvidia/Nemotron-3-Embed-8B-BF16 (shared text endpoint, 4096 dimensions, query: / passage: prefixes)",
+            "definitive": false,
+            "gpt": "current source ruling; no new blind-family verdict recorded here",
+            "historical_settlement": {
+              "catalog": "foundation",
+              "claude": "not judged in the first round",
+              "coincides_with_lane_record": null,
+              "default": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+              "definitive": false,
+              "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
+              "installs_nothing_extra": false,
+              "job": "local embedding model",
+              "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",
+              "layer_id": "semantic-rag",
+              "measurement": {
+                "receipts": [
+                  {
+                    "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+                    "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+                  },
+                  {
+                    "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+                    "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541"
+                  }
+                ],
+                "returned": true
+              },
+              "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+              "resolution": {
+                "arms": [
+                  {
+                    "name": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b)",
+                    "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+                    "support": "the critic: served by the one model server; not in the judges' candidate list; its repository was last pushed on 2025-09-30, so it enters as an arm to be measured, not as a default"
+                  },
+                  {
+                    "name": "EmbeddingGemma through Ollama",
+                    "repository": "https://github.com/google-deepmind/gemma",
+                    "support": "one blind GPT order; capped at 2K input"
+                  },
+                  {
+                    "name": "Nemotron-3-Embed-1B",
+                    "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+                    "support": "one blind GPT order; the strongest published retrieval score, but it needs a second model server"
+                  }
+                ],
+                "by": "one refuting Claude critic",
+                "deciding_measurement": "Retrieval quality on one fixed public retrieval set through each model's served route, with the generation model resident; a model that needs a second model server must beat the best single-server model by an interval that excludes zero.",
+                "evidence": {
+                  "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
+                  "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
+                },
+                "former_default": {
+                  "name": "Qwen3-Embedding-0.6B through Ollama",
+                  "repository": "https://github.com/QwenLM/Qwen3-Embedding"
+                },
+                "measurement_id": "embedding-model",
+                "outcome": "split",
+                "reason": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates"
+              },
+              "row_kind": "added",
+              "slot_id": "embedding-model",
+              "state": "measurement"
+            },
+            "installs_nothing_extra": false,
+            "job": "local embedding model",
+            "label": "2026-10-06 current source choice: shared Nemotron 8B; application and independent execution acceptance are separate",
+            "layer_id": "semantic-rag",
+            "measurement": null,
+            "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
             "resolution": {
-              "arms": [
-                {
-                  "name": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b)",
-                  "repository": "https://github.com/QwenLM/Qwen3-Embedding",
-                  "support": "the critic: served by the one model server; not in the judges' candidate list; its repository was last pushed on 2025-09-30, so it enters as an arm to be measured, not as a default"
-                },
-                {
-                  "name": "EmbeddingGemma through Ollama",
-                  "repository": "https://github.com/google-deepmind/gemma",
-                  "support": "one blind GPT order; capped at 2K input"
-                },
-                {
-                  "name": "Nemotron-3-Embed-1B",
-                  "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
-                  "support": "one blind GPT order; the strongest published retrieval score, but it needs a second model server"
-                }
-              ],
-              "by": "one refuting Claude critic",
-              "deciding_measurement": "Retrieval quality on one fixed public retrieval set through each model's served route, with the generation model resident; a model that needs a second model server must beat the best single-server model by an interval that excludes zero.",
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
-                "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
+              "by": "command-center dated local-model ruling",
+              "first_round_record": {
+                "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance"
               },
-              "former_default": {
-                "name": "Qwen3-Embedding-0.6B through Ollama",
-                "repository": "https://github.com/QwenLM/Qwen3-Embedding"
-              },
-              "measurement_id": "embedding-model",
-              "outcome": "split",
-              "reason": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates"
+              "outcome": "kept",
+              "reason": "Select the already shared text-embedding role; this publication performs no model run or migration."
             },
             "row_kind": "added",
             "slot_id": "embedding-model",
-            "state": "measurement"
+            "state": "resolved"
           },
-          "state": "measurement"
+          "state": "resolved"
         },
         {
           "installed": false,
@@ -4338,42 +4390,92 @@
           "state": "resolved"
         },
         {
-          "installed": true,
-          "not_installed_reason": null,
+          "installed": false,
+          "not_installed_reason": "The generation/server role is retired until a consumer is named.",
           "record": {
             "catalog": "foundation",
-            "claude": "converged",
+            "claude": "current source ruling; no new blind-family verdict recorded here",
             "coincides_with_lane_record": null,
-            "default": "Ollama",
-            "definitive": false,
-            "gpt": "converged",
-            "installs_nothing_extra": false,
-            "job": "local model serving",
-            "label": "settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance",
-            "layer_id": "observation-inference",
-            "measurement": {
+            "current_ruling": {
+              "date_utc": "2026-10-06",
+              "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+              "default": {
+                "name": "Not installed: retired; no general local-generation consumer",
+                "repository": ""
+              },
+              "evidence_class": "source_review",
+              "installs_nothing_extra": true,
+              "label": "2026-10-06 owner retirement: no general local-generation consumer; historical returned measurement retained",
               "receipts": [
                 {
-                  "path": "evidence/artifacts/local-model-server-gate-20261001/receipt.json",
-                  "sha256": "111802a9feca13139316187e206bf12dcee43fa1fba37be50dedee3994f3a0bf"
-                },
-                {
-                  "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/receipt.json",
-                  "sha256": "79010a4c336a99ec34caa80062f5724982f91f899106de0da7692abc98b95b44"
+                  "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+                  "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5"
                 }
               ],
-              "returned": true
+              "resolution": {
+                "by": "command-center dated local-model ruling",
+                "covered_by": "not needed",
+                "outcome": "not_installed",
+                "reason": "The generation/server role is retired until a consumer is named."
+              },
+              "state": "resolved"
             },
-            "repository": "https://github.com/ollama/ollama",
+            "default": "Not installed: retired; no general local-generation consumer",
+            "definitive": false,
+            "gpt": "current source ruling; no new blind-family verdict recorded here",
+            "historical_settlement": {
+              "catalog": "foundation",
+              "claude": "converged",
+              "coincides_with_lane_record": null,
+              "default": "Ollama",
+              "definitive": false,
+              "gpt": "converged",
+              "installs_nothing_extra": false,
+              "job": "local model serving",
+              "label": "settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance",
+              "layer_id": "observation-inference",
+              "measurement": {
+                "receipts": [
+                  {
+                    "path": "evidence/artifacts/local-model-server-gate-20261001/receipt.json",
+                    "sha256": "111802a9feca13139316187e206bf12dcee43fa1fba37be50dedee3994f3a0bf"
+                  },
+                  {
+                    "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/receipt.json",
+                    "sha256": "79010a4c336a99ec34caa80062f5724982f91f899106de0da7692abc98b95b44"
+                  }
+                ],
+                "returned": true
+              },
+              "repository": "https://github.com/ollama/ollama",
+              "resolution": {
+                "outcome": "kept",
+                "reason": "waits for or was settled by a measurement: outside the combination rule"
+              },
+              "row_kind": "judged",
+              "slot_id": "local-model-server",
+              "state": "measurement"
+            },
+            "installs_nothing_extra": true,
+            "job": "local model serving",
+            "label": "2026-10-06 owner retirement: no general local-generation consumer; historical returned measurement retained",
+            "layer_id": "observation-inference",
+            "measurement": null,
+            "repository": "",
             "resolution": {
-              "outcome": "kept",
-              "reason": "waits for or was settled by a measurement: outside the combination rule"
+              "by": "command-center dated local-model ruling",
+              "covered_by": "not needed",
+              "first_round_record": {
+                "label": "settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance"
+              },
+              "outcome": "not_installed",
+              "reason": "The generation/server role is retired until a consumer is named."
             },
             "row_kind": "judged",
             "slot_id": "local-model-server",
-            "state": "measurement"
+            "state": "resolved"
           },
-          "state": "measurement"
+          "state": "resolved"
         },
         {
           "installed": true,
@@ -4407,65 +4509,115 @@
           "state": "resolved"
         },
         {
-          "installed": true,
-          "not_installed_reason": null,
+          "installed": false,
+          "not_installed_reason": "The generation/server role is retired until a consumer is named.",
           "record": {
             "catalog": "foundation",
-            "claude": "not judged in the first round",
+            "claude": "current source ruling; no new blind-family verdict recorded here",
             "coincides_with_lane_record": null,
-            "default": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
-            "definitive": false,
-            "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": false,
-            "job": "local generation model",
-            "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
-            "layer_id": "observation-inference",
-            "measurement": {
+            "current_ruling": {
+              "date_utc": "2026-10-06",
+              "decision_record": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+              "default": {
+                "name": "Not installed: retired; no general local-generation consumer",
+                "repository": ""
+              },
+              "evidence_class": "source_review",
+              "installs_nothing_extra": true,
+              "label": "2026-10-06 owner retirement: no general local-generation consumer; historical returned measurement retained",
               "receipts": [
                 {
-                  "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
-                  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
-                },
-                {
-                  "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
-                  "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
+                  "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+                  "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5"
                 }
               ],
-              "returned": true
+              "resolution": {
+                "by": "command-center dated local-model ruling",
+                "covered_by": "not needed",
+                "outcome": "not_installed",
+                "reason": "The generation/server role is retired until a consumer is named."
+              },
+              "state": "resolved"
             },
-            "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
-            "resolution": {
-              "arms": [
-                {
-                  "name": "Qwen3.8-27B through Ollama (qwen3.8:27b, Q4_K_M)",
-                  "repository": "https://github.com/QwenLM/Qwen3.8",
-                  "support": "the critic, on a public index and the server's library; a listed candidate both blind GPT orders dropped on fit"
+            "default": "Not installed: retired; no general local-generation consumer",
+            "definitive": false,
+            "gpt": "current source ruling; no new blind-family verdict recorded here",
+            "historical_settlement": {
+              "catalog": "foundation",
+              "claude": "not judged in the first round",
+              "coincides_with_lane_record": null,
+              "default": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+              "definitive": false,
+              "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
+              "installs_nothing_extra": false,
+              "job": "local generation model",
+              "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
+              "layer_id": "observation-inference",
+              "measurement": {
+                "receipts": [
+                  {
+                    "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+                    "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+                  },
+                  {
+                    "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+                    "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577"
+                  }
+                ],
+                "returned": true
+              },
+              "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+              "resolution": {
+                "arms": [
+                  {
+                    "name": "Qwen3.8-27B through Ollama (qwen3.8:27b, Q4_K_M)",
+                    "repository": "https://github.com/QwenLM/Qwen3.8",
+                    "support": "the critic, on a public index and the server's library; a listed candidate both blind GPT orders dropped on fit"
+                  },
+                  {
+                    "name": "gpt-oss-20b",
+                    "repository": "https://github.com/openai/gpt-oss",
+                    "support": "both blind GPT orders (with Granite 4.2, which has no tools tag in the server's library)"
+                  }
+                ],
+                "by": "one refuting Claude critic",
+                "deciding_measurement": "A fixed tool-call set through the server's three API surfaces with the generation model and the embedder both resident on the RTX 4090 at a 64k context: gpt-oss-20b takes the slot if Qwen3.8-27B offloads to CPU, evicts the embedder, or has the lower valid tool-call rate.",
+                "evidence": {
+                  "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
+                  "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
                 },
-                {
-                  "name": "gpt-oss-20b",
-                  "repository": "https://github.com/openai/gpt-oss",
-                  "support": "both blind GPT orders (with Granite 4.2, which has no tools tag in the server's library)"
-                }
-              ],
-              "by": "one refuting Claude critic",
-              "deciding_measurement": "A fixed tool-call set through the server's three API surfaces with the generation model and the embedder both resident on the RTX 4090 at a 64k context: gpt-oss-20b takes the slot if Qwen3.8-27B offloads to CPU, evicts the embedder, or has the lower valid tool-call rate.",
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
-                "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
+                "former_default": {
+                  "name": "Qwen3.8-27B through Ollama",
+                  "repository": "https://github.com/QwenLM/Qwen3.8"
+                },
+                "measurement_id": "local-generation-model",
+                "outcome": "split",
+                "reason": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured"
               },
-              "former_default": {
-                "name": "Qwen3.8-27B through Ollama",
-                "repository": "https://github.com/QwenLM/Qwen3.8"
+              "row_kind": "added",
+              "slot_id": "local-generation-model",
+              "state": "measurement"
+            },
+            "installs_nothing_extra": true,
+            "job": "local generation model",
+            "label": "2026-10-06 owner retirement: no general local-generation consumer; historical returned measurement retained",
+            "layer_id": "observation-inference",
+            "measurement": null,
+            "repository": "",
+            "resolution": {
+              "by": "command-center dated local-model ruling",
+              "covered_by": "not needed",
+              "first_round_record": {
+                "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance"
               },
-              "measurement_id": "local-generation-model",
-              "outcome": "split",
-              "reason": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured"
+              "outcome": "not_installed",
+              "reason": "The generation/server role is retired until a consumer is named."
             },
             "row_kind": "added",
             "slot_id": "local-generation-model",
-            "state": "measurement"
+            "state": "resolved"
           },
-          "state": "measurement"
+          "state": "resolved"
         },
         {
           "installed": true,
@@ -7844,7 +7996,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "f9ba8f70ffd7350178ef4cdb5226a5cd7040a1f43f0f416855aa156dda6f8b23"
+      "sha256": "62a518a15ef0a8ff2a705bbf5c4ce842ad4c99f45adf882eada7a9a9dd6bb2ee"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7960,7 +8112,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "ce52b6a34c58f93938adef7bf775c439f568001dcb5c444534e3b29a73e2ed32"
+      "sha256": "ef1b61b738326c7e693117c4e5416e7c87b5ea177dc44fdeca6ce192f59abe44"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7968,7 +8120,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3"
+      "sha256": "2be48d48805198d261094845cb94117abf38e89f8308c6df3fda961100abb61c"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json",

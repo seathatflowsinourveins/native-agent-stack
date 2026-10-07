@@ -4626,6 +4626,61 @@
         "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
       ],
       "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json"
+    },
+    {
+      "id": "ns2604-local-models-rulings-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "vllm",
+        "qmd",
+        "ai-memory",
+        "socraticode",
+        "jcodemunch-mcp",
+        "codebase-memory-mcp",
+        "headroom",
+        "huggingface-hub-native"
+      ],
+      "claim": "Dated source-review record of the command center local-model choices. Ten roles, consumer-limited exceptions, retirement, pins and pending application gates; no new model run, native acceptance or readiness aggregate.",
+      "limitations": [
+        "These labels are the command center's final choices, not upstream test verdicts or aggregate readiness.",
+        "CURRENT means selected for the stated role; NEW and GATED do not imply activation.",
+        "Host cutover/deletion, independent acceptance and organic-use observations remain the assigned owners' separate records.",
+        "RTEB private-13 means and GGUF-versus-BF16 score comparisons are derived/sibling evidence; do not label them official scores for the deployed artifact.",
+        "Trading catalog changes are handed off; fixwave-defects owns install-plan finding2."
+      ],
+      "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json"
+    },
+    {
+      "id": "ns2604-vllm-freshness-source-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "vllm"
+      ],
+      "claim": "Bounded vLLM-only selected-pin/freshness refresh; API/source observations, no native install or model acceptance.",
+      "limitations": [
+        "The complete prior 0.30 row and its dated September checks are preserved verbatim here, not relabelled as 0.31 checks.",
+        "Only the vLLM row was refreshed; the global snapshot date and all other component observations retain their previous scope.",
+        "The exact row remains subject to convergence-practice review; source selection does not establish native model acceptance."
+      ],
+      "path": "evidence/receipts/ns2604-vllm-freshness-source-20261006.json"
+    },
+    {
+      "id": "ns2604-local-models-local-checks-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "vllm",
+        "qmd",
+        "ai-memory",
+        "socraticode"
+      ],
+      "claim": "Actual returned repository checks for the documentary local-model correction; retained failures are not native model acceptance.",
+      "limitations": [
+        "The unit cases include synthetic clients and controls; they do not qualify an upstream model or demonstrate organic use.",
+        "Actual failed attempts and their output hashes remain distinct from passing repairs.",
+        "No readiness aggregate is derived; no host configuration is applied.",
+        "Final full validator and generated-output checks passed at this source checkpoint. The unchanged install-plan coupling remains a failed local integration check pending its owner-authored atomic correction."
+      ],
+      "path": "evidence/receipts/ns2604-local-models-local-checks-20261006.json"
     }
   ],
   "files": [
@@ -4951,8 +5006,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "1a5533bfcb028ef8c952fc1ebd08a2ca36dd22f7c3538bae7717e78e44501761",
-      "bytes": 68841
+      "sha256": "08d30f8fe03670f0c81793a09c622eebc2295787336033edfb5faf796d9b71f7",
+      "bytes": 69222
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5026,8 +5081,8 @@
     },
     {
       "path": "adoption/hosts/example.json",
-      "sha256": "7ec6a782fd2e19c989f4b4deb3428f17b5550608cedd38cbac454db33ab3c876",
-      "bytes": 413
+      "sha256": "ab052feccfedfacdc84ddfb963ac0d1cecbb92685606debcbb20b3e8717a3c8d",
+      "bytes": 414
     },
     {
       "path": "adoption/hosts/macos-example.json",
@@ -5063,6 +5118,11 @@
       "path": "adoption/manifest.json",
       "sha256": "16d9708777667b29a4c25b363fca5644b94ab7932d0735c7323ac48188f7eaec",
       "bytes": 20038
+    },
+    {
+      "path": "adoption/mcp/claude-user.json",
+      "sha256": "57c37d72897abe8cebcb0757a6fee65647218b550c6455ba3e1e2c91c0ce57d6",
+      "bytes": 7846
     },
     {
       "path": "adoption/new-wsl-profile.json",
@@ -5151,13 +5211,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "1f3b29db1d2585b548a8595dd25b7ab3c7a2ff33af7e9f9a2ba750c3b0452174",
-      "bytes": 30164
+      "sha256": "81b2ed074545376923fde92669aee7209b6bb9e2b26b1c381d10e07b0a837f58",
+      "bytes": 30556
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "d7f026a3480e71374f25c33a92d3b0c4b30c1717846f74d0c3038872ad6d5870",
-      "bytes": 65911
+      "sha256": "969a6edbe4603fa8da506fc664cb1c6e95c18719a3595603f3d6e641ac611bc8",
+      "bytes": 66303
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -5221,8 +5281,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
-      "bytes": 19129
+      "sha256": "ef2f87ebcc66f9e68bbcdc81023cb3b499cd965465aedf1211aa4e901db0d805",
+      "bytes": 19466
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -5311,8 +5371,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "fa66de9fa5f37eb440fe0a8f4b9d611ba584e0da59594b02a0b2889db5262aef",
-      "bytes": 32102
+      "sha256": "ca3fa0fd427509945befcb8417539010eade87db2b82c6acbaa6f74f7eeef62a",
+      "bytes": 33733
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -16472,8 +16532,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "f9ba8f70ffd7350178ef4cdb5226a5cd7040a1f43f0f416855aa156dda6f8b23",
-      "bytes": 325528
+      "sha256": "62a518a15ef0a8ff2a705bbf5c4ce842ad4c99f45adf882eada7a9a9dd6bb2ee",
+      "bytes": 325549
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -16587,8 +16647,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "e5987d047e09f2f16ed9592cba1f7d2a7a350a6428f2904b9e481298a5f9ab5e",
-      "bytes": 286532
+      "sha256": "5431e66bca728d12ce5a63f42923c94041c10f1cbecee82c4cc3c9ee9591af07",
+      "bytes": 286588
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17202,8 +17262,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "c3e2d0a439a8c0a0e74d9f607e69ddde65ffbbc1cdcf4da6b0048f6af5076564",
-      "bytes": 57789
+      "sha256": "8bbaa99fdfc1bb01cd2f8e9236f7ff9d3735455c7da718507801328dd79e6a92",
+      "bytes": 58783
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -17312,8 +17372,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "1d3e6dd6d86df768a2683cd9f64bd478111467efdf6f35b3c71526af93b9f1d6",
-      "bytes": 80195
+      "sha256": "dad9a1e19c3cb2a25ebc9157b3ce40e71a81390a5100b43724f3f1b7a35df722",
+      "bytes": 80729
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -17337,8 +17397,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "2bcc4e1c173e1780cd6f48f863e6e4fcb134d9374971f95d1217e755e7f336d4",
-      "bytes": 135623
+      "sha256": "81f776da7ff4d093f7a484ca9722189956ddee81d56153d97839a1547d257fee",
+      "bytes": 136188
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17601,6 +17661,11 @@
       "bytes": 19235
     },
     {
+      "path": "docs/decisions/2026-10-06-retrieval-first-local-models.md",
+      "sha256": "8bf27c8b524f2a651215b81fba3bbd6df40b236a6eed2c7ee5a276004e0ed3a5",
+      "bytes": 11646
+    },
+    {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
@@ -17747,8 +17812,8 @@
     },
     {
       "path": "docs/hf-memory-model-qualification.md",
-      "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5",
-      "bytes": 7017
+      "sha256": "86c1182d6f15626d9f7dcd97fecd545c8faf067cb45f88f88e62ba42221fc3e0",
+      "bytes": 7527
     },
     {
       "path": "docs/hosting-container-practice.md",
@@ -17867,13 +17932,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1",
-      "bytes": 692584
+      "sha256": "fe1b2a614f09fa6e7948ca799b344a3182df87dfc2ba8d2975d8bf71c135e698",
+      "bytes": 701819
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
-      "bytes": 368585
+      "sha256": "029dbda7c33e716a519835b647c903506354814d37bbde448b261767767f7413",
+      "bytes": 367811
     },
     {
       "path": "docs/next-host-stages.md",
@@ -17967,8 +18032,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "82dd8fabc8348c4297395f54f8af7b60d4fe8f75c00bcf4b50dd6af6c91376dc",
-      "bytes": 594844
+      "sha256": "54075571819150536e3f01487f2eb8bbdf3bed2f7222a5cbc5462a22fa93e25a",
+      "bytes": 595210
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -39272,8 +39337,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "d2c480a1a6f86787abe216ffdc7e04a4d493ac5d3c0ee78efaad03e06bb0ebba",
-      "bytes": 58625
+      "sha256": "03710701cde68902e226549aaea80c12010e0117135916d0d40d9eef0bc61871",
+      "bytes": 60846
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -39317,8 +39382,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "ce52b6a34c58f93938adef7bf775c439f568001dcb5c444534e3b29a73e2ed32",
-      "bytes": 229932
+      "sha256": "ef1b61b738326c7e693117c4e5416e7c87b5ea177dc44fdeca6ce192f59abe44",
+      "bytes": 237411
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -39397,8 +39462,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "f64d40f119fdbdfa1024925c63a68976e2bb06c96a0464980fcc6e368fa5a76d",
-      "bytes": 10890
+      "sha256": "579624fc232b6bd32c5178be4b1497abe94c514438c443c6428ce5fcb5a1360f",
+      "bytes": 11364
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -39407,8 +39472,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3",
-      "bytes": 15186
+      "sha256": "2be48d48805198d261094845cb94117abf38e89f8308c6df3fda961100abb61c",
+      "bytes": 18108
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/assemble_trading_definitive.py",
@@ -40067,8 +40132,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "084eb71632e71f16643ed54a166e6da44d615fa9f016e96aa53d666765cb27cd",
-      "bytes": 37656
+      "sha256": "eb51b76ddec870b25c323f8b98e4d3a616147f8c630d37581668f187ad9c0ec6",
+      "bytes": 41114
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -53276,6 +53341,16 @@
       "bytes": 22000
     },
     {
+      "path": "evidence/receipts/ns2604-local-models-local-checks-20261006.json",
+      "sha256": "8c8b82ddbdf7ce4d025db07d50e9f69db893c3475223a1937d8021c2275a4ebb",
+      "bytes": 25061
+    },
+    {
+      "path": "evidence/receipts/ns2604-local-models-rulings-20261006.json",
+      "sha256": "2320e13a216d32aa0454ea0db355a69f5bc779239c6bfd0a61582bf3df604cd5",
+      "bytes": 37472
+    },
+    {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
       "sha256": "1d0afd73a954e448eb00bac14dbe0f2c7384d65a51efd0ad0c5e990f7ae3273b",
       "bytes": 16469
@@ -53284,6 +53359,11 @@
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json",
       "sha256": "a01e1b8b9a4d4a917b891ecbb6df3076c72fef06588628f127772ec51683466e",
       "bytes": 11795
+    },
+    {
+      "path": "evidence/receipts/ns2604-vllm-freshness-source-20261006.json",
+      "sha256": "6a27da4bd87301c4be19c751583bb056edf5a7dbc226cb853896e0f6f586618a",
+      "bytes": 7179
     },
     {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
@@ -53637,8 +53717,8 @@
     },
     {
       "path": "examples/ai-memory-config.toml.example",
-      "sha256": "e2bf451070061ab0deb7d116e1f5920cc60bcd56df674c56a94df7dbc05b99b6",
-      "bytes": 578
+      "sha256": "54887fba5cf1105ccda0db92d172622ad976b0a2abf3180c3194e543ceb0f2f9",
+      "bytes": 862
     },
     {
       "path": "examples/ai-memory-project.toml.example",
@@ -53647,8 +53727,8 @@
     },
     {
       "path": "examples/claude-mcp.json.example",
-      "sha256": "cb89602bd91721c072c4a5b8adebe4d583e624e01c77772f10aaedeb77ac4810",
-      "bytes": 1511
+      "sha256": "da8e45d9aac74d287b3001933eb69ea9448f040ff6df2e3a3025176315f54de8",
+      "bytes": 1512
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
@@ -53807,8 +53887,8 @@
     },
     {
       "path": "examples/codex-mcp.toml.example",
-      "sha256": "6203fdcb819d183fae1ac01ae2eda447252f2f8d07de53d82cf947845a07e6c0",
-      "bytes": 1474
+      "sha256": "a2776f59db0b50bd5988150c5d1338f5643b2c524134d166f6281ced23aa07cb",
+      "bytes": 1696
     },
     {
       "path": "examples/codex-native/README.md",
@@ -53897,8 +53977,8 @@
     },
     {
       "path": "examples/mcporter.json.example",
-      "sha256": "cdb2e40a8b2feab0db591f5421b1ece60548bc572ddb384cd4d073d88c1cc0b4",
-      "bytes": 1589
+      "sha256": "eedbc78e88d7a7ae2f6cce324a6d802bd8593886056c8bb4afb67c73fbfa1493",
+      "bytes": 1590
     },
     {
       "path": "examples/native-sdk-acceptance/README.md",
@@ -53907,8 +53987,8 @@
     },
     {
       "path": "examples/native-stack-embeddings.service.example",
-      "sha256": "2cefa31441eb392333e706f4aa585ab009b45446031800484f7f5b04f2e75c93",
-      "bytes": 632
+      "sha256": "db19ccc7b4fd17222086b8c7dec6ee43bf31b9c6d056a4d59deb71d22ef16968",
+      "bytes": 1075
     },
     {
       "path": "examples/native-stack-qdrant.service.example",
@@ -54022,8 +54102,8 @@
     },
     {
       "path": "examples/qdrant.yaml.example",
-      "sha256": "f1233ba5f3858b80e1296168d0688d7da156832c4f995606d1d9375c2cbff2b4",
-      "bytes": 340
+      "sha256": "486c0344c2ad00e05cf3ad22bf08c28816de949151e8ee956b2b6d6351a86a7d",
+      "bytes": 350
     },
     {
       "path": "examples/sandbox-policy.json.example",
@@ -54132,8 +54212,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "cbc65770d505fcc1253aa270db6d9930d884c9b22abeb34de450405b670c21a3",
-      "bytes": 106396
+      "sha256": "59df8cf10d18ce6c06b18031c1136d61b0b164ed7abab28e64b0f48da158340b",
+      "bytes": 104384
     },
     {
       "path": "observability/README.md",
@@ -54417,8 +54497,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "cf1b7a7276d3836fa09d9ea49e7b626d1db4efb578da286b6cd8cb6b3d8888e9",
-      "bytes": 132632
+      "sha256": "5e2b7097de4f750b68ff942212cb08df527197ad940e3e86f04531d506dfadae",
+      "bytes": 133030
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -55342,8 +55422,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "66225f2f62892b5600883e15ac362c0a62ef0d858e856ed00b86f418620699bc",
-      "bytes": 131331
+      "sha256": "64310e6ce66e04940d30ebcfc285bcef66a3e2f412ff9ecd43bc64f4d8cc8595",
+      "bytes": 131479
     },
     {
       "path": "tests/test_install_skills.py",
@@ -55409,6 +55489,11 @@
       "path": "tests/test_local_inference_latest_20260926.py",
       "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
       "bytes": 74274
+    },
+    {
+      "path": "tests/test_local_model_rulings.py",
+      "sha256": "acdf752631354cf50176cff76385c75e936027a4c268778e743b73326b421586",
+      "bytes": 4804
     },
     {
       "path": "tests/test_managed_block.py",
@@ -55522,13 +55607,13 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "82ade12e1e2522fb69404c9a84eb7f6b0d206f77c055c51bbfc136b98942dae5",
-      "bytes": 163353
+      "sha256": "e4bb6eb30e52118d604aec8ed04569bc9808520917f8fff3367c74e538de62a8",
+      "bytes": 165496
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "7a151c05cccf4a0b0f96ae27302497be6035850fbe0272c35a3438a58d5ab0b9",
-      "bytes": 104637
+      "sha256": "262b56c9e179ee5fd80ef17ffe4bb6e3b46dcb8306e1908e9d068cacfb4580d1",
+      "bytes": 105280
     },
     {
       "path": "tests/test_new_wsl_profile.py",

@@ -1097,7 +1097,7 @@
         "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
       ],
       "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"\u25cb Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
+      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"○ Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
@@ -2101,6 +2101,15 @@
       "distribution": "Hosted; no local weights or CI calls"
     },
     {
+      "id": "claude-fable-5-1",
+      "route": "Native Claude account",
+      "distribution": "Hosted; observed configured default in bounded read-only trial. Historical Opus research remains separate.",
+      "evidence_ids": [
+        "native-ultracode-20260921",
+        "full-stack-convergence-20260921"
+      ]
+    },
+    {
       "id": "nvidia/Nemotron-3-Embed-8B-BF16",
       "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
       "release_date": "2026-07-16",
@@ -2114,15 +2123,6 @@
       ],
       "runtime_version": "0.31.0",
       "scope": "NativeStack2604 shared text endpoint; historical 1B receipt provenance is preserved in the dated supersession record."
-    },
-    {
-      "id": "claude-fable-5-1",
-      "route": "Native Claude account",
-      "distribution": "Hosted; observed configured default in bounded read-only trial. Historical Opus research remains separate.",
-      "evidence_ids": [
-        "native-ultracode-20260921",
-        "full-stack-convergence-20260921"
-      ]
     }
   ],
   "policy": {
