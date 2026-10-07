@@ -132,3 +132,89 @@ while preserving historical and organic evidence classes.
 - At the same pin, `scripts/validate.py:405-461,484-485`: publication references/hashes and the existing entrypoint extended by this draft.
 - At the same pin, `catalogs/landscape/README.md:75-102`, `catalogs/saturation/ledger.schema.json:27-59` and `docs/acceptance-evidence-policy.md:26-33`: alternatives, overturn comparisons, scoped votes and evidence boundaries.
 - [Python JSON duplicate-key hooks](https://docs.python.org/3.13/library/json.html#json.load), [sets](https://docs.python.org/3.13/library/stdtypes.html#set-types-set-frozenset), and [JSON Schema uniqueItems](https://json-schema.org/draft/2020-12/json-schema-validation#section-6.4.3): reuse existing identity/key checks; whole-object uniqueness alone cannot establish exclusive ownership.
+
+## Addendum (2026-10-07): synthesis inputs and verification method
+
+The following inputs are required for the adoption synthesis. A pending locator
+is an open input, not a missing observation treated as a zero. Private artifacts
+must acquire a sanitized, registered publication reference before a finalized
+record can cite them; workflow identifiers alone do not establish their results.
+
+| Input | Artifact locator or explicit pending publication reference | Scope |
+| --- | --- | --- |
+| First-pass landscape sweep 1 | Pending: the convergence owner supplies the first sweep's exact path, JSON pointer and stable commit from #804's retained inputs. | Candidate discovery and dated source observations; no installation claim. |
+| First-pass landscape sweep 2 | Pending: the convergence owner supplies the second sweep's exact path, JSON pointer and stable commit from #804's retained inputs. | Separate first-pass evidence, with its own failures and limitations. |
+| Vendor-official follow-up | `wf_62ccd24a-231`; pending sanitized registered artifact locator. | Recheck the vendor's repository, selected release and source identity rather than accepting discovery metadata. |
+| AUDIT-SEEDS follow-up | Pending: the convergence owner supplies the AUDIT-SEEDS artifact and its pinned source references. | Follow missing candidates and modalities; retain gaps that are not resolved. |
+| Owner audit | Pending: the dated audit's registered artifact locator. | A lead only, with origin and limitations; it supplies neither a family-role refutation nor native acceptance. |
+| Install, wiring and client-smoke observations | `manifests/evidence.json`; pending exact receipt IDs and scoped original output references for each selected component and consuming client. | Verify the declared native integration and returned operation separately from source review or a synthetic fixture. |
+| Organic counters | Pending: qualified per-client native/env protocol references and the dated invoke-rate dashboard report. | Retain trials, uses, selection rate, intervals, dates and unknown/deferred states; a directed smoke is not organic use. |
+| Grand-manifest gather | `wf_4d706751-ca6`; pending sanitized registered artifact locator. | Reconcile repository ownership, slot boundaries, shared interfaces and the independently declared census. |
+
+The command center performs adversarial verification against the selected
+primary sources and original returned artifacts. It preserves four separate
+refutation roles: Claude facts, Claude fit, GPT facts and GPT fit. It checks
+release identity and evidence scope before joining a result to a recommendation.
+Any disagreement, unavailable input, retained failure or missing client scope
+remains visible; the synthesis does not manufacture a completed observation.
+
+A completeness critic follows that verification. It checks missed vendor
+repositories, candidate classes, modalities, language interfaces and consumers,
+then feeds unresolved findings into the next scoped landscape sweep. The
+command center records adjudication and the comparison that would overturn
+each selection. Defaults and the complete census remain pending until that
+work supplies their canonical references; this addendum selects none.
+
+The declaration contract reuses the repository's exact-key validators and
+canonical evidence carriers. Required fields, explicit dispositions and resolved
+references constrain what a finalized declaration may claim; validation remains
+a consistency check, not proof that an external observation is true.
+
+## Addendum (2026-10-07): enforceable declaration fields
+
+The projection document and every slot reject unknown or missing required
+fields. Every repository declaration carries `repository`, `selection`,
+`component_ids`, `adoption_status`, `source`, `evidence_classes`,
+`install_smoke`, `organic`, `refutations`, `audit`, `exclusion`, `overturn`
+and `supersedes`. Evidence carriers declare their disposition explicitly;
+unknown or deferred evidence is not a completed result. Finalized publication
+describes a recommendation; an adopted status needs its additional evidence.
+
+A default's component references resolve to the canonical component source
+and matching repository/pin. An alternative or exclusion can instead bind
+the canonical research record and its specific source origin; this does not
+promote it into the installed stack. A public-star discovery reference alone
+cannot supply a release identity, native operation or audit outcome.
+
+Release references join the selected repository, tag/version, commit,
+publication date and clean-release metadata. A different latest release's
+date cannot be used to date the selected pin. Evidence references resolve
+registered bytes and the original payload's identity, class and scope. Native
+host receipts remain usable when registered as files without an aggregate
+receipt entry; when both exist their metadata must agree.
+
+Facts and fit remain four separately bound Claude/GPT family-role judgments.
+The owner audit is a dated lead with explicit limitations. Exclusions need a
+dated reason and overturn conditions; comparisons and supersession retain
+their scoped, stable references. A fabricated generic organic payload cannot
+stand in for the canonical owner's missing carrier or qualify adoption.
+
+Implementation sources at
+`seathatflowsinourveins/native-agent-stack@6fc39660d458824b7aaf0827d1c6d3ea0ae73453`:
+
+- `scripts/catalog_decisions.py:110-150,178-203,224-239`: canonical research identities and origin references.
+- `manifests/landscape.json:5-14,355` and `scripts/landscape.py:1368-1381`: concrete release metadata and matching selected identity.
+- `scripts/validate.py:397-424,454-490`, `adoption/host-receipt.schema.json:127-184` and `scripts/host_receipts.py:204-232,1240-1291,1420-1428,1696-1702`: registered source bytes, original receipt metadata, scoped native operations and pin agreement.
+- `scripts/saturation_ledger.py:315-326,350-354,436-481,538-555,740-778,1250-1267`: retained family-role judgments, source identities and resolved registered pointers.
+- `scripts/validate_foundation.py:313-328` and `docs/acceptance-evidence-policy.md:26-33,42-63`: dated scoped supersession and evidence-class boundaries.
+- [RFC 6901, sections 3, 4 and 7](https://www.rfc-editor.org/rfc/rfc6901.txt) and [JSON Schema 2020-12 required fields](https://json-schema.org/draft/2020-12/json-schema-validation#section-6.5.3): pointer resolution and required declarations, reused through the existing native validators.
+
+An optional slot `task_scope` maps an organic workload to the owner's canonical
+record; each organic cell states that scope or an explicit unresolved value.
+Native host envelopes are read through their existing component/version
+adapter. An original operation without client or role coverage remains an
+`observed` result and cannot establish adoption. Refuter observations likewise
+remain useful without qualifying the current selection: recorded qualification
+needs the original requirement's hash-bound repository, pin, commit and role.
+Historical superseded references bind the prior decision's identity, pin and
+scope; retained failures are not tested against today's selected pin.

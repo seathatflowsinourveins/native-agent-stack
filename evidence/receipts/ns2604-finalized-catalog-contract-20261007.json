@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-finalized-catalog-contract-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "source_review",
+  "claim": "Typed finalized-catalog declarations join canonical repository/component, selected-release and registered evidence scopes, preserving unresolved observations and historical pins. The pending projection selects no repository; local fixtures and structural checks are not adoption evidence.",
+  "limitations": [
+    "Validation checks declared consistency and registered references, not the truth of external source or execution claims.",
+    "The 78 proposed roles and null census remain byte-unchanged; no default, installation, organic result or readiness aggregate is populated.",
+    "Canonical organic qualification remains deferred until its owner carrier/validator is available; observed records cannot authorize adoption.",
+    "The completeness critic is a same-family source review, not independent cross-family acceptance; exact-head review and command-center ACK remain required.",
+    "All checks here are local structural or synthetic checks; no vendor upstream test, model/GPU acceptance, host configuration or broker operation is claimed."
+  ],
+  "source_base_commit": "6fc39660d458824b7aaf0827d1c6d3ea0ae73453",
+  "prior_receipt": {
+    "path": "evidence/receipts/ns2604-finalized-catalog-structure-20261006.json",
+    "sha256": "4171f7cdff94c04d3e89a438ac1430b21fb53e95d63af1aea165638c0b58b52d",
+    "commit": "6fc39660d458824b7aaf0827d1c6d3ea0ae73453"
+  },
+  "decision_record": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
+  "source_file_sha256": {
+    "scripts/validate_foundation.py": "0b4a7513c12671e5f7a887c2b15b7fdd6862dbbf87c1665499508a7fb427b8c4",
+    "tests/test_finalized_foundation_catalog.py": "2cc182400bb4a53aebf96c123302d4cd2ff8220216fe41b4f88d022e825d1d4e",
+    "docs/decisions/2026-10-07-finalized-sota-catalog.md": "5fb99a258467e25e07cfb60574309f7eddc59141863ed1202fb65861f8fd9ae1"
+  },
+  "declaration_changes": {
+    "P1": [
+      "Exact document, slot and repository fields reject omissions and misspellings.",
+      "Known defaults bind official selected repository/tag/pin/commit/date/clean-release metadata; nondefaults retain canonical research origins without stack promotion.",
+      "Evidence resolves registered bytes, actual payload identities and classes, component/pin scope and receipt-owned children.",
+      "Install, wiring and smoke retain per-client, role/layer, stage and actual command results; host observations without consuming context stay unqualified.",
+      "Organic references use the canonical task_scope/client/pin shape and the owner validator rather than a duplicate qualifier.",
+      "Four family-role refuters retain canonical replication, original frozen requirement identity and selected release/role scope.",
+      "Owner audit remains lead-only; exclusions are dated with overturn conditions; comparisons and supersession resolve scoped prior records and historical pins."
+    ],
+    "P2": "Append-only synthesis-input/method section names both first-pass sweeps, vendor wf_62ccd24a-231, AUDIT-SEEDS, owner audit lead, install/wiring/smoke, organic counters and grand-manifest wf_4d706751-ca6, with pending publication locators, command-center adversarial verification and completeness critic."
+  },
+  "checks": [
+    {
+      "stage": "worker_first_field_fixtures",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "tests": 39,
+      "failures": 5,
+      "returned_summary": "Five message-expectation failures were retained and corrected against the complete field contract.",
+      "retained_output_sha256": "9e2155dde394cf18dc6ad61a76cdd08ace45aeefd36d4afbd9ea6c4b3dbb6a23"
+    },
+    {
+      "stage": "integrated_before_expected_exit_fixture",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog tests.test_foundation_catalog tests.test_catalogs tests.test_validate",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "tests": 174,
+      "returned_summary": "Ran 174 tests in 2.974s; OK.",
+      "retained_output_sha256": "db1b73175044c08e3bfcfc5c115a10e5750aea714d08112ccd8a58ab794c3277"
+    },
+    {
+      "stage": "expected_exit_counterexample_before_fix",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog.FinalizedSelectionTests.test_real_host_envelope_shape_is_preserved_as_unqualified_observation",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "tests": 1,
+      "failures": 2,
+      "errors": 1,
+      "returned_summary": "Matching nonzero expected exit was rejected; mismatched and boolean expected exits were accepted. All three cases were retained before the compatibility repair.",
+      "retained_output_sha256": "ba579389ac21dd6ae83bb4dcc01ea85e0fcfecb9bd8f118a35c9c9d7be15dd80"
+    },
+    {
+      "stage": "complete_repaired_contract",
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog tests.test_foundation_catalog tests.test_catalogs tests.test_validate",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "tests": 174,
+      "focused_tests": 40,
+      "returned_summary": "Ran 174 tests in 3.083s; OK.",
+"retained_output_sha256": "b45f0a397fe4ace8a8813e74ba8cf873a858ae2aa85fd45d987f9235abf92c18"
+    },
+    {
+      "stage": "publication_integrity_after_registration",
+      "command": "python3 scripts/validate.py",
+      "execution_prefix": "env PYTHONDONTWRITEBYTECODE=1 nice -n 19 ionice -c3",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "returned_summary": "{\"components\": 69, \"hashed_files\": 10367, \"profiles\": 4, \"receipts\": 217, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "retained_output_sha256": "19fe37349408a07b43eb52471c7e6e2518a9893129037c08cf0bb5dbec668008"
+    }
+  ],
+  "source_completeness_critic": {
+    "evidence_class": "source_review",
+    "independent_cross_family": false,
+    "design_boundaries": [
+      "receipt-owned child artifacts",
+      "native client/role/pin scope",
+      "canonical refuter completeness"
+    ],
+    "implementation_repairs": [
+      "historical superseded pins and prior scope",
+      "canonical host envelope adapter",
+      "original-input-bound current release and role",
+      "documented expected nonzero exits"
+    ],
+    "final_unresolved_findings": 0
+  },
+  "preserved_observations": {
+    "pending_projection_sha256": "b8ba24173d82a59626ffc31b1604429a2be49c055a2367c926d2b6d4e56c12a4",
+    "prior_structure_receipt_sha256": "4171f7cdff94c04d3e89a438ac1430b21fb53e95d63af1aea165638c0b58b52d",
+    "difftastic_smoke_receipt_sha256": "38086f027c63404bdd8175034ef8f4b9085b91c6710a87e587d35a1698bc31be"
+  }
+}

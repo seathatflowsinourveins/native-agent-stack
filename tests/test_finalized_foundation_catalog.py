@@ -8,6 +8,7 @@ https://json-schema.org/understanding-json-schema/reference/array#uniqueitems
 """
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -56,6 +57,7 @@ class FinalizedSelectionTests(unittest.TestCase):
             "decision_record": DECISION,
             "source_base_commit": "e28d0eec112527ac02659ac23753533b8ed39a73",
             "included_repositories": [RESEARCH, SDK, ALTERNATIVE, EXCLUDED],
+            "limitations": ["Synthetic structural fixtures; no actual installation or adoption."],
             "slots": [
                 slot("research-worker", "web-research", "research-worker",
                      [selected(RESEARCH)], [SDK, SDK]),
@@ -67,6 +69,499 @@ class FinalizedSelectionTests(unittest.TestCase):
             ],
         }
         self.write(DECISION, "# Synthetic decision record\n")
+        self.prepare_sources()
+        for value in self.document["slots"]:
+            value["repositories"] = [self.contract(row["repository"], row["selection"]) for row in value["repositories"]]
+
+    def prepare_sources(self):
+        self.base_commit = "6fc39660d458824b7aaf0827d1c6d3ea0ae73453"
+        self.release_commit = "a" * 40
+        self.component_ids = {RESEARCH: "fixture-research", SDK: "fixture-sdk"}
+        self.source_documents = {
+            "manifests/landscape.json": {"schema_version": 1, "current_core_releases": [
+                {"repo": repo.removeprefix("https://github.com/"), "tag_name": "v1.0.0",
+                 "published_at": "2026-10-01T00:00:00Z", "prerelease": False,
+                 "html_url": repo + "/releases/tag/v1.0.0", "source_commit": self.release_commit}
+                for repo in (RESEARCH, SDK, ALTERNATIVE, EXCLUDED)]},
+            "catalogs/us-equities/agents-operations.json": {"schema_version": 1, "entries": [
+                {"repository": repo, "version_or_commit": "1.0.0", "evidence_level": "source_review"}
+                for repo in (ALTERNATIVE, EXCLUDED)]},
+            "catalogs/us-equities/decision-index.json": {"schema_version": 1, "records": [
+                {"repository": repo, "references": [{"kind": "catalog_card",
+                 "path": "catalogs/us-equities/agents-operations.json", "pointer": f"/entries/{index}",
+                 "evidence_level": "source_review"}]} for index, repo in enumerate((ALTERNATIVE, EXCLUDED))]},
+            "fixtures/comparison.json": {"frozen": "Synthetic comparison input"},
+        }
+        self.packet_path = "evidence/receipts/fixture-selection-evidence.json"
+        self.packet = {"schema_version": 1, "id": "fixture-selection-evidence", "kind": "artifact_measurement",
+                       "component_ids": list(self.component_ids.values()),
+                       "claim": "Synthetic publication-contract inputs; no native acceptance.",
+                       "limitations": ["Every observation is synthetic fixture data."],
+                       "evidence_class": "synthetic", "data": {"proofs": {}, "organic": {}, "judgments": {},
+                       "fields": {}, "audits": {}, "comparisons": {}, "exclusions": {
+                           "retired": {"repository": EXCLUDED, "pin": "1.0.0", "component_ids": [],
+                                       "evidence_class": "synthetic", "scope": "Dated fixture exclusion",
+                                       "date": "2026-10-01", "reason": "Synthetic retired candidate",
+                                       "overturn_conditions": ["A supported replacement meets the same fixture requirement."]}}}}
+        self.source_documents[self.packet_path] = self.packet
+        self.stack = {"schema_version": 1, "components": [
+            {"id": cid, "repository": repo, "version": "1.0.0", "source_pin": self.release_commit,
+             "profile": "core", "commands": ["fixture --help"], "evidence_ids": [self.packet["id"]]}
+            for repo, cid in self.component_ids.items()], "profiles": [{"id": "core", "component_ids": list(self.component_ids.values())}],
+            "models": []}
+
+    def source_ref(self, path, pointer):
+        raw = json.dumps(self.source_documents[path]).encode()
+        return {"path": path, "pointer": pointer, "sha256": hashlib.sha256(raw).hexdigest(),
+                "source_commit": self.base_commit}
+
+    def evidence_ref(self, pointer, target):
+        return {**self.source_ref(self.packet_path, pointer), "receipt_id": self.packet["id"],
+                "evidence_class": target.get("evidence_class", "synthetic"), "scope": target["scope"]}
+
+    def contract(self, repo, selection="default"):
+        position = [RESEARCH, SDK, ALTERNATIVE, EXCLUDED].index(repo)
+        unknown = lambda: {"status": "unknown", "reason": "No qualifying observation in this synthetic fixture.", "evidence_refs": []}
+        result = {"repository": repo, "selection": selection, "component_ids": [self.component_ids[repo]] if repo in self.component_ids else [],
+                  "adoption_status": "recommendation", "source": {"status": "recorded", "reason": None,
+                  "vendor_official": True, "release_pin": "1.0.0", "commit": self.release_commit,
+                  "release_date": "2026-10-01", "clean_release": True,
+                  "release_ref": self.source_ref("manifests/landscape.json", f"/current_core_releases/{position}"),
+                  "candidate_binding": None}, "evidence_classes": ["metadata_only"],
+                  "install_smoke": [{"client": client, "installation": unknown(), "wiring": unknown(), "smoke": unknown()}
+                                    for client in ("claude", "codex")],
+                  "organic": [{"client": client, "arm": arm, "task_scope": None, **unknown()} for client in ("claude", "codex") for arm in ("native", "env")],
+                  "refutations": [{"family": family, "role": role, "status": "unknown", "reason": "No original judgment returned.",
+                                   "source_field_ref": None, "judgment_refs": [], "result": None}
+                                  for family in ("claude", "gpt6") for role in ("facts", "fit")],
+                  "audit": {"status": "unknown", "reason": "Audit unavailable.", "grade": None, "origin": None,
+                            "date": None, "limitations": ["Owner audit is only a lead."], "lead_only": True, "evidence_refs": []},
+                  "exclusion": None, "overturn": {"status": "unknown", "reason": "Comparison not run.", "fixture_ref": None,
+                                                 "metric_ref": None, "arms": [], "trigger_ref": None}, "supersedes": []}
+        if repo not in self.component_ids:
+            index = [ALTERNATIVE, EXCLUDED].index(repo)
+            result["source"]["candidate_binding"] = {
+                "record_ref": self.source_ref("catalogs/us-equities/decision-index.json", f"/records/{index}"),
+                "origin_ref": self.source_ref("catalogs/us-equities/agents-operations.json", f"/entries/{index}")}
+            result["evidence_classes"].append("source_review")
+        if selection == "excluded":
+            target = self.packet["data"]["exclusions"]["retired"]
+            result["exclusion"] = {key: copy.deepcopy(target[key]) for key in ("date", "reason", "overturn_conditions")}
+            result["exclusion"]["evidence_refs"] = [self.evidence_ref("/data/exclusions/retired", target)]
+            result["evidence_classes"].append("synthetic")
+        return result
+
+    def registry(self):
+        return {"schema_version": 1, "receipts": [{**{key: self.packet[key] for key in
+                ("id", "kind", "component_ids", "claim", "limitations")}, "path": self.packet_path}],
+                "files": sorted([{"path": path, "sha256": hashlib.sha256(json.dumps(value).encode()).hexdigest(),
+                                  "bytes": len(json.dumps(value).encode())} for path, value in self.source_documents.items()],
+                                 key=lambda row: row["path"])}
+
+    def refresh_refs(self):
+        def walk(value):
+            if isinstance(value, dict):
+                if "path" in value and "pointer" in value and "source_commit" in value and value["path"] in self.source_documents:
+                    value["sha256"] = self.source_ref(value["path"], value["pointer"])["sha256"]
+                for child in value.values():
+                    walk(child)
+            elif isinstance(value, list):
+                for child in value:
+                    walk(child)
+        walk(self.document)
+
+    def copy_sources_to(self, fixture):
+        for path, value in self.source_documents.items():
+            target = fixture.root / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps(value), encoding="utf-8")
+        stack_path = fixture.root / "manifests/stack.json"
+        stack = json.loads(stack_path.read_text())
+        stack["components"].extend(copy.deepcopy(self.stack["components"]))
+        for component in stack["components"]:
+            component["profile"] = "core"
+        if "profiles" in stack:
+            stack["profiles"][0]["component_ids"].extend(self.component_ids.values())
+        registry = json.loads((fixture.root / "manifests/evidence.json").read_text())
+        additional = self.registry()
+        registry["receipts"].extend(additional["receipts"])
+        registry["files"] = sorted(registry.get("files", []) + additional["files"], key=lambda row: row["path"])
+        for path, value in (("manifests/stack.json", stack), ("manifests/evidence.json", registry)):
+            fixture.write_json(path, value) if hasattr(fixture, "write_json") else fixture.write(path, value)
+        return {"components": len(stack["components"]), "profiles": len(stack.get("profiles", [])),
+                "receipts": len(registry["receipts"]), "hashed_files": len(registry["files"])}
+
+    def default_row(self):
+        return self.document["slots"][0]["repositories"][0]
+
+    def add_smoke(self, *, client="claude", stage="smoke", evidence_class="synthetic"):
+        row, slot = self.default_row(), self.document["slots"][0]
+        key = client + "-" + stage
+        target = {"repository": row["repository"], "pin": "1.0.0", "component_ids": row["component_ids"],
+                  "evidence_class": evidence_class, "scope": "One synthetic consuming-client operation",
+                  "client": client, "stage": stage, "role": slot["role"], "layer_id": slot["layer_id"],
+                  "result": "pass", "observed_at_utc": "2026-10-06T00:00:00Z", "commands": [
+                      {"exit": 0, "output_excerpt": "Synthetic structural fixture output.", "output_sha256": "b" * 64}]}
+        self.packet["data"]["proofs"][key] = target
+        carrier = next(value for value in row["install_smoke"] if value["client"] == client)
+        field = "installation" if stage == "install" else stage
+        carrier[field] = {"status": "recorded", "reason": None,
+                          "evidence_refs": [self.evidence_ref("/data/proofs/" + key, target)]}
+        if evidence_class not in row["evidence_classes"]:
+            row["evidence_classes"].append(evidence_class)
+        self.refresh_refs()
+        return carrier[field]["evidence_refs"][0], target
+
+    def add_refuters(self):
+        from scripts.saturation_ledger import v2_field_sha256
+        row, slot = self.default_row(), self.document["slots"][0]
+        member = {"candidate_key": "foundation/web-research/fixture-research", "repository": RESEARCH}
+        source = {"contract_version": 2, "catalog": "foundation", "layer_id": slot["layer_id"],
+                  "requirement_sha256": "c" * 64, "platform_profiles_sha256": "d" * 64,
+                  "eligible_field": [member], "requirement": {"selection": {
+                      "repository": RESEARCH, "pin": "1.0.0", "commit": self.release_commit, "role": slot["role"]}}}
+        from scripts.saturation_ledger import canonical
+        source["requirement_sha256"] = hashlib.sha256(canonical(source["requirement"])).hexdigest()
+        source["field_sha256"] = v2_field_sha256(source)
+        self.packet["data"]["fields"]["research"] = source
+        for carrier in row["refutations"]:
+            family, role = carrier["family"], carrier["role"]
+            refs, results = [], []
+            for seed in (1, 2):
+                jid = family + "-" + role + "-" + str(seed)
+                vote = {"candidate_key": member["candidate_key"], "repository": RESEARCH,
+                        "evidence_key": member["candidate_key"], "status": "credible", "criterion": None,
+                        "fact": "Synthetic source identity", "confidence": 0.9,
+                        "reasoning": "Synthetic fixture of an original returned judgment.",
+                        "refs": [RESEARCH], "requirement_fit": "Bounded fixture requirement"}
+                self.packet["data"]["judgments"][jid] = {
+                    "contract_version": 2, "layer_id": slot["layer_id"], "role": role,
+                    "votes": [vote], "skills_used": [], "judgment": {
+                        "judgment_id": jid, "order_seed": seed, "family": family,
+                        "model_route_requested": "fixture", "model_route_actual": None,
+                        "source_field_sha256": source["field_sha256"],
+                        "provider_sampling_seed_requested": None, "provider_sampling_seed_actual": None,
+                        "provider_sampling_seed_status": "unknown"}}
+                refs.append(self.source_ref(self.packet_path, "/data/judgments/" + jid))
+                results.append({"judgment_id": jid, "status": "credible", "criterion": None})
+            carrier.update(status="recorded", reason=None, source_field_ref=self.source_ref(self.packet_path, "/data/fields/research"),
+                           judgment_refs=refs, result=results)
+        row["evidence_classes"].append("synthetic")
+        self.refresh_refs()
+
+    def test_all_declared_carrier_fields_are_required_and_typos_reject(self):
+        row = self.default_row()
+        carriers = [self.document, self.document["slots"][0], row, row["source"], row["install_smoke"][0],
+                    row["install_smoke"][0]["smoke"], row["organic"][0], row["refutations"][0], row["audit"],
+                    row["overturn"], row["source"]["release_ref"],
+                    self.document["slots"][1]["repositories"][2]["exclusion"]]
+        optional = {"language", "supported_languages"}
+        for carrier in carriers:
+            for key in list(carrier):
+                if key in optional:
+                    continue
+                with self.subTest(field=key, carrier_keys=sorted(carrier)):
+                    value = carrier.pop(key)
+                    try:
+                        self.assert_invalid("missing fields|expected nonempty text|expected one of")
+                    finally:
+                        carrier[key] = value
+            carrier["misspelled_contract_field"] = True
+            try:
+                self.assert_invalid("unknown fields")
+            finally:
+                del carrier["misspelled_contract_field"]
+
+    def test_component_repository_version_and_source_pin_are_bound(self):
+        component = self.stack["components"][0]
+        for key, value, fragment in (("repository", SDK, "component repository"),
+                                     ("version", "2.0.0", "component pin"),
+                                     ("source_pin", "e" * 40, "component source commit")):
+            with self.subTest(key=key):
+                original = component[key]
+                component[key] = value
+                try:
+                    self.assert_invalid(fragment)
+                finally:
+                    component[key] = original
+
+    def test_selected_release_pin_commit_date_and_clean_flag_are_bound(self):
+        source = self.default_row()["source"]
+        for key, value, fragment in (("release_pin", "2.0.0", "selected release pin"),
+                                     ("commit", "e" * 40, "selected release commit"),
+                                     ("release_date", "2026-10-02", "selected release date"),
+                                     ("clean_release", False, "clean-release declaration")):
+            with self.subTest(key=key):
+                original = source[key]
+                source[key] = value
+                try:
+                    self.assert_invalid(fragment)
+                finally:
+                    source[key] = original
+        source.update(status="unknown", reason="Official release not verified.")
+        self.assert_invalid("default requires known official selected release")
+
+    def test_snapshot_release_joins_actual_tag_commit_without_using_commit_date(self):
+        target = copy.deepcopy(self.source_documents["manifests/landscape.json"]["current_core_releases"][0])
+        del target["source_commit"]
+        path = "catalogs/landscape/upstream-snapshot.json"
+        component = {"repository": RESEARCH, "latest_stable_release": target,
+                     "latest_release_source": {"ref": "v1.0.0", "sha": self.release_commit},
+                     "selected_pin_source": {"sha": self.release_commit, "committed_at": "2026-09-30T00:00:00Z"}}
+        self.source_documents[path] = {"schema_version": 1, "components": [component]}
+        self.default_row()["source"]["release_ref"] = self.source_ref(path, "/components/0/latest_stable_release")
+        self.assertEqual(self.check()["repositories"], 4)
+        component["latest_release_source"]["ref"] = "v2.0.0"
+        self.refresh_refs()
+        self.assert_invalid("latest-release commit source names a different tag")
+
+    def test_candidate_can_defer_release_without_becoming_installed(self):
+        row = self.document["slots"][1]["repositories"][1]
+        row["source"].update(status="deferred", reason="Release API metadata not retained.", vendor_official=None,
+                            release_ref=None, release_date=None, clean_release=None)
+        row["evidence_classes"] = ["source_review"]
+        self.assertEqual(self.check()["repositories"], 4)
+        self.assertEqual(row["component_ids"], [])
+
+    def test_candidate_binding_and_origin_cannot_be_unrelated_or_star_only(self):
+        candidate = self.source_documents["catalogs/us-equities/decision-index.json"]["records"][0]
+        candidate["repository"] = SDK
+        self.refresh_refs()
+        self.assert_invalid("candidate repository mismatch")
+        candidate["repository"] = ALTERNATIVE
+        candidate["references"][0]["kind"] = "public_star"
+        self.refresh_refs()
+        self.assert_invalid("not public-star-only discovery")
+
+    def test_unknown_or_misbound_registered_receipt_and_pointer_reject(self):
+        ref, _ = self.add_smoke()
+        for key, value, fragment in (("receipt_id", "not-registered", "unknown registered receipt ID"),
+                                     ("pointer", "/data/no-such-object", "does not resolve"),
+                                     ("sha256", "e" * 64, "reference hash differs"),
+                                     ("scope", "Other scope", "evidence scope differs"),
+                                     ("evidence_class", "native_proven", "evidence class differs")):
+            with self.subTest(key=key):
+                original = ref[key]
+                ref[key] = value
+                try:
+                    self.assert_invalid(fragment)
+                finally:
+                    ref[key] = original
+
+    def test_unrelated_registered_child_artifact_cannot_borrow_parent_coverage(self):
+        ref, target = self.add_smoke()
+        path = "evidence/artifacts/unrelated-child.json"
+        self.source_documents[path] = {"target": copy.deepcopy(target)}
+        ref.update(self.source_ref(path, "/target"))
+        self.assert_invalid("artifact is not a declared child")
+        self.packet["data"]["artifacts"] = [{"path": path}]
+        self.refresh_refs()
+        self.assertEqual(self.check()["repositories"], 4)
+        self.source_documents[path]["target"]["component_ids"] = ["fixture-sdk"]
+        self.refresh_refs()
+        self.assert_invalid("pointed source does not cover selected components")
+
+    def test_native_operation_keeps_client_role_layer_stage_pin_and_completion(self):
+        _, target = self.add_smoke()
+        for key, value, fragment in (("client", "codex", "consumer client/stage"),
+                                     ("stage", "install", "consumer client/stage"),
+                                     ("role", "other-role", "functional role/layer"),
+                                     ("layer_id", "workers", "functional role/layer"),
+                                     ("pin", "2.0.0", "pointed source pin")):
+            with self.subTest(key=key):
+                original = target[key]
+                target[key] = value
+                self.refresh_refs()
+                try:
+                    self.assert_invalid(fragment)
+                finally:
+                    target[key] = original
+                    self.refresh_refs()
+        target["commands"][0]["exit"] = 1
+        self.refresh_refs()
+        self.assert_invalid("passed evidence contains a failed command")
+        target["result"] = "fail"
+        self.refresh_refs()
+        self.assertEqual(self.check()["repositories"], 4)
+
+    def test_synthetic_smoke_cannot_supply_adoption_or_self_asserted_classes(self):
+        self.add_smoke()
+        row = self.default_row()
+        row["evidence_classes"].append("native_proven")
+        self.assert_invalid("evidence classes must equal resolved canonical classes")
+        row["evidence_classes"].remove("native_proven")
+        row["adoption_status"] = "adopted"
+        self.assert_invalid("adoption requires both clients")
+
+    def test_undated_or_unbound_exclusion_rejects(self):
+        value = self.document["slots"][1]["repositories"][2]["exclusion"]
+        value["date"] = None
+        self.assert_invalid("expected nonempty text")
+        value["date"] = "2026-10-02"
+        self.assert_invalid("exclusion differs from dated canonical evidence")
+
+    def test_four_family_role_carriers_need_original_bound_judgments(self):
+        self.add_refuters()
+        self.assertEqual(self.check()["repositories"], 4)
+        carrier = self.default_row()["refutations"][0]
+        carrier["judgment_refs"].pop()
+        carrier["result"].pop()
+        self.assert_invalid("recorded refuter lacks canonical replicated judgments")
+
+    def test_refuter_source_field_repository_family_and_result_mismatch_reject(self):
+        self.add_refuters()
+        doc = self.packet["data"]["judgments"]["claude-facts-1"]
+        doc["judgment"]["source_field_sha256"] = "e" * 64
+        self.refresh_refs()
+        self.assert_invalid("malformed/unbound canonical refuter")
+        doc["judgment"]["source_field_sha256"] = self.packet["data"]["fields"]["research"]["field_sha256"]
+        doc["judgment"]["family"] = "gpt6"
+        self.refresh_refs()
+        self.assert_invalid("refuter role/family mismatch")
+        doc["judgment"]["family"] = "claude"
+        self.default_row()["refutations"][0]["result"][0]["status"] = "not_credible"
+        self.refresh_refs()
+        self.assert_invalid("refuter result differs from original")
+
+    def test_old_pin_or_other_role_refuters_cannot_qualify_current_selection(self):
+        from scripts.saturation_ledger import canonical, v2_field_sha256
+        self.add_refuters()
+        source = self.packet["data"]["fields"]["research"]
+        for key, value in (("pin", "0.9.0"), ("role", "other-worker")):
+            with self.subTest(key=key):
+                original = source["requirement"]["selection"][key]
+                source["requirement"]["selection"][key] = value
+                source["requirement_sha256"] = hashlib.sha256(canonical(source["requirement"])).hexdigest()
+                source["field_sha256"] = v2_field_sha256(source)
+                for doc in self.packet["data"]["judgments"].values():
+                    doc["judgment"]["source_field_sha256"] = source["field_sha256"]
+                self.refresh_refs()
+                self.assert_invalid("reviewed input selected pin/commit/functional role mismatch")
+                for carrier in self.default_row()["refutations"]:
+                    carrier["status"] = "observed"
+                self.assertEqual(self.check()["repositories"], 4)
+                for carrier in self.default_row()["refutations"]:
+                    carrier["status"] = "recorded"
+                source["requirement"]["selection"][key] = original
+
+    def test_real_host_envelope_shape_is_preserved_as_unqualified_observation(self):
+        row = self.default_row()
+        cid = row["component_ids"][0]
+        target = {"schema_version": 1, "id": "fixture-host-20261006--fixture-research--use--20261006",
+                  "kind": "host_acceptance", "component_id": cid, "stage": "use",
+                  "host": {"host_id": "fixture-host-20261006", "platform_id": "linux", "os": "linux",
+                           "architecture": "x86_64", "second_physical_machine": False},
+                  "catalog_revision": self.base_commit, "tool_versions": {cid: "1.0.0"},
+                  "observed_at_utc": "2026-10-06T00:00:00Z", "result": "pass",
+                  "claim": "Synthetic host-shaped operation; no consuming-client qualification.",
+                  "limitations": ["Synthetic fixture; no real host acceptance."], "evidence_class": "synthetic",
+                  "commands": [{"cmd": "fixture operation", "exit": 0, "duration_s": 0.1,
+                                "output_excerpt": "Synthetic original host output", "output_sha256": "b" * 64}], "reviews": []}
+        path = "evidence/hosts/fixture-host-20261006/fixture-use.json"
+        self.source_documents[path] = target
+        ref = {**self.source_ref(path, ""), "receipt_id": target["id"], "evidence_class": "synthetic", "scope": target["claim"]}
+        row["install_smoke"][0]["smoke"] = {"status": "observed", "reason": None, "evidence_refs": [ref]}
+        row["evidence_classes"].append("synthetic")
+        self.assertEqual(self.check()["repositories"], 4)
+        self.assertNotIn("repository", target)
+        self.assertNotIn("pin", target)
+        command = target["commands"][0]
+        for actual, expected in ((1, 1), (0, 1)):
+            with self.subTest(actual_exit=actual, expected_exit=expected):
+                command.update(exit=actual, expected_exit=expected)
+                ref.update(self.source_ref(path, ""))
+                if actual == expected:
+                    self.assertEqual(self.check()["repositories"], 4)
+                else:
+                    self.assert_invalid("passed evidence contains a failed command")
+        command.update(exit=0, expected_exit=True)
+        ref.update(self.source_ref(path, ""))
+        self.assert_invalid("expected exit code must be an integer")
+        del command["expected_exit"]
+        ref.update(self.source_ref(path, ""))
+        row["install_smoke"][0]["smoke"]["status"] = "recorded"
+        self.assert_invalid("consumer client/stage scope mismatch")
+
+    def test_organic_owner_shape_joins_task_scope_and_preserves_missing_owner(self):
+        row, slot = self.default_row(), self.document["slots"][0]
+        slot["task_scope"] = "One source-retrieval fixture"
+        # Canonical #750 properties: component_pin, task_scope, client.id and
+        # layer_ids; the owner schema deliberately has no repository/pin/role.
+        target = {"component_id": row["component_ids"][0], "component_pin": "1.0.0",
+                  "task_scope": slot["task_scope"], "client": {"id": "claude-code"}, "arm": "native",
+                  "layer_ids": [slot["layer_id"]], "evidence_class": "synthetic", "verdict": None}
+        self.packet["data"]["organic_use"] = {"records": [target]}
+        cell = next(cell for cell in row["organic"] if cell["client"] == "claude" and cell["arm"] == "native")
+        cell.update(status="observed", reason=None, task_scope=slot["task_scope"], evidence_refs=[
+            self.evidence_ref("/data/organic_use/records/0", {**target, "scope": target["task_scope"]})])
+        row["evidence_classes"].append("synthetic")
+        self.refresh_refs()
+        self.assertEqual(self.check()["repositories"], 4)
+        cell["status"] = "recorded"
+        self.assert_invalid("canonical organic owner/validator is unavailable")
+
+    def test_audit_grade_is_dated_bound_and_never_native_acceptance(self):
+        row = self.default_row()
+        target = {"repository": RESEARCH, "pin": "1.0.0", "component_ids": row["component_ids"],
+                  "evidence_class": "synthetic", "scope": "Owner audit lead", "grade": "A",
+                  "origin": "Synthetic owner audit", "date": "2026-10-01",
+                  "limitations": ["Lead only; neither refutation nor execution."], "lead_only": True}
+        self.packet["data"]["audits"]["research"] = target
+        row["audit"] = {"status": "recorded", "reason": None,
+                        **{key: copy.deepcopy(target[key]) for key in ("grade", "origin", "date", "limitations", "lead_only")},
+                        "evidence_refs": [self.evidence_ref("/data/audits/research", target)]}
+        row["evidence_classes"].append("synthetic")
+        self.refresh_refs()
+        self.assertEqual(self.check()["repositories"], 4)
+        row["audit"]["lead_only"] = False
+        self.assert_invalid("audit grade is a lead only")
+        row["audit"]["lead_only"] = True
+        row["audit"]["grade"] = "B"
+        self.assert_invalid("audit differs from its canonical source")
+
+    def test_overturn_comparison_binds_fixture_metric_arms_and_trigger(self):
+        row = self.default_row()
+        fixture = self.source_documents["fixtures/comparison.json"]
+        comparison = {"fixture": {"path": "fixtures/comparison.json", "sha256": hashlib.sha256(json.dumps(fixture).encode()).hexdigest()},
+                      "metric": {"name": "quality", "direction": "maximize"},
+                      "arms": [{"repository": RESEARCH, "pin": "1.0.0"}, {"repository": ALTERNATIVE, "pin": "1.0.0"}],
+                      "trigger": {"metric": "quality", "operator": "gt", "threshold": 0.95}}
+        self.packet["data"]["comparisons"]["research"] = comparison
+        row["overturn"] = {"status": "recorded", "reason": None,
+                           "fixture_ref": self.source_ref(self.packet_path, "/data/comparisons/research/fixture"),
+                           "metric_ref": self.source_ref(self.packet_path, "/data/comparisons/research/metric"),
+                           "arms": [{**arm, "source_ref": self.source_ref(self.packet_path, f"/data/comparisons/research/arms/{index}")}
+                                    for index, arm in enumerate(comparison["arms"])],
+                           "trigger_ref": self.source_ref(self.packet_path, "/data/comparisons/research/trigger")}
+        row["evidence_classes"].append("synthetic")
+        self.refresh_refs()
+        self.assertEqual(self.check()["repositories"], 4)
+        comparison["trigger"]["metric"] = "latency"
+        self.refresh_refs()
+        self.assert_invalid("comparison trigger metric mismatch")
+
+    def test_prior_pin_failures_remain_valid_supersession_evidence(self):
+        row = self.default_row()
+        scope = "One prior fixture operation"
+        prior = {"role": self.document["slots"][0]["role"], "repository": RESEARCH, "pin": "0.9.0",
+                 "commit": "9" * 40, "component_ids": row["component_ids"], "checked_at": "2026-09-01", "scope": scope}
+        retained = {"repository": RESEARCH, "pin": "0.9.0", "component_ids": row["component_ids"],
+                    "evidence_class": "synthetic", "scope": scope, "result": "fail"}
+        self.packet["data"]["prior_decision"] = prior
+        self.packet["data"]["prior_failure"] = retained
+        row["supersedes"] = [{"date": "2026-09-01", "scope": scope, "reason": "Retain original failed condition.",
+                             "decision_ref": self.source_ref(self.packet_path, "/data/prior_decision"),
+                             "receipt_refs": [self.evidence_ref("/data/prior_failure", retained)]}]
+        row["evidence_classes"].append("synthetic")
+        self.refresh_refs()
+        self.assertEqual(self.check()["repositories"], 4)
+        retained["pin"] = "0.8.0"
+        self.refresh_refs()
+        self.assert_invalid("pointed source pin mismatch")
+        retained["pin"] = "0.9.0"
+        row["supersedes"][0]["scope"] = "Wrong prior scope"
+        self.refresh_refs()
+        self.assert_invalid("supersession scope differs from prior canonical decision")
 
     def write(self, relative, value):
         target = self.root / relative
@@ -78,6 +573,10 @@ class FinalizedSelectionTests(unittest.TestCase):
         self.write(MANIFEST, self.manifest)
         self.write(REPOSITORY_COVERAGE, self.coverage)
         self.write(FINALIZED_SELECTION, self.document)
+        for path, value in self.source_documents.items():
+            self.write(path, value)
+        self.write("manifests/stack.json", self.stack)
+        self.write("manifests/evidence.json", self.registry())
 
     def check(self):
         self.save()
@@ -143,12 +642,14 @@ class FinalizedSelectionTests(unittest.TestCase):
         self.document["included_repositories"].remove(ALTERNATIVE)
         self.assert_invalid(r"outside_census=\['vendor/sdk-alternative'\]")
         del self.document["included_repositories"]
-        self.assert_invalid("missing included_repositories")
+        self.assert_invalid("missing fields")
 
     def test_case_and_alias_collisions_fail_in_both_ownership_and_census(self):
         for spelling in ("https://github.com/Vendor/SDK", "https://github.com/old/sdk"):
             with self.subTest(spelling=spelling, declaration="ownership"):
-                self.document["slots"][0]["repositories"].append(selected(spelling, "excluded"))
+                duplicate = copy.deepcopy(self.document["slots"][1]["repositories"][0])
+                duplicate.update(repository=spelling, selection="alternative")
+                self.document["slots"][0]["repositories"].append(duplicate)
                 self.assert_invalid("already owned by slot")
                 self.document["slots"][0]["repositories"].pop()
             with self.subTest(spelling=spelling, declaration="census"):
@@ -235,6 +736,7 @@ class FinalizedSelectionTests(unittest.TestCase):
         fixture.write(REPOSITORY_COVERAGE, self.coverage)
         fixture.write(DECISION, {})
         fixture.write(FINALIZED_SELECTION, self.document)
+        self.copy_sources_to(fixture)
         self.assertEqual(validate_foundation(fixture.root)["layers"], 20)
         self.document["slots"][0]["repositories"] = []
         fixture.write(FINALIZED_SELECTION, self.document)
@@ -251,6 +753,7 @@ class FinalizedSelectionTests(unittest.TestCase):
         fixture.write_json(REPOSITORY_COVERAGE, self.coverage)
         fixture.write(DECISION, "# Synthetic decision\n")
         fixture.write_json(FINALIZED_SELECTION, self.document)
+        self.copy_sources_to(fixture)
         script = Path(__file__).resolve().parents[1] / "scripts/validate.py"
         arguments = [sys.executable, str(script), "--root", str(fixture.root)]
         environment = {"PYTHONPATH": str(self.root), "PYTHONDONTWRITEBYTECODE": "1"}
@@ -292,8 +795,8 @@ print('private-patterns:', len(module.PRIVATE_CONTENT))
         fixture.write_json(REPOSITORY_COVERAGE, self.coverage)
         fixture.write(DECISION, "# Synthetic decision\n")
         fixture.write_json(FINALIZED_SELECTION, self.document)
-        self.assertEqual(validate_publication(fixture.root),
-                         {"components": 1, "profiles": 1, "receipts": 1, "hashed_files": 2})
+        counts = self.copy_sources_to(fixture)
+        self.assertEqual(validate_publication(fixture.root), counts)
         self.document["slots"][0]["repositories"] = []
         fixture.write_json(FINALIZED_SELECTION, self.document)
         with self.assertRaisesRegex(InvalidPublication, "exactly one default"):
