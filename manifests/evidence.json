@@ -54461,6 +54461,16 @@
       "bytes": 24794
     },
     {
+      "path": "observability/invoke-rates/README.md",
+      "sha256": "4d70f0bc51bae3bc1c1bfbc99886ca59c82b1585fec1bbb741c9815cdf50a150",
+      "bytes": 5750
+    },
+    {
+      "path": "observability/invoke-rates/collector-identity.example.yaml",
+      "sha256": "58765e49dc158738c877b01c1c565de45b76b71eae9b04754626c1ebddd96521",
+      "bytes": 1588
+    },
+    {
       "path": "observability/memory-scheduled-20260923.json",
       "sha256": "86ae722cc2bf6dadfff7c7fbbf05e9fdb16abac7614e1b494c0b4725a71a8f95",
       "bytes": 15847
