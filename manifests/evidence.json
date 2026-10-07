@@ -17363,8 +17363,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-memory-keep-and-consolidated-recall.md",
-      "sha256": "e37240c1585021c07b6c4b97e22b54eccba54295750e50bb270b7b2b69dd1db0",
-      "bytes": 19212
+      "sha256": "ec300e0bd16d1e3d014f5517cd13da255f0d5a5a0afc849a217560e5133a3e5a",
+      "bytes": 21025
     },
     {
       "path": "docs/direct-results.md",
