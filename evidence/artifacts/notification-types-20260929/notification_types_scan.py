@@ -18,6 +18,9 @@ import json, mmap, os, re, sys
 from pathlib import Path
 
 DECISIONS = {
+    # 2026-10-06 Q55: installed Claude Code 2.1.291; exact host gate output/ruling in
+    # docs/decisions/2026-10-06-auth-storage-failure-notification.md (DECISIONS row).
+    "auth_storage_failure": ("ring", False, "2026-10-06 Q55: a credential-storage or sign-in failure that needs the user is an escalation under the quiet-bell-only-for-escalations rule; observed by the installed Claude Code 2.1.291 host currency gate"),
     "permission_prompt": ("ring", True, "a tool or a sandboxed command's network request waits for approval and the person has not typed for about 6 s since the prompt appeared (terminal sessions; a session hosted by the Agent SDK sends it about 6 s after the request whether or not the person types)"),
     "elicitation_dialog": ("ring", True, "an MCP server opened a form and the person has not typed for about 6 s"),
     "elicitation_url_dialog": ("ring", True, "an MCP server asked the person to open a URL and they have not typed for about 6 s"),

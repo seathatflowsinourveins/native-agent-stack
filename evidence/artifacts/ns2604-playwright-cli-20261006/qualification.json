@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "kind": "native_bar_slot_qualification",
+  "recorded_at_utc": "2026-10-06T14:52:55Z",
+  "host_scope": "NativeStack2604",
+  "slot": "web-research/playwright-cli",
+  "state": "READY",
+  "closure_basis": "dated_decision_with_native_tests_and_dual_client_fixture_acceptance",
+  "decision_record": "docs/decisions/2026-10-06-ns2604-selected-browser-native-qualification.md",
+  "source_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "selected_owner": {
+    "name": "Chrome DevTools MCP",
+    "version": "1.10.1",
+    "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+    "source_pin": "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df",
+    "legacy_slot_id_preserved": true,
+    "legacy_microsoft_cli_qualified_by_this_record": false
+  },
+  "browser": {
+    "product": "Google Chrome stable",
+    "observed_version": "154.0.8037.97",
+    "package_version": "154.0.8037.97-1",
+    "architecture": "amd64",
+    "minimum_version_pass": true,
+    "installed_version_google_apt_origin_pass": true,
+    "signed_by_fingerprint_pass": true,
+    "legacy_conflicting_source_files_present": false
+  },
+  "fixture": {
+    "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/chrome-devtools-accept.html",
+    "sha256": "2480db42f335e809cfbdfeedb8e1789f3f0cf9de4c43e03e8b0606a8836d650f",
+    "evidence_class": "synthetic_fixture",
+    "title": "NativeStack Chrome MCP acceptance",
+    "console_marker": "native-stack-chrome-devtools-ready"
+  },
+  "upstream_test_subset": {
+    "evidence_class": "unchanged_upstream_tests_on_host",
+    "command": "NODE_TEST_REPORTER=spec PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts",
+    "source_pin": "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df",
+    "source_checkout_unchanged": true,
+    "rebuilt_or_installed": false,
+    "node_version": "24.21.0",
+    "tests": 129,
+    "suites": 27,
+    "passed": 129,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "duration_ms": 45337.759306,
+    "exit_code": 0,
+    "prior_dot_reporter_run": {
+      "exit_code": 0,
+      "scope": "Same unchanged subset; original output retained before repeat with upstream reporter setting to obtain explicit totals"
+    },
+    "files": [
+      "tests/index.test.ts",
+      "tests/tools/pages.test.ts",
+      "tests/tools/snapshot.test.ts",
+      "tests/tools/console.test.ts",
+      "tests/tools/network.test.ts",
+      "tests/tools/performance.test.ts"
+    ]
+  },
+  "native_clients": {
+    "claude": {
+      "evidence_class": "native_client_integration_with_synthetic_fixture",
+      "client_version": "2.1.291",
+      "reported_model": "claude-opus-5-5",
+      "requested_effort": "max",
+      "max_turns": 8,
+      "shared_session_lock_used": true,
+      "stdin_closed": true,
+      "session_persistence": false,
+      "exit_code": 0,
+      "result_success": true,
+      "required_returned_results": {
+        "navigate_page_fixture_url": true,
+        "take_snapshot_title": true,
+        "list_console_messages_marker": true
+      },
+      "created_page_closed": true,
+      "preexisting_page_retained": true,
+      "registration_npx_and_exact_required_args_pass": true,
+      "usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 49896,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 49896,
+        "cache_read_input_tokens": 237147,
+        "fallback_credit": null,
+        "inference_geo": "not_available",
+        "input_tokens": 12,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 305,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 305,
+            "cache_read_input_tokens": 49591,
+            "input_tokens": 2,
+            "output_tokens": 1268,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 5120,
+        "output_tokens_details": {
+          "thinking_tokens": 3841
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      }
+    },
+    "codex": {
+      "evidence_class": "native_client_integration_with_synthetic_fixture",
+      "client_version": "0.160.1",
+      "requested_model": "gpt-6.1-sol",
+      "reported_model": null,
+      "requested_effort": "max",
+      "stdin_closed": true,
+      "ephemeral": true,
+      "standalone_process": true,
+      "sandbox": "read-only",
+      "non_git_working_directory": true,
+      "skip_git_repo_check": true,
+      "exit_code": 0,
+      "turn_completed": true,
+      "turn_failed": false,
+      "required_returned_results": {
+        "navigate_page_fixture_url": true,
+        "take_snapshot_title": true,
+        "list_console_messages_marker": true
+      },
+      "created_page_closed": true,
+      "preexisting_page_retained": true,
+      "registration_npx_and_exact_required_args_pass": true,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 254848,
+        "input_tokens": 278722,
+        "output_tokens": 1078,
+        "reasoning_output_tokens": 427
+      }
+    }
+  },
+  "discriminating_control": {
+    "evidence_class": "native_mcp_integration_with_synthetic_fixture",
+    "condition_absent": "Created page navigated to about:blank; returned snapshot has no fixture title and console has no marker",
+    "condition_absent_pass": false,
+    "condition_present_pass": true,
+    "created_page_closed": true,
+    "raw_observation_retained_privately": true
+  },
+  "metadata_checks": {
+    "credential_status_exit_code": 0,
+    "credential_values_read": false,
+    "native_signin_stores_present": {
+      "claude": true,
+      "codex": true
+    },
+    "actual_cli_model_operations_pass": true,
+    "codex_registration_readback": "Native plaintext get; upstream masks environment values; no direct config/store read",
+    "claude_registration_readback": "Native get command/args checked; only booleans returned, no environment values logged",
+    "required_args": [
+      "-y",
+      "chrome-devtools-mcp@1.10.1",
+      "--headless",
+      "--isolated",
+      "--no-usage-statistics",
+      "--no-performance-crux"
+    ]
+  },
+  "raw_artifact_sha256": {
+    "claude.jsonl": "38cbfbccf4101020a0c0c292082282e1c42cb3de2605f7d8b437e19bdfb83f33",
+    "codex.jsonl": "07d040fa827587fd46022f06d8dede76cca16f451fc6ac0e2120f957c82d3fe1",
+    "upstream-tests-spec.log": "89609b2e3ae1c7b8a03e3c82b0558663195cfdf54ae5f6b6e917659183fdd9d1",
+    "upstream-tests.log": "583ec07bc71d023b44f92008f24a5fdeb6bdbde9e2db8b52443644f0a3f496ad"
+  },
+  "raw_artifact_custody": "Original JSONL, stderr and upstream output retained in private coordinator state at mode0700; public record omits raw conversations, session identifiers and personal paths",
+  "retained_prior_blocker": {
+    "board_source_revision": "2b115ef1ab035c0f205bf8a90cbc6578567d49ff",
+    "state": "BLOCKED",
+    "source": "native-census /result/units/0/result/items/24; landed-requalification /slots/web-research~1playwright-cli",
+    "meaning": "Historical sudo/sign-in and failed-stage gate retained; current host prerequisites and native calls observed directly"
+  },
+  "limits": [
+    "Six-file upstream subset only; other upstream suites were not run",
+    "Synthetic local fixture is not authenticated website, broker or public-web workload acceptance",
+    "Current selected Chrome MCP is qualified; Microsoft Playwright CLI catalog history and the unstarted20-task Harbor comparison are unchanged",
+    "No other browser/diagnostic slot or global platform status is promoted",
+    "Enclosing coordinator/research usage is unknown and not summed with the native client counters",
+    "No host install, rebuild, configuration mutation, sudo or OS restart by this qualification"
+  ],
+  "sources": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json#L1425",
+      "scope": "Current legacy slot selects Chrome DevTools MCP and declares acceptance"
+    },
+    {
+      "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L223",
+      "scope": "Native navigation"
+    },
+    {
+      "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L240",
+      "scope": "Owned page creation and isolatedContext"
+    },
+    {
+      "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L462",
+      "scope": "Native accessibility snapshot"
+    },
+    {
+      "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/scripts/test.js#L19",
+      "scope": "Native test selection and supported reporter switch; no build"
+    },
+    {
+      "url": "https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/cli/src/mcp_cmd.rs#L1017",
+      "scope": "Native plaintext metadata readback"
+    },
+    {
+      "url": "https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/utils/cli/src/format_env_display.rs#L3",
+      "scope": "Environment values masked by upstream"
+    },
+    {
+      "url": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md#L7",
+      "scope": "Optional legacy browser tool is not a text-only tool"
+    }
+  ]
+}
