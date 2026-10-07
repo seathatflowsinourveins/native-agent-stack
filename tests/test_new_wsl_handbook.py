@@ -1674,7 +1674,7 @@ class NewWslHandbookTests(unittest.TestCase):
                                 capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         # The receipt freezes the generator, the profile and both outputs; its hashes follow the regenerated files.
-        receipt = json.loads(self.committed("evidence/artifacts/model-currency-enforcement-20261007/handbook-projection.json"))
+        receipt = json.loads(self.committed("evidence/artifacts/model-currency-enforcement-20261007/handbook-projection-landing-prep-20261007T113834Z.json"))
         profile = json.loads(self.committed(handbook.PROFILE))
         data = json.loads(self.committed(handbook.OUTPUTS[1]))
         self.assertEqual(receipt["generator_sha256"],
