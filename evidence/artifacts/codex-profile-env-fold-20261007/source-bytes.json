@@ -1,0 +1,619 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "target_base": "1a567f540ac9231328bbe349ad05baeaa12b5ad9",
+  "class": "independent-byte-observation",
+  "source_summaries": [
+    {
+      "source_pr": 716,
+      "base": "4af7417b7d4db8936c0136235a86717f31d16f27",
+      "head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "changed_files": 76,
+      "identical_files": 70,
+      "identical_added_files": 70,
+      "composed_paths": [
+        "adoption/new-wsl/templates/codex.config.additions.toml",
+        "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
+        "docs/harness-defaults.md",
+        "manifests/evidence.json",
+        "tests/test_new_wsl_client_config.py",
+        "tools/adoption/new_wsl_client_config.py"
+      ]
+    },
+    {
+      "source_pr": 756,
+      "base": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "head": "5cfb02f7ab11161711bc0de4cb898744bf2296b6",
+      "changed_files": 5,
+      "identical_files": 2,
+      "identical_added_files": 2,
+      "composed_paths": [
+        "manifests/evidence.json",
+        "tests/test_new_wsl_client_config.py",
+        "tools/adoption/new_wsl_client_config.py"
+      ]
+    }
+  ],
+  "copied_files": [
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "docs/decisions/2026-10-05-codex-token-parity.md",
+      "bytes": 12245,
+      "sha256": "7d6c2c6ba39b28d841b30f6dc9aeb401b5d34b3d3c5b23daba4be53b38963464",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "docs/decisions/2026-10-05-gateway-token-features.md",
+      "bytes": 17936,
+      "sha256": "d49ab080e58529b9a9f1812e1744c2afea76b188748316f41cee6581a5d9d3af",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/codex-token-parity-20261005/README.md",
+      "bytes": 3049,
+      "sha256": "0f076fdd425e6434810ac7604a5eac99638d77997c8f833e9c84ccb4888d5092",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/codex-token-parity-20261005/receipt.json",
+      "bytes": 8948,
+      "sha256": "556b1e8cc4aa62cd1445b2c9c06d237c7245813e12f88724d2a84665c65170f7",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/README.md",
+      "bytes": 5919,
+      "sha256": "0b4c4f766ca4e0b11aedaf1ab91252ff3377aa5f56a9b0f1ca55857dd00b9f04",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/experiment.json",
+      "bytes": 18546,
+      "sha256": "b82732190154042ec51e8b3d0ce324cc94bd8b6353501d96a44c99b1e40b3f98",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/citation-caveman.json",
+      "bytes": 5181,
+      "sha256": "1037b037805f8ab166e7ee4829a256d9e6d8ae90d083187232fc3dea6b772626",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/citation-raw.json",
+      "bytes": 5173,
+      "sha256": "df052c452f03b4514c32f0fc14a60d2fa1120ddefbe89088b1421998c6e914bb",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/citation-rtk.json",
+      "bytes": 5177,
+      "sha256": "9e7d3abd194f8d684a9f570439c3dcf2810d7263045daf8c01fcabc4636d8d3e",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/diff-caveman.json",
+      "bytes": 5108,
+      "sha256": "bb3cfd65b086749c4bb4df3a4393f8aa5ef4c488bbb6c71770416880f3bd1655",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/diff-raw.json",
+      "bytes": 5100,
+      "sha256": "5ce4bd6890c8ea09dc41568d1e1413bb0e65340808284851ffb2831375f78c1b",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/diff-rtk.json",
+      "bytes": 5104,
+      "sha256": "cc71be83cf82dbe71dbec4f2290a140950ce67ab929e3fb8c214e4f817ef52a6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/gate-caveman.json",
+      "bytes": 5108,
+      "sha256": "a26d72908eaa3dc6e25a173b0c102021fd136a3508ef064c77e39531eaf5b59a",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/gate-raw.json",
+      "bytes": 5100,
+      "sha256": "13001ec1694320c969431caafc2204f743aa582a3b79a366cd51013b6535136a",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/gate-rtk.json",
+      "bytes": 5104,
+      "sha256": "0e0e2f3e7e6d19e72f4946b0390f1641bb6350e3d76204bccd732e502ece1b92",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/instruction-caveman.json",
+      "bytes": 5110,
+      "sha256": "1ebcc2fcf21cf929b6fd98aba4a5618975f5d45882970f187b0c9eb0c444ff00",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/instruction-raw.json",
+      "bytes": 5102,
+      "sha256": "64bb6cac057ca0199e0dee31b94c88e73f25938b45b94618012355bbb658de27",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/instruction-rtk.json",
+      "bytes": 5106,
+      "sha256": "3047d46f13f126387608789846f751ec7a885ce32a7726a7632ef0daaecacbd1",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/json-caveman.json",
+      "bytes": 5177,
+      "sha256": "3d7c5dc397fc96ddb292ad46cea5d69ae1d3481af87d52b2b8ffcbb62782877b",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/json-raw.json",
+      "bytes": 5169,
+      "sha256": "506488aabde8b5081457e73c1af42df9f8a3813bbc52f08b0f1592b03ab1de33",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/json-rtk.json",
+      "bytes": 5173,
+      "sha256": "c7f960ab9ca61c804168bb8002b256912dd8b37671106e73ca7bb71a90b5cdcd",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/log-caveman.json",
+      "bytes": 5067,
+      "sha256": "f028392661eebe9c59945bb5b69e074ce7ed7efa88c8492e9ffa27cc8637058f",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/log-raw.json",
+      "bytes": 5059,
+      "sha256": "d2ce2071add7a5c165b86bb86a639b8bd0937e95b5034abdfc4dd31dfd14f6e6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/log-rtk.json",
+      "bytes": 5063,
+      "sha256": "031bd19b5bc66f5857c75b993b7e0ed4c261f9f280aa747ce75d4dfb0c92880b",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/revision-caveman.json",
+      "bytes": 5152,
+      "sha256": "c67109a2562f5e2a16ae88c9471f0589e3991ed1e4f204688daed719342c7dcd",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/revision-raw.json",
+      "bytes": 5144,
+      "sha256": "8f0a98bd0f72da8ace1344ed04adc3f6021b77c9bcba916c8bfa75331248a4f6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/revision-rtk.json",
+      "bytes": 5148,
+      "sha256": "3e0cd751f95d074ecd8fee9e6a8ea06103371452764e14be82646eafbc3c57ed",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/semantic-caveman.json",
+      "bytes": 5171,
+      "sha256": "6231c069e33d788eb703560aca6eb6878b9520ad39020a2dc1626ecb0562607a",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/semantic-raw.json",
+      "bytes": 5163,
+      "sha256": "5db7090452d1906666b61537c684e65394a67be1ba80d050d96edb760f3c66b6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/fixtures/semantic-rtk.json",
+      "bytes": 5167,
+      "sha256": "c7f1261717a5aff48695ff1c90330b26057f634f776483057fb57f51d0875009",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/freeze.json",
+      "bytes": 1017,
+      "sha256": "5d2d9215cb3d078d3789a41c7e0d1b06e297b07028da27dbb33ff5980510e595",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/pilot-calls.json",
+      "bytes": 36674,
+      "sha256": "2b0bdc1a387a205c55de0faaeddc96b4e3eb8866c5c0d1c00d2981b1115baa91",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/plan.json",
+      "bytes": 3413,
+      "sha256": "d2f2cb3319592d55a9501fab1c802783da3997d4392daeb0a03575affaba38c0",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/preview-metrics.json",
+      "bytes": 14162,
+      "sha256": "33d4cb05351b929ee7957922da7f1cc9a3728266f47d68665b8f6d28ef2b3f2c",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/promptfoo.json",
+      "bytes": 111072,
+      "sha256": "4cee95c1ca56a270d9a0d29de6915134369c37092592029d68a08fffae2fd1b8",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/calls.json",
+      "bytes": 36945,
+      "sha256": "beaf60a36253875af114a32c06932d0fe742d4316e62d588e1fe62b7a1b98def",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-caveman.json",
+      "bytes": 5659,
+      "sha256": "c914c8208371883b30f5bcb1bbf49adbd995e92ec9cd0bb317b6b27d0ed2fcd0",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-raw.json",
+      "bytes": 5651,
+      "sha256": "cf455a71c6e9fa4973fe90fbd0478a46c20d768d8b9b0a6d28f37d9859901410",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/citation-rtk.json",
+      "bytes": 5655,
+      "sha256": "617bfb842d15520e8a0a7eb2a9582d316956f13e992501fa67027ea3fb172f2c",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-caveman.json",
+      "bytes": 5108,
+      "sha256": "bb3cfd65b086749c4bb4df3a4393f8aa5ef4c488bbb6c71770416880f3bd1655",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-raw.json",
+      "bytes": 5100,
+      "sha256": "5ce4bd6890c8ea09dc41568d1e1413bb0e65340808284851ffb2831375f78c1b",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/diff-rtk.json",
+      "bytes": 5104,
+      "sha256": "cc71be83cf82dbe71dbec4f2290a140950ce67ab929e3fb8c214e4f817ef52a6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-caveman.json",
+      "bytes": 5660,
+      "sha256": "30d8f6b2ded60465131cf3a86479040a0093af39e64d5ce2c72288ffafd7ed65",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-raw.json",
+      "bytes": 5652,
+      "sha256": "b4dfb3dc08e2883a5dd53205db26d18b68736e8f50f467b7162ea3ebf857a393",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/gate-rtk.json",
+      "bytes": 5656,
+      "sha256": "454126d72e88a4df04351f4a3e7a2b838043e4c982d1457eeb7b86d8e57ff69c",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-caveman.json",
+      "bytes": 5662,
+      "sha256": "6e48553d48331d805ffd48c32421e15358d2298c50705c391b0ef9a5ea04cd8f",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-raw.json",
+      "bytes": 5654,
+      "sha256": "4e84ce0fbf11e9805ce047f33ff8469036df92b3dca8dfc2ceb141b117037a79",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/instruction-rtk.json",
+      "bytes": 5658,
+      "sha256": "7e5b715aca4e8d5a4809fbf14930df23f3ae8be19b38498c3a5d0169baa5bd77",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-caveman.json",
+      "bytes": 5103,
+      "sha256": "1dd97b6c7cfafb5b3fd2a9c57295add9f70dd4d7ee1a531c0c0ca705b871982b",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-raw.json",
+      "bytes": 5095,
+      "sha256": "8108a177b599c0771e5b0a2c7441f9603968668da158d409c328c50c4fb4634f",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/json-rtk.json",
+      "bytes": 5099,
+      "sha256": "33b79b2c874ddf785e16ead1f796e2ab9e4b0260eef2292f92fcb24a71052adf",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-caveman.json",
+      "bytes": 5067,
+      "sha256": "f028392661eebe9c59945bb5b69e074ce7ed7efa88c8492e9ffa27cc8637058f",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-raw.json",
+      "bytes": 5059,
+      "sha256": "d2ce2071add7a5c165b86bb86a639b8bd0937e95b5034abdfc4dd31dfd14f6e6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/log-rtk.json",
+      "bytes": 5063,
+      "sha256": "031bd19b5bc66f5857c75b993b7e0ed4c261f9f280aa747ce75d4dfb0c92880b",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-caveman.json",
+      "bytes": 5152,
+      "sha256": "c67109a2562f5e2a16ae88c9471f0589e3991ed1e4f204688daed719342c7dcd",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-raw.json",
+      "bytes": 5144,
+      "sha256": "8f0a98bd0f72da8ace1344ed04adc3f6021b77c9bcba916c8bfa75331248a4f6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/revision-rtk.json",
+      "bytes": 5148,
+      "sha256": "3e0cd751f95d074ecd8fee9e6a8ea06103371452764e14be82646eafbc3c57ed",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-caveman.json",
+      "bytes": 5649,
+      "sha256": "aa73b97b984bce4998ed126867d0e856532872494a0a19aa4dd830a88947636c",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-raw.json",
+      "bytes": 5641,
+      "sha256": "1bf02693f4bfeb32dc37c0cca445917ef36e6737065208e88ae1f27c66fecb25",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/fixtures/semantic-rtk.json",
+      "bytes": 5645,
+      "sha256": "4c6b00015557b14111d4fd270bb143ece5b6533673ed5cc68f1f91442c57ea40",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/freeze.json",
+      "bytes": 937,
+      "sha256": "a3cec1a999bef3657b026991cb219fba3e1cb339b91acb9c1f93a1656466698d",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/plan.json",
+      "bytes": 3449,
+      "sha256": "54a48aad3c15298d58d06de148e4023d3a1205776c6cc095d6461fecc1df25b6",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/preview-metrics.json",
+      "bytes": 15410,
+      "sha256": "ae49f26a5f805e8c801513a7e4f49417ba205800707e2bbbcc22eaaf5d2b6e39",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/qualification/promptfoo.json",
+      "bytes": 127583,
+      "sha256": "0b596a115a7ef7941ecc8094154250c5680b3bca80be052b57b5606c825f5c7d",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/receipt.json",
+      "bytes": 6533,
+      "sha256": "16bc710317b371cc61a1442453af1a489419cee3d422d3130fbedbf6f8fd9f1e",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/calls.json",
+      "bytes": 47313,
+      "sha256": "a41e70cddd159c8c4c4cb21cbf6581452bf5bcdd42b36cad03f8376074553b8d",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/freeze.json",
+      "bytes": 6301,
+      "sha256": "f059ababd41653bc9ec145042646039d80835fe6c783ec77e60d9b4e980a9af4",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/plan.json",
+      "bytes": 4174,
+      "sha256": "0b1cacddcb97e94a8adc8e0ee1cb686b42889ee6482c8efc8883cd70298de312",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/preview-metrics.json",
+      "bytes": 27346,
+      "sha256": "c2432532cb2c9d7c0f6fa01e695f612482945b827e5eceeba463a44df193c996",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 716,
+      "source_head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6",
+      "path": "evidence/artifacts/gateway-token-feature-evaluation-20261005/transform-vars/promptfoo.json",
+      "bytes": 23407,
+      "sha256": "cf5c556a784fa56fed6af38693c917a0d46fddf8ff39964db57eca03a6158feb",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 756,
+      "source_head": "5cfb02f7ab11161711bc0de4cb898744bf2296b6",
+      "path": "docs/decisions/2026-10-05-codex-profile-drift-check.md",
+      "bytes": 5882,
+      "sha256": "7854ddafca2912b5d755a3aaadff9f7154537a633199eb3452214e24694e8218",
+      "byte_identical": true
+    },
+    {
+      "source_pr": 756,
+      "source_head": "5cfb02f7ab11161711bc0de4cb898744bf2296b6",
+      "path": "evidence/artifacts/codex-profile-drift-check-20261005/receipt.json",
+      "bytes": 8686,
+      "sha256": "1bac7eb84eec5b3be8fc93e5761f588f71bc08ae3ea5b376cd1afca52d3a8f0f",
+      "byte_identical": true
+    }
+  ],
+  "limits": [
+    "Byte identity establishes content preservation, not a rerun of source qualification.",
+    "The shared registry is rebuilt from target entries via native registration, never copied from a donor."
+  ]
+}

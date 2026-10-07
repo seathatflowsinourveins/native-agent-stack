@@ -33,6 +33,9 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              docs/decisions/2026-10-02-new-wsl-client-configuration.md.
              A piece mapped to a slot that does not install is not wired, not an error: the manifest decides, and the
              piece is wired when the slot installs the owner the entry names.
+             With --host NAME, compare installed Codex profiles under --home (default: current user)
+             with the host render; report differing/missing keys by name only. Extra operator keys are outside
+             this comparison. Existing profile-v2 files recover missing keys while preserving differing values.
   --render   --host NAME --out DIR [--with-authorization-settings]: settings.json (and the WSL overlay),
              mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
              with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
@@ -78,6 +81,8 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              says `left to the clients' own defaults` when the option was not given and, when it was, `applied`, `partly
              applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry run), followed by
              what it added, kept, found already the same and did not reach, a skipped step and a failed step told apart.
+
+             Unless codex-files is explicitly skipped, apply verification also fails on rendered profile drift.
 
 Reused, not rewritten: render_config.render_one (placeholders), install_claude_profile.py (hook and agent copies with
 their checksums, MCP registration), apply_claude_settings.py (settings merge and backup), managed_block.py (instruction
@@ -1513,9 +1518,20 @@ def short(text: str, width: int = 170) -> str:
 
 def cmd_check(args: argparse.Namespace) -> int:
     root = args.root
+    if args.home and not args.host:
+        print("--check --home needs --host NAME to render the profile values", file=sys.stderr)
+        return 2
+    if args.host and not HOST_NAME.fullmatch(args.host):
+        print(f"--host must match {HOST_NAME.pattern}", file=sys.stderr)
+        return 2
     try:
-        results, manifest, plan, errors, warnings = analyse(root)
-    except (ConfigError, OSError, KeyError, ValueError) as error:
+        results, manifest, plan, errors, warnings = analyse(root, authorization=args.with_authorization_settings)
+        if args.host:
+            home = Path(args.home) if args.home else Path.home()
+            values = host_values(args.host, plan, home, wired_path_dirs(results))
+            files = render(root, results, plan, values, manifest)
+            errors = errors + codex_profile_errors(results, files, home / ".codex")
+    except (ConfigError, render_config.RenderError, OSError, KeyError, ValueError) as error:
         print(f"check failed: {error}", file=sys.stderr)
         return 1
     errors = errors + rendered_name_errors(root)
@@ -1524,6 +1540,8 @@ def cmd_check(args: argparse.Namespace) -> int:
     elif args.markdown:
         sys.stdout.write(markdown_tables(root, results, plan))
         sys.stdout.write("\n" + dropped_markdown(root, generate_blocks(root, unwired_names(results, manifest))))
+        for error in errors:
+            print(f"error: {error}", file=sys.stderr)
         return 1 if errors else 0
     else:
         for v in results:
@@ -1819,6 +1837,46 @@ def plan_merge(existing: dict, rendered: dict) -> MergePlan:
             holder = holder[part]
         holder.setdefault(path[-1], []).extend(copy.deepcopy(items))
     return MergePlan(expected, keys, tables, conflicts, appends)
+
+
+CODEX_PROFILES = (("stack-worker.config.toml", "codex/stack-worker", "codex.stack-worker.config.toml"),
+                  ("omniroute.config.toml", "codex/omniroute", "codex.omniroute.config.toml"))
+
+
+def codex_profile_errors(results: list, files: dict, codex_home: Path) -> list:
+    """Report render-owned profile drift, never values or changes to the file.
+
+    Codex profile-v2 is an override layer, not an expected-render comparator
+    (openai/codex@a956835d, codex-rs/config/src/loader/mod.rs:286-333).
+    Reuse the additive merge's typed comparison, but compare its missing/conflicting
+    keys rather than its expected tree: expected deliberately keeps operator values.
+    """
+    errors = []
+    for name, group, staged in CODEX_PROFILES:
+        if not any(v.wired and v.piece.group == group for v in results):
+            continue
+        target = codex_home / name
+        try:
+            if not target.exists():
+                errors.append(f"Codex profile {name} is missing")
+                continue
+            existing = tomllib.loads(target.read_text(encoding="utf-8"))
+            rendered = tomllib.loads(files[staged])
+            plan = plan_merge(existing, rendered)
+        except (OSError, ValueError) as error:
+            # TOML errors and OS messages must not echo host content or paths.
+            errors.append(f"Codex profile {name} cannot be checked ({type(error).__name__})")
+            continue
+        paths = {path for path, _, _ in plan.conflicts} | {path for path, _ in plan.appends}
+        for path, value in [*plan.keys, *plan.tables]:
+            if isinstance(value, dict) and value:
+                paths.update(p for p, _ in toml_leaves(value, path))
+            else:
+                paths.add(path)
+        if paths:
+            keys = ", ".join(sorted(lane.key_path(list(path)) for path in paths))
+            errors.append(f"Codex profile {name} differs from the render at keys: {keys}; existing values kept")
+    return errors
 
 
 @dataclasses.dataclass
@@ -2466,16 +2524,16 @@ class Apply:
             self.authorization.update({v.piece.key: "added" for v in self.results
                                        if v.authorization and v.wired and v.piece.group == "codex/config"})
 
-    def merge_codex_config(self, config: Path) -> None:
+    def merge_codex_config(self, config: Path, *, staged: str = "codex.config.toml",
+                           group: str = "codex/config", step: str = "codex-config") -> None:
         """Merge, never rewrite: every key and table the file has stays as it is, what the render has and the file lacks is
         added, and a value that differs stays (shown beside the render's). The file is backed up first, read back after
         the write and put back from memory when it is not the merge. `features.daemon_auto_start` goes through Codex's
         own writer when a codex binary is at hand, as codex_home.py does; every other key is a text edit that the
         read-back proves. Only CODEX_OWNED_MIGRATIONS may replace a previous managed value once, through the native
         app-server writer. A running Codex writes the same file, so the write waits until none runs."""
-        step = "codex-config"
         try:
-            rendered = tomllib.loads((self.stage / "codex.config.toml").read_text(encoding="utf-8"))
+            rendered = tomllib.loads((self.stage / staged).read_text(encoding="utf-8"))
             if config.is_symlink() or not config.is_file():
                 raise MergeError(f"{config} is a symlink or not a regular file, so it is not written through; compare it "
                                  "with codex.config.toml from `--render --host <host> --out <dir>` by hand")
@@ -2485,7 +2543,7 @@ class Apply:
             except (UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
                 raise MergeError(f"{config} is not valid UTF-8 TOML ({error}); fix it, then run again") from None
             plan = plan_merge(existing, rendered)
-            pending = self.pending_codex_migrations(rendered)
+            pending = self.pending_codex_migrations(rendered) if group == "codex/config" else []
             migrations = [rule for rule, _ in pending
                           if strict_equal(lane.get_path(existing, list(rule[0])), (True, rule[1]))]
             for path, previous, new in migrations:
@@ -2497,7 +2555,7 @@ class Apply:
             migration_writer = self.binary("codex", self.args.codex_bin) if migrations else None
             if migrations and not migration_writer:
                 raise MergeError("owned-value migration needs the native Codex app-server writer; nothing written")
-            adds_daemon = (not lane.get_path(existing, list(DAEMON_PATH))[0]
+            adds_daemon = (group == "codex/config" and not lane.get_path(existing, list(DAEMON_PATH))[0]
                            and lane.get_path(plan.expected, list(DAEMON_PATH))[0])
             writer = self.binary("codex", self.args.codex_bin) if adds_daemon else None
             text_plan = plan.without(DAEMON_PATH) if writer else plan
@@ -2526,11 +2584,13 @@ class Apply:
                      f"{shown(path, previous)} -> {shown(path, new)} (one-time owned value)")
         found = {}
         for verdict in self.results:
-            if verdict.authorization and verdict.wired and verdict.piece.group == "codex/config":
+            if verdict.authorization and verdict.wired and verdict.piece.group == group:
                 # A piece's path is the template's: a key that names a placeholder (a project's trust grant under
                 # projects."${PROJECT_ROOT}") is looked up as the render filled it.
                 path = [string.Template(part).safe_substitute(self.values) if isinstance(part, str) else part
                         for part in verdict.piece.path]
+                if not lane.get_path(plan.expected, path)[0]:
+                    continue  # An ancestor type conflict kept this authorization out.
                 have = lane.get_path(existing, path)
                 found[verdict.piece.key] = ("added" if not have[0] else "same" if strict_equal(
                     have[1], lane.get_path(rendered, path)[1]) else "kept")
@@ -2666,18 +2726,30 @@ class Apply:
             return False
 
     def step_codex_files(self) -> None:
-        """The two profiles and the role carriers, created only when absent, as apply_codex_lane.py creates them."""
+        """Merge missing profile-v2 keys; keep role carriers create-only.
+
+        Profile-v2 is a full user config layer (openai/codex rust-v0.160.0,
+        codex-rs/config/src/loader/mod.rs). Reuse the config merge's backup,
+        process guard, expected-byte write and read-back, preserving existing values.
+        """
         items, groups = [], {}
-        for target_name, group, staged in (("stack-worker.config.toml", "codex/stack-worker",
-                                            "codex.stack-worker.config.toml"),
-                                           ("omniroute.config.toml", "codex/omniroute", "codex.omniroute.config.toml")):
+        for target_name, group, staged in CODEX_PROFILES:
             if any(v.wired and v.piece.group == group for v in self.results):
                 items.append((self.stage / staged, self.codex_home / target_name))
                 groups[self.codex_home / target_name] = group
         items += [(codex_roles.ROLES_SOURCE / name, self.codex_home / "agents" / name)
                   for name in self.wired_files("codex/role/")]  # none while the map leaves the carriers out
         states = []
+        outcomes_before = len(self.outcomes)
         for source, target in items:
+            if target in groups:
+                if os.path.lexists(target):
+                    self.merge_codex_config(target, staged=source.name, group=groups[target], step="codex-files")
+                    continue
+                running, how = self.codex_guard()
+                if running and not self.dry:
+                    self.record("codex-files", "failed", self.codex_refusal(running, how))
+                    continue
             data = source.read_bytes()
             state = lane.file_state(target.read_bytes() if target.is_file() else None, data)
             if state == "create" and not self.dry:
@@ -2692,6 +2764,21 @@ class Apply:
             shown = {"create": "would create" if self.dry else "created", "same": "already there",
                      "differs": "differs from the render and is never overwritten"}[state]
             self.say("codex-files", f"  {target.name}: {shown}")
+        profile_outcomes = self.outcomes[outcomes_before:]
+        drift = codex_profile_errors(self.results, self.files, self.codex_home) if not self.dry else []
+        for error in drift:
+            self.say("codex-files", f"  {error}")
+        if any(outcome[1] == "failed" for outcome in profile_outcomes):
+            self.record("codex-files", "failed", "at least one profile failed; individual outcomes retained")
+            return
+        if drift:
+            self.record("codex-files", "drifted", "render-owned profile keys differ; existing values retained")
+            return
+        if any(outcome[1] == "merged with conflicts kept" for outcome in profile_outcomes):
+            self.record("codex-files", "merged with conflicts kept", "existing profile values retained")
+            return
+        if not states and profile_outcomes:
+            return
         done = ("planned" if self.dry else "applied") if "create" in states else "current"
         self.record("codex-files", done, f"{len(items)} file(s)")
 
@@ -2719,6 +2806,8 @@ class Apply:
         found = login_shell_resolution(self.home, names)
         launcher = self.eco / "bin" / "claude"
         problems = []
+        if "codex-files" not in self.args.skip:
+            problems.extend(codex_profile_errors(self.results, self.files, self.codex_home))
         for name, path in found.items():
             self.say("verify", f"  a login shell finds {name}: {path or 'nothing (not installed here yet)'}")
         if found.get("claude") and Path(found["claude"]).resolve() != launcher.resolve():
@@ -2811,7 +2900,8 @@ def login_shell_resolution(home: Path, names: list) -> dict:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--check", action="store_true", help="check the map against the manifest, plan and templates")
+    mode.add_argument("--check", action="store_true", help="check repository wiring; with --host, also check installed "
+                      "Codex profile keys against that host's render without writing")
     mode.add_argument("--check-login-env", action="store_true",
                       help="--host NAME: read back pointer source, profile reader and Codex policy (booleans only)")
     mode.add_argument("--preflight-login-env", action="store_true",
@@ -2824,12 +2914,12 @@ def build_parser() -> argparse.ArgumentParser:
                         help="the catalog checkout whose map, templates, manifest and plan are read (default: this one)")
     parser.add_argument("--host", help="adoption/hosts/<name>.json, the host value file")
     parser.add_argument("--out", type=Path, help="--render: the directory to write")
-    parser.add_argument("--home", help="--apply, --check-login-env or --preflight-login-env: the home directory (default: the current user's)")
+    parser.add_argument("--home", help="--apply, --check --host, --check-login-env or --preflight-login-env: the home directory (default: the current user's)")
     parser.add_argument("--claude-bin", help="--apply: the claude binary (default: the native installer's, from PATH)")
     parser.add_argument("--codex-bin", help="--apply: the codex binary (default: the native installer's, from PATH)")
     parser.add_argument("--dry-run", action="store_true", help="--apply: report each step; run no client, write nothing")
     parser.add_argument("--with-authorization-settings", action="store_true",
-                        help="--render and --apply: also render and write the authorization settings, the ones that grant "
+                        help="--render, --apply or --check --host: include authorization settings (installed only by --apply), the ones that grant "
                              "a permission or suppress a confirmation (Claude Code permissions.defaultMode, "
                              "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level "
                              "of the host's main checkout in Codex, and the tool approval mode of a Codex MCP server "

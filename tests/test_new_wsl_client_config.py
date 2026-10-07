@@ -2374,6 +2374,108 @@ class LoginEnvironmentTests(ApplyCase):
         self.assertIn("summary:", out)
 
 
+class CodexProfileDriftTests(ApplyCase):
+    """Synthetic profile files exercise the real check and apply verification; no native account is read."""
+
+    def setUp(self):
+        super().setUp()
+        results, manifest, plan, errors, _ = cfg.analyse(ROOT)
+        self.assertEqual(errors, [])
+        values = cfg.host_values(EXAMPLE_HOST, plan, self.home, cfg.wired_path_dirs(results))
+        files = cfg.render(ROOT, results, plan, values, manifest)
+        self.results, self.files = results, files
+        self.profiles = {}
+        for name in ("stack-worker", "omniroute"):
+            target = self.home / ".codex" / f"{name}.config.toml"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(files[f"codex.{name}.config.toml"], encoding="utf-8")
+            self.profiles[name] = target
+
+    def check(self, *extra):
+        return run_main("--check", "--host", EXAMPLE_HOST, "--home", str(self.home), *extra)
+
+    def drift(self):
+        target = self.profiles["omniroute"]
+        data = tomllib.loads(target.read_text())
+        data.update(model="cx/gpt-6-astra", model_reasoning_effort="max", web_search="live")
+        data["features"]["standalone_web_search"] = True
+        target.write_text(cfg.emit_toml(data, "# operator profile\n"), encoding="utf-8")
+        return target.read_bytes()
+
+    def test_check_reports_drifted_profile_keys_without_values_or_writes(self):
+        before = self.drift()
+        for mode in ((), ("--json",), ("--markdown",)):
+            with self.subTest(mode=mode):
+                code, out, err = self.check(*mode)
+                self.assertEqual(code, 1, out[-800:])
+                for key in ("model", "model_reasoning_effort", "web_search", "features.standalone_web_search"):
+                    self.assertIn(key, err)
+                self.assertIn("omniroute.config.toml", err)
+                self.assertNotIn("cx/gpt-6-astra", err)
+                self.assertEqual(self.profiles["omniroute"].read_bytes(), before)
+                if mode == ("--json",):
+                    json.loads(out)  # Diagnostics must leave the existing JSON table parseable.
+        self.assertFalse(self.marker.exists())
+
+    def test_missing_rendered_keys_and_invalid_toml_fail_without_echoing_content(self):
+        target = self.profiles["omniroute"]
+        data = tomllib.loads(target.read_text())
+        del data["web_search"]
+        target.write_text(cfg.emit_toml(data, ""), encoding="utf-8")
+        code, _, err = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("web_search", err)
+        before = "model = 'synthetic-private-sentinel\n"
+        target.write_text(before, encoding="utf-8")
+        code, _, err = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("TOMLDecodeError", err)
+        self.assertNotIn("synthetic-private-sentinel", err)
+        self.assertEqual(target.read_text(), before)
+
+    def test_check_authorization_scope_matches_the_explicit_render_option(self):
+        code, _, err = self.check("--with-authorization-settings")
+        self.assertEqual(code, 1)
+        self.assertIn("mcp_servers.ai-memory.default_tools_approval_mode", err)
+        self.assertIn("mcp_servers.headroom.default_tools_approval_mode", err)
+        self.assertIn("mcp_servers.socraticode.default_tools_approval_mode", err)
+
+    def test_permission_errors_do_not_echo_host_paths_or_os_messages(self):
+        with mock.patch.object(Path, "exists", side_effect=PermissionError("synthetic-private-path")):
+            errors = cfg.codex_profile_errors(self.results, self.files, self.home / ".codex")
+        self.assertEqual(len(errors), 2)
+        for error in errors:
+            self.assertIn("PermissionError", error)
+            self.assertNotIn("synthetic-private-path", error)
+            self.assertNotIn(str(self.home), error)
+
+    def test_matching_profile_keys_pass_with_operator_extras_and_formatting(self):
+        with self.profiles["omniroute"].open("a", encoding="utf-8") as stream:
+            stream.write("\n# Operator-owned extra table is outside the render.\n[operator_only]\nkeep = true\n")
+        before = tree(self.home)
+        code, out, err = self.check()
+        self.assertEqual((code, err), (0, ""), out[-800:])
+        self.assertEqual(tree(self.home), before)
+        self.assertFalse(self.marker.exists())
+
+    def test_apply_verify_reports_profile_drift_while_merge_keeps_operator_values(self):
+        self.installed_state()
+        before = self.drift()
+        config = self.home / ".codex/config.toml"
+        config.write_text("model = 'operator-base-model'\n[features]\ndaemon_auto_start = false\n", encoding="utf-8")
+        code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-800:] + err)
+        self.assertEqual(tomllib.loads(config.read_text())["model"], "operator-base-model")
+        self.assertIn("mcp_servers", tomllib.loads(config.read_text()))
+        self.assertEqual(self.profiles["omniroute"].read_bytes(), before)
+        self.assertIn("codex-files drifted", out.split("summary: ")[1])
+        self.assertIn("verify failed", out.split("summary: ")[1])
+        verify = "\n".join(line for line in out.splitlines() if line.startswith("verify:"))
+        self.assertIn("omniroute.config.toml", verify)
+        self.assertIn("model_reasoning_effort", verify)
+        self.assertNotIn("cx/gpt-6-astra", verify)
+
+
 class ApplyTests(ApplyCase):
     def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
         self.installed_state()
@@ -2632,22 +2734,28 @@ class ApplyTests(ApplyCase):
         self.assertEqual(hashlib.sha256((claude / "hooks/secret_path_guard.py").read_bytes()).hexdigest(),
                          icp.expected_sha256(icp.HOOKS["secret_path_guard.py"]))
 
-    def test_a_differing_profile_file_is_never_overwritten_while_an_existing_config_is_merged(self):
+    def test_a_differing_profile_keeps_its_values_and_gains_missing_keys(self):
         self.installed_state()
         codex = self.home / ".codex"
         codex.mkdir(mode=0o700)
         (codex / "config.toml").write_text("model = 'mine'\n[features]\ndaemon_auto_start = false\n", encoding="utf-8")
         (codex / "stack-worker.config.toml").write_text("model = 'mine'\n", encoding="utf-8")
         code, out, _ = self.apply()
-        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(code, 1, out[-800:])  # Kept profile values now fail verification instead of passing as current.
+        self.assertIn("verify failed", out.split("summary: ")[1])
         config = tomllib.loads((codex / "config.toml").read_text())
         self.assertEqual(config["model"], "mine")                       # the file's own value stays
         self.assertIs(config["features"]["daemon_auto_start"], False)
         self.assertIn("mcp_servers", config)                            # what it lacked came in
         self.assertIn("conflict kept: model: the file has \"mine\"; the render has \"gpt-6.1-sol\"", out)
         self.assertIn("codex-config merged with conflicts kept", out.split("summary: ")[1])
-        self.assertEqual((codex / "stack-worker.config.toml").read_text(), "model = 'mine'\n")
-        self.assertIn("stack-worker.config.toml: differs from the render and is never overwritten", out)
+        profile = tomllib.loads((codex / "stack-worker.config.toml").read_text())
+        self.assertEqual(profile["model"], "mine")
+        self.assertEqual(profile["model_reasoning_effort"], "max")
+        self.assertIn("headroom", profile["mcp_servers"])
+        self.assertNotIn("default_tools_approval_mode", profile["mcp_servers"]["headroom"])
+        self.assertTrue(list(codex.glob("stack-worker.config.toml.bak.*")))
+        self.assertIn("codex-files merged with conflicts kept", out)
         self.assertTrue((codex / "omniroute.config.toml").exists())
 
     def test_a_settings_file_of_the_destinations_shape_keeps_its_marketplace_and_theme_and_gains_the_wired_settings(self):
@@ -2767,6 +2875,141 @@ def leaves(node, prefix=()):
     return {prefix: json.dumps(node, sort_keys=True)}
 
 
+class ProfileMergeTests(ApplyCase):
+    """Recovery of an older profile-v2 render, through the existing guarded merge."""
+
+    def profile_apply(self, *extra):
+        skipped = [arg for step in cfg.STEPS if step != "codex-files" for arg in ("--skip", step)]
+        return self.apply(*skipped, *extra)
+
+    def profile(self, text=None):
+        path = self.home / ".codex/stack-worker.config.toml"
+        path.parent.mkdir(mode=0o700, exist_ok=True)
+        if text is not None:
+            path.write_text(text, encoding="utf-8")
+            path.chmod(0o600)
+        return path
+
+    def test_stale_profile_recovers_missing_mcp_policies_and_is_idempotent(self):
+        path = self.profile('# operator comment\nmodel = "mine"\n[mcp_servers.serena]\nstartup_timeout_sec = 60\n')
+        before = path.read_bytes()
+        code, out, _ = self.profile_apply("--with-authorization-settings")
+        self.assertEqual(code, 0, out)
+        data = tomllib.loads(path.read_text())
+        self.assertEqual(data["model"], "mine")
+        self.assertTrue(path.read_text().startswith('# operator comment\nmodel = "mine"\n'))
+        self.assertTrue(data["mcp_servers"]["serena"]["required"])
+        for name in ("ai-memory", "headroom", "socraticode"):
+            self.assertEqual(data["mcp_servers"][name]["default_tools_approval_mode"], "approve")
+            self.assertTrue(data["mcp_servers"][name]["enabled_tools"])
+        self.assertEqual(data["mcp_servers"]["socraticode"]["env"]["SOCRATICODE_WATCHER"], "manual")
+        self.assertEqual(data["mcp_servers"]["context-mode"]["disabled_tools"], ["ctx_upgrade", "ctx_purge"])
+        after, backups = path.read_bytes(), list(path.parent.glob(path.name + ".bak.*"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_bytes(), before)
+        code, out, _ = self.profile_apply("--with-authorization-settings")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(path.read_bytes(), after)
+        self.assertEqual(list(path.parent.glob(path.name + ".bak.*")), backups)
+
+    def test_existing_approval_value_is_preserved_and_reported(self):
+        path = self.profile('[mcp_servers.headroom]\ndefault_tools_approval_mode = "prompt"\n')
+        code, out, _ = self.profile_apply("--with-authorization-settings")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(tomllib.loads(path.read_text())["mcp_servers"]["headroom"]["default_tools_approval_mode"], "prompt")
+        self.assertIn('conflict kept: mcp_servers.headroom.default_tools_approval_mode', out)
+        self.assertIn('kept your value: Codex stack-worker profile mcp_servers.headroom.default_tools_approval_mode', out)
+
+    def test_profile_merge_does_not_migrate_owned_main_config_values_or_disable_its_daemon(self):
+        render = cfg.render
+
+        def profile_with_main_keys(*args, **kwargs):
+            files = render(*args, **kwargs)
+            key = "codex.stack-worker.config.toml"
+            data = tomllib.loads(files[key])
+            data["service_tier"] = "default"
+            data.setdefault("features", {})["daemon_auto_start"] = False
+            files[key] = cfg.emit_toml(data, "")
+            return files
+
+        for has_daemon in (True, False):
+            with self.subTest(daemon_key_present=has_daemon):
+                text = 'service_tier = "fast"\n'
+                if has_daemon:
+                    text += '[features]\ndaemon_auto_start = true\n'
+                path = self.profile(text)
+                with mock.patch.object(cfg, "render", side_effect=profile_with_main_keys), \
+                        mock.patch.object(cfg.Apply, "pending_codex_migrations", side_effect=AssertionError("profile reached main migration")), \
+                        mock.patch.object(cfg.Apply, "migrate_owned_codex_values") as migration, \
+                        mock.patch.object(cfg.Apply, "codex_disable_daemon") as daemon:
+                    code, out, _ = self.profile_apply("--with-authorization-settings")
+                self.assertEqual(code, 0, out)
+                data = tomllib.loads(path.read_text())
+                self.assertEqual(data["service_tier"], "fast")
+                self.assertEqual(data["features"]["daemon_auto_start"], has_daemon)
+                migration.assert_not_called()
+                daemon.assert_not_called()
+                self.assertFalse((self.home / ".codex/.native-agent-stack-migrations").exists())
+    def test_busy_client_blocks_profile_creation_and_update(self):
+        for existing in (False, True):
+            with self.subTest(existing=existing):
+                path = self.profile('model = "mine"\n' if existing else None)
+                before = path.read_bytes() if path.exists() else None
+                with mock.patch.object(cfg, "running_codex_pids", return_value=["123"]):
+                    code, out, _ = self.profile_apply("--with-authorization-settings")
+                self.assertNotEqual(code, 0)
+                self.assertIn("process(es) running", out)
+                self.assertIn("codex-files failed", out.split("summary: ")[1])
+                self.assertEqual(path.read_bytes() if path.exists() else None, before)
+                self.assertFalse(list(path.parent.glob(path.name + ".bak.*")))
+                self.assertFalse((path.parent / "omniroute.config.toml").exists())
+
+    def test_symlink_profile_is_refused_without_changing_its_target(self):
+        path = self.profile()
+        target = self.base / "operator.toml"
+        target.write_text('model = "mine"\n', encoding="utf-8")
+        path.symlink_to(target)
+        code, out, _ = self.profile_apply()
+        self.assertNotEqual(code, 0)
+        self.assertIn("symlink", out)
+        self.assertEqual(target.read_text(), 'model = "mine"\n')
+
+    def test_failed_worker_profile_is_reported_when_another_existing_profile_succeeds(self):
+        path = self.profile()
+        path.symlink_to(self.base / "missing-profile.toml")
+        (path.parent / "omniroute.config.toml").write_text('model = "operator"\n', encoding="utf-8")
+        code, out, _ = self.profile_apply("--with-authorization-settings")
+        self.assertNotEqual(code, 0)
+        line = next(line for line in out.splitlines() if line.startswith("authorization settings:"))
+        self.assertIn("not reached, its step codex-files failed:", line)
+        self.assertNotIn("its step codex-files ended current", line)
+
+    def test_ancestor_conflict_does_not_report_an_unwritten_permission_as_added(self):
+        path = self.profile('[mcp_servers]\nheadroom = "operator"\n')
+        code, out, _ = self.profile_apply("--with-authorization-settings")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(tomllib.loads(path.read_text())["mcp_servers"]["headroom"], "operator")
+        line = next(line for line in out.splitlines() if line.startswith("authorization settings:"))
+        self.assertIn("not reached, its step codex-files ended drifted: "
+                      "Codex stack-worker profile mcp_servers.headroom.default_tools_approval_mode", line)
+
+    def test_profile_readback_mismatch_restores_original_bytes(self):
+        path = self.profile('model = "mine"\n')
+        before = path.read_bytes()
+        write = cfg.lane.atomic_write
+
+        def corrupt(target, data, *args, **kwargs):
+            if target == path and data != before:
+                data += b"\nunexpected = true\n"
+            return write(target, data, *args, **kwargs)
+
+        with mock.patch.object(cfg.lane, "atomic_write", side_effect=corrupt):
+            code, out, _ = self.profile_apply("--with-authorization-settings")
+        self.assertNotEqual(code, 0)
+        self.assertIn("read-back", out)
+        self.assertEqual(path.read_bytes(), before)
+
+
 class AuthorizationTests(ApplyCase):
     """The settings that grant a permission or suppress a confirmation are written only on request: the five that stand
     alone, the main checkout's Codex trust grant, and the tool approval modes and allow rules tied to the slot that wires
@@ -2785,6 +3028,8 @@ class AuthorizationTests(ApplyCase):
                 "codex/config/mcp_servers.context-mode.default_tools_approval_mode",
                 "codex/config/mcp_servers.jcodemunch.default_tools_approval_mode",
                 "codex/config/mcp_servers.chrome-devtools.default_tools_approval_mode",
+                "codex/config/mcp_servers.socraticode.default_tools_approval_mode",
+                "codex/config/mcp_servers.headroom.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode")
@@ -2796,10 +3041,11 @@ class AuthorizationTests(ApplyCase):
                                           ("context-supply", "context-mode"), ("code-index", "jcodemunch"),
                                           ("playwright-cli", "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, "
                                            "in both clients; it also serves browser diagnostics)"),
+                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("memory-owner", "ai-memory"),
                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
-    WAITING = APPROVAL[6:]                        # the same two negative-control owners, after Chrome's insertion
+    WAITING = tuple(key for key in APPROVAL if any(name in key for name in ("socraticode", "headroom")))
     WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
@@ -2885,7 +3131,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
                           if "default_tools_approval_mode" in server},
                          {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve",
-                          "chrome-devtools": "approve"})
+                          "chrome-devtools": "approve", "socraticode": "approve", "headroom": "approve"})
         # One trust grant, for the host's main checkout (PROJECT_ROOT) and nothing else: no parent directory, and not
         # the publication checkout the shared template also names.
         project_root = json.loads((ROOT / "adoption/hosts/example.json").read_text())["PROJECT_ROOT"]
@@ -2901,6 +3147,8 @@ class AuthorizationTests(ApplyCase):
                  ("mcp_servers", "context-mode", "default_tools_approval_mode"),
                  ("mcp_servers", "jcodemunch", "default_tools_approval_mode"),
                  ("mcp_servers", "chrome-devtools", "default_tools_approval_mode"),
+                 ("mcp_servers", "socraticode", "default_tools_approval_mode"),
+                 ("mcp_servers", "headroom", "default_tools_approval_mode"),
                  ("projects", project_root, "trust_level")]))
             self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
             self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
@@ -2912,6 +3160,8 @@ class AuthorizationTests(ApplyCase):
     ADDED_CLAUDE = (f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt, "
                     "Claude Code crossSessionInbound")
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
+                    "Codex mcp_servers.socraticode.default_tools_approval_mode, "
+                    "Codex mcp_servers.headroom.default_tools_approval_mode, "
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
                     "Codex mcp_servers.semble.default_tools_approval_mode, "
@@ -2935,9 +3185,10 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual([name for name, server in config["mcp_servers"].items() if "default_tools_approval_mode" in server],
                          [])
         self.assertEqual(self.authorization_line(out), self.DEFAULT_LINE)
-        # Negative control: the same home with the option gets every one, in both clients and the stack-worker profile.
+        # The option also recovers the profile authorization keys missing from the earlier plain render.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
+        self.assertIn("verify verified", out.split("summary: ")[1])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         config = tomllib.loads((self.home / ".codex/config.toml").read_text())
         self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")
@@ -2946,17 +3197,17 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual((config["approval_policy"], config["sandbox_mode"]), ("never", "danger-full-access"))
         for server in ("ai-memory", "semble", "context-mode"):
             self.assertEqual(config["mcp_servers"][server]["default_tools_approval_mode"], "approve", server)
-        # The stack-worker profile is created only when absent, so the profile the plain run created stays as it was.
+        # The profile the plain run created gains the approval settings it lacked.
         line = self.authorization_line(out)
         self.assertEqual(line, f"authorization settings: applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
-                               f"{self.CODEX_CONFIG}; kept your value: {self.STACK_WORKER})")
+                               f"{self.CODEX_CONFIG}, {self.STACK_WORKER})")
         # A second run with the option has nothing left to add: the settings are the same, and the line says kept.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
         line = self.authorization_line(out)
-        self.assertEqual(line, f"authorization settings: kept (--with-authorization-settings; kept your value: "
-                               f"{self.STACK_WORKER}; already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
-                               f"{self.CODEX_CONFIG})")
+        self.assertEqual(line, f"authorization settings: kept (--with-authorization-settings; "
+                               f"already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
+                               f"{self.CODEX_CONFIG}, {self.STACK_WORKER})")
 
     def test_a_new_codex_home_with_the_option_keeps_the_trust_grant_and_a_second_run_finds_it_the_same(self):
         # codex_home.py --keep-project-trust: the grant the render holds survives the creation of config.toml, so the
@@ -2996,7 +3247,7 @@ class AuthorizationTests(ApplyCase):
         for extra, present in (((), False), ((self.OPTION,), True)):
             with self.subTest(option=bool(extra)):
                 code, out, _ = self.apply(*extra)
-                self.assertEqual(code, 0, out[-800:])
+                self.assertEqual(code, 0, out[-800:])  # Missing profile keys are recovered; existing values still stay.
                 settings = json.loads((self.home / ".claude/settings.json").read_text())
                 config = tomllib.loads((self.home / ".codex/config.toml").read_text())
                 self.assertEqual("defaultMode" in settings["permissions"], present)
@@ -3036,10 +3287,10 @@ class AuthorizationTests(ApplyCase):
                     line = self.authorization_line(out)
                     self.assertTrue(line.startswith("authorization settings: applied (--with-authorization-settings; "
                                                     f"added: {self.ALLOW_LABELS}, "), line)
-                    # The stack-worker profile the plain run created is kept too (profiles are created only when absent).
+                    # The plain run's profile gains missing approval settings with the option.
                     self.assertIn("kept your value: Claude Code permissions.defaultMode, Claude Code "
                                   "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode, "
-                                  f"{self.STACK_WORKER})", line)
+                                  .rstrip(", "), line)
                 else:
                     self.assertNotIn("kept your permissions.defaultMode", out)
                     self.assertNotIn("conflict kept: approval_policy", out)

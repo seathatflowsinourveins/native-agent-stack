@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "unit": "codex-profile-environment-content-fold",
+  "lane": "foundation",
+  "target_pr": 770,
+  "target_base": "1a567f540ac9231328bbe349ad05baeaa12b5ad9",
+  "decision": "docs/decisions/2026-10-07-codex-profile-environment-content-fold.md",
+  "evidence_class": ["source-review", "local-integration-check", "synthetic-fixture", "independent-observation", "structural-validation"],
+  "byte_ledger": "evidence/artifacts/codex-profile-env-fold-20261007/source-bytes.json",
+  "donors": [
+    {"pr": 716, "head": "b63381f877dd1108a0347300f4a3ee765eb1f0d6", "changed_files": 76, "identical_files": 70, "added_files_preserved": "70/70"},
+    {"pr": 756, "head": "5cfb02f7ab11161711bc0de4cb898744bf2296b6", "changed_files": 5, "identical_files": 2, "added_files_preserved": "2/2"}
+  ],
+  "shared_path_ledger": [
+    {"path": "tools/adoption/new_wsl_client_config.py", "sources": [716, 756, 770], "composition": "Parameterize the target guarded merge; retain native main-config migration/daemon writers only for group codex/config; add profile recovery and independent key-only drift checks without replacing login-env."},
+    {"path": "tests/test_new_wsl_client_config.py", "sources": [716, 756, 770], "composition": "Keep P1ENV/main-tier assertions, source ProfileMerge/Drift fixtures and authorization scope; expected missing-key recovery now succeeds, preserved render drift fails verification. Add profile fast/daemon-present/daemon-missing isolation coverage."},
+    {"path": "adoption/new-wsl/templates/codex.config.additions.toml", "sources": [716, 770], "composition": "Add only slot-bound SocratiCode/Headroom approval defaults; retain service-tier policy and all shell_environment_policy.set pointers."},
+    {"path": "docs/harness-defaults.md", "sources": [716, 770], "composition": "Append eight donor source anti-pattern rows to the existing table; preserve target rows and measured wording."},
+    {"path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md", "sources": [716, 770], "composition": "Retain original decided bytes; append latest native generated counts/tables and explicit create-only supersession rather than transplant stale donor counts or remove prose."},
+    {"path": "manifests/evidence.json", "sources": [716, 756, 770], "composition": "Keep target registry, register imported/changed files through host_receipts, and add only donor716's convergence-record path; never hand-merge or replace the registry."}
+  ],
+  "retained_local_failures": [
+    {"raw_log": "controller-first.log", "exit_code": 1, "tests": 234, "failures": 6, "duration_seconds": 97.956, "cause": "Source create-only authorization return codes and merged-conflict label no longer match additive recovery plus drift; two generated record bindings were stale."},
+    {"raw_log": "controller-qualified.log", "exit_code": 1, "tests": 235, "failures": 2, "duration_seconds": 94.060, "cause": "One literal status replacement did not match, and the new dated count projection was inserted before older projections; exact status and EOF placement were corrected."}
+  ],
+  "qualification": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_new_wsl_client_config tests.test_managed_block tests.test_credential_status tests.test_adoption_docs_consistency",
+    "python_version": "3.13.16",
+    "umask": "022",
+    "exit_code": 0,
+    "tests": 370,
+    "skips": 1,
+    "duration_seconds": 113.237,
+    "raw_log": "final-touched-modules.log",
+    "source_condition": "Before extending the isolation test with the missing-daemon subcase; production controller and all old test cases are unchanged by that extension."
+  },
+  "focused_interaction_check": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_new_wsl_client_config.ProfileMergeTests.test_profile_merge_does_not_migrate_owned_main_config_values_or_disable_its_daemon",
+    "exit_code": 0,
+    "tests": 1,
+    "subcases": ["existing daemon true is kept", "missing daemon becomes false through additive profile merge"],
+    "duration_seconds": 0.293,
+    "raw_log": "profile-isolation-final.log",
+    "assertions": "Operator fast remains; neither native main-config writer is called and no global migration marker appears."
+  },
+  "reused_source_evidence": "All copied donor observations, source test outcomes, failed attempts and limits retain original bytes and classes; no model or gateway test is replayed.",
+  "host_changes": false,
+  "limits": [
+    "Focused composition checks are local integration evidence, not new upstream acceptance or an all-green host suite.",
+    "No live Codex profile, credential file, client setup, install, index, gateway setting or source branch is changed.",
+    "Content folds keep the current base; the command center owns landing rebase/merge, host apply and closure of originals.",
+    "The root publishes one retained-PR content head after review; no worker push or PR closure occurs."
+  ]
+}
