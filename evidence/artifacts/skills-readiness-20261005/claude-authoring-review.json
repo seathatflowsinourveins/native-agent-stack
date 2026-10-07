@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "claude-authoring-independent-review-20261005",
+  "evidence_class": "source_review",
+  "reviewer": "Separate read-only Codex critic, with coordinator original-artifact verification",
+  "scope": "Six executor runs, native grading, aggregation, static viewer and interrupted first analysis; the later completion repair is recorded separately",
+  "observation": {
+    "transcript_copies_match_native_originals": 6,
+    "native_write_payloads_match_returned_answers": 6,
+    "native_model": "claude-opus-5-5",
+    "native_effort": "max",
+    "model_effort_location": "Each actual child transcript line 14; effort is client metadata, not a separate provider attestation",
+    "timing_matches_native_notifications": 6,
+    "notification_parent_stream_lines": [766, 776, 782, 790, 797, 825],
+    "paired_contract_and_case_match": true,
+    "expected_answers_withheld_from_executors": true,
+    "executor_oracle_file_reads_found": false,
+    "with_skill_reads_candidate": 3,
+    "without_skill_reads_candidate": 0,
+    "grading_files": 7,
+    "asset_oracle_failures": 5,
+    "wrong_answer_status_and_owner_rejected": true,
+    "native_aggregate_exit_code": 0,
+    "native_static_viewer_exit_code": 0,
+    "actual_runs_per_case_per_arm": 1
+  },
+  "interrupted_analysis": {
+    "workflow_id": "wf_376bb5e0-d15",
+    "journal_records": {"launched": 1, "started": 2},
+    "terminal_results": 0,
+    "analyst_native_transcript_line": 168,
+    "critic_native_transcript_line": 429,
+    "native_interruption_timestamp": "2026-10-05T12:07:01.379Z",
+    "parent_exit_causation": "Inference from coincident timing; no human-cancellation claim",
+    "repair_receipt": "claude-authoring-completion.json"
+  },
+  "limitations": [
+    "Frozen asset wording is ambiguous; preserve the five strict oracle failures",
+    "The three paired cases, one repetition and shared full contract establish no quality uplift",
+    "Coordinator verification finds native advisor too_many_requests records at line 25 in cases 2 and 3 with_skill; variable advisor outcomes add a runtime confound",
+    "Native aggregator model placeholders, hardcoded repetition metadata and default tool/error counters are not observations",
+    "A historical general-purpose grader Workflow lacks the repository's required dispatch annotation; retain the policy limitation",
+    "No production candidate, lifecycle installation, worker discovery or human qualitative acceptance is established"
+  ],
+  "sources": [
+    "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:171",
+    "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:207",
+    "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:225",
+    "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:229",
+    "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:234",
+    "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:247",
+    "claude-authoring.json",
+    "authoring-fixture.json"
+  ],
+  "no_reexecution_or_writes_by_critic": true
+}

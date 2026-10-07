@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-getsentry-skills-agents-md",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "getsentry/skills@agents-md",
+ "reviewed_commit": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+ "readme_path": "skills/agents-md/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-agent-docs"
+ ],
+ "claim": "Source review of the skill agents-md in getsentry/skills at commit d18b7aa8ba878354e5c348310230e652f7690f9c (the adjudicated pin; license Apache-2.0), read from skills/agents-md/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for agents-md; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 79bf72b1b141202a03f515b4a133f4845cf8d9e6. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 1038,
+  "pushed_at": "2026-10-02T19:29:06Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named agents-md",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "8a91ada35068f43ef7ee03e38937863bac4f407878b06f0a4f1ddb4af24bec7e",
+  "skill_md_bytes": 3188,
+  "survivor_skill_md_sha256": "8a91ada35068f43ef7ee03e38937863bac4f407878b06f0a4f1ddb4af24bec7e",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "79bf72b1b141202a03f515b4a133f4845cf8d9e6",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/agents-md/SKILL.md@d18b7aa8ba878354e5c348310230e652f7690f9c",
+   "text": "Goal: concise, actionable agent instructions. Target under 60 lines; never exceed 100."
+  },
+  {
+   "source": "skills/agents-md/SKILL.md@d18b7aa8ba878354e5c348310230e652f7690f9c",
+   "text": "1. Inspect before writing: - package manager: lock files and manifests - commands: `package.json`, `Makefile`, task runners, CI workflows - docs/specs/policies: `README.md`, `CONTRIBUTING.md`, `docs/`, `specs/`, `policies/`, `SECURITY.md`, `.github/` - conventions: current code patterns, test layout, generated files, legacy areas to avoid 2. Choose scope: - root `AGENTS.md`: repo-wide defaults - nested `AGENTS.md`: only when a subtree has different commands or rules - closest instruction file wi"
+  },
+  {
+   "source": "skills/agents-md/SKILL.md@d18b7aa8ba878354e5c348310230e652f7690f9c",
+   "text": "- Create `AGENTS.md` at the repository root. - If a Claude-compatible entrypoint is required, symlink `CLAUDE.md` to `AGENTS.md`. - Do not maintain divergent `AGENTS.md` and `CLAUDE.md` copies."
+  }
+ ]
+}

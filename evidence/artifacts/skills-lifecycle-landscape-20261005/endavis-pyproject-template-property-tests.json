@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-endavis-pyproject-template-property-tests",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "endavis/pyproject-template@property-tests",
+ "reviewed_commit": "e10989adec8992a5b0ce77af2e6a37e2a414b0aa",
+ "readme_path": ".agents/skills/property-tests/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill property-tests in endavis/pyproject-template at commit e10989adec8992a5b0ce77af2e6a37e2a414b0aa (the adjudicated pin; license MIT), read from .agents/skills/property-tests/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for property-tests; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 7c23ff799e04a9cc12f208a738acac6af8f349e0. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 1,
+  "pushed_at": "2026-10-05T09:11:27Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "e10989adec8992a5b0ce77af2e6a37e2a414b0aa",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".agents/skills/, the first location the CLI searches that holds a valid folder named property-tests",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "ebda4ce3cd80ac52bd16fb583ee6aad762363d1c06a59dd8d44dd93ace2548ee",
+  "skill_md_bytes": 5868,
+  "survivor_skill_md_sha256": "ebda4ce3cd80ac52bd16fb583ee6aad762363d1c06a59dd8d44dd93ace2548ee",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "7c23ff799e04a9cc12f208a738acac6af8f349e0",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".agents/skills/property-tests/SKILL.md@e10989adec8992a5b0ce77af2e6a37e2a414b0aa",
+   "text": "Write a Hypothesis property test for a function or module: a property named up front, a strategy built from types, and proof -- against deliberately broken code -- that the test can actually fail."
+  },
+  {
+   "source": ".agents/skills/property-tests/SKILL.md@e10989adec8992a5b0ce77af2e6a37e2a414b0aa",
+   "text": "The function or module to test, and what property to check, come from the user's request or from the task at hand. If neither says, ask before doing anything else."
+  },
+  {
+   "source": ".agents/skills/property-tests/SKILL.md@e10989adec8992a5b0ce77af2e6a37e2a414b0aa",
+   "text": "A property test that only checks a call does not raise, or that restates the implementation under a different name, passes forever and finds nothing. This skill keeps the judgment calls that prevent that explicit, instead of leaving them to be skipped under deadline pressure."
+  }
+ ]
+}

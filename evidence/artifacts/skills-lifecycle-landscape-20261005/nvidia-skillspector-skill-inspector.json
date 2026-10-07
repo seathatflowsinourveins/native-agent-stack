@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nvidia-skillspector-skill-inspector",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "NVIDIA/SkillSpector@skill-inspector",
+ "reviewed_commit": "a50b9c93835c94f7d36329f11c6599abbb9c74ee",
+ "readme_path": "skills/skill-inspector/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-skill-lifecycle"
+ ],
+ "claim": "Source review of the skill skill-inspector in NVIDIA/SkillSpector at commit a50b9c93835c94f7d36329f11c6599abbb9c74ee (the adjudicated pin; license Apache-2.0), read from skills/skill-inspector/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for skill-inspector; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 15e4c0c0f944db0912979dbc2c95f2cc86cf365c. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 19410,
+  "pushed_at": "2026-10-05T06:14:51Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "a50b9c93835c94f7d36329f11c6599abbb9c74ee",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named skill-inspector",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "89ab1550769752ffbad782ee63fee3c345d546bded672adaac5fd03d2941aa84",
+  "skill_md_bytes": 7213,
+  "survivor_skill_md_sha256": "89ab1550769752ffbad782ee63fee3c345d546bded672adaac5fd03d2941aa84",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "15e4c0c0f944db0912979dbc2c95f2cc86cf365c",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/skill-inspector/SKILL.md@a50b9c93835c94f7d36329f11c6599abbb9c74ee",
+   "text": "Decide whether an AI agent skill is safe to install, keep installed, or submit for review."
+  },
+  {
+   "source": "skills/skill-inspector/SKILL.md@a50b9c93835c94f7d36329f11c6599abbb9c74ee",
+   "text": "1. SkillSpector static evidence: deterministic scanning for known risk patterns. 2. Agent semantic review: source-aware judgment about intent, permission fit, hidden behavior, and user control."
+  },
+  {
+   "source": "skills/skill-inspector/SKILL.md@a50b9c93835c94f7d36329f11c6599abbb9c74ee",
+   "text": "Do not rely on the numeric score alone. A low score can miss semantic risk, and a high score can be justified when sensitive behavior is clearly documented, necessary, and bounded."
+  }
+ ]
+}

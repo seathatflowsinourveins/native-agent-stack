@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "source_fold_comparison",
+  "retained_pr": 795,
+  "comparison": "Frozen source commit bytes versus final staged keeper worktree; the retained push head is reported separately.",
+  "originals": [
+    {
+      "original_pr": 719,
+      "source_head": "876010fbadfcb2b6846f9aa97f0841e829a81ff4",
+      "source_base": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "nonhot_files": 203,
+      "identical": 193,
+      "different_paths": [
+        "adoption/skills/manifest.json",
+        "adoption/templates/claude.settings.template.json",
+        "adoption/templates/codex.config.template.toml",
+        "blueprints/runtime-workers/skills/manifest.json",
+        "catalogs/landscape/skills-lifecycle.json",
+        "docs/harness-defaults.md",
+        "tests/test_install_skills.py",
+        "tests/test_runtime_worker_skills.py",
+        "tests/test_skills_status.py",
+        "tools/adoption/install_skills.py"
+      ],
+      "missing_paths": [],
+      "historical_files_identical": 183
+    },
+    {
+      "original_pr": 792,
+      "source_head": "ae17e43dea30d747b1742ffbfcd847495b526a65",
+      "source_base": "d9eb68750311d5f888adec140723da174f9fe10c",
+      "nonhot_files": 11,
+      "identical": 4,
+      "different_paths": [
+        "adoption/skills/lifecycle.md",
+        "adoption/skills/manifest.json",
+        "adoption/templates/codex.config.template.toml",
+        "tests/test_install_skills.py",
+        "tests/test_skills_manifest.py",
+        "tests/test_skills_status.py",
+        "tools/adoption/install_skills.py"
+      ],
+      "missing_paths": [],
+      "historical_files_identical": 3
+    },
+    {
+      "original_pr": 793,
+      "source_head": "401d98b96fb887055124c3f248621116736c6298",
+      "source_base": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "nonhot_files": 7,
+      "identical": 7,
+      "different_paths": [],
+      "missing_paths": [],
+      "historical_files_identical": 4
+    },
+    {
+      "original_pr": 794,
+      "source_head": "7a3a6c7f5245a185dd2178e02b33747c0b723b4f",
+      "source_base": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "nonhot_files": 22,
+      "identical": 20,
+      "different_paths": [
+        ".github/osv-scanner-lockfiles.json",
+        "tests/test_osv_lockfile_coverage.py"
+      ],
+      "missing_paths": [],
+      "historical_files_identical": 3
+    },
+    {
+      "original_pr": 817,
+      "source_head": "2a017e52659e34e1c6ddb4bf9666846292dc6088",
+      "source_base": "e28d0eec112527ac02659ac23753533b8ed39a73",
+      "nonhot_files": 5,
+      "identical": 3,
+      "different_paths": [
+        "catalogs/landscape/skills-lifecycle.json",
+        "tests/test_landscape_sweep_skills.py"
+      ],
+      "missing_paths": [],
+      "historical_files_identical": 3
+    }
+  ],
+  "hot_files": {
+    "registry": "main copy plus native host_receipts.register_file registrations; never hand-merged",
+    "ledger": "three native saturation_ledger.py appends and native check; never hand-merged"
+  },
+  "overlap_record": "docs/decisions/2026-10-07-skills-fold-budget-amendment.md",
+  "limitations": [
+    "Different paths are the reviewed compatible unions, approved A26 metadata amendment, and current-carrier/test alignment; no original source file is missing.",
+    "Historical observations and decided text are unchanged; new amendments and companion receipts are separate files.",
+    "Original closure belongs to the co-op after its independent verification; branches are retained."
+  ]
+}

@@ -1,0 +1,3 @@
+source_reviews.py: addyosmani/agent-skills@context-engineering: addyosmani/agent-skills@context-engineering: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged
+source_reviews.py: cursor/plugins@get-pr-comments: cursor/plugins@get-pr-comments: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged
+source_reviews.py: openai/plugins@verify-fix: openai/plugins@verify-fix at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named verify-fix in the locations the CLI searches without --full-depth

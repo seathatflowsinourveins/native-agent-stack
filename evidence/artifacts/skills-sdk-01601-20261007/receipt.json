@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "published_sdk_and_native_catalog_qualification",
+  "source": {
+    "repository": "openai/codex",
+    "ref": "d27764b82f7118f674371e6d6e76271d9d606edb",
+    "release": "rust-v0.160.1",
+    "prior_ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "sdk": "openai-codex==0.160.1",
+    "runtime": "openai-codex-cli-bin==0.160.1",
+    "sdk_wheel_sha256": "930e46e2153c00d76ff4e88e14eb7f694949244fb4be47d84394d736709e022e",
+    "installation": "uv run --no-build --locked --script examples/omniroute-codex-sdk/worker.py --help",
+    "isolated_cache": true,
+    "source_build": false,
+    "initialize_fields": "SDK source retains optional serverInfo/userAgent and the same user-agent fallback; compared tagged blobs are unchanged."
+  },
+  "upstream_test": {
+    "path": "sdk/python/tests/installed_sdk_smoke.py",
+    "git_blob": "cf662bd5b77b6273f8c1bec322bba15a6f81838b",
+    "required_sibling": "sdk/python/tests/app_server_harness.py",
+    "sibling_git_blob": "9e6425bed38b54779c8123c29b10a87e3e4169c0",
+    "ci_source": ".github/workflows/sdk.yml:35",
+    "command": "env -u PYTHONPATH -u CODEX_EXEC_PATH <isolated-candidate-python> -B <unchanged-upstream-tests>/installed_sdk_smoke.py",
+    "exit_code": 0,
+    "stdout": "Installed SDK passed with CLI runtime 0.160.1",
+    "stdout_sha256": "ab680d175c9f05e42fef216fa061d42c62c40ee3c934d1f90a3fc432885f2d71",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "test_files_unchanged": true,
+    "evidence_class": "unchanged_upstream_test",
+    "backend": "vendor localhost MockResponsesServer; synthetic responses, no external model",
+    "scope": "installed-wheel import and bundled runtime turn/resume/fork protocol"
+  },
+  "local_integration": {
+    "command": "uv run --no-build --locked --script examples/omniroute-codex-sdk/test_worker.py",
+    "exit_code": 0,
+    "tests": 31,
+    "elapsed_seconds": 36.863,
+    "resource_warning_mentions": 8,
+    "stderr_sha256": "9d47dd6150b15bae6dbc14b9ea99614deebd429502207bb75a5b87ebba3474a7",
+    "negative_controls": [
+      "explicit wrong runtime version is not replaced by matching userAgent",
+      "missing required skill/server and disabled/empty/error catalogs",
+      "unsupported wire API never submits a turn"
+    ],
+    "evidence_class": "authored_local_integration_with_synthetic_backend",
+    "limits": "ResourceWarnings and expected argparse rejection output retained; not upstream tests or live model acceptance."
+  },
+  "native_inspection": {
+    "command": "native_worker.py inspect --provider omniroute --gateway-base-url http://127.0.0.1:21128/v1 --codex-bin <installed-native-0.160.1> --codex-home <existing-native-home> --workspace <owned-worktree> --receipt <new-private-path>",
+    "exit_code": 0,
+    "status": "discovery_complete",
+    "raw_receipt_sha256": "a39767207c5b307ea9242b244cef26e039f898b781c7e763c208b7c5f65a781b",
+    "model_inference_submitted": false
+  },
+  "native_catalog": {
+    "command": "worker.py --base-url http://127.0.0.1:21128/v1 --codex-bin <installed-native-0.160.1> --codex-home <existing-native-home> --workspace <owned-worktree> --preflight --catalog-details --require-skill <each of the 23 non-held central Codex-enabled names>",
+    "exit_code": 0,
+    "status": "ready",
+    "native_runtime_version": "0.160.1",
+    "metadata_source": "userAgent",
+    "model_inference_submitted": false,
+    "cleanup_status": "closed",
+    "skill_error_count": 0,
+    "skill_count": 34,
+    "enabled_skill_count": 33,
+    "central_required_skill_count": 23,
+    "unavailable_required_skills": [],
+    "raw_readback_sha256": "b4ea1b8b55fc28792b1dd043ff0f449c1449edf159a272601923270f29259fb1",
+    "scope": "existing native home and owned workspace under worker process overrides, including plugins=false; catalog name/enabled/scope only"
+  },
+  "retained_failure": {
+    "sdk_version": "0.160.0",
+    "requested_native_runtime": "0.160.1",
+    "exit_code": 2,
+    "status": "failed",
+    "error_type": "RuntimeError",
+    "phase": "initialize",
+    "model_inference_submitted": false,
+    "cleanup_status": "closed",
+    "raw_readback_sha256": "e2dd10bea5f8b0ee79655e027624cb4c4129951010c48a9730a13ba7ba5978f8",
+    "boundary": "Error message was not emitted. The exact 0.160.0 source guard independently makes runtime 0.160.1 ineligible; precise exception cause is a source inference. Original failed artifact remains unchanged."
+  },
+  "acceptance_limits": [
+    "Current source exact-version guard remains an equality check; no version range or fallback that accepts a mismatch.",
+    "No persistent client configuration, global SDK installation, credential/auth copy, default gateway change or live model task.",
+    "Metadata discovery is not rendered-prompt/budget coverage, full-tree skill identity, instruction delivery or actual skill/MCP execution.",
+    "Claude-only selected skill-creator and Codex embedded creator are distinct sources; held agent-browser is not a required central skill.",
+    "Plugin roots are disabled in this worker profile; coordinator/plugin/role-preload and other worker-home exposure need separate evidence.",
+    "No live writing-dispatch, provider identity, billing, organic-use or general SDK winner claim.",
+    "Shared/global SDK adoption pins are outside this example qualification; their historical acceptance is unchanged."
+  ]
+}

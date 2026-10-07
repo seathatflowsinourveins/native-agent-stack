@@ -1,0 +1,1 @@
+{"name":"disposable-instruction-fixture","private":true,"packageManager":"pnpm@10.17.1","scripts":{"test":"python3 -m unittest discover -s tests","lint":"python3 scripts/check_fixture.py"}}

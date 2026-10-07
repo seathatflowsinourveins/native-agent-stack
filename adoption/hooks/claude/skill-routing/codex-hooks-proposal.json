@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "python3 <REVIEWED_PLUGIN>/hooks/skill-routing.py --client codex --benchmark-hints", "timeout": 1}]}],
+    "PostToolUse": [{"matcher": "Bash|Write|Edit|apply_patch|write_file|edit_file", "hooks": [{"type": "command", "command": "python3 <REVIEWED_PLUGIN>/hooks/skill-routing.py --client codex --benchmark-hints", "timeout": 1}]}],
+    "SubagentStart": [{"hooks": [{"type": "command", "command": "python3 <REVIEWED_PLUGIN>/hooks/skill-routing.py --client codex --benchmark-hints", "timeout": 1}]}]
+  }
+}

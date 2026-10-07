@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-github-awesome-copilot-test-gap-audit",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "github/awesome-copilot@test-gap-audit",
+ "reviewed_commit": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+ "readme_path": "skills/test-gap-audit/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill test-gap-audit in github/awesome-copilot at commit 143a3d976b3c1603cc8932984d5e1f28501cb5fc (the adjudicated pin; license MIT), read from skills/test-gap-audit/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for test-gap-audit; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 9816e43cbb2d6ec5ef53ef116b08ae0b9d4cd022. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 39713,
+  "pushed_at": "2026-10-04T23:45:13Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named test-gap-audit",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "a7747ac0b60d33ec6a44b9703ae11e8f6bf7aede251f117cc46599d182bfef21",
+  "skill_md_bytes": 13585,
+  "survivor_skill_md_sha256": "a7747ac0b60d33ec6a44b9703ae11e8f6bf7aede251f117cc46599d182bfef21",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "9816e43cbb2d6ec5ef53ef116b08ae0b9d4cd022",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/test-gap-audit/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "Find the tests that should exist but do not, or tests that exist but do not prove the important behavior. Produce concrete, prioritized test recommendations grounded in code paths, risk, and existing test conventions."
+  },
+  {
+   "source": "skills/test-gap-audit/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "- Stay read-only unless the user explicitly asks to add tests. - Default to a full-repository audit when the user does not provide a specific scope. - Full-repo audits are breadth-first, then depth-limited. Inventory the repo, rank surfaces by risk, deep-inspect as many high-risk surfaces as the turn allows, and list the rest under **Surveyed But Not Deeply Inspected** with a pointer to run another pass on them. State the surface counts in the report header. Never present a shallow sweep as comp"
+  },
+  {
+   "source": "skills/test-gap-audit/SKILL.md@143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+   "text": "When no scope is given, audit the whole repository. Inventory the repo's major testable surfaces and report which important areas do not have tests, do not have enough assertions, or are only indirectly covered."
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bgauryy-octocode-octocode-research",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "bgauryy/octocode@octocode-research",
+ "reviewed_commit": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+ "readme_path": "skills/octocode-research/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-research"
+ ],
+ "claim": "Source review of the skill octocode-research in bgauryy/octocode at commit c265e3f9413161c900cbf4aa70d451b8e6b3920a (the adjudicated pin; license MIT), read from skills/octocode-research/SKILL.md and skills/octocode-research/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for octocode-research; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 097065d55d94efc8cdc4874ba5783d04b415398c. Survived the landscape-sweep-skills-20261005-fu1-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and native GPT-6 (requested route; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 945,
+  "pushed_at": "2026-10-03T16:43:40Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named octocode-research",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "0dd7a864064c5ac3dd7122343aad312dba13baf1b5e66b0ac82766377fb9d2d3",
+  "skill_md_bytes": 5943,
+  "survivor_skill_md_sha256": "0dd7a864064c5ac3dd7122343aad312dba13baf1b5e66b0ac82766377fb9d2d3",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "097065d55d94efc8cdc4874ba5783d04b415398c",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "skills/octocode-research/agents/openai.yaml",
+  "openai_yaml_reader": "PyYAML 6.0.3 compose_all with CSafeLoader",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/octocode-research/SKILL.md@c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+   "text": "Evidence before assertion. Find the anchor, read the exact bytes, prove the claim, then answer or patch."
+  },
+  {
+   "source": "skills/octocode-research/SKILL.md@c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+   "text": "```text FRAME → CLASSIFY → MODEL → SEARCH → READ EXACT → PROVE → DECIDE/PATCH → VERIFY ```"
+  },
+  {
+   "source": "skills/octocode-research/SKILL.md@c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+   "text": "That's the full shape, not a checklist to march through. Scale it to the claim: a small lookup gets a cheap read and an honest confidence label; a delete, a merge verdict, or a root cause earns the whole ladder. Skip stages you can already answer — but say which ones you skipped."
+  }
+ ]
+}

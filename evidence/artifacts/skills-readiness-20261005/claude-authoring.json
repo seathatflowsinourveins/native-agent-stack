@@ -1,0 +1,767 @@
+{
+  "schema_version": 1,
+  "id": "claude-native-skill-authoring-20261005",
+  "evidence_classes": [
+    "native_proven",
+    "synthetic",
+    "source_review"
+  ],
+  "result": "paired_pipeline_executed_five_asset_failures_analysis_interrupted",
+  "source": "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator",
+  "source_locators": [
+    "SKILL.md:171",
+    "SKILL.md:207",
+    "SKILL.md:225",
+    "SKILL.md:229",
+    "SKILL.md:234",
+    "SKILL.md:247",
+    "agents/grader.md",
+    "agents/analyzer.md"
+  ],
+  "source_sha256": {
+    "SKILL.md": "dcd4803e61e913e6fc27294184cd3a71f09f5e924ff20c8a9a20173e7b3c2bcf",
+    "scripts/quick_validate.py": "67cf5703402013936c8fb75ad6a1afecd8841d45cc5e606b634eb05825fde365",
+    "scripts/aggregate_benchmark.py": "123ef128ea5ccc01a4b1ac212ef5567f21e9c13d3d240609780beeb3200c49aa",
+    "eval-viewer/generate_review.py": "fc9d1b9243fe5ab6012ebd579bd76d0035de1b79fd3b969de114defab26478fb",
+    "agents/grader.md": "57134da0c1a4eea33fbd74a1c9c44aa814f07d6bc64de303edb586f941e5d21a",
+    "agents/analyzer.md": "bf68f4cac5a56c673a928c2e6d619586c5b93ea364026ab37547772cb45a663a"
+  },
+  "scope": "Fictional Cedar pipeline only; no lifecycle candidate adoption, installation or client configuration",
+  "fixture": "authoring-fixture.json",
+  "original_input_sha256": {
+    "plan.md": "5283917719bef34ae6886a93c9f98c29d3996b0e504a6e95c1b11b481fa2bf37",
+    "claude/task.md": "421f8cbfee712199e0ae12f3a45fb87141a721bcf7b108917e6d3ed620e0c7e1",
+    "codex/task.md": "e37b78575f553dfcd5bb3f381f0acd0919785f89bb49e425ec80de3ee21cb3bf"
+  },
+  "original_inputs_still_match": true,
+  "requested_model": "opus",
+  "requested_effort": "max",
+  "native_init": {
+    "model": "claude-opus-5-5",
+    "claude_code_version": "2.1.289"
+  },
+  "provider_attestation": "Native client records only; no independent provider/billing attestation",
+  "native_argv": [
+    "env",
+    "-u",
+    "CLAUDE_CODE_EFFORT_LEVEL",
+    "TMPDIR=<scratch>/tmp",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "claude",
+    "-p",
+    "--model",
+    "opus",
+    "--effort",
+    "max",
+    "--permission-mode",
+    "bypassPermissions",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--forward-subagent-text"
+  ],
+  "stdin": "<scratch>/skill-authoring/claude/task.md",
+  "cwd": "<scratch>/skill-authoring/claude (non-git)",
+  "failed_quota_attempt": {
+    "exit_code": 1,
+    "is_error": true,
+    "end_observed_utc": "2026-10-05 10:56:12 UTC",
+    "reported_reset_utc": "2026-10-05 11:30:00 UTC",
+    "fixture_outputs": 0
+  },
+  "parent_cli_exit_code": 0,
+  "end_observed_utc": "2026-10-05 12:07:01 UTC",
+  "sampling": {
+    "cases": 3,
+    "arms": 2,
+    "repetitions_per_case_per_arm": 1,
+    "executor_runs": 6
+  },
+  "runs": [
+    {
+      "case_id": 1,
+      "arm": "with_skill",
+      "run_number": 1,
+      "answer": {
+        "asset": "Cedar C-17",
+        "status": "complete",
+        "owner": "Mira",
+        "next_action": "archive the card"
+      },
+      "independent_checks": {
+        "exact_keys": true,
+        "asset": false,
+        "status": true,
+        "owner": true,
+        "next_action": true
+      },
+      "native_grading_summary": {
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "pass_rate": 0.8
+      },
+      "native_expectations": [
+        {
+          "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+          "passed": true,
+          "evidence_first_sentence": "outputs_dir contains only answer.json (98 bytes; find lists no other file)"
+        },
+        {
+          "text": "asset is \"C-17\"",
+          "passed": false,
+          "evidence_first_sentence": "answer.json has \"asset\": \"Cedar C-17\", and an exact comparison with \"C-17\" is False"
+        },
+        {
+          "text": "status is \"complete\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"status\": \"complete\""
+        },
+        {
+          "text": "owner is \"Mira\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"owner\": \"Mira\" (a JSON string; exact equality is True)"
+        },
+        {
+          "text": "next_action is \"archive the card\" (copied verbatim)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"next_action\": \"archive the card\", and exact string equality is True"
+        }
+      ],
+      "native_timing": {
+        "total_tokens": 31149,
+        "duration_ms": 48395,
+        "total_duration_seconds": 48.395,
+        "tool_uses": 4,
+        "source": "Agent tool task-notification <usage>, status completed; total_tokens is the notification's <subagent_tokens> value, total_duration_seconds is duration_ms/1000",
+        "task_id": "ad203ad5ea4e25452",
+        "tool_use_id": "toolu_01BSVXY72g2j7NFY73uaQrJw",
+        "notification_arrival_order": 3,
+        "captured_at_utc": "2026-10-05T11:47:13.533Z"
+      },
+      "native_models": [
+        "claude-opus-5-5"
+      ],
+      "native_efforts": [
+        "max"
+      ],
+      "native_model_effort_line": 14,
+      "raw_sha256": {
+        "outputs/answer.json": "1e3ef58ef58058d0a8a46fd5e91e50bcc379519ac1f7c9532881f1d28b323052",
+        "grading.json": "cc349549a67c9138b4802667bb1a9ce82cb61547d7959c6d8e7548ed5203b0fb",
+        "timing.json": "e4ffaeb5ed2f882e7994a03620910bc180eab46c67be70f35320b1fb0a98e365",
+        "transcript.meta.json": "774230152b09a620ab081a1705b8ff3cca82e7cb742f78788030469939300a09",
+        "transcript.jsonl": "afb738089a6232f5eca63f29591e6c165e47ae223e37d11e2aec40fc54c1dfc9"
+      }
+    },
+    {
+      "case_id": 1,
+      "arm": "without_skill",
+      "run_number": 1,
+      "answer": {
+        "asset": "Cedar C-17",
+        "status": "complete",
+        "owner": "Mira",
+        "next_action": "archive the card"
+      },
+      "independent_checks": {
+        "exact_keys": true,
+        "asset": false,
+        "status": true,
+        "owner": true,
+        "next_action": true
+      },
+      "native_grading_summary": {
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "pass_rate": 0.8
+      },
+      "native_expectations": [
+        {
+          "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+          "passed": true,
+          "evidence_first_sentence": "outputs/answer.json (98 bytes, UTF-8, no BOM) holds the single line {\"asset\": \"Cedar C-17\", \"status\": \"complete\", \"owner\": \"Mira\", \"next_action\": \"archive the card\"} and then one newline"
+        },
+        {
+          "text": "asset is \"C-17\"",
+          "passed": false,
+          "evidence_first_sentence": "answer.json has \"asset\": \"Cedar C-17\", and the grader's equality check against \"C-17\" returns False"
+        },
+        {
+          "text": "status is \"complete\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"status\": \"complete\""
+        },
+        {
+          "text": "owner is \"Mira\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"owner\": \"Mira\", a string and not null"
+        },
+        {
+          "text": "next_action is \"archive the card\" (copied verbatim)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"next_action\": \"archive the card\""
+        }
+      ],
+      "native_timing": {
+        "total_tokens": 30364,
+        "duration_ms": 43548,
+        "total_duration_seconds": 43.548,
+        "tool_uses": 3,
+        "source": "Agent tool task-notification <usage>, status completed; total_tokens is the notification's <subagent_tokens> value, total_duration_seconds is duration_ms/1000",
+        "task_id": "ad17cc8929bf212f7",
+        "tool_use_id": "toolu_01PGmj7hZwbNrDwvzVngi7j6",
+        "notification_arrival_order": 2,
+        "captured_at_utc": "2026-10-05T11:47:13.533Z"
+      },
+      "native_models": [
+        "claude-opus-5-5"
+      ],
+      "native_efforts": [
+        "max"
+      ],
+      "native_model_effort_line": 14,
+      "raw_sha256": {
+        "outputs/answer.json": "1e3ef58ef58058d0a8a46fd5e91e50bcc379519ac1f7c9532881f1d28b323052",
+        "grading.json": "2086179d15370ce71b6aecc8f869a88f3f01f6562d8cc0e03be7a52bf4ea22b2",
+        "timing.json": "0f3be02309d4452facd09c58ad583797140f7304eb0a86fe590d3e8417e36895",
+        "transcript.meta.json": "9a61cf2e425189727924bdef6808d865ebcaf51cb25251dd7750c9a8c1a27335",
+        "transcript.jsonl": "8b2504e660524eacb9a2a87605fc7bbf9837a11c5777ce885635d48ca88d403a"
+      }
+    },
+    {
+      "case_id": 2,
+      "arm": "with_skill",
+      "run_number": 1,
+      "answer": {
+        "asset": "Cedar C-22",
+        "status": "blocked",
+        "owner": "Jules",
+        "next_action": "isolate the sensor"
+      },
+      "independent_checks": {
+        "exact_keys": true,
+        "asset": false,
+        "status": true,
+        "owner": true,
+        "next_action": true
+      },
+      "native_grading_summary": {
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "pass_rate": 0.8
+      },
+      "native_expectations": [
+        {
+          "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+          "passed": true,
+          "evidence_first_sentence": "outputs/answer.json is 100 bytes: {\"asset\": \"Cedar C-22\", \"status\": \"blocked\", \"owner\": \"Jules\", \"next_action\": \"isolate the sensor\"} plus a trailing newline"
+        },
+        {
+          "text": "asset is \"C-22\"",
+          "passed": false,
+          "evidence_first_sentence": "answer.json has \"asset\": \"Cedar C-22\", not \"C-22\""
+        },
+        {
+          "text": "status is \"blocked\" (the unresolved unsafe condition outranks the reported completion)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"status\": \"blocked\""
+        },
+        {
+          "text": "owner is \"Jules\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"owner\": \"Jules\", a 5-character string with no trailing period carried over"
+        },
+        {
+          "text": "next_action is \"isolate the sensor\" (copied verbatim)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"next_action\": \"isolate the sensor\" (18 characters)"
+        }
+      ],
+      "native_timing": {
+        "total_tokens": 31382,
+        "duration_ms": 35484,
+        "total_duration_seconds": 35.484,
+        "tool_uses": 4,
+        "source": "Agent tool task-notification <usage>, status completed; total_tokens is the notification's <subagent_tokens> value, total_duration_seconds is duration_ms/1000",
+        "task_id": "af7fe394731bc09fc",
+        "tool_use_id": "toolu_01GGC5EmPRG4miZa89A2QoVv",
+        "notification_arrival_order": 1,
+        "captured_at_utc": "2026-10-05T11:47:13.533Z"
+      },
+      "native_models": [
+        "claude-opus-5-5"
+      ],
+      "native_efforts": [
+        "max"
+      ],
+      "native_model_effort_line": 14,
+      "raw_sha256": {
+        "outputs/answer.json": "4676e610696b848a0c44b538015dfbd08551583adc785d6a520670437df1b7b0",
+        "grading.json": "ddde7ec64f9b9ca44488bebec70f9fe4010a29620321750366fafdcb6b9b7e3f",
+        "timing.json": "c9196087fa2697762de40a8374aea2fd18c12480bf9fa24b5675aa2f2ab9ea2e",
+        "transcript.meta.json": "f6f11265944fe0c9e6de1a42cfac613e9b40473c7469e2142cfdd4f18cc83b8a",
+        "transcript.jsonl": "46d22b3adfc75c5d1fb6fe3323799718c150030a61d5fbfe21668321a4d2172d"
+      }
+    },
+    {
+      "case_id": 2,
+      "arm": "without_skill",
+      "run_number": 1,
+      "answer": {
+        "asset": "Cedar C-22",
+        "status": "blocked",
+        "owner": "Jules",
+        "next_action": "isolate the sensor"
+      },
+      "independent_checks": {
+        "exact_keys": true,
+        "asset": false,
+        "status": true,
+        "owner": true,
+        "next_action": true
+      },
+      "native_grading_summary": {
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "pass_rate": 0.8
+      },
+      "native_expectations": [
+        {
+          "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+          "passed": true,
+          "evidence_first_sentence": "outputs/answer.json (110 bytes, the only file in outputs_dir) parses as a single JSON object: json.JSONDecoder.raw_decode consumes the object and leaves only a trailing newline, so there is no prose, code fence or second value"
+        },
+        {
+          "text": "asset is \"C-22\"",
+          "passed": false,
+          "evidence_first_sentence": "answer.json contains \"asset\": \"Cedar C-22\", not \"C-22\""
+        },
+        {
+          "text": "status is \"blocked\" (the unresolved unsafe condition outranks the reported completion)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json contains \"status\": \"blocked\""
+        },
+        {
+          "text": "owner is \"Jules\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json contains \"owner\": \"Jules\""
+        },
+        {
+          "text": "next_action is \"isolate the sensor\" (copied verbatim)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json contains \"next_action\": \"isolate the sensor\""
+        }
+      ],
+      "native_timing": {
+        "total_tokens": 30243,
+        "duration_ms": 40458,
+        "total_duration_seconds": 40.458,
+        "tool_uses": 2,
+        "source": "Agent tool task-notification <usage>, status completed; total_tokens is the notification's <subagent_tokens> value, total_duration_seconds is duration_ms/1000",
+        "task_id": "aec9f6348263f1931",
+        "tool_use_id": "toolu_01B22NjwDXENyBoSsK439w9w",
+        "notification_arrival_order": 4,
+        "captured_at_utc": "2026-10-05T11:47:13.533Z"
+      },
+      "native_models": [
+        "claude-opus-5-5"
+      ],
+      "native_efforts": [
+        "max"
+      ],
+      "native_model_effort_line": 14,
+      "raw_sha256": {
+        "outputs/answer.json": "d52197642d387cdf255412797e4c531fc326bfcfc2c25ab367c011f92b109a31",
+        "grading.json": "90d4908d0e923a95bbe30056718c1a44a56404f21d9787212c992b32b4227228",
+        "timing.json": "533487c923c9f2fecf1de510eefb919c34cdf78968fb5524bf0808567a72c741",
+        "transcript.meta.json": "ba822e3c939204939bb5c9d19df97fa9b8a458d40fc8a7f88b0ccecec5428814",
+        "transcript.jsonl": "ad2b1c0b35202fe4b56415af204af1b95a67ca8e4d5115e34242ea2be59fbfb2"
+      }
+    },
+    {
+      "case_id": 3,
+      "arm": "with_skill",
+      "run_number": 1,
+      "answer": {
+        "asset": "C-31",
+        "status": "needs-information",
+        "owner": null,
+        "next_action": null
+      },
+      "independent_checks": {
+        "exact_keys": true,
+        "asset": true,
+        "status": true,
+        "owner": true,
+        "next_action": true
+      },
+      "native_grading_summary": {
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "pass_rate": 1.0
+      },
+      "native_expectations": [
+        {
+          "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+          "passed": true,
+          "evidence_first_sentence": "outputs/ holds only answer.json (85 bytes): {\"asset\": \"C-31\", \"status\": \"needs-information\", \"owner\": null, \"next_action\": null} plus one trailing newline, with no BOM"
+        },
+        {
+          "text": "asset is \"C-31\"",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"asset\": \"C-31\" (a JSON string)"
+        },
+        {
+          "text": "status is \"needs-information\" (an unresolved question remains)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"status\": \"needs-information\""
+        },
+        {
+          "text": "owner is JSON null (no responsible person is named)",
+          "passed": true,
+          "evidence_first_sentence": "The raw answer.json bytes contain \"owner\": null"
+        },
+        {
+          "text": "next_action is JSON null (no next action is requested)",
+          "passed": true,
+          "evidence_first_sentence": "The raw answer.json bytes contain \"next_action\": null"
+        }
+      ],
+      "native_timing": {
+        "total_tokens": 32618,
+        "duration_ms": 55005,
+        "total_duration_seconds": 55.005,
+        "tool_uses": 4,
+        "source": "Agent tool task-notification <usage>, status completed; total_tokens is the notification's <subagent_tokens> value, total_duration_seconds is duration_ms/1000",
+        "task_id": "ae5eecd3ee2ca9e99",
+        "tool_use_id": "toolu_01QwzMKEevwYJjnzJbYFV2RC",
+        "notification_arrival_order": 6,
+        "captured_at_utc": "2026-10-05T11:47:13.533Z"
+      },
+      "native_models": [
+        "claude-opus-5-5"
+      ],
+      "native_efforts": [
+        "max"
+      ],
+      "native_model_effort_line": 14,
+      "raw_sha256": {
+        "outputs/answer.json": "d077e0e22c15bb882a50f953b1f94cfb4f939fe3eb2a5fac247d016defd72e7f",
+        "grading.json": "f1f61a810417b0fd18057939acf01c947b86e1f26839511df199a3ebba52f534",
+        "timing.json": "4d558a812288e2877297fb1d148ce69b8b120c63046341903290164d97439cf8",
+        "transcript.meta.json": "d3350064273203abed4087a118cc68e7b285d52f906e3e7cbfffb2125f0ef609",
+        "transcript.jsonl": "ac95d2814e13695cc060090dd16ec6812754b76877f101202830b106a4ed3e61"
+      }
+    },
+    {
+      "case_id": 3,
+      "arm": "without_skill",
+      "run_number": 1,
+      "answer": {
+        "asset": "Cedar C-31",
+        "status": "needs-information",
+        "owner": null,
+        "next_action": null
+      },
+      "independent_checks": {
+        "exact_keys": true,
+        "asset": false,
+        "status": true,
+        "owner": true,
+        "next_action": true
+      },
+      "native_grading_summary": {
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "pass_rate": 0.8
+      },
+      "native_expectations": [
+        {
+          "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+          "passed": true,
+          "evidence_first_sentence": "outputs/answer.json is 91 bytes and the only file in outputs_dir"
+        },
+        {
+          "text": "asset is \"C-31\"",
+          "passed": false,
+          "evidence_first_sentence": "answer.json has \"asset\": \"Cedar C-31\", not \"C-31\""
+        },
+        {
+          "text": "status is \"needs-information\" (an unresolved question remains)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"status\": \"needs-information\" (exact string)"
+        },
+        {
+          "text": "owner is JSON null (no responsible person is named)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"owner\": null"
+        },
+        {
+          "text": "next_action is JSON null (no next action is requested)",
+          "passed": true,
+          "evidence_first_sentence": "answer.json has \"next_action\": null"
+        }
+      ],
+      "native_timing": {
+        "total_tokens": 29260,
+        "duration_ms": 34000,
+        "total_duration_seconds": 34.0,
+        "tool_uses": 3,
+        "source": "Agent tool task-notification <usage>, status completed; total_tokens is the notification's <subagent_tokens> value, total_duration_seconds is duration_ms/1000",
+        "task_id": "a8a0dd8598997c665",
+        "tool_use_id": "toolu_011qKNjVt218wCfSNqnZEQaT",
+        "notification_arrival_order": 5,
+        "captured_at_utc": "2026-10-05T11:47:13.533Z"
+      },
+      "native_models": [
+        "claude-opus-5-5"
+      ],
+      "native_efforts": [
+        "max"
+      ],
+      "native_model_effort_line": 14,
+      "raw_sha256": {
+        "outputs/answer.json": "4130406eeaba0fe52780982832c0abf5def1d252b2c981c3dc86bd11a68c177b",
+        "grading.json": "ecc942277aa23e3594bc29124a77a8a6d57a2aa77ee10632d16ae1216ec98d51",
+        "timing.json": "db015bbdc764e7cf927d2181fc8e8383c336a0acb74800e633d60298dde04df1",
+        "transcript.meta.json": "f706205e844f1410885e04c4ca54ab02d8646d55747e4460df8578977db67e56",
+        "transcript.jsonl": "a59afb9ad41cf71050e582338f67fc084ee1942308d1b977d79da5b2eee58fc7"
+      }
+    }
+  ],
+  "native_structural_controls": {
+    "valid_exit_code": 0,
+    "invalid_underscore_name_exit_code": 1,
+    "output": "claude-validator-results.txt"
+  },
+  "wrong_answer_control": {
+    "native_summary": {
+      "passed": 3,
+      "failed": 2,
+      "total": 5,
+      "pass_rate": 0.6
+    },
+    "native_expectations": [
+      {
+        "text": "answer.json is exactly one JSON object with exactly four keys: asset, status, owner, next_action",
+        "passed": true,
+        "evidence": "outputs/answer.json (96 bytes, UTF-8, no BOM) contains {\"asset\": \"C-22\", \"status\": \"complete\", \"owner\": \"Morgan\", \"next_action\": \"isolate the sensor\"} and one trailing newline. A strict parse (Python json.loads with an object_pairs_hook to catch duplicate keys) returns a single top-level object with exactly the keys ['asset', 'status', 'owner', 'next_action'], in that order, with no duplicates and nothing after the object except '\\n'. The structure is correct; the field values are judged by expectations 2-5."
+      },
+      {
+        "text": "asset is \"C-22\"",
+        "passed": true,
+        "evidence": "answer.json has \"asset\": \"C-22\". The note in the transcript's Eval Prompt (line 10) begins 'Cedar C-22: checklist completed.', so the value exactly matches the identifier this expectation requires. The transcript (line 3) says the hand-written control falsified only status and owner, so this field is correct deliberately, not by coincidence. The expectation is about the file's content, not about which process produced it."
+      },
+      {
+        "text": "status is \"blocked\" (the unresolved unsafe condition outranks the reported completion)",
+        "passed": false,
+        "evidence": "answer.json has \"status\": \"complete\", not \"blocked\". The note reports both 'checklist completed' and 'An unsafe exposed wire remains unresolved'. The contract says status is blocked when an unresolved unsafe condition is reported, even if another sentence reports completion. The answer let the completion sentence win, which is the safety-precedence error this case tests. Transcript line 3 confirms 'complete' was set deliberately."
+      },
+      {
+        "text": "owner is \"Jules\"",
+        "passed": false,
+        "evidence": "answer.json has \"owner\": \"Morgan\", not \"Jules\". The note says 'Responsible person: Jules.' and never mentions Morgan; in the transcript 'Morgan' appears only on line 3 (the description of the control) and line 18 (the final output). The value is wrong and invented, which also breaks the contract's 'Do not invent facts.'"
+      },
+      {
+        "text": "next_action is \"isolate the sensor\" (copied verbatim)",
+        "passed": true,
+        "evidence": "answer.json has \"next_action\": \"isolate the sensor\". The note ends 'Requested next action: isolate the sensor' with no trailing punctuation, so the value is a byte-exact verbatim copy: same case, no added period or words. As with asset, the transcript says only status and owner were falsified, so this match is a deliberate correct copy."
+      }
+    ],
+    "outside_aggregate": true,
+    "status_and_owner_rejected": true
+  },
+  "actual_assertion_counts": {
+    "with_skill": {
+      "passed": 13,
+      "total": 15
+    },
+    "without_skill": {
+      "passed": 12,
+      "total": 15
+    },
+    "asset_mismatches": 5
+  },
+  "native_aggregate": {
+    "metadata_as_returned": {
+      "skill_name": "cedar-note",
+      "skill_path": "<scratch>/skill-authoring/claude/cedar-note",
+      "executor_model": "<model-name>",
+      "analyzer_model": "<model-name>",
+      "timestamp": "2026-10-05T11:55:36Z",
+      "evals_run": [
+        1,
+        2,
+        3
+      ],
+      "runs_per_configuration": 3
+    },
+    "run_summary": {
+      "with_skill": {
+        "pass_rate": {
+          "mean": 0.8667,
+          "stddev": 0.1155,
+          "min": 0.8,
+          "max": 1.0
+        },
+        "time_seconds": {
+          "mean": 46.2947,
+          "stddev": 9.9285,
+          "min": 35.484,
+          "max": 55.005
+        },
+        "tokens": {
+          "mean": 31716.3333,
+          "stddev": 789.5089,
+          "min": 31149,
+          "max": 32618
+        }
+      },
+      "without_skill": {
+        "pass_rate": {
+          "mean": 0.8,
+          "stddev": 0.0,
+          "min": 0.8,
+          "max": 0.8
+        },
+        "time_seconds": {
+          "mean": 39.3353,
+          "stddev": 4.872,
+          "min": 34.0,
+          "max": 43.548
+        },
+        "tokens": {
+          "mean": 29955.6667,
+          "stddev": 605.4951,
+          "min": 29260,
+          "max": 30364
+        }
+      },
+      "delta": {
+        "pass_rate": "+0.07",
+        "time_seconds": "+7.0",
+        "tokens": "+1761"
+      }
+    },
+    "raw_sha256": "7a5941a4cdedb54e497bc4d6404fe34d3f04fdf777588be284eaf90b660ec4ce",
+    "defaults_not_observations": [
+      "runs_per_configuration=3: actual one per case/arm",
+      "executor_model and analyzer_model=<model-name>",
+      "result.tool_calls=0 and errors=0 are default fallbacks; actual task tool counters are in timing.json"
+    ]
+  },
+  "native_commands": {
+    "aggregate_benchmark_exit_code": 0,
+    "static_viewer_exit_code": 0,
+    "static_viewer_actual_run_count": 6,
+    "output": "claude-native-command-results.txt"
+  },
+  "interrupted_analysis": {
+    "workflow_id": "wf_376bb5e0-d15",
+    "journal_counts": {
+      "launched": 1,
+      "started": 2
+    },
+    "terminal_results": 0,
+    "child_interruption_timestamp": "2026-10-05T12:07:01.379Z",
+    "trigger": "Unknown; parent-exit causation is only an inference from timing",
+    "repair": "claude-authoring-completion.json"
+  },
+  "native_cli_model_usage_snapshot_once": {
+    "claude-opus-5-5": {
+      "inputTokens": 690311,
+      "outputTokens": 475096,
+      "cacheReadInputTokens": 24936274,
+      "cacheCreationInputTokens": 1290189,
+      "webSearchRequests": 0,
+      "costUSD": 24.5860518,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 297834,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage_scope": "Last cumulative native CLI modelUsage snapshot once. Do not add repeated result snapshots, per-turn usage, executor notifications or grader workflow aggregate. costBasis=list is not billed spend.",
+  "last_result": {
+    "subtype": "success",
+    "is_error": false,
+    "reported_waiting_for_analysis": true
+  },
+  "private_streams": [
+    {
+      "path": "<scratch>/logs/authoring-claude.jsonl",
+      "sha256": "f68f00aaae9381793ffc871574a561b41fc557ca2e6e0ebca4725ef388465602",
+      "bytes": 26612
+    },
+    {
+      "path": "<scratch>/logs/authoring-claude.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "<scratch>/logs/authoring-claude-retry.jsonl",
+      "sha256": "9f1a70b02a14da1e4c567164fe2de216b31d32e853ef2cd84c6c484a07d4162e",
+      "bytes": 2333398
+    },
+    {
+      "path": "<scratch>/logs/authoring-claude-retry.stderr",
+      "sha256": "d55355fe83585c9ce5594bc559eaa4007d2c894542ce4c0b2442a34683ba1591",
+      "bytes": 121
+    }
+  ],
+  "native_artifacts": [
+    {
+      "path": "<scratch>/skill-authoring/claude/cedar-note/SKILL.md",
+      "raw_sha256": "ed781f99bd9b0faae7c4e32e8e0ca37f448f8b30adc3cb9bdbbf80b442cd5c52",
+      "raw_bytes": 1291
+    },
+    {
+      "path": "<scratch>/skill-authoring/claude/cedar-note/evals/evals.json",
+      "raw_sha256": "0d14fd36521b2e91cc354b0c1e7e3b688ed02153f7cc1adceecfef065d7ea6e7",
+      "raw_bytes": 3842
+    },
+    {
+      "path": "<scratch>/skill-authoring/claude/validator-results.txt",
+      "raw_sha256": "e3fa0a3fb49b961acfc15790146fef1fcc5fc2b5c7c49af99f703689c84cc5eb",
+      "raw_bytes": 1612
+    },
+    {
+      "path": "<scratch>/skill-authoring/claude/native-command-results.txt",
+      "raw_sha256": "eb250214b09514c347122b23e9cdc40064009722762082051d16c808d32d0c3f",
+      "raw_bytes": 3092
+    },
+    {
+      "path": "<scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1/benchmark.json",
+      "raw_sha256": "7a5941a4cdedb54e497bc4d6404fe34d3f04fdf777588be284eaf90b660ec4ce",
+      "raw_bytes": 20444
+    },
+    {
+      "path": "<scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1/benchmark.md",
+      "raw_sha256": "86556c945c7243c097ac0c4c142af41ce7aea440af35c14a46d9874950651391",
+      "raw_bytes": 390
+    },
+    {
+      "path": "<scratch>/skill-authoring/claude/review.html",
+      "raw_sha256": "e29e1dffeab6e13c7f284add6cf6a8d391eb8f8132954eefcff8c21bc67aebe4",
+      "raw_bytes": 111630
+    }
+  ],
+  "limitations": [
+    "Frozen asset label wording is ambiguous; five strict oracle failures retained",
+    "Both arms receive full contract; one repetition supports no quality uplift",
+    "Native advisor results differ: too_many_requests in cases 2 and 3 with_skill (each actual transcript line 25). Opaque advisor contributions remain unqualified; this is an additional runtime confound",
+    "No human qualitative feedback, worker discovery, candidate adoption or production acceptance",
+    "Historical ad-hoc grader Workflow lacks required general-purpose // dispatch annotation",
+    "Owned scratch grader-args file briefly escaped the model-stated directory and was removed; no repository/client configuration change",
+    "First bfs mtime check failed; supported-timestamp retry and independent source hashes close it"
+  ],
+  "independent_observation": "Read-only critic verified exact native transcript copies, actual Write payloads, timing notifications, prompt/oracle isolation and candidate reads; coordinator independently re-parsed outputs"
+}

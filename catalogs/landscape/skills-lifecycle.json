@@ -13,52 +13,225 @@
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
     "Historical 2026-09-30 disposition: alpacahq-alpaca-skills and vercel-labs-agent-skills served no task. The 2026-10-06 broker-adapter task now records read-only fit candidates; order mutation stays outside that fit and no install occurs before the deny-set ruling. React/Vercel remains off-domain here.",
     "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit.",
-    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill."
+    "On 2026-10-05, native-stack-research's existing embedded research contract was registered in the lifecycle and mapped to skills-research (docs/decisions/2026-10-05-research-skill-round2.md). The native-agent-stack source is its published immutable directory-package commit 05e3ead094d09a55e4652296d3d305edc2d10888, not a new default-branch freshness observation or one of the 22 sources checked on 2026-09-30. The source bytes originated in the landed config/research-harnesses-skill.md plan; its adoption manifest owns the SKILL.md hash. Retained sweeps keep their frozen earlier task inputs; this catalog mapping does not retroactively change their discovery scope.",
+    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py). On 2026-10-03 the wave-2 skills ruling retired grill-me, improve-codebase-architecture and semgrep (changes 1 and 3) and held agent-browser (change 6); the installed lists follow the manifest, and the design-intake task has no installed skill.",
+    "C13 reconciliation on 2026-10-06: selected-but-held agent-browser is not an installed browser incumbent. The browser task has an empty installed list and its explicit browser-tool gate in open_gaps; its central pin, eligibility and conservative budget contribution remain unchanged."
   ],
   "sources": [
-    {"source_id": "addyosmani-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/addyosmani/agent-skills", "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6"},
-    {"source_id": "affaan-m-ecc", "kind": "github-skills-repo", "url": "https://github.com/affaan-m/ECC", "pin": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f"},
-    {"source_id": "alpacahq-alpaca-skills", "kind": "github-skills-repo", "url": "https://github.com/alpacahq/alpaca-skills", "pin": "39111abee6b60af7c11d40b5fc892dfc4fd791a4"},
-    {"source_id": "anthropics-claude-code", "kind": "github-skills-repo", "url": "https://github.com/anthropics/claude-code", "pin": "2282079d6ac8824ec4b72a432a03e0c636e0512f"},
-    {"source_id": "anthropics-skills", "kind": "github-skills-repo", "url": "https://github.com/anthropics/skills", "pin": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4"},
-    {"source_id": "bgauryy-octocode", "kind": "github-skills-repo", "url": "https://github.com/bgauryy/octocode", "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a"},
-    {"source_id": "cloudflare-security-audit-skill", "kind": "github-skills-repo", "url": "https://github.com/cloudflare/security-audit-skill", "pin": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8"},
-    {"source_id": "composiohq-awesome-claude-skills", "kind": "awesome-list", "url": "https://github.com/ComposioHQ/awesome-claude-skills", "pin": "be2a406907dbc61b73e6827ded415c96139d13a2"},
-    {"source_id": "getsentry-skills", "kind": "github-skills-repo", "url": "https://github.com/getsentry/skills", "pin": "d18b7aa8ba878354e5c348310230e652f7690f9c"},
-    {"source_id": "huggingface-skills", "kind": "github-skills-repo", "url": "https://github.com/huggingface/skills", "pin": "80f9fa530e46f4ae642fcb9e1725bad0e1979395"},
-    {"source_id": "mattpocock-skills", "kind": "github-skills-repo", "url": "https://github.com/mattpocock/skills", "pin": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"},
-    {"source_id": "microsoft-playwright-cli", "kind": "github-skills-repo", "url": "https://github.com/microsoft/playwright-cli", "pin": "b85c7a736bb473bf55b584e54a09ffa698d6d871"},
-    {"source_id": "microsoft-skills", "kind": "github-skills-repo", "url": "https://github.com/microsoft/skills", "pin": "3495f50ae0d7b69dcb19c6922db9f80aab6cf79c"},
-    {"source_id": "obra-superpowers", "kind": "github-skills-repo", "url": "https://github.com/obra/superpowers", "pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d"},
-    {"source_id": "openai-skills", "kind": "github-skills-repo", "url": "https://github.com/openai/skills", "pin": "49f948faa9258a0c61caceaf225e179651397431", "maintenance": {"status": "stale", "checked_at": "2026-09-30", "evidence": "gh api 'repos/openai/skills/commits?sha=main&since=2026-07-02T00:00:00Z&per_page=1' returned no commit; the last main commit, 49f948faa9258a0c61caceaf225e179651397431, is dated 2026-06-24T02:36:12Z, 98 days before 2026-09-30. The repository is not archived, and its pushed_at of 2026-09-08 counts a push to another branch."}},
-    {"source_id": "semgrep-skills", "kind": "github-skills-repo", "url": "https://github.com/semgrep/skills", "pin": "68177b8830f96cd9d10dacbb14dde2566360503d"},
-    {"source_id": "skills-sh-registry", "kind": "registry", "url": "https://skills.sh", "pin": "7407f3893ad4dceab546ac002c3ef806e4000c73"},
-    {"source_id": "superagent-ai-skills", "kind": "github-skills-repo", "url": "https://github.com/superagent-ai/skills", "pin": "0da315b873ed141025fa601ed6e0ebe0c878d5af"},
-    {"source_id": "trailofbits-skills", "kind": "github-skills-repo", "url": "https://github.com/trailofbits/skills", "pin": "82fe8226252622fa807643bdca1710901198553a"},
-    {"source_id": "typesafe-ai-skills", "kind": "github-skills-repo", "url": "https://github.com/typesafe-ai/skills", "pin": "65a39f393687675ce170e6094757de20370365b9"},
-    {"source_id": "vercel-labs-agent-browser", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-browser", "pin": "d01253d9db28d75080e36da3c1c31ef89454731e"},
-    {"source_id": "vercel-labs-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-skills", "pin": "063bee94c3f4df8453406c830b0a7df0f2860278"},
-    {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"},
-    {"source_id": "dgunning-edgartools", "kind": "github-skills-repo", "url": "https://github.com/dgunning/edgartools", "pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348"},
-    {"source_id": "dagucloud-dagu", "kind": "github-skills-repo", "url": "https://github.com/dagucloud/dagu", "pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4"},
-    {"source_id": "huggingface-huggingface-hub", "kind": "github-skills-repo", "url": "https://github.com/huggingface/huggingface_hub", "pin": "bd4a76030582d118e28dc9ad6c7a5911ea76176b"}
+    {
+      "source_id": "addyosmani-agent-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/addyosmani/agent-skills",
+      "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6"
+    },
+    {
+      "source_id": "affaan-m-ecc",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/affaan-m/ECC",
+      "pin": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f"
+    },
+    {
+      "source_id": "alpacahq-alpaca-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/alpacahq/alpaca-skills",
+      "pin": "39111abee6b60af7c11d40b5fc892dfc4fd791a4"
+    },
+    {
+      "source_id": "anthropics-claude-code",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/anthropics/claude-code",
+      "pin": "2282079d6ac8824ec4b72a432a03e0c636e0512f"
+    },
+    {
+      "source_id": "anthropics-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/anthropics/skills",
+      "pin": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4"
+    },
+    {
+      "source_id": "bgauryy-octocode",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/bgauryy/octocode",
+      "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a"
+    },
+    {
+      "source_id": "cloudflare-security-audit-skill",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/cloudflare/security-audit-skill",
+      "pin": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8"
+    },
+    {
+      "source_id": "composiohq-awesome-claude-skills",
+      "kind": "awesome-list",
+      "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "pin": "be2a406907dbc61b73e6827ded415c96139d13a2"
+    },
+    {
+      "source_id": "getsentry-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/getsentry/skills",
+      "pin": "d18b7aa8ba878354e5c348310230e652f7690f9c"
+    },
+    {
+      "source_id": "huggingface-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/huggingface/skills",
+      "pin": "80f9fa530e46f4ae642fcb9e1725bad0e1979395"
+    },
+    {
+      "source_id": "mattpocock-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/mattpocock/skills",
+      "pin": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    },
+    {
+      "source_id": "microsoft-playwright-cli",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/microsoft/playwright-cli",
+      "pin": "b85c7a736bb473bf55b584e54a09ffa698d6d871"
+    },
+    {
+      "source_id": "microsoft-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/microsoft/skills",
+      "pin": "3495f50ae0d7b69dcb19c6922db9f80aab6cf79c"
+    },
+    {
+      "source_id": "native-agent-stack",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "pin": "05e3ead094d09a55e4652296d3d305edc2d10888"
+    },
+    {
+      "source_id": "obra-superpowers",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/obra/superpowers",
+      "pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d"
+    },
+    {
+      "source_id": "openai-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/openai/skills",
+      "pin": "49f948faa9258a0c61caceaf225e179651397431",
+      "maintenance": {
+        "status": "stale",
+        "checked_at": "2026-09-30",
+        "evidence": "gh api 'repos/openai/skills/commits?sha=main&since=2026-07-02T00:00:00Z&per_page=1' returned no commit; the last main commit, 49f948faa9258a0c61caceaf225e179651397431, is dated 2026-06-24T02:36:12Z, 98 days before 2026-09-30. The repository is not archived, and its pushed_at of 2026-09-08 counts a push to another branch."
+      }
+    },
+    {
+      "source_id": "semgrep-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/semgrep/skills",
+      "pin": "68177b8830f96cd9d10dacbb14dde2566360503d"
+    },
+    {
+      "source_id": "skills-sh-registry",
+      "kind": "registry",
+      "url": "https://skills.sh",
+      "pin": "7407f3893ad4dceab546ac002c3ef806e4000c73"
+    },
+    {
+      "source_id": "superagent-ai-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/superagent-ai/skills",
+      "pin": "0da315b873ed141025fa601ed6e0ebe0c878d5af"
+    },
+    {
+      "source_id": "trailofbits-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/trailofbits/skills",
+      "pin": "82fe8226252622fa807643bdca1710901198553a"
+    },
+    {
+      "source_id": "typesafe-ai-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/typesafe-ai/skills",
+      "pin": "65a39f393687675ce170e6094757de20370365b9"
+    },
+    {
+      "source_id": "vercel-labs-agent-browser",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/vercel-labs/agent-browser",
+      "pin": "d01253d9db28d75080e36da3c1c31ef89454731e"
+    },
+    {
+      "source_id": "vercel-labs-agent-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/vercel-labs/agent-skills",
+      "pin": "063bee94c3f4df8453406c830b0a7df0f2860278"
+    },
+    {
+      "source_id": "vercel-labs-skills",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/vercel-labs/skills",
+      "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"
+    },
+    {
+      "source_id": "dgunning-edgartools",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/dgunning/edgartools",
+      "pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348"
+    },
+    {
+      "source_id": "dagucloud-dagu",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/dagucloud/dagu",
+      "pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4"
+    },
+    {
+      "source_id": "huggingface-huggingface-hub",
+      "kind": "github-skills-repo",
+      "url": "https://github.com/huggingface/huggingface_hub",
+      "pin": "bd4a76030582d118e28dc9ad6c7a5911ea76176b"
+    }
   ],
   "tasks": [
     {
       "layer_id": "skills-research",
       "lifecycle_task": "research",
       "requirement": "Research first, before acting: survey maintained upstream tools, skills and prior decisions before writing code or adopting a component (the AGENTS.md research-first rule), with staged, bounded retrieval that keeps subagent context small.",
-      "installed": ["search-first", "iterative-retrieval"],
-      "source_ids": ["affaan-m-ecc", "mattpocock-skills", "bgauryy-octocode", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [],
+      "installed": [
+        "search-first",
+        "iterative-retrieval",
+        "native-stack-research"
+      ],
+      "source_ids": [
+        "affaan-m-ecc",
+        "mattpocock-skills",
+        "bgauryy-octocode",
+        "microsoft-skills",
+        "addyosmani-agent-skills",
+        "native-agent-stack",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
+      "open_gaps": [
+        "native-stack-research registers the existing embedded research contract without a new candidate or quality-promotion claim. Reviewed lifecycle installation and fresh client discovery remain with the sole host writer; the host-specific skill is excluded from workers pending a qualified bridge (docs/decisions/2026-10-05-research-skill-round2.md)."
+      ],
       "overturn_when": "A skill-creator paired with-skill/without-skill benchmark (or a promptfoo config) on a frozen set of research-first prompts from this repository's adopt-or-build decisions, in Claude Code and in Codex at equal model and effort, shows a candidate beating the installed skills' pass rate without a higher token or time cost; or an installed skill's upstream is archived, removed, relicensed or changes its invocation flags."
     },
     {
       "layer_id": "skills-skill-lifecycle",
       "lifecycle_task": "skill-lifecycle",
       "requirement": "Run a skill's lifecycle end to end: discover (registry and source search), evaluate (source review at a pinned commit and audits), install (pinned through adoption/skills/manifest.json only), verify (listing and invocation on each host), A/B (a paired with-skill/without-skill comparison) and record (the manifest row and a decision record). Anything a registry search finds must still be pinned in the manifest before install.",
-      "installed": ["find-skills", "skill-creator"],
-      "source_ids": ["vercel-labs-skills", "anthropics-skills", "openai-skills", "microsoft-skills", "obra-superpowers", "getsentry-skills", "superagent-ai-skills", "anthropics-claude-code", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "find-skills",
+        "skill-creator"
+      ],
+      "source_ids": [
+        "vercel-labs-skills",
+        "anthropics-skills",
+        "openai-skills",
+        "microsoft-skills",
+        "obra-superpowers",
+        "getsentry-skills",
+        "superagent-ai-skills",
+        "anthropics-claude-code",
+        "bgauryy-octocode",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "skill-creator, a trial skill unit F3 (#553) pinned on 2026-09-30, covers authoring, evaluation and the paired with-skill/without-skill A/B in Claude; the manifest keeps it off in Codex (codex_enabled false), whose own .system/skill-creator is a different skill.",
         "No pinned skill covers verify or record: none checks a skill's listing and invocation on each host, or writes or verifies a manifest row."
@@ -70,7 +243,15 @@
       "lifecycle_task": "design-intake",
       "requirement": "Interrogate requirements before building: stress-test an ambiguous request or plan (assumptions, open decisions, acceptance) before implementation starts. The skill must be model-invocable (no true-valued disable-model-invocation (true/yes/on/1) in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml), so a worker or the main session can run it without a user trigger, and it must not make intake, brainstorming or a planning approval mandatory for bounded work (AGENTS.md; the manifest's obra/superpowers exclusion).",
       "installed": [],
-      "source_ids": ["mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "bgauryy-octocode", "openai-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "source_ids": [
+        "mattpocock-skills",
+        "obra-superpowers",
+        "addyosmani-agent-skills",
+        "bgauryy-octocode",
+        "openai-skills",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "No skill serves this task since 2026-10-03: the wave-2 skills ruling retired grill-me (change 1), which did nothing but call the excluded grilling skill, so the task waits for a candidate that passes the comparison below."
       ],
@@ -80,8 +261,17 @@
       "layer_id": "skills-architecture",
       "lifecycle_task": "architecture",
       "requirement": "Improve codebase architecture: review a grown module and propose deeper modules and narrower interfaces, with a shared module/interface vocabulary for refactoring the large single-file validators (scripts/validate.py, scripts/landscape.py). The skill must be model-invocable (no true-valued disable-model-invocation (true/yes/on/1) in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml).",
-      "installed": ["codebase-design"],
-      "source_ids": ["mattpocock-skills", "affaan-m-ecc", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "codebase-design"
+      ],
+      "source_ids": [
+        "mattpocock-skills",
+        "affaan-m-ecc",
+        "microsoft-skills",
+        "addyosmani-agent-skills",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "The wave-2 skills ruling retired improve-codebase-architecture on 2026-10-03 (change 1): it calls the excluded grilling and domain-modeling skills, so codebase-design alone serves this task."
       ],
@@ -91,8 +281,20 @@
       "layer_id": "skills-implement",
       "lifecycle_task": "implement",
       "requirement": "Implement changes with this repository's current tooling: Python scripts and tools on uv, ruff and pyproject conventions, and the generated HTML guide and dashboards, which are hand-styled today.",
-      "installed": ["modern-python", "frontend-design"],
-      "source_ids": ["trailofbits-skills", "anthropics-skills", "mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "modern-python",
+        "frontend-design"
+      ],
+      "source_ids": [
+        "trailofbits-skills",
+        "anthropics-skills",
+        "mattpocock-skills",
+        "obra-superpowers",
+        "addyosmani-agent-skills",
+        "affaan-m-ecc",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "Both are trial skills (the trial window's review falls after 2026-10-25, the manifest's trial block)."
       ],
@@ -102,8 +304,20 @@
       "layer_id": "skills-test",
       "lifecycle_task": "test",
       "requirement": "Test first: new scripts land with unittest suites as the acceptance gate, and parsers and sanitizers (host_receipts.sanitize, the receipt validators) need property-based tests beyond their example tests (Scorecard's Fuzzing check scores 0).",
-      "installed": ["tdd", "property-based-testing"],
-      "source_ids": ["mattpocock-skills", "trailofbits-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "anthropics-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "tdd",
+        "property-based-testing"
+      ],
+      "source_ids": [
+        "mattpocock-skills",
+        "trailofbits-skills",
+        "obra-superpowers",
+        "addyosmani-agent-skills",
+        "affaan-m-ecc",
+        "anthropics-skills",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "property-based-testing sets effort: low in its frontmatter, which lowers a max-effort worker's turns after it loads (tools/sota-convergence/landscape-sweep/README.md, Model roles)."
       ],
@@ -113,8 +327,18 @@
       "layer_id": "skills-debug",
       "lifecycle_task": "debug",
       "requirement": "A debugging procedure for failing tests, CI checks and paper-engine faults, which are otherwise diagnosed ad hoc.",
-      "installed": ["diagnosing-bugs"],
-      "source_ids": ["mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "getsentry-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "diagnosing-bugs"
+      ],
+      "source_ids": [
+        "mattpocock-skills",
+        "obra-superpowers",
+        "addyosmani-agent-skills",
+        "affaan-m-ecc",
+        "getsentry-skills",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "diagnosing-bugs is a trial skill; obra/superpowers systematic-debugging is excluded as a duplicate of it under the manifest's single-winner rule."
       ],
@@ -124,8 +348,21 @@
       "layer_id": "skills-review",
       "lifecycle_task": "review",
       "requirement": "Review evidence and changes before merge: typed semantic judgments for evidence review (the semantic-evidence-reviewer role) and a search for siblings of an already fixed defect before merge.",
-      "installed": ["typesafe-ai", "variant-analysis"],
-      "source_ids": ["typesafe-ai-skills", "trailofbits-skills", "getsentry-skills", "mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "typesafe-ai",
+        "variant-analysis"
+      ],
+      "source_ids": [
+        "typesafe-ai-skills",
+        "trailofbits-skills",
+        "getsentry-skills",
+        "mattpocock-skills",
+        "obra-superpowers",
+        "addyosmani-agent-skills",
+        "affaan-m-ecc",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "Native /code-review and /security-review cover diff review; the excluded mattpocock code-review failed its skills.sh audit (the manifest's excluded reason)."
       ],
@@ -135,8 +372,28 @@
       "layer_id": "skills-security",
       "lifecycle_task": "security",
       "requirement": "Security review with retained reasoning: secure-coding guidance for scripts/ and tools/, a threat model for the paper-lane broker adapters and credential stores, custom static rules and CodeQL alert triage, SARIF reading and diffing, dependency and agentic Actions risk audits, false-positive triage of Scorecard, zizmor and CodeQL alerts, and a whole-repository audit with a coverage ledger and a confirmed/needs_validation/rejected verdict contract.",
-      "installed": ["security-best-practices", "security-threat-model", "codeql", "supply-chain-risk-auditor", "agentic-actions-auditor", "sarif-parsing", "fp-check", "security-audit"],
-      "source_ids": ["openai-skills", "trailofbits-skills", "cloudflare-security-audit-skill", "semgrep-skills", "superagent-ai-skills", "getsentry-skills", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "security-best-practices",
+        "security-threat-model",
+        "codeql",
+        "supply-chain-risk-auditor",
+        "agentic-actions-auditor",
+        "sarif-parsing",
+        "fp-check",
+        "security-audit"
+      ],
+      "source_ids": [
+        "openai-skills",
+        "trailofbits-skills",
+        "cloudflare-security-audit-skill",
+        "semgrep-skills",
+        "superagent-ai-skills",
+        "getsentry-skills",
+        "addyosmani-agent-skills",
+        "affaan-m-ecc",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "security-audit is listed in Claude and enabled in Codex since 2026-09-30 (unit F3, #553), so the model may load it on an ordinary security question, where it is guidance only unless a prompt asks for the full audit; its M5c bake-off against /security-review decides its promotion (the manifest's security-audit row).",
         "Stale source: replacement via this sweep. security-best-practices and security-threat-model come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record).",
@@ -148,8 +405,22 @@
       "layer_id": "skills-ci-pr",
       "lifecycle_task": "ci-pr",
       "requirement": "CI and pull-request work: triage failing GitHub Actions checks across this repository's workflows and required checks, address PR review threads (the main ruleset requires their resolution), and resolve rebase conflicts on hot files (manifests/evidence.json, the docs/lanes.md hot-file protocol).",
-      "installed": ["gh-fix-ci", "gh-address-comments"],
-      "source_ids": ["openai-skills", "mattpocock-skills", "getsentry-skills", "obra-superpowers", "addyosmani-agent-skills", "trailofbits-skills", "superagent-ai-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "gh-fix-ci",
+        "gh-address-comments"
+      ],
+      "source_ids": [
+        "openai-skills",
+        "mattpocock-skills",
+        "getsentry-skills",
+        "obra-superpowers",
+        "addyosmani-agent-skills",
+        "trailofbits-skills",
+        "superagent-ai-skills",
+        "affaan-m-ecc",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "No installed skill resolves rebase conflicts: resolving-merge-conflicts was retired by unit F3 (#553) on 2026-09-30, after upstream removed it in daa01d8 (the manifest's excluded entry).",
         "Stale source: replacement via this sweep. gh-fix-ci and gh-address-comments come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record)."
@@ -160,8 +431,20 @@
       "layer_id": "skills-agent-docs",
       "lifecycle_task": "agent-docs",
       "requirement": "Maintain the agent instruction files (AGENTS.md, CLAUDE.md), which load into every Claude and Codex session and every worker that keeps project instructions: context load, a single source of truth and pruning of dated chronology. Skill authoring stays with skill-creator (skills-skill-lifecycle).",
-      "installed": ["writing-for-agents"],
-      "source_ids": ["mattpocock-skills", "getsentry-skills", "anthropics-claude-code", "addyosmani-agent-skills", "microsoft-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "writing-for-agents"
+      ],
+      "source_ids": [
+        "mattpocock-skills",
+        "getsentry-skills",
+        "anthropics-claude-code",
+        "addyosmani-agent-skills",
+        "microsoft-skills",
+        "affaan-m-ecc",
+        "bgauryy-octocode",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [
         "writing-for-agents' description also triggers on skill edits, a trial confound; only AGENTS.md and CLAUDE.md uses count toward its gap (the manifest's writing-for-agents row)."
       ],
@@ -171,17 +454,39 @@
       "layer_id": "skills-browser",
       "lifecycle_task": "browser",
       "requirement": "Browser acceptance through the pinned agent-browser CLI (adoption/pins-*.json), with a skill that documents its commands for the pinned CLI version.",
-      "installed": ["agent-browser"],
-      "source_ids": ["vercel-labs-agent-browser", "microsoft-playwright-cli", "openai-skills", "anthropics-skills", "addyosmani-agent-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [],
+      "installed": [],
+      "source_ids": [
+        "vercel-labs-agent-browser",
+        "microsoft-playwright-cli",
+        "openai-skills",
+        "anthropics-skills",
+        "addyosmani-agent-skills",
+        "affaan-m-ecc",
+        "bgauryy-octocode",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
+      "open_gaps": [
+        "agent-browser is selected but held in adoption/skills/manifest.json for the browser-tool measurement; it is not an installed incumbent. Preserve its source pin and held gate until the owning measurement and lifecycle adoption decide it."
+      ],
       "overturn_when": "agent-browser fails a browser acceptance task that a candidate passes, measured with a skill-creator paired benchmark (or a promptfoo config) on frozen browser acceptance tasks against the pinned CLI, in Claude Code and in Codex; or the pinned agent-browser CLI stops shipping the skill."
     },
     {
       "layer_id": "skills-mcp-build",
       "lifecycle_task": "mcp-build",
       "requirement": "Build or fix the MCP servers the stack wires (adoption/mcp and the files that reference MCP servers) with a written procedure.",
-      "installed": ["mcp-builder"],
-      "source_ids": ["anthropics-skills", "microsoft-skills", "affaan-m-ecc", "anthropics-claude-code", "huggingface-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": [
+        "mcp-builder"
+      ],
+      "source_ids": [
+        "anthropics-skills",
+        "microsoft-skills",
+        "affaan-m-ecc",
+        "anthropics-claude-code",
+        "huggingface-skills",
+        "skills-sh-registry",
+        "composiohq-awesome-claude-skills"
+      ],
       "open_gaps": [],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen MCP server build and fix tasks shows a candidate producing servers that pass their own tests and connect in Claude Code and Codex more often than mcp-builder at no higher token or time cost, in Claude Code and in Codex; or mcp-builder's upstream is archived, removed or relicensed."
     },
@@ -190,36 +495,63 @@
       "lifecycle_task": "data-quant",
       "requirement": "Source public SEC data and prepare reproducible systematic research while preserving as-known information and keeping numeric, risk and order state deterministic.",
       "installed": [],
-      "source_ids": ["dgunning-edgartools", "anthropics-skills", "openai-skills", "alpacahq-alpaca-skills"],
-      "open_gaps": ["EdgarTools vendor skill is a pending Tier B trial; compare vendor finance candidates by systematic-research fit and connector requirements rather than omitting them."],
-      "overturn_when": "A maintained vendor alternative better meets the frozen research outcome, provenance and token criteria, or the selected owner fails native delivery."
+      "source_ids": [
+        "dgunning-edgartools",
+        "anthropics-skills",
+        "openai-skills",
+        "alpacahq-alpaca-skills"
+      ],
+      "open_gaps": [
+        "EdgarTools vendor skill is a pending Tier B trial; compare vendor finance candidates by systematic-research fit and connector requirements rather than omitting them."
+      ],
+      "overturn_when": "A maintained vendor alternative better meets the frozen research outcome, provenance and token criteria, or the selected owner fails native delivery. For a contended candidate choice, compare that outcome using skill-creator's paired benchmark or a promptfoo configuration on frozen task cases; this is not a skill-used campaign or a replacement for native install/smoke/organic evidence."
     },
     {
       "layer_id": "skills-broker-adapter",
       "lifecycle_task": "broker-adapter",
       "requirement": "Review read-only broker API and adapter guidance against the selected research/paper scope. Deterministic code owns numeric, risk and order state; no skill or MCP install precedes the deny-set ruling.",
       "installed": [],
-      "source_ids": ["alpacahq-alpaca-skills", "microsoft-skills", "anthropics-skills"],
-      "open_gaps": ["Alpaca money-precision, resilience and market-data frontmatter names are vendor candidates, not permission to install or submit orders. The trading owner qualifies domain changes."],
-      "overturn_when": "A qualified vendor-native owner fails the read-only fit or a better maintained source passes the same scope and outcome criteria."
+      "source_ids": [
+        "alpacahq-alpaca-skills",
+        "microsoft-skills",
+        "anthropics-skills"
+      ],
+      "open_gaps": [
+        "Alpaca money-precision, resilience and market-data frontmatter names are vendor candidates, not permission to install or submit orders. The trading owner qualifies domain changes."
+      ],
+      "overturn_when": "A qualified vendor-native owner fails the read-only fit or a better maintained source passes the same scope and outcome criteria. For a contended candidate choice, compare that outcome using skill-creator's paired benchmark or a promptfoo configuration on frozen task cases; this is not a skill-used campaign or a replacement for native install/smoke/organic evidence."
     },
     {
       "layer_id": "skills-hosting",
       "lifecycle_task": "hosting",
       "requirement": "Prepare native Dagu DAG and runtime-hosting changes with binary-coupled guidance and state/storage outside source worktrees.",
       "installed": [],
-      "source_ids": ["dagucloud-dagu", "affaan-m-ecc", "skills-sh-registry"],
-      "open_gaps": ["The dagu skill and hosting preload remain pending until their native release identity and Tier B entry are recorded. Native host operations and private cleanup stay with the command center."],
-      "overturn_when": "Native acceptance fails, a skill tree moves ahead of its binary, or a maintained alternative wins the declared hosting outcome."
+      "source_ids": [
+        "dagucloud-dagu",
+        "affaan-m-ecc",
+        "skills-sh-registry"
+      ],
+      "open_gaps": [
+        "The dagu skill and hosting preload remain pending until their native release identity and Tier B entry are recorded. Native host operations and private cleanup stay with the command center."
+      ],
+      "overturn_when": "Native acceptance fails, a skill tree moves ahead of its binary, or a maintained alternative wins the declared hosting outcome. For a contended candidate choice, compare that outcome using skill-creator's paired benchmark or a promptfoo configuration on frozen task cases; this is not a skill-used campaign or a replacement for native install/smoke/organic evidence."
     },
     {
       "layer_id": "skills-model-hub",
       "lifecycle_task": "model-hub",
       "requirement": "Use Hugging Face's native CLI and generated guidance for Hub model and dataset work, with recorded source/version identity and bounded data/model operations.",
-      "installed": [],
-      "source_ids": ["huggingface-huggingface-hub", "huggingface-skills", "microsoft-skills"],
-      "open_gaps": ["hf-cli is observed installed through the vendor route; its generated-source lifecycle reconciliation is a separate S4 draft dependency. Compare curated Hugging Face and NVIDIA skill sets by task rather than omitting them."],
-      "overturn_when": "The generator or native route fails the declared task, the recorded bytes/version drift, or a maintained candidate wins the same bounded outcome."
+      "installed": [
+        "hf-cli"
+      ],
+      "source_ids": [
+        "huggingface-huggingface-hub",
+        "huggingface-skills",
+        "microsoft-skills"
+      ],
+      "open_gaps": [
+        "The vendor-generated hf-cli entry is reconciled in the central lifecycle manifest. Native worker installation, actual task use and quality remain separately qualified; compare curated Hugging Face and NVIDIA candidates by this task rather than omitting them."
+      ],
+      "overturn_when": "The generator or native route fails the declared task, the recorded bytes/version drift, or a maintained candidate wins the same bounded outcome. For a contended candidate choice, compare that outcome using skill-creator's paired benchmark or a promptfoo configuration on frozen task cases; this is not a skill-used campaign or a replacement for native install/smoke/organic evidence."
     }
   ]
 }

@@ -1,0 +1,35 @@
+{
+  "description": "B13 held Codex SDK hook ablation preparation; unresolved path/trust/auth/input prerequisites prevent execution as shipped.",
+  "sharing": false,
+  "prompts": ["{{ request }} Return one JSON object with summary and actions. Actions describes only work actually requested and supported by the retained inputs."],
+  "providers": [
+    {
+      "id": "openai:codex-sdk",
+      "label": "hook-on",
+      "config": {
+        "model": "cx/gpt-6.1-sol", "model_reasoning_effort": "max", "model_provider": "omniroute",
+        "working_dir": "@RUN_DIR@/codex-on/work", "codex_path_override": "@CODEX_BIN@",
+        "skip_git_repo_check": true, "enable_streaming": true, "sandbox_mode": "workspace-write",
+        "approval_policy": "never", "network_access_enabled": false, "inherit_process_env": false,
+        "cli_env": {"HOME":"@RUN_DIR@/codex-on/home","CODEX_HOME":"@RUN_DIR@/codex-on/codex-home","OPENAI_API_KEY":"","CODEX_API_KEY":"","CODEX_AUTH_JSON_PATH":"","CODEX_FORCE_AUTH_JSON":"0"},
+        "cli_config": {"model_providers":{"omniroute":{"name":"OmniRoute","base_url":"http://127.0.0.1:21128/v1","wire_api":"responses","requires_openai_auth":false}},"skills":{"bundled":{"enabled":false}}},
+        "output_schema": {"type":"object","required":["summary","actions"],"additionalProperties":false,"properties":{"summary":{"type":"string"},"actions":{"type":"array","items":{"type":"string"}}}}
+      }
+    },
+    {
+      "id": "openai:codex-sdk",
+      "label": "hook-off",
+      "config": {
+        "model": "cx/gpt-6.1-sol", "model_reasoning_effort": "max", "model_provider": "omniroute",
+        "working_dir": "@RUN_DIR@/codex-off/work", "codex_path_override": "@CODEX_BIN@",
+        "skip_git_repo_check": true, "enable_streaming": true, "sandbox_mode": "workspace-write",
+        "approval_policy": "never", "network_access_enabled": false, "inherit_process_env": false,
+        "cli_env": {"HOME":"@RUN_DIR@/codex-off/home","CODEX_HOME":"@RUN_DIR@/codex-off/codex-home","OPENAI_API_KEY":"","CODEX_API_KEY":"","CODEX_AUTH_JSON_PATH":"","CODEX_FORCE_AUTH_JSON":"0"},
+        "cli_config": {"model_providers":{"omniroute":{"name":"OmniRoute","base_url":"http://127.0.0.1:21128/v1","wire_api":"responses","requires_openai_auth":false}},"skills":{"bundled":{"enabled":false}}},
+        "output_schema": {"type":"object","required":["summary","actions"],"additionalProperties":false,"properties":{"summary":{"type":"string"},"actions":{"type":"array","items":{"type":"string"}}}}
+      }
+    }
+  ],
+  "defaultTest": {"assert":[{"type":"is-json"}]},
+  "tests": "file://cases.json"
+}

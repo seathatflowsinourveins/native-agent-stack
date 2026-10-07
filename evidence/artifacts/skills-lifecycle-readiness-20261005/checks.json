@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "kind": "skills_lifecycle_integration_checks",
+  "date": "2026-10-05",
+  "base_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "scope": "Held/pruned reuse correction and existing installation observations; no upstream skill-quality, benchmark, model or provider acceptance.",
+  "path_policy": "Commands normalize private cache/worktree paths as LANE_CACHE and LANE_WORKTREE. Original outputs remain private; hashes identify the actual captures.",
+  "test_modules": [
+    "tests.test_install_skills",
+    "tests.test_skills_manifest",
+    "tests.test_runtime_worker_skills",
+    "tests.test_runtime_worker_openhands",
+    "tests.test_runtime_worker_openhands_resolver",
+    "tests.test_skills_status"
+  ],
+  "checks": [
+    {
+      "name": "negative_controls_before_fix",
+      "evidence_classes": ["synthetic", "local_integration"],
+      "test_selection": [
+        "tests.test_install_skills.ReuseRefGateTests.test_reused_skill_cannot_bypass_a_central_install_hold_or_prune",
+        "tests.test_install_skills.ReuseRefGateTests.test_reuse_preserves_a_stricter_worker_hold_and_does_not_promote_a_trial",
+        "tests.test_runtime_worker_openhands.OpenHandsUpstreamAdapterTests.test_workspace_discovery_uses_the_installers_resolved_hold_gate"
+      ],
+      "command_scope": "Three selected new regression checks; the retained log verifies the failing test locators, not the shell invocation's exact spelling.",
+      "exit_code": 1,
+      "returned_summary": "Ran 3 tests in 0.054s\nFAILED (failures=2, errors=1)",
+      "failure_conditions": [
+        "Central held status still resolved as worker trial.",
+        "Central pruned status still resolved as worker trial.",
+        "Worker discovery still expected the absent centrally held file."
+      ],
+      "original_log": {"name": "reuse-hold-red.log", "bytes": 3283, "sha256": "b54633c795d778dc2c2b52c1d932f37145d990ffabadc0a97f238a6f1087208f"},
+      "upstream_acceptance": false
+    },
+    {
+      "name": "focused_regressions_after_fix",
+      "evidence_classes": ["synthetic", "local_integration"],
+      "exit_code": 0,
+      "returned_summary": "Ran 8 tests in 0.263s\nOK",
+      "original_log": {"name": "reuse-hold-green.log", "bytes": 271, "sha256": "628d0badec3e7b7213ea9773bd267b5af8f893ee51b44f853e53ca3f7cee0c37"},
+      "upstream_acceptance": false
+    },
+    {
+      "name": "first_broader_run",
+      "evidence_classes": ["synthetic", "local_integration"],
+      "command": "rtk proxy env TMPDIR=LANE_WORKTREE/.local/skills-lifecycle/tmp python3 -m unittest <test_modules>",
+      "exit_code": 1,
+      "returned_summary": "Ran 452 tests in 38.664s\nFAILED (failures=12, errors=16, skipped=3)",
+      "failure_conditions": [
+        "The selected TMPDIR was inside the checkout, against private-fixture containment requirements.",
+        "One synthetic stack fixture omitted the newly shared installer dependency."
+      ],
+      "correction": "Use an ignored private cache outside the checkout; include the actual shared installer in the synthetic stack fixture. Existing containment checks are preserved.",
+      "original_log": {"name": "touched-tests.log", "bytes": 33014, "sha256": "a681d54b85acac17a08c138f0d4b70e8a90795238ce21c9e52f6937805312aa9"},
+      "upstream_acceptance": false
+    },
+    {
+      "name": "broader_run_after_correction",
+      "evidence_classes": ["synthetic", "local_integration"],
+      "command": "rtk proxy env TMPDIR=LANE_CACHE/tmp python3 -m unittest <test_modules>",
+      "exit_code": 0,
+      "returned_summary": "Ran 452 tests in 44.587s\nOK (skipped=3)",
+      "skipped": 3,
+      "skip_detail": "The retained non-verbose unittest summary does not enumerate skip reasons; skipped checks are not promoted to passed.",
+      "original_log": {"name": "touched-tests-retry.log", "bytes": 731, "sha256": "43fa9fd814d6957b1dd23100dbd2ef5baed3bd8dd7bb660ce1abb56a18b9df46"},
+      "upstream_acceptance": false
+    },
+    {
+      "name": "native_worker_held_selection_refusal",
+      "evidence_classes": ["native_proven"],
+      "command": "rtk proxy python3 tools/adoption/install_skills.py --manifest blueprints/runtime-workers/skills/manifest.json --project-dir .local/skills-lifecycle/project-probe --only agent-browser --check-only --json --skills-bin <isolated-skills-1.7.0>",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "returned_output": "install-skills failed: held --only name(s), not installed while held: ['agent-browser']",
+      "scope": "Actual native refusal before source lookup or installation, not a worker/model execution.",
+      "original_log": {"name": "native-held-refusal.log", "bytes": 88, "sha256": "aa49a77d3cfee7504a8228ca42dc6c9011b61bc73621a1991281105ad024769b"},
+      "upstream_acceptance": false
+    },
+    {
+      "name": "native_existing_installation_check",
+      "evidence_classes": ["native_proven"],
+      "command": "rtk proxy python3 tools/adoption/install_skills.py --skills-bin <isolated-skills-1.7.0> --check-only --json",
+      "exit_code": 0,
+      "returned_output": {
+        "dry_run": false,
+        "ok": true,
+        "skills": {
+          "agentic-actions-auditor": "ok",
+          "codebase-design": "ok",
+          "codeql": "ok",
+          "diagnosing-bugs": "ok",
+          "find-skills": "ok",
+          "fp-check": "ok",
+          "frontend-design": "ok",
+          "gh-address-comments": "ok",
+          "gh-fix-ci": "ok",
+          "iterative-retrieval": "ok",
+          "mcp-builder": "ok",
+          "modern-python": "ok",
+          "property-based-testing": "ok",
+          "sarif-parsing": "ok",
+          "search-first": "ok",
+          "security-audit": "ok",
+          "security-best-practices": "ok",
+          "security-threat-model": "ok",
+          "skill-creator": "ok",
+          "supply-chain-risk-auditor": "ok",
+          "tdd": "ok",
+          "typesafe-ai": "ok",
+          "variant-analysis": "ok",
+          "writing-for-agents": "ok"
+        }
+      },
+      "scope": "Read-only current manifest/installation verification; no new installation, native model turn or skill benchmark.",
+      "original_log": {"name": "installed-check-only.log", "bytes": 638, "sha256": "d3737fe77837899011b6d6a623cd5c90b41e170a57d0bce5f0b3841e711f9b33"},
+      "upstream_acceptance": false
+    }
+  ],
+  "repository_validation": [
+    {
+      "command": "rtk proxy python3 scripts/validate.py",
+      "exit_code": 0,
+      "evidence_classes": ["local_integration"],
+      "returned_output": "{\"components\": 69, \"hashed_files\": 10097, \"profiles\": 4, \"receipts\": 202, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "original_log": {"name": "validate.log", "bytes": 162, "sha256": "9782b3a6c145b190a0fece80fad51a3282e2b46f041b9bf3c05fc61d53869dc5"},
+      "scope": "Validation before the readiness record's final check-log registration and branch refresh; the final PR validation is reported separately."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=LANE_CACHE/tmp python3 -m unittest tests.test_adoption_docs_consistency",
+      "exit_code": 0,
+      "evidence_classes": ["local_integration"],
+      "returned_summary": "Ran 39 tests in 16.635s\nOK (skipped=1)",
+      "original_log": {"name": "docs-tests.log", "bytes": 151, "sha256": "a67ec745387c7477abeb3e7d5d3d017f04ea8bd4ffa1efd96fda67efedb7d710"}
+    },
+    {
+      "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded --root . --json",
+      "exit_code": 0,
+      "evidence_classes": ["local_integration"],
+      "returned_summary": {"valid": true},
+      "original_log": {"name": "convergence.log", "bytes": 4050, "sha256": "b060ae1767884e493e2fbf82acb9032413241b798eb53bcb3a2eb8a895b9dd21"},
+      "scope": "Declared consistency and frozen-input integrity; no new convergence winner."
+    }
+  ],
+  "unknown_usage": "Provider and model usage were not measured for these integration checks; no model execution is claimed.",
+  "pending_gates": [
+    "Final 13-task sweep survivors and pinned full-source/license reviews",
+    "Upstream skill-creator paired benchmark or promptfoo comparison",
+    "Review of the adoption manifest PR",
+    "Lifecycle-only installation",
+    "Fresh Claude/Codex model-side discovery and native worker discovery/invocation"
+  ]
+}

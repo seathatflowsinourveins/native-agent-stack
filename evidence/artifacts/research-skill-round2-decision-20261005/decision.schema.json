@@ -1,0 +1,125 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "slot": {
+      "type": "string",
+      "enum": [
+        "instructions-skills/research-skill"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "configure_existing_owner",
+        "retain_hold",
+        "adopt_candidate"
+      ]
+    },
+    "adopt_new_candidate": {
+      "type": "boolean"
+    },
+    "chosen_candidate": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "candidate_assessments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "eligible": {
+            "type": "boolean"
+          },
+          "gates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "gate": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "pass",
+                    "fail",
+                    "unknown",
+                    "not_applicable"
+                  ]
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gate",
+                "result",
+                "evidence",
+                "source"
+              ]
+            }
+          },
+          "quality": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "eligible",
+          "gates",
+          "quality"
+        ]
+      }
+    },
+    "reasoning": {
+      "type": "string"
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "overturn_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "completeness_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "slot",
+    "decision",
+    "adopt_new_candidate",
+    "chosen_candidate",
+    "candidate_assessments",
+    "reasoning",
+    "unknowns",
+    "overturn_conditions",
+    "completeness_inputs",
+    "sources"
+  ]
+}

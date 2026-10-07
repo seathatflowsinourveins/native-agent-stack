@@ -393,7 +393,8 @@
     "variant-analysis": "on",
     "writing-for-agents": "on",
     "security-audit": "on",
-    "skill-creator": "on"
+    "skill-creator": "on",
+    "native-stack-research": "on"
   },
   "skillListingBudgetFraction": 0.05
 }

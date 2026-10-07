@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-zandereins-schliff-schliff",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "Zandereins/schliff@schliff",
+ "reviewed_commit": "874b2a4811d51353757135badaa853abe5c2702e",
+ "readme_path": "skills/schliff/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-agent-docs"
+ ],
+ "claim": "Source review of the skill schliff in Zandereins/schliff at commit 874b2a4811d51353757135badaa853abe5c2702e (the adjudicated pin; license MIT), read from skills/schliff/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for schliff; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 7e2849857f0d441ee4676747c9db6f9faed0d773. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 16,
+  "pushed_at": "2026-10-05T08:26:46Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "874b2a4811d51353757135badaa853abe5c2702e",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named schliff",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "c0cb9d17fb10241c464a876dda9b2915370c8fcb6df054db9b671d1c4e762b79",
+  "skill_md_bytes": 5065,
+  "survivor_skill_md_sha256": "c0cb9d17fb10241c464a876dda9b2915370c8fcb6df054db9b671d1c4e762b79",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "7e2849857f0d441ee4676747c9db6f9faed0d773",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/schliff/SKILL.md@874b2a4811d51353757135badaa853abe5c2702e",
+   "text": "Scores one instruction file per dimension and turns that score into a CI gate."
+  },
+  {
+   "source": "skills/schliff/SKILL.md@874b2a4811d51353757135badaa853abe5c2702e",
+   "text": "`uv` on PATH (it provides `uvx`). No API key. Expects an instruction-file path for most commands; see each command's `--help`."
+  },
+  {
+   "source": "skills/schliff/SKILL.md@874b2a4811d51353757135badaa853abe5c2702e",
+   "text": "These run anywhere `uv` is available: no plugin, no checkout. All except `badge` and `demo` accept `--json` for machine-readable output."
+  }
+ ]
+}

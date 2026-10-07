@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "checked_at_utc": "2026-10-05T17:33:18Z",
+  "fixed_main": "e7d94e7bcc074edba093994c8853e59b650ce7e0",
+  "commands": [
+    {
+      "command": "python3 -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills",
+      "attempt": "initial",
+      "exit_code": 1,
+      "tests": 498,
+      "failures": 2,
+      "skipped": 6,
+      "failed_tests": [
+        "tests.test_landscape_sweep_skills.CatalogTests.test_every_manifest_source_and_the_named_sources_are_listed",
+        "tests.test_landscape_sweep_skills.CatalogTests.test_every_pinned_skill_serves_exactly_one_task"
+      ],
+      "limit": "Existing native-stack-research manifest entry lacked current catalog source/task mapping; corrected mapping preserves the immutable source and frozen earlier sweep scope.",
+      "raw_log_sha256": "a13e3c2f423a9ad44334261a8bfdfde4a53a0dd9e69005a20c776ebdcbb2c7c7"
+    },
+    {
+      "command": "python3 -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills",
+      "attempt": "after catalog correction",
+      "exit_code": 0,
+      "tests": 498,
+      "failures": 0,
+      "skipped": 6,
+      "elapsed_seconds": 117.202,
+      "raw_log_sha256": "ed3a4c126c164b3d64877e37aab317c6b33c81c037d3c1359b956361aff0a1e2"
+    },
+    {
+      "command": "python3 scripts/saturation_ledger.py --append evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/RESULT-input.json",
+      "attempt": "initial",
+      "exit_code": 2,
+      "limit": "The unrecognized source_review_stopped trigger was rejected. Replaced only its label with the supported retained_failure enum; exact stop references remain."
+    },
+    {
+      "command": "python3 scripts/saturation_ledger.py --append evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/RESULT-input.json",
+      "attempt": "corrected",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/saturation_ledger.py --check --base e7d94e7bcc074edba093994c8853e59b650ce7e0",
+      "exit_code": 0,
+      "sweep_records": 7,
+      "chain_intact": true,
+      "bindings_verified": true
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "attempt": "initial after ledger append",
+      "exit_code": 1,
+      "limit": "catalogs/saturation/ledger.json registered hash/bytes were stale after append; refreshed using official register_file.",
+      "raw_log_sha256": "a1c8b7f281880fc2eaa52c2b8a601b04fc24b5456db682ebf54257fb6a728b0e"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "attempt": "after fixed-main registry reconstruction, before this checks receipt",
+      "exit_code": 0,
+      "components": 69,
+      "hashed_files": 10345,
+      "profiles": 4,
+      "receipts": 204,
+      "raw_log_sha256": "faa112a0e67e78ab611910ad994387c15829fb2eb95a51de63521e8a42b6e75a",
+      "scope": "Integrity and scope only; no live provider or GPU execution."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "independent_review": {
+    "scope": "FU1 publication and subsequent catalog correction, read-only",
+    "source_review_bindings": 8,
+    "result_pointers_resolved": 59,
+    "new_files_privacy_checked": 21,
+    "private_pattern_hits": 0,
+    "frozen_prompt_digest_independently_verified": true,
+    "substantive_blockers": 0
+  },
+  "registry": {
+    "fixed_base": "e7d94e7bcc074edba093994c8853e59b650ce7e0",
+    "method": "scripts.host_receipts.register_file from fixed main copy",
+    "prior_owned_files": 151,
+    "unowned_main_rows_preserved": true,
+    "other_registry_keys_preserved": true
+  },
+  "limitations": [
+    "Local tests/checkers verify consistency and synthetic/native fixture behavior; no new upstream skill benchmark, provider acceptance or fresh client discovery.",
+    "Source reviewer exit1 and completed-result refusal exit2 are retained in publication.json and actual stderr; these gate failures are not corrected by local checks.",
+    "Raw logs remain in owned private cache with hashes; no raw conversations or machine-specific configuration is published."
+  ]
+}

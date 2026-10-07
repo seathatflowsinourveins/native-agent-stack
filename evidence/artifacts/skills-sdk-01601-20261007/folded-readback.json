@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "kind": "folded_manifest_model_free_catalog_readback",
+  "recorded_at_utc": "2026-10-07T04:27:28Z",
+  "source": {
+    "repository": "openai/codex",
+    "ref": "d27764b82f7118f674371e6d6e76271d9d606edb",
+    "sdk": "openai-codex==0.160.1",
+    "runtime": "openai-codex-cli-bin==0.160.1",
+    "prior_receipt": "receipt.json",
+    "inputs": {
+      "adoption/skills/manifest.json": "5047895fa345af2159b7bd9996be1c1bd370e21a27cb549510552d95743cb4d1",
+      "examples/omniroute-codex-sdk/worker.py": "a06aa977c8e5c77db6a834bd7e0789410b4dbbd1808d70490e7e29ec0eec10ce",
+      "examples/omniroute-codex-sdk/worker.py.lock": "0efd94def645a838fb3fc4e6484c60761312343e35ebc1ddc4cfb6d91966b947",
+      "blueprints/us-equities/workers/native_worker.py": "bbdbad012df99ae2c6a2384865c9acd8a5241db32d2596e6f904525be40fe74b"
+    }
+  },
+  "manifest_metadata": {
+    "selected_entries": 27,
+    "codex_eligible_entries": 26,
+    "nonheld_required_names": [
+      "agentic-actions-auditor",
+      "codebase-design",
+      "codeql",
+      "diagnosing-bugs",
+      "find-skills",
+      "fp-check",
+      "frontend-design",
+      "gh-address-comments",
+      "gh-fix-ci",
+      "hf-cli",
+      "iterative-retrieval",
+      "mcp-builder",
+      "modern-python",
+      "native-stack-research",
+      "property-based-testing",
+      "sarif-parsing",
+      "search-first",
+      "security-audit",
+      "security-best-practices",
+      "security-threat-model",
+      "supply-chain-risk-auditor",
+      "tdd",
+      "typesafe-ai",
+      "variant-analysis",
+      "writing-for-agents"
+    ],
+    "claude_description_chars": 10645,
+    "claude_metadata_cap": 10645,
+    "codex_description_chars": 10326,
+    "policy_amendment": "docs/decisions/2026-10-07-skills-fold-budget-amendment.md"
+  },
+  "inspection": {
+    "command": "<isolated-sdk-python> -B blueprints/us-equities/workers/native_worker.py inspect --provider omniroute --gateway-base-url http://127.0.0.1:21128/v1 --codex-bin <installed-native-cli> --codex-home <existing-native-home> --workspace <owned-keeper> --receipt <new-private-receipt>",
+    "exit_code": 0,
+    "status": "discovery_complete",
+    "sdk_version": "0.160.1",
+    "model_inference_submitted": false,
+    "raw_sha256": "a39767207c5b307ea9242b244cef26e039f898b781c7e763c208b7c5f65a781b"
+  },
+  "readback": {
+    "command": "uv run --no-build --locked --script examples/omniroute-codex-sdk/worker.py --base-url http://127.0.0.1:21128/v1 --codex-bin <installed-native-cli> --codex-home <existing-native-home> --workspace <owned-keeper> --preflight --catalog-details --require-skill <each of the exact 25 input names>",
+    "exit_code": 0,
+    "status": "ready",
+    "native_runtime": {
+      "name": "omniroute_codex_runtime_worker",
+      "version": "0.160.1",
+      "metadata_source": "userAgent"
+    },
+    "skill_count": 34,
+    "enabled_skill_count": 33,
+    "skill_error_count": 0,
+    "requirements": {
+      "mcp": [],
+      "skills": [
+        "agentic-actions-auditor",
+        "codebase-design",
+        "codeql",
+        "diagnosing-bugs",
+        "find-skills",
+        "fp-check",
+        "frontend-design",
+        "gh-address-comments",
+        "gh-fix-ci",
+        "hf-cli",
+        "iterative-retrieval",
+        "mcp-builder",
+        "modern-python",
+        "native-stack-research",
+        "property-based-testing",
+        "sarif-parsing",
+        "search-first",
+        "security-audit",
+        "security-best-practices",
+        "security-threat-model",
+        "supply-chain-risk-auditor",
+        "tdd",
+        "typesafe-ai",
+        "variant-analysis",
+        "writing-for-agents"
+      ],
+      "unavailable_mcp": [],
+      "unavailable_skills": []
+    },
+    "model_inference_submitted": false,
+    "usage_status": "unknown",
+    "cleanup_status": "closed",
+    "raw_sha256": "561d9ef562b4308dc097cb386508afc8afe407184df6b0ae7b6e75267588fa4c"
+  },
+  "retained_attempt": {
+    "command": "python3 -B native_worker.py inspect with the same explicit route and locators",
+    "exit_code": 1,
+    "stderr": "ModuleNotFoundError: No module named openai_codex",
+    "stderr_sha256": "251ba78a788449e4f190f9010fea79f7399873a0840f2fb792fdfcd75c95fa9a",
+    "repair": "Use the already-qualified isolated SDK interpreter; no global install or source change."
+  },
+  "evidence_class": "native_model_free_catalog_discovery",
+  "limits": [
+    "Native name/enabled/scope catalog availability under worker process overrides, including plugins=false; not rendered descriptions, loaded bodies, invocation, provider inference or host writing.",
+    "Manifest sums and the metadata ceiling do not establish fresh visibility at either client budget.",
+    "Earlier 0.160.0 guard failure and 23-name baseline observations remain unchanged; this new record binds the 25-name folded input.",
+    "Native usage remains unknown; no model turn was submitted."
+  ]
+}

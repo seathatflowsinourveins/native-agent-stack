@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ast-grep-agent-skill-ast-grep",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "ast-grep/agent-skill@ast-grep",
+ "reviewed_commit": "f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
+ "readme_path": "ast-grep/skills/ast-grep/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-review"
+ ],
+ "claim": "Source review of the skill ast-grep in ast-grep/agent-skill at commit f2175aff21f20cfb8e2db30c28febeb3a2d42b61 (the adjudicated pin; license NOASSERTION), read from ast-grep/skills/ast-grep/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ast-grep; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 1f1877bfb051fff6e6de5ebe529fb47758a03367. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 885,
+  "pushed_at": "2026-09-13T02:58:57Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "ast-grep/skills/, the first location the CLI searches that holds a valid folder named ast-grep",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "a18b68ab555758b85915937cf252d70b0261f930a07ce52095e7cafbbd304782",
+  "skill_md_bytes": 11030,
+  "survivor_skill_md_sha256": "a18b68ab555758b85915937cf252d70b0261f930a07ce52095e7cafbbd304782",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "1f1877bfb051fff6e6de5ebe529fb47758a03367",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "ast-grep/skills/ast-grep/SKILL.md@f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
+   "text": "This skill helps translate natural language queries into ast-grep rules for structural code search. ast-grep uses Abstract Syntax Tree (AST) patterns to match code based on its structure rather than just text, enabling powerful and precise code search across large codebases."
+  },
+  {
+   "source": "ast-grep/skills/ast-grep/SKILL.md@f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
+   "text": "Use this skill when users: - Need to search for code patterns using structural matching (e.g., \"find all async functions that don't have error handling\") - Want to locate specific language constructs (e.g., \"find all function calls with specific parameters\") - Request searches that require understanding code structure rather than just text - Ask to search for code with particular AST characteristics - Need to perform complex code queries that traditional text search cannot handle"
+  },
+  {
+   "source": "ast-grep/skills/ast-grep/SKILL.md@f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
+   "text": "Follow this process to help users write effective ast-grep rules:"
+  }
+ ]
+}

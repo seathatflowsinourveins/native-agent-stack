@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "skills-tier-a-recorder-source-review-20261006",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "checked_at": "2026-10-06",
+  "repository_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "scope": "PR-only state observation glue and passive native hook proposals. No hook registration, trust change, client configuration, host backfill, installation, model call or native client acceptance.",
+  "upstream_sources": [
+    {
+      "url": "https://code.claude.com/docs/en/hooks-guide#audit-configuration-changes",
+      "observation": "Official command-hook example appends timestamp/source/file metadata. State deduplication and cross-client identity reconciliation are local integration glue."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/hooks",
+      "observation": "Native ConfigChange, FileChanged, SessionStart watchPaths, async command and audit-only InstructionsLoaded interfaces. No instruction or decision payload is retained."
+    },
+    {
+      "url": "https://developers.openai.com/codex/hooks",
+      "observation": "Native background command hooks and exact-definition trust. New groups must be appended without shifting existing indices; trust remains needs_user."
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "paths": [
+        "codex-rs/hooks/schema/generated/post-tool-use.command.input.schema.json",
+        "codex-rs/hooks/schema/generated/post-tool-use.command.output.schema.json",
+        "codex-rs/hooks/schema/generated/session-start.command.input.schema.json",
+        "codex-rs/hooks/schema/generated/session-start.command.output.schema.json"
+      ],
+      "observation": "Pinned native input/output schemas read unchanged from official source. The recorder emits no decision or additionalContext."
+    },
+    {
+      "url": "https://docs.python.org/3/library/fcntl.html#fcntl.flock",
+      "observation": "POSIX exclusive nonblocking flock for deduplication; lock contention is an observer error, never a client decision."
+    }
+  ],
+  "local_artifacts": [
+    {"path": "tools/adoption/skill_state_recorder.py", "sha256": "b4ef03aa20a94c1349afa8771cfa6fb454dd85ce698a5226a21e976624baef7d", "bytes": 20439},
+    {"path": "tests/test_skill_state_recorder.py", "sha256": "bce68682ee1287a5a1e451f42c86d52cfb793efa7dd24d1002ae3e8990a83c44", "bytes": 15016},
+    {"path": "adoption/hooks/claude/skill-state-recorder-proposal.md", "sha256": "00bc57a14c358098eaa67ad1ccaf91d1a86584892ef9287114fbace7e03effe9", "bytes": 9849}
+  ],
+  "local_test_attempts": [
+    {
+      "evidence_class": "local_integration_check",
+      "command": "python3 -m unittest tests.test_skill_state_recorder -v",
+      "attempt": 1,
+      "exit_code": 1,
+      "tests": 22,
+      "errors": 15,
+      "duration_seconds": 0.135,
+      "actual_failure": "ValueError: too many values to unpack (expected 2)",
+      "correction": "The root tuple has three fields; corrected the allowed-root comprehension's tuple arity. Kept original assertions and failed output.",
+      "private_log": {"name": "focused-tests-1.log", "sha256": "9f8161c2c596899a1c44770ab9caf9f934171c85d4148dc03a8fc5b9e21fc5e4", "bytes": 20744}
+    },
+    {
+      "evidence_class": "local_integration_check",
+      "command": "python3 -m unittest tests.test_skill_state_recorder -v",
+      "attempt": 2,
+      "exit_code": 0,
+      "tests": 22,
+      "errors": 0,
+      "skips": 0,
+      "duration_seconds": 0.398,
+      "private_log": {"name": "focused-tests-2.log", "sha256": "0eff69346fef981f03c2951a0b25a655d8d43691a06f8909b01ecbb8456a7f58", "bytes": 3819}
+    },
+    {
+      "evidence_class": "local_integration_check",
+      "command": "python3 -m unittest tests.test_skill_state_recorder -v",
+      "attempt": 3,
+      "exit_code": 0,
+      "tests": 24,
+      "errors": 0,
+      "skips": 0,
+      "duration_seconds": 0.438,
+      "new_controls": ["Plugin name collision must not borrow a global lock source", "Instruction FIFO must fail open without blocking"],
+      "private_log": {"name": "focused-tests-3.log", "sha256": "535a1e5e4c2fc0b0b94697307c48280af30561207fec6e6e52d6879ccfc6eb36", "bytes": 4173}
+    }
+  ],
+  "structural_validation_before_registration": {
+    "evidence_class": "structural_validation",
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "private_log": {"name": "validate-1.log", "sha256": "9ea00b9db9e7864cf6998c20a507f8128341cecc84908541a13183a0347d33a2", "bytes": 162},
+    "boundary": "Repository consistency only; final registered-file validation remains a PR check and is reported separately."
+  },
+  "controls_and_limits": [
+    "Local fixtures independently inspect actual rows, hashes, add/remove/add identities, canonical aliases, bytecode exclusions, safe instruction hashing, metadata-status arguments and pending-journal recovery.",
+    "Busy-lock and malformed-input negative controls produce observer errors while ordinary hook invocations return zero and emit no decision/context.",
+    "Supporting-file fingerprints use stat metadata, not file content or reconstructed Git trees; restored metadata can evade that observation.",
+    "Public lock source metadata is a declaration. Plugin/bundled identities do not borrow a same-name global lock source.",
+    "S4 metadata-only subprocess boundary is checked with a local mock; native integration awaits the S4 change. No live native-client subprocess was started.",
+    "Fresh Claude/Codex hook firing, Codex trust positive/skipped controls, real upstream add/remove, ledger backfill and representative latency acceptance remain untested.",
+    "Proposed unchanged-path p95 bound is 250 ms; changed observer/status work is asynchronous with bounded timeouts. Fixture suite duration is not a production latency measurement.",
+    "Missing installation provenance, source refs, plugin activation, native model reads, provider identity and usage stay unknown."
+  ],
+  "sanitization": "No raw logs, hook payloads, instruction bodies, personal host paths, credentials or active client configuration are copied into this receipt.",
+  "model_usage": null
+}

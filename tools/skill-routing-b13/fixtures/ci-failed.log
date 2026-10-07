@@ -1,0 +1,6 @@
+Synthetic retained check fixture; no live repository or job.
+check: unit-tests
+result: failed
+failure: ImportError: GitCloneError is imported by the tested add operation but missing from its upstream test mock.
+control: compile and lint checks passed; the mock-export failure is the failing unit step.
+scope: diagnose and propose a mock-export correction; no source edit or GitHub contact is authorized by this case.

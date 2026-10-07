@@ -333,3 +333,28 @@ outputs are sealed in the receipt before the final read-only publication and
 convergence rerun. `host_receipts.register_file` re-registers the owned files
 after their last change, with the receipt claim/limitations synchronized in the
 registry; the coordinator retains commit, push and final merge ownership.
+
+## Amendment (2026-10-07): exact SDK 0.160.1 qualification
+
+The maintained example moves its exact published SDK/runtime pair to 0.160.1
+at `openai/codex@d27764b82f7118f674371e6d6e76271d9d606edb`. The original
+decided text and every earlier observation remain unchanged. The new
+[qualification receipt](../../evidence/artifacts/skills-sdk-01601-20261007/receipt.json)
+records a clean isolated wheel install, the unchanged upstream installed-SDK
+protocol smoke, 31 authored integration fixtures and model-free discovery
+against the installed native CLI 0.160.1, explicitly routed through 21128.
+
+Keeping 0.160.0 would leave the installed client's catalog unqualified under
+the existing exact-version guard. A range or weakened guard is rejected: the
+new pin remains an exact equality, and its mismatched-version control still
+rejects. Upstream initialization fields and the user-agent fallback retain
+their tagged source blobs. This comparison would be overturned by a changed
+native interface or a failing unchanged upstream/local integration check at
+the new pair; retain that failure and qualify another exact pair.
+
+The source is the [published release](https://github.com/openai/codex/releases/tag/rust-v0.160.1),
+[version-pair publication policy](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python/RELEASING.md#L3)
+and [upstream installed-SDK check](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python/tests/installed_sdk_smoke.py).
+Catalog discovery does not establish prompt visibility, actual skill/MCP use,
+organic counters or live writing dispatch. Shared/global adoption pins and
+client configuration remain outside this example update.

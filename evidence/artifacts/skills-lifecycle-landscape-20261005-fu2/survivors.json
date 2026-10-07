@@ -1,0 +1,104 @@
+[
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "warpdotdev/common-skills@resolve-merge-conflicts",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "skill_md_sha256": "ac26cb07c75c1778513383f45df53902ad7b7f97898cf0131f2967a80a3f0e51"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "skill_md_sha256": "eacf6cc68063d5c92e1d0a87051b4c5cdd0a18cf8931cb4def3ae541808ddfc8"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+  "pin": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+  "skill_md_sha256": "7e5769d01dc4b451382a970c0fd5ba3cc1f1b3134521a4fd138ddc1788bf84e7"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "skill_md_sha256": "e0fb9b1fd723745ffa767c0b8a8a9f41c035ad19046f22573232af59cd21934b"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "Parcha-ai/parcha-skills@review-loop",
+  "pin": "31b804ccb999ccee809e65590b48c1220c8d0ddd",
+  "skill_md_sha256": "313bb9fbc5dce0e1d1b406a2d6ee5ee07021935958ed1e8f899661b84a50a6e0"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "cursor/plugins@get-pr-comments",
+  "pin": "77526ffa67f8dafc698d14b5356e6d4fc78c3127",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "anthropics/claude-plugins-official@claude-md-improver",
+  "pin": "d182ca456ca09d31d139f7d3818d1d333b103cce",
+  "skill_md_sha256": "b06c7420be08ca1c7f6d75f7f4709fdb787624a2d363e2f8052216d8c780f85b"
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "getsentry/skills@agents-md",
+  "pin": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+  "skill_md_sha256": "8a91ada35068f43ef7ee03e38937863bac4f407878b06f0a4f1ddb4af24bec7e"
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "addyosmani/agent-skills@context-engineering",
+  "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "agent-sh/agnix@agnix",
+  "pin": "a121e401f06149d23bfe2037a51220982d51f437",
+  "skill_md_sha256": "cf16bcff1800cb8d9ff01b597a22c435cd556cec5e9b8ca97cce1f7a6e62362e"
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "dyoshikawa/rulesync@rulesync",
+  "pin": "f14b5bd1273329514c1a0b2762f6f1f1435e089b",
+  "skill_md_sha256": "838e7d2a887a45c961729a9626d2363803240dd60f0363f62a24662792ca98bc"
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "mblode/agent-skills@agents-md",
+  "pin": "012e6e5208f512151bdea0e2965dafd01ff61340",
+  "skill_md_sha256": "2553c9e0e4b45bdd7d5cc36d26269ede812994d410ce177a5b894ad2eef39c3a"
+ },
+ {
+  "layer_id": "skills-agent-docs",
+  "repository": "Zandereins/schliff@schliff",
+  "pin": "874b2a4811d51353757135badaa853abe5c2702e",
+  "skill_md_sha256": "c0cb9d17fb10241c464a876dda9b2915370c8fcb6df054db9b671d1c4e762b79"
+ },
+ {
+  "layer_id": "skills-review",
+  "repository": "mattpocock/skills@code-review",
+  "pin": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+  "skill_md_sha256": "47f4e52c21694def9c7c11cbfbf891ca35eac7a93e395797515be3c8a409ae50"
+ },
+ {
+  "layer_id": "skills-review",
+  "repository": "ast-grep/agent-skill@ast-grep",
+  "pin": "f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
+  "skill_md_sha256": "a18b68ab555758b85915937cf252d70b0261f930a07ce52095e7cafbbd304782"
+ },
+ {
+  "layer_id": "skills-review",
+  "repository": "BoundaryML/baml@baml-core",
+  "pin": "1698b89bc0881ce893e0f0b9f5d842108cfefe81",
+  "skill_md_sha256": "8bf10bba07c9ea252406e9e725944fbb3e22074ce7f32109b02f0e223316239b"
+ },
+ {
+  "layer_id": "skills-review",
+  "repository": "openai/plugins@verify-fix",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "skill_md_sha256": "3d4530484c7e4c18b6afe7c6527247e96517dce1ebd1bda9d349cd367ecb0ae3"
+ }
+]

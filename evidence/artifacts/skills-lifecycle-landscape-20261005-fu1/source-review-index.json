@@ -1,0 +1,78 @@
+[
+ {
+  "repository": "akitaonrails/ai-memory@ai-memory-retrieval",
+  "path": "akitaonrails-ai-memory-ai-memory-retrieval.json",
+  "layers": [
+   "skills-research"
+  ]
+ },
+ {
+  "repository": "bgauryy/octocode@octocode-research",
+  "path": "bgauryy-octocode-octocode-research.json",
+  "layers": [
+   "skills-research"
+  ]
+ },
+ {
+  "repository": "cursor/plugins@fix-merge-conflicts",
+  "path": "cursor-plugins-fix-merge-conflicts.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "cursor/plugins@loop-on-ci",
+  "path": "cursor-plugins-loop-on-ci.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "openai/codex@babysit-pr",
+  "path": "openai-codex-babysit-pr.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "upstash/context7@find-docs",
+  "path": "upstash-context7-find-docs.json",
+  "layers": [
+   "skills-research"
+  ]
+ },
+ {
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "path": "warpdotdev-common-skills-diagnose-ci-failures.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "warpdotdev/common-skills@resolve-merge-conflicts",
+  "path": "warpdotdev-common-skills-resolve-merge-conflicts.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "equinor/fusion-skills@fusion-github-review-resolution",
+  "layers": [
+   "skills-ci-pr"
+  ],
+  "status": "stopped",
+  "pin": "e8fd6cfaf8ed8ea78c564ca87ca60eaaa4615612",
+  "pin_lookup": null,
+  "reason": "equinor/fusion-skills@fusion-github-review-resolution: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "microsoft/vscode-pull-request-github@address-pr-comments",
+  "layers": [
+   "skills-ci-pr"
+  ],
+  "status": "stopped",
+  "pin": "e62a2ad08cc07791d0d13f471532b5032486b6f1",
+  "pin_lookup": "ok",
+  "reason": "microsoft/vscode-pull-request-github@address-pr-comments at e62a2ad08cc07791d0d13f471532b5032486b6f1: no folder named address-pr-comments in the locations the CLI searches without --full-depth"
+ }
+]

@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "evidence_class": "repository integration/provenance publication; not upstream behavioral or host/model acceptance",
+  "workflow_run": "wf_4b9c7d98-ffd",
+  "sweep_id": "landscape-sweep-skills-20261005-fu2-ns2604",
+  "status": "stopped",
+  "fixed_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+  "prompts_sha256": "495e1b50d8c9f2aab2bc6507f0f912f96e46f7134914be68b64f30fd993a5fee",
+  "immutable_inputs": {
+    "lanes.json": {
+      "bytes": 352750,
+      "sha256": "0838dfbee0ef8fc1a3d683d56f895efdf17a7fb36de5991c3e8821062d93e285"
+    },
+    "returns.json": {
+      "bytes": 630455,
+      "sha256": "7e8f59f47610d311805400b25ae1a33bbaeb86597cad7248f7afeaca68ffe562"
+    },
+    "layers.json": {
+      "bytes": 13810,
+      "sha256": "3c46ca9e43b00ef862d8bbd21ab0524ba5e3fcb997dc62062130b89de6ae3875"
+    },
+    "survivors.json": {
+      "bytes": 3885,
+      "sha256": "530e3205cb790aad671e7e4fd8ff92c8dcb19bed4402b390812f864845a57243"
+    },
+    "child-usage-wf_4b9c7d98-ffd.json": {
+      "bytes": 903073,
+      "sha256": "fce0cbb987bb8f49de7f9678f3be18eacb2e40702052ee0f67fe466c8a5b18ba"
+    },
+    "convert-wf_4b9c7d98-ffd.log": {
+      "bytes": 2653,
+      "sha256": "a14bfd5b016188d562e610f39300c7da388d1b7627be04d900a3026141d1062b"
+    },
+    "sanitization.json": {
+      "bytes": 578,
+      "sha256": "da1341d7c6fd040760f9018f3a5aa7c7daed2b75989bef65901102b0e02d8ba5"
+    }
+  },
+  "raw_run_sha256": "7ea150a7cef9d36b06850b372a3c4ecbedee5355c822583ce538c0f0838e221a",
+  "sanitized_run_sha256": "76d3f2ec49a1ad0e416a77f376e2add75d73a718bef86164640c4cee5789f7e6",
+  "freshness": {
+    "sha256": "c47a93310ebdbe09bc4b657427eb210b12ec611f158d656e4665649b40a35b19",
+    "reuse": true,
+    "source": "coordination scratch archive / landscape-sweep-20261005 / work/github-freshness.json",
+    "observed_utc": "2026-10-05T02:31:02.310498Z through 2026-10-05T02:32:24.946120Z"
+  },
+  "private_raw_records_published": false,
+  "counts": {
+    "layers": 3,
+    "proposals": 41,
+    "vote_survivors": 17,
+    "source_bound": 14,
+    "source_stopped": 3,
+    "refuted": 24,
+    "selected": 0
+  },
+  "sanitization": {
+    "receipt_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/sanitization.json",
+    "exact_replacements_verified": 1,
+    "json_pointer": "/result/followups/1/claude_discover/notes",
+    "rule": "scratchpad root outside the sweep work dir -> <scratchpad>",
+    "initial_converter_exit_code": 3,
+    "initial_exit_observation": "producer-reported; original failed stdout/stderr absent from handed-off bundle",
+    "sanitized_converter_exit_code": 0,
+    "sanitized_exit_observation": "producer native retained convert log and usage record; no converter rerun by this lane"
+  },
+  "privacy": {
+    "method": "scripts/validate.py PRIVATE_CONTENT on serialized and decoded seven retained inputs",
+    "patterns": 11,
+    "hits": 0
+  },
+  "requested_gpt_route": {
+    "provider": "OmniRoute pool (producer-reported; transport independently unverified)",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "provider_served_independent_attestation": "unknown"
+  },
+  "usage": {
+    "gpt_current_jobs": 12,
+    "gpt_ok": 11,
+    "gpt_timeout_exit_124": 1,
+    "gpt_copy_matches": 11,
+    "gpt_lost": 0,
+    "gpt_current_usage_unavailable": 1,
+    "gpt_earlier_usage_unavailable": 2,
+    "claude_complete_children": 31,
+    "claude_complete_requests": 990,
+    "claude_superseded_attempts": 4,
+    "claude_superseded_requests": 136,
+    "claude_by_resolved_model_includes_superseded": true,
+    "synthetic_bucket_is_zero_counter_metadata": true,
+    "claude_effort_deviations": 0,
+    "claude_capped_searches": 0,
+    "counter_scopes_summed": false
+  },
+  "native_commands": [
+    {
+      "command": "git archive424b8a77, native extract_layers.py --repo-root <immutable owned cache snapshot> --out <owned-cache>/work",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/sota-convergence/build_manifest.py --work-dir <owned-cache>/work --freshness <retained-snapshot> --lanes <converted>/lanes.json --out catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu2.json --checked-at 2026-10-05 --id sota-convergence-20261005-skills-ns2604-fu2 --scope <recorded manifest scope>",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/sota-convergence/landscape-sweep/source_reviews.py --survivors <converted>/survivors.json --out evidence/artifacts/skills-lifecycle-landscape-20261005-fu2 --lane landscape-sweep-skills-20261005-fu2-ns2604 --fit-models <requested route label>",
+      "exit_code": 1,
+      "stderr_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/source-reviews.stderr"
+    },
+    {
+      "command": "python3 tools/sota-convergence/landscape-sweep/make_result.py --layers <artifact>/layers.json --reviews <artifact>/source-review-index.json --sweep-id landscape-sweep-skills-20261005-fu2-ns2604 --lane skills-lifecycle-landscape-20261005-fu2 --returns-ref <artifact>/returns.json --usage-ref <attempts>/child-usage-wf_4b9c7d98-ffd.json --manifest-ref catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu2.json --prompts-sha256 495e1b50d8c9f2aab2bc6507f0f912f96e46f7134914be68b64f30fd993a5fee",
+      "exit_code": 2,
+      "stderr_ref": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/make-result.stderr"
+    }
+  ],
+  "limits": [
+    "Two missing judged hashes and one default CLI folder lookup stop source qualification; preserve all 17 original vote leads without merit reclassification.",
+    "All three tasks acquire source-stop reopen entries; CI/PR also preserves its first GPT discovery timeout.",
+    "Source provenance and local checker passes do not establish skill quality, fresh model discovery, installation, provider model attestation or saturation."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-addyosmani-agent-skills-spec-driven-development",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "addyosmani/agent-skills@spec-driven-development",
+ "reviewed_commit": "1401c8b8030e023baeebb31781a6653fe8e93026",
+ "readme_path": "skills/spec-driven-development/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill spec-driven-development in addyosmani/agent-skills at commit 1401c8b8030e023baeebb31781a6653fe8e93026 (the adjudicated pin; license MIT), read from skills/spec-driven-development/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for spec-driven-development; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 4d36b30efbe4109ed70f5933fb9cf97860786492. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 101348,
+  "pushed_at": "2026-10-03T18:21:11Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named spec-driven-development",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "c4b97ce3d7f24be0e67fd612c7595f65504872e3a9f8d338d098b2363fdb66ef",
+  "skill_md_bytes": 13096,
+  "survivor_skill_md_sha256": "c4b97ce3d7f24be0e67fd612c7595f65504872e3a9f8d338d098b2363fdb66ef",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "4d36b30efbe4109ed70f5933fb9cf97860786492",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/spec-driven-development/SKILL.md@1401c8b8030e023baeebb31781a6653fe8e93026",
+   "text": "Write a structured specification before writing any code. The spec is the shared source of truth between you and the human engineer — it defines what we're building, why, and how we'll know it's done. Code without a spec is guessing."
+  },
+  {
+   "source": "skills/spec-driven-development/SKILL.md@1401c8b8030e023baeebb31781a6653fe8e93026",
+   "text": "- Starting a new project or feature - Requirements are ambiguous or incomplete - The change touches multiple files or modules - You're about to make an architectural decision - The task would take more than 30 minutes to implement"
+  },
+  {
+   "source": "skills/spec-driven-development/SKILL.md@1401c8b8030e023baeebb31781a6653fe8e93026",
+   "text": "**When NOT to use:** Single-line fixes, typo corrections, or changes where requirements are unambiguous and self-contained."
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "skills-tier-a-recorder-alias-correction-20261006",
+  "kind": "local_integration_check",
+  "evidence_class": "local_integration_check",
+  "checked_at": "2026-10-06",
+  "scope": "Normalize stat-only supporting-file fingerprints across canonical skill aliases. No host registration, native client, model, configuration, trust or installation operation.",
+  "sources": [
+    "https://code.claude.com/docs/en/hooks-guide#audit-configuration-changes",
+    "https://code.claude.com/docs/en/hooks",
+    "https://developers.openai.com/codex/hooks",
+    "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/hooks/schema/generated/post-tool-use.command.input.schema.json",
+    "https://docs.python.org/3/library/fcntl.html#fcntl.flock"
+  ],
+  "original_evidence_retained": {
+    "receipt": "evidence/artifacts/skills-tier-a-recorder-20261006/source-review.json",
+    "original_content_commit": "3cc3dc57d63ebd179087ef62d864448d39ca0a48",
+    "original_registered_head": "e2dd105c093f6c61134160c159edcee7780abcbb",
+    "boundary": "The earlier receipt's local source hashes describe the original content commit, not this repaired source. Its actual failed/passing attempts remain unchanged."
+  },
+  "finding": "A supporting file traversed through both shared and Claude alias roots could enter the stat fingerprint twice. Adding/removing only the alias could therefore emit a spurious content-change row.",
+  "repair": "Share the resolved-directory visited set across all roots in each state group. Each supporting file contributes once, while alias path stamps still trigger an inexpensive rescan.",
+  "local_artifacts": [
+    {"path": "tools/adoption/skill_state_recorder.py", "sha256": "065133f130be0d170c5524d11b187f09486321490069204d264a85f87adfbdae", "bytes": 20435},
+    {"path": "tests/test_skill_state_recorder.py", "sha256": "6310149faa9dcc6935543c2f4b44a5ddc475fdcef781f9c38b0d9d8d401f16fa", "bytes": 15744}
+  ],
+  "actual_test_result": {
+    "command": "python3 -m unittest tests.test_skill_state_recorder -v",
+    "attempt": 4,
+    "exit_code": 0,
+    "tests": 25,
+    "errors": 0,
+    "skips": 0,
+    "duration_seconds": 0.492,
+    "new_oracle": "Add then remove a Claude alias of a shared skill containing a supporting file. The actual canonical fingerprint and ledger row count must remain unchanged.",
+    "private_log": {"name": "focused-tests-4.log", "sha256": "af375ff0516e5deba6eecd5f9edfcba2b8f0b2f39ef6187fd151213ab40ee29b", "bytes": 4366}
+  },
+  "acceptance_boundary": "Local filesystem/observer integration fixture only. Fresh-client firing, real add/remove, hook trust, live S4 integration, representative latency and model efficacy remain untested. Final registered-file validation is reported separately.",
+  "sanitization": "Only compact actual results and log digests are public. No raw logs, personal host paths, hook payloads, instruction bodies or credentials are retained.",
+  "model_usage": null
+}

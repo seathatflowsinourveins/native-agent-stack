@@ -34,9 +34,12 @@ default_subagent_reasoning_effort = "max"
 # 272,000-token window of gpt-6.1-sol and gpt-6-astra in models-manager/models.json) and at 8,000 characters only when
 # the window is unknown; a set value is capped at 10,000 tokens (codex-rs/ext/skills/src/render.rs L19-22 and L126-152
 # at rust-v0.159.2, L17-20 and L123-149 at rust-v0.157.1; the key is core/config.schema.json L4122-4127 at
-# rust-v0.159.2). The manifest's 24 catalog-visible skills render to about 11,100 bytes with a 28-character skills
-# root, which render.rs charges at about 2,790 tokens (each line and its newline at ceil(bytes / 4), L154-160 and L25),
-# so a fixed 6,000 leaves room for Codex's five .system skills and plugin skills on any model a child runs
+# rust-v0.159.2). The folded manifest's 26 catalog-eligible skills count 27 entries
+# minus Claude-only skill-creator, including the held browser. This is declared
+# eligibility, not fresh host visibility. scripts/skills_status.py keeps the
+# template's 6,000-token budget separate from a retained native catalog readback;
+# the native renderer charges names, descriptions and paths plus each newline
+# at ceil(UTF-8 bytes / 4). A fixed configured budget is not proof
 # (docs/decisions/2026-09-30-skills-llm-native-listing.md). Per-skill [[skills.config]] disables of manifest skills
 # stay out of this template: tools/adoption/install_skills.py --print-codex-config prints the manifest's, each keyed by
 # the installed SKILL.md path (adoption/skills/lifecycle.md). The one rule below turns off Codex's bundled

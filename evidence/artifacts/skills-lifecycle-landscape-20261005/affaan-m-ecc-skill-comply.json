@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-affaan-m-ecc-skill-comply",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "affaan-m/ECC@skill-comply",
+ "reviewed_commit": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+ "readme_path": "skills/skill-comply/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-skill-lifecycle"
+ ],
+ "claim": "Source review of the skill skill-comply in affaan-m/ECC at commit ef648e01899ba3e8dc6371642deaaf64b4477775 (the adjudicated pin; license MIT), read from skills/skill-comply/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for skill-comply; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 9adcee96dfd59313b79e6fe48ab206ff6ee988e9. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 273189,
+  "pushed_at": "2026-10-05T04:55:16Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named skill-comply",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e26cbbc30a32ea8c76c56d09ba9a3a921e82ad6e2360f825ec63d3f8df6b1f5a",
+  "skill_md_bytes": 2500,
+  "survivor_skill_md_sha256": "e26cbbc30a32ea8c76c56d09ba9a3a921e82ad6e2360f825ec63d3f8df6b1f5a",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "9adcee96dfd59313b79e6fe48ab206ff6ee988e9",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/skill-comply/SKILL.md@ef648e01899ba3e8dc6371642deaaf64b4477775",
+   "text": "Measures whether coding agents actually follow skills, rules, or agent definitions by: 1. Auto-generating expected behavioral sequences (specs) from any .md file 2. Auto-generating scenarios with decreasing prompt strictness (supportive → neutral → competing) 3. Running `claude -p` and capturing tool call traces via stream-json 4. Classifying tool calls against spec steps using LLM (not regex) 5. Checking temporal ordering deterministically 6. Generating self-contained reports with spec, prompts"
+  },
+  {
+   "source": "skills/skill-comply/SKILL.md@ef648e01899ba3e8dc6371642deaaf64b4477775",
+   "text": "- **Skills** (`skills/*/SKILL.md`): Workflow skills like search-first, TDD guides - **Rules** (`rules/common/*.md`): Mandatory rules like testing.md, security.md, git-workflow.md - **Agent definitions** (`agents/*.md`): Whether an agent gets invoked when expected (internal workflow verification not yet supported)"
+  },
+  {
+   "source": "skills/skill-comply/SKILL.md@ef648e01899ba3e8dc6371642deaaf64b4477775",
+   "text": "- User runs `/skill-comply <path>` - User asks \"is this rule actually being followed?\" - After adding new rules/skills, to verify agent compliance - Periodically as part of quality maintenance"
+  }
+ ]
+}

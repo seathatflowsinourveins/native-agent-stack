@@ -2,12 +2,12 @@
 # /// script
 # requires-python = ">=3.13,<3.14"
 # dependencies = [
-#     "openai-codex==0.160.0",
+#     "openai-codex==0.160.1",
 # ]
 # ///
 """Local integration fixtures, not upstream tests or provider/model acceptance.
 
-The SSE fixture derives from openai/codex rust-v0.160.0
+The SSE fixture derives from openai/codex rust-v0.160.1
 codex-rs/core/tests/common/responses.rs::{sse,ev_response_created,
 ev_assistant_message,ev_completed}. The SDK and bundled native runtime are real;
 the loopback provider returns authored deterministic fixture responses.
@@ -313,7 +313,7 @@ class NativeTransportTests(unittest.TestCase):
                 self.assertEqual(request["body"]["model"], worker.DEFAULT_MODEL)
                 self.assertEqual(request["body"]["reasoning"]["effort"], "max")
                 # Native Sol/Astra ResponsesLite carries tools inside input.
-                # Source: core/src/client.rs:902–933 at rust-v0.160.0.
+                # Source: core/src/client.rs:902–933 at rust-v0.160.1.
                 tool_prefix = request["body"]["input"][0]
                 self.assertEqual(tool_prefix["type"], "additional_tools")
                 self.assertTrue(tool_prefix["tools"])

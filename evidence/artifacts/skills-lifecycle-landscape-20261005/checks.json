@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "id": "skills-lifecycle-landscape-publication-20261005",
+  "evidence_class": "local_integration_checks",
+  "checked_at": "2026-10-05",
+  "workflow_run": "wf_b786bea1-429",
+  "scope": "Converted-artifact integrity and native source provenance; no skill adoption, license approval, benchmark, model or upstream execution acceptance.",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "pin": "4af7417b7d4db8936c0136235a86717f31d16f27",
+    "locators": [
+      "tools/sota-convergence/landscape-sweep/source_reviews.py:1210",
+      "tools/sota-convergence/landscape-sweep/make_result.py:160",
+      "tools/sota-convergence/landscape-sweep/make_result.py:244",
+      "tools/sota-convergence/landscape-sweep/sweep_common.py:100",
+      "recipes/saturation-sweep.md:112",
+      "scripts/saturation_ledger.py:1025"
+    ]
+  },
+  "observed": {
+    "checksums": {
+      "files": 4,
+      "matches": 4,
+      "source": "SHA256SUMS"
+    },
+    "converted": {
+      "layers": 13,
+      "proposal_occurrences": 140,
+      "vote_survivors": 48,
+      "selected": 0,
+      "keep_but_compare": 0,
+      "serialized_refuted_placeholders": 92,
+      "missing_fit_unadjudicated_placeholders": 16
+    },
+    "source_reviews": {
+      "exit_code": 1,
+      "review_index": "source-review-index.json",
+      "positive_reviews": 37,
+      "stopped": 11,
+      "raw_stops": "source-review-stops.txt",
+      "acceptance": false
+    },
+    "completed_result": {
+      "exit_code": 2,
+      "output": "completion-refusal.txt",
+      "completed": false
+    },
+    "native_skill_review_problem": {
+      "checked": 37,
+      "problems": 0,
+      "by_layer": {
+        "skills-skill-lifecycle": 6,
+        "skills-design-intake": 6,
+        "skills-architecture": 3,
+        "skills-test": 11,
+        "skills-debug": 2,
+        "skills-security": 3,
+        "skills-ci-pr": 2,
+        "skills-mcp-build": 4
+      }
+    },
+    "manual_stopped_input": {
+      "path": "RESULT-input.json",
+      "status": "stopped",
+      "lower_bound_usage": true,
+      "proposals": 140,
+      "bound_survivors": 37,
+      "unbound_original_leads": 11,
+      "reopened_layers": 12,
+      "lost_claude_children": 0,
+      "computed_fields_authored": false
+    },
+    "private_content": {
+      "json_files": 49,
+      "json_findings": 0,
+      "retained_stderr_files": 2,
+      "stderr_findings": 0
+    },
+    "usage": {
+      "claude_complete_children": 106,
+      "claude_incomplete_children": 0,
+      "claude_effort_deviations": 1,
+      "web_search_calls": 53,
+      "web_search_capped": 0,
+      "gpt_jobs": 42,
+      "gpt_ok": 28,
+      "gpt_file_only": 13,
+      "gpt_timeout_exit_124": 1,
+      "gpt_usage_unavailable_jobs": 14,
+      "gpt_earlier_attempts": 3,
+      "lower_bound": true,
+      "counters_added_across_scopes": false
+    }
+  },
+  "reported_by_coop": {
+    "converter_initial_exit_code": 3,
+    "home_path_redactions": 13,
+    "converter_final_exit_code": 4,
+    "usage_record_exit_code": 1,
+    "ui_subagent_token_estimate": 16500000,
+    "ui_estimate_is_native_total": false
+  },
+  "retained_failures": {
+    "initial_source_review_path_lookup_exit_code": 1,
+    "initial_archived_smoke_copy_lookups": {
+      "commands": 4,
+      "exit_code": 1
+    },
+    "corrected_archived_smoke_copies": {
+      "commands": 4,
+      "exit_code": 0
+    },
+    "details": "Path errors preceded any input acceptance; corrected native results and unchanged converted inputs are retained. Private command logs remain outside public artifacts."
+  },
+  "publication_gates": {
+    "base_commit": "ec0b8fd821a7b2004c331d2185b33d9e5ed47896",
+    "shared_doc_resolution": "Main eleven freshness rows preserved byte-for-byte, followed by lane three lifecycle rows; rebase complete.",
+    "manifest_refresh_exit_code": 0,
+    "freshness_metadata_sha256": "c47a93310ebdbe09bc4b657427eb210b12ec611f158d656e4665649b40a35b19",
+    "freshness_is_new_live_acceptance": false,
+    "retained_skill_freshness_lookup": {
+      "distinct_skill_refs": 137,
+      "underlying_repositories": 73,
+      "covered_underlying_repositories": 24,
+      "missing_underlying_repositories": 49,
+      "literal_skill_refs_resolved_by_builder": 0,
+      "scope": "Native SKILL_REF parsing and repository_known lookup in the retained snapshot only; not a claim about other converted source evidence or accepted candidate currency."
+    },
+    "ledger_append_exit_code": 0,
+    "ledger_base_check": {
+      "exit_code": 0,
+      "sweeps": 6,
+      "chain_and_bindings": "passed",
+      "output": "ledger-check.txt"
+    },
+    "initial_staged_validation": {
+      "exit_code": 0,
+      "components": 69,
+      "hashed_files": 10179,
+      "profiles": 4,
+      "receipts": 202,
+      "output": "validation-initial.txt",
+      "scope": "Before attaching local check outputs; final registry integrity checked again before publication."
+    },
+    "local_tests": [
+      {"command": "python3 -m unittest tests.test_install_skills tests.test_skills_manifest tests.test_runtime_worker_skills tests.test_runtime_worker_openhands tests.test_runtime_worker_openhands_resolver tests.test_skills_status", "exit_code": 0, "tests": 452, "skipped": 3, "output": "tests-skills-workers.txt"},
+      {"command": "python3 -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills tests.test_sota_convergence", "exit_code": 0, "tests": 655, "skipped": 6, "output": "tests-sweep-ledger.txt"},
+      {"command": "python3 -m unittest tests.test_adoption_docs_consistency tests.test_release_pin_contents", "exit_code": 0, "tests": 61, "skipped": 1, "output": "tests-docs-release.txt"}
+    ],
+    "tests_are_skill_quality_acceptance": false
+  },
+  "remaining_acceptance_gates": [
+    "Bounded co-op follow-up (private coordination Q2)",
+    "License/supporting-code review and native paired benchmark before any adoption",
+    "Command-center cross-family read, lifecycle install and fresh model-side discovery"
+  ]
+}

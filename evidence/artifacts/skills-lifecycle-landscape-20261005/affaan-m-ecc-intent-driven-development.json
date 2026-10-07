@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-affaan-m-ecc-intent-driven-development",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "affaan-m/ECC@intent-driven-development",
+ "reviewed_commit": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+ "readme_path": "skills/intent-driven-development/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill intent-driven-development in affaan-m/ECC at commit ef648e01899ba3e8dc6371642deaaf64b4477775 (the adjudicated pin; license MIT), read from skills/intent-driven-development/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for intent-driven-development; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is d21a3038acffa440454fd4b539c221627c2f7b2b. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 273189,
+  "pushed_at": "2026-10-05T04:55:16Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named intent-driven-development",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e34045f7b3bf6a6fbd364f85c7bc81d8208e18bb929ceff80bbc987f78aadea8",
+  "skill_md_bytes": 17199,
+  "survivor_skill_md_sha256": "e34045f7b3bf6a6fbd364f85c7bc81d8208e18bb929ceff80bbc987f78aadea8",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "d21a3038acffa440454fd4b539c221627c2f7b2b",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/intent-driven-development/SKILL.md@ef648e01899ba3e8dc6371642deaaf64b4477775",
+   "text": "Produce useful acceptance criteria without turning specification into ceremony. Inspect available context first, expose genuine ambiguity, and choose verification methods that fit the work and its risk."
+  },
+  {
+   "source": "skills/intent-driven-development/SKILL.md@ef648e01899ba3e8dc6371642deaaf64b4477775",
+   "text": "- User asks to clarify a feature, define acceptance criteria, or de-risk a change before implementation - Request touches security, authentication, persistent data, migrations, external APIs, or compliance - User wants to prepare a handoff artifact for another agent or team - Request is ambiguous enough that the expected outcome is not yet observable or testable - User explicitly invokes this skill with `/intent-driven-development`"
+  },
+  {
+   "source": "skills/intent-driven-development/SKILL.md@ef648e01899ba3e8dc6371642deaaf64b4477775",
+   "text": "Do not activate for trivial edits, straightforward one-line fixes, active debugging sessions, code review requests, or implementation requests whose acceptance conditions are already clear."
+  }
+ ]
+}

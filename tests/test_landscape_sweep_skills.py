@@ -49,7 +49,8 @@ usage_record = harness_tests.usage_record
 run, write_json, temp_dir = harness_tests.run, harness_tests.write_json, harness_tests.temp_dir
 REQ, PLAT, LANE = harness_tests.REQ, harness_tests.PLAT, "landscape-sweep-skills-20260930"
 TASKS = ("research", "skill-lifecycle", "design-intake", "architecture", "implement", "test", "debug", "review",
-         "security", "ci-pr", "agent-docs", "browser", "mcp-build")
+         "security", "ci-pr", "agent-docs", "browser", "mcp-build", "data-quant",
+         "broker-adapter", "hosting", "model-hub")
 HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
 
 
@@ -101,7 +102,7 @@ class CatalogTests(unittest.TestCase):
     def test_catalog_shape_tasks_and_pins(self):
         catalog = self.catalog
         self.assertEqual((catalog["schema_version"], catalog["kind"], catalog["checked_at"]),
-                         (1, "skills-lifecycle", "2026-09-30"))
+                         (1, "skills-lifecycle", "2026-10-06"))
         self.assertEqual([task["lifecycle_task"] for task in catalog["tasks"]], list(TASKS))
         for task in catalog["tasks"]:
             self.assertEqual(task["layer_id"], f"skills-{task['lifecycle_task']}")
@@ -132,8 +133,19 @@ class CatalogTests(unittest.TestCase):
 
     def test_every_pinned_skill_serves_exactly_one_task(self):
         served = [name for task in self.catalog["tasks"] for name in task["installed"]]
-        self.assertEqual(sorted(served), sorted(skill["name"] for skill in self.manifest["skills"]))
+        # Selected-but-held sources remain covered as gaps, not installed incumbents
+        # (adoption/skills/lifecycle.md:77-86; C13 reconciliation).
+        active = [skill["name"] for skill in self.manifest["skills"] if skill.get("status") != "held"]
+        self.assertEqual(sorted(served), sorted(active))
         self.assertEqual(len(served), len(set(served)))
+        pinned = {skill["name"]: skill for skill in self.manifest["skills"]}
+        for skill in self.manifest["skills"]:
+            if skill.get("status") == "held":
+                with self.subTest(held=skill["name"]):
+                    gaps = [task["layer_id"] for task in self.catalog["tasks"]
+                            if any(skill["name"] in build_args.skill_mentions(gap, pinned)
+                                   for gap in task["open_gaps"])]
+                    self.assertEqual(len(gaps), 1, gaps)
 
     def test_open_gaps_state_the_pinned_codex_and_claude_flags(self):
         # Each layer input carries the installed skills' codex_enabled and claude_listing from the manifest beside the
@@ -211,7 +223,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(served, openai)
         self.assertEqual(sorted(task["lifecycle_task"] for task in self.catalog["tasks"]
                                 if "openai-skills" in task["source_ids"]),
-                         ["browser", "ci-pr", "design-intake", "security", "skill-lifecycle"])
+                         ["browser", "ci-pr", "data-quant", "design-intake", "security", "skill-lifecycle"])
 
 
 # --------------------------------------------------------------------------- the strict return schema

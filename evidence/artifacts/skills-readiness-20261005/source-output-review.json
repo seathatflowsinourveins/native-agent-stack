@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "skills-readiness-jobs-1-3-completeness-critic-20261005",
+  "evidence_class": "independent_observation",
+  "reviewer_role": "Separate read-only GPT lane worker; source and artifact inspection, no writes, network, installs or suites",
+  "scope": ["trailofbits-upstream-tests.json", "discovery-upstream-tests.json", "engineering-upstream-tests.json", "returned-output-index.json", "README.md", "dated readiness decision"],
+  "observed": {"checkout_pins_and_clean_states_matched": 3, "declared_source_hashes_matched": 10, "frozen_upstream_bash_bodies_matched": 2, "private_raw_and_public_output_records_matched": 33, "failed_attempts_retained": true, "unknown_timestamps_not_filled": true, "passing_subsets_not_promoted": true},
+  "findings": [
+    {"kind": "source_locator_correction", "before": "Claude loadability at validate.yml:145", "verified": "145 appends GITHUB_PATH; helper command is149", "after": "validate.yml:149", "source": "trailofbits/skills@82fe8226252622fa807643bdca1710901198553a:.github/workflows/validate.yml:149", "root_original_source_verified": true},
+    {"kind": "source_locator_correction", "before": "Codex loadability at validate.yml:158", "verified": "158 calls codex --version; helper command is161", "after": "validate.yml:161", "source": "trailofbits/skills@82fe8226252622fa807643bdca1710901198553a:.github/workflows/validate.yml:161", "root_original_source_verified": true}
+  ],
+  "result": "No further material Jobs1–3 issue found after the two locator corrections",
+  "limitations": "Hash identity and scoped source/log inspection do not establish truth of every test or whole-slot readiness. Job4 execution was not reviewed in this pass.",
+  "next_sweep_inputs": ["Current Claude plugin naming compatibility", "Persistent Skills CLI GitCloneError mock failure and unrun OS/Node matrix", "Engineering behavioral-suite availability", "Separate model invocation/behavior and lifecycle worker discovery"]
+}

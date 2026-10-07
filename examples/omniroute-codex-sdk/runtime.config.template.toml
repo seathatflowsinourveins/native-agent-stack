@@ -1,5 +1,5 @@
 # Native Codex configuration for a NEW private SDK worker home, not a named profile.
-# Source: openai/codex a956835d020762cb2b570053af06f643a11c0ecc (rust-v0.160.0)
+# Source: openai/codex d27764b82f7118f674371e6d6e76271d9d606edb (rust-v0.160.1)
 # codex-rs/config/src/config_toml.rs (agents, MCP and hooks);
 # codex-rs/cli/src/main.rs:1263 (app-server does not apply --profile).
 # Render with tools/adoption/render_config.py as described in enhancements.md.
@@ -13,7 +13,7 @@ Read only task-relevant skill bodies and source. Prefix shell commands with rtk;
 """
 
 # Canonical native filter; worker.py also excludes the validated --api-key-env name.
-# a956835d codex-rs/config/src/shell_environment_policy.rs:28-35,106-110.
+# d27764b8 codex-rs/config/src/shell_environment_policy.rs:28-35,106-110.
 [shell_environment_policy.filters]
 "OMNIROUTE_API_KEY" = "exclude"
 

@@ -1,0 +1,397 @@
+[
+ {
+  "catalog": "skills",
+  "layer_id": "skills-research",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-research",
+  "calls": {
+   "web_search": 13,
+   "web_fetch": 1,
+   "gh_api": 45,
+   "gpt6_web_search": 20,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 80
+  },
+  "proposed": [
+   "bgauryy/octocode@octocode-research",
+   "addyosmani/agent-skills@source-driven-development",
+   "mattpocock/skills@research",
+   "warpdotdev/common-skills@research",
+   "affaan-m/ECC@skill-scout",
+   "affaan-m/ECC@research-ops",
+   "anthropics/knowledge-work-plugins@search-strategy",
+   "upstash/context7@find-docs",
+   "akitaonrails/ai-memory@ai-memory-retrieval",
+   "github/awesome-copilot@agent-skill-stack",
+   "tobi/qmd@qmd",
+   "assafelovic/gpt-researcher@gpt-researcher",
+   "openai/plugins@aiq-research",
+   "affaan-m/ECC@architecture-decision-records",
+   "affaan-m/ECC@search-first"
+  ],
+  "survived": [
+   {
+    "repo": "bgauryy/octocode@octocode-research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/0/fit"
+    }
+   },
+   {
+    "repo": "upstash/context7@find-docs",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/7/fit"
+    }
+   },
+   {
+    "repo": "akitaonrails/ai-memory@ai-memory-retrieval",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/8/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "addyosmani/agent-skills@source-driven-development",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/1/fit"
+    }
+   },
+   {
+    "repo": "mattpocock/skills@research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/2/fit"
+    }
+   },
+   {
+    "repo": "warpdotdev/common-skills@research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/3/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@skill-scout",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/4/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@research-ops",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/5/fit"
+    }
+   },
+   {
+    "repo": "anthropics/knowledge-work-plugins@search-strategy",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/6/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@agent-skill-stack",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/9/fit"
+    }
+   },
+   {
+    "repo": "tobi/qmd@qmd",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/10/fit"
+    }
+   },
+   {
+    "repo": "assafelovic/gpt-researcher@gpt-researcher",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/11/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@aiq-research",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/12/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@architecture-decision-records",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/13/fit"
+    }
+   },
+   {
+    "repo": "affaan-m/ECC@search-first",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-research/14/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-research/14/fit"
+    }
+   }
+  ],
+  "reopen": []
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-ci-pr",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-ci-pr",
+  "calls": {
+   "web_search": 14,
+   "web_fetch": 6,
+   "gh_api": 56,
+   "gpt6_web_search": 8,
+   "gpt6_web_fetch": 7,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "getsentry/skills@iterate-pr",
+   "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+   "warpdotdev/common-skills@resolve-merge-conflicts",
+   "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+   "wshobson/agents@git-advanced-workflows",
+   "openai/codex@babysit-pr",
+   "warpdotdev/common-skills@diagnose-ci-failures",
+   "equinor/fusion-skills@fusion-github-review-resolution",
+   "OpenHands/extensions@iterate",
+   "amElnagdy/review-skills@babysit-pr",
+   "cursor/plugins@loop-on-ci",
+   "cursor/plugins@fix-merge-conflicts",
+   "github/awesome-copilot@copilot-pr-autopilot",
+   "microsoft/vscode-pull-request-github@address-pr-comments"
+  ],
+  "survived": [
+   {
+    "repo": "warpdotdev/common-skills@resolve-merge-conflicts",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/2/fit"
+    }
+   },
+   {
+    "repo": "openai/codex@babysit-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/5/fit"
+    }
+   },
+   {
+    "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/6/fit"
+    }
+   },
+   {
+    "repo": "equinor/fusion-skills@fusion-github-review-resolution",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/7/fit"
+    }
+   },
+   {
+    "repo": "cursor/plugins@loop-on-ci",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/10/fit"
+    }
+   },
+   {
+    "repo": "cursor/plugins@fix-merge-conflicts",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/11/fit"
+    }
+   },
+   {
+    "repo": "microsoft/vscode-pull-request-github@address-pr-comments",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/13/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/13/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "getsentry/skills@iterate-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/0/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/1/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/3/fit"
+    }
+   },
+   {
+    "repo": "wshobson/agents@git-advanced-workflows",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/4/fit"
+    }
+   },
+   {
+    "repo": "OpenHands/extensions@iterate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/8/fit"
+    }
+   },
+   {
+    "repo": "amElnagdy/review-skills@babysit-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/9/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@copilot-pr-autopilot",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/12/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-ci-pr"
+   }
+  ]
+ }
+]

@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-codybrom-clairvoyance-design-review",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "codybrom/clairvoyance@design-review",
+ "reviewed_commit": "b11ca9349436fb7afd891a999d07d6d1a15b348b",
+ "readme_path": "skills/design-review/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-architecture"
+ ],
+ "claim": "Source review of the skill design-review in codybrom/clairvoyance at commit b11ca9349436fb7afd891a999d07d6d1a15b348b (the adjudicated pin; license MIT), read from skills/design-review/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for design-review; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is fa9b625e05d310941e06d40522f5312f0f1a72d8. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 12,
+  "pushed_at": "2026-09-20T00:46:02Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "b11ca9349436fb7afd891a999d07d6d1a15b348b",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named design-review",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "0e994e7cd6d02a947201d02a47cf4e4a367380cebbbe58f3c6354281e337aa77",
+  "skill_md_bytes": 5713,
+  "survivor_skill_md_sha256": "0e994e7cd6d02a947201d02a47cf4e4a367380cebbbe58f3c6354281e337aa77",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "fa9b625e05d310941e06d40522f5312f0f1a72d8",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/design-review/SKILL.md@b11ca9349436fb7afd891a999d07d6d1a15b348b",
+   "text": "When invoked with $ARGUMENTS, scope the entire review to the specified target. Read the target code first, then proceed through the phases below in order. This skill orchestrates other skills from Clairvoyance (https://clairvoyance.fyi). It works best when the full collection is installed."
+  },
+  {
+   "source": "skills/design-review/SKILL.md@b11ca9349436fb7afd891a999d07d6d1a15b348b",
+   "text": "This skill does not replace individual lenses. It sequences them into a diagnostic funnel that moves from broad to narrow, skipping work when early phases find nothing actionable."
+  },
+  {
+   "source": "skills/design-review/SKILL.md@b11ca9349436fb7afd891a999d07d6d1a15b348b",
+   "text": "- Identify the three symptoms: change amplification, cognitive load, unknown unknowns - Trace any symptoms to root causes: dependencies or obscurity - Weight findings by the complexity formula: high-traffic code first"
+  }
+ ]
+}

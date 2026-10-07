@@ -992,10 +992,14 @@ class DependencyFreeMutationTests(unittest.TestCase):
         self.inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
         self.assertTrue(self.inventory['dependency_free'], 'no dependency_free entry to mutate')
         self.entry = self.inventory['dependency_free'][0]
-        for name in (self.entry['path'], self.entry['evidence']):
-            target = self.scratch / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes((ROOT / name).read_bytes())
+        # The native inventory check validates every entry. Preserve unrelated
+        # dependency-free fixtures when mutating one entry; do not create a
+        # missing-file failure that masks the intended mutation.
+        for entry in self.inventory['dependency_free']:
+            for name in (entry['path'], entry['evidence']):
+                target = self.scratch / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((ROOT / name).read_bytes())
         self.manifest = self.scratch / self.entry['path']
 
     def check(self, inventory=None):

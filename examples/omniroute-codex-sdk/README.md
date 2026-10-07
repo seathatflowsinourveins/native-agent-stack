@@ -12,7 +12,7 @@ The existing Codex integration remains the incumbent; this example does not
 select a winner in the separate SDK comparison.
 
 The [October 3 refresh receipt](../../evidence/receipts/omniroute-sdk-worker-0160-20261003.json)
-records current 0.160.0 checks. September 30 receipts below retain their original
+records historical 0.160.0 checks. September 30 receipts below retain their original
 0.159.2 execution and are historical evidence.
 The builder's nested Codex sandbox caused two shell startup failures; the
 coordinator's separate non-nested read-only run completed one shell command
@@ -20,9 +20,22 @@ with exit 0 and output `13`, as retained in the refresh receipt.
 The builder's completed task also retained one MCP `Transport closed` failure;
 writing (`workspace-write`) dispatch is not yet qualified at 0.160.0.
 
+The [0.160.1 qualification](../../evidence/artifacts/skills-sdk-01601-20261007/receipt.json)
+records a clean published SDK/runtime pair, the unchanged upstream installed-SDK
+protocol smoke, authored integration fixtures and model-free discovery against
+the installed 0.160.1 CLI. Its [requirement inputs](../../evidence/artifacts/skills-sdk-01601-20261007/inputs.json)
+bind the central manifest pin, digest and exact required names. It retains the
+earlier mismatched-runtime failure.
+The [folded-manifest read-back](../../evidence/artifacts/skills-sdk-01601-20261007/folded-readback.json)
+separately binds the consolidated 25-name requirement set, including hf-cli and
+native-stack-research, and the amended manifest digest; all required names were
+available without submitting a model turn.
+Catalog discovery is separate from model prompt visibility, actual skill/MCP
+execution and organic use. No live writing-dispatch qualification is added.
+
 ## Call from a native Claude coordinator
 
-The PEP 723 scripts and adjacent locks pin `openai-codex==0.160.0`, including
+The PEP 723 scripts and adjacent locks pin `openai-codex==0.160.1`, including
 its matching native CLI. In the native Claude session, use its `Bash` tool to run
 the following command from the repository root. `WORKER_PROJECT` is the owned
 task worktree with the selected project `.agents/skills`; `PRIVATE_WORKER_HOME`
@@ -104,7 +117,7 @@ qualified its native approval reviewer and accounting. This is separate from an
 explicit Astra judgment stage. The worker preserves existing native MCP/tool
 configuration; an empty private Codex home does not qualify those integrations.
 
-Use `--codex-bin` only for an explicit matching native 0.160.0 binary. An omitted
+Use `--codex-bin` only for an explicit matching native 0.160.1 binary. An omitted
 `--codex-home` inherits the native home; supplying it scopes worker configuration
 and recoverable state to the child process. The example neither reads nor copies
 authentication stores. The selected keyless loopback gateway owns its upstream
@@ -250,43 +263,43 @@ formatter-driver test failure; no whole-suite passing claim is made here.
 
 ## Sources and installation
 
-- [openai/codex `rust-v0.160.0`](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python),
-  immutable commit `a956835d020762cb2b570053af06f643a11c0ecc`: maintained SDK,
+- [openai/codex `rust-v0.160.1`](https://github.com/openai/codex/tree/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python),
+  immutable commit `d27764b82f7118f674371e6d6e76271d9d606edb`: maintained SDK,
   its constructor/resume/turn-control examples and native installation commands.
-- [SDK transport/configuration](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/client.py)
-  and [native provider fields](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider-info/src/lib.rs):
+- [SDK transport/configuration](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python/src/openai_codex/client.py)
+  and [native provider fields](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/model-provider-info/src/lib.rs):
   child-only CLI overrides, native lifecycle, Responses, headers and optional
   environment-key authentication.
-- [Native effort enum](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/generated/v2_all.py#L3694),
-  [SDK turn input](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/api.py#L724)
-  and [unchanged enum serialization test](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/tests/test_client_rpc_methods.py#L267):
+- [Native effort enum](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python/src/openai_codex/generated/v2_all.py#L3694),
+  [SDK turn input](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python/src/openai_codex/api.py#L724)
+  and [unchanged enum serialization test](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python/tests/test_client_rpc_methods.py#L267):
   native `max` and `ultra` selections through the maintained SDK API.
-- [Native Ultra normalization](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/openai_models/reasoning_effort.rs#L10)
-  and [native orchestration mode conditions](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/session/multi_agents.rs#L77):
+- [Native Ultra normalization](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/protocol/src/openai_models/reasoning_effort.rs#L10)
+  and [native orchestration mode conditions](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/session/multi_agents.rs#L77):
   supported model-owned effort override, then native fallback, with orchestration
   separately conditional on V2 and native hint/catalog messages.
 - [OmniRoute effort precedence](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex.ts#L1414)
   and [recognized model suffixes](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts):
   force rule, then model suffix, then body effort at the declared owner carry;
   input selection alone does not establish its installed state or actual delivery.
-- [Native namespaced model matching](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/src/manager.rs#L873)
-  and [bundled model metadata](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/models.json):
+- [Native namespaced model matching](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/models-manager/src/manager.rs#L873)
+  and [bundled model metadata](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/models-manager/models.json):
   the single `cx/` namespace and `-max` suffix retain the longest-matching native
   Sol/Astra capability row; this does not attest the gateway's backend routing.
-- [Native ResponsesLite prefix assembly](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/client.rs#L902)
-  and [SSE fixture helpers](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/tests/common/responses.rs#L753):
+- [Native ResponsesLite prefix assembly](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/client.rs#L902)
+  and [SSE fixture helpers](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/tests/common/responses.rs#L753):
   native tool/prefix preservation and the source of the authored local fixture.
-- [Published SDK 0.160.0](https://pypi.org/pypi/openai-codex/0.160.0/json): wheel
-  SHA-256 `61d2d855ca2ebedfd51280fbeb60ff31fc47ccbd55ebce186505e3f3da096921`.
+- [Published SDK 0.160.1](https://pypi.org/pypi/openai-codex/0.160.1/json): wheel
+  SHA-256 `930e46e2153c00d76ff4e88e14eb7f694949244fb4be47d84394d736709e022e`.
   The adjacent locks are generated by supported `uv add --script` and
   `uv lock --script` commands; execution uses `uv run --locked --script`.
 - [Historical September 30 SDK installation and source qualification](https://github.com/seathatflowsinourveins/native-agent-stack/blob/404b821cd3af25800ea418dc6145cc5cb6fe33c5/evidence/artifacts/runtime-sdk-20260930/receipt.json):
   preserved matching SDK/CLI pins, native custom-provider reference,
   21 unchanged published Python source files at 0.159.2 and retained upstream
-  test results. Those results do not qualify the 0.160.0 wheel or runtime.
-- [Pinned curated-plugin sync gate](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core-plugins/src/manager.rs#L743-L763)
-  and [boolean feature schema](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/config.schema.json#L7038).
-- [Content-filter guidance and native retries](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/responses_retry.rs#L66-L171).
+  test results. Those results do not qualify the 0.160.1 wheel or runtime.
+- [Pinned curated-plugin sync gate](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core-plugins/src/manager.rs#L743-L763)
+  and [boolean feature schema](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/config.schema.json#L7038).
+- [Content-filter guidance and native retries](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/responses_retry.rs#L66-L171).
 
 Preflight relies on exactly pinned SDK internals (`AsyncCodexClient` and generated
 request types), which are excluded from the package-root public API. The PID

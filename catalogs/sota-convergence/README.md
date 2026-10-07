@@ -26,6 +26,52 @@ or trial selections — and five trading layers have no natively proven default
 (evaluation, portfolio, identity, data quality, market data beyond filings/calendars).
 The full list is `manifest-20260922.json#/critic/layers_without_confirmed_selection`.
 
+## Skills lifecycle — 2026-10-05 stopped publication
+
+[The dated skills manifest](manifest-20261005-skills-ns2604.json) retains the
+full 13-task sweep `landscape-sweep-skills-20261005-ns2604` (`wf_b786bea1-429`).
+It is a stopped research publication: 140 proposal occurrences, 48 original
+vote survivors and 37 successful pinned source reviews; eleven provenance
+stops remain explicit. Every adoption selection is empty. Twelve tasks are
+reopened. The original votes, late/missing GPT failures and separate usage
+attempts remain in the [publication receipt](../../evidence/artifacts/skills-lifecycle-landscape-20261005/README.md)
+and [decision](../../docs/decisions/2026-10-05-skills-landscape-sweep.md).
+
+| Lifecycle task | Original vote survivors | Bound source reviews |
+| --- | ---: | ---: |
+| skills-research | 0 | 0 |
+| skill-lifecycle | 11 | 6 |
+| design-intake | 7 | 6 |
+| architecture | 3 | 3 |
+| implement | 0 | 0 |
+| test | 12 | 11 |
+| debug | 2 | 2 |
+| review | 0 | 0 |
+| security | 4 | 3 |
+| ci-pr | 4 | 2 |
+| agent-docs | 0 | 0 |
+| browser | 0 | 0 |
+| mcp-build | 5 | 4 |
+
+GPT-6 returned 28 of 42 jobs within the workflow; thirteen were late file_only
+returns and one timed out. Fourteen jobs have unknown usage. Stopped status
+neither counts nor resets saturation. Source identity is distinct from license
+approval, supporting-code audit, paired benchmark and client/worker acceptance.
+No skill was adopted, installed or benchmarked by this publication. The native
+publication route is `tools/sota-convergence/landscape-sweep/README.md` steps
+9–12 at native-agent-stack@ec0b8fd821a7b2004c331d2185b33d9e5ed47896;
+`make_result.py:244` requires stopped status on source-review failure, and
+`scripts/saturation_ledger.py:1077` binds included survivors to successful reviews.
+
+Both foundation and trading baselines were freshly extracted at that main pin.
+The reused upstream freshness snapshot is dated 2026-10-05 02:31 metadata,
+not a new live acceptance run. Its stack baseline coverage does not qualify
+skill-source currency: the 137 distinct skill references map to 73 repositories,
+of which 24 occur in that snapshot and 49 do not. The native manifest metadata
+lookup does not resolve literal owner/repo@skill identities (0/137); pinned
+SKILL.md provenance is separately reviewed. The historical September comparison below
+keeps its original date and scope.
+
 ## Foundation — 16 layers (native Claude Code + Codex harness)
 
 Pins are `manifests/stack.json`; "now" is the GitHub latest release on 2026-09-22. The two

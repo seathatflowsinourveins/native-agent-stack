@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tenequm-skills-mcp-best-practices",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "tenequm/skills@mcp-best-practices",
+ "reviewed_commit": "0e8107783cfe2715e4c14002c7579bd4d60537e8",
+ "readme_path": "skills/mcp-best-practices/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-mcp-build"
+ ],
+ "claim": "Source review of the skill mcp-best-practices in tenequm/skills at commit 0e8107783cfe2715e4c14002c7579bd4d60537e8 (the adjudicated pin; license MIT), read from skills/mcp-best-practices/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for mcp-best-practices; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 9045a0e705092d523410d2070fbeee8134a079c7. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 37,
+  "pushed_at": "2026-10-02T18:57:49Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "0e8107783cfe2715e4c14002c7579bd4d60537e8",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named mcp-best-practices",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "f74376d01d2eff47981af854a43f221649452d9e50585c7dd38868574979b3aa",
+  "skill_md_bytes": 33524,
+  "survivor_skill_md_sha256": "f74376d01d2eff47981af854a43f221649452d9e50585c7dd38868574979b3aa",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "9045a0e705092d523410d2070fbeee8134a079c7",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/mcp-best-practices/SKILL.md@0e8107783cfe2715e4c14002c7579bd4d60537e8",
+   "text": "Decision reference for building production MCP servers with the TypeScript SDK. Not a tutorial - assumes you already have a working server and need to make it correct, fast, and secure."
+  },
+  {
+   "source": "skills/mcp-best-practices/SKILL.md@0e8107783cfe2715e4c14002c7579bd4d60537e8",
+   "text": "**v2 imports** (current): ```typescript import { McpServer } from \"@modelcontextprotocol/server\"; import { WebStandardStreamableHTTPServerTransport } from \"@modelcontextprotocol/server\"; import { ProtocolError, ProtocolErrorCode } from \"@modelcontextprotocol/core\"; ```"
+  },
+  {
+   "source": "skills/mcp-best-practices/SKILL.md@0e8107783cfe2715e4c14002c7579bd4d60537e8",
+   "text": "**v1 imports** (legacy line, still widely deployed): ```typescript import { McpServer } from \"@modelcontextprotocol/sdk/server/mcp.js\"; import { WebStandardStreamableHTTPServerTransport } from \"@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js\"; import { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\"; ```"
+  }
+ ]
+}

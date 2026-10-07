@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-everyinc-compound-engineering-plugin-ce-brainstorm",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "EveryInc/compound-engineering-plugin@ce-brainstorm",
+ "reviewed_commit": "9af474a70e7f2a844338519ad9e92aafbd92d4fb",
+ "readme_path": "skills/ce-brainstorm/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill ce-brainstorm in EveryInc/compound-engineering-plugin at commit 9af474a70e7f2a844338519ad9e92aafbd92d4fb (the adjudicated pin; license MIT), read from skills/ce-brainstorm/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ce-brainstorm; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is deded1048e9432e9f0d3535aeebf5ef99252f35a. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 25393,
+  "pushed_at": "2026-10-05T07:01:52Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "9af474a70e7f2a844338519ad9e92aafbd92d4fb",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named ce-brainstorm",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "1820aa67cd39b4f220b6b1e638bd98841e6ba8e8a3c3f35448155a28b2822948",
+  "skill_md_bytes": 7798,
+  "survivor_skill_md_sha256": "1820aa67cd39b4f220b6b1e638bd98841e6ba8e8a3c3f35448155a28b2822948",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "deded1048e9432e9f0d3535aeebf5ef99252f35a",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/ce-brainstorm/SKILL.md@9af474a70e7f2a844338519ad9e92aafbd92d4fb",
+   "text": "Brainstorming answers **WHAT** to build through dialogue; `ce-plan` then enriches the same unified plan artifact with **HOW**. This skill does not implement code. **The current year is 2026**, for dating the artifact."
+  },
+  {
+   "source": "skills/ce-brainstorm/SKILL.md@9af474a70e7f2a844338519ad9e92aafbd92d4fb",
+   "text": "**Outcome:** a result sized to the work that `ce-plan` can build on without inventing product behavior, scope boundaries, or success criteria: a chat paragraph for Lightweight work, or a requirements-only unified plan under `<root>/plans/` when a file is earned."
+  },
+  {
+   "source": "skills/ce-brainstorm/SKILL.md@9af474a70e7f2a844338519ad9e92aafbd92d4fb",
+   "text": "**Done, on the brainstorm path:** that artifact is written and passes the Ready for Planning Check — or no file was written because the dialogue produced no decision that a later reader (the planner, a reviewer, or a future reader) needs recorded under a stable ID and the user asked for none — and Phase 4's handoff has been presented."
+  }
+ ]
+}

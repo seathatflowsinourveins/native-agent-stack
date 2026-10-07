@@ -1,0 +1,14 @@
+[
+ {
+  "layer_id": "skills-research",
+  "repository": "bgauryy/octocode@octocode-research",
+  "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+  "skill_md_sha256": "0dd7a864064c5ac3dd7122343aad312dba13baf1b5e66b0ac82766377fb9d2d3"
+ },
+ {
+  "layer_id": "skills-research",
+  "repository": "muratcankoylan/Agent-Skills-for-Context-Engineering@filesystem-context",
+  "pin": "58b55a8921758d13453b440704fb1b5b208c0b0e",
+  "skill_md_sha256": "91cd7f071e38dbeee15dbebd9dd549c9116affae939702f05409ed1952355f50"
+ }
+]

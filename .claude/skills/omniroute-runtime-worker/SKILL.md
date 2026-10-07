@@ -11,6 +11,9 @@ Two shell startup failures occurred in the builder's nested Codex sandbox;
 the coordinator's separate non-nested read-only shell run succeeded with exit 0
 and output `13`. The builder's task also retained an MCP `Transport closed`
 failure; writing (`workspace-write`) dispatch is not yet qualified at 0.160.0.
+The current 0.160.1 pair qualifies model-free discovery and native protocol
+fixtures as recorded in `evidence/artifacts/skills-sdk-01601-20261007/receipt.json`;
+it adds no live writing-dispatch, prompt-visibility or organic-use acceptance.
 
 Give a writing worker its own worktree, bounded file ownership, an executable
 acceptance condition and the enhanced private Codex home described in
@@ -59,7 +62,7 @@ repair. Record that trigger and the acceptance result. The separate Claude SDK
 bridge remains a trial after its gateway errors; it is not the primary worker.
 
 Sources: [Claude native project skills](https://code.claude.com/docs/en/skills)
-and [official Codex SDK, rust-v0.160.0](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python).
+and [official Codex SDK, rust-v0.160.1](https://github.com/openai/codex/tree/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python).
 Functional scope and retained failures are recorded in
 `docs/decisions/2026-09-30-omniroute-runtime-workers.md` and
 `docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md`.

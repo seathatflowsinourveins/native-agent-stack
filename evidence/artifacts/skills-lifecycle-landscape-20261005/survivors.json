@@ -1,0 +1,290 @@
+[
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "getsentry/skills@skill-writer",
+  "pin": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+  "skill_md_sha256": "d8597ec2e5f00cc8d87a73741369c7cc433a3bbb95801169c35e84a10d514d26"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "bgauryy/octocode@octocode-skills",
+  "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+  "skill_md_sha256": "f7d3a8087d4bf07f250b7b5c9fa3248b392d5b5f95dfcc1552ecd8b7e762b9b1"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "affaan-m/ECC@skill-comply",
+  "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+  "skill_md_sha256": "e26cbbc30a32ea8c76c56d09ba9a3a921e82ad6e2360f825ec63d3f8df6b1f5a"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "github/awesome-copilot@agent-skill-stack",
+  "pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "skill_md_sha256": "d75ed95177dab5ddb5ca96c87fed93842e7d3221b4b5c9f2d8ebb72d33cde5e2"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "SunChJ/skillbench@skillbench",
+  "pin": "d05557e1370704fda56aebf587bd7ca51cc8571f",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "NVIDIA/SkillSpector@skill-inspector",
+  "pin": "a50b9c93835c94f7d36329f11c6599abbb9c74ee",
+  "skill_md_sha256": "89ab1550769752ffbad782ee63fee3c345d546bded672adaac5fd03d2941aa84"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "openai/plugins@evaluate-skill",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "skill_md_sha256": "92697228260f93c79967607822b0d998f68ce742de9440df51426fb71f2d4d64"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "promptfoo/promptfoo@promptfoo-evals",
+  "pin": "3233b37e6869a0d9f97bda5a99ce9c52c21f0bc6",
+  "skill_md_sha256": "897473f598d1b96816f08c755fa83c9cbf85b4012ba0ce28213faaa5f5df63e3"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "agent-sh/agnix@agnix",
+  "pin": "1306ce5e302b8295c5c8e4865cbac5929caa67f4",
+  "skill_md_sha256": "4a4b14023eabb627d0e827cf417546086e412d106431bf7738d3f1903f94a5d3"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "openai/plugins@improve-skill",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "skill_md_sha256": "9b407623e1c1d64d918d05e6ec6430234f687ff14b28c4f17a693d07d7711d36"
+ },
+ {
+  "layer_id": "skills-skill-lifecycle",
+  "repository": "alchaincyf/darwin-skill@darwin-skill",
+  "pin": "8a8b66258e3c45d6ae4aea39719468c6428fcb0a",
+  "skill_md_sha256": "3d57422079687a3aa641cb0c6c78ea8a5c6fa0c8645a37dfbcde4fdb870f7150"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "affaan-m/ECC@intent-driven-development",
+  "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+  "skill_md_sha256": "e34045f7b3bf6a6fbd364f85c7bc81d8208e18bb929ceff80bbc987f78aadea8"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "EveryInc/compound-engineering-plugin@ce-brainstorm",
+  "pin": "9af474a70e7f2a844338519ad9e92aafbd92d4fb",
+  "skill_md_sha256": "1820aa67cd39b4f220b6b1e638bd98841e6ba8e8a3c3f35448155a28b2822948"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "addyosmani/agent-skills@spec-driven-development",
+  "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+  "skill_md_sha256": "c4b97ce3d7f24be0e67fd612c7595f65504872e3a9f8d338d098b2363fdb66ef"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+  "pin": "8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+  "skill_md_sha256": "e8c4080be9f34e473725f2bd42fa8a8aad5e89ba19b9733a83f9091b97386d24"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "bmad-code-org/BMAD-METHOD@bmad-advanced-elicitation",
+  "pin": "8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+  "skill_md_sha256": "225a59e2a5377cfa66a4c96a58195134401b356ae3f80b3ca1306e4859141e9a"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "Fission-AI/OpenSpec@openspec-explore",
+  "pin": "2500d6da971336167548b53731a35b2127df35ac",
+  "skill_md_sha256": "5bc03c568d0348c61b37f0647167252db5be1775ff5742ca9760b4e03ab9a5ac"
+ },
+ {
+  "layer_id": "skills-design-intake",
+  "repository": "garrytan/gstack@office-hours",
+  "pin": "857466ff8b93c0575bc9e46cf2838d1962077d8f",
+  "skill_md_sha256": "0b99e6c08ea1b0bdc305dc8bdd6c7a9a9f638c7b2de6065a3f4654308fe98c72"
+ },
+ {
+  "layer_id": "skills-architecture",
+  "repository": "codybrom/clairvoyance@design-review",
+  "pin": "b11ca9349436fb7afd891a999d07d6d1a15b348b",
+  "skill_md_sha256": "0e994e7cd6d02a947201d02a47cf4e4a367380cebbbe58f3c6354281e337aa77"
+ },
+ {
+  "layer_id": "skills-architecture",
+  "repository": "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
+  "pin": "a5d6eabb550ac95d4d9a1ae08ab6006d1ef508f1",
+  "skill_md_sha256": "0cbe75a3e45f1f6626096f62e9d0e8ae71fb7956846cb571a3863bf1999260ab"
+ },
+ {
+  "layer_id": "skills-architecture",
+  "repository": "TerminalSkills/skills@improve-codebase-architecture",
+  "pin": "a021875c0f1bd906248e3784ce470faa65055201",
+  "skill_md_sha256": "cadb445fd847bc01228e5e5e4b48bd8b1d95639fa019e157312a7fd708034aa8"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "addyosmani/agent-skills@test-driven-development",
+  "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+  "skill_md_sha256": "7c0c6ac057c19d7f8be65d9f49c3a638703b868f4625c78b70da5439d5d74fca"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "nyxandro/property-testing-skill@property-testing",
+  "pin": "786d52b3211e3ccbd7fe8727e1d9ae9b9bad16de",
+  "skill_md_sha256": "8c70748629f0401f5f22352b6128cb75144cb0a26c2f9458639383bf3ec11a19"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "trailofbits/skills@atheris",
+  "pin": "82fe8226252622fa807643bdca1710901198553a",
+  "skill_md_sha256": "133306875d88bb063636a9165c56141ac8b30d3b993db3740f166693dfeecbb5"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "affaan-m/ECC@tdd-workflow",
+  "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+  "skill_md_sha256": "8887afa786ef30de834e7567115d3df71934b343c3d9d849714f8ea43f979ee0"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "endavis/pyproject-template@property-tests",
+  "pin": "e10989adec8992a5b0ce77af2e6a37e2a414b0aa",
+  "skill_md_sha256": "ebda4ce3cd80ac52bd16fb583ee6aad762363d1c06a59dd8d44dd93ace2548ee"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "dmoka/skills@mutation-testing",
+  "pin": "3f89040672649309429ebd4d1127af8f537aa330",
+  "skill_md_sha256": "e6e9cf6f51d141f0d93f54f463adf52a2a7bb0d6c2eb3a10def2920038407e5a"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "github/awesome-copilot@test-gap-audit",
+  "pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "skill_md_sha256": "a7747ac0b60d33ec6a44b9703ae11e8f6bf7aede251f117cc46599d182bfef21"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "trailofbits/skills@ossfuzz",
+  "pin": "82fe8226252622fa807643bdca1710901198553a",
+  "skill_md_sha256": "aeb1abbcac5ae5e4a73be4bb923fc9cca20d8d1073630c2e0a1ff37fccbec598"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+  "pin": "647ba5e67724862cc048c5216c046e6e9247f9c7",
+  "skill_md_sha256": "12f474857e7e5077315500b2b131194cad218196f77cf55818059ddc328e90db"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "SocketDev/socket-btm@property-and-fuzz-testing",
+  "pin": "f1555cdf9bedcaf04c824c6bb4d1768736bcd077",
+  "skill_md_sha256": "b826d6b931e550bf4d96279a9883486f591bcaa408bee8750cfc256c4765dfb4"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "lgtm-hq/ai-skills@scorecard",
+  "pin": "64070edb3077ce36ea1c436c9ccf1567be48fc3a",
+  "skill_md_sha256": "de2b0e3a61f5b5f13b54ae29f3b448e768309dbdae008570efe983efb6a56d3c"
+ },
+ {
+  "layer_id": "skills-test",
+  "repository": "mattpocock/skills@tdd",
+  "pin": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-debug",
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "skill_md_sha256": "eacf6cc68063d5c92e1d0a87051b4c5cdd0a18cf8931cb4def3ae541808ddfc8"
+ },
+ {
+  "layer_id": "skills-debug",
+  "repository": "NousResearch/hermes-agent@python-debugpy",
+  "pin": "f2555a8dfcacc6413d8a8e2718fbf0df3148fdab",
+  "skill_md_sha256": "cb1b8b0795a56fa0fd79f80f3363f1ad79d404a6757d6cf547971cf89f21155e"
+ },
+ {
+  "layer_id": "skills-security",
+  "repository": "trailofbits/skills@semgrep-rule-creator",
+  "pin": "82fe8226252622fa807643bdca1710901198553a",
+  "skill_md_sha256": "6ca2e3b8520ed20af1b0879b7cab318832fcbe89c19c17a9fa347a45a9f28913"
+ },
+ {
+  "layer_id": "skills-security",
+  "repository": "getsentry/skills@secret-serialization",
+  "pin": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+  "skill_md_sha256": "fcff1bc1e5f38bdbe9dccccd21a39846bd45e2423307fda971c9cc1e53a39d3b"
+ },
+ {
+  "layer_id": "skills-security",
+  "repository": "github/awesome-copilot@codeql",
+  "pin": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+  "skill_md_sha256": "81503394c7c0595756d18a47e0b626dfd1dc6cf4673d40e9be23349a66fa5d27"
+ },
+ {
+  "layer_id": "skills-security",
+  "repository": "openai/plugins@threat-model",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "skill_md_sha256": "9aa474aed20b89a350a1e9181c8fdf80c89b6ca05a300e5cc4727cd31ae3eadd"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+  "pin": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+  "skill_md_sha256": "c1f7d4d14e932fd6b51d758bd7e25e3673fa380dd13546679af3a45debc5cffc"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "trailofbits/skills-curated@openai-gh-address-comments",
+  "pin": "6d05be4889017b06fb15069f371afd220daffb62",
+  "skill_md_sha256": "fcd5e5cf7b7e1f5abf4fc56d4b935e4e0ee7f2ca1b9ccb0f744a7c711a743391"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "davila7/claude-code-templates@gh-fix-ci",
+  "pin": "19bfc4e8841bd653d0e653d7671851eb7658c8f0",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "davila7/claude-code-templates@gh-address-comments",
+  "pin": "19bfc4e8841bd653d0e653d7671851eb7658c8f0",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-mcp-build",
+  "repository": "PrefectHQ/fastmcp@fastmcp-client-cli",
+  "pin": "5baeacfe20eca735cb949564b4915f93a622b916",
+  "skill_md_sha256": "d1984daf0f157651a0aa9825666e307e9e238440d21cbe19ec2d754fb9182d96"
+ },
+ {
+  "layer_id": "skills-mcp-build",
+  "repository": "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+  "pin": "fd5b82cdae0963e97ec0c534c2b08cfe95a652fb",
+  "skill_md_sha256": "9f196cf5e8bbd1b932b37fc067e025b096900740b790ef384a798d6463052aef"
+ },
+ {
+  "layer_id": "skills-mcp-build",
+  "repository": "tenequm/skills@mcp-best-practices",
+  "pin": "0e8107783cfe2715e4c14002c7579bd4d60537e8",
+  "skill_md_sha256": "f74376d01d2eff47981af854a43f221649452d9e50585c7dd38868574979b3aa"
+ },
+ {
+  "layer_id": "skills-mcp-build",
+  "repository": "yigitkonur/skills-by-yigitkonur@build-mcp-server-sdk-v2",
+  "pin": "fd8b771f7a4bccdb9db92bfee396a0f045041fb9",
+  "skill_md_sha256": "e70dfe67b629db6cc2ca746c066c8883a1d00844654500f073637cf44f1daae9"
+ },
+ {
+  "layer_id": "skills-mcp-build",
+  "repository": "AlpayC/mcp-migration-check@mcp-migration",
+  "pin": "560d1f4fef6fdc1580b68c8a92b5714499fcfcd8",
+  "skill_md_sha256": null
+ }
+]

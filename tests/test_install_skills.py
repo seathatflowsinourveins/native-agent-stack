@@ -1479,6 +1479,46 @@ class ReuseRefGateTests(InstallSkillsTestCase):
         self.assertIn("restates main's codex_enabled", result.stderr)
         self.assertNotIn("[[skills.config]]", result.stdout)
 
+    def test_reused_skill_cannot_bypass_a_central_install_hold_or_prune(self):
+        installer = load_installer_module()
+        old = json.loads(ADOPTION_MANIFEST.read_text())["skills"][0]
+        root = self.tmp_path / "blocked-reuse-root"
+        base_path = root / ADOPTION_REF
+        base_path.parent.mkdir(parents=True)
+        entry = {key: old[key] for key in REUSE_PIN_KEYS}
+        entry.update(status="trial", reuse_ref=ADOPTION_REF)
+        runtime = self.write_manifest([entry])
+        for status in ("held", "pruned"):
+            with self.subTest(status=status):
+                blocked = dict(old, status=status)
+                if status == "held":
+                    blocked["held_for"] = "synthetic qualification gate"
+                base_path.write_text(json.dumps({"skills": [blocked]}))
+                resolved = installer.load_manifest(runtime, root=root)
+                self.assertEqual(resolved["skills"][0]["status"], status)
+                if status == "held":
+                    self.assertEqual(resolved["skills"][0]["held_for"], blocked["held_for"])
+                with mock.patch.object(installer, "load_manifest", return_value=resolved), \
+                        mock.patch.object(installer.subprocess, "run") as run:
+                    result = installer.main(["--manifest", str(runtime), "--only", entry["name"]])
+                self.assertEqual(result, 1)
+                run.assert_not_called()
+
+    def test_reuse_preserves_a_stricter_worker_hold_and_does_not_promote_a_trial(self):
+        installer = load_installer_module()
+        old = json.loads(ADOPTION_MANIFEST.read_text())["skills"][0]
+        root = self.tmp_path / "eligible-reuse-root"
+        base_path = root / ADOPTION_REF
+        base_path.parent.mkdir(parents=True)
+        base_path.write_text(json.dumps({"skills": [dict(old, status="kept")]}))
+        for status in ("trial", "held"):
+            with self.subTest(status=status):
+                entry = {key: old[key] for key in REUSE_PIN_KEYS}
+                entry.update(status=status, reuse_ref=ADOPTION_REF)
+                runtime = self.write_manifest([entry])
+                resolved = installer.load_manifest(runtime, root=root)
+                self.assertEqual(resolved["skills"][0]["status"], status)
+
     def test_reuse_ref_that_drifted_from_main_is_refused_before_any_install(self):
         entry = self.reuse(lambda s: s.get("codex_enabled") is False)
         entry["tree_sha"] = tree_sha("drifted")
@@ -1681,6 +1721,190 @@ class HeldAndCopyTests(InstallSkillsTestCase):
                 self.assertEqual(result.returncode, 1)
                 self.assertIn(message, result.stderr)
                 self.assertFalse([call for call in calls_log(fake_bin) if call and call[0] == "add"])
+
+
+class RecordingAndRetirementTests(InstallSkillsTestCase):
+    """Local integration with frozen source/CLI boundaries; no provider or host install is exercised."""
+
+    def metadata_fixture(self):
+        module = load_installer_module()
+        folder = self.home / ".agents/skills/record-me"
+        folder.mkdir(parents=True)
+        raw = "---\nname: record-me\ndescription: Recorded fixture\n---\nBody\n"
+        (folder / "SKILL.md").write_text(raw)
+        tree = module.skill_state.git_tree_sha(folder)
+        lock = self.home / ".agents/.skill-lock.json"
+        lock.write_text(json.dumps({"version": 3, "skills": {"record-me": {
+            "source": "example/record-me", "skillPath": "skills/record-me/SKILL.md", "skillFolderHash": tree}}}))
+        return module, make_manifest([]), folder, tree
+
+    def test_record_requires_source_tree_and_retains_unknown_audits(self):
+        module, manifest, folder, tree = self.metadata_fixture()
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}), \
+             mock.patch.object(module, "git_commit", return_value="a" * 40), \
+             mock.patch.object(module, "pinned_source_trees", return_value={"skills/record-me": tree}):
+            recorded, status = module.record_skills(manifest, self.home)
+        self.assertEqual(status, {"record-me": "recorded"})
+        skill = recorded["skills"][0]
+        self.assertEqual(skill["ref"], "a" * 40)
+        self.assertEqual(skill["skill_md_sha256"], hashlib.sha256((folder / "SKILL.md").read_bytes()).hexdigest())
+        self.assertEqual(skill["audits"]["socket"], "Unknown")
+        module, manifest, _folder, _tree = self.metadata_fixture_again(folder)
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}), \
+             mock.patch.object(module, "git_commit", return_value="a" * 40), \
+             mock.patch.object(module, "pinned_source_trees", return_value={"skills/record-me": "0" * 40}):
+            recorded, status = module.record_skills(manifest, self.home)
+        self.assertEqual(status, {"record-me": "unverified"})
+        self.assertEqual(recorded["skills"], [])
+
+    def metadata_fixture_again(self, folder):
+        module = load_installer_module()
+        return module, make_manifest([]), folder, module.skill_state.git_tree_sha(folder)
+
+    def test_ref_resolution_failure_never_invents_a_pin(self):
+        module, manifest, _folder, _tree = self.metadata_fixture()
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}), \
+             mock.patch.object(module, "git_commit", side_effect=module.InstallError("source unavailable")):
+            recorded, status = module.record_skills(manifest, self.home)
+        self.assertEqual(status["record-me"], "unverified")
+        self.assertEqual(recorded["skills"], [])
+
+    def test_identical_fork_bytes_do_not_inherit_origin_license_or_audits(self):
+        module, _empty, folder, tree = self.metadata_fixture()
+        old = make_skill("record-me", (folder / "SKILL.md").read_text(), tree)
+        old.update(source="vendor/skills", path="skills/record-me", ref="a" * 40, official=True,
+                   url="https://github.com/vendor/skills/tree/" + "a" * 40 + "/skills/record-me")
+        lock = self.home / ".agents/.skill-lock.json"
+        lock.write_text(json.dumps({"version": 3, "skills": {"record-me": {
+            "source": "fork/skills", "skillPath": "skills/record-me/SKILL.md", "skillFolderHash": tree}}}))
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": "", "CODEX_HOME": ""}), \
+             mock.patch.object(module, "git_commit", return_value="a" * 40), \
+             mock.patch.object(module, "pinned_source_trees", return_value={"skills/record-me": tree}):
+            recorded, result = module.record_skills(make_manifest([old]), self.home)
+        new = recorded["skills"][0]
+        self.assertEqual(result["record-me"], "recorded")
+        self.assertFalse(new["official"])
+        self.assertEqual(new["license"], "Unknown")
+        self.assertEqual(new["audits"]["socket"], "Unknown")
+        self.assertIn("fork/skills", new["audits"]["url"])
+        self.assertEqual(new["prior_pins"][-1]["source"], "vendor/skills")
+        self.assertTrue(new["prior_pins"][-1]["official"])
+
+    def test_retirement_retains_legacy_codex_copy_without_touching_bundled_system(self):
+        module, _empty, folder, tree = self.metadata_fixture()
+        skill = make_skill("record-me", (folder / "SKILL.md").read_text(), tree)
+        shutil.rmtree(folder)
+        (self.home / ".agents/.skill-lock.json").write_text(json.dumps({"version": 3, "skills": {}}))
+        codex = self.tmp_path / "isolated-codex"
+        legacy = codex / "skills/record-me"
+        legacy.mkdir(parents=True)
+        (legacy / "SKILL.md").write_text("public retained fixture")
+        bundled = codex / "skills/.system/record-me"
+        bundled.mkdir(parents=True)
+        (bundled / "SKILL.md").write_text("public unrelated bundled fixture")
+        manifest = make_manifest([skill])
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": "", "CODEX_HOME": str(codex)}), \
+             mock.patch.object(module, "run_skills_bin", return_value=subprocess.CompletedProcess([], 0)):
+            self.assertEqual(module.retire_skill(manifest, self.home, "record-me", "skills", False), "remove-retained")
+            self.assertEqual(manifest["skills"], [skill])
+            shutil.rmtree(legacy)
+            self.assertEqual(module.retire_skill(manifest, self.home, "record-me", "skills", False), "retired")
+        self.assertTrue((bundled / "SKILL.md").is_file())
+
+    def test_record_cli_dry_run_then_idempotent_owned_manifest_write(self):
+        _module, manifest, _folder, tree = self.metadata_fixture()
+        path = self.tmp_path / "manifest.json"
+        path.write_text(json.dumps(manifest))
+        original = path.read_bytes()
+        gh = self.bin_dir / "gh"
+        gh.write_text("#!/usr/bin/env python3\nimport json,sys\n"
+                      "endpoint=sys.argv[-1]\n"
+                      f"print(json.dumps({{'sha':{'a' * 40!r}}} if '/commits/' in endpoint else "
+                      f"{{'tree':[{{'type':'tree','path':'skills/record-me','sha':{tree!r}}}]}}))\n")
+        gh.chmod(0o755)
+        environment = {"PATH": str(self.bin_dir) + os.pathsep + os.environ.get("PATH", ""), "CODEX_HOME": ""}
+        planned = self.run_install(path, "--record", "--dry-run", env=environment)
+        self.assertEqual(planned.returncode, 0, planned.stderr)
+        self.assertEqual(path.read_bytes(), original)
+        written = self.run_install(path, "--record", env=environment)
+        self.assertEqual(written.returncode, 0, written.stderr)
+        first = path.read_bytes()
+        repeated = self.run_install(path, "--record", env=environment)
+        self.assertEqual(repeated.returncode, 0, repeated.stderr)
+        self.assertEqual(path.read_bytes(), first)
+
+    def test_retirement_requires_native_removal_readback_and_keeps_last_pin(self):
+        module, _empty, folder, tree = self.metadata_fixture()
+        skill = make_skill("record-me", (folder / "SKILL.md").read_text(), tree)
+        manifest = make_manifest([skill])
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}), \
+             mock.patch.object(module, "run_skills_bin", return_value=subprocess.CompletedProcess([], 0)) as native:
+            self.assertEqual(module.retire_skill(manifest, self.home, "record-me", "skills", False), "remove-retained")
+            self.assertEqual(manifest["skills"], [skill])
+        self.assertEqual(native.call_args.args[1], ["remove", "record-me", "-g", "-y", "-a", "claude-code", "codex"])
+        shutil.rmtree(folder)
+        (self.home / ".agents/.skill-lock.json").write_text(json.dumps({"version": 3, "skills": {}}))
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}), \
+             mock.patch.object(module, "run_skills_bin", return_value=subprocess.CompletedProcess([], 0)):
+            self.assertEqual(module.retire_skill(manifest, self.home, "record-me", "skills", False), "retired")
+        self.assertEqual(manifest["excluded"][0]["last_pin"], skill)
+
+    def generated_fixture(self):
+        module = load_installer_module()
+        skill = next(s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"] if s["name"] == "hf-cli")
+        raw = b"---\nname: hf-cli\ndescription: fixture\n---\nvendor-generated fixture"
+        skill.update(skill_md_sha256=hashlib.sha256(raw).hexdigest(), skill_md_bytes=len(raw))
+        return module, skill, raw
+
+    def test_unsafe_generated_metadata_stays_unverified_while_another_row_records(self):
+        module, _empty, _folder, tree = self.metadata_fixture()
+        _other, generated, raw = self.generated_fixture()
+        folder = self.home / ".agents/skills/hf-cli"
+        folder.mkdir(parents=True)
+        harmless = self.tmp_path / "harmless-generated.txt"
+        harmless.write_bytes(raw)
+        (folder / "SKILL.md").symlink_to(harmless)
+        original = dict(generated)
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": "", "CODEX_HOME": ""}), \
+             mock.patch.object(module, "git_commit", return_value="a" * 40), \
+             mock.patch.object(module, "pinned_source_trees", return_value={"skills/record-me": tree}):
+            recorded, result = module.record_skills(make_manifest([generated]), self.home)
+        self.assertEqual(result["hf-cli"], "unverified")
+        self.assertEqual(result["record-me"], "recorded")
+        self.assertEqual(next(s for s in recorded["skills"] if s["name"] == "hf-cli"), original)
+
+    def test_generated_native_dispatch_and_preview_mismatch_control(self):
+        module, skill, raw = self.generated_fixture()
+        calls = []
+
+        def native(command, **kwargs):
+            calls.append(command)
+            if command[1:] == ["version", "--format", "json"]:
+                return subprocess.CompletedProcess(command, 0, '{"version":"2.1.1"}')
+            if command[1:] == ["skills", "preview"]:
+                return subprocess.CompletedProcess(command, 0, raw + b"\n")
+            folder = self.home / ".agents/skills/hf-cli"
+            folder.mkdir(parents=True)
+            (folder / "SKILL.md").write_bytes(raw)
+            (folder / ".hf-skill-manifest.json").touch()
+            aliases = self.home / ".claude/skills"
+            aliases.mkdir(parents=True, exist_ok=True)
+            target = aliases / "hf-cli"
+            if target.is_symlink():
+                target.unlink()
+            target.symlink_to(folder, target_is_directory=True)
+            return subprocess.CompletedProcess(command, 0, b"")
+
+        with mock.patch.dict(os.environ, {"CLAUDE_CONFIG_DIR": ""}), mock.patch.object(module.subprocess, "run", side_effect=native):
+            self.assertEqual(module.generated_skill(skill, self.home, "hf", False, False, False), "installed")
+        self.assertEqual(calls[-1], ["hf", "skills", "add", "--global"])
+        shutil.rmtree(self.home / ".agents/skills/hf-cli")
+        raw = b"wrong generated bytes"
+        calls.clear()
+        with mock.patch.dict(os.environ, {"CLAUDE_CONFIG_DIR": ""}), mock.patch.object(module.subprocess, "run", side_effect=native):
+            self.assertEqual(module.generated_skill(skill, self.home, "hf", False, False, False), "unverified-generated-bytes")
+        self.assertNotIn(["hf", "skills", "add", "--global"], calls)
+        self.assertEqual(module.retire_skill(make_manifest([skill]), self.home, "hf-cli", "skills", False), "unsupported-native-remove")
 
 
 if __name__ == "__main__":

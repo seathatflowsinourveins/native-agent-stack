@@ -26,7 +26,7 @@
     "started": "2026-09-25",
     "window_days": 30,
     "review_after": "2026-10-25",
-    "on_description_char_cap": 10500,
+    "on_description_char_cap": 10645,
     "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
@@ -670,17 +670,121 @@
         "claude-code"
       ],
       "copy": true
+    },
+    {
+      "name": "native-stack-research",
+      "source": "seathatflowsinourveins/native-agent-stack",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/05e3ead094d09a55e4652296d3d305edc2d10888/adoption/skills/native-stack-research",
+      "ref": "05e3ead094d09a55e4652296d3d305edc2d10888",
+      "path": "adoption/skills/native-stack-research",
+      "tree_sha": "2d233cad78ad1d2da70721fd46fbe20088909558",
+      "skill_md_sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+      "skill_md_bytes": 1602,
+      "description_chars": 153,
+      "upstream_disable_model_invocation": false,
+      "upstream_allow_implicit_invocation": true,
+      "license": "MIT (package LICENSE)",
+      "official": false,
+      "audits": {
+        "gen_agent_trust_hub": "Unknown",
+        "socket": "Unknown",
+        "snyk": "Unknown",
+        "url": "https://skills.sh/seathatflowsinourveins/native-agent-stack/native-stack-research",
+        "checked_at": null,
+        "note": "Prospective registry locator only; no registry listing or audit was observed. Unknown is not a passing audit."
+      },
+      "status": "kept",
+      "gap": "Administrative lifecycle registration of the existing plan-owned research entry, already installed with identical bytes in both clients. Frozen main source retains embedded DeerFlow and the existing GPT Researcher route; this is repository-owned glue, not a new vendor adoption or runtime qualification. Round 2 records BY_DESIGN for new candidates; useful research, both-client discovery and worker execution remain separate gates. The sole shared-host plan-apply writer remains the co-op. A landed native-headless contract change requires a normal lifecycle re-pin and changed-skill validation.",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-05",
+      "decision_record": "docs/decisions/2026-10-05-research-skill-round2.md",
+      "source_origin": {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "ref": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md",
+        "skill_md_sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+        "relationship": "Unchanged lifecycle snapshot of the landed plan-of-record file; the original plan file remains authoritative."
+      }
+    },
+    {
+      "name": "hf-cli",
+      "source_type": "native_generated",
+      "source": "huggingface/huggingface_hub",
+      "url": "https://github.com/huggingface/huggingface_hub/blob/bd4a76030582d118e28dc9ad6c7a5911ea76176b/src/huggingface_hub/cli/skills.py",
+      "ref": "bd4a76030582d118e28dc9ad6c7a5911ea76176b",
+      "path": "src/huggingface_hub/cli/skills.py",
+      "tree_sha": null,
+      "skill_md_sha256": "5fa67d3f5b5e071d026c13a029544220f077d9651ed96f5e4ed546981e2c19c5",
+      "skill_md_bytes": 33972,
+      "description_chars": 1008,
+      "upstream_disable_model_invocation": false,
+      "license": "Apache-2.0",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Unknown",
+        "socket": "Unknown",
+        "snyk": "Unknown",
+        "url": "https://skills.sh/huggingface/skills/hf-cli",
+        "checked_at": "2026-10-06"
+      },
+      "status": "kept",
+      "gap": "Record the vendor-generated skill already installed by the command center. Task: model-hub. Generator and mirror bytes are distinct provenance; no new host installation or paired quality claim.",
+      "task": "model-hub",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-06",
+      "pin_policy": {
+        "kind": "tool-coupled",
+        "binary": "hf",
+        "release_tag": "v2.1.1",
+        "advisory": true
+      },
+      "generator": {
+        "package": "huggingface_hub",
+        "version": "2.1.1",
+        "release_tag": "v2.1.1",
+        "install": [
+          "hf",
+          "skills",
+          "add",
+          "--global"
+        ],
+        "update": [
+          "hf",
+          "skills",
+          "update",
+          "hf-cli",
+          "--global"
+        ],
+        "preview": [
+          "hf",
+          "skills",
+          "preview"
+        ],
+        "managed_marker": ".hf-skill-manifest.json",
+        "managed_marker_format": "empty-presence-marker"
+      },
+      "mirror": {
+        "source": "huggingface/skills",
+        "ref": "ca0325bb20b2d0a1b2efa893670c4c72f79e707b",
+        "path": "skills/hf-cli",
+        "tree_sha": "6f293e30d665bc0447a46af7831e386f3ab84bdb",
+        "skill_md_sha256": "91dddd0303b2a3c5b6a38aa240d29cb2c93b118c98a6aafe46461df8f7a163bb",
+        "skill_md_bytes": 33973,
+        "relationship": "mirror bytes equal generated installed bytes plus one final LF; never an installed-tree identity"
+      }
     }
   ],
   "budget": {
-    "claude_on_description_chars": 9484,
-    "claude_on_cap": 10500,
-    "codex_enabled_description_chars": 9165,
-    "codex_catalog_description_chars": 9165,
+    "claude_on_description_chars": 10645,
+    "claude_on_cap": 10645,
+    "codex_enabled_description_chars": 10326,
+    "codex_catalog_description_chars": 10326,
     "codex_configured_budget_tokens": 6000,
     "codex_fallback_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
-    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 24 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 24 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md. The preceding 24-entry figure describes the historical catalog. With the unchanged native-stack-research and vendor-generated hf-cli registrations, codex_catalog_description_chars now counts the 26 manifest skills eligible for Codex's catalog (27 entries minus Claude-only skill-creator, including the held browser). These declared eligibility and budget totals do not prove every host skill is visible in a fresh model session. Amendment (2026-10-07): claude_on_cap and its trial metadata mirror are 10,645, exactly the measured on-listed sum of the ruled #719/#792/#793/#794/#817 union into #795 at this revision. At the user's unchanged 0.05 fraction on a 200,000-token window, about 40,000 listing characters is the 2026-09-30 decision's inference, not a measured native rate. This repository ceiling guards metadata, not fresh visibility. Overturn condition: a fresh native catalog read on either client showing a dropped or truncated description at this sum lowers the cap or retires a skill through the lifecycle. The separate proposed 15,000 ceiling for further installs remains unapproved. See docs/decisions/2026-10-07-skills-fold-budget-amendment.md."
   },
   "excluded": [
     {
@@ -848,7 +952,7 @@
     {
       "skills": "verification-before-completion",
       "source": "obra/superpowers",
-      "reason": "Removed from the trial on 2026-09-28 under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill that conflicts with CLAUDE.md/AGENTS.md once read in full is removed immediately; that record's 2026-09-28 removal addendum). The full SKILL.md at 8ca22db (sha256 2befe7fc\u2026) says at L20 \"If you haven't run the verification command in this message, you cannot claim it passes\", and its L42 row \"Tests pass | Test command output: 0 failures | Previous run, \\\"should pass\\\"\" puts a previous run under Not Sufficient; AGENTS.md:16 says \"Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap\". Decision: docs/decisions/2026-09-28-delegated-decisions.md (M4); GPT-6 verdict: evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md; Claude readings: evidence/artifacts/delegated-decisions-20260928/coordination.md.",
+      "reason": "Removed from the trial on 2026-09-28 under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill that conflicts with CLAUDE.md/AGENTS.md once read in full is removed immediately; that record's 2026-09-28 removal addendum). The full SKILL.md at 8ca22db (sha256 2befe7fc…) says at L20 \"If you haven't run the verification command in this message, you cannot claim it passes\", and its L42 row \"Tests pass | Test command output: 0 failures | Previous run, \\\"should pass\\\"\" puts a previous run under Not Sufficient; AGENTS.md:16 says \"Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap\". Decision: docs/decisions/2026-09-28-delegated-decisions.md (M4); GPT-6 verdict: evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md; Claude readings: evidence/artifacts/delegated-decisions-20260928/coordination.md.",
       "overturn": "An upstream revision of the skill drops the absolute freshness requirement, is re-read in full and is re-pinned through this manifest."
     },
     {

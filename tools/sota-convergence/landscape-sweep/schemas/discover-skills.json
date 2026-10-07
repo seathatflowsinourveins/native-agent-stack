@@ -59,7 +59,11 @@
        "ci-pr",
        "agent-docs",
        "browser",
-       "mcp-build"
+        "mcp-build",
+        "data-quant",
+        "broker-adapter",
+        "hosting",
+        "model-hub"
       ]
      },
      "pin": {

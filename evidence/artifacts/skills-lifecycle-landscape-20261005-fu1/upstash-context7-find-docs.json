@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-upstash-context7-find-docs",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "upstash/context7@find-docs",
+ "reviewed_commit": "f2eef4f49da71a758c91cf6cb97640c8b262ef81",
+ "readme_path": "skills/find-docs/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-research"
+ ],
+ "claim": "Source review of the skill find-docs in upstash/context7 at commit f2eef4f49da71a758c91cf6cb97640c8b262ef81 (the adjudicated pin; license MIT), read from skills/find-docs/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for find-docs; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is b635cd66f1414befd36d18646561398de2ddab54. Survived the landscape-sweep-skills-20261005-fu1-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and native GPT-6 (requested route; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 62709,
+  "pushed_at": "2026-10-05T14:31:15Z",
+  "archived": false,
+  "default_branch": "master",
+  "repository_license": "MIT",
+  "adjudicated_pin": "f2eef4f49da71a758c91cf6cb97640c8b262ef81",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named find-docs",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "5bf22997630fd5518112ab855c55ddba8653b7aefe16e5efad70e38966927fcf",
+  "skill_md_bytes": 7429,
+  "survivor_skill_md_sha256": "5bf22997630fd5518112ab855c55ddba8653b7aefe16e5efad70e38966927fcf",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "b635cd66f1414befd36d18646561398de2ddab54",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/find-docs/SKILL.md@f2eef4f49da71a758c91cf6cb97640c8b262ef81",
+   "text": "Retrieve current documentation and code examples for any library using the Context7 CLI."
+  },
+  {
+   "source": "skills/find-docs/SKILL.md@f2eef4f49da71a758c91cf6cb97640c8b262ef81",
+   "text": "Run commands with `npx ctx7@latest` so setup always uses the latest CLI without a global install:"
+  },
+  {
+   "source": "skills/find-docs/SKILL.md@f2eef4f49da71a758c91cf6cb97640c8b262ef81",
+   "text": "```bash npx ctx7@latest library <name> \"<query>\" npx ctx7@latest docs <libraryId> \"<query>\" ```"
+  }
+ ]
+}

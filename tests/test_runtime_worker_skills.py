@@ -160,9 +160,8 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         runtime["excluded"].append({"name": double["name"], "source": double["source"],
                                     "adoption_ref": double["reuse_ref"], "reason": "r", "overturn": "o"})
         restating["codex_enabled"] = True
-        # The runtime manifest has no adoption_ref exclusion of its own since main promoted security-audit
-        # (2026-09-30), so the bare exclusion is built here: one reused skill claimed only by an exclusion
-        # without an overturn condition.
+        # Build a bare exclusion independently of the host-research exclusion: one reused skill claimed
+        # only by an exclusion without an overturn condition must still fail.
         runtime["skills"].remove(bare_skill)
         bare = {"name": bare_skill["name"], "source": bare_skill["source"], "adoption_ref": ADOPTION_REF,
                 "reason": "r"}
@@ -291,9 +290,26 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         code_blocks = re.findall(r"```(?:bash|sh)\n(.*?)```", readme, re.S)
         self.assertFalse(any(re.search(r"(?m)^\s*(?:cp|rsync)\s", block) for block in code_blocks))
         source = (ROOT / "tools/adoption/install_skills.py").read_text()
-        calls = [n for n in ast.walk(ast.parse(source)) if isinstance(n, ast.Call)]
+        tree = ast.parse(source)
+        calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)]
         self.assertFalse(any(isinstance(c.func, ast.Attribute) and c.func.attr in
-                             {"write_text", "write_bytes", "copytree", "copyfile"} for c in calls))
+                             {"copytree", "copyfile"} for c in calls))
+        # JSON metadata recording is distinct from installing a skill payload.
+        writes = [c for c in calls if isinstance(c.func, ast.Attribute) and
+                  c.func.attr in {"write_text", "write_bytes"}]
+        metadata_guards = [n for n in ast.walk(tree) if isinstance(n, ast.If) and
+                           ast.unparse(n.test) == "args.record or args.retire"]
+        self.assertEqual(len(metadata_guards), 1)
+        metadata_calls = [n for statement in metadata_guards[0].body
+                          for n in ast.walk(statement) if isinstance(n, ast.Call)]
+        self.assertTrue(all(c in metadata_calls for c in writes))
+        self.assertEqual(len(writes), 1)
+        self.assertEqual(writes[0].func.attr, "write_text")
+        self.assertEqual(ast.unparse(writes[0].func.value), "temporary")
+        self.assertEqual(ast.unparse(writes[0].args[0]), "after")
+        metadata_text = ast.unparse(metadata_guards[0])
+        self.assertIn("after = json.dumps(manifest", metadata_text)
+        self.assertIn("temporary = manifest_path.with_name", metadata_text)
 
     def test_readme_matrix_matches_manifest_including_empty_cells(self):
         table = (DIRECTORY / "README.md").read_text().split("<!-- coverage-table -->", 1)[1]

@@ -1,0 +1,25 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/private-repo-add-security.test.ts > private repository installs > falls back to normal Git authentication without reading stored gh credentials
+Error: [vitest] No "GitCloneError" export is defined on the "../src/git.ts" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../src/git.ts"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ Module.runAdd src/add.ts:2317:26
+    2315|     await promptForFindSkills(options, targetAgents);
+    2316|   } catch (error) {
+    2317|     if (error instanceof GitCloneError) {
+       |                          ^
+    2318|       p.log.error(pc.red('Failed to clone repository'));
+    2319|       // Print each line of the error message separately for better fo…
+ ❯ tests/private-repo-add-security.test.ts:110:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

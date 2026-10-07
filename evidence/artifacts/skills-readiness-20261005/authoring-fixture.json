@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "cedar-native-authoring-synthetic-fixture-20261005",
+  "evidence_class": "synthetic",
+  "author": "Lane coordinator froze the fictional contract/cases; fresh native client models author their own skills from that contract",
+  "frozen_at_utc": "2026-10-05 10:47:04",
+  "private_input_sha256": {
+    "plan.md": "5283917719bef34ae6886a93c9f98c29d3996b0e504a6e95c1b11b481fa2bf37",
+    "claude/task.md": "421f8cbfee712199e0ae12f3a45fb87141a721bcf7b108917e6d3ed620e0c7e1",
+    "codex/task.md": "e37b78575f553dfcd5bb3f381f0acd0919785f89bb49e425ec80de3ee21cb3bf"
+  },
+  "contract": "Emit one JSON object with exactly asset, status, owner and next_action. Copy the explicitly named asset. status is blocked when an unresolved unsafe condition is reported, even if another sentence reports completion; otherwise needs-information when an unresolved question remains; otherwise complete when completion is explicit; otherwise needs-information. owner is the named responsible person, or null when absent. next_action copies an explicit requested next action verbatim, or is null when absent. Do not invent facts.",
+  "cases": [
+    {"id": 1, "name": "complete", "prompt": "Cedar C-17: inspection completed. Responsible person: Mira. Requested next action: archive the card", "expected": {"asset": "C-17", "status": "complete", "owner": "Mira", "next_action": "archive the card"}},
+    {"id": 2, "name": "safety-precedence", "prompt": "Cedar C-22: checklist completed. An unsafe exposed wire remains unresolved. Responsible person: Jules. Requested next action: isolate the sensor", "expected": {"asset": "C-22", "status": "blocked", "owner": "Jules", "next_action": "isolate the sensor"}},
+    {"id": 3, "name": "missing-facts", "prompt": "Cedar C-31: the inspection date is still an unresolved question. No responsible person or next action is specified.", "expected": {"asset": "C-31", "status": "needs-information", "owner": null, "next_action": null}}
+  ],
+  "assertions_per_case": ["One JSON object, exactly four contract keys", "Exact asset", "Exact precedence status", "Exact owner or null", "Exact next_action or null"],
+  "claude_plan": {"requested_model": "opus", "requested_effort": "max", "cases": 3, "repetitions_per_case_per_arm": 1, "executor_runs": 6, "arms": ["with_skill", "without_skill"], "parity": "Same full contract and case prompt, same tools, model and effort; only with_skill gets the created skill path. Expected answers are withheld from both executors.", "native_harness": "Pinned skill-creator paired workflow, upstream grader, aggregate_benchmark.py and static generate_review.py; no self-written runner", "controls": ["Invalid underscore name rejected by unchanged quick_validate.py", "Deliberately wrong safety-precedence answer rejected by upstream grader, outside the aggregate"]},
+  "codex_plan": {"requested_model": "gpt-6.1-sol", "requested_effort": "max", "native_harness": "Built-in init_skill.py and quick_validate.py", "executor_runs": 0, "scope": "Fresh creation plus structural validation; no Codex paired A/B", "control": "Invalid underscore name rejected by the same unchanged quick_validate.py"},
+  "limitations": ["Fictional pipeline probe; no production skill or landscape candidate is selected or installed", "Both Claude arms know the entire contract, so an all-pass result does not establish skill quality uplift", "One repetition per case; native aggregator metadata/defaults are not actual repetitions, model identity or usage", "Human qualitative review, actual provider identity/billing and worker discovery are separate evidence gates", "Raw task prompts and native conversation streams remain private; this file is the bounded synthetic contract/oracle and their hashes"],
+  "sources": ["anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:163", "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:229", "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md:247", "openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md", "native-agent-stack@ec0b8fd821a7b2004c331d2185b33d9e5ed47896:docs/acceptance-evidence-policy.md:42"]
+}

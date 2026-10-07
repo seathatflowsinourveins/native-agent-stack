@@ -1,0 +1,21 @@
+................................................s..................................................................................................................................................................................................s....................................................................................................ss......................................................................s......................................................................s.....................................................................started start-race
+not started launch-refused: the job runner could not start
+github repositories 1 non-github 0 already-covered 0 to-fetch 1
+done 1 errors 0 partial_errors 0 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0
+github repositories 1 non-github 0 already-covered 1 to-fetch 0
+.done 1 errors 0 partial_errors 0 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0
+github repositories 1 non-github 0 already-covered 0 to-fetch 1
+.done 1 errors 0 partial_errors 0 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0
+github repositories 1 non-github 0 already-covered 0 to-fetch 1
+done 1 errors 0 partial_errors 1 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0
+github repositories 1 non-github 0 already-covered 0 to-fetch 1
+....done 1 errors 0 partial_errors 0 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0
+github repositories 2 non-github 0 already-covered 0 to-fetch 2
+done 2 errors 1 partial_errors 0 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0
+github repositories 2 non-github 0 already-covered 1 to-fetch 1
+............................................................................................
+----------------------------------------------------------------------
+Ran 655 tests in 120.516s
+
+OK (skipped=6)
+done 2 errors 0 partial_errors 0 matching_tags_errors 0 runtime_only_errors 0 runtime_only_partial_errors 0

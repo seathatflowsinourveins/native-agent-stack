@@ -1,0 +1,27 @@
+# Native quick_validate results
+# Validator: <installed-creator>/scripts/quick_validate.py (pinned skill-creator anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4, run unchanged)
+# Validator sha256: 67cf5703402013936c8fb75ad6a1afecd8841d45cc5e606b634eb05825fde365
+
+## 1. cedar-note (created skill; expected: valid, exit 0)
+cwd: <scratch>/skill-authoring/claude
+command: python3 -B <installed-creator>/scripts/quick_validate.py cedar-note
+SKILL.md sha256: ed781f99bd9b0faae7c4e32e8e0ca37f448f8b30adc3cb9bdbbf80b442cd5c52
+started_utc: 2026-10-05T11:45:01.590Z
+ended_utc: 2026-10-05T11:45:01.640Z
+exit_code: 0
+output (stdout+stderr):
+Skill is valid!
+
+## 2. negative-control/invalid-skill (deliberately invalid: frontmatter name 'cedar_note' contains an underscore; expected: rejected, exit 1)
+cwd: <scratch>/skill-authoring/claude
+command: python3 -B <installed-creator>/scripts/quick_validate.py negative-control/invalid-skill
+SKILL.md sha256: fbdea0c0ba73f919050dc9d37f1752fe50b130e9adebb951ba95f6409d4866bf
+validator sha256 at this run: 67cf5703402013936c8fb75ad6a1afecd8841d45cc5e606b634eb05825fde365
+started_utc: 2026-10-05T11:48:51.127Z
+ended_utc: 2026-10-05T11:48:51.173Z
+exit_code: 1
+output (stdout+stderr):
+Name 'cedar_note' should be kebab-case (lowercase letters, digits, and hyphens only)
+
+## Control verdict
+Discriminated: the unchanged native validator accepted cedar-note (exit 0) and rejected the underscore name (exit 1).

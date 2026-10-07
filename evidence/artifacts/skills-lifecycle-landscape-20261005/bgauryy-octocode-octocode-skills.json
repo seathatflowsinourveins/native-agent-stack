@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bgauryy-octocode-octocode-skills",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "bgauryy/octocode@octocode-skills",
+ "reviewed_commit": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+ "readme_path": "skills/octocode-skills/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-skill-lifecycle"
+ ],
+ "claim": "Source review of the skill octocode-skills in bgauryy/octocode at commit c265e3f9413161c900cbf4aa70d451b8e6b3920a (the adjudicated pin; license MIT), read from skills/octocode-skills/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for octocode-skills; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 81a69f978b635487ea63d2299735f1b4c076f729. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 946,
+  "pushed_at": "2026-10-03T16:43:40Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named octocode-skills",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "f7d3a8087d4bf07f250b7b5c9fa3248b392d5b5f95dfcc1552ecd8b7e762b9b1",
+  "skill_md_bytes": 4845,
+  "survivor_skill_md_sha256": "f7d3a8087d4bf07f250b7b5c9fa3248b392d5b5f95dfcc1552ecd8b7e762b9b1",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "81a69f978b635487ea63d2299735f1b4c076f729",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/octocode-skills/SKILL.md@c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+   "text": "Operate on standalone Agent Skill folders: `SKILL.md` plus optional references, scripts, and assets. Flow: `UNDERSTAND → DISCOVER → INSPECT → JUDGE → RECOMMEND → USER GATE → ACT → CLEANUP → REVIEW → VERIFY`."
+  },
+  {
+   "source": "skills/octocode-skills/SKILL.md@c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+   "text": "## Lobby rules - `SKILL.md` owns workflows, hard gates, and routes; each reference owns one concept and never restates the flow. - The lobby lists every reference and every script with when and how to use it, plus the workflows — no chunk is discoverable only by opening another file. - MUST read and navigate between routed reference files to understand the complete flow; this skill is intentionally simplified into reference units for efficiency, including reference-to-reference handoffs. - Inspe"
+  },
+  {
+   "source": "skills/octocode-skills/SKILL.md@c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+   "text": "## Smart routes — load only what the current step needs - When discovering, load `references/search-playbook.md`; choose a source with `references/discovery-surfaces.md`, parse manifests with `references/discovery-manifests.md`, and recover with `references/recovery.md` — search broadly enough without inventing candidates. - When judging, load `references/quality-rubric.md` for content fit and `references/quality-signals.md` for adoption/recency; when recommending, present through `references/ou"
+  }
+ ]
+}

@@ -2,13 +2,13 @@
 # /// script
 # requires-python = ">=3.13,<3.14"
 # dependencies = [
-#     "openai-codex==0.160.0",
+#     "openai-codex==0.160.1",
 # ]
 # ///
 """One native Codex SDK turn, or metadata preflight, through OmniRoute.
 
-Derived from openai/codex rust-v0.160.0, commit
-a956835d020762cb2b570053af06f643a11c0ecc, sdk/python/examples/{01,05,14}_*
+Derived from openai/codex rust-v0.160.1, commit
+d27764b82f7118f674371e6d6e76271d9d606edb, sdk/python/examples/{01,05,14}_*
 and sdk/python/src/openai_codex/{api,client,_run,async_client}.py. Preflight uses
 exactly pinned SDK internals in generated/v2_all.py and the native app-server
 request_processors/mcp_processor.rs. See README.md for sources.
@@ -36,7 +36,7 @@ from openai_codex.generated.v2_all import (
 )
 from openai_codex.types import ReasoningEffort
 
-SDK_VERSION = "0.160.0"
+SDK_VERSION = "0.160.1"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
@@ -207,7 +207,7 @@ def initial_record(args: argparse.Namespace) -> dict:
 
 def native_runtime(metadata) -> dict:
     # Match the pinned SDK's _initialize_metadata.py normalization using public
-    # response fields. Low-level initialize() returns serverInfo=None on 0.160.0.
+    # response fields. Low-level initialize() can return serverInfo=None on 0.160.1.
     server = metadata.serverInfo
     name = (server.name or "").strip() if server is not None else ""
     version = (server.version or "").strip() if server is not None else ""
@@ -267,7 +267,7 @@ async def run_preflight(
     """Inspect native catalogs without a thread, model turn or tool call.
 
     Exactly pinned SDK internals own a separate app-server for this invocation.
-    Native 0.160.0 ignores CLI profile selection in app-server mode; configuration
+    Native 0.160.1 ignores CLI profile selection in app-server mode; configuration
     comes from CODEX_HOME/config.toml and supported config_overrides instead.
     """
     codex = sdk_factory(config=runtime_config(args))
@@ -557,7 +557,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "--codex-bin",
         type=Path,
-        help="explicit native 0.160.0 binary; defaults to the pinned SDK bundle",
+        help="explicit native 0.160.1 binary; defaults to the pinned SDK bundle",
     )
     parser.add_argument(
         "--codex-home",

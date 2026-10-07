@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-internationalcolorconsortium-iccdev-clusterfuzzlite",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "InternationalColorConsortium/iccDEV@clusterfuzzlite",
+ "reviewed_commit": "647ba5e67724862cc048c5216c046e6e9247f9c7",
+ "readme_path": ".github/skills/clusterfuzzlite/SKILL.md",
+ "license": "BSD-3-Clause",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill clusterfuzzlite in InternationalColorConsortium/iccDEV at commit 647ba5e67724862cc048c5216c046e6e9247f9c7 (the adjudicated pin; license BSD-3-Clause), read from .github/skills/clusterfuzzlite/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for clusterfuzzlite; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 2794530ff3b2884feaa20530d1ff6565e61fc317. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 182,
+  "pushed_at": "2026-10-05T05:24:44Z",
+  "archived": false,
+  "default_branch": "master",
+  "repository_license": "BSD-3-Clause",
+  "adjudicated_pin": "647ba5e67724862cc048c5216c046e6e9247f9c7",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".github/skills/, the first location the CLI searches that holds a valid folder named clusterfuzzlite",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "12f474857e7e5077315500b2b131194cad218196f77cf55818059ddc328e90db",
+  "skill_md_bytes": 6003,
+  "survivor_skill_md_sha256": "12f474857e7e5077315500b2b131194cad218196f77cf55818059ddc328e90db",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "2794530ff3b2884feaa20530d1ff6565e61fc317",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".github/skills/clusterfuzzlite/SKILL.md@647ba5e67724862cc048c5216c046e6e9247f9c7",
+   "text": "Use this skill for `.clusterfuzzlite/**`, `.github/workflows/ci-clusterfuzzlite.yml`, or the ClusterFuzzLite mode in `.github/ci/cfl/build.sh`."
+  },
+  {
+   "source": ".github/skills/clusterfuzzlite/SKILL.md@647ba5e67724862cc048c5216c046e6e9247f9c7",
+   "text": "- Treat libFuzzer as the single fuzzing engine and `address`, `undefined`, and `memory` as three separate sanitizer builds. - Build all three in-process groups in ClusterFuzzLite: `core` (`profileparse`, `cmmapply`, `profilevisualize`, `writerserialize`), `formats` (`xmlparse`, `jsonparse`, `connectconfig`), and `assessment` (`pawgreport`). - Forward the GitHub matrix group and patch mode through `CFL_EXTRA_*`; the official action builds a fresh `GITHUB_SHA` clone, so pre-step checkout file muta"
+  },
+  {
+   "source": ".github/skills/clusterfuzzlite/SKILL.md@647ba5e67724862cc048c5216c046e6e9247f9c7",
+   "text": "After strengthening an existing target, prefer a multi-profile CMM chain, separate XML/JSON serializers, and V5 display-observer conversion, in that order. Add image or carrier targets only with instrumented MSan dependencies. Do not copy the local research inventory wholesale; require a public in-process seam, structured seed, and distinct attribution boundary."
+  }
+ ]
+}

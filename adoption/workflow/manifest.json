@@ -95,7 +95,7 @@
             "skills": [
               "native-stack-research"
             ],
-            "reason": "Pending reviewed lifecycle registration from draft719 and the S11 native runtime consumer."
+            "reason": "Central lifecycle store row is present; pending Tier B recording and the S11 native runtime consumer."
           }
         },
         "coordinator_only_skills": [
@@ -1135,7 +1135,7 @@
         ]
       },
       "overturn": "Broken source/delivery, stale or truncated catalog, task regression, or a better qualified owner.",
-      "inert_reason": "Pending S4 vendor-generated lifecycle record and the native model-hub consumer."
+      "inert_reason": "Central lifecycle store row is present; pending Tier B recording and the native model-hub consumer."
     }
   ],
   "native_skill_aliases": {

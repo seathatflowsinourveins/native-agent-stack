@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lgtm-hq-ai-skills-scorecard",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "lgtm-hq/ai-skills@scorecard",
+ "reviewed_commit": "64070edb3077ce36ea1c436c9ccf1567be48fc3a",
+ "readme_path": "skills/scorecard/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-test"
+ ],
+ "claim": "Source review of the skill scorecard in lgtm-hq/ai-skills at commit 64070edb3077ce36ea1c436c9ccf1567be48fc3a (the adjudicated pin; license MIT), read from skills/scorecard/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for scorecard; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 6cb7518b747695b233119479dec2818d02e13c98. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 0,
+  "pushed_at": "2026-10-05T01:54:23Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "64070edb3077ce36ea1c436c9ccf1567be48fc3a",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named scorecard",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "de2b0e3a61f5b5f13b54ae29f3b448e768309dbdae008570efe983efb6a56d3c",
+  "skill_md_bytes": 11151,
+  "survivor_skill_md_sha256": "de2b0e3a61f5b5f13b54ae29f3b448e768309dbdae008570efe983efb6a56d3c",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "6cb7518b747695b233119479dec2818d02e13c98",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/scorecard/SKILL.md@64070edb3077ce36ea1c436c9ccf1567be48fc3a",
+   "text": "Audit the OpenSSF Scorecard rating for `github.com/lgtm-hq/py-lintro` and identify what's dragging the score down."
+  },
+  {
+   "source": "skills/scorecard/SKILL.md@64070edb3077ce36ea1c436c9ccf1567be48fc3a",
+   "text": "```bash # Get the latest scorecard JSON from the API curl -s \"https://api.securityscorecards.dev/projects/github.com/lgtm-hq/py-lintro\" | python3 -m json.tool ```"
+  },
+  {
+   "source": "skills/scorecard/SKILL.md@64070edb3077ce36ea1c436c9ccf1567be48fc3a",
+   "text": "Also check the [scorecard viewer](https://scorecard.dev/viewer/?uri=github.com/lgtm-hq/py-lintro)."
+  }
+ ]
+}

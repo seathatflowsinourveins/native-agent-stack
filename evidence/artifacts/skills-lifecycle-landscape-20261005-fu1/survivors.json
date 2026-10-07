@@ -1,0 +1,62 @@
+[
+ {
+  "layer_id": "skills-research",
+  "repository": "bgauryy/octocode@octocode-research",
+  "pin": "c265e3f9413161c900cbf4aa70d451b8e6b3920a",
+  "skill_md_sha256": "0dd7a864064c5ac3dd7122343aad312dba13baf1b5e66b0ac82766377fb9d2d3"
+ },
+ {
+  "layer_id": "skills-research",
+  "repository": "upstash/context7@find-docs",
+  "pin": "f2eef4f49da71a758c91cf6cb97640c8b262ef81",
+  "skill_md_sha256": "5bf22997630fd5518112ab855c55ddba8653b7aefe16e5efad70e38966927fcf"
+ },
+ {
+  "layer_id": "skills-research",
+  "repository": "akitaonrails/ai-memory@ai-memory-retrieval",
+  "pin": "fc4da03ac5268aa44d18894685818eab2f9ecdea",
+  "skill_md_sha256": "819d0682a3a882db024d4727ee699db9a5d8352a328d475a43342698c4905f90"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "warpdotdev/common-skills@resolve-merge-conflicts",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "skill_md_sha256": "ac26cb07c75c1778513383f45df53902ad7b7f97898cf0131f2967a80a3f0e51"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "openai/codex@babysit-pr",
+  "pin": "84aa75204ad604bcf498df180d128181c89b2f0b",
+  "skill_md_sha256": "8e4b149a345eca77207cb061209eed500924695c9d5547c99f0a42215597de2e"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "skill_md_sha256": "eacf6cc68063d5c92e1d0a87051b4c5cdd0a18cf8931cb4def3ae541808ddfc8"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "equinor/fusion-skills@fusion-github-review-resolution",
+  "pin": "e8fd6cfaf8ed8ea78c564ca87ca60eaaa4615612",
+  "skill_md_sha256": null
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "cursor/plugins@loop-on-ci",
+  "pin": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "skill_md_sha256": "66b85dbd2bc3700386283539292a55438652bbe227271fd90b73b74525b9b9de"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "cursor/plugins@fix-merge-conflicts",
+  "pin": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "skill_md_sha256": "738b251281b30fd33e3892d0679cf94249e9c9e29e1bed40bcdde4a6aca98a76"
+ },
+ {
+  "layer_id": "skills-ci-pr",
+  "repository": "microsoft/vscode-pull-request-github@address-pr-comments",
+  "pin": "e62a2ad08cc07791d0d13f471532b5032486b6f1",
+  "skill_md_sha256": "2c75412cedf21975b9c0f7f92d939588f5ffa966e589d53cad9911031d93f4f3"
+ }
+]

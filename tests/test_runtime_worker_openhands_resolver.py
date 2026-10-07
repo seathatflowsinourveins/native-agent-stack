@@ -3260,6 +3260,9 @@ class ResolverHostTests(unittest.TestCase):
         stack = self.tmp / "stack"
         manifest = stack / "blueprints/runtime-workers/skills/manifest.json"
         workspace = self.tmp / "workspace"
+        installer = stack / "tools/adoption/install_skills.py"
+        installer.parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / "tools/adoption/install_skills.py", installer)
         texts = {"tdd": "tdd body\n", "search-first": "search body\n"}
         for name, text in texts.items():
             write_file(workspace, f".agents/skills/{name}/SKILL.md", text)

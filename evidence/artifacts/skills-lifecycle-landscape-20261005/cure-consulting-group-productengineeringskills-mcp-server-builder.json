@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-cure-consulting-group-productengineeringskills-mcp-server-builder",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "Cure-Consulting-Group/ProductEngineeringSkills@mcp-server-builder",
+ "reviewed_commit": "fd5b82cdae0963e97ec0c534c2b08cfe95a652fb",
+ "readme_path": "skills/engineering/mcp-server-builder/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-mcp-build"
+ ],
+ "claim": "Source review of the skill mcp-server-builder in Cure-Consulting-Group/ProductEngineeringSkills at commit fd5b82cdae0963e97ec0c534c2b08cfe95a652fb (the adjudicated pin; license NOASSERTION), read from skills/engineering/mcp-server-builder/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for mcp-server-builder; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 703da1230ec6e943b76d708e3046ff683979b940. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 3,
+  "pushed_at": "2026-09-28T23:18:27Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "fd5b82cdae0963e97ec0c534c2b08cfe95a652fb",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named mcp-server-builder",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "9f196cf5e8bbd1b932b37fc067e025b096900740b790ef384a798d6463052aef",
+  "skill_md_bytes": 15828,
+  "survivor_skill_md_sha256": "9f196cf5e8bbd1b932b37fc067e025b096900740b790ef384a798d6463052aef",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "703da1230ec6e943b76d708e3046ff683979b940",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/engineering/mcp-server-builder/SKILL.md@fd5b82cdae0963e97ec0c534c2b08cfe95a652fb",
+   "text": "**Outcome:** a working MCP server (or a design for one) with a small, well-named tool surface, strict schemas, typed results, honest tool annotations, the right transport and auth, and contract tests. Done when each tool has a schema, annotations, an error path returning `isError`, and a test, and the server runs in at least one real client. Deliver the requested server; don't add unrequested tools."
+  },
+  {
+   "source": "skills/engineering/mcp-server-builder/SKILL.md@fd5b82cdae0963e97ec0c534c2b08cfe95a652fb",
+   "text": "Cure standard: tools are explicit, schemas are strict, secrets never leak into results, and destructive tools are declared as such so the host can ask for consent."
+  },
+  {
+   "source": "skills/engineering/mcp-server-builder/SKILL.md@fd5b82cdae0963e97ec0c534c2b08cfe95a652fb",
+   "text": "**Currency (verified 2026-09-23):** current spec revision is **2026-07-28** (modelcontextprotocol.io/specification/2026-07-28/changelog). It made the protocol stateless — no `initialize` handshake or `Mcp-Session-Id`; version and client capabilities travel in each request's `_meta`; servers must implement `server/discover`. Server-initiated requests (elicitation, sampling, roots) are replaced by Multi Round-Trip Requests (`resultType: \"input_required\"`); Roots, Sampling, Logging, and HTTP+SSE ar"
+  }
+ ]
+}

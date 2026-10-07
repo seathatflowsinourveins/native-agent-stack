@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-everyinc-compound-engineering-plugin-ce-babysit-pr",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+ "reviewed_commit": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+ "readme_path": "skills/ce-babysit-pr/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill ce-babysit-pr in EveryInc/compound-engineering-plugin at commit 030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c (the adjudicated pin; license MIT), read from skills/ce-babysit-pr/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for ce-babysit-pr; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 3add2c00b91a015c503956020c76ac664fc0a630. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 25398,
+  "pushed_at": "2026-10-05T07:01:52Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named ce-babysit-pr",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "7e5769d01dc4b451382a970c0fd5ba3cc1f1b3134521a4fd138ddc1788bf84e7",
+  "skill_md_bytes": 7915,
+  "survivor_skill_md_sha256": "7e5769d01dc4b451382a970c0fd5ba3cc1f1b3134521a4fd138ddc1788bf84e7",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "3add2c00b91a015c503956020c76ac664fc0a630",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/ce-babysit-pr/SKILL.md@030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+   "text": "Keep an open PR moving toward merge by reacting to three streams as each arrives: review comments (handed to `ce-resolve-pr-feedback`), CI failures (handed to `ce-debug`), and branch-currency items the snapshot flags."
+  },
+  {
+   "source": "skills/ce-babysit-pr/SKILL.md@030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+   "text": "**Outcome:** the PR is left at a truthfully reported terminal, looks-ready, blocked, or out-of-budget state under the run's posture. **Done:** Step 3 (stop conditions) reached a true stop and the Step 4 report is written. Settled ≠ merged."
+  },
+  {
+   "source": "skills/ce-babysit-pr/SKILL.md@030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c",
+   "text": "**What each tick looks at and every change it makes come from the bundled `pr-snapshot` output — never by prose, events you notice, or a coordinator's say-so** (readiness also applies the review judgment in `references/settle.md`, which reads live state this output does not model). Read `references/tick.md` before the first snapshot; `references/envelope.md` states the full boundaries."
+  }
+ ]
+}

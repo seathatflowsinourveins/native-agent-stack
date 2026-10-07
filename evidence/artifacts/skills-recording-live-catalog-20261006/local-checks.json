@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "status": "focused_suite_passed",
+  "source_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "rebase_target": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "attempts": [
+    {
+      "kind": "local-integration-test-attempt",
+      "source_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "working_tree": "codex/ns2604-skills-r2-lifecycle-20261006 (uncommitted S4 changes)",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_install_skills",
+        "tests.test_skills_status",
+        "tests.test_skills_manifest"
+      ],
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "TMPDIR": "durable private lifecycle directory"
+      },
+      "log": "focused-01.log",
+      "exit_code": 1,
+      "tests": 198,
+      "elapsed_seconds": 26.95,
+      "failures": [
+        "test_pruned_skills_are_not_reinstalled: empty pruned selection skipped the existing pinned-CLI version check",
+        "test_json_shape: required expected top-level fields needed the newly added metadata fields",
+        "test_codex_template_comment_counts_the_skills_the_catalog_shows: historical comment 24 versus declared eligible count 25 after HF addition"
+      ],
+      "evidence_class": "local integration and synthetic fixtures; no unchanged upstream test or fresh model execution"
+    },
+    {
+      "kind": "local-integration-test-attempt",
+      "source_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "working_tree": "codex/ns2604-skills-r2-lifecycle-20261006 (uncommitted S4 changes)",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_install_skills",
+        "tests.test_skills_status",
+        "tests.test_skills_manifest"
+      ],
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "TMPDIR": "durable private lifecycle directory"
+      },
+      "log": "focused-02.log",
+      "log_sha256": "2fc77c6c8624e26b942ccec8082b5ef1424adb0d74754234683dec6fbfe3b81a",
+      "exit_code": 0,
+      "tests": 198,
+      "elapsed_seconds": 32.326,
+      "skips": 0,
+      "repairs_since_first_attempt": [
+        "Preserved pinned-CLI version checking for empty all-pruned selections",
+        "Matched exact new JSON top-level and folder-state schema contracts",
+        "Aligned authorized comment-only declared catalog count with HF addition; client configuration values unchanged"
+      ],
+      "evidence_class": "local integration and synthetic fixtures; no unchanged upstream test or fresh model execution"
+    },
+    {
+      "kind": "repository-validation-attempt",
+      "source_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "TMPDIR": "durable private lifecycle directory"
+      },
+      "log": "validate-01.log",
+      "log_sha256": "13aeac09e6a0c81975f0310a334db9635559121ed860ee850b30d8422b8eed38",
+      "exit_code": 1,
+      "result": "publication registry hashes and byte counts stale for changed registered source files",
+      "mismatch_paths": [
+        "adoption/skills/lifecycle.md",
+        "adoption/skills/manifest.json",
+        "adoption/templates/codex.config.template.toml",
+        "scripts/skills_status.py",
+        "tests/test_install_skills.py",
+        "tests/test_skills_manifest.py",
+        "tests/test_skills_status.py",
+        "tools/adoption/install_skills.py"
+      ],
+      "next_step": "Parent rebuilds official registry from current main, using register_file, then performs final validation; no ad-hoc registry edits or repeated validation by this worker.",
+      "evidence_class": "repository publication consistency check; not upstream acceptance or fresh model discovery"
+    }
+  ],
+  "limits": [
+    "Synthetic fixtures and repository checks are not unchanged upstream tests.",
+    "No host installer/removal/configuration or fresh model discovery was run.",
+    "Actual returned logs remain in durable private coordination state; public summaries retain their hashes.",
+    "A final repeat publication check follows registration of this added receipt metadata."
+  ],
+  "sources": [
+    "vercel-labs/skills@7407f389:src/installer.ts,src/remove.ts,src/agents.ts",
+    "huggingface/huggingface_hub@bd4a76030582d118e28dc9ad6c7a5911ea76176b:src/huggingface_hub/cli/_skills.py,src/huggingface_hub/cli/skills.py",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:docs/acceptance-evidence-policy.md"
+  ],
+  "publication_validation": {
+    "command": [
+      "python3",
+      "scripts/validate.py"
+    ],
+    "exit_code": 0,
+    "log_sha256": "208e1a1e71c09f7a3481396d14edfa350de8b5638e7b1d617782fb350aff9d59",
+    "result": {
+      "components": 69,
+      "hashed_files": 10338,
+      "profiles": 4,
+      "receipts": 214,
+      "status": "passed"
+    },
+    "scope": "Integrity and scope only; no live provider or GPU execution."
+  }
+}

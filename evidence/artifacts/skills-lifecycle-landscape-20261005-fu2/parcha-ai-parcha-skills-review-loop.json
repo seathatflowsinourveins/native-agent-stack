@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-parcha-ai-parcha-skills-review-loop",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "Parcha-ai/parcha-skills@review-loop",
+ "reviewed_commit": "31b804ccb999ccee809e65590b48c1220c8d0ddd",
+ "readme_path": "review-loop/skills/review-loop/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill review-loop in Parcha-ai/parcha-skills at commit 31b804ccb999ccee809e65590b48c1220c8d0ddd (the adjudicated pin; license MIT), read from review-loop/skills/review-loop/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for review-loop; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 4363df25608380244af254d94be873adec81c42a. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 63,
+  "pushed_at": "2026-10-05T18:14:37Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "31b804ccb999ccee809e65590b48c1220c8d0ddd",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "review-loop/skills/, the first location the CLI searches that holds a valid folder named review-loop",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "313bb9fbc5dce0e1d1b406a2d6ee5ee07021935958ed1e8f899661b84a50a6e0",
+  "skill_md_bytes": 11783,
+  "survivor_skill_md_sha256": "313bb9fbc5dce0e1d1b406a2d6ee5ee07021935958ed1e8f899661b84a50a6e0",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "4363df25608380244af254d94be873adec81c42a",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "review-loop/skills/review-loop/SKILL.md@31b804ccb999ccee809e65590b48c1220c8d0ddd",
+   "text": "This skill has one job: take a GitHub PR with open review threads and drive every thread, from every reviewer, to zero unresolved, iterating until the target is met, then report what it did in a fixed format. It does not QA the running application; that is `autoqa`'s job. It does not decide whether the diff is safe beyond what reviewers raised; that is `blast-radius`'s job. It does not merge, and it does not mint credentials."
+  },
+  {
+   "source": "review-loop/skills/review-loop/SKILL.md@31b804ccb999ccee809e65590b48c1220c8d0ddd",
+   "text": "Auth precondition: the caller has authenticated `gh` before invoking this skill. The skill never mints, reads, or stores tokens. If `gh auth status` fails, stop and report it."
+  },
+  {
+   "source": "review-loop/skills/review-loop/SKILL.md@31b804ccb999ccee809e65590b48c1220c8d0ddd",
+   "text": "Repeat until the target in step 9 is met. There is no iteration cap by default; a caller may pass `--max-iterations` to impose one. The loop still stops on timeout, a red gate it cannot fix, an auth failure, or a stall (see \"Stop on stall\"). Each iteration:"
+  }
+ ]
+}

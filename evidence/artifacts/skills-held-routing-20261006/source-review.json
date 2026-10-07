@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "id": "skills-held-routing-source-review-20261006",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "checked_at": "2026-10-06",
+  "repository_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "scope": "Inactive local plugin and passive Codex proposal for a bounded native routing gap. Authored filesystem/shape fixtures only; no registration, trust, native hook firing, B13, model task or container task is claimed.",
+  "upstream_sources": [
+    {
+      "url": "https://code.claude.com/docs/en/hooks",
+      "observation": "Native per-event hookSpecificOutput/additionalContext interfaces; a context hint has no permission decision."
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "paths": [
+        "codex-rs/hooks/schema/generated/user-prompt-submit.command.output.schema.json",
+        "codex-rs/hooks/schema/generated/post-tool-use.command.output.schema.json",
+        "codex-rs/hooks/schema/generated/subagent-start.command.output.schema.json",
+        "codex-rs/core/src/tools/handlers/apply_patch.rs:290-295,437-450",
+        "codex-rs/model-provider-info/src/lib.rs:184-190,474-488",
+        "codex-rs/core/config.schema.json"
+      ],
+      "observation": "Exact native event serialization and command-shaped patch input. Supported provider/configuration fields are static source evidence, not discovery or authentication acceptance."
+    },
+    {
+      "repository": "native-agent-stack",
+      "ref": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "path": "adoption/hooks/claude/token-lanes-subagent-start.py:35-45",
+      "observation": "Existing native wrapper and blind exclusion are references; its generic role fallback is not proof of Skill capability."
+    },
+    {
+      "repository": "alex-macra/claude-codex-skills-assembly",
+      "ref": "aba8bedadd83998cd2004838683ee41eaa449c1f",
+      "paths": [
+        "LICENSE",
+        "README.md",
+        "hooks/skill-activation.py:23-32,432-460,644"
+      ],
+      "observation": "MIT, documented supported installer/overlay, prompt-only activation and bounded matcher reference. Five upstream CI checks reported success at the reviewed pin; no release/tag was returned. Preserve unchanged executable/catalog as separate comparator; no installer was run here."
+    },
+    {
+      "repository": "diet103/claude-code-infrastructure-showcase",
+      "ref": "07f75ce3c301259e857343596e7883b8ce5a9f50",
+      "observation": "Codex adapter exists; optional paths call models and may block/synthesize events. No release was returned and pinned workflow directory lookup was unavailable. Reference only."
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/glob.html#glob.translate",
+      "observation": "Maintained recursive path-segment semantics replace filename fnmatch; explicit supported subset avoids a new glob parser."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/env-vars",
+      "observation": "Native CLAUDE_CONFIG_DIR selects global fallback root; default-profile grants cannot be borrowed by an isolated profile."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "observation": "Native role definition/preload format and project priority. On-disk source is not effective runtime permission acceptance."
+    }
+  ],
+  "demonstrated_gap": "No reviewed candidate covers the three events, dynamic workflow rows, verified declared-role capability and blind/Skill-less filtering together. This is bounded comparison, not an ecosystem-wide absence claim or an adoption winner.",
+  "repairs_retained": [
+    "Require actual nonempty main lane channels or an active matching child stage; missing/empty/inert lanes stay silent even with benchmark opt-in.",
+    "Bound trigger/member types and counts, plus remaining deadline inside every regex/glob attempt and loop. Optional canonical skill_intents discriminate CI from review-request outcomes.",
+    "Use the native Codex tool_input.command patch envelope; input/patch-only shapes are negative controls. Relative paths require validated native cwd within the project.",
+    "Reject unknown redirected roots/parents before opening; do not resolve arbitrary targets into newly trusted roots. Honor selected global CLAUDE_CONFIG_DIR while retaining project-role priority.",
+    "The initial wildcard fixture used invalid YAML tools:*. Quote the scalar using valid JSON/YAML syntax; keep the same assertions and failed output."
+  ],
+  "local_artifacts": [
+    {
+      "path": "adoption/hooks/claude/skill-routing/.claude-plugin/plugin.json",
+      "sha256": "d228b6e80858bd2b69d038083efb08bcfb9e6dcdb0cd083b1c7b7a6707978057",
+      "bytes": 205
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/hooks/hooks.json",
+      "sha256": "858448e0a13f1e1ecbbe84c8a8789b961ac3506b645f2117f74d65d36481ee42",
+      "bytes": 635
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/hooks/skill-routing.py",
+      "sha256": "2b7d470fbbdba229361075a6a229f2c45d2e80078b406ca275d334635220e3a8",
+      "bytes": 23648
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/codex-hooks-proposal.json",
+      "sha256": "48ae8181f5c0f0a40753b846dd8cac25ef5127405be660d282096ce996327200",
+      "bytes": 585
+    },
+    {
+      "path": "adoption/hooks/claude/skill-routing/README.md",
+      "sha256": "a5ff6e45b543561e99ef7a9cf9a69c06e927b2f147070d55942af27b35afaf8d",
+      "bytes": 9371
+    },
+    {
+      "path": "docs/decisions/2026-10-06-held-skill-routing-prototype.md",
+      "sha256": "64c276dd73cfdfdfb53cfe0c81bf917ac14f5abb6ece1a46bf8ec694330db24f",
+      "bytes": 8970
+    },
+    {
+      "path": "tests/test_skill_routing_hook.py",
+      "sha256": "42fff0b29bb771b9fd682f42de0d4002ac08afec43db1da2ef23e0d7f9a0efb7",
+      "bytes": 22634
+    },
+    {
+      "path": "tools/skill-routing-b13/cases.json",
+      "sha256": "0e8377d63b452f7dd24e7526aaa82bd09dc9a47a7c1b37d794649937f4f78759",
+      "bytes": 2530
+    },
+    {
+      "path": "tools/skill-routing-b13/promptfoo.codex.json",
+      "sha256": "90c5ba0ec8ac3520886625c3fe07e5fef523864b5c868f32e8ffa463d4b9a4ef",
+      "bytes": 2605
+    },
+    {
+      "path": "tools/skill-routing-b13/README.md",
+      "sha256": "eaef9c3a28d0f6d936d9bc43c22a989af83dac6024e053cbdb8a4b5d2cf16dc3",
+      "bytes": 6344
+    },
+    {
+      "path": "tools/skill-routing-b13/harbor-keyless-smoke.md",
+      "sha256": "8fd1148de43fe4a650bd27b7082f157d491b3b61601c6697915321529a9881cd",
+      "bytes": 5264
+    }
+  ],
+  "local_test_attempts": [
+    {
+      "attempt": 1,
+      "command": "python3 -m unittest tests.test_skill_routing_hook -v",
+      "exit_code": 1,
+      "tests": 33,
+      "errors": 1,
+      "failures": 0,
+      "skips": 0,
+      "duration_seconds": 0.272,
+      "actual_failure": "The authored wildcard tools scalar was unquoted and therefore parsed as an invalid YAML alias.",
+      "private_log": {
+        "name": "focused-tests-1.log",
+        "sha256": "334d5d6fd0f7e24f2ca8fe2d58a52b9f5e49046ea59f4ccd8fd78cd01622f3b1",
+        "bytes": 11023
+      }
+    },
+    {
+      "attempt": 2,
+      "command": "python3 -m unittest tests.test_skill_routing_hook -v",
+      "exit_code": 0,
+      "tests": 33,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "duration_seconds": 0.237,
+      "private_log": {
+        "name": "focused-tests-2.log",
+        "sha256": "4307bede16a443b4ba8cf15f05383baa076fc36c682af02ca9c369ae592eb1e3",
+        "bytes": 5995
+      }
+    }
+  ],
+  "frozen_comparison": {
+    "cases": "tools/skill-routing-b13/cases.json",
+    "cases_sha256": "0e8377d63b452f7dd24e7526aaa82bd09dc9a47a7c1b37d794649937f4f78759",
+    "cases_count": 7,
+    "cases_changed_during_repair": false,
+    "native_harnesses": [
+      "Claude native plugin evaluation",
+      "Anthropic skill-creator paired grading/review at 8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "Promptfoo 0.123.1 openai:codex-sdk"
+    ],
+    "required": [
+      "Actual hook-firing positive controls",
+      "Positive load-rate gain",
+      "At most 10% adjacent-negative false hints",
+      "No task-pass regression",
+      "Exact inputs/effort/provider identities and retained failures"
+    ],
+    "status": "not_executed"
+  },
+  "limits": [
+    "Local role/payload/filesystem fixtures are authored controls, not fresh native callbacks, unchanged upstream tests, organic loads or efficacy evidence.",
+    "Native Codex child capability remains pending S10; current inert Claude Skill-grant previews are not accepted callers.",
+    "The supported Python 3.13 glob subset is literals, single stars and complete double-star components; brace/extglob/character-class/question/backslash/parent-reference forms and older runtimes stay silent. Native parity controls remain pending.",
+    "On-disk role equality does not reveal CLI/runtime overrides. Filesystem parent checks require cooperating processes, are not race-proof and do not bound regular I/O.",
+    "Stateless fetch-only reads remain silent; their frozen negative cases are retained.",
+    "Fresh keyless route answers, container loopback, Harbor 0.24 qualification, SDK hook trust, native firing, B13 and command-center ACK remain independent prerequisites.",
+    "Prepared Promptfoo placeholders are not executable defaults; no trust bypass, native credential copy or client setting apply is proposed.",
+    "Official-main registry reconstruction registered nineteen owned paths through register_file. The validator passed; this proves integrity and scope only."
+  ],
+  "publication_validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "base": "0d5e6506434fab598dee861c749a22e628beb75a",
+    "registry_method": "Take main's registry, then scripts.host_receipts.register_file for nineteen owned paths; registry committed last.",
+    "private_log": {
+      "name": "validate-final.log",
+      "sha256": "5f0d2c46208286de84e1630b7ded64dde8ec2c38098c13078e2559cfe7ed6aa0"
+    },
+    "components": 69,
+    "hashed_files": 10355,
+    "profiles": 4,
+    "receipts": 214,
+    "scope": "Integrity and scope checks only; no live provider or GPU execution."
+  },
+  "sanitization": "Compact actual results and source/artifact hashes only. No raw logs, conversations, personal host paths, prompt/patch bodies, credentials or active client configuration are published.",
+  "model_usage": null
+}

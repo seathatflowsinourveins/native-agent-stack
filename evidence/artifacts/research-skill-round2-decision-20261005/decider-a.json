@@ -1,0 +1,131 @@
+{
+  "slot": "instructions-skills/research-skill",
+  "decision": "configure_existing_owner",
+  "adopt_new_candidate": false,
+  "chosen_candidate": "existing-research-harnesses-owner",
+  "candidate_assessments": [
+    {
+      "candidate_id": "gpt-researcher-vendor-mcp-entry",
+      "eligible": false,
+      "gates": [
+        {
+          "gate": "A_requirement",
+          "result": "pass",
+          "evidence": "A native research entry addresses the explicitly named requirement.",
+          "source": "User-provided requirement"
+        },
+        {
+          "gate": "B_candidate",
+          "result": "unknown",
+          "evidence": "Reported gptr-mcp ages of 332 and 554 days would fail both freshness thresholds if confirmed. Exact sources were inaccessible. Linux/WSL2 installation, usable native integration and an overlap win remain unverified.",
+          "source": "Packet candidate facts; cited vendor sources unavailable"
+        },
+        {
+          "gate": "reported_package_startup",
+          "result": "fail",
+          "evidence": "Transcribed uvx probes exited 1 with no executables. This establishes failed observed startup, without establishing distribution/tag equivalence or a native MCP result.",
+          "source": "User-provided probe observations; provenance documents not opened"
+        },
+        {
+          "gate": "C_engineering_quality",
+          "result": "unknown",
+          "evidence": "Tagged tests/CI, release discipline, integration documentation, maintenance and evaluation were not source-verified. The reported SSE tester does not establish STDIO acceptance.",
+          "source": "Packet candidate facts; cited vendor sources unavailable"
+        },
+        {
+          "gate": "Opus_and_native_activation",
+          "result": "unknown",
+          "evidence": "No Opus live-upstream verification, pinned protocol-clean STDIO handshake, five-tool discovery, useful result in each client, paired-skill acceptance or bounded lifecycle pass is supplied.",
+          "source": "User-provided activation constraint and candidate facts"
+        }
+      ],
+      "quality": "Failed observed package entry and unresolved mandatory gates prevent adoption."
+    },
+    {
+      "candidate_id": "deerflow-vendor-http-entry",
+      "eligible": false,
+      "gates": [
+        {
+          "gate": "A_requirement",
+          "result": "pass",
+          "evidence": "A native entry into research addresses the explicitly named requirement.",
+          "source": "User-provided requirement"
+        },
+        {
+          "gate": "B_candidate",
+          "result": "unknown",
+          "evidence": "Commit/release freshness, upstream Linux/WSL2 installation, self-hosting and both-client integration remain unverified. No matched overlap win is supplied.",
+          "source": "Packet candidate facts; cited vendor sources unavailable"
+        },
+        {
+          "gate": "C_engineering_quality",
+          "result": "unknown",
+          "evidence": "Tagged tests/CI, release discipline, integration documentation, maintenance and published evaluation remain unverified. A proposed comparison is not completed evaluation evidence.",
+          "source": "User-provided candidate facts"
+        },
+        {
+          "gate": "Opus_and_native_activation",
+          "result": "unknown",
+          "evidence": "No Opus verification, both-client HTTP useful-result receipt, bounded lifecycle or paired-skill benchmark is supplied. Embedded chat does not establish gateway health, thread creation or streamed HTTP execution.",
+          "source": "User-provided activation constraint and candidate facts"
+        }
+      ],
+      "quality": "Insufficient evidence to qualify the HTTP entry or rank it above the existing owner."
+    },
+    {
+      "candidate_id": "deerflow-vendor-internal-research-skill",
+      "eligible": false,
+      "gates": [
+        {
+          "gate": "A_requirement",
+          "result": "pass",
+          "evidence": "The named research workflow is within the stated research scope.",
+          "source": "User-provided requirement and candidate facts"
+        },
+        {
+          "gate": "B_candidate",
+          "result": "unknown",
+          "evidence": "Freshness, upstream installation, self-hosting and a standalone Claude Code/Codex start-to-useful-result path remain unverified. Another skill's transport cannot establish this candidate's integration or overlap win.",
+          "source": "Packet candidate facts; exact cited skill source unavailable"
+        },
+        {
+          "gate": "C_engineering_quality",
+          "result": "unknown",
+          "evidence": "No source-verified tagged tests/CI, release discipline, integration documentation, maintenance or published evaluation is available.",
+          "source": "User-provided packet; cited vendor source unavailable"
+        },
+        {
+          "gate": "Opus_and_native_activation",
+          "result": "unknown",
+          "evidence": "No candidate-specific Opus verification, useful result in both native clients, bounded lifecycle or paired-skill acceptance is supplied.",
+          "source": "User-provided activation constraint and candidate facts"
+        }
+      ],
+      "quality": "A workflow alternative has not been established as an eligible native entry."
+    }
+  ],
+  "reasoning": "Select the already installed native-stack-research owner for central ownership/provenance registration. This is an existing-owner configuration decision, not activation acceptance or a new vendor adoption. No candidate is established to pass every gate or beat the incumbent. The north-star useful research result remains unproven; no new local trial is authorized.",
+  "unknowns": [
+    "Exact vendor source checks failed: web open was unsupported, search timed out and raw-source retrieval could not resolve the host. Repository claims remain leads.",
+    "Current commit/release freshness, pin-to-tag identity and engineering quality remain unverified.",
+    "The incumbent's useful cited results in both clients, lifecycle acceptance and paired-skill acceptance remain unknown.",
+    "No fresh runtime, model or search discovery was made. Historical failures do not establish a new failure or a pass."
+  ],
+  "overturn_conditions": [
+    "A candidate has exact upstream evidence satisfying every A/B/C gate, including any required server dependency and a demonstrated overlap win.",
+    "An adoption result additionally has Opus live-upstream refute-by-default verification and the required native lifecycle and paired-skill passes before installation.",
+    "Any empirical work is separately authorized through the owner gates; this round authorizes no new local trial."
+  ],
+  "completeness_inputs": [
+    "Exact cited vendor source/API contents and dated commit/release evidence.",
+    "Tag-specific tests/CI, release discipline, installation/integration documentation, maintenance and published evaluation evidence.",
+    "Authorized mode-matched overlap comparison and candidate-specific paired-skill evidence.",
+    "Opus verification and native lifecycle receipts, including useful cited research from Claude Code and Codex."
+  ],
+  "sources": [
+    "User-provided factual packet and unchanged criteria A-D; provenance documents were not opened.",
+    "GPT Researcher skill, root MCP configuration, Codex plugin and pyproject at 0957c301ed06c2a5857b834358c7227c739041d4: retrieval attempted, unavailable.",
+    "gptr-mcp server/test at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda and cited commit/release APIs: retrieval attempted, unavailable.",
+    "DeerFlow claude-to-deerflow skill, chat script and deep-research skill at 345f08be00c8a9495079b732a39b46aa9af1584e: retrieval attempted, unavailable."
+  ]
+}

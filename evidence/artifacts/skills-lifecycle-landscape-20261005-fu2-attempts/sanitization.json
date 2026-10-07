@@ -1,0 +1,9 @@
+{
+ "step": "pre-conversion sanitization",
+ "why": "convert.py refused: a discovery note named a sibling scratchpad folder outside the work dir, so the session UUID in the scratchpad root was not covered by its work-dir/repo/home redaction",
+ "rule": "scratchpad root (outside the sweep work dir) -> '<scratchpad>'",
+ "replacements": 1,
+ "original_sha256": "7ea150a7cef9d36b06850b372a3c4ecbedee5355c822583ce538c0f0838e221a",
+ "sanitized_sha256": "76d3f2ec49a1ad0e416a77f376e2add75d73a718bef86164640c4cee5789f7e6",
+ "original_kept": "private, in this directory; never published"
+}

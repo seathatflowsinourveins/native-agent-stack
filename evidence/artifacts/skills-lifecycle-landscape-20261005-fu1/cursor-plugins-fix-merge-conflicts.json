@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-cursor-plugins-fix-merge-conflicts",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "cursor/plugins@fix-merge-conflicts",
+ "reviewed_commit": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+ "readme_path": "cursor-team-kit/skills/fix-merge-conflicts/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill fix-merge-conflicts in cursor/plugins at commit 4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536 (the adjudicated pin; license NOASSERTION), read from cursor-team-kit/skills/fix-merge-conflicts/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for fix-merge-conflicts; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 9a539a5c5359e25c9a57df5a741e42524f2fe3c8. Survived the landscape-sweep-skills-20261005-fu1-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and native GPT-6 (requested route; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 9925,
+  "pushed_at": "2026-10-05T16:57:16Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "the recursive search the CLI runs when no location it searches holds a valid skill",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "738b251281b30fd33e3892d0679cf94249e9c9e29e1bed40bcdde4a6aca98a76",
+  "skill_md_bytes": 988,
+  "survivor_skill_md_sha256": "738b251281b30fd33e3892d0679cf94249e9c9e29e1bed40bcdde4a6aca98a76",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "9a539a5c5359e25c9a57df5a741e42524f2fe3c8",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "cursor-team-kit/skills/fix-merge-conflicts/SKILL.md@4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+   "text": "Branch has unresolved merge conflicts and needs a reliable path to a buildable state."
+  },
+  {
+   "source": "cursor-team-kit/skills/fix-merge-conflicts/SKILL.md@4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+   "text": "1. Detect all conflicting files from git status and conflict markers. 2. Resolve each conflict with minimal, correctness-first edits. 3. Prefer preserving both sides when safe. Otherwise, choose the variant that compiles and keeps public behavior stable. 4. Regenerate lockfiles with package manager tools instead of hand-editing. 5. Run compile, lint, and relevant tests. 6. Stage resolved files and summarize key decisions."
+  },
+  {
+   "source": "cursor-team-kit/skills/fix-merge-conflicts/SKILL.md@4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+   "text": "- Keep changes minimal and readable. - Do not leave conflict markers in any file. - Avoid broad refactors while resolving conflicts. - Do not push or tag during conflict resolution."
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "kind": "pending-skill-registration",
+  "state": "inert-source-plan",
+  "checked_at": "2026-10-06",
+  "source_class": "source_review_and_selected_installed_file_observation",
+  "candidate": {
+    "name": "mineru",
+    "source": "opendatalab/MinerU",
+    "url": "https://github.com/opendatalab/MinerU/tree/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/skills/mineru",
+    "ref": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+    "path": "skills/mineru",
+    "tree_sha": "38d108595980854f65640d46ab27ecea002b549d",
+    "skill_md_sha256": "dec330a3549d232fed44db2b0c9bc0b64505a11d2526008ddf044b3f94681d96",
+    "skill_md_bytes": 37708,
+    "description_chars": 589,
+    "upstream_disable_model_invocation": false,
+    "license": "Apache-2.0 base with upstream additional commercial and attribution terms; pending lifecycle license review",
+    "official": true,
+    "status": "held",
+    "held_for": "Upstream license/implicit-policy and full installed-tree review, cumulative capacity with hf-cli and native-stack-research, and command-center lifecycle reconciliation decision.",
+    "gap": "Native document reading through the pinned official MinerU skill; existing folder observation is not clean lifecycle installation or model acceptance.",
+    "claude_listing": "on",
+    "codex_enabled": true
+  },
+  "budget": {
+    "main_claude_description_chars": 9484,
+    "repository_claude_cap": 10500,
+    "mineru_delta": 589,
+    "hf_cli_delta": 1008,
+    "both_claude_description_chars": 11081,
+    "both_over_cap": 581,
+    "pending_research_delta": 153,
+    "with_research_claude_description_chars": 11234,
+    "with_research_over_cap": 734
+  },
+  "limits": [
+    "This file is outside the active central skills store and installs or routes nothing.",
+    "Tree pin reused from the retained source manifest; installed full-tree identity was not qualified.",
+    "Selected installed SKILL.md digest/bytes and frontmatter description match; source implicit-policy files still need review.",
+    "No fresh native model discovery, smoke, benchmark or organic census ran for this record.",
+    "LICENSE.md at the pinned official repository has additional terms; do not relabel it plain Apache-2.0.",
+    "hf-cli registration belongs to draft792; no duplicate active entry or cap removal here."
+  ]
+}

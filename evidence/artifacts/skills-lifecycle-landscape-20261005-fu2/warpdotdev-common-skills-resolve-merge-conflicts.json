@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-warpdotdev-common-skills-resolve-merge-conflicts",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "warpdotdev/common-skills@resolve-merge-conflicts",
+ "reviewed_commit": "69b4753651ab7fab518c82be087b9f1d5b966631",
+ "readme_path": ".agents/skills/resolve-merge-conflicts/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill resolve-merge-conflicts in warpdotdev/common-skills at commit 69b4753651ab7fab518c82be087b9f1d5b966631 (the adjudicated pin; license MIT), read from .agents/skills/resolve-merge-conflicts/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for resolve-merge-conflicts; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is f62fff286d3ba22ae59e8c99c3ad0b5c96a5a8e8. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 604,
+  "pushed_at": "2026-09-30T22:51:00Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".agents/skills/, the first location the CLI searches that holds a valid folder named resolve-merge-conflicts",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "ac26cb07c75c1778513383f45df53902ad7b7f97898cf0131f2967a80a3f0e51",
+  "skill_md_bytes": 2929,
+  "survivor_skill_md_sha256": "ac26cb07c75c1778513383f45df53902ad7b7f97898cf0131f2967a80a3f0e51",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "f62fff286d3ba22ae59e8c99c3ad0b5c96a5a8e8",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".agents/skills/resolve-merge-conflicts/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "Resolve conflicts without opening full files unless the compact view is insufficient. Start with a summary, then inspect one conflicted file at a time."
+  },
+  {
+   "source": ".agents/skills/resolve-merge-conflicts/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "```bash python3 .agents/skills/resolve-merge-conflicts/scripts/extract_conflict_context.py ```"
+  },
+  {
+   "source": ".agents/skills/resolve-merge-conflicts/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "Use the summary to identify which files are unresolved, which index stages exist, and how many text hunks each file contains."
+  }
+ ]
+}

@@ -1,8 +1,8 @@
 # Runtime-worker skills trial
 
-The [manifest](manifest.json) selects **137 skills from 13 pinned sources** for
+The [manifest](manifest.json) selects **134 skills from 13 pinned sources** for
 a broad worker trial: 77 OpenHands registry skills, 14 of the 15 superpowers
-lifecycle skills, all 28 of the adoption manifest's skills reused by `reuse_ref`,
+lifecycle skills, all 25 of the adoption manifest's skills reused by `reuse_ref`,
 and targeted additions for evaluation, research, browser testing and framework
 review. `security-audit` and `skill-creator` joined the reused set on 2026-09-30, when
 main promoted the first and pinned the second
@@ -68,6 +68,13 @@ Both references are the value `"adoption/skills/manifest.json"` and match the
 adoption skill of the same name, so main can reorder or insert skills without
 moving a reference. `tests.test_runtime_worker_skills` fails when main adds a skill
 that is in neither set, and when a reused entry's pin differs from main's.
+
+The shared installer also carries a central `held` or `pruned` status into a
+reused entry. A worker trial cannot release either gate. An eligible central
+entry leaves the worker's own trial or hold intact. OpenHands checks the same
+resolved set as the installer and records both manifest hashes. Thus the 134
+rows are a catalog count; the current central browser hold leaves 133 eligible
+worker entries. See the [2026-10-05 readiness record](../../../evidence/artifacts/skills-lifecycle-readiness-20261005/README.md).
 
 - **Codex.** A reused entry carries no `codex_enabled` or `claude_listing` of its
   own. `install_skills.py` resolves each `reuse_ref` when it reads the manifest,

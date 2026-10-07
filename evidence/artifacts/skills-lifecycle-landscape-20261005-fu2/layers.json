@@ -1,0 +1,562 @@
+[
+ {
+  "catalog": "skills",
+  "layer_id": "skills-ci-pr",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-ci-pr",
+  "calls": {
+   "web_search": 9,
+   "web_fetch": 3,
+   "gh_api": 61,
+   "gpt6_web_search": 11,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "getsentry/skills@iterate-pr",
+   "OpenHands/extensions@iterate",
+   "warpdotdev/common-skills@resolve-merge-conflicts",
+   "jMerta/codex-skills@rebase-assistant",
+   "warpdotdev/common-skills@diagnose-ci-failures",
+   "github/awesome-copilot@copilot-pr-autopilot",
+   "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+   "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+   "cursor/plugins@fix-merge-conflicts",
+   "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+   "cursor/plugins@fix-ci",
+   "Parcha-ai/parcha-skills@review-loop",
+   "equinor/fusion-skills@fusion-github-review-resolution",
+   "cursor/plugins@get-pr-comments"
+  ],
+  "survived": [
+   {
+    "repo": "warpdotdev/common-skills@resolve-merge-conflicts",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/2/fit"
+    }
+   },
+   {
+    "repo": "warpdotdev/common-skills@diagnose-ci-failures",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/4/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/7/fit"
+    }
+   },
+   {
+    "repo": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/9/fit"
+    }
+   },
+   {
+    "repo": "Parcha-ai/parcha-skills@review-loop",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/11/fit"
+    }
+   },
+   {
+    "repo": "cursor/plugins@get-pr-comments",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/13/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/13/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "getsentry/skills@iterate-pr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/0/fit"
+    }
+   },
+   {
+    "repo": "OpenHands/extensions@iterate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/1/fit"
+    }
+   },
+   {
+    "repo": "jMerta/codex-skills@rebase-assistant",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/3/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@copilot-pr-autopilot",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/5/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-resolve-pr-feedback",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/6/fit"
+    }
+   },
+   {
+    "repo": "cursor/plugins@fix-merge-conflicts",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/8/fit"
+    }
+   },
+   {
+    "repo": "cursor/plugins@fix-ci",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/10/fit"
+    }
+   },
+   {
+    "repo": "equinor/fusion-skills@fusion-github-review-resolution",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-ci-pr/12/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/skills-ci-pr"
+   }
+  ]
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-agent-docs",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-agent-docs",
+  "calls": {
+   "web_search": 11,
+   "web_fetch": 11,
+   "gh_api": 80,
+   "gpt6_web_search": 22,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 80
+  },
+  "proposed": [
+   "affaan-m/ECC@living-docs-governance",
+   "anthropics/claude-plugins-official@claude-md-improver",
+   "getsentry/skills@agents-md",
+   "pizzayap/pza-skills@astra-instruction-audit",
+   "microsoft/skills@wiki-agents-md",
+   "JuliusBrussee/caveman@caveman-compress",
+   "addyosmani/agent-skills@context-engineering",
+   "github/awesome-copilot@docs-sync-audit",
+   "agent-sh/agnix@agnix",
+   "dyoshikawa/rulesync@rulesync",
+   "anthropics/skills@claude-api",
+   "mblode/agent-skills@agents-md",
+   "Zandereins/schliff@schliff"
+  ],
+  "survived": [
+   {
+    "repo": "anthropics/claude-plugins-official@claude-md-improver",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/1/fit"
+    }
+   },
+   {
+    "repo": "getsentry/skills@agents-md",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/2/fit"
+    }
+   },
+   {
+    "repo": "addyosmani/agent-skills@context-engineering",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/6/fit"
+    }
+   },
+   {
+    "repo": "agent-sh/agnix@agnix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/8/fit"
+    }
+   },
+   {
+    "repo": "dyoshikawa/rulesync@rulesync",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/9/fit"
+    }
+   },
+   {
+    "repo": "mblode/agent-skills@agents-md",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/11/fit"
+    }
+   },
+   {
+    "repo": "Zandereins/schliff@schliff",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/12/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "affaan-m/ECC@living-docs-governance",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/0/fit"
+    }
+   },
+   {
+    "repo": "pizzayap/pza-skills@astra-instruction-audit",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/3/fit"
+    }
+   },
+   {
+    "repo": "microsoft/skills@wiki-agents-md",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/4/fit"
+    }
+   },
+   {
+    "repo": "JuliusBrussee/caveman@caveman-compress",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/5/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@docs-sync-audit",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/7/fit"
+    }
+   },
+   {
+    "repo": "anthropics/skills@claude-api",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-agent-docs/10/fit"
+    }
+   }
+  ],
+  "reopen": []
+ },
+ {
+  "catalog": "skills",
+  "layer_id": "skills-review",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/skills-review",
+  "calls": {
+   "web_search": 14,
+   "web_fetch": 11,
+   "gh_api": 64,
+   "gpt6_web_search": 22,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 80
+  },
+  "proposed": [
+   "trailofbits/skills@post-patch-validation",
+   "mattpocock/skills@code-review",
+   "github/awesome-copilot@build-evidence-map",
+   "anthropics/claude-plugins-official@claude-security",
+   "cursor/plugins@verify-this",
+   "trailofbits/skills@trailmark-variant-neighborhood",
+   "getsentry/skills@find-bugs",
+   "EveryInc/compound-engineering-plugin@ce-code-review",
+   "ast-grep/agent-skill@ast-grep",
+   "openai/codex@review-agent",
+   "openai/plugins@assess-patch-risk",
+   "BoundaryML/baml@baml-core",
+   "pydantic/skills@building-pydantic-ai-agents",
+   "openai/plugins@verify-fix"
+  ],
+  "survived": [
+   {
+    "repo": "mattpocock/skills@code-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/1/fit"
+    }
+   },
+   {
+    "repo": "ast-grep/agent-skill@ast-grep",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/8/fit"
+    }
+   },
+   {
+    "repo": "BoundaryML/baml@baml-core",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/11/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/11/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@verify-fix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/13/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/13/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "trailofbits/skills@post-patch-validation",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/0/fit"
+    }
+   },
+   {
+    "repo": "github/awesome-copilot@build-evidence-map",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/2/fit"
+    }
+   },
+   {
+    "repo": "anthropics/claude-plugins-official@claude-security",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/3/fit"
+    }
+   },
+   {
+    "repo": "cursor/plugins@verify-this",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/4/fit"
+    }
+   },
+   {
+    "repo": "trailofbits/skills@trailmark-variant-neighborhood",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/5/fit"
+    }
+   },
+   {
+    "repo": "getsentry/skills@find-bugs",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/6/fit"
+    }
+   },
+   {
+    "repo": "EveryInc/compound-engineering-plugin@ce-code-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/7/fit"
+    }
+   },
+   {
+    "repo": "openai/codex@review-agent",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/9/fit"
+    }
+   },
+   {
+    "repo": "openai/plugins@assess-patch-risk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/skills-review/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/10/fit"
+    }
+   },
+   {
+    "repo": "pydantic/skills@building-pydantic-ai-agents",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/skills-review/12/fit"
+    }
+   }
+  ],
+  "reopen": []
+ }
+]

@@ -46,7 +46,7 @@ This starter and the worker override disable the unused curated-plugin sync with
 `features.plugins=false`. Native skills/MCP remain available; plugin-provided
 skill roots are excluded. See the [source-based choice](../../docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md).
 
-Codex 0.160.0 app-server does not apply the CLI's selected named profile, even
+Codex 0.160.1 app-server does not apply the CLI's selected named profile, even
 though the SDK exposes launch-argument overrides. Keep selected settings in the
 worker home's native configuration and process overrides. A profile flag or
 legacy `profile=` key is not a substitute.
@@ -145,13 +145,13 @@ hook support and optional scheduler/tool recipes keep their own execution gates.
 
 ## Primary sources
 
-- [Codex SDK and exactly pinned request internals](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python),
-  `AsyncCodexClient.request`, `generated/v2_all.py`, version 0.160.0.
-- [Native app-server profile boundary](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/main.rs#L1263)
-  and [child provider inheritance](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/agent/child_config.rs#L130).
-- [Native spawn-default validation order](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/agent/child_config.rs#L196-L235)
-  and [role model overrides](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/agent/role.rs#L177-L191).
-- [Native MCP configuration](https://developers.openai.com/codex/mcp), [native agent fields](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/config_toml.rs#L479).
+- [Codex SDK and exactly pinned request internals](https://github.com/openai/codex/tree/d27764b82f7118f674371e6d6e76271d9d606edb/sdk/python),
+  `AsyncCodexClient.request`, `generated/v2_all.py`, version 0.160.1.
+- [Native app-server profile boundary](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/cli/src/main.rs#L1263)
+  and [child provider inheritance](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/agent/child_config.rs#L130).
+- [Native spawn-default validation order](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/agent/child_config.rs#L196-L235)
+  and [role model overrides](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/agent/role.rs#L177-L191).
+- [Native MCP configuration](https://developers.openai.com/codex/mcp), [native agent fields](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/config/src/config_toml.rs#L479).
 - [Context Mode 1.0.169](https://github.com/mksglu/context-mode/tree/589d8214d56740a28b5f7bf63167743d586b0b40),
   native stdio entry as reviewed in `adoption/templates/codex.config.template.toml`.
 - [Serena selected source](https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143),

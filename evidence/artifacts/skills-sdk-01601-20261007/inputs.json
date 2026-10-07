@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "native_catalog_requirement_binding",
+  "observation": "receipt.json native_catalog",
+  "raw_readback_sha256": "b4ea1b8b55fc28792b1dd043ff0f449c1449edf159a272601923270f29259fb1",
+  "central_manifest": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "ref": "3d7d4a4b2640c8583d8855670111ef5d023d3e03",
+    "path": "adoption/skills/manifest.json",
+    "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
+    "selection": "status != held and codex_enabled == true",
+    "required_count": 23,
+    "required_names": [
+      "agentic-actions-auditor", "codebase-design", "codeql", "diagnosing-bugs",
+      "find-skills", "fp-check", "frontend-design", "gh-address-comments",
+      "gh-fix-ci", "iterative-retrieval", "mcp-builder", "modern-python",
+      "property-based-testing", "sarif-parsing", "search-first", "security-audit",
+      "security-best-practices", "security-threat-model", "supply-chain-risk-auditor",
+      "tdd", "typesafe-ai", "variant-analysis", "writing-for-agents"
+    ],
+    "matches_native_requirement_set": true
+  },
+  "limits": "These are the original readback's selected requirements. Later merged manifests need their own declared input binding/readback; no observation in receipt.json is rewritten."
+}

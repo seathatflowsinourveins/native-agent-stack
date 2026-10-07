@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-boundaryml-baml-baml-core",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "BoundaryML/baml@baml-core",
+ "reviewed_commit": "1698b89bc0881ce893e0f0b9f5d842108cfefe81",
+ "readme_path": "skills/baml-core/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-review"
+ ],
+ "claim": "Source review of the skill baml-core in BoundaryML/baml at commit 1698b89bc0881ce893e0f0b9f5d842108cfefe81 (the adjudicated pin; license Apache-2.0), read from skills/baml-core/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for baml-core; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 431b00053bc7af9bec3a3f03a139c6a6e06f473b. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 9381,
+  "pushed_at": "2026-10-05T19:58:10Z",
+  "archived": false,
+  "default_branch": "canary",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "1698b89bc0881ce893e0f0b9f5d842108cfefe81",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named baml-core",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "8bf10bba07c9ea252406e9e725944fbb3e22074ce7f32109b02f0e223316239b",
+  "skill_md_bytes": 28708,
+  "survivor_skill_md_sha256": "8bf10bba07c9ea252406e9e725944fbb3e22074ce7f32109b02f0e223316239b",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "431b00053bc7af9bec3a3f03a139c6a6e06f473b",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/baml-core/SKILL.md@1698b89bc0881ce893e0f0b9f5d842108cfefe81",
+   "text": "BAML is a statically-typed, expression-oriented *language* — TypeScript with `snake_case` methods, `name: type,` fields, enums, interfaces, generics, closures, optional chaining, backtick strings with `${...}` interpolation, `.to_string()` on any value, a real stdlib. And a declarative *DSL* for LLM calls (`function … { client: prompt: }`, `test`) that desugars into it, so a model's structured output is just a typed return value."
+  },
+  {
+   "source": "skills/baml-core/SKILL.md@1698b89bc0881ce893e0f0b9f5d842108cfefe81",
+   "text": "**The CLI is the documentation. Discover via `baml describe`:**"
+  },
+  {
+   "source": "skills/baml-core/SKILL.md@1698b89bc0881ce893e0f0b9f5d842108cfefe81",
+   "text": "baml init # new project (baml.toml + baml_src/) baml help <command> # CLI options and examples baml describe baml.json # reference for any module/type/method/signature/keyword baml describe Array --budget 120 # (Array, String, Map, assert, match, patterns, spawn, python, ...) # ends with \"N more lines\"? re-run with `--budget <N>` baml check # compile-check the project baml run -e 'expr' # eval an expression; fast feedback + syntax check baml test --list && baml test # run every test/testset bloc"
+  }
+ ]
+}

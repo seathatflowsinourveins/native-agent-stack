@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bmad-code-org-bmad-method-bmad-forge-idea",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "bmad-code-org/BMAD-METHOD@bmad-forge-idea",
+ "reviewed_commit": "8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+ "readme_path": "skills/bmad-forge-idea/SKILL.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "skills-design-intake"
+ ],
+ "claim": "Source review of the skill bmad-forge-idea in bmad-code-org/BMAD-METHOD at commit 8f2c13dd0e0073cad84168a679e5c553b2fb30b6 (the adjudicated pin; license NOASSERTION), read from skills/bmad-forge-idea/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for bmad-forge-idea; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is e943bbaf546f50e94bf68a22d87d66b8b54ad6a9. Survived the landscape-sweep-skills-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 53794,
+  "pushed_at": "2026-10-05T06:14:29Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "NOASSERTION",
+  "adjudicated_pin": "8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named bmad-forge-idea",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e8c4080be9f34e473725f2bd42fa8a8aad5e89ba19b9733a83f9091b97386d24",
+  "skill_md_bytes": 11056,
+  "survivor_skill_md_sha256": "e8c4080be9f34e473725f2bd42fa8a8aad5e89ba19b9733a83f9091b97386d24",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "e943bbaf546f50e94bf68a22d87d66b8b54ad6a9",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/bmad-forge-idea/SKILL.md@8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+   "text": "Take a half-formed idea and pressure-test it in conversation, while changing your mind is still cheap, until it becomes something the user can act on with conviction or reject. The main risk is what the user has not examined yet: unchecked assumptions and unresolved decisions usually become more expensive problems later."
+  },
+  {
+   "source": "skills/bmad-forge-idea/SKILL.md@8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+   "text": "The main goal is better thinking, not producing an artifact. Strengthening an idea, rejecting it, or thinking it through more clearly are all complete outcomes. Writing the forged idea to hand off to another workflow is optional. Do not steer the conversation toward \"shall we build it?\""
+  },
+  {
+   "source": "skills/bmad-forge-idea/SKILL.md@8f2c13dd0e0073cad84168a679e5c553b2fb30b6",
+   "text": "This skill can be used on many kinds of ideas. When the idea is about a product or feature, what survives may be written to a short forged idea for later planning."
+  }
+ ]
+}

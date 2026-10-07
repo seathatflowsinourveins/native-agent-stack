@@ -710,11 +710,12 @@ class SkillsStatusTests(unittest.TestCase):
         extra = self.make_skill("extra-skill")  # a real canonical folder the manifest never mentions
         self.write_lock(self.lock_entries_for([alpha, beta, extra]))
         report = self.report(manifest)
-        self.assertEqual(report["extra_skills"], [{"name": "extra-skill", "in_agents_dir": True, "in_lock": True}])
+        self.assertEqual(report["extra_skills"][0]["name"], "extra-skill")
+        self.assertFalse(report["extra_skills"][0]["recorded"])
         self.assertEqual(report["unlocked_folders"], [])
-        self.assertEqual(report["result"], "ok")  # a warning, not a failure
+        self.assertEqual(report["result"], "fail")  # unrecorded extras fail metadata status, never an installer deny
         result = self.run_cli(manifest)
-        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.returncode, 1, result.stderr)
         self.assertIn("extra-skill", result.stdout)
 
     def test_extra_skill_in_lock_only(self):
@@ -725,8 +726,9 @@ class SkillsStatusTests(unittest.TestCase):
                                   "installedAt": "2026-09-25T00:00:00Z", "updatedAt": "2026-09-25T00:00:00Z"}
         self.write_lock(entries)  # a lock entry with no folder on disk
         report = self.report(manifest)
-        self.assertEqual(report["extra_skills"], [{"name": "ghost-skill", "in_agents_dir": False, "in_lock": True}])
-        self.assertEqual(report["result"], "ok")
+        self.assertEqual(report["extra_skills"][0]["name"], "ghost-skill")
+        self.assertFalse(report["extra_skills"][0]["recorded"])
+        self.assertEqual(report["result"], "fail")
 
     # -- unlocked folders ---------------------------------------------------
 
@@ -826,8 +828,10 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
         self.assertEqual(set(data), {"schema_version", "lock", "claude_settings", "codex_config", "skills",
-                                     "extra_skills", "unlocked_folders", "budget", "folder_trees", "result"})
-        self.assertEqual(set(data["folder_trees"]), {"ok", "runtime_artifacts", "drift", "missing", "unreadable", "held"})
+                                    "extra_skills", "unlocked_folders", "budget", "folder_trees", "result",
+                                    "metadata_only", "ledger", "metadata_roots", "preloads", "tool_coupling"})
+        self.assertEqual(set(data["folder_trees"]), {"ok", "runtime_artifacts", "drift", "missing", "unreadable", "held",
+                                                   "native_generated", "not_checked"})
         self.assertEqual(len(data["skills"]), 2)
         for skill in data["skills"]:
             self.assertEqual(set(skill), {"name", "pass", "canonical", "lock", "claude_link",
@@ -989,7 +993,7 @@ class SkillsStatusTests(unittest.TestCase):
         budget = report["budget"]
         self.assertEqual(budget["claude_on_description_chars"],
                          {"manifest": 500, "computed": 500, "matches_manifest": True})
-        self.assertTrue(budget["claude_within_cap"])
+        self.assertIsNone(budget["claude_within_cap"])
         self.assertEqual(budget["codex_catalog_description_chars"],
                          {"manifest": 500, "computed": 500, "matches_manifest": True})
         self.assertEqual(report["result"], "ok")
@@ -1012,8 +1016,8 @@ class SkillsStatusTests(unittest.TestCase):
         self.write_claude_settings({})
         self.write_codex_config([])
         report = self.report(manifest)
-        self.assertFalse(report["budget"]["claude_within_cap"])
-        self.assertFalse(report["budget"]["codex_within_budget"])
+        self.assertIsNone(report["budget"]["claude_within_cap"])
+        self.assertIsNone(report["budget"]["codex_within_budget"])
         self.assertEqual(report["result"], "ok")
 
     def test_codex_catalog_is_estimated_as_render_rs_estimates_it_against_the_configured_token_budget(self):
@@ -1050,29 +1054,271 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(budget["codex_catalog_description_chars"],
                          {"manifest": 1600, "computed": 1600, "matches_manifest": True})
         self.assertEqual(budget["codex_catalog_estimated_tokens"], expected)
-        self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
-        self.assertTrue(budget["codex_within_budget"])
+        self.assertIsNone(budget["codex_configured_budget_tokens"])
+        self.assertIsNone(budget["codex_within_budget"])
         self.assertEqual(budget["codex_fallback_budget_chars"], 8000)  # metadata only, never the comparison
         self.assertNotIn("codex_within_cap", budget)
         self.assertEqual(report["result"], "ok")
         text = ss.render_text(report)
-        self.assertIn(f"estimated_tokens={expected} configured_budget_tokens=6000 within_budget=True", text)
+        self.assertIn(f"estimated_tokens={expected} configured_budget_tokens=None within_budget=None", text)
         manifest["budget"]["codex_configured_budget_tokens"] = expected - 1
         tight = self.report(manifest)
-        self.assertFalse(tight["budget"]["codex_within_budget"])
-        self.assertEqual(tight["result"], "ok")  # informational only
+        self.assertIsNone(tight["budget"]["codex_within_budget"])
+        self.assertEqual(tight["result"], "ok")
+        self.assertIsNone(budget["codex_within_budget"])
+
+    def test_recorded_extra_needs_current_identity_and_a_nonremoved_ledger_row(self):
+        manifest, alpha, beta = self.setup_pair()
+        extra = self.make_skill("extra-skill")
+        self.write_lock(self.lock_entries_for([alpha, beta, extra]))
+        ledger = self.tmp / "ledger.jsonl"
+        row = {"schema_version": 1, "kind": "skill_state_change", "skill_name": "extra-skill",
+               "scope": "home_agents", "action": "observed",
+               "state_key": ss.metadata_state_key(self.skill_md_path("extra-skill").resolve()),
+               "after": {"skill_md_sha256": extra["skill_md_sha256"]}}
+        ledger.write_text(json.dumps(row) + "\n")
+        report = ss.inspect(manifest, self.home, self.env, ledger=ledger)
+        self.assertEqual(report["result"], "ok")
+        self.assertTrue(report["extra_skills"][0]["recorded"])
+        row["after"]["skill_md_sha256"] = "0" * 64
+        ledger.write_text(json.dumps(row) + "\n")
+        self.assertEqual(ss.inspect(manifest, self.home, self.env, ledger=ledger)["result"], "fail")
+        row.update(action="remove", after=None)
+        ledger.write_text(json.dumps(row) + "\n")
+        self.assertEqual(ss.inspect(manifest, self.home, self.env, ledger=ledger)["result"], "fail")
+
+    def test_ledger_coverage_and_removal_are_bound_to_the_canonical_profile_root(self):
+        manifest, _alpha, _beta = self.setup_pair()
+        default = self.write_canonical("profile-skill", b"default-profile public fixture")
+        custom_home = self.tmp / "custom-profile"
+        custom = custom_home / ".agents/skills/profile-skill/SKILL.md"
+        custom.parent.mkdir(parents=True)
+        custom.write_bytes(b"custom-profile public fixture")
+        default_key, custom_key = ss.metadata_state_key(default.resolve()), ss.metadata_state_key(custom.resolve())
+
+        def row(path, key, action="observed"):
+            return {"schema_version": 1, "kind": "skill_state_change", "skill_name": "profile-skill",
+                    "scope": "home_agents", "state_key": key, "action": action,
+                    "after": None if action == "remove" else {"skill_md_sha256": hashlib.sha256(path.read_bytes()).hexdigest()}}
+
+        ledger = self.tmp / "profile-ledger.jsonl"
+        ledger.write_text(json.dumps(row(default, default_key)) + "\n" + json.dumps(row(custom, custom_key)) + "\n")
+        identities, state = ss.ledger_identities(ledger)
+        self.assertEqual(state, "ok")
+        self.assertTrue(ss.recorded_extras(manifest, self.home, self.env, set(), identities)[0]["recorded"])
+        custom_extra = ss.recorded_extras(manifest, custom_home, {}, set(), identities)[0]
+        self.assertTrue(custom_extra["recorded"])
+        self.assertNotEqual(default_key, custom_extra["state_key"])
+        with ledger.open("a") as stream:
+            stream.write(json.dumps(row(custom, custom_key, "remove")) + "\n")
+        identities, _state = ss.ledger_identities(ledger)
+        self.assertTrue(ss.recorded_extras(manifest, self.home, self.env, set(), identities)[0]["recorded"])
+        self.assertFalse(ss.recorded_extras(manifest, custom_home, {}, set(), identities)[0]["recorded"])
+        custom.write_bytes(default.read_bytes())
+        ledger.write_text(json.dumps(row(custom, custom_key)) + "\n")
+        identities, _state = ss.ledger_identities(ledger)
+        # Even identical bytes in another profile cannot attest this physical root.
+        self.assertFalse(ss.recorded_extras(manifest, self.home, self.env, set(), identities)[0]["recorded"])
+        legacy = row(default, default_key)
+        del legacy["state_key"]
+        ledger.write_text(json.dumps(legacy) + "\n")
+        identities, _state = ss.ledger_identities(ledger)
+        self.assertFalse(ss.recorded_extras(manifest, self.home, self.env, set(), identities)[0]["recorded"])
+
+    def test_canonical_claude_alias_and_shared_copy_have_one_state_key(self):
+        _manifest, _alpha, _beta = self.setup_pair()
+        extra = self.write_canonical("alias-skill", b"public alias fixture")
+        self.write_claude_link("alias-skill")
+        identities = [item for item in ss.installed_metadata(self.home, self.env) if item["name"] == "alias-skill"]
+        self.assertEqual(len(identities), 1)
+        self.assertEqual(identities[0]["state_key"], ss.metadata_state_key(extra.resolve()))
+
+    def test_metadata_only_never_reads_client_settings_or_runs_executables(self):
+        manifest, _alpha, _beta = self.setup_pair()
+        with mock.patch.object(ss, "load_skill_overrides", side_effect=AssertionError("settings read")), \
+             mock.patch.object(ss, "load_codex_config", side_effect=AssertionError("config read")), \
+             mock.patch.object(ss, "check_cli_version", side_effect=AssertionError("executable")), \
+             mock.patch.object(ss, "check_folder_tree", side_effect=AssertionError("full tree")):
+            report = ss.inspect(manifest, self.home, self.env, skills_bin="never-run", metadata_only=True)
+        self.assertEqual(report["result"], "ok")
+        self.assertTrue(report["metadata_only"])
+        self.assertEqual(report["claude_settings"]["state"], "not_checked")
+        self.assertNotIn("cli_version", report)
+        self.assertIsNone(report["budget"]["codex_within_budget"])
+
+    def test_bytecode_does_not_change_a_compared_skill_tree_but_source_mutation_does(self):
+        skill = self.make_skill("bytecode")
+        folder = self.home / ".agents/skills/bytecode"
+        skill["tree_sha"] = ss.git_tree_sha(folder)
+        (folder / "__pycache__").mkdir()
+        (folder / "__pycache__/imported.pyc").write_bytes(b"compiled runtime artifact")
+        (folder / "loose.pyc").write_bytes(b"another runtime artifact")
+        self.assertEqual(ss.check_folder_tree(folder.parent, skill)["state"], "ok")
+        (folder / "SKILL.md").write_text("changed pinned content")
+        self.assertEqual(ss.check_folder_tree(folder.parent, skill)["state"], "drift")
+
+    def test_claude_live_budget_uses_native_ratio_and_utf16_units_and_requires_signal(self):
+        listing = {"listing": "x" * 30001, "contextWindow": 200000, "bytesPerToken": 3,
+                   "skillListingBudgetFraction": 0.05, "truncatedSkills": []}
+        self.assertEqual(ss.native_claude_budget(listing)["state"], "fail")
+        self.assertEqual(ss.native_claude_budget(listing)["character_budget"], 30000)
+        listing["bytesPerToken"] = 4
+        self.assertEqual(ss.native_claude_budget(listing)["state"], "ok")
+        listing.update(listing="😀😀", contextWindow=20, bytesPerToken=3)
+        self.assertEqual(ss.native_claude_budget(listing)["state"], "fail")  # four JS code units, cap three
+        listing["listing"] = "ok"
+        listing["truncatedSkills"] = ["hidden"]
+        self.assertEqual(ss.native_claude_budget(listing)["state"], "fail")
+        del listing["truncatedSkills"]
+        self.assertEqual(ss.native_claude_budget(listing)["state"], "unknown")
+
+    def test_native_codex_render_charge_and_failed_truncation_controls(self):
+        line = "- alpha: 漢字 (file: /owned/alpha/SKILL.md)"
+        expected = (len((line + "\n").encode()) + 3) // 4
+        catalog = {"catalog": line, "max_context_tokens": expected, "warnings": [], "truncated_descriptions": []}
+        self.assertEqual(ss.native_codex_budget(catalog, None)["catalog_tokens"], expected)
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "ok")
+        catalog["max_context_tokens"] = expected - 1
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "fail")
+        catalog.update(max_context_tokens=6000, truncated_descriptions=["alpha"])
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "fail")
+        catalog.update(truncated_descriptions=[], warnings=["Exceeded skills context budget. All skill descriptions were removed and names remain."])
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "fail")
+        catalog["catalog"] = "not a native catalog"
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "fail")  # observed warning is definitive
+        catalog["warnings"] = []
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "unknown")
+
+    def test_native_nonhost_locators_are_charged_and_unparsed_entries_are_unknown(self):
+        lines = [f"- skill{i}: description ({kind}: locator{i})" for i, kind in enumerate(
+            ("file", "executor package", "cloud package", "custom resource"))]
+        tokens = sum((len((line + "\n").encode()) + 3) // 4 for line in lines)
+        catalog = {"catalog": "\n".join(lines), "max_context_tokens": tokens,
+                   "warnings": [], "truncated_descriptions": []}
+        report = ss.native_codex_budget(catalog, None)
+        self.assertEqual(report["catalog_skills"], 4)
+        self.assertEqual(report["catalog_tokens"], tokens)
+        self.assertEqual(report["state"], "ok")
+        catalog["catalog"] += "\n- mystery: unsupported entry"
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "unknown")
+        catalog["truncated_descriptions"] = ["mystery"]
+        self.assertEqual(ss.native_codex_budget(catalog, None)["state"], "fail")
+
+    def test_metadata_external_final_symlink_is_never_opened_or_ledger_covered(self):
+        manifest, _alpha, _beta = self.setup_pair()
+        harmless = self.tmp / "harmless-external.txt"
+        harmless.write_text("public synthetic fixture")
+        path = self.write_canonical("external-link", b"placeholder")
+        path.unlink()
+        path.symlink_to(harmless)
+        original = ss.regular_stream
+
+        def guarded(path):
+            if path == harmless:
+                raise AssertionError("external target opened")
+            return original(path)
+
+        with mock.patch.object(ss, "regular_stream", side_effect=guarded):
+            report = ss.inspect(manifest, self.home, self.env, metadata_only=True)
+        extra = next(item for item in report["extra_skills"] if item["name"] == "external-link")
+        self.assertIsNone(extra["skill_md_sha256"])
+        self.assertFalse(extra["recorded"])
+        self.assertEqual(report["result"], "fail")
+
+    def test_regular_nonblocking_descriptor_rejects_fifo_and_root_redirection(self):
+        if not hasattr(os, "mkfifo"):
+            self.skipTest("POSIX FIFO fixture")
+        folder = self.home / ".claude/agents"
+        folder.mkdir(parents=True)
+        fifo = folder / "blocking.md"
+        os.mkfifo(fifo)
+        with self.assertRaises((OSError, ValueError)):
+            ss.metadata_bytes(fifo, (folder,))
+        harmless_root = self.tmp / "harmless-root"
+        (harmless_root / "skills/example").mkdir(parents=True)
+        (harmless_root / "skills/example/SKILL.md").write_text("public synthetic fixture")
+        redirected = self.tmp / "redirected-home"
+        redirected.mkdir()
+        (redirected / ".agents").symlink_to(harmless_root, target_is_directory=True)
+        with mock.patch.object(ss, "regular_stream", side_effect=AssertionError("redirected root opened")):
+            self.assertEqual(ss.installed_metadata(redirected, {}), [])
+
+    def test_canonical_claude_directory_alias_is_preserved_but_external_role_link_is_unknown(self):
+        manifest, _alpha, _beta = self.setup_pair()
+        observed = ss.installed_metadata(self.home, self.env)
+        self.assertEqual(len(observed), 2)
+        self.assertTrue(all(item["skill_md_sha256"] for item in observed))
+        folder = self.home / ".claude/agents"
+        folder.mkdir(parents=True)
+        harmless = self.tmp / "harmless-role.md"
+        harmless.write_text("---\nname: harmless\nskills: []\n---\npublic fixture\n")
+        (folder / "external-role.md").symlink_to(harmless)
+        report = ss.preload_report(None, self.home, self.env)
+        self.assertEqual(report["state"], "unknown")
+        self.assertIn("external-role", report["unverified_roles"])
+
+    def test_known_missing_role_preload_is_reported_without_running_a_role(self):
+        directory = self.home / ".claude/agents"
+        directory.mkdir(parents=True)
+        role = directory / "isolated-builder-skills.md"
+        role.write_text('---\nname: isolated-builder-skills\nskills:\n  - missing-trial\n---\nPinned body\n')
+        report = ss.preload_report(None, self.home, self.env)
+        self.assertEqual(report["missing"], [{"role": "isolated-builder-skills", "skill": "missing-trial"}])
+        self.write_canonical("missing-trial", b"native skill")
+        self.assertEqual(ss.preload_report(None, self.home, self.env)["missing"], [])
+
+    def test_pending_workflow_preload_is_reported_as_pending(self):
+        workflow = {"rows": [{"lanes": {"ultracode_stage": "inert"}, "measure": {
+            "planned_ultracode_stage": {"agentType": "pending-role", "preload": ["pending-trial"]}}}]}
+        report = ss.preload_report(workflow, self.home, self.env)
+        self.assertIn({"role": "pending-role", "skill": "pending-trial"}, report["pending_missing"])
+
+    def test_known_native_truncation_changes_full_status_result(self):
+        manifest, _alpha, _beta = self.setup_pair()
+        listing = {"listing": "ok", "contextWindow": 200000, "bytesPerToken": 3,
+                   "skillListingBudgetFraction": 0.05, "truncatedSkills": []}
+        self.assertEqual(ss.inspect(manifest, self.home, self.env, claude_listing=listing)["result"], "ok")
+        listing["truncatedSkills"] = ["alpha-skill"]
+        self.assertEqual(ss.inspect(manifest, self.home, self.env, claude_listing=listing)["result"], "fail")
+
+    def test_null_tree_is_only_valid_for_declared_vendor_generated_hf(self):
+        manifest, _alpha, _beta = self.setup_pair()
+        manifest["skills"][0]["tree_sha"] = None
+        path = self.tmp / "null-tree.json"
+        path.write_text(json.dumps(manifest))
+        with self.assertRaises(ss.ManifestError):
+            ss.load_manifest(path)
+        manifest["skills"][0]["source_type"] = "native_generated"
+        path.write_text(json.dumps(manifest))
+        with self.assertRaises(ss.ManifestError):
+            ss.load_manifest(path)
+
+    def test_tool_coupling_is_advisory_and_unknown_without_binary_release_input(self):
+        skill = self.make_skill("agent-browser")
+        skill.update(source="example/browser", path="skills/agent-browser", ref="a" * 40,
+                     url="https://github.com/example/browser/tree/" + "a" * 40 + "/skills/agent-browser")
+        lock = {"skills": self.lock_entries_for([skill])}
+        report = ss.tool_coupling_report([skill], lock, None)
+        self.assertEqual(report[0]["state"], "unknown")
+        self.assertTrue(report[0]["advisory"])
+        release = {"agent-browser": {"tree_sha": "b" * 40, "ref": "c" * 40}}
+        report = ss.tool_coupling_report([skill], lock, release)
+        self.assertEqual(report[0]["state"], "mismatch")
+        self.assertIn("c" * 40, report[0]["restore_proposal"][2])
+        release["agent-browser"]["tree_sha"] = skill["tree_sha"]
+        self.assertEqual(ss.tool_coupling_report([skill], lock, release)[0]["state"], "aligned")
 
     def test_real_manifest_codex_catalog_fits_the_configured_token_budget(self):
         # The Codex template configures [skills] max_context_tokens = 6000; its 8,000-character fallback applies
         # only when the context window is unknown (render.rs L19-22 and L126-152 at rust-v0.159.2), so the
-        # 10,048 Codex-enabled description characters are not measured against it.
+        # Folded catalog descriptions are metadata; they are not measured against that fallback.
         real = ss.load_manifest(ROOT / "adoption" / "skills" / "manifest.json")
         budget = ss.inspect(real, self.home, self.env)["budget"]
-        self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
-        self.assertEqual(budget["codex_catalog_skills"], 24)  # 25 until semgrep was retired on 2026-10-03
+        self.assertIsNone(budget["codex_configured_budget_tokens"])
+        self.assertEqual(budget["codex_catalog_skills"], 26)  # HF and research added; held browser remains metadata.
         self.assertTrue(budget["codex_catalog_description_chars"]["matches_manifest"])
         self.assertLess(budget["codex_catalog_estimated_tokens"], 6000)
-        self.assertTrue(budget["codex_within_budget"])
+        self.assertIsNone(budget["codex_within_budget"])
 
     def test_a_non_boolean_implicit_invocation_flag_is_a_manifest_error(self):
         manifest, alpha, beta = self.setup_pair()

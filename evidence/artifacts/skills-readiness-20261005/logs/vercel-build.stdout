@@ -1,0 +1,17 @@
+
+> skills@1.7.0 build <scratch>/vercel-skills
+> node scripts/generate-licenses.ts && obuild
+
+Generating ThirdPartyNoticeText.txt...
+Generated ThirdPartyNoticeText.txt
+[log] 📦 Building `skills` (`<scratch>/vercel-skills`)
+[log] 🧻 Cleaning up `./dist`
+Writing third-party licenses to <scratch>/vercel-skills/dist/THIRD-PARTY-LICENSES.md
+[log]
+[bundle] ./dist/cli.mjs
+Size: 514 kB, 278 kB minified, 86.6 kB min+gzipped (Side effects: 514 kB)
+Dependencies: [Node.js], tar, yaml
+[log]
+Σ Total dist byte size: 539 kB (20 files)
+[log]
+✅ obuild finished in 2634ms
