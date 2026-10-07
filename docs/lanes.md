@@ -200,6 +200,21 @@ gh pr merge <N> --squash --match-head-commit <SHA>
   Merging `main` right before the merge narrows that window without closing
   it, and `validate.yml` runs again on every push to `main`.
 
+Account for local cleanup separately. At gh v2.102.0, local branch deletion
+requires a requested deletion and an existing local branch, with no `--repo`
+flag and no pending automatic merge. Prunable records are pruned; removal
+applies to another linked worktree holding the head branch, not the current
+linked or main worktree directory
+([local deletion conditions](https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/pr/merge/merge.go#L380-L514),
+[repository flag](https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/pr/merge/merge.go#L123-L124),
+[automatic-merge state](https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/pr/merge/merge.go#L591-L594)).
+The [native removal call](https://github.com/cli/cli/blob/v2.102.0/git/client.go#L283-L290)
+uses no `--force`; a failed removal keeps the branch. Git's
+[status-based clean check and recursive removal](https://github.com/git/git/blob/v2.53.0/builtin/worktree.c#L1295-L1357)
+honor status configuration, and ignored files can be removed with an eligible
+worktree. Inspect the actual worktree list and its contents before selecting
+cleanup options.
+
 ## Coordination
 
 When another live session owns an area, hand off instead of editing it.
@@ -208,6 +223,39 @@ client supports it (for Claude Code peers, see
 [Lane B of the cooperation recipe](../recipes/claude-codex-cooperation-lanes.md#lane-b-live-session-coordination)).
 Mirror the handoff as a GitHub issue or PR comment so other clients, hosts and
 later sessions see it.
+
+Resolve a writer's actual directory with `git worktree list --porcelain`;
+use `git worktree list --porcelain -z` for programmatic reads. Verify the
+branch and HEAD in that directory against the assignment, then confirm the
+selected paths' current owner. Read the recorded directory instead of
+constructing it from a branch name. Git's
+[stable porcelain format](https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc#L251-L261)
+and [labelled worktree records](https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc#L454-L461)
+support this lookup.
+
+Coordinate workers' user-authenticated GitHub REST reads against
+[the per-user primary allowance and its authentication-specific exceptions at github/docs@45a0f053](https://github.com/github/docs/blob/45a0f053ac67e8d1f56fc8f7ee38f0b2a58925c3/data/reusables/rest-api/primary-rate-limit-authenticated-users.md#L1-L3).
+Reuse a pinned source checkout or retained source capture for repeated file
+reads so workers avoid fetching identical source again.
+
+On systemd hosts, use the repository's
+[bounded-run recipe](../adoption/tools/README.md) for its documented resource
+limits; CPU quota depends on controller delegation. Retain actual arguments,
+working directory, start/end times, exit status and returned output under the
+[result-retention policy](acceptance-evidence-policy.md#preserve-the-returned-result).
+The GNU Coreutils v9.12 manual describes
+[`nice` as scheduler advice](https://github.com/coreutils/coreutils/blob/v9.12/doc/coreutils.texi#L18098-L18101);
+[uutils 0.10.0's native help](https://github.com/uutils/coreutils/blob/0.10.0/src/uu/nice/locales/en-US.ftl#L1-L3)
+also describes its scheduling effect. Keep niceness settings separate from
+independently measured containment or performance results.
+
+Generate each new event's timestamp from the actual clock when writing its
+record ([GNU Coreutils v9.12 date invocation](https://github.com/coreutils/coreutils/blob/v9.12/doc/coreutils.texi#L16001-L16019);
+[uutils 0.10.0's default clock read](https://github.com/uutils/coreutils/blob/0.10.0/src/uu/date/src/date.rs#L296-L307),
+[current-time selection](https://github.com/uutils/coreutils/blob/0.10.0/src/uu/date/src/date.rs#L361-L366)).
+For an earlier action, use the time retained in its original native event
+or platform record, following the
+[independent-observation policy](acceptance-evidence-policy.md).
 
 ## No CI lane check for now
 
