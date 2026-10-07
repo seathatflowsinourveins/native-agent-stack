@@ -24,7 +24,8 @@ the package installation is the SDK's
 
 ```sh
 rtk uv lock --script examples/claude-runtime-sdk/worker.py --check
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway http://127.0.0.1:21128 --preflight
+rtk proxy uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway-check &&
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
 ```
 
 Preflight makes no provider request. It reports selected options, package pin,
@@ -35,8 +36,8 @@ the worker launch environment when needed; do not change the coordinator's
 environment or settings. The standalone worker adopts OmniRoute's pinned
 [`buildClaudeEnv`](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/bin/cli/commands/launch.mjs#L23)
 transport: it removes inherited `ANTHROPIC_*` from its own process, sets the
-loopback Anthropic root (the checked-out topology's `gateway.endpoint` with its
-`/v1` suffix removed, fallback `http://127.0.0.1:21128`), enables
+loopback Anthropic root (this host's recorded endpoint with its `/v1` suffix
+removed), enables
 native gateway model discovery and supplies the documented `omniroute-no-auth`
 sentinel for a keyless loopback gateway. An authenticated gateway may use
 `--gateway-token-env APPLICATION_BINDING`: the runtime copies that opaque
@@ -100,10 +101,13 @@ Actual hook/MCP/plugin activation needs an observed worker run.
 
 ## Run, interrupt and recover
 
-Before dispatch on NativeStack2604, complete both
-[model-free gateway preflights](../omniroute-codex-sdk/README.md#2604-gateway-preflights).
-Every invocation, including this bridge's preflight, explicitly passes
-`--gateway http://127.0.0.1:21128`; its Anthropic transport adds `/v1/messages`.
+Before dispatch, complete the
+[gateway tripwire and model-free readiness checks](../omniroute-codex-sdk/README.md#gateway-tripwire-and-readiness).
+The operator writes and checks the host record as documented there; ordinary
+invocations resolve it without a gateway flag. An older checkout refuses
+`--gateway-check` and stops the chain. An owned observer supplies its root through
+`--gateway` and also passes `--unrecorded-gateway-reason 'observer: <name>'` to
+both the tripwire and run. The Anthropic transport adds `/v1/messages`.
 
 Supply a prompt on stdin and an isolated owned cwd. A run contains one native
 SDK query and no retries. The native client handles additional model/tool turns.
@@ -111,8 +115,9 @@ The runner observes the first native result, so independent background jobs need
 their own completion and usage qualification.
 
 ```sh
+rtk proxy uv run --frozen --script examples/claude-runtime-sdk/worker.py \
+  --gateway-check &&
 rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py \
-  --gateway http://127.0.0.1:21128 \
   --cwd "$WORKER_CHECKOUT" --setting-source project \
   --skill search-first --allow-tool Read --timeout 180 \
   --result-output "$PRIVATE_RUN/returned.txt" < "$PRIVATE_RUN/prompt.txt"
@@ -164,7 +169,8 @@ wrong-family, token-binding, missing-result, cancellation and cumulative-snapsho
 are not unchanged upstream tests or live provider evidence.
 
 ```sh
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway http://127.0.0.1:21128 --preflight
+rtk proxy uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway-check &&
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
 rtk uv run --with claude-agent-sdk==0.2.162 \
   python -m unittest discover -s examples/claude-runtime-sdk/tests -v
 rtk uv run --with claude-agent-sdk==0.2.162 \

@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T03:23:03Z",
+  "evidence_class": "source_review_and_local_integration",
+  "deployment_acceptance": "UNQUALIFIED",
+  "base_revision": "e2c569b52c79356d3d5a4ba9a80fee62b359e741",
+  "authorization": "Approved gateway-default-resolution revision3.1, change set A; no host application or native provider acceptance.",
+  "contract": {
+    "sha256_with_marker_lines_and_final_newline": "437e46ea457ff205648cebb9c06c56b201c014fd21fb2133d4be4550be0f94c2",
+    "sha256_with_marker_lines_without_final_newline": "e63090a57a5a58078fd019428fccdba75ffddbf5a1decc52d893e4848dbf4af3",
+    "copies_equal": 4
+  },
+  "sources": [
+    "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+    "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.162",
+    "https://github.com/langchain-ai/langchain/blob/026c3da2/libs/partners/openai/langchain_openai/chat_models/base.py",
+    "https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp",
+    "https://docs.python.org/3/library/os.html#os.replace",
+    "https://docs.python.org/3/library/socket.html#socket.create_connection"
+  ],
+  "unknowns": [
+    "T17/T17c/T17d real transport/precedence lane receipts not run",
+    "Live21128 P15 effective config/read not qualified",
+    "H0/H1/H2/P8 and GW-01 need owner/CC observations",
+    "Dagu V10 native variable expansion not run",
+    "Normal/priority tier value-free operator observations pending"
+  ],
+  "id": "worker-gateway-contract-v2-correction-20261007",
+  "corrects": {
+    "path": "evidence/receipts/worker-gateway-defaults-20261006.json",
+    "sha256": "3bec902a17127dbf380b80a61e9faff08a5e7e22228c330763dfb14c7b58b306",
+    "bytes_unchanged": true
+  },
+  "correction": "The claim that an explicit20128 is accepted describes the prior code's C1 defect on2604. Contractv2 now admits the host record, or an explicitly named unrecorded override; NativeStack's own20128 record remains accepted. This is local/source repair, not proof of a deployed route.",
+  "checks": [
+    {
+      "name": "host_contract",
+      "class": "synthetic_integration",
+      "tests": 31,
+      "skips": 0,
+      "exit_code": 0,
+      "reported_seconds": 0.358
+    },
+    {
+      "name": "worker_adapters",
+      "class": "synthetic_integration",
+      "tests": 23,
+      "skips": 0,
+      "exit_code": 0,
+      "reported_seconds": 0.6
+    },
+    {
+      "name": "legacy_port_ratchet",
+      "class": "synthetic_integration",
+      "tests": 6,
+      "exit_code": 0,
+      "reported_seconds": 0.516,
+      "seeded_lines": 357
+    },
+    {
+      "name": "codex_sdk_initial",
+      "class": "native_sdk_with_authored_loopback_fixtures",
+      "tests": 31,
+      "skips": 0,
+      "exit_code": 1,
+      "reported_seconds": 46.703,
+      "passed": 30,
+      "failure": "One CLI-preflight fixture's two catalog-details subcases omitted the named unrecorded override."
+    },
+    {
+      "name": "codex_sdk_focused_repair",
+      "class": "native_sdk_with_authored_loopback_fixtures",
+      "tests": 1,
+      "subcases": 2,
+      "skips": 0,
+      "exit_code": 0,
+      "reported_seconds": 1.021,
+      "note": "Only failing argv repaired; does not replace the initial failed full-module result. ResourceWarnings retained."
+    },
+    {
+      "name": "claude_sdk",
+      "class": "native_sdk_option_and_synthetic_lifecycle_integration",
+      "tests": 26,
+      "skips": 0,
+      "exit_code": 0,
+      "reported_seconds": 0.4
+    },
+    {
+      "name": "claude_route_control_disarmed",
+      "class": "synthetic_fault_injection",
+      "tests": 1,
+      "failures": 4,
+      "exit_code": 1,
+      "expected_exit_code": 1
+    },
+    {
+      "name": "claude_route_control_armed",
+      "class": "synthetic_fault_injection",
+      "tests": 1,
+      "exit_code": 0
+    }
+  ],
+  "retained_failed_attempts": [
+    {
+      "name": "contract_initial_fixture",
+      "exit_code": 1,
+      "observation": "Eight registry/lint controls ran; writer fixtures never started because fixture helper run collided with TestCase.run. Fixed to fake_run; original log retained."
+    },
+    {
+      "name": "uv_fixture_initial",
+      "exit_code": 2,
+      "observation": "Installed uv rejects combining --no-build and --only-binary. No install happened; corrected by retaining --no-build."
+    },
+    {
+      "name": "graph_index",
+      "status": "aborted_previous_preserved",
+      "observation": "Files changed while indexing or discovery failed; subsequent coverage returned not indexed. Exact source fallback used; no graph completeness claimed."
+    }
+  ],
+  "sdk_fixture_install": {
+    "cli": "uv",
+    "sdk": "claude-agent-sdk==0.2.162",
+    "python": "3.13.16",
+    "isolated_fixture_only": true,
+    "offline": true,
+    "no_config": true,
+    "no_python_downloads": true,
+    "no_build": true,
+    "packages": 30,
+    "exit_code": 0,
+    "native_version_readback_exit": 0,
+    "source": "https://docs.astral.sh/uv/pip/environments/",
+    "host_or_client_configuration_changed": false
+  },
+  "historical_decision": {
+    "path": "docs/decisions/2026-10-06-worker-gateway-defaults.md",
+    "original_prefix_bytes": 10450,
+    "original_prefix_lines": 124,
+    "original_prefix_unchanged": true,
+    "correction_form": "Appended Amendment(2026-10-07): contractv2"
+  },
+  "protocol": [
+    "Each holder uses the same stdlib block before --gateway-check can import an SDK.",
+    "Codex start/resume compares native config/read effective provider base_url before a turn.",
+    "Failed Windows table reads are UNKNOWN, windows_readfalse per legacy port; never no-listener evidence."
+  ],
+  "claim_boundary": "No unchanged upstream test suite, live provider turn, real current deployment, cross-family ACK, hosted CI green or native-bar closure is claimed."
+}

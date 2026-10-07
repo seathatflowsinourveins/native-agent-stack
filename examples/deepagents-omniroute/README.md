@@ -20,16 +20,12 @@ provider execution or promote this candidate to a default.
   [`FilesystemBackend`](https://github.com/langchain-ai/deepagents/blob/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/deepagents/backends/filesystem.py)
   and supported harness profiles.
 - LangChain OpenAI **1.6.7**, [source `026c3da2`](https://github.com/langchain-ai/langchain/blob/026c3da2b615abe52f8446e37de460b844d07a43/libs/partners/openai/langchain_openai/chat_models/base.py).
-  Each `ChatOpenAI` instance uses the supplied `--base-url` (default from the
-  checked-out install plan's `config/gpt-gateway-topology.json` gateway.endpoint,
-  fallback `http://127.0.0.1:21128/v1`), `cx/gpt-6.1-sol-max`, Responses, reasoning
+  Each `ChatOpenAI` instance uses this host's recorded gateway (or a deliberately
+  named observer override), `cx/gpt-6.1-sol-max`, Responses, reasoning
   `{"effort": "max"}`, `use_previous_response_id=False`, request timeout 120
   seconds and zero retries. The caller supplies an existing credential through
   an environment-variable name; the recipe does not copy native client sign-ins.
-  WSL distributions share networking; implicit defaults avoid NativeStack's
-  ports 20128 and 20129. Every NativeStack2604 invocation explicitly passes
-  `--base-url http://127.0.0.1:21128/v1`, regardless of worker revision.
-  Complete both [model-free gateway preflights](../omniroute-codex-sdk/README.md#2604-gateway-preflights)
+  Complete the [gateway tripwire and model-free readiness checks](../omniroute-codex-sdk/README.md#gateway-tripwire-and-readiness)
   before dispatch.
 - SQLite checkpoint package **3.1.1**, [matched release source `b2926a0f`](https://github.com/langchain-ai/langgraph/tree/b2926a0ff9589c28c7e01fe7cdbb337b86d5a4b4/libs/checkpoint-sqlite).
   The published wheel SHA-256 is
@@ -38,7 +34,8 @@ provider execution or promote this candidate to a default.
   Matching package metadata alone does not establish source identity: the
   earlier LangGraph `49cce0ca` source differs from these published bytes.
 
-Each model sends `X-OmniRoute-Session-Id: nas-deepagents-omniroute-<UUID hex>`
+Each model sends matching `X-OmniRoute-Session-Id` and `X-Session-Id` values,
+`nas-deepagents-omniroute-<UUID hex>`,
 through LangChain's pinned `default_headers` interface. The main model and
 specialist keep distinct fresh tags, held for each model instance. OmniRoute's
 [`session_tag` persistence](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/src/lib/usage/callLogs.ts#L741)
@@ -72,8 +69,8 @@ rtk uv pip compile "$RECIPE/requirements.in" --python-version 3.13 \
 rtk uv venv --python 3.13 "$TRIAL_STATE/integration-venv"
 rtk uv pip sync --python "$TRIAL_PYTHON" --require-hashes "$RECIPE/requirements.lock"
 rtk uv pip check --python "$TRIAL_PYTHON"
+rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --gateway-check &&
 rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --workspace "$WORKSPACE" \
-  --base-url http://127.0.0.1:21128/v1 \
   --checkpoint "$CHECKPOINT" --thread-id research-trial \
   --skill /skills --api-key-env OMNIROUTE_WORKER_API_KEY --describe
 ```
@@ -83,14 +80,29 @@ no graph execution, authentication check or provider call. Before an authorized
 trial, supply the existing child credential under `OMNIROUTE_WORKER_API_KEY`
 without logging its value and prepare the frozen task and source files.
 The retained historical trial used the coordinator's owned reverse observer at
-`http://127.0.0.1:25371/v1` for description and execution. The current 2604 commands
-target 21128 explicitly. Description prints the selected endpoint separately
+`http://127.0.0.1:25371/v1` for description and execution. Current normal commands
+resolve the host record activated with `host_gateway.py write` and verified with
+`check`, as documented in the linked worker README. Description prints the selected endpoint separately
 from the retained underlying lane; it does not verify provider identity.
 
+For an owned observer, give the same endpoint and a named reason to the tripwire
+and normal invocation:
+
 ```sh
+rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --gateway-check \
+  --base-url "$OBSERVER_ENDPOINT" \
+  --unrecorded-gateway-reason 'observer: research-trial' &&
+rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --workspace "$WORKSPACE" \
+  --base-url "$OBSERVER_ENDPOINT" \
+  --unrecorded-gateway-reason 'observer: research-trial' \
+  --checkpoint "$CHECKPOINT" --thread-id research-trial \
+  --api-key-env OMNIROUTE_WORKER_API_KEY --describe
+```
+
+```sh
+rtk "$TRIAL_PYTHON" "$RECIPE/worker.py" --gateway-check &&
 rtk timeout --signal=TERM --kill-after=5s 600s "$TRIAL_PYTHON" \
   "$RECIPE/worker.py" --workspace "$WORKSPACE" --checkpoint "$CHECKPOINT" \
-  --base-url http://127.0.0.1:21128/v1 \
   --thread-id research-trial --skill /skills \
   --api-key-env OMNIROUTE_WORKER_API_KEY --prompt-file "$PROMPT_FILE"
 ```

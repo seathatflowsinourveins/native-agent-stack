@@ -3,7 +3,7 @@
 Use this kit by default for foundation OmniRoute workers dispatched by Claude,
 with selected skills, MCP tools, native agents and a readiness gate. The official
 SDK owns execution, tools, compaction, resume and interruption. The worker retains
-Sol/Max on NativeStack2604's port 21128; native parent sessions retain their accounts.
+Sol/Max through this host's recorded gateway; native parent sessions retain their accounts.
 
 ## Prepare an owned worker
 
@@ -53,13 +53,15 @@ legacy `profile=` key is not a substitute.
 
 ## Check readiness, then execute
 
-On NativeStack2604, first complete both model-free checks in
-[2604 gateway preflights](README.md#2604-gateway-preflights). Every launch passes
-the explicit 21128 flag; the guarded reader remains a fallback.
+First complete the [gateway tripwire and model-free readiness checks](README.md#gateway-tripwire-and-readiness).
+The operator activates and checks this host's gateway record as documented there.
+An older checkout rejects the tripwire and stops; normal invocations resolve the
+record without a gateway flag.
 
 ```sh
+rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --gateway-check &&
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
-  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" --codex-home "$WORKER_CODEX_HOME" \
   --preflight --require-mcp context-mode \
   --timeout 60
@@ -86,15 +88,15 @@ selecting retry or fresh recovery.
 
 ## Automate with Dagu
 
-[runtime-worker.yaml](runtime-worker.yaml) uses maintained Dagu 2.16.6 to run
+[runtime-worker.yaml](runtime-worker.yaml) declares the reviewed plan's Dagu 2.18.2 pin to run
 readiness before one bounded SDK task. Export `STACK_ROOT`, `WORKER_PROJECT`,
-`WORKER_CODEX_HOME`, `WORKER_TASK_FILE`, `WORKER_BASE_URL` (normally
-`http://127.0.0.1:21128/v1`) and a new private `WORKER_RESULT` path.
-`WORKER_BASE_URL` is required: both steps pass it as an explicit override of
-the worker's guarded canonical default. Set it deliberately; an empty or
-unset binding is not the worker's implicit-default path. Dagu's pinned value
-resolution preserves unavailable variables rather than supplying an unset
-`${NAME:-word}` default (`specs/006-value-resolution-env.md:393-414`).
+`WORKER_CODEX_HOME`, `WORKER_TASK_FILE` and a new private `WORKER_RESULT` path.
+`WORKER_BASE_URL` is optional: export an empty value to use this host's record;
+any supplied value goes through the same gateway rule in both steps. The graph
+keeps `${WORKER_BASE_URL}` without a `:-` default. An unresolved expansion refuses
+instead of selecting another host. Dagu expansion and unit-context acceptance
+remain the plan's V10 proof; this header is a declared pin, not a new native
+version or DAG-run observation.
 The task comes from the owned input file rather than a scheduler prompt.
 Keep skill requirements in the task's graph configuration: add
 `--require-skill NAME` only after the documented installer and `--check-only`

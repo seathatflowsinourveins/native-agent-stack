@@ -122,3 +122,104 @@ Sources:
 - `langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py:1016,1464-1468` supports request default headers.
 - `anthropics/claude-agent-sdk-python@f2204bb956bab02907aaf3cb88eb9dead28eaa35:src/claude_agent_sdk/types.py:2124-2127;_internal/transport/subprocess_cli.py:819-825` passes worker-scoped environment. [Official Claude header interface](https://code.claude.com/docs/en/env-vars), read 2026-10-06.
 - `diegosouzapw/OmniRoute@2f42a9ac19d1a247ec9ce5473b790843724b3061:open-sse/services/conversationTracker.ts:453,462-468;open-sse/handlers/chatCore.ts:1082-1095,1127-1133;src/lib/usage/callLogs.ts:741,804-821,995-996` defines marker handling, persistence and filtering; `src/sse/services/sessionAffinityPin.ts:197-215` plus `chatCore.ts:1093-1095` refute guaranteed replay isolation from those tags. [UUID generation](https://docs.python.org/3.13/library/uuid.html#uuid.uuid4) supplies distinct identifiers without credential or path content.
+
+## Amendment (2026-10-07): contract v2
+
+The command center's reviewed gateway-default plan revision 3.1 supersedes the
+topology-reader and literal fallback selection above for runtime holders. The
+original 124 lines remain unchanged at `e2c569b52c79356d3d5a4ba9a80fee62b359e741`,
+SHA-256 `5b19c7ce457a23391beac9f6f02b8ed8ac2576880b72b4997125049e50dfe96e`.
+This is a contract decision and implementation amendment. Its fixtures, host
+activation, launch-context proof cells, effective-endpoint read-back and live
+provider qualification remain separate evidence; this section claims none ran.
+
+The selected rule is one host record and one contract in every gateway holder.
+The shipped `tools/omniroute/host_gateway.py write` activates
+`<passwd home>/.config/agent-stack-host/gateway.json` only after verifying exactly
+one IPv4 listener on the exact address, a visible owning PID and, when named,
+membership in the gateway unit's cgroup. A free port cannot establish ownership.
+The record binds its endpoint to the host name and the installation's machine-id
+hash. Missing, malformed, unreadable or foreign records refuse; a missing or
+invalid installation identity also refuses. Darwin remains deferred until a
+cited installation identity is reviewed.
+
+A normal invocation takes its endpoint from that record. An explicit endpoint
+equal to the record is accepted; another endpoint requires
+`--unrecorded-gateway-reason TEXT`. Each holder checks its own gateway-variable
+tuple through the same rule. Unexpanded placeholders and conflicting values
+refuse. The record comes from the passwd home, independent of environment home
+selectors or a distribution-name variable. A `--gateway-check` tripwire executes
+before SDK imports; an old checkout rejects the option and stops the launch
+chain. A normal run adds a bounded TCP probe. Spawned children carry loopback
+`NO_PROXY`/`no_proxy`, and supported Python clients use `trust_env=False` and
+`follow_redirects=False`. The Codex child must report the resolved effective
+provider endpoint through `config/read` before a turn, both on start and resume.
+A missing or mismatched key refuses: V2 has no waiver or residual success path.
+
+The contract covers the Codex, DeepAgents and Claude example workers; the trading
+native worker and Astra router; the landscape-sweep stager and executor; the host
+tool; the OpenHands host-side holder family; the token snapshot reader and
+gateway-record observer. Shell research, observability rendering, Codex lane
+installation and new-host rendering delegate to the shipped tool. The final
+holder registry and parity checks are a retirement prerequisite; a new holder
+must be registered rather than inheriting an unexamined route. Native-provider
+paths without a loopback endpoint read no gateway record.
+
+K2's earlier rejection of a mandatory per-host template placeholder at
+`native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:docs/decisions/2026-09-26-codex-worker-lane.md:339-340`
+is overturned on this date for runtime holders: sharing a loopback made an
+upstream default inadequate authority for host selection. K2 remains in force
+for the source template's bytes. The reviewed client and lane renderers rewrite
+that template from the activated host record and preserve its match rule. This
+scope does not change native coordinator accounts or make generic client
+configuration a runtime route selector. The similarly named K2 launch-context
+cell in the plan means the hcom/tmux pane; it is a separate identifier.
+
+The convergence compared three designs. A's portable host-written record won
+with C's tripwire, negative controls and listener/connect acceptance. B's minimal
+host-class/topology-reader delta retained host-specific classification and
+fallback authority. C's per-run kernel ownership selection embedded this PC's
+ports, unit names and topology path in shared code. Its blocking soak conflicted
+with the owner's rule. Contract v2 instead verifies ownership when publishing
+and accepting the record; runtime callers read the record and probe the resolved
+endpoint. No local trial or waiting interval establishes adoption.
+
+The GPT judge's P1 findings are mapped to the reviewed plan's requirements:
+
+| Judge finding | Contract correction | Required proof; not claimed by this amendment |
+| --- | --- | --- |
+| #1 environment override ignored | Holder-specific variables, including `WORKER_BASE_URL`, are checked; unexpanded values refuse | T12, T14, environment matrix, P3a |
+| #2 any listener accepted then IPv4 recorded | Exact IPv4 address, one visible PID and named-unit cgroup ownership | T16, P9 |
+| #3 free port sufficient to publish | Own listener required; existing record preserved without `--replace`; atomic replacement | T16, H1 read-back |
+| #5 child endpoint unenforced | Mandatory V2 on start/resume; Codex-home checks and Claude settings precedence | T25, T17c/T17d/T17p, T27, P14/P15, GW-07 |
+| #6 transport origin unconstrained | Child loopback bypass; supported Python clients disable environment routing and redirects | T17/T17d with zero skips |
+| #13 retirement omits consumers | Registered holders, executable F-row read-backs and one disposition per host-copy group | P16, GW-05, GW-06 |
+
+Overturn this selection if a host record is lost or overwritten more than once,
+if a required worker account or sandbox cannot see its passwd home, or if GW-11
+observes a foreign listener on a recorded port. The first condition reopens a
+host-name-keyed repository table; the second reopens a system-owned record location;
+the third reopens ownership enforcement. Requalification binds to the exact
+reviewed code, activated host record, child endpoint and deployment. Retirement
+keeps its pre-delete and post-unregister read-backs separate; a dated re-label
+never replaces an executable consumer check.
+
+Sources for this amendment:
+
+- Reviewed gateway-default plan revision 3.1, sections 2.1, 2.5, 5 and 7;
+  SHA-256 `8ce35229f4b1628e274675b1ab6fa283a240ecaf6ae9165e7dbe7fb7b6424cc3`.
+  Its github-ci-finalize change set sections 2, 4 and 6 has SHA-256
+  `e97a5a0d8014613213038b9fa5f83d2ba115350fc7861ba88ec78fdb3a4ab6fd`.
+  These are approved design inputs, not executed proof receipts.
+- The converged design's alternatives table, section 2, is superseded where the
+  reviewed plan strengthens installation binding and mandatory V2 read-back.
+- [Python 3.13 passwd lookup](https://docs.python.org/3.13/library/pwd.html#pwd.getpwuid)
+  and [host name](https://docs.python.org/3.13/library/socket.html#socket.gethostname)
+  supply the host-local lookup primitives; [systemd machine-id format](https://www.freedesktop.org/software/systemd/man/latest/machine-id.html)
+  supplies the installation-identity format, read 2026-10-07.
+- [Git grep at 2.53.0](https://github.com/git/git/blob/v2.53.0/Documentation/git-grep.adoc#L31) supplies the tracked-text
+  scans in the legacy-port ratchet. It unions the main scope with the living
+  new-WSL plan, preserving historical lines and reporting stale allowances.
+- [Dagu 2.18.2 release](https://github.com/dagu-org/dagu/releases/tag/v2.18.2)
+  is the plan's DAG pin. Unset-variable expansion and unit-context execution
+  remain V10 until native observations establish them.

@@ -20,28 +20,53 @@ with exit 0 and output `13`, as retained in the refresh receipt.
 The builder's completed task also retained one MCP `Transport closed` failure;
 writing (`workspace-write`) dispatch is not yet qualified at 0.160.0.
 
-## 2604 gateway preflights
+<a id="2604-gateway-preflights"></a>
 
-Before every NativeStack2604 worker dispatch, complete both model-free checks
-against `http://127.0.0.1:21128/v1`. Use the existing accepted SDK interpreter
+## Gateway tripwire and readiness
+
+Before dispatch, run the tripwire and both model-free readiness checks using this
+host's recorded gateway. Use the existing accepted SDK interpreter
 as `WORKER_SDK_PYTHON`, its native executable as `WORKER_CODEX_BIN`, and the
 owned worktree/private home described below. `PRIVATE_INSPECT_RECEIPT` is a new
 private receipt path. These checks prove readiness/configuration, not a model
 turn, delivered effort or replay isolation. Credentials remain in native state.
 
 ```sh
+rtk "$WORKER_SDK_PYTHON" blueprints/us-equities/workers/native_worker.py \
+  --gateway-check &&
 rtk "$WORKER_SDK_PYTHON" blueprints/us-equities/workers/native_worker.py inspect \
   --codex-bin "$WORKER_CODEX_BIN" --codex-home "$PRIVATE_WORKER_HOME" \
   --workspace "$WORKER_PROJECT" --receipt "$PRIVATE_INSPECT_RECEIPT" \
-  --provider omniroute --gateway-base-url http://127.0.0.1:21128/v1
+  --provider omniroute
+rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --gateway-check &&
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" --codex-home "$PRIVATE_WORKER_HOME" \
-  --base-url http://127.0.0.1:21128/v1 --preflight
+  --preflight
 ```
 
 Source: `native-agent-stack@aca1104d6c082cfb64f1babddecc906f2752c9cd:blueprints/us-equities/workers/native_worker.py:314-317,344-347`
 and the current SDK worker's `--preflight` contract. Require both successful
 checks before the bounded task; an unavailable prerequisite stays unqualified.
+
+The gateway operator activates the record after its own gateway unit is running:
+
+```sh
+rtk proxy python3 -I tools/omniroute/host_gateway.py write \
+  --port "$HOST_GATEWAY_PORT" --unit "$HOST_GATEWAY_UNIT"
+rtk proxy python3 -I tools/omniroute/host_gateway.py check
+```
+
+`write` verifies the local listener's PID and unit before publishing
+`<passwd home>/.config/agent-stack-host/gateway.json`. An existing endpoint is
+preserved unless the operator deliberately supplies `--replace`. Normal workers
+read that record and verify its host and installation identity; they do not
+activate or replace it. Missing, malformed or foreign records refuse with exit 2.
+The tripwire uses only the standard library and rejects an older checkout before
+SDK imports or a task. Its success is a configuration check; the normal run also
+performs a bounded TCP probe. An owned observer requires both an explicit
+`--base-url` and a named `--unrecorded-gateway-reason 'observer: <name>'` in its
+tripwire and run. Gateway variables go through the same rule.
 
 ## Call from a native Claude coordinator
 
@@ -55,8 +80,9 @@ and its artifact/test contract. Pass only that task, not the coordinator's whole
 conversation. `PRIVATE_NATIVE_RESULT` names a new private artifact path.
 
 ```sh
+rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --gateway-check &&
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
-  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --prompt "$WORKER_TASK" \
@@ -76,13 +102,11 @@ dispatcher, called this worker through Bash, and the full native SDK result
 shows one unchanged `npm test` command with exit0. This bounded read-only call
 qualifies the caller path; the separate Claude SDK gateway bridge remains a trial.
 
-The default endpoint comes from `gateway.endpoint` in the checked-out install
-plan's `config/gpt-gateway-topology.json`, with loopback port 21128 as fallback.
-WSL distributions share networking; ports 20128 and 20129 belong to NativeStack,
-so implicit defaults select neither. Every NativeStack2604 invocation still
-passes `--base-url http://127.0.0.1:21128/v1` explicitly, regardless of revision.
-Complete both [model-free preflights](#2604-gateway-preflights) before dispatch. An owned
-reverse observer can be supplied with `--base-url`; the worker never changes
+The default endpoint is this host's recorded gateway. The same checkout uses
+each host's own record, independent of the shell, scheduler or private Codex home.
+Complete the [tripwire and model-free readiness checks](#gateway-tripwire-and-readiness)
+before dispatch. An owned reverse observer needs its explicit endpoint and named
+override reason; the worker never changes
 gateway compression engines or native coordinator configuration. The default
 model is the explicit `cx/gpt-6.1-sol-max` route, with native reasoning effort
 `max` requested at launch and turn start. This route requires an OmniRoute build
@@ -153,8 +177,9 @@ Retain the native thread ID privately and resume with the same project, worker
 home and route:
 
 ```sh
+rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --gateway-check &&
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
-  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --resume "$WORKER_THREAD_ID" \

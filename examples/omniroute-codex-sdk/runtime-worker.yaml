@@ -1,4 +1,4 @@
-# Dagu 2.16.6 / 58fed633d58c1dd1319091fdb2c2f6158ecfa053.
+# Dagu 2.18.2 (the reviewed gateway plan's pin; no native version check here).
 # Native graph/run/depends/timeout format from examples/embedded/local/workflow.yaml
 # and the existing blueprints/convergence-practice/job-recovery/run.py recipe.
 # Export only the task-specific path bindings described in enhancements.md.
@@ -9,14 +9,15 @@ env:
   - STACK_ROOT: ${STACK_ROOT}
   - WORKER_PROJECT: ${WORKER_PROJECT}
   - WORKER_CODEX_HOME: ${WORKER_CODEX_HOME}
-  # Required explicit binding; normally http://127.0.0.1:21128/v1.
-  # Both steps preserve deliberate caller overrides; unset is not a default.
+  # Optional; empty means this host's record; any value goes through the rule.
   - WORKER_BASE_URL: ${WORKER_BASE_URL}
   - WORKER_RESULT: ${WORKER_RESULT}
   - WORKER_TASK_FILE: ${WORKER_TASK_FILE}
 steps:
   - id: readiness
     run: >-
+      rtk proxy uv run --locked --script "${STACK_ROOT}/examples/omniroute-codex-sdk/worker.py"
+      --gateway-check &&
       rtk proxy uv run --locked --script "${STACK_ROOT}/examples/omniroute-codex-sdk/worker.py"
       --workspace "${WORKER_PROJECT}" --codex-home "${WORKER_CODEX_HOME}"
       --base-url "${WORKER_BASE_URL}"
@@ -26,6 +27,8 @@ steps:
   - id: worker
     depends: [readiness]
     run: >-
+      rtk proxy uv run --locked --script "${STACK_ROOT}/examples/omniroute-codex-sdk/worker.py"
+      --gateway-check &&
       rtk proxy uv run --locked --script "${STACK_ROOT}/examples/omniroute-codex-sdk/worker.py"
       --workspace "${WORKER_PROJECT}" --codex-home "${WORKER_CODEX_HOME}"
       --base-url "${WORKER_BASE_URL}"

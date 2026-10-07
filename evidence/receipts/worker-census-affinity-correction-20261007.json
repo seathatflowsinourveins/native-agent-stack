@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T03:23:03Z",
+  "evidence_class": "source_review_and_local_integration",
+  "deployment_acceptance": "UNQUALIFIED",
+  "base_revision": "e2c569b52c79356d3d5a4ba9a80fee62b359e741",
+  "authorization": "Approved gateway-default-resolution revision3.1, change set A; no host application or native provider acceptance.",
+  "contract": {
+    "sha256_with_marker_lines_and_final_newline": "437e46ea457ff205648cebb9c06c56b201c014fd21fb2133d4be4550be0f94c2",
+    "sha256_with_marker_lines_without_final_newline": "e63090a57a5a58078fd019428fccdba75ffddbf5a1decc52d893e4848dbf4af3",
+    "copies_equal": 4
+  },
+  "sources": [
+    "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+    "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.162",
+    "https://github.com/langchain-ai/langchain/blob/026c3da2/libs/partners/openai/langchain_openai/chat_models/base.py",
+    "https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp",
+    "https://docs.python.org/3/library/os.html#os.replace",
+    "https://docs.python.org/3/library/socket.html#socket.create_connection"
+  ],
+  "unknowns": [
+    "T17/T17c/T17d real transport/precedence lane receipts not run",
+    "Live21128 P15 effective config/read not qualified",
+    "H0/H1/H2/P8 and GW-01 need owner/CC observations",
+    "Dagu V10 native variable expansion not run",
+    "Normal/priority tier value-free operator observations pending"
+  ],
+  "id": "worker-census-affinity-correction-20261007",
+  "corrects": {
+    "path": "evidence/receipts/worker-census-markers-20261006.json",
+    "sha256": "30dd1e814d790d28b6355a7f667d675a6968114dccfff7232530916eb3e5ed56",
+    "bytes_unchanged": true
+  },
+  "correction": "Census tags alone did not establish reasoning-replay isolation. Each DeepAgents model now generates one tag and sends that identical value through X-OmniRoute-Session-Id and X-Session-Id. Distinct model instances have distinct pairs. Effective replay isolation in the live deployment remains UNQUALIFIED.",
+  "mechanism_sources": [
+    "langchain-ai/langchain@026c3da2:libs/partners/openai/langchain_openai/chat_models/base.py:1016,1467,1513-1515,1531-1533",
+    "OmniRoute@2f42a9ac:src/sse/services/sessionAffinityPin.ts:197-215",
+    "diegosouzapw/OmniRoute@2f42a9ac:open-sse/handlers/chatCore/attemptLogging.ts:296-299",
+    "https://github.com/encode/httpx/blob/0.28.1/httpx/_client.py"
+  ],
+  "checks": {
+    "suite": "tests.test_gateway_worker_defaults",
+    "tests": 23,
+    "skips": 0,
+    "exit_code": 0,
+    "kind": "synthetic_native_header_and_client_constructor_fixture",
+    "paired_values_equal": true,
+    "pairs_distinct_between_models": true,
+    "real_model_calls": false
+  },
+  "claim_boundary": "Returned fixture header/constructor values verify source integration, not census counts, organic invocations, delivered effort/tier or deployed replay isolation."
+}
