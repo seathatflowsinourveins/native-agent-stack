@@ -4525,6 +4525,23 @@
         "All checks here are local structural or synthetic checks; no vendor upstream test, model/GPU acceptance, host configuration or broker operation is claimed."
       ],
       "path": "evidence/receipts/ns2604-finalized-catalog-contract-20261007.json"
+    },
+    {
+      "id": "ns2604-terminal-catalog-context-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "A pending terminal-management catalog role distinguishes the command-center-reported deployment, read-only installed interface/version observations and unqualified synthesis candidates. It selects no repository or adoption status.",
+      "limitations": [
+        "The 79 roles are a proposed taxonomy, not a native readiness or qualified-tool count; the repository census remains null and selections empty.",
+        "Windows Terminal visual settings and sound are reported by the command center; September 28 native measurements retain their NativeStack host scope.",
+        "Help/version observations establish interface availability and installed versions only; no fresh-session functional smoke, organic use, inventory, launch, kill, injection or host setting change occurred.",
+        "The retained feature and orchestration records are dated owner observations/decisions; this lane performs no new model or session-lifecycle qualification.",
+        "Independent review of this new catalog context is pending; neither the current deployment report nor old outcomes establish a new SOTA selection."
+      ],
+      "path": "evidence/receipts/ns2604-terminal-catalog-context-20261007.json"
     }
   ],
   "files": [
@@ -16356,8 +16373,8 @@
     },
     {
       "path": "catalogs/foundation/finalized-sota-catalog.json",
-      "sha256": "b8ba24173d82a59626ffc31b1604429a2be49c055a2367c926d2b6d4e56c12a4",
-      "bytes": 25577
+      "sha256": "83cf186d6d3d97d081dd08a1bf0006da6f0b7fb6ecf35315aa0dbbb07df99829",
+      "bytes": 25985
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -17501,8 +17518,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
-      "sha256": "5fb99a258467e25e07cfb60574309f7eddc59141863ed1202fb65861f8fd9ae1",
-      "bytes": 16311
+      "sha256": "3b63625a3f063c478324b0937274303ba3bc4f7732247db9ea5845200e818e3b",
+      "bytes": 20396
     },
     {
       "path": "docs/direct-results.md",
@@ -41025,6 +41042,11 @@
       "bytes": 114093
     },
     {
+      "path": "evidence/artifacts/ns2604-terminal-context-20261007/native-interface-observations.json",
+      "sha256": "49458e4f987650db08666242d358a846c9a14202b328c54a605d295b8e4cc107",
+      "bytes": 1493
+    },
+    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -53143,6 +53165,11 @@
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json",
       "sha256": "a01e1b8b9a4d4a917b891ecbb6df3076c72fef06588628f127772ec51683466e",
       "bytes": 11795
+    },
+    {
+      "path": "evidence/receipts/ns2604-terminal-catalog-context-20261007.json",
+      "sha256": "d78f062de04a3c68665c24afa9378b2ab30bb0c3e4170b2d8172d2bb35d280fa",
+      "bytes": 12681
     },
     {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
