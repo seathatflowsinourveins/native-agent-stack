@@ -4648,6 +4648,23 @@
         "Claude's actual provenance, independent cross-family observation and command-center review remain pending. Original prototype/old fixture bindings are retained."
       ],
       "path": "evidence/receipts/codex-organic-oracle-controls-20261007.json"
+    },
+    {
+      "id": "grand-catalog-folds-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Fold owned organic counter/catalog bindings, portable Terminal fragment and dated Dagu records into #820. Original source bytes are conserved except explicitly recorded merges; the historical gateway correction is carried as a dated amendment without changing the prior decided sentence. No adoption or readiness promotion.",
+      "limitations": [
+        "Repository source-byte/hash and fixture consistency, not upstream acceptance, native deployment or a new host observation.",
+        "Old observed results, prototype/fixture bindings and all existing receipt classes remain historical and unchanged.",
+        "The one original decision file is intentionally not byte-identical to #768: A34 requires an appended amendment preserving decided text.",
+        "Native organic counts and adoption synthesis remain pending; synthetic control proof supplies no qualified native use.",
+        "Original PR closures and merge/landing belong to the co-op/5f after verification and command-center review."
+      ],
+      "path": "evidence/receipts/grand-catalog-folds-20261007.json"
     }
   ],
   "files": [
@@ -17594,8 +17611,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
-      "sha256": "2859b9a07848be5666856121e1bd350e0c08389826718e96334354dd0ac9ecc7",
-      "bytes": 22114
+      "sha256": "69238589b9f571ca1ef758aa22b57bfab3717a48a92c6c25f6e69c6876b9e028",
+      "bytes": 23200
     },
     {
       "path": "docs/decisions/2026-10-05-organic-use-catalog-records.md",
@@ -52941,6 +52958,11 @@
       "path": "evidence/receipts/gpt-tokenizer-400-qualification-20260929.json",
       "sha256": "5c1c1e5e98882f76373825f057db81c50f1c7bc2ae0ca0be5f821cd039aa2bbf",
       "bytes": 21687
+    },
+    {
+      "path": "evidence/receipts/grand-catalog-folds-20261007.json",
+      "sha256": "efbedf979a8f0f27de37598d79233524d7c460c2164d64896840c234571e068d",
+      "bytes": 24579
     },
     {
       "path": "evidence/receipts/guard-k3-verification-20260930.json",
