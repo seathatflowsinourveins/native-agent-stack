@@ -300,13 +300,55 @@ def _prompt_words(payload):
     # Literal native user-message names, never prose inference of requestedness.
     item = payload.get("item") or {}
     content = payload.get("message", payload.get("content", item.get("content", []) if isinstance(item, dict) else []))
-    text = "\n".join(strings(content))
+    text = "\n".join(strings(content)).casefold()
     # Prose punctuation can surround a name; punctuation runs inside it are
     # literal name characters, so a longer name never names its prefix.
     words = set(re.findall(r"\w(?:[\w.:-]*\w)?", text))
     for server, tool in re.findall(r"\bmcp__([\w-]+?)__([\w-]+)\b", text):
         words.update((server, tool))
     return words
+
+
+def _completion_command_identity(command):
+    """Retain the representation that completed, independently of attribution."""
+    if isinstance(command, str):
+        return ("shell", command)
+    if isinstance(command, list):
+        return ("argv", tuple(command))
+    return (type(command).__name__, command)
+
+
+def _completed_commands_agree(first, second):
+    """Compare original forms using only documented cross-kind serialization.
+
+    Python 3.12 subprocess distinguishes argv's program from shell text;
+    shlex.join quotes operands and is split's inverse. The documented external
+    rtk-ai/rtk@v0.51.0 CLI allows that exact escaped-argv comparison. The pinned
+    Codex shell normalizer supports Sh/Bash/Zsh -c/-lc script extraction, but
+    extra argv can bind positional parameters (skill_usage.py:926-935).
+    Different argv vectors never agree merely because their scripts match.
+    """
+    if first == second:
+        return True
+    if first[0] == "shell" and second[0] == "argv":
+        text, argv = first[1], second[1]
+    elif first[0] == "argv" and second[0] == "shell":
+        argv, text = first[1], second[1]
+    else:
+        return False
+    if not all(isinstance(part, str) for part in argv):
+        return False
+    if (len(argv) == 3 and argv[1] in {"-c", "-lc"}
+            and os.path.basename(argv[0]) in {"sh", "bash", "zsh"}):
+        return argv[2] == text
+    return bool(argv and argv[0] == "rtk" and shlex.join(argv) == text)
+
+
+def _completed_commands_conflict(commands):
+    # Compatibility is not transitive: shell text can agree with two different
+    # argv wrappers. Every original pair must agree, not just the first member.
+    return any(not _completed_commands_agree(first, second)
+               for index, first in enumerate(commands) for second in commands[index + 1:])
 
 
 def _record_facts(records):
@@ -404,11 +446,13 @@ def _record_facts(records):
                 # Shell function names normalize to Bash, as in the adapter.
                 normalized_tool = "Bash" if command is not None else tool
                 model_call = row.get("type") == "response_item"
+                completed_command = None if model_call or command is None else _completion_command_identity(command)
                 fact = {"turn_id": turn, "timestamp": stamp, "command": command,
                         "tool": normalized_tool, "identity_complete": identity_complete,
                         "model_call": model_call, "completion_at": None if model_call else stamp,
                         "completion_status": None if model_call else item.get("status"),
-                        "completion_command": None if model_call or command is None else _USAGE.shell_script(command)}
+                        "completion_command": completed_command,
+                        "completion_commands": [] if completed_command is None else [completed_command]}
                 prior = facts.get(ident)
                 if prior:
                     if prior["turn_id"] != turn or (prior["tool"] and normalized_tool and prior["tool"] != normalized_tool):
@@ -419,8 +463,8 @@ def _record_facts(records):
                         notes["conflicting_native_representation"] += 1
                         prior["identity_complete"] = False
                     completed_command = fact["completion_command"]
-                    if (prior["completion_command"] is not None and completed_command is not None
-                            and prior["completion_command"] != completed_command):
+                    if (completed_command is not None
+                            and _completed_commands_conflict(prior["completion_commands"] + [completed_command])):
                         notes["conflicting_native_representation"] += 1
                         prior["identity_complete"] = False
                     else:
@@ -428,8 +472,10 @@ def _record_facts(records):
                         # them, but cannot replace an observed completed command.
                         if command is not None and (not model_call or prior["completion_command"] is None):
                             prior["command"] = command
-                        if completed_command is not None:
+                        if completed_command is not None and prior["completion_command"] is None:
                             prior["completion_command"] = completed_command
+                    if completed_command is not None and completed_command not in prior["completion_commands"]:
+                        prior["completion_commands"].append(completed_command)
                     if normalized_tool:
                         prior["tool"] = normalized_tool
                     if model_call and not prior["model_call"]:
@@ -449,8 +495,9 @@ def _record_facts(records):
         if left and right and ((left["tool"] and right["tool"] and left["tool"] != right["tool"]) or left["turn_id"] != right["turn_id"]):
             notes["conflicting_native_identity"] += 1
             left["identity_complete"] = right["identity_complete"] = False
-        if left and right and any(left[field] is not None and right[field] is not None and left[field] != right[field]
-                                  for field in ("completion_command", "completion_status")):
+        if left and right and (any(left[field] is not None and right[field] is not None and left[field] != right[field]
+                                   for field in ("completion_status",))
+                               or _completed_commands_conflict(left["completion_commands"] + right["completion_commands"])):
             notes["conflicting_native_representation"] += 1
             left["identity_complete"] = right["identity_complete"] = False
         if left and right and left["completion_at"] is not None and right["timestamp"] is not None and left["completion_at"] < right["timestamp"]:
@@ -468,8 +515,8 @@ def _record_facts(records):
     for ident, fact in facts.items():
         alias_groups[links.get(ident, ident)].append(fact)
     for group in alias_groups.values():
-        conflict = False
-        for field in ("completion_command", "completion_status"):
+        conflict = _completed_commands_conflict([command for fact in group for command in fact["completion_commands"]])
+        for field in ("completion_status",):
             values = [fact[field] for fact in group if fact[field] is not None]
             conflict |= any(value != values[0] for value in values[1:])
         if conflict:
@@ -608,7 +655,7 @@ def qualify_records(batches, *, since, until, controls):
                 else:
                     named.update(context["named_tools"])
         for tool_key, spec in tools.items():
-            if set(spec["prompt_names"]) & owner_names.get(key, set()):
+            if {name.casefold() for name in spec["prompt_names"]} & owner_names.get(key, set()):
                 named.add(tool_key)
         parent = parent_ids.get(owner)
         if parent:

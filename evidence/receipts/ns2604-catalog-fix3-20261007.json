@@ -1,0 +1,363 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-catalog-fix3-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Repair case-sensitive named-tool masking and lossy completed-command attribution with separately retained synthetic controls.",
+  "limitations": [
+    "These checks are synthetic fixtures and source/structural review, not actual organic use, native host acceptance or upstream tests.",
+    "Supported cross-kind serialization does not prove external execution or shell environment equivalence; unproved command representations remain conflicting.",
+    "Recorded CanonicalRef declarations still need actual owner-controlled native provenance before publication of qualified counts.",
+    "The legacy raw/provisional prompt filter is unchanged and cannot supply a qualified organic verdict.",
+    "Command-center exact-head delta review is pending; hosted validate has not run because the draft conflicts with main.",
+    "Recorded malformed command value types outside the pinned native formats remain an open source limitation; this unit adds no format qualification."
+  ],
+  "prior_records": [
+    {
+      "path": "evidence/receipts/ns2604-catalog-fix2-20261007.json",
+      "sha256": "73731148a4cae941da307936105581fdb65753c97c3e1f884dc34a5cf1e8f109"
+    },
+    {
+      "path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
+      "sha256": "48e1dbb4981b224c95a313dc85972852dfd2535bb0724565e1a131a0b6d0b7a7"
+    }
+  ],
+  "reviewed_base_commit": "dee7cae97c74a6657cb40c7bf8324ccbd41f9111",
+  "source_files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+    },
+    {
+      "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+      "sha256": "dc1bb12b51e4ca5cbd0bb5d509feb2e47ec8da51d8a19986ea83f3c89f45dd4a"
+    },
+    {
+      "path": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+      "sha256": "73e6f8a99afaf3cb340d41ebe89b62a24914d5ab2fb00515292faf40a6ef06cd"
+    }
+  ],
+  "checks": [
+    {
+      "id": "red",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T09:50:35.171451+00:00",
+      "ended_utc": "2026-10-07T09:50:40.319431+00:00",
+      "exit_code": 1,
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "test_codex_counter.OrganicControlChecks.test_caseless_prompt_names_mask_all_native_tool_classes",
+        "test_codex_counter.OrganicControlChecks.test_caseless_configured_names_preserve_exact_internal_punctuation",
+        "test_codex_counter.OrganicControlChecks.test_caseless_mcp_component_names_mask_native_user_payload_forms",
+        "test_codex_counter.OrganicControlChecks.test_completed_argv_shell_semantics_conflicts_are_unknown",
+        "test_codex_counter.OrganicControlChecks.test_completed_argv_shell_semantics_conflicts_follow_aliases",
+        "test_codex_counter.OrganicControlChecks.test_unproven_cross_kind_commands_are_unknown",
+        "test_codex_counter.OrganicControlChecks.test_final_scan_caseless_names_exclude_current_turn",
+        "test_codex_counter.OrganicControlChecks.test_final_scan_command_representation_conflicts_remain_unknown"
+      ],
+      "working_directory": "tools/invocation-monitoring",
+      "tests": 8,
+      "failure_subcases": 60,
+      "errors": 0,
+      "wall_seconds": 5.147985675997916,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+        "tools/invocation-monitoring/test_codex_counter.py": "9177fbf534092ea8159e65a641029d25570a6f9c71c202c503ee40cd714b600e"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "02ee9a7456768978ef09edc1a196bfde5b109c9589233f39243b6aae6717cb27",
+      "private_output_scope": ".local/j820-fix3/red.{stdout,stderr}.log and .meta.json; exact cwd retained privately"
+    },
+    {
+      "id": "red-parent",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T09:52:58.373317+00:00",
+      "ended_utc": "2026-10-07T09:52:59.080879+00:00",
+      "exit_code": 1,
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "test_codex_counter.OrganicControlChecks.test_caseless_parent_names_mask_qualified_child_turns"
+      ],
+      "working_directory": "tools/invocation-monitoring",
+      "tests": 1,
+      "failure_subcases": 4,
+      "errors": 0,
+      "wall_seconds": 0.7075677670072764,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+        "tools/invocation-monitoring/test_codex_counter.py": "1a3d394884bf6df4257cb1eea7a00566ad0cb724e3157e950f226721de94f171"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "702530ee0ee95ffaacade2ffb20b44589485c4d0158cd58e44dc5f92bc049b59",
+      "private_output_scope": ".local/j820-fix3/red-parent.{stdout,stderr}.log and .meta.json; exact cwd retained privately"
+    },
+    {
+      "id": "green",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T09:53:44.944559+00:00",
+      "ended_utc": "2026-10-07T09:54:03.699464+00:00",
+      "exit_code": 1,
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "test_codex_counter"
+      ],
+      "working_directory": "tools/invocation-monitoring",
+      "tests": 55,
+      "failure_subcases": 4,
+      "errors": 0,
+      "wall_seconds": 18.754908946997602,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "b10407075b4b4525ed1a8e602d278a9c43cbeead9546318c60b4fdf4f9829099",
+        "tools/invocation-monitoring/test_codex_counter.py": "1a3d394884bf6df4257cb1eea7a00566ad0cb724e3157e950f226721de94f171"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "2a8b7bbca07f314f93833eb2db476b7f8fc3d7d53939fe8161b60e94d1ee3dc9",
+      "private_output_scope": ".local/j820-fix3/green.{stdout,stderr}.log and .meta.json; exact cwd retained privately"
+    },
+    {
+      "id": "red-expanded",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T09:59:35.256748+00:00",
+      "ended_utc": "2026-10-07T09:59:44.520582+00:00",
+      "exit_code": 1,
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "test_codex_counter.OrganicControlChecks.test_caseless_prompt_names_mask_all_native_tool_classes",
+        "test_codex_counter.OrganicControlChecks.test_caseless_configured_names_preserve_exact_internal_punctuation",
+        "test_codex_counter.OrganicControlChecks.test_caseless_mcp_component_names_mask_native_user_payload_forms",
+        "test_codex_counter.OrganicControlChecks.test_caseless_parent_names_mask_qualified_child_turns",
+        "test_codex_counter.OrganicControlChecks.test_completed_argv_shell_semantics_conflicts_are_unknown",
+        "test_codex_counter.OrganicControlChecks.test_completed_argv_shell_semantics_conflicts_follow_aliases",
+        "test_codex_counter.OrganicControlChecks.test_unproven_cross_kind_commands_are_unknown",
+        "test_codex_counter.OrganicControlChecks.test_final_scan_caseless_names_exclude_current_turn",
+        "test_codex_counter.OrganicControlChecks.test_final_scan_command_representation_conflicts_remain_unknown",
+        "test_codex_counter.OrganicControlChecks.test_distinct_completed_argv_wrappers_remain_unknown",
+        "test_codex_counter.OrganicControlChecks.test_shell_string_cannot_bridge_distinct_completed_argv"
+      ],
+      "working_directory": "tools/invocation-monitoring",
+      "tests": 11,
+      "failure_subcases": 108,
+      "errors": 0,
+      "wall_seconds": 9.263840278988937,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+        "tools/invocation-monitoring/test_codex_counter.py": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "582d0f0d5f690885f49e1537ec4098adf6c379426933b7a6e885ee1d9fff5f58",
+      "private_output_scope": ".local/j820-fix3/red-expanded.{stdout,stderr}.log and .meta.json; exact cwd retained privately"
+    },
+    {
+      "id": "final-green",
+      "evidence_class": "synthetic",
+      "started_utc": "2026-10-07T10:01:16.617153+00:00",
+      "ended_utc": "2026-10-07T10:01:39.093242+00:00",
+      "exit_code": 0,
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "ionice",
+        "-c3",
+        "python3",
+        "-m",
+        "unittest",
+        "test_codex_counter"
+      ],
+      "working_directory": "tools/invocation-monitoring",
+      "tests": 57,
+      "failure_subcases": 0,
+      "errors": 0,
+      "wall_seconds": 22.47609657200519,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b",
+        "tools/invocation-monitoring/test_codex_counter.py": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e89ce18635da96d1a939e72071720b9e06864a5f35e56f5bb0d35ef33da08855",
+      "private_output_scope": ".local/j820-fix3/final-green.{stdout,stderr}.log and .meta.json; exact cwd retained privately"
+    }
+  ],
+  "discriminating_conditions": [
+    "Capitalized/mixed-case configured names and complete native prompt names exclude commands, skills and MCP calls, including uppercase MCP components and inherited parent turns.",
+    "Exact internal punctuation and distinct longer names remain supported; native tool identifiers retain their original case-sensitive identity.",
+    "Direct and linked/sibling native identities retain every completed command representation. Assignment argv versus shell text conflicts in both orders, with duplicates and split sources.",
+    "Distinct shell argv heads/flags/extra arguments conflict; an intermediate shell-string record cannot bridge two contradictory argv vectors.",
+    "Exact typed duplicates, supported request/completion enrichment, documented native wrapper serialization and exactly shell-escaped bare RTK argv remain supported."
+  ],
+  "representation_rule": {
+    "identity": "Typed shell string or exact argv original; no lossy shell_script identity.",
+    "cross_kind": "Only exact three-element Sh/Bash/Zsh -c/-lc wrapper script or precisely shlex.join-escaped bare external RTK argv can agree with shell text.",
+    "all_originals": "Pairwise compatibility across the full retained completed-command set within direct and explicit one-hop native alias groups.",
+    "conflict": "Sticky incomplete identity, null organic counts and zero eligible lower bounds; no last-record attribution."
+  },
+  "preservation": {
+    "baseline_test_methods": 44,
+    "changed_baseline_methods": [],
+    "scan_byte_identical": true,
+    "prompt_names_by_turn_byte_identical": true,
+    "snapshots": [
+      {
+        "path": ".local/j820-fix3/snapshots/final-counter.py",
+        "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b"
+      },
+      {
+        "path": ".local/j820-fix3/snapshots/final-test.py",
+        "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      },
+      {
+        "path": ".local/j820-fix3/snapshots/first-green-counter.py",
+        "sha256": "b10407075b4b4525ed1a8e602d278a9c43cbeead9546318c60b4fdf4f9829099"
+      },
+      {
+        "path": ".local/j820-fix3/snapshots/red-expanded-test.py",
+        "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
+      },
+      {
+        "path": ".local/j820-fix3/snapshots/red-parent-test.py",
+        "sha256": "1a3d394884bf6df4257cb1eea7a00566ad0cb724e3157e950f226721de94f171"
+      },
+      {
+        "path": ".local/j820-fix3/snapshots/red-test-reconstructed.py",
+        "sha256": "9177fbf534092ea8159e65a641029d25570a6f9c71c202c503ee40cd714b600e"
+      }
+    ],
+    "stage_snapshot_scope": {
+      "red": "Original test9177 reconstructed after failed first-green by removing only parent method; byte hash independently matched recorded red test. Baseline source92 is pinned at dee.",
+      "red_parent": "Test1a3d copied after first-green, while still byte-identical to recorded red-parent; not claimed pre-run-frozen.",
+      "green": "Sourceb104 and test1a3d kept with failed55/4 output.",
+      "red_expanded": "Corrected/expanded test7835 retained before final production fix.",
+      "final_green": "Sourcec3 and test7835 copied after actual57/0 run."
+    },
+    "fixture_corrections": [
+      {
+        "first_green_failure": "Three case-config fixture subcases contained an unregistered punctuated MCP tool.",
+        "correction": "Declare that native tool for every case; preserve uppercase config and required named-turn exclusion.",
+        "contract": "qualify_records maps every native call to declared control tools and unknown census stays null (baseline counter:675-724)."
+      },
+      {
+        "first_green_failure": "UserMessage nested fixture used unsupported item_completed envelope.",
+        "correction": "Use the already-supported user_message payload branch with item content; retain uppercase MCP-component exclusion.",
+        "contract": "_record_facts user_message handling and _prompt_words item.content fallback (baseline counter:299-303,342-347); unsupported completion formats correctly stay unknown."
+      }
+    ],
+    "worker_proof_sha256": "fee02ce43d9c23abe3519e85ca051bba5e2e86cbd602a242a7438198cb5bf9d9",
+    "root_byte_verification": "All44 prior test methods, scan, prompt_names_by_turn and shell_reads independently compared byte-for-byte with the reviewed base; no changes.",
+    "dependencies": [
+      {
+        "path": "tools/skill-usage/skill_usage.py",
+        "sha256": "d8f37f929fc9f7fc170b6ac794c9e23d84c4a7e70f6328e565f3d9ac9595b65b"
+      },
+      {
+        "path": "examples/claude-native/workflows/child-usage.mjs",
+        "sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4"
+      }
+    ],
+    "history": "Existing receipts/observed outcomes unchanged; decision text extended only through an appended dated amendment.",
+    "optional_reference_lookup": "An optional test-reference lookup returned1; actual locator retained privately. Native stdlib unittest remains the execution harness."
+  },
+  "sanitization": "Host-specific cwd and TMPDIR generalized; exact vectors, source snapshots, UTC metadata and returned logs remain in the owned ignored .local/j820-fix3 directory. No raw native transcripts, credentials, active configuration or provider calls were collected.",
+  "review": {
+    "same_family_source_critic": {
+      "evidence_class": "source_review",
+      "reviewer_family": "gpt6",
+      "reviewer_role": "Same-family GPT source reviewer; not the counter patch author, not a cross-family acceptance stage.",
+      "completed_utc": "2026-10-07T10:11:48Z",
+      "unresolved_findings": 0,
+      "scope": "NO_UNRESOLVED_FINDINGS_WITHIN_REQUESTED_VARIANT_AXES",
+      "source_sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b",
+      "test_sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526",
+      "private_record_ref": "coordination:ns2604-coop/lanes/grand-catalog-durable-20261006/j820-fix3-variant-review-20261007.json",
+      "private_record_sha256": "5099e721939d5984adb338019ae02cfda5b7df27292081f12316c8114f9c35d8",
+      "limitation": "Source inspection only, no independent execution or cross-family acceptance."
+    },
+    "independent_delta": "pending",
+    "command_center": "pending"
+  },
+  "native_counts": null,
+  "organic_verdict": null,
+  "adoption_status": null,
+  "synthesis_status": "pending_synthesis",
+  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "dee7cae97c74a6657cb40c7bf8324ccbd41f9111",
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "lines": "49-99,299-309,405-432,611"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "dee7cae97c74a6657cb40c7bf8324ccbd41f9111",
+      "path": "tools/skill-usage/skill_usage.py",
+      "lines": "926-936"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "tag": "rust-v0.160.1",
+      "path": "codex-rs/core/src/shell.rs",
+      "lines": "20-30"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "path": "codex-rs/protocol/src/models.rs",
+      "lines": "1944-1945"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "v0.51.0",
+      "path": "README.md",
+      "lines": "6,313"
+    },
+    {
+      "url": "https://docs.python.org/3.12/library/stdtypes.html#str.casefold",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "url": "https://docs.python.org/3.12/library/subprocess.html#frequently-used-arguments",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "url": "https://docs.python.org/3.12/library/shlex.html#shlex.join",
+      "checked_date": "2026-10-07"
+    }
+  ]
+}

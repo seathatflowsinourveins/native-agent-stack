@@ -9,11 +9,11 @@
   "files": [
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249"
+      "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b"
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3"
+      "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526"
     }
   ],
   "prior_snapshot": {
@@ -41,7 +41,10 @@
     "Original response aliases and outcomes across split sources; missing ID/time/unsupported native call forms remain unknown.",
     "Prose punctuation still excludes configured names while internal punctuation and distinct longer names are preserved.",
     "Contradictory completed commands sharing a native identity remain unknown; supported enrichment and identical duplicates are preserved.",
-    "Explicit one-hop native ID groups require agreeing completion commands/statuses across canonical and sibling alias originals, with sticky incomplete identity."
+    "Explicit one-hop native ID groups require agreeing completion commands/statuses across canonical and sibling alias originals, with sticky incomplete identity.",
+    "Case-fold extracted and configured prompt names, including MCP components and inherited parent turns; preserve exact internal punctuation and longer-name boundaries.",
+    "Retain completed argv and shell-text originals; compare every representation pair within direct and explicit alias groups. Unproved compatibility and non-transitive bridges leave attribution unknown.",
+    "Cross-kind serialization is limited to exact three-element Sh/Bash/Zsh -c/-lc wrappers or precisely shlex.join-escaped bare external RTK argv; distinct argv vectors retain executable and flags."
   ],
   "reference_boundary": "CanonicalRef shape declarations are not external hash resolution or original-context truth proof. Actual publication counts need the matching owner-controlled native evidence.",
   "historical_fixture_binding": {
@@ -56,7 +59,7 @@
     "claude_scope": "Not implemented by this Codex code unit; equivalent Claude provenance remains separate."
   },
   "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
-  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
+  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix3-20261007.json",
   "prior_repair_snapshot": {
     "source_commit": "5530276d1df426db36ce2ddbd0f92e59105c0f1e",
     "manifest_path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
@@ -66,5 +69,15 @@
     "receipt_path": "evidence/receipts/ns2604-catalog-fix2-20261007.json",
     "receipt_sha256": "73731148a4cae941da307936105581fdb65753c97c3e1f884dc34a5cf1e8f109",
     "scope": "First repair and passing fixture stages precede the linked-ID counterexamples; their recorded bytes and results remain unchanged."
+  },
+  "fix2_alias_controls_snapshot": {
+    "source_commit": "dee7cae97c74a6657cb40c7bf8324ccbd41f9111",
+    "manifest_path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+    "manifest_sha256": "0b5614cdb6ea68c037d1e6c873651c182a04fb2c6598c67fe971c2124a005571",
+    "counter_sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+    "test_sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3",
+    "receipt_path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
+    "receipt_sha256": "48e1dbb4981b224c95a313dc85972852dfd2535bb0724565e1a131a0b6d0b7a7",
+    "scope": "Previous alias repair and its recorded outcomes are immutable. The later case and representation witnesses use new supplement records."
   }
 }

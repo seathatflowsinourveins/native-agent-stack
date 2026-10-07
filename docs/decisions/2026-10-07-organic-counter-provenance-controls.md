@@ -140,3 +140,50 @@ and the existing native call/result ledger at
 `native-agent-stack@77d35e41911c0f8c28a5561790cd8d8a8cd68175:examples/claude-native/workflows/child-usage.mjs:2854-2878`.
 The Codex protocol's required call ID and optional response item ID are pinned
 in the upstream sources above; matching names or timestamps do not create an alias.
+
+## Amendment (2026-10-07): Case and command representation controls
+
+The delta review at `dee7cae97c74a6657cb40c7bf8324ccbd41f9111` found two
+remaining variants. Case-fold both extracted prompt names and configured names
+before exact token comparison. Capitalized or mixed-case names followed by prose
+punctuation exclude the tool, while internal punctuation and distinct longer
+names retain their existing boundaries.
+
+Completed-command agreement must preserve the original representation. Native
+argv and shell text can flatten to the same string while naming different
+executables or skill reads. Keep their representation kinds and contents apart;
+without demonstrated equivalence, different completed representations conflict
+and leave attribution incomplete and counts unknown. The same rule applies
+within the existing explicit native identity groups. Requests may still enrich
+completions, and identical completed originals still deduplicate.
+
+The supported cross-representation forms remain narrow: an exact three-element
+Sh/Bash/Zsh `-c` or `-lc` wrapper carries its declared script, and a bare external
+RTK argv can agree with precisely its `shlex.join`-escaped shell string.
+Additional shell arguments and unproved argv forms retain their own identities.
+Distinct argv vectors retain their executables and flags even when their script
+text matches. Require pairwise agreement among all completed representations;
+a compatible shell-text record must not bridge two conflicting argv originals.
+This verifies declared command compatibility for the controlled projection;
+it does not prove external execution or shell environment equivalence.
+
+The historical raw/provisional prompt filter remains unchanged. Its older
+case-sensitive extraction is not the controlled oracle: qualification rebuilds
+complete owner/turn names through the repaired original-record path. Do not
+publish the provisional filter's output as qualified organic counts.
+
+The new [`fix3 supplement`](../../evidence/receipts/ns2604-catalog-fix3-20261007.json)
+preserves the red controls and repaired outcomes separately from the earlier
+receipts. These are synthetic counter controls, not actual organic use, upstream
+acceptance or adoption. The final catalog remains pending synthesis.
+
+Sources: `native-agent-stack@dee7cae97c74a6657cb40c7bf8324ccbd41f9111:tools/invocation-monitoring/codex_counter.py:49-99,299-309,405-432,611`
+and `tools/skill-usage/skill_usage.py:926-936`; the
+[Python 3.12 case-folding reference](https://docs.python.org/3.12/library/stdtypes.html#str.casefold)
+and [subprocess argument semantics](https://docs.python.org/3.12/library/subprocess.html#frequently-used-arguments),
+checked on 2026-10-07; the pinned native Codex protocol sources above.
+The supported representation seam follows
+`openai/codex@d27764b82f7118f674371e6d6e76271d9d606edb:codex-rs/core/src/shell.rs:20-30`,
+the [Python 3.12 shell-token serialization reference](https://docs.python.org/3.12/library/shlex.html#shlex.join),
+and `rtk-ai/rtk@v0.51.0:README.md:6,313`. The unchanged provisional paths are
+`native-agent-stack@dee7cae97c74a6657cb40c7bf8324ccbd41f9111:tools/invocation-monitoring/codex_counter.py:198-224,788-799,874`.

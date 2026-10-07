@@ -667,5 +667,251 @@ class OrganicControlChecks(unittest.TestCase):
         self.assertIsNone(result["by_tool"]["command"]["organic_count"])
 
 
+    def _run_final_scan(self, streams, change=None):
+        batches, controls = inputs(*streams)
+        if change:
+            change(batches, controls)
+        scratch = Path(__file__).resolve().parents[2] / ".local" / "j820-fix3"
+        scratch.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=scratch) as directory:
+            files, sources = [], {}
+            for index, batch in enumerate(batches):
+                path = Path(directory) / (str(index) + ".jsonl")
+                encoded = "\n".join(json.dumps(row, sort_keys=True) for row in batch["records"]).encode()
+                path.write_bytes(encoded)
+                files.append(path)
+                sources[str(path)] = controls["sources"][batch["source_id"]]
+            controls["sources"] = sources
+            return c.scan(files, {}, {}, {}, self.since, self.until, "fixture",
+                          controls=controls)["organic_controls"]
+
+    def test_caseless_prompt_names_mask_all_native_tool_classes(self):
+        cases = (("Use Serena.", "serena"), ("Use RTK:", "rtk"),
+                 ("Use BaSh.", "command"), ("Use ExEc_CoMmAnD:", "command"),
+                 ("Use OPENAI-Docs.", "openai-docs-read"),
+                 ("Use CoNTeXt-MoDe:", "context-mode"),
+                 ("Use ApPlY_PaTcH.", "apply_patch"))
+        for text, named in cases:
+            with self.subTest(text=text):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work",
+                                                 "message": text}, ordinal=8)
+                patch = native_row("response_item", {"type": "custom_tool_call", "call_id": "patch",
+                                                       "name": "apply_patch", "input": "fixture"})
+                result = self.run_controls([records(command(command="rtk cat /fixture/skills/openai-docs/SKILL.md"),
+                    mcp(), mcp("ctx", "context-mode", "ctx_execute"), patch, returned("patch", True), late)])
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"][named]["organic_count"], 0)
+                self.assertEqual(result["by_tool"][named]["reasons"]["named_turn"], 1)
+                for key in {"command", "rtk", "openai-docs-read", "serena", "context-mode", "apply_patch"} - {named}:
+                    self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+
+    def test_caseless_configured_names_preserve_exact_internal_punctuation(self):
+        cases = (("Use serena.", "serena", "SERENA"), ("Use rtk:", "rtk", "RtK"),
+                 ("Use openai-docs.", "openai-docs-read", "OPENAI-Docs"),
+                 ("Use vendor..search::tool:", "punctuated", "Vendor..Search::Tool"))
+        for text, named, configured in cases:
+            def configure(_, controls):
+                controls["tools"]["punctuated"] = {"kind": "mcp", "native_names": ["mcp__vendor..search::tool__search"],
+                    "prompt_names": [configured if named == "punctuated" else "vendor..search::tool"]}
+                if named != "punctuated":
+                    controls["tools"][named]["prompt_names"] = [configured]
+            with self.subTest(text=text, configured=configured):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work", "message": text}, ordinal=8)
+                result = self.run_controls([records(command(command="rtk cat /fixture/skills/openai-docs/SKILL.md"),
+                    mcp(), mcp("punct", "vendor..search::tool"), late)], configure)
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"][named]["organic_count"], 0)
+                self.assertEqual(result["by_tool"][named]["reasons"]["named_turn"], 1)
+
+    def test_caseless_mcp_component_names_mask_native_user_payload_forms(self):
+        for prompt in (native_row("event_msg", {"type": "user_message", "turn_id": "work",
+                                                "message": "Use MCP__SeReNa__SeArCh."}, ordinal=8),
+                       native_row("response_item", {"type": "message", "role": "user",
+                                                   "content": [{"type": "input_text", "text": "Use MCP__SERENA__SEARCH:"}]}, ordinal=8),
+                       native_row("event_msg", {"type": "user_message", "turn_id": "work",
+                            "item": {"type": "UserMessage", "content": [{"type": "input_text", "text": "Use McP__Serena__Search."}]}}, ordinal=8)):
+            with self.subTest(payload=prompt["payload"]["type"]):
+                result = self.run_controls([records(mcp(), prompt)],
+                    lambda _, controls: controls["tools"]["serena"].update({"prompt_names": ["serena"]}))
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"]["serena"]["organic_count"], 0)
+                self.assertEqual(result["by_tool"]["serena"]["reasons"]["named_turn"], 1)
+
+    def test_caseless_parent_names_mask_qualified_child_turns(self):
+        for text in ("Use SeReNa.", "Use MCP__SERENA__SEARCH:"):
+            parent = records(command(), native_row("event_msg", {"type": "user_message", "turn_id": "work",
+                                                                "message": text}, ordinal=8))
+            child = records(owner="child", parent="owner")
+            child[0]["payload"]["subagent_history_start_ordinal"] = 5
+            child = [child[0], command("parent-copy", ordinal=1),
+                     started("child-first", ordinal=5, root_turn="work"), finished("child-first", ordinal=6),
+                     started("child-work", ordinal=7, root_turn="work"),
+                     mcp("child-mcp", turn="child-work", ordinal=8, owner="child"), finished("child-work", ordinal=9)]
+            def bind_parent(_, controls):
+                controls["tools"]["serena"]["prompt_names"] = ["SERENA"]
+                for turn in controls["turns"]:
+                    if turn["owner_id"] == "child":
+                        turn.update({"parent_turn": {"owner_id": "owner", "turn_id": "work"}, "parent_ref": proof("/parent")})
+            for runner in (self.run_controls, self._run_final_scan):
+                with self.subTest(text=text, runner=runner.__name__):
+                    result = runner([parent, child], bind_parent)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["native_call_attempts"], 2)
+                    self.assertEqual(result["by_tool"]["command"]["organic_count"], 1)
+                    self.assertEqual(result["by_tool"]["serena"]["organic_count"], 0)
+                    self.assertEqual(result["by_tool"]["serena"]["reasons"]["named_turn"], 1)
+
+    def test_caseless_longer_names_remain_distinct(self):
+        for text in ("Use SERENADE.", "Use SeReNa_Helper.", "Use SeReNa.Search.",
+                     "Use RtK.Proxy:", "Use OpenAI-Docs-Extra."):
+            with self.subTest(text=text):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work", "message": text}, ordinal=8)
+                result = self.run_controls([records(command(command="rtk cat /fixture/skills/openai-docs/SKILL.md"), mcp(), late)])
+                self.assertEqual(result["status"], "controls_complete")
+                for key in ("command", "rtk", "openai-docs-read", "serena"):
+                    self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+                    self.assertNotIn("named_turn", result["by_tool"][key]["reasons"])
+
+    def test_completed_argv_shell_semantics_conflicts_are_unknown(self):
+        path = "/fixture/skills/openai-docs/SKILL.md"
+        first = command(command=["X=1", "cat", path], status="failed")
+        second = command(command="X=1 cat " + path, status="failed")
+        for ordered in ((first, second), (second, first)):
+            for repeat in ((), (copy.deepcopy(ordered[0]),), (copy.deepcopy(ordered[1]),)):
+                for streams in ([records(*ordered, *repeat)], [records(ordered[0]), records(ordered[1], *repeat)]):
+                    with self.subTest(first=ordered[0]["payload"]["item"]["command"], sources=len(streams), repeated=bool(repeat)):
+                        result = self.run_controls(streams)
+                        self.assertEqual(result["status"], "unknown")
+                        self.assertEqual(result["native_call_attempts"], 1)
+                        self.assertIn("conflicting_native_representation", result["diagnostics"])
+                        for cell in result["by_tool"].values():
+                            self.assertIsNone(cell["organic_count"])
+                            self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_completed_argv_shell_semantics_conflicts_follow_aliases(self):
+        path = "/fixture/skills/openai-docs/SKILL.md"
+        for sibling in (False, True):
+            originals = [function("C", response_id="R1"), returned("C")]
+            if sibling:
+                originals.append(function("C", response_id="R2"))
+            first = command("R1", command=["X=1", "cat", path], status="failed")
+            second = command("R2" if sibling else "C", command="X=1 cat " + path, status="failed")
+            for ordered in ((first, second), (second, first)):
+                for repeat in ((), (copy.deepcopy(ordered[-1]),)):
+                    for streams in ([records(*originals, *ordered, *repeat)],
+                                    [records(*originals), records(ordered[0]), records(ordered[1], *repeat)]):
+                        with self.subTest(sibling=sibling, first=ordered[0]["payload"]["item"]["id"],
+                                          sources=len(streams), repeated=bool(repeat)):
+                            result = self.run_controls(streams)
+                            self.assertEqual(result["status"], "unknown")
+                            self.assertEqual(result["native_call_attempts"], 1)
+                            self.assertIn("conflicting_native_representation", result["diagnostics"])
+                            for cell in result["by_tool"].values():
+                                self.assertIsNone(cell["organic_count"])
+                                self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_unproven_cross_kind_commands_are_unknown(self):
+        path = "/fixture/skills/openai-docs/SKILL.md"
+        cases = ((["cat", path], "cat " + path), (["env", "X=1", "cat", path], "env X=1 cat " + path),
+                 (["cd", "/fixture"], "cd /fixture"),
+                 (["/bin/bash", "-lc", "cat " + path, "argument"], "cat " + path),
+                 (["/bin/sh", "-c", "cat " + path, "argument"], "cat " + path),
+                 (["rtk", "cat", "$SKILL_PATH"], "rtk cat $SKILL_PATH"),
+                 (["rtk", "cat", "*.md"], "rtk cat *.md"))
+        for argv, script in cases:
+            for ordered in ((argv, script), (script, argv)):
+                with self.subTest(argv=argv, first=ordered[0]):
+                    result = self.run_controls([records(command(command=ordered[0], status="failed"),
+                                                       command(command=ordered[1], status="failed"))])
+                    self.assertEqual(result["status"], "unknown")
+                    self.assertIn("conflicting_native_representation", result["diagnostics"])
+                    for cell in result["by_tool"].values():
+                        self.assertIsNone(cell["organic_count"])
+                        self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_exact_typed_command_duplicates_preserve_supported_attribution(self):
+        path = "/fixture/skills/openai-docs/SKILL.md"
+        for representation, reader in ((["X=1", "cat", path], False), ("X=1 cat " + path, True),
+                                       (["cat", path], True), (["rtk", "cat", path], True),
+                                       (["/bin/bash", "-lc", "cat " + path, "argument"], True)):
+            for streams in ([records(command(command=representation, status="failed"),
+                                     command(command=copy.deepcopy(representation), status="failed"))],
+                            [records(command(command=representation, status="failed")),
+                             records(command(command=copy.deepcopy(representation), status="failed"))]):
+                with self.subTest(representation=representation, sources=len(streams)):
+                    result = self.run_controls(streams)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    self.assertEqual(result["by_tool"]["command"]["organic_count"], 1)
+                    self.assertEqual(result["by_tool"]["openai-docs-read"]["organic_count"], int(reader))
+                    self.assertNotIn("conflicting_native_representation", result["diagnostics"])
+
+    def test_final_scan_caseless_names_exclude_current_turn(self):
+        for text, named in (("Use Serena.", "serena"), ("Use RTK:", "rtk"),
+                            ("Use OPENAI-DOCS.", "openai-docs-read"), ("Use ExEc_CoMmAnD.", "command")):
+            with self.subTest(text=text):
+                late = native_row("event_msg", {"type": "user_message", "turn_id": "work", "message": text}, ordinal=8)
+                result = self._run_final_scan([records(command(command="rtk cat /fixture/skills/openai-docs/SKILL.md"), mcp(), late)])
+                self.assertEqual(result["status"], "controls_complete")
+                self.assertEqual(result["by_tool"][named]["organic_count"], 0)
+                self.assertEqual(result["by_tool"][named]["reasons"]["named_turn"], 1)
+
+    def test_final_scan_command_representation_conflicts_remain_unknown(self):
+        path = "/fixture/skills/openai-docs/SKILL.md"
+        first = command(command=["X=1", "cat", path], status="failed")
+        second = command(command="X=1 cat " + path, status="failed")
+        for ordered in ((first, second), (second, first)):
+            for streams in ([records(*ordered)], [records(ordered[0]), records(ordered[1])]):
+                with self.subTest(first=ordered[0]["payload"]["item"]["command"], sources=len(streams)):
+                    result = self._run_final_scan(streams)
+                    self.assertEqual(result["status"], "unknown")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    self.assertIn("conflicting_native_representation", result["diagnostics"])
+                    for cell in result["by_tool"].values():
+                        self.assertIsNone(cell["organic_count"])
+                        self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_distinct_completed_argv_wrappers_remain_unknown(self):
+        script = "rtk cat /fixture/skills/openai-docs/SKILL.md"
+        cases = ((["/bin/bash", "-lc", script], ["/bin/sh", "-lc", script]),
+                 (["/bin/bash", "-lc", script], ["/bin/zsh", "-lc", script]),
+                 (["/bin/bash", "-lc", script], ["/bin/bash", "-c", script]),
+                 (["/bin/bash", "-lc", script], ["/usr/bin/bash", "-lc", script]),
+                 (["/bin/bash", "-lc", script, "first"], ["/bin/bash", "-lc", script, "second"]))
+        for first, second in cases:
+            for ordered in ((first, second), (second, first)):
+                for streams in ([records(command(command=ordered[0]), command(command=ordered[1]))],
+                                [records(command(command=ordered[0])), records(command(command=ordered[1]))]):
+                    with self.subTest(first=ordered[0], second=ordered[1], sources=len(streams)):
+                        result = self.run_controls(streams)
+                        self.assertEqual(result["status"], "unknown")
+                        self.assertIn("conflicting_native_representation", result["diagnostics"])
+                        for cell in result["by_tool"].values():
+                            self.assertIsNone(cell["organic_count"])
+                            self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_shell_string_cannot_bridge_distinct_completed_argv(self):
+        script = "rtk cat /fixture/skills/openai-docs/SKILL.md"
+        commands = (script, ["/bin/bash", "-lc", script], ["/bin/sh", "-lc", script])
+        orders = ((0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0))
+        for order in orders:
+            direct = [command(command=commands[index]) for index in order]
+            originals = [function("C", args={"cmd": script}, response_id="R1"),
+                         function("C", args={"cmd": script}, response_id="R2"), returned("C")]
+            aliased = [command(ident, command=commands[index]) for ident, index in zip(("C", "R1", "R2"), order)]
+            cases = ([records(*direct)], [records(direct[0]), records(*direct[1:])],
+                     [records(*originals, *aliased)],
+                     [records(*originals), records(aliased[0]), records(aliased[1]), records(aliased[2])])
+            for streams in cases:
+                with self.subTest(order=order, sources=len(streams)):
+                    result = self.run_controls(streams)
+                    self.assertEqual(result["status"], "unknown")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    self.assertIn("conflicting_native_representation", result["diagnostics"])
+                    for cell in result["by_tool"].values():
+                        self.assertIsNone(cell["organic_count"])
+                        self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()
