@@ -33,3 +33,13 @@ Pending workflow routes remain inert until Tier B recording and the named native
 Registry entries are rebuilt with scripts/host_receipts.py register_file from the frozen main registry; never hand-merged. The three lane ledger rows are appended by scripts/saturation_ledger.py and checked natively. Final shared hot files are committed last. Required checks precede the single retained #795 push, then final FOLDED and Q23-QUALIFIED headers name the pushed head. Co-op byte/range-diff verification precedes its closure of originals; their branches remain.
 
 Process sources: native-agent-stack@d9eb68750311d5f888adec140723da174f9fe10c:docs/lanes.md:94-98; the five frozen source heads above; direct FOLDS-RULED CC review023012Z; A26 at 2026-10-07T04:20:17Z in the lane questions file, and [the bounded amendment](../../../docs/decisions/2026-10-07-skills-fold-budget-amendment.md).
+
+
+## Amendment (2026-10-07) — correction of merge descriptions
+
+This dated correction supersedes the two descriptions in the original "Exact unions and source adaptations" section; the source comparisons, observed counts and earlier text remain unchanged.
+
+- The Codex-template sentence at original line 19 incorrectly described retained lifecycle/research configuration. The incoming comment hunks are superseded by 26 catalog-eligible entries from 27 selections, with fresh visibility unproven (adoption/templates/codex.config.template.toml:37-42). Manifest-specific configuration is delegated to tools/adoption/install_skills.py --print-codex-config at lines 43-44; research/HF identities and lifecycle operations remain in the central manifest and installer. The template keeps max_context_tokens = 6000 and its bundled skill-installer path rule, as tests/test_skills_manifest.py:307 enforces. No lifecycle/research per-skill table is added to the template.
+- The OSV sentence at original line 26 incorrectly called the routing fixture a lock. The union retains the PyYAML validation requirements lock as a scan input and the dependency-free routing fixture manifest exemption: .github/osv-scanner-lockfiles.json:278 names tools/skill-routing-b13/fixtures/instructions/package.json and explicitly records no dependency declarations or sibling lock. Both coverage assertions remain; the fixture is not an install or build input.
+
+Verification sources: native-agent-stack@f809570b2175908e14ab6b88e5dbe394eab220bb:adoption/templates/codex.config.template.toml:37,43,53; tests/test_skills_manifest.py:307; .github/osv-scanner-lockfiles.json:278. These exact source bytes were read for J795's P3 correction. No source behavior or historical observation changes.

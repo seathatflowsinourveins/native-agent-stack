@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "kind": "qualification_provenance_addendum",
+  "recorded_at_utc": "2026-10-07T04:53:45Z",
+  "amendment": "2026-10-07",
+  "review": "J795 / GPT-VERDICT-f809570b2.md P2",
+  "source_revision": "f809570b2175908e14ab6b88e5dbe394eab220bb",
+  "locator_root": "Private coordination/ns2604-coop directory on the execution host; outside this checkout.",
+  "bindings": [
+    {
+      "observation": "receipt.json#/native_catalog",
+      "input_record": "inputs.json",
+      "private_relative_locator": "skills-r2-private/sdk-01601-qualification-20261007/native-01601-readback.jsonl",
+      "sha256": "b4ea1b8b55fc28792b1dd043ff0f449c1449edf159a272601923270f29259fb1",
+      "required_skill_count": 23,
+      "status": "ready",
+      "model_inference_submitted": false,
+      "cleanup_status": "closed",
+      "scope": "Original non-held central Codex-enabled baseline. This file supports the original b4ea1b8b digest; it is not the later 25-name observation."
+    },
+    {
+      "observation": "folded-readback.json#/readback",
+      "private_relative_locator": "skills-r2-private/sdk-01601-qualification-20261007/final-native-01601-readback.jsonl",
+      "sha256": "561d9ef562b4308dc097cb386508afc8afe407184df6b0ae7b6e75267588fa4c",
+      "required_skill_count": 25,
+      "status": "ready",
+      "model_inference_submitted": false,
+      "cleanup_status": "closed",
+      "scope": "Final folded manifest's non-held central Codex-enabled names, including hf-cli and native-stack-research. This file supports the 25-name folded observation and its distinct digest."
+    }
+  ],
+  "verification": {
+    "method": "Read the retained raw bytes only to compute SHA256 and extract status, required-name count, inference and cleanup fields; compare to the existing public observations.",
+    "digests_match_public_observations": true,
+    "raw_contents_published": false,
+    "original_observations_modified": false,
+    "new_client_session_or_model_turn": false
+  },
+  "evidence_class": "provenance_binding_of_retained_native_observations",
+  "limits": [
+    "The private-relative locators are operator-accessible references, not checkout-relative files or published raw contents.",
+    "The baseline and folded observations are distinct; no result or usage is added across them.",
+    "The addendum establishes traceability, not rendered descriptions, loaded bodies, organic use, provider inference or live writing acceptance."
+  ]
+}
