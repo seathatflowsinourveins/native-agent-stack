@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
   "outputs": {
-    "docs/new-wsl-handbook.md": "c6a357756080c7651a3890f5ff2c9bcd4d5c14a0e596d7a7fa7372d2e08c2303",
-    "docs/new-wsl-handbook.json": "e85827c513b80cf075792edbcaf0c1b03c59ca89ca0c31e8fe846f2f3d1fa174"
+    "docs/new-wsl-handbook.md": "c8ecbb5dc3ca5fd0a8f9e4bb7414d05d4872b5cf20a66fd29c0e49307525b583",
+    "docs/new-wsl-handbook.json": "d7cc2ccb94480f666614cc80bd9fb20b69cf263abb8c245f0b9fde615a2db394"
   },
   "inventory": {
     "layers": 37,
@@ -649,6 +649,42 @@
       },
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    }
+  ],
+  "previous_outputs": [
+    {
+      "superseded_at_utc": "2026-10-07T00:37:33.361409+00:00",
+      "source_main": "3d7d4a4b2640c8583d8855670111ef5d023d3e03",
+      "reason": "J723d final landing-cue rebase and maintained native builder regeneration; prior observations remain unchanged.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "c6a357756080c7651a3890f5ff2c9bcd4d5c14a0e596d7a7fa7372d2e08c2303",
+        "docs/new-wsl-handbook.json": "e85827c513b80cf075792edbcaf0c1b03c59ca89ca0c31e8fe846f2f3d1fa174"
+      }
+    },
+    {
+      "source_head": "52d4de84d638aeb6d9679c0518ad1e92de119b75",
+      "reason": "Last published successful current-output binding before the final #758 rebase.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "95612231ea96471350adfdefccb151c2204c3ba5fdd04e83b3d6ca1043b0c369",
+        "docs/new-wsl-handbook.json": "0a37d0c92682aef6ad637314d6360b76d53b0fd62f0dd5a35a3ef753a6e493d7"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-06T23:57:00Z",
+      "source_main": "d9eb68750311d5f888adec140723da174f9fe10c",
+      "reason": "J723: refresh the generator-owned publication binding after rebasing and native regeneration; historical observations remain unchanged.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
+        "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
+      }
+    },
+    {
+      "source_head": "4e07a17d55860d3ae15c7437a348d59ff2fc40a1",
+      "reason": "Former current-output binding identified by the exact-head J723 guard; also retained in the existing regeneration history.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
+        "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
+      }
     }
   ]
 }
