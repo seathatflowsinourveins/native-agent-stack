@@ -346,8 +346,8 @@ embedding_backfill_interval_secs = 900
 See the [2026-10-06 decision and native receipt](../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md)
 for335/335 latest-page coverage, the29-target known-answer comparison,
 prefix proof and the remaining cross-client/environment boundaries. This
-profile changes ai-memory's embedder; it does not select the D3r4 memory owner
-or change the separate SocratiCode index. The [pinned upstream prefix path](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465)
+profile follows the October6 upstream KEEP decision for ai-memory; changing
+the separate SocratiCode index requires its own qualification. The [pinned upstream prefix path](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465)
 preserves the significant spaces in both strings.
 
 For a text-only clean-install trial, explicitly set `embedding_provider="none"`
@@ -375,6 +375,14 @@ ai-memory install-hooks --agent codex --server-url http://127.0.0.1:49374 \
 Replace `http://127.0.0.1:49374` with the URL the host's own ai-memory server binds; a copied port can send hooks to another host's or distro's store (on the NativeStack WSL2 workstation the service binds `127.0.0.1:49474`, and 49374 is another distro's default there). These hook installers are global additions gated by the project marker. They preserve a shared capture mode; back up the affected files and inspect the generated merge. Codex uses its selected `CODEX_HOME/hooks.json`; Claude uses its native settings. Review exact Codex hook definitions via `/hooks` afterward. Upstream can disable Claude prompt capture here; Codex prompt capture has no corresponding disable flag at this pin. Bounded sanitized observations and heuristic handoffs still have storage/prompt overhead. Do not describe this profile as zero capture.
 
 ### Worktrees and the capture marker
+
+The portable [marker example](../examples/ai-memory-project.toml.example)
+uses the operator-selected workspace `default` and project `native-agent-stack`.
+Static MCP clients pass both names on every project-scoped call, as required
+by [ai-memory2.5.2's marker contract](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/marker-file.md#L24).
+The example is tracked; each host's root `.ai-memory.toml` is not. The operator
+places a marker only in enrolled existing worktrees; preserve independent-review
+lanes' exclusion. Source: [native marker schema and precedence](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/marker-file.md#L68).
 
 This section changed after `v2026.09.26.2`, which has no `.worktreeinclude`. The marker
 stays untracked (`/.ai-memory.toml` is in `.gitignore`): it is one host's opt-in, and a

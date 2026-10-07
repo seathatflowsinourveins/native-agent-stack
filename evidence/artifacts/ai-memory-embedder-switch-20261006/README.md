@@ -30,3 +30,21 @@ canary text, before/after results and backups remain private. Backups are
 retained until at least2026-10-13; the optional purge of227 superseded MiniLM
 rows was not run. See the [decision](../../../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md)
 for source pins, alternatives and the comparison that would overturn it.
+
+## Addendum (2026-10-06): control meaning and later recall evidence
+
+The raw strict text-absence flag above remains false. The command-center
+ruling treats it as a text-presence observation, not a defect or leak gate:
+nearby vector hits in the small scratch corpus can include canary facts.
+The marker/fact association control, `control_clean`, is the actual leak
+check. Its passing result does not assert strict text absence.
+
+The later long-prompt smoke failed recall despite intact prompt capture.
+After the documented optional SessionEnd consolidation was configured, one
+authorized long-prompt rerun passed recall and `control_clean`; strict text
+absence remained false. The dated
+[decision addenda](../../../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md#addendum-2026-10-06-long-prompt-failure-and-consolidation-rerun)
+record the failed and passing private receipt hashes, source citations and
+the separate CC cleanup manifest. The acceptance-time values and this
+published receipt are unchanged. The memory KEEP ruling and upstream
+re-drive trigger are recorded there as subsequent decisions.

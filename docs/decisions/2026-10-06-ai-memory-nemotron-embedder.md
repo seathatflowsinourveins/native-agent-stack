@@ -144,3 +144,79 @@ log prints the configured client default before command-specific backfill
 URL selection; it did not prove requests went to the wrong listener.
 Sources: [config.rs:267/1655](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L267),
 [backfill endpoint override](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/backfill.rs#L156).
+
+## Addendum (2026-10-06): KEEP and upstream re-drive
+
+The command-center ruling `task-ns2604-coop-20261006T204552Z`, section 1,
+keeps ai-memory 2.5.2 on Nemotron as the memory of record. It supersedes the
+earlier D3r4 and paired-comparison selection gates above. No local campaign
+is resumed, and StackMeasure2604 is excluded from all lane work. Selection
+uses upstream evidence, a clean supported release, one real integration
+smoke per consuming client and organic native counters.
+
+Hindsight v0.10.2, commit
+`5fc4ce20917b916240cef27c212c387a177f115b`, is the named challenger:
+[maintainer release](https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2).
+Re-drive on its next clean release after 0.10.2, or new externally inspectable
+evidence on coding-agent memory or source-record recovery. The maintained
+[memory re-drive record](../memory-landscape-maintenance.md#october-6-upstream-keep-and-re-drive)
+owns that trigger. This ruling does not convert the 29-target integration
+comparison into a memory-product vote.
+
+The strict no-canary-text flag remains false. It is not a defect: the scorer
+flags any canary fact among top hits for a never-written control query, while
+a small vector corpus can return nearby canary pages. `control_clean` checks
+the marker/fact association and is the actual leak control. The previously
+recorded pass in both directions refers to that control, not text absence.
+
+## Addendum (2026-10-06): long-prompt failure and consolidation rerun
+
+The single fresh source at 21:48Z and receiver at 21:54Z exited 0, but the
+Gate 3 scorer returned `recall_pass=false`, `control_clean=true`. The capture
+gate timed out at 300 s with no fact-preserving latest page. Full prompt
+capture remained intact. The failed native receipt remains private and
+unchanged, SHA256
+`beba568b2cb04e2666372db300b7209d27a1c0ec13085b5a459491adb4688b92`.
+
+At ai-memory v2.5.2, the deterministic session page renders the capped
+80-character observation title; the stored body is separate. The compiled
+query result suppresses raw-observation fallback whenever compiled hits
+exist, even if those pages omit the requested fact. Sources:
+[sanitize.rs:344](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-core/src/sanitize.rs#L344),
+[synth.rs:398](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-hooks/src/synth.rs#L398),
+and [raw fallback at server.rs:2740](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-mcp/src/server.rs#L2740).
+No configurable title bound was found at those call sites. Native
+`memory_read_session_observations` can inspect full captured bodies without
+an LLM; it was not substituted for the Gate 3 receiver:
+[server.rs:4158](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-mcp/src/server.rs#L4158).
+
+Consolidation was disabled with no provider/model and no queued jobs. After
+the operator supplied the provider/model choice, the documented
+OpenAI-compatible route and SessionEnd consolidation were configured through
+an additive, backed-up service override. The existing mixed TOML and unit
+environment were left unread and untouched. The approved route uses
+`cx/gpt-6.1-sol-max` on the 21128 gateway. Supported configuration
+and enqueue/worker behavior are in
+[config.rs:948](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L948),
+[config.rs:1616](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L1616),
+[router.rs:2686](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-hooks/src/router.rs#L2686),
+and [serve.rs:757](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L757).
+
+The one authorized rerun retained the long-prompt design: 191 characters,
+with the fact starting at zero-based character 77. Its source consolidation
+job completed in one attempt before the fresh native receiver. At
+2026-10-06T23:47:19Z the receipt records `recall_pass=true`,
+`control_clean=true`, strict text-absence false, two `memory_query` calls and
+one `memory_read_page` call. No manual consolidation call or canary page
+write was used. The retained private rerun receipt is SHA256
+`772f222f0107cffcc48b3b328b527bcfb4a65101d027d11006c2dc87959d32ed`.
+This is one steered native integration rerun, not organic use or an upstream
+test. Both the failed and passing attempts and their native usage remain
+retained; the acceptance-time receipt stays unchanged.
+
+The CC subsequently records MiniLM cleanup in its dated manifest
+`deletion-manifest-minilm-20261006T235252Z.json`. That later S14 operation is
+separate from the original embedder receipt and the optional purge of 227
+superseded database rows. The CC owns the Gate 3 ruling and deletion; this
+lane performed no MiniLM deletion. Private backups remain governed by their
+retention record.

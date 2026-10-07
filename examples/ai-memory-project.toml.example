@@ -1,5 +1,6 @@
-# Copy only to an explicitly enrolled project's .ai-memory.toml.
-workspace = "local"
+# Portable example; the host-owned .ai-memory.toml stays untracked.
+# Use the operator's explicit scope (ai-memory v2.5.2 docs/marker-file.md:68-73).
+workspace = "default"
 project = "native-agent-stack"
 
 [capture]

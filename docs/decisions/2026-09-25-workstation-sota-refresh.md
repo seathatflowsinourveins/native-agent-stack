@@ -674,14 +674,6 @@ sends no prefixes, and ai-memory's config accepts unknown keys, so setting prefi
 production since 2026-09-26, is the same here: it does not contain #859, and its `config.rs`
 has no prefix keys.
 
-**Correction2026-10-06.** The2.4.x review above remains historical. Prefix
-keys shipped in2.5.0 (#859) and are supported by2.5.2@7580b74d:
-[config.rs:461–502](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L461),
-[query/document application](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465).
-The `local` provider still uses MiniLM; the supported OpenAI-compatible route
-now applies publisher prefixes. See the [accepted NativeStack2604 record](2026-10-06-ai-memory-nemotron-embedder.md)
-for the8B integration, its actual native gates and remaining boundaries.
-
 **Alternatives.** Switch on 2.4.x without prefixes (only if an unprefixed arm passes the
 same preregistered rule); instruction-free models such as pplx-embed-v1-0.6b (needs a
 serving runtime this stack does not run) or granite-embedding-english-r2 (weaker).
@@ -698,3 +690,18 @@ with a different identity scheme (re-run).
 - The rtk and markitdown pins and receipts landed separately in #291.
 - One host (`nativestack-5975wx-20260925`, WSL2). Nothing here is macOS evidence, and no
   landscape verdict changes.
+
+## Addendum (2026-10-06): released ai-memory prefix support
+
+The evaluation-only decision and v2.4.x observations above remain historical.
+Prefix support shipped in v2.5.0 and is supported by v2.5.2, commit
+`7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83`:
+[v2.5.0 config.rs:489](https://github.com/akitaonrails/ai-memory/blob/v2.5.0/crates/ai-memory-cli/src/config.rs#L489),
+[v2.5.2 config.rs:461](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L461),
+and [query/document application](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465).
+The `local` provider's MiniLM default and the OpenAI-compatible prefix route
+are distinct supported profiles. The
+[October 6 NativeStack2604 decision](2026-10-06-ai-memory-nemotron-embedder.md)
+records acceptance of the 8B route, its native evidence and subsequent KEEP
+ruling. It supersedes the earlier evaluation-only installation guidance;
+no unreleased build or local memory-selection campaign is required now.

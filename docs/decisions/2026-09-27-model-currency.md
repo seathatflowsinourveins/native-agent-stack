@@ -71,12 +71,9 @@ Two rows keep a model that a single source could rank lower:
   requires the `littlewine/llama.cpp` fork, a `projector.safetensors` file and a Python listwise scorer, and the
   upstream pull request it cites (#26286, "qwen3 : add sliding-window attention pattern support") is open.
   **Gate:** stock llama.cpp and node-llama-cpp gain rank-pooling for it; then qualify it on the catalog task.
-- **Nemotron for ai-memory — correction2026-10-06.** The September27 hold
-  described v2.4.1, not the current release. Prefix keys shipped in2.5.0 and
-  are wired in2.5.2@7580b74d. NativeStack2604's supported8B integration is now
-  accepted with its [native receipt and boundaries](2026-10-06-ai-memory-nemotron-embedder.md).
-  The1B model remains a separately qualified fallback; this embedder acceptance
-  does not settle D3r4's memory-product head-to-head.
+- **Nemotron-3-Embed-1B for ai-memory.** Prefix support (#859) is merged into `release/2.5` but unreleased; the latest
+  release is `v2.4.1`. **Gate:** ai-memory 2.5.0 ships with #859; then run the preregistered evaluation of the
+  [workstation refresh record](2026-09-25-workstation-sota-refresh.md#evaluation-only).
 - **Claude Sonnet 5.5 and Claude Haiku 5.5.** Announced on 2026-09-22 with no model ID, price or release-notes entry
   (re-fetched 2026-09-27). When they ship, the `sonnet` and `haiku` aliases move with a Claude Code update, but three
   version-keyed places will not: the template's `modelSettings` (keyed `claude-opus-5-5`), `LEGACY_EXACT` in
@@ -531,3 +528,17 @@ they describe the September 27 state. The
 also points forward and retains its old quote through this record's unchanged line 132. Keeping Fable was the previous
 selection; Opus replaces it at the user's request, with post-change savings and quality still unmeasured. Revisit the
 selection through the October 4 record's observation contract or a subsequent user decision.
+
+## Addendum (2026-10-06): ai-memory prefix support and accepted 8B route
+
+The September 27 hold above describes ai-memory v2.4.1 and remains a dated
+decision. Prefix keys shipped in v2.5.0 and are wired in v2.5.2, commit
+`7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83`:
+[v2.5.0 config.rs:489](https://github.com/akitaonrails/ai-memory/blob/v2.5.0/crates/ai-memory-cli/src/config.rs#L489),
+[v2.5.2 config.rs:461](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L461),
+and [prefix application at embedding.rs:465](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465).
+NativeStack2604's supported 8B integration is now
+[accepted with its native receipt and dated boundaries](2026-10-06-ai-memory-nemotron-embedder.md).
+The 1B model requires separate qualification. The October 6 command-center
+KEEP ruling and upstream re-drive trigger supersede the earlier memory
+selection gates; they do not turn this dated hold into a new measurement.

@@ -169,3 +169,49 @@ tokens saved. Such values remain **unknown**, separate from provider usage.
   learned writes and their long-term quality are distinct evidence. A rejected
   proposal is useful behavior; it is not proof that automatic learning improved
   future answers.
+
+## October 6 upstream KEEP and re-drive
+
+The dated command-center ruling keeps **ai-memory2.5.2 on the Nemotron
+embedder as the memory of record**. Its released [scope contract](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/marker-file.md),
+[handoff/source-record interfaces](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/usage.md)
+and [backup](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/backup.md)
+fit the two native clients; [released Ubuntu tests passed](https://github.com/akitaonrails/ai-memory/actions/runs/36828476560/job/110259413156).
+Today's installed integration has a separate [native receipt and boundaries](decisions/2026-10-06-ai-memory-nemotron-embedder.md).
+Those checks do not establish a comparative benchmark winner.
+
+**Named challenger: Hindsight, vectorize-io v0.10.2.** Its [published paper](https://arxiv.org/html/2512.12818#S7.T3)
+is vendor/collaborator long-dialogue QA evidence, not a coding-agent project
+memory comparison with ai-memory. Its released [Coding Agents integration](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs-integrations/coding-agents.md)
+supports both native clients and shared banks; old client-specific-bank
+warnings belong to superseded scripts.
+
+**Re-drive trigger, dated2026-10-06:** the next clean Hindsight release after
+0.10.2, or new externally inspectable evidence on coding-agent memory or
+source-record recovery. Reconsider the choice on upstream release/test and
+published-method evidence, with no local head-to-head, campaign or periodic
+remeasurement gate. A supported clean install is checked by one real
+integration smoke per client and organic native counters. D3r4 steps8 onward
+gate nothing and are not resumed; no measurement distribution is used.
+
+The current memory row awaits the CC-requested fresh Claude→Codex scratch
+smoke after2026-10-07T00:10Z. Its `control_clean` association check is the leak
+criterion; a separate strict text-presence flag is not a defect when nearby
+canary pages appear in a small vector corpus. Only the CC closes rollback
+and deletes superseded MiniLM rows after its holder check; the lane deletes
+nothing.
+
+### Addendum (2026-10-07): completed recall and owner cleanup
+
+The earlier waiting status above is superseded. FOUNDATION-FIRST removed
+the paper clock hold, and the authorized long-prompt Claude-to-Codex rerun
+passed on October6 at23:47Z after documented LLM consolidation completed.
+The compiled page preserved the fact; `recall_pass` and `control_clean` were
+true. The strict neighbour-text flag remained false and is not a failure
+gate. See the [dated decision addendum](decisions/2026-10-06-ai-memory-nemotron-embedder.md#addendum-2026-10-06-keep-and-upstream-re-drive).
+
+The CC then recorded removal of the three former MiniLM model files after
+its fresh holder checks, at23:52:52Z. This was model-cache cleanup, not a
+purge of historical database embedding rows or backups. The lane performed
+no deletion. Recorded receipts remain unchanged; upstream evidence and the
+Hindsight re-drive trigger above govern future selection.
