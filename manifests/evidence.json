@@ -4358,6 +4358,22 @@
         "Trading requirement text corrections remain the trading owner's work. No host operation, model execution, installation, closure or gating count changed."
       ],
       "path": "evidence/receipts/ns2604-saturation-requirement-binding-20261007.json"
+    },
+    {
+      "id": "codex-organic-oracle-controls-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Pinned Codex prototype plus explicit supplied-record control classification; meaningful fixtures cover directed/smoke/first/named-turn exclusions and scoped native-ID/window/dedup cases. No native organic counts, readiness or adoption result.",
+      "limitations": [
+        "Fixture and source consistency only, not upstream acceptance, actual native use, a working-day report or final organic protocol qualification.",
+        "Control references and completeness remain producer declarations; actual owner sources and retained native context must be verified before reporting organic counts.",
+        "Unsupported native call formats and missing provenance/IDs/time remain unknown; known non-call variants are separate.",
+        "Skill-read attempts remain attempts; per-tool attribution may overlap and must not be summed as unique calls.",
+        "Claude's actual provenance, independent cross-family observation and command-center review remain pending. Original prototype/old fixture bindings are retained."
+      ],
+      "path": "evidence/receipts/codex-organic-oracle-controls-20261007.json"
     }
   ],
   "files": [
@@ -16996,6 +17012,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+      "sha256": "cdf6fb9dd3e6765e7ee83625fe9f5af6c65b4f2ae150f22df74bc1cc5403191f",
+      "bytes": 6056
     },
     {
       "path": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
@@ -42123,6 +42144,11 @@
       "bytes": 12542
     },
     {
+      "path": "evidence/artifacts/organic-counter-20261007/upstream-contract.json",
+      "sha256": "0f723a4309f84fe0e8e750267a900480a2762447e6ba3394ef20283f0dc4030a",
+      "bytes": 4150
+    },
+    {
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/acceptance-runs.json",
       "sha256": "932b155b20a059f3c5b7d350470e0e09ac97584a5398bb74360c38e27f8fff95",
       "bytes": 13809
@@ -51948,6 +51974,11 @@
       "bytes": 12905
     },
     {
+      "path": "evidence/receipts/codex-organic-oracle-controls-20261007.json",
+      "sha256": "227bd42267b39a92fd779bd08045d448c5a4c7b892548a0353ca5fc9edc0a4f8",
+      "bytes": 5342
+    },
+    {
       "path": "evidence/receipts/codex-serena-startup-port-20261003.json",
       "sha256": "b41227ea9b1c54ea7091d7450520fbb5b1c6931911272a256af3ad59e4fd8d67",
       "bytes": 137419
@@ -55183,19 +55214,29 @@
       "bytes": 55887
     },
     {
+      "path": "tools/invocation-monitoring/README.md",
+      "sha256": "e8c1f5cae62cd7b459f178a952b821dd1c1772bc8539499f3e60785b2d70ed3f",
+      "bytes": 3250
+    },
+    {
       "path": "tools/invocation-monitoring/codex-counter-prototype-manifest.json",
       "sha256": "e339e3039ae044a1ca5f63edb62f4c5d7af2981b246c51d930a537dacfbda5ba",
       "bytes": 3634
     },
     {
+      "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+      "sha256": "eb22a57c77c0bf26257c6c808ef6875d95c926bd0ee69bbb59f5f5ed69ab5367",
+      "bytes": 2502
+    },
+    {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "d44d5ea4dcb9cf3c69f606fc25aba847084d593597025f853d76d67528d46eec",
-      "bytes": 24770
+      "sha256": "c12d61a8ca0bd9903c4e5055e228b6fcff27010c290752dd080b55ee3b7598a7",
+      "bytes": 52981
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "519e9f54bc9e0c901aae97865abbb62c9516a0537337c968068a484f91e5ac5a",
-      "bytes": 6941
+      "sha256": "5832128afcb65a583a2443b78007e8c8ad8c76ab616320c0df8ff30add7c2a40",
+      "bytes": 33402
     },
     {
       "path": "tools/omniroute/gateway_record.py",
