@@ -5,7 +5,7 @@ It serves POST /v1/responses and POST /v1/chat/completions as a streamed respons
 that has the live gateway store's real table definitions (loaded from a schema file dumped, without data, from the live store). How rows are written is set by a JSON mode file that is re-read
 for every request, so a control driver can switch behaviour between runs:
 
-  {"mode": "...", "tail_s": 3.0, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
+  {"mode": "...", "tail_s": 3.0, "row_delay_s": 0.4, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
   (responses_corr_header: send X-Correlation-Id on /v1/responses too, as the real gateway does on some responses; by default only Chat Completions responses carry it, so a Responses client attributes rows by the response id)
   ("null_effort": [true, false, ...]: a list cycled over the requests that write rows; a true entry writes BOTH effort columns as NULL, as the real gateway does for a response without encrypted reasoning; without it the columns
    carry the client's requested effort and, for a model whose id ends in -max, an upstream effort max even when the client sent none; "effort_upstream_override" replaces the upstream effort of a row that is not NULL;
@@ -13,8 +13,7 @@ for every request, so a control driver can switch behaviour between runs:
   Rows carry what the real gateway's rows carry that the acceptance scripts read: provider, connection_id 'ctl-conn', duration (the request's measured milliseconds), ttft_ms, reasoning_source ('encrypted' when an effort column is stored, else NULL), and
   usage_history rows carry provider, connection_id, endpoint (the call's path), latency_ms (duration + 1) and ttft_ms (the call's + 0.2), as on 457 live pairs.
 
-  (tail_s: how long the connection is kept open, with keep-alive comments, after the terminal event; there is no separate persistence delay: round 27 removed the unused `row_delay_s` setting that this text used to describe)
-  mode "normal"            rows are written when the tail (tail_s) has passed, or at once when a keep-alive write to a client that has closed fails, whether or not the client is still connected (what the patched gateway does)
+  mode "normal"            rows are written row_delay_s after the terminal event, whether or not the client is still connected (what the patched gateway does)
   mode "lose-on-early"     rows are written only when the client stayed connected until the stream ended; a client that closes after the terminal event leaves NO row (the unpatched gateway's drop)
   mode "double-row"        the normal rows plus a second identical call_logs row dup_s (default 4) seconds later (a late duplicate)
   mode "status-flip"       the normal rows, then flip_s (default 3) seconds later the call_logs row's status becomes 499 (a row that changes after the first read)
@@ -140,6 +139,7 @@ class Handler(BaseHTTPRequestHandler):
         cfg = mode()
         m = cfg.get("mode", "normal")
         tail = float(cfg.get("tail_s", 3.0))
+        delay = float(cfg.get("row_delay_s", 0.4))
         tag = self.headers.get("X-OmniRoute-Session-Id")
         t_req = time.time()
         with open(ARGS.db + ".requests.jsonl", "a", encoding="utf-8") as f:
@@ -191,7 +191,7 @@ class Handler(BaseHTTPRequestHandler):
                     chunk(b"data: [DONE]\n\n")
         except (BrokenPipeError, ConnectionResetError):
             pass
-        # the rows: written when the tail (tail_s of keep-alive comments after the terminal event) ends, or as soon as a write to a client that closed fails, unless this mode loses them for an early-closing client
+        # the rows: written when the response completes (delay after the terminal event), unless this mode loses them for an early-closing client
         stayed = True
         end = time.time() + tail
         try:

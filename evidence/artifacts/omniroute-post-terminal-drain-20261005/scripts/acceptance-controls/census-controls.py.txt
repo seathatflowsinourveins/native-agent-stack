@@ -20,6 +20,7 @@ foreign request that left none; with a late stream, benign, without a correlatio
 the service manager's monotonic start stamp, the boot id) and J38f/J38j (the edge of the start window). Every world's journal entries carry `_BOOT_ID` and `__MONOTONIC_TIMESTAMP` (augment_journal: derived from each entry's stamp as the fixture writes it, so only `clock_step` models a physical step), every call row has its own correlation id, and `clock_step` and
 `honour_bounds` model a stepped wall clock and a journalctl that honours its query.
 Added after the independent review of round 25 (no P0, P1 or P2; eight P3): J48a-J48b (a line of the listener's pid with another boot's `_BOOT_ID` and no call row: r25 PASSed), J48c (two rows of one request under different paths share a correlation id), J48d (two opposite steps of the wall clock cancel in the first and last entries) and X9 (boottime_minus_monotonic()).
+Added after 5f's FULL read r15 of 1004174e3 and the command center's ruling J757-R15-FIX (the census r27 adds ONE refusal: every world that PASSes on r27 PASSed on r26): G17a-G17e (the idle receipt's INFO line: the gateway's pending-request counter changing during the idle observation is INCONCLUSIVE, an unchanged counter, also the unpatched build's stale one, and an unreadable one are not).
 Exit status 0 when every scenario behaved as expected."""
 import argparse
 import math
@@ -201,6 +202,8 @@ def write_guard(path, g):
     L = [f"GUARD version={g['version']} mode={g['mode']} script_sha256={GUARD_SHA} start={utc(g['start'])} port={g.get('port', 20128)} unit={g.get('unit', 'omniroute.service')} clean_for={g.get('clean_for', 30.0)} interval=5.0 tolerate_units={g.get('tolerated', "['omniroute-fw.service']")}",
          *([] if g.get("no_identity") else ["   IDENTITY label=idle-only time=x unit=omniroute.service MainPID=1 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT health=ok"]),
          "CHECK nothing in flight for 30 s (7 samples): " + ("ok (0 idle and 0 tolerated connection(s))" if g["clean"] else "FAIL ['an active connection']")]
+    if g.get("info"):   # round 27: the guard's informational INFO line (printed before the result line), only when a scenario sets it
+        L.append(g["info"])
     if g["result"]:
         if g["version"] == "4":
             L.append(f"GUARD-RESULT clean={g['clean']} failed_checks={g['failed']} end={utc(g['end'])}")
@@ -695,6 +698,13 @@ def main():
         spec["arms"][1]["pid"] = 2   # the second arm's wrapper saw another MainPID than the idle receipt
     scenario("I7", "the gateway was restarted between the idle receipt and an arm (another MainPID in the arm's identity line)", mutate=restarted, want=2, must=["a restart between them voids the idle claim"])
     scenario("G4", "the guard was not clean", mutate=g(clean=False, failed="['nothing in flight for 30 s (7 samples)']"), want=2, must=["the idle check was not clean"])
+    info17 = "INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before={b} pending_total_after={a} pending_changed={c} hindsight_processes=0"
+    scenario("G17a", "r15, the command center's second condition: a CLEAN idle receipt whose INFO line shows the gateway's own pending-request counter rising during the observation (0 to 1, pending_changed=True): INCONCLUSIVE (r26 PASSed: the census read only IDLE-RESULT)", mutate=g(info=info17.format(b=0, a=1, c=True)), want=2,
+             must=["the INFO line shows that the gateway's own pending-request counter changed", "pending_total_before=0, pending_total_after=1, pending_changed=True"])
+    scenario("G17b", "the same receipt with the counter unchanged at the stale value of the unpatched build (92 and 92, pending_changed=False, as the live trial's receipts print it): PASS", mutate=g(info=info17.format(b=92, a=92, c=False)), want=0, must=["CENSUS-RESULT PASS", "pending_changed=False"])
+    scenario("G17c", "the counter falling during the observation (3 to 2, pending_changed=True: a request that was in flight at its start finished): INCONCLUSIVE", mutate=g(info=info17.format(b=3, a=2, c=True)), want=2, must=["the INFO line shows that the gateway's own pending-request counter changed"])
+    scenario("G17d", "the totals differ (0 and 1) while the flag says False: INCONCLUSIVE (the totals decide)", mutate=g(info=info17.format(b=0, a=1, c=False)), want=2, must=["the INFO line shows that the gateway's own pending-request counter changed", "pending_changed=False"])
+    scenario("G17e", "the counter could not be read (None and None, pending_changed=False): the receipt shows no change, so no foreign arrival: PASS", mutate=g(info=info17.format(b=None, a=None, c=False)), want=0, must=["CENSUS-RESULT PASS"])
     scenario("G5", "a guard version 4 receipt (GUARD-RESULT, no IDLE-RESULT)", mutate=g(version="4", mode="full"), want=2, must=["not from guard version 5", "not an --idle-only receipt", "0 IDLE-RESULT line(s)"])
     scenario("G6", "a full-mode guard 5 receipt (mode=full) is not an idle-only receipt", mutate=g(mode="full"), want=2, must=["not an --idle-only receipt"])
     scenario("G7", "--diagnostic with an otherwise perfect world: measured and printed, never PASS", diagnostic=True, want=2, must=["PASS is not possible", "foreign=0", "orphans=0", "statuses={'unique': 6}"])

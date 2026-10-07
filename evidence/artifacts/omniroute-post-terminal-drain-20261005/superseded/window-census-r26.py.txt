@@ -9,7 +9,7 @@ The census closes that over the whole window, on the gateway's own rows (SQLite 
   (ii)  completeness: exactly one own call row per raw request, at least the printed min_rows per judged native turn; and the own call rows and the usage rows of the window form connected components, each with as many usage rows as call rows and a UNIQUE PERFECT MATCHING
         (the candidate query and `associated()` are the scripts' own, copied byte for byte; unique perfect matching: a perfect matching M exists and no edge of M can be left out without losing perfection);
   (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad, and exactly (the pad alone leaves a sliver at its edge) every call row that is not this run's and could own a usage row an own call row can claim (the candidate query seen from the usage row, the same association) is a problem wherever it lies;
-  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and an INFO line (if the receipt has one) that shows no change of the gateway's own pending-request counter during the observation (round 27, the command center's second condition on the item (2) residual: a window whose idle receipt shows a foreign arrival is INCONCLUSIVE; the flag `pending_changed=True`, or two different totals, shows one); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
+  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier; the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
         no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
   (v)   the clocks agree: every own call row lies inside its arm's recorded interval with a margin of 2 s (the arm's interval is taken from the output's own lines: the wrapper's `started`/`# finished` stamps when present and the frozen script's FROZEN start= / SUMMARY end=; those are the host clock, the rows' timestamps are the gateway process's own clock, on the same machine); the arms must not overlap (the wrapper's stamps are whole seconds, so 1 s of overlap is tolerated);
   (vi)  the gateway is the same process throughout: the MainPID and ExecMainStartTimestamp of the guard receipt's identity line equal those of every arm's first identity line (the wrapper's); the canary gate (the default four arms) requires that line in the receipt and in all four arms and every comparison to succeed, a trial of another number of arms compares the arms that carry one;
@@ -1192,14 +1192,6 @@ def parse_guard(path):
         m = re.match(r"^IDLE-RESULT clean=(True|False) failed_checks=(\[.*\]) end=(\S+)\s*$", line)
         if m:
             results.append((m.group(1) == "True", m.group(2), parse_ts(m.group(3))))
-        m = re.match(r"^\s*INFO\b.*?\bpending_total_before=(\S+)\s+pending_total_after=(\S+)\s+pending_changed=(True|False)\b", line)
-        if m:   # round 27: the gateway's own pending-request counter, which the guard prints as informational; a change during the idle observation shows a request that arrived or finished while the lane was to be idle
-            before, after, flag = m.group(1), m.group(2), m.group(3) == "True"
-            differ = before.lstrip("-").isdigit() and after.lstrip("-").isdigit() and int(before) != int(after)
-            g["pending_changed"] = bool(g.get("pending_changed")) or flag or differ
-            if flag or differ:
-                g["problems"].append(f"the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before={before}, pending_total_after={after}, pending_changed={flag}): a request arrived or finished while the lane was to be idle, so the idle receipt shows foreign traffic "
-                                     "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX)")
     if g.get("guard_lines", 0) != 1 or g.get("identity_lines", 0) > 1:
         g["problems"].append(f"the receipt holds {g.get('guard_lines', 0)} GUARD line(s) and {g.get('identity_lines', 0)} IDENTITY line(s): one run per file is expected (a hand-concatenated receipt is refused)")
     if g.get("result_lines", 0) != 1:
@@ -1353,7 +1345,7 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
             rep.bad("no guard receipt: the window's idle start is not established, so PASS is not possible")
     else:
         guard = parse_guard(guard_path)
-        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']} pending_changed={guard.get('pending_changed')}")
+        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']}")
         for problem in guard["problems"]:
             rep.bad(f"guard receipt: {problem}")
         if canary_gate and guard.get("script_sha") == GUARD_SCRIPT_SHA_BEFORE_R12:
@@ -1397,7 +1389,7 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
     rep.say("TILES " + " | ".join(f"{k}: {a['name']} {utc(bounds[k - 1])}..{utc(bounds[k])}" for k, a in enumerate(timed, 1)))
     rep.say("CLOCKS arm intervals: the host clock (the wrapper's date -u stamps, the scripts' datetime.now(UTC)); rows: the gateway process's own clock (new Date() in UTC), same machine; own rows must lie inside their arm's interval with a margin of "
             f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
-    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO line, if it has one, shows no change of the gateway's pending-request counter) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
+    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
     # ---- queries (printed first, so a failure below still leaves them in the receipt)
     for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("incarnation-calls", SQL_INCARNATION_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
         rep.say(f"QUERY {name}: {sql}")

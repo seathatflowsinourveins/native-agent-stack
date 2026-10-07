@@ -1,0 +1,31 @@
+# The complete diff of the window census between the head that 5f's FULL read r15 read (1004174e3; superseded/window-census-r26.py.txt, sha256 d3e2317bf7d2382dd9a7126bc176554e7bf9448a2109b3ca7570ebe0bda6ce63) and this head (scripts/window-census.py.txt, sha256 4229f076f1dcbf1e4562c523402252ad90ca7e87da964498b5f57d8ee4b07c47), as `diff -u` with one line of context. Nothing else of the census differs.
+# The cause: the command center's ruling J757-R15-FIX, line 1, second condition (a window whose idle receipt shows a foreign arrival is INCONCLUSIVE, not PASS) and its instruction that, if the census does not already do it, it becomes a refusal to add. The census refused an idle receipt that is not clean (a call_logs row under 120 s old at a guard sample, a new or active client connection, a process of another lane), a foreign call row or an orphan usage row in the tiled window and an inbound line without a call row, but it read nothing of the guard's INFO line: a clean receipt whose INFO line reported a change of the gateway's own pending-request counter passed. It is now INCONCLUSIVE when an INFO line shows that the counter changed during the idle observation (`pending_changed=True`, or two different totals). REFUSALS only (every window that PASSes now PASSed on the census that the read r15 read: checks/census-negative-controls.txt). The controls are G17a-G17e.
+
+--- superseded/window-census-r26.py.txt
++++ scripts/window-census.py.txt
+@@ -11,3 +11,3 @@
+   (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad, and exactly (the pad alone leaves a sliver at its edge) every call row that is not this run's and could own a usage row an own call row can claim (the candidate query seen from the usage row, the same association) is a problem wherever it lies;
+-  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier; the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
++  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and an INFO line (if the receipt has one) that shows no change of the gateway's own pending-request counter during the observation (round 27, the command center's second condition on the item (2) residual: a window whose idle receipt shows a foreign arrival is INCONCLUSIVE; the flag `pending_changed=True`, or two different totals, shows one); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
+         no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
+@@ -1194,2 +1194,10 @@
+             results.append((m.group(1) == "True", m.group(2), parse_ts(m.group(3))))
++        m = re.match(r"^\s*INFO\b.*?\bpending_total_before=(\S+)\s+pending_total_after=(\S+)\s+pending_changed=(True|False)\b", line)
++        if m:   # round 27: the gateway's own pending-request counter, which the guard prints as informational; a change during the idle observation shows a request that arrived or finished while the lane was to be idle
++            before, after, flag = m.group(1), m.group(2), m.group(3) == "True"
++            differ = before.lstrip("-").isdigit() and after.lstrip("-").isdigit() and int(before) != int(after)
++            g["pending_changed"] = bool(g.get("pending_changed")) or flag or differ
++            if flag or differ:
++                g["problems"].append(f"the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before={before}, pending_total_after={after}, pending_changed={flag}): a request arrived or finished while the lane was to be idle, so the idle receipt shows foreign traffic "
++                                     "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX)")
+     if g.get("guard_lines", 0) != 1 or g.get("identity_lines", 0) > 1:
+@@ -1347,3 +1355,3 @@
+         guard = parse_guard(guard_path)
+-        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']}")
++        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']} pending_changed={guard.get('pending_changed')}")
+         for problem in guard["problems"]:
+@@ -1391,3 +1399,3 @@
+             f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
+-    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
++    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO line, if it has one, shows no change of the gateway's pending-request counter) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
+     # ---- queries (printed first, so a failure below still leaves them in the receipt)
