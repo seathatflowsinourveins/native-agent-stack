@@ -143,3 +143,96 @@ original evidence classes and untested boundaries remain explicit.
 | 2026-10-06 | Counting failed assertions as scorer execution errors | An error count must use promptfoo failureReason ==2; failed assertions are a separate outcome. | Count the actual returned error discriminator and retain failure versus execution-error classes separately. | [promptfoo@34f74d34 ResultFailureReason](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/types/index.ts#L376); [switch known_answer.test_errors](../../evidence/artifacts/ai-memory-embedder-switch-20261006/receipt.json) |
 | 2026-10-06 | Wrapping a cited document without checking its line-bound references | PR800 added three lines before the cited ANTHROPIC_DEFAULT_SONNET_MODEL location; documentation checks passed but the citation-specific CI test failed. | Check the citation contract for each changed source document; preserve valid locators or update their owning records, and keep fallback qualification pending until proved. | [Repository citation contract@0d5e6506:2054–2060](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/tests/test_upstream_surface_watch.py#L2054); [actual failed CI assertion](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37509622651/job/112427730163) |
 
+
+## Amendment (2026-10-07): comparison, cleanup and provenance
+
+This amendment retains every earlier observed value and decided paragraph.
+It supplies the comparison and provenance qualifications requested in the
+co-op review of PR800 at004c78319 and CC item012642Z.
+
+### Incumbent, challenger and overturn outcome
+
+The incumbent disposition is **KEEP ai-memory2.5.2 on the accepted Nemotron
+embedder as the installed memory of record**, under CC204552Z. The challenger
+is **Hindsight0.10.2, an uninstalled upstream-evidence challenger**, at
+`5fc4ce20917b916240cef27c212c387a177f115b`:
+[official release](https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2).
+The next clean Hindsight release or new externally inspectable coding-agent
+memory/source-record-recovery evidence starts a re-drive; that event alone
+is not a replacement outcome.
+
+Replacing the incumbent requires a dated CC decision on an upstream comparison
+that establishes a better-evidenced maintained candidate. For this KEEP record,
+the comparison must show stronger coding-agent memory or source-record recovery
+than the incumbent, under compatible, externally inspectable methods and data,
+while preserving scoped source records, faithful full-body retrieval, recovery
+and the two native clients' supported capture/recall paths. Published source,
+tests and release discipline must support the capability claims; usage/resource
+claims require comparable disclosed accounting. An unrelated vendor QA table,
+popularity or a new release number does not establish that outcome. The
+[published Hindsight method](https://arxiv.org/abs/2512.12818) is a lead to inspect,
+not an ai-memory comparison or an already-proved coding-agent superiority.
+Without that comparative outcome and CC binding, KEEP remains in force.
+
+After a source-backed replacement decision, use the candidate's clean upstream
+release and one real consuming-client integration smoke per client, followed
+by the native organic-counter check. Those checks accept the integration;
+they do not select the product. No D3r4/LongMemEval/StackMeasure campaign,
+local head-to-head, new arm or preregistration amendment is revived.
+
+### Complete CC-reported model retirement
+
+The following manifests are under the CC's durable
+`coordination/e2e-truth-20261006/deletions/` record. This lane read their
+metadata and verified the manifest digests; it did not repeat the filesystem
+operations or holder checks. These are the CC's completed operations, under
+its status235312Z, not newly executed deletion evidence from this lane.
+
+| CC-reported retired model | Manifest locator | Files | Manifest SHA256 |
+| --- | --- | --- | --- |
+| Qwen3-Embedding-8B | `deletion-manifest-q3e8b-20261006T215554Z.json` |20| `8a9223091db5f665e9f25b2c75c932e251f5a461879e267b1b0dd046993314b4` |
+| embeddinggemma | `deletion-manifest-embeddinggemma-20261006T221910Z.json` |2| `a8a5cd6cce2e624c87ab0fcd0d8efa1c72660d6ee00a4b2d897c23398d021fb1` |
+| all-MiniLM-L6-v2 | `deletion-manifest-minilm-20261006T235252Z.json` |3| `0070add553649e97bd6a59b27ac00592773398ffaaa3559f48fe40dc75cad7e7` |
+
+**The host's MiniLM-dependent tier-1 rollback is retired.** Historical receipts,
+data backups and their retention remain intact; source-backed data restore and
+qualified Nemotron re-embedding are distinct remaining recovery operations.
+The portable CPU example for other hosts is not this host's active rollback.
+Model-file retirement is not a purge of historical database embedding rows,
+completion of the still-pending live qmd cutover, or an HF cache-cleanup claim.
+Those separate operations need their own CC records. This lane deleted nothing.
+
+### Deployment revision and private follow-up reports
+
+The intended plan/model-card revision is
+`d1f2f25730bbd775b99b29185134bc86653bf2d1`;
+[pinned model card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md).
+The actually served-weight revision has not been independently verified by this
+lane. The public [switch receipt](../../evidence/artifacts/ai-memory-embedder-switch-20261006/receipt.json)
+explicitly marks HF/vLLM provenance as plan-recorded. API model ID, dimensions,
+prefix agreement and page vector identity do not independently checksum the
+server's loaded weights. No different weight revision is inferred.
+
+| Measurement report | Executing/reporting owner | Report SHA256 and publishing-lane inspection |
+| --- | --- | --- |
+| Original switch and29-target comparison | CC executor, workflow `wf_9044bb3b-c29` | `8624a287a3df356e4ddabfdd0975ad4b93ca85d83ad57e9bbd36edc6df64339b`; sanitized receipt read and hash inspected, private executor backups/weights not inspected |
+|17:47–17:50 capture-repair follow-up and passive spool samples | Assigned co-op lane `memory-h2h`, CC follow-up executor | `12e00241c1f6654c989660f816f50d2107a8932b2a3467706e585e14ca892c01`, private `gate3-c2x-repair-20261006/summary.json`; lane executed and inspected native results, report re-read and hash verified |
+| Failed long-prompt attempt | Assigned co-op lane `memory-h2h` | `beba568b2cb04e2666372db300b7209d27a1c0ec13085b5a459491adb4688b92`; private native receipt/results inspected by executing lane, immutable failure retained |
+| One consolidation-gated long-prompt rerun | Assigned co-op lane `memory-h2h`, accepted by CC235312Z | `772f222f0107cffcc48b3b328b527bcfb4a65101d027d11006c2dc87959d32ed`; lane executed and inspected native source/receiver/scorer results and receipt hashes |
+
+Detailed character offsets, attempt/call counts and queue measurements above
+are reports by those execution owners. Inspection by the same executing lane
+is not independent replication by the co-op reviewer; that reviewer had the
+public receipt and CC status, not these private inputs. Requested native smokes
+remain distinct from organic use and unchanged upstream test acceptance.
+No private canary facts, conversations, vectors or backups are published here.
+
+### Pending model-currency qualification
+
+**The embedder's release date and current-release status are unverified here.**
+The [older manifest](../../evidence/artifacts/hf-memory-models-20260921/model-manifest.json)
+records2026-07-16 and the8B source URL above. The CC's active model-currency
+workflow `wf_5053494c-265` supplies the verified landscape record when its
+critic completes. The recorded date is a locator for that review, not a fresh
+current-release attestation or independently measured served-weight identity.
+No observation is rewritten and no new start gate or model switch is claimed.

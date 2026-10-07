@@ -144,3 +144,43 @@ log prints the configured client default before command-specific backfill
 URL selection; it did not prove requests went to the wrong listener.
 Sources: [config.rs:267/1655](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L267),
 [backfill endpoint override](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/backfill.rs#L156).
+
+## Amendment (2026-10-07): provenance and model currency
+
+The originally recorded observations and decided text above remain unchanged.
+The [new successor's dated amendment](2026-10-07-memory-keep-and-consolidated-recall.md#amendment-2026-10-07-comparison-cleanup-and-provenance)
+qualifies later reports and owns the current memory-product disposition.
+
+The HF revision `d1f2f25730bbd775b99b29185134bc86653bf2d1` above is the
+plan/model-card revision, not an independently checked served-weight revision
+by this publishing lane. The immutable [executor receipt](../../evidence/artifacts/ai-memory-embedder-switch-20261006/receipt.json)
+qualifies its HF and vLLM pins as plan-recorded and not re-read. Model ID,
+4096 dimensions, prefix behavior and stored vector identity establish their
+recorded integration contract; they do not independently attest the loaded
+weight bytes. The actually served weight revision remains unverified here.
+
+The original switch results are reports by the CC executor of
+`wf_9044bb3b-c29`; this lane inspected the sanitized receipt and its digest,
+not the executor's private backups or the served weights. The later private
+follow-ups were executed and reported by the assigned co-op lane
+`memory-h2h`, acting as the CC's designated follow-up executor. It inspected
+its native source/receiver results and private reports. The reviewer was not
+supplied those private inputs, so their detailed measurements are executor
+reports rather than an independent reviewer reproduction.
+
+The post-capture-repair summary `gate3-c2x-repair-20261006/summary.json`
+retains SHA256
+`12e00241c1f6654c989660f816f50d2107a8932b2a3467706e585e14ca892c01`.
+It reports the17:47–17:50 recall/control result and the30→18→10 spool samples;
+this lane re-read the report and verified its hash. Pending counts are not
+acknowledgement counts or proof of a globally empty queue. Later failed and
+passing long-prompt reports and their inspection are identified in the
+successor amendment; the published acceptance-time PARTIAL result stays intact.
+
+**The embedder's release date and current-release status are unverified here.**
+The older [model manifest](../../evidence/artifacts/hf-memory-models-20260921/model-manifest.json)
+records2026-07-16 for the8B and links the
+[pinned NVIDIA model card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md).
+Those are follow-up locators, not fresh verification of release currency.
+The CC's model-currency workflow `wf_5053494c-265` owns its verified landscape
+record; that pending qualification is not a new start gate or model change here.
