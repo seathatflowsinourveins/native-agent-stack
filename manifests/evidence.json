@@ -4542,6 +4542,26 @@
         "Independent review of this new catalog context is pending; neither the current deployment report nor old outcomes establish a new SOTA selection."
       ],
       "path": "evidence/receipts/ns2604-terminal-catalog-context-20261007.json"
+    },
+    {
+      "id": "ns2604-catalog-native-wiring-contract-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Finalized-catalog adoption declarations require vendor-native per-client integration and state readback, fresh implicit-use native smokes, and owner-qualified daily organic evidence on the actual invocation channel. This is a declaration contract with local fixtures; it installs, smokes or adopts no tool.",
+      "limitations": [
+        "Declared references and consistency are checked, not the truth of external vendor, state, execution or counter claims.",
+        "Production hook invoke-map and qualified working-day policy/report are not present at the read source pin; unknown/deferred daily state remains non-adopted.",
+        "No universal working-day duration or OIR threshold, telemetry collector, runner or duplicate organic qualifier is introduced.",
+        "Vendor documentation initially supports pinned repository snapshots and same-vendor integration repositories; unsupported unpinned official-site citations remain unresolved rather than adopted.",
+        "Operational client integration, restart-window fixes, fresh-session smokes and daily measurement belong to their designated owners; this lane changes no client configuration or runtime.",
+        "Local state-readback classes remain local; native functional smoke and organic-owner qualification remain distinct. Synthetic/planning evidence cannot qualify completed daily adoption.",
+        "All existing 79 roles stay pending with null census and empty selections; no native readiness figure changes. Independent exact-head review is pending.",
+        "Daily qualification also needs a known canonical native-client emitter source pin. Missing or unmapped client source identity remains non-adopted; this carrier adds no unpinned official-site/version-mapping parser."
+      ],
+      "path": "evidence/receipts/ns2604-catalog-native-wiring-contract-20261007.json"
     }
   ],
   "files": [
@@ -17518,8 +17538,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
-      "sha256": "3b63625a3f063c478324b0937274303ba3bc4f7732247db9ea5845200e818e3b",
-      "bytes": 20396
+      "sha256": "2ae97d1d4d8d3aa14b02ac08522a73d2637a1aa2430794eabcc3125445cf3a2a",
+      "bytes": 24423
     },
     {
       "path": "docs/direct-results.md",
@@ -53137,6 +53157,11 @@
       "bytes": 24695
     },
     {
+      "path": "evidence/receipts/ns2604-catalog-native-wiring-contract-20261007.json",
+      "sha256": "419665cb9b8aa2baea4282784636fba8bc537e63e09ced307fb1f1464744ec92",
+      "bytes": 7731
+    },
+    {
       "path": "evidence/receipts/ns2604-difftastic-client-smokes-20261006.json",
       "sha256": "38086f027c63404bdd8175034ef8f4b9085b91c6710a87e587d35a1698bc31be",
       "bytes": 3770
@@ -54478,8 +54503,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "0b4a7513c12671e5f7a887c2b15b7fdd6862dbbf87c1665499508a7fb427b8c4",
-      "bytes": 56482
+      "sha256": "4c3531b763f126ebd78153651afba5fb44c3b1a44a9d08dc351a7122aebf1f34",
+      "bytes": 82201
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -55078,8 +55103,8 @@
     },
     {
       "path": "tests/test_finalized_foundation_catalog.py",
-      "sha256": "2cc182400bb4a53aebf96c123302d4cd2ff8220216fe41b4f88d022e825d1d4e",
-      "bytes": 48031
+      "sha256": "85c030accdd8e93c843829c2237921e3451f7dac6686125130650abd5e3a5093",
+      "bytes": 74621
     },
     {
       "path": "tests/test_financial_data.py",
