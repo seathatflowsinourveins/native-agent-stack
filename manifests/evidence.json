@@ -5252,8 +5252,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
-      "sha256": "691003167dc4e03cdf9dfb4bb5628ca01194d65b74bf7180179f80d822af0d77",
-      "bytes": 551
+      "sha256": "cb60aed603faeff7624be7d5c213406a8d983078e5b21902c0a017be590db0dc",
+      "bytes": 572
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
@@ -17107,6 +17107,11 @@
       "bytes": 4075
     },
     {
+      "path": "docs/codex-currency-upgrade-checklist.md",
+      "sha256": "4a7bff666f04d2c791f38a2249f56671a162215696ed2ab0160b6ead1bdeb8dc",
+      "bytes": 5494
+    },
+    {
       "path": "docs/community-native-practice.md",
       "sha256": "4334eda38f9961f971e4c5394cd6fef418cef236d3ad73c34a0e080b5b71be21",
       "bytes": 56958
@@ -17308,8 +17313,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "04722d8d8691e9ce6e4d95d88fff58adb838690ed0cf3b4bd966ba7b7a4ace8a",
-      "bytes": 135109
+      "sha256": "565b666f18c56f11d0519d4968fb3129a1f42d00547621b27939e9cd07630fc9",
+      "bytes": 138336
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -17667,9 +17672,19 @@
       "bytes": 3654
     },
     {
+      "path": "docs/decisions/2026-10-06-auth-storage-failure-notification.md",
+      "sha256": "9e30b13eaee2bddc8285b90cf1acffcd6ce01f3698bdabd927e2b824a46c2e5a",
+      "bytes": 3639
+    },
+    {
       "path": "docs/decisions/2026-10-06-cc-orchestration-composition.md",
       "sha256": "5f5a6d54e9de82ba99fda40547036677800785787d6670f449280af0cfaef964",
       "bytes": 21371
+    },
+    {
+      "path": "docs/decisions/2026-10-06-codex-omniroute-opt-in-search.md",
+      "sha256": "ba0334e96fb169e19d96c67bac5b43190318e9ee9cdb98325167cd88b4a458a6",
+      "bytes": 10495
     },
     {
       "path": "docs/decisions/2026-10-06-codex-skill-read-exception.md",
@@ -17690,6 +17705,11 @@
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
+    },
+    {
+      "path": "docs/decisions/2026-10-06-ns2604-selected-browser-native-qualification.md",
+      "sha256": "57bc05cf3f26c4d3fe6ba51e0028a763e6c77902f4c6db8ed824f9f9cdce403a",
+      "bytes": 8457
     },
     {
       "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
@@ -41223,8 +41243,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
-      "sha256": "902969375dbc1404bf220226aa5c6ab149b9f8023f2b6d6819cf9c4c33c21e11",
-      "bytes": 11649
+      "sha256": "b12ea18b67f64a13688d1468249c395058a528b8ba44239b472edba897bdf385",
+      "bytes": 12075
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
@@ -41315,6 +41335,11 @@
       "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
       "sha256": "b13ffd5fe0995830da568e5582f1bd3fdea77d3b16d651d660d16c4fa56628ef",
       "bytes": 23333
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20261006/notification_types_scan_2.1.291.json",
+      "sha256": "e43b95aab9f5f841c52edc7db700b159495fb211910247e83c5cd7c7f4bf983d",
+      "bytes": 4518
     },
     {
       "path": "evidence/artifacts/ns2604-context-audit-20261006/resolver-assignment.json",
@@ -41530,6 +41555,11 @@
       "path": "evidence/artifacts/ns2604-pin-decision-20261006/selection.json",
       "sha256": "ba388865d8507e849ebf4a9fdcc3feeacce592b6d7538a684f92913ca03d2801",
       "bytes": 5042
+    },
+    {
+      "path": "evidence/artifacts/ns2604-playwright-cli-20261006/qualification.json",
+      "sha256": "efd14ae59a0b276babe09be2989fa3b2e48de0c545174189698d88654bbc1458",
+      "bytes": 9771
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
@@ -54938,8 +54968,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "1267c78f2b719ce6ed23c781ce97f2b189d29a2897c970e4d64610cb42b6efba",
-      "bytes": 39626
+      "sha256": "889aba2511afec00769d7e344812e0493be040e58e858e934dd66225894ab46a",
+      "bytes": 39973
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -56408,8 +56438,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "1df0730ff6cbe700bc590f6849ddecb61685a0b83c0c8424f1cc338c2f1a20a4",
-      "bytes": 49913
+      "sha256": "fb944eaf37f25c0222c10440690972f4948b03adf5fd9829d120ac61eff626b7",
+      "bytes": 51736
     },
     {
       "path": "tests/test_worker_recovery.py",
