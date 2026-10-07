@@ -4562,6 +4562,76 @@
         "Daily qualification also needs a known canonical native-client emitter source pin. Missing or unmapped client source identity remains non-adopted; this carrier adds no unpinned official-site/version-mapping parser."
       ],
       "path": "evidence/receipts/ns2604-catalog-native-wiring-contract-20261007.json"
+    },
+    {
+      "id": "ns2604-organic-use-pilot-20261005",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "jcodemunch-mcp",
+        "serena"
+      ],
+      "claim": "Sanitized source inventory for organic-e2e-v1-20261005 plus U1: four pending client/arm cells and eight terminal process records; no metrics, verdict or readiness change.",
+      "limitations": [
+        "Historical inventory only, not a live organic qualification, upstream acceptance or a new host execution.",
+        "Process rc/times do not establish exposure, selection, successful use, native telemetry joins or an organic verdict.",
+        "Protocol and run originals are private owner-held proof; the public digest retains logical locators and hashes without prompts, conversations or active host configuration.",
+        "Pilot metrics and verdicts remain null; independent verification, convergence-practice format review and command-center adjudication are pending.",
+        "The 30-day observational recheck limit reuses the existing freshness default and is not a protocol qualification threshold."
+      ],
+      "path": "evidence/receipts/ns2604-organic-use-pilot-20261005.json"
+    },
+    {
+      "id": "ns2604-saturation-requirement-binding-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Additive versioned saturation requirement text/identity snapshots preserve all prior scope digests and records. Deterministic checker/fixture evidence only; no new sweep, trading text correction, native adoption or readiness change.",
+      "limitations": [
+        "Historical ledger records remain unchanged. Old requirement_sha256 values are retained as legacy_hash in new snapshots; they are not rehashed in place.",
+        "Local structural checks and synthetic fixtures are not upstream acceptance, an independent cross-family review or a new model-run qualification.",
+        "The actual model-run producer paths need convergence-practice custody and compatible propagation before any future run claims text-bound qualification; this publication does not claim those integrations are enabled.",
+        "Trading requirement text corrections remain the trading owner's work. No host operation, model execution, installation, closure or gating count changed."
+      ],
+      "path": "evidence/receipts/ns2604-saturation-requirement-binding-20261007.json"
+    },
+    {
+      "id": "windows-terminal-2604-fragment-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "A portable 16-profile NativeStack2604 Terminal fragment carries explicit Microsoft-derived profile identities and the maintained bell/truecolor policy; source/fixture checks pass, while host deployment and session continuity remain pending.",
+      "limitations": [
+        "Repository/source checks only: no Windows Terminal deployment, UI, sound-playback or session-continuity acceptance was performed.",
+        "Source transformations remove private bindings; owner-supplied command-center, co-op and account-pool launchers are deployment prerequisites, not accepted implementations.",
+        "Librarium cwd and clone/vault binding are DEFERRED to P1-CLI; its profile remains hidden. Librarium course is a distinct project.",
+        "Operations and Local Chat depend on the installed nativestack CLI; four lane launcher/prompt files must be staged by their owner. No prompt body is authored here.",
+        "The old independent HTTP omniroute-fw on 20129 has no established 2604 equivalent. Its references are DEFERRED to Phase 3; WebSocket 21129 is not a replacement.",
+        "The broader 174-test regression retained one installed-client currency failure: Claude 2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
+        "The command-center exact-head read at b216f9d7884d4d8519743b9e1c8f4f3c53181513 returned ACK_AFTER with two P2 and four P3 findings. Repair micro-check and operator host apply/read-back remain pending; a source review is not deployment acceptance."
+      ],
+      "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json"
+    },
+    {
+      "id": "dagu-loopback-auth-none-20261006",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "dagu"
+      ],
+      "claim": "The NativeStack2604 Dagu record distinguishes reported auth:none configuration from native loopback/version/credential-free inventory observations. Eight returned identities have separate operator-reported sample/foundation ownership; no paper execution or readiness status is promoted.",
+      "limitations": [
+        "Read-only observations only: no DAG, paper or broker operation, upstream suite, installation or role-completeness acceptance.",
+        "The configuration change/restart is the command center's report; this lane did not inspect dagu.env, backups, keys or the quarantined home, and changed no host configuration.",
+        "Direct SS/interface probes establish direct loopback reachability only; tunnels, reverse proxies and off-host forwarding paths were not tested.",
+        "Names/tags do not establish unchanged bodies or owners. The separate co-op A25 description/comment/schedule inspection classifies all eight outside paper execution/support; that is reported metadata, not workflow execution or body identity.",
+        "The first inventory GET did not disable default curl configuration; retain it as inventory evidence only. The later --disable-first GET supplies credential-free interface observation.",
+        "Raw API bodies, parameters/defaultParams, live DAG definitions, credential values and host-interface addresses are excluded from model context/artifact retention.",
+        "Independent publication review remains pending. Structural validation is not native application, provider or paper acceptance."
+      ],
+      "path": "evidence/receipts/dagu-loopback-auth-none-20261006.json"
     }
   ],
   "files": [
@@ -16278,8 +16348,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "b849394c1855754c7dbcc1106e5b21c196a4dd2113d1f3862c9a07107c1b9715",
-      "bytes": 3355
+      "sha256": "9024607e5f684c1ea06bc8816dc60d66f10d1980f7113951fb894e64b351df75",
+      "bytes": 3839
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -16458,8 +16528,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
-      "bytes": 314853
+      "sha256": "7ec9b56ca1438059bd478d03f07d4520dfbd53927b80f6a0673d819c915b0102",
+      "bytes": 336586
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -16517,6 +16587,11 @@
       "bytes": 287704
     },
     {
+      "path": "catalogs/landscape/organic-use.schema.json",
+      "sha256": "318a0b72fefc89275adcb3b78307117636e4a1be6be459e66c579e3dc52df617",
+      "bytes": 17982
+    },
+    {
       "path": "catalogs/landscape/research-state.json",
       "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
       "bytes": 21449
@@ -16533,13 +16608,18 @@
     },
     {
       "path": "catalogs/saturation/README.md",
-      "sha256": "65b35374209ae8abf0d37154e4664cdcac98d5415f02b4583a9c479b4bf4436e",
-      "bytes": 12036
+      "sha256": "12c7e3ccc3c8ec840475b1fb219d62775d548b9ac3578c79c4434fe8deafbe09",
+      "bytes": 14350
     },
     {
       "path": "catalogs/saturation/ledger.json",
       "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
       "bytes": 403074
+    },
+    {
+      "path": "catalogs/saturation/ledger.schema.json",
+      "sha256": "fb5f5002508a653860b5763dc2cc4a58fedcdf155f725813001025a184fafe09",
+      "bytes": 8309
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -16907,6 +16987,11 @@
       "bytes": 3031
     },
     {
+      "path": "checks/check-terminal-profiles.py",
+      "sha256": "acebacc0b1ed1c6f7c4e242af6506476749a13140d8a1afe9fe54c907a9b7e30",
+      "bytes": 13126
+    },
+    {
       "path": "docs/acceptance-evidence-policy.md",
       "sha256": "38ddfb80673ae86cad110a65a9cc938bb974d65a34bb9638b7a0f96d3e2ef508",
       "bytes": 5820
@@ -16993,8 +17078,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a1af27458583cabaebfe3d0299b239fdf23f42740165f02f9323d33f0647d26f",
-      "bytes": 32903
+      "sha256": "da9d870a652523187490562b738ee50838122d29359c5eb27c8f1f5179749c54",
+      "bytes": 34130
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -17497,6 +17582,11 @@
       "bytes": 22114
     },
     {
+      "path": "docs/decisions/2026-10-05-organic-use-catalog-records.md",
+      "sha256": "60038ef6ff8a502fc1b679dd03def1c4bcd777acfffc56ff79c5e0f6db79655e",
+      "bytes": 13008
+    },
+    {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
@@ -17527,6 +17617,11 @@
       "bytes": 21371
     },
     {
+      "path": "docs/decisions/2026-10-06-dagu-loopback-auth-none.md",
+      "sha256": "1c11c1444d5decbf6e1cd16b065dc366850a4a25e92c06c142f42b0c6fc9474a",
+      "bytes": 12117
+    },
+    {
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
@@ -17537,9 +17632,19 @@
       "bytes": 3898
     },
     {
+      "path": "docs/decisions/2026-10-06-windows-terminal-2604-fragment.md",
+      "sha256": "95b8932613303acff86bab695023f77e8eddc90120bf0a3f3fb1b44e1f1336e6",
+      "bytes": 7568
+    },
+    {
       "path": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
       "sha256": "2ae97d1d4d8d3aa14b02ac08522a73d2637a1aa2430794eabcc3125445cf3a2a",
       "bytes": 24423
+    },
+    {
+      "path": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
+      "sha256": "dac41a540114e2e5868f8ec354e800f11569eb2406eed8e15b4cdb492b40bb3f",
+      "bytes": 5767
     },
     {
       "path": "docs/direct-results.md",
@@ -19570,6 +19675,16 @@
       "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
       "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
       "bytes": 14197
+    },
+    {
+      "path": "evidence/artifacts/dagu-loopback-auth-none-20261006/native-observations.json",
+      "sha256": "54493115a1177753928afa9c7a74e117ed6eedf8110a6797aa4a9d3c010cb3ac",
+      "bytes": 7736
+    },
+    {
+      "path": "evidence/artifacts/dagu-loopback-auth-none-20261006/owner-classification.json",
+      "sha256": "2ecaa7cc48bfb25b2061695c910dcaee9ddf74abc2c14fc2651359cbb881b4a6",
+      "bytes": 4384
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -52697,6 +52812,11 @@
       "bytes": 55987
     },
     {
+      "path": "evidence/receipts/dagu-loopback-auth-none-20261006.json",
+      "sha256": "1f39d47344b907785714b1174e93ab478ef27027d2306ab7119a0175db83e2f0",
+      "bytes": 16092
+    },
+    {
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
       "sha256": "f6de5af7e9defdc32c3f121ba83aa523e4f8e513981f63b3437d063453171452",
       "bytes": 76528
@@ -53182,6 +53302,11 @@
       "bytes": 5675
     },
     {
+      "path": "evidence/receipts/ns2604-organic-use-pilot-20261005.json",
+      "sha256": "aacec9253bc6a2fb6c71fe07acb7f6232408da01af8e4abf827c25af8204ae39",
+      "bytes": 18024
+    },
+    {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
       "sha256": "1d0afd73a954e448eb00bac14dbe0f2c7384d65a51efd0ad0c5e990f7ae3273b",
       "bytes": 16469
@@ -53190,6 +53315,11 @@
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json",
       "sha256": "a01e1b8b9a4d4a917b891ecbb6df3076c72fef06588628f127772ec51683466e",
       "bytes": 11795
+    },
+    {
+      "path": "evidence/receipts/ns2604-saturation-requirement-binding-20261007.json",
+      "sha256": "568788d410f64509640e55819420a20c9228b3be0bdc4638f4a994dcceb13b40",
+      "bytes": 8701
     },
     {
       "path": "evidence/receipts/ns2604-terminal-catalog-context-20261007.json",
@@ -53455,6 +53585,11 @@
       "path": "evidence/receipts/vllm-compatibility.json",
       "sha256": "33adf727233d608e0d76bf8da12e30909b279582e2f73bc74ceccde520fb8a99",
       "bytes": 1939
+    },
+    {
+      "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json",
+      "sha256": "240d0197ab30e6329d38b47aa9afae0316267a69a9cd55bbffad6a127808dccb",
+      "bytes": 12434
     },
     {
       "path": "evidence/receipts/worktrunk-list.json",
@@ -54028,8 +54163,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
-      "bytes": 25778
+      "sha256": "7e56a706d7bf53d07ffcc33a4e0ead8c3aebfc266cb10a161669eac70418f459",
+      "bytes": 26211
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -54163,8 +54298,8 @@
     },
     {
       "path": "observability/grand-dashboard/README.md",
-      "sha256": "22662cb7c468977a874f87fa1d2395e00dfd09991a0933e57e357b08b44cadd7",
-      "bytes": 8128
+      "sha256": "6dfcbe4cb0f98661d75f94e052d59f1018298b74347414150c16f56c63a0ed2a",
+      "bytes": 8441
     },
     {
       "path": "observability/grand-dashboard/acceptance.py",
@@ -54193,8 +54328,8 @@
     },
     {
       "path": "observability/grand-dashboard/passwordless.md",
-      "sha256": "686719345c736aa29830d3afca74bc06cb0dc45d8c0283860dc83018db207a0b",
-      "bytes": 4976
+      "sha256": "dfb1f5ae4614edd50f994796f3cdd773b9cf43d1b2e13eee34a8fb2460ad4ffb",
+      "bytes": 5234
     },
     {
       "path": "observability/grand-dashboard/progress.py",
@@ -54373,8 +54508,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
-      "bytes": 72137
+      "sha256": "e34baa87370bf62bc0ee9ec032cf6e7662d51e6bfbc477121aed5295be3312ef",
+      "bytes": 74063
     },
     {
       "path": "scripts/credential_status.py",
@@ -54418,8 +54553,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f",
-      "bytes": 111077
+      "sha256": "5b2cef2ae1b944001a6b800f1fcba6770edd7f86ead7be10ac2a53578868a4dc",
+      "bytes": 111679
     },
     {
       "path": "scripts/kernel_keyring.py",
@@ -54442,6 +54577,11 @@
       "bytes": 14217
     },
     {
+      "path": "scripts/organic_use.py",
+      "sha256": "cf4b6228a5ddfc1de2d2a232b811db1a04f856b351b9f6c1826d0157f19ef43c",
+      "bytes": 21220
+    },
+    {
       "path": "scripts/path_safety.py",
       "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703",
       "bytes": 3308
@@ -54453,8 +54593,8 @@
     },
     {
       "path": "scripts/receipt_staleness.py",
-      "sha256": "2360fcd200cf9a98914367408aca1ec7df44fdadf32c97c2f13df27a2b18a997",
-      "bytes": 13408
+      "sha256": "7a2ab6dc85adb574467e08f9f1433a4a1100886acbed87ab650fdb931708eb44",
+      "bytes": 20489
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -54468,13 +54608,18 @@
     },
     {
       "path": "scripts/saturation_ledger.py",
-      "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
-      "bytes": 110935
+      "sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6",
+      "bytes": 120756
     },
     {
       "path": "scripts/skills_status.py",
       "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
       "bytes": 42439
+    },
+    {
+      "path": "scripts/terminal_profile_ids.py",
+      "sha256": "33127acd396afdc0070f2cf9bee3bc4987079f6e002879af52ea3a81578645c8",
+      "bytes": 4951
     },
     {
       "path": "scripts/trading_gates.py",
@@ -54488,8 +54633,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "8af1a053f662509dac2d674158037ab0dbde9ae852dbab23ef0b5323ed2d96c6",
-      "bytes": 28553
+      "sha256": "d603cac42c57032f3a46696e74b9beff5bcea0555a0f996e79fe70a090df3334",
+      "bytes": 31885
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -55023,8 +55168,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
-      "bytes": 83131
+      "sha256": "ae8cce129a77ce5f621e04c0a315fe212dd30db2151b61ab679483fdece0d38a",
+      "bytes": 85366
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
@@ -55103,8 +55248,8 @@
     },
     {
       "path": "tests/test_finalized_foundation_catalog.py",
-      "sha256": "85c030accdd8e93c843829c2237921e3451f7dac6686125130650abd5e3a5093",
-      "bytes": 74621
+      "sha256": "0ce4a4704ddb2b707459306828261ca2cfce9c27f70955ee242c221f80e380a9",
+      "bytes": 75089
     },
     {
       "path": "tests/test_financial_data.py",
@@ -55203,8 +55348,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
-      "bytes": 144843
+      "sha256": "9bedd016368d474b95df96f56b46c22bf8d288c8be93e507bb7132af6db659ff",
+      "bytes": 146443
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -55482,6 +55627,11 @@
       "bytes": 73784
     },
     {
+      "path": "tests/test_organic_use.py",
+      "sha256": "d5bb4aa341b57c42918c08eea890cf050de95b038b4a390faba4fc53f442b0c4",
+      "bytes": 24082
+    },
+    {
       "path": "tests/test_osv_lockfile_coverage.py",
       "sha256": "2d81844b1041b71019c3d0caa529dbbc13b6a86af3c634c0c442c31023e9d760",
       "bytes": 75161
@@ -55543,8 +55693,8 @@
     },
     {
       "path": "tests/test_receipt_staleness.py",
-      "sha256": "3bf62e631f72fc93740f4ebf361fd76d0da5c9b1743e7ba65542bea640e37fae",
-      "bytes": 24084
+      "sha256": "c99e4ee256b35af82ee5abe04d0bfd2e576c8c4951e94e8809ab60a2d529573c",
+      "bytes": 32273
     },
     {
       "path": "tests/test_release_pin_contents.py",
@@ -55598,8 +55748,8 @@
     },
     {
       "path": "tests/test_saturation_ledger.py",
-      "sha256": "c0311178a40acd4f233bbce29540f6f591f3878e855242f85f71b8dc49a3cbb3",
-      "bytes": 112415
+      "sha256": "c2b52378cb817995be919f9e83dc175a619a62d8c127701a6f43555511d15f43",
+      "bytes": 122869
     },
     {
       "path": "tests/test_sdk_usage_scope.py",
@@ -55690,6 +55840,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_terminal_fragment.py",
+      "sha256": "51a332e0efd450cb368ee0590cfa9bbd602888ade4ffef4f4d2a617c3b06ab1d",
+      "bytes": 16799
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -56430,6 +56585,21 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "57c98b9b1389315a06de47f59d6d4708e00f44959e02a717f14e0c500365b8b4",
       "bytes": 64712
+    },
+    {
+      "path": "windows/README.md",
+      "sha256": "5ce9eb3a499e66173c3f194259298ff54e24c9daef11f24fa53eab500292afe3",
+      "bytes": 12490
+    },
+    {
+      "path": "windows/nativestack2604.json",
+      "sha256": "eadcf2da6bdb68c573892a5c89a033fa595867e9d8e0872bfb4f60c16942f1d6",
+      "bytes": 8522
+    },
+    {
+      "path": "windows/ops-entry.sh",
+      "sha256": "05cfc1bfc7eea9ec34ac60c53f644ece166e81b9f0b09b3e4da70ad039a62aac",
+      "bytes": 278
     }
   ],
   "convergence_records": [
