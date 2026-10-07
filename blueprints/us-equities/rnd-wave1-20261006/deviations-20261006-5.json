@@ -1,0 +1,584 @@
+{
+  "schema_version": 1,
+  "kind": "rnd_wave1_preregistration_deviations",
+  "status": "draft_pending_GPT_read_and_CC_ACK",
+  "recorded_at_utc": "2026-10-06T21:32:50.391663+00:00",
+  "frozen_commit": "b253161a480f8369283e4661e36e737792765891",
+  "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "kept_sha256": {
+    "deviations-20261006-2.json": "b2974b6f3c76d3308d9450437dbbc015f89449ef607cffa57b049ac6a83d9ac0",
+    "plan.json": "36e55742ec837809cf6d41ae1b35e22237cc25a0c3abf01d0f36384cee0e1743",
+    "deviations.json": "6dfca17ac1fa1a011a36a4fd37919fcdcd29941bef4c9a359ce3675f941bae42",
+    "deviations-20261006-4.json": "c3eb8594f3da2acbc54ce331cf104e146e57a9418ca9b806968bae8cff3aa87c",
+    "d6-class-review-20261006.json": "63c66ae2ec42923272b25d2b239ae60f6706c1968d9f3d9b1766cc9dad7ea071",
+    "deviations-20261006-3.json": "44f3fa81a1d6f483b4715b02c12dab5b35f23ea816acccf6b2afc825329b2d1a",
+    "PREREGISTRATION.md": "7b7f4ce3f4506abf2370938a36556dbcdb5596bcbcdf792f2a92b494671e4f96"
+  },
+  "previous_deviation_commits": [
+    "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
+    "22fa80187",
+    "b0df1fb0440698b0f210cb6becdcb24c685e232b",
+    "b253161a480f8369283e4661e36e737792765891"
+  ],
+  "found_by": "Command-center RULING-Q5-MINIMAL, task-ns2604-coop-20261006T204552Z section 2, queued user direction; original R1 Q5 table.",
+  "policy": "D7 is the minimal clarification of D1 and D6. It does not govern over D1, rewrite D6 pins, add a decision rule or change success/exit precedence. Every earlier file remains byte-identical. The previous all-fields D7 proposal at 7ebf6164 is superseded, unfrozen and not an authorized extractor input.",
+  "deviations": [
+    {
+      "id": "D7.1",
+      "finding": "CC refined Q5 to form (a), minimal.",
+      "rule": "D6 entries are independent pins checked against deterministic source derivations, never a binding output lookup. Bind only the 15 date-range fields identified by the original table; a literal date pair is not proof of a complete data-read interval. Preserve unresolved bounds under D1, including C06's unknown lower date. D6 is never a fallback or parser-selector input."
+    },
+    {
+      "id": "D7.2",
+      "finding": "The original table supports 15 date-range fields.",
+      "rule": "The bindings below identify exactly those entries, their original source file/span hashes, JSON fields or date-only patterns. Numeric/gate state stays in deterministic code. No code-derived lookback, identifier parser, scope classifier, access classifier, identity formatting, timestamp-unit decoder, supplementary record or in-window projection is introduced.",
+      "date_range_bindings": [
+        {
+          "entry_id": "D6-C04",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/incentive-monitor/README.md",
+          "sha256": "0b7b3d2deda7d003c60d682c68c369fba5f6a99cbff44b19085a46b68c8c7055",
+          "source_spans": [
+            {
+              "lines": [
+                113,
+                115
+              ],
+              "span_sha256": "e2e4ba54fe2fbfd9be92a0e3ea598650e8f54998f81653aebd4c39029556a0e4"
+            }
+          ],
+          "parser_kind": "prose",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "date_pattern": "replays \\((?P<start>\\d{4}-\\d{2}-\\d{2}) when probed on (?P<end>\\d{4}-\\d{2}-\\d{2});",
+          "pattern_flags": [
+            "MULTILINE"
+          ],
+          "required_matches": 1,
+          "capture_order": [
+            "start",
+            "end"
+          ]
+        },
+        {
+          "entry_id": "D6-C06",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/broad-universe/README.md",
+          "sha256": "b0aaac2a7d6124eb769fab5d2964bd554a9ebd132df59c0570517771878fc674",
+          "source_spans": [
+            {
+              "lines": [
+                133,
+                153
+              ],
+              "span_sha256": "c5090b404ad0b4ffc5a62cbef5fe026020d296e5d943b28c968b04a2955b52ac"
+            }
+          ],
+          "parser_kind": "partial_prose",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "date_pattern": "^## Dated scan: session (?P<day>\\d{4}-\\d{2}-\\d{2}) \\(",
+          "pattern_flags": [
+            "MULTILINE"
+          ],
+          "required_matches": 1,
+          "capture_order": [
+            "unknown",
+            "day"
+          ],
+          "unknown_lower_reason": "The same original cited span at README:139-140 records older/stale snapshot bars and gives no earliest data date. The session title determines only the known recorded upper date; D1 preserves an unknown lower endpoint.",
+          "operation": "Emit [unknown, captured day]. Do not fill the lower endpoint with the session label or the D6 pin."
+        },
+        {
+          "entry_id": "D6-C08",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/data-lake/README.md",
+          "sha256": "956d0d74837b26ac93a95b7ba16071c25ab471b0d7f919aa4051dc0588dc54c9",
+          "source_spans": [
+            {
+              "lines": [
+                55,
+                57
+              ],
+              "span_sha256": "e1f858380fe72a4a71594aa36cf23accceb6c3cccb67f141e2e2b782da8fbd32"
+            }
+          ],
+          "parser_kind": "prose",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "date_pattern": "Backfilled (?P<start>\\d{4}-\\d{2}-\\d{2})\\.\\.(?P<end>\\d{4}-\\d{2}-\\d{2}) on",
+          "pattern_flags": [
+            "MULTILINE"
+          ],
+          "required_matches": 1,
+          "capture_order": [
+            "start",
+            "end"
+          ]
+        },
+        {
+          "entry_id": "D6-C11",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/pit-availability/README.md",
+          "sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+          "source_spans": [
+            {
+              "lines": [
+                136,
+                142
+              ],
+              "span_sha256": "67145dfde3d8f10f94e0f8b4689c80315d8ecedb7fc0f46bb8b9553d267135f3"
+            }
+          ],
+          "parser_kind": "prose",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "date_pattern": "full (?P<start>\\d{4}-\\d{2}-\\d{2})\\.\\.(?P<end>\\d{4}-\\d{2}-\\d{2}) daily series",
+          "pattern_flags": [
+            "MULTILINE"
+          ],
+          "required_matches": 1,
+          "capture_order": [
+            "start",
+            "end"
+          ]
+        },
+        {
+          "entry_id": "D6-C13-w1",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/adaptive-paper/corporate-actions-native-check-20260924.json",
+          "sha256": "510decdbdbaafd475bbbf5a997f6a3e2148abb7783b93bf0c585b44f1074c729",
+          "source_spans": [
+            {
+              "lines": [
+                9,
+                26
+              ],
+              "span_sha256": "e82f6c0b8635d06a02becbce2bcb9f624d0d9b89d992761bd33031d73b7d044d"
+            }
+          ],
+          "parser_kind": "json_interval",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/queries/0/start",
+            "/queries/0/end"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})$",
+          "operation": "Read the two fields in listed order; validate each full ISO date."
+        },
+        {
+          "entry_id": "D6-I04",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+          "sha256": "e813c655d664966a6910926d284887815d933ac81d0552d2c985aadbdb5d43dc",
+          "source_spans": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "span_sha256": "97643d51ae8cee074fc6a6c79a521d3915c39027d63a90f0b7a429a68959d24f"
+            }
+          ],
+          "parser_kind": "singleton_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/generated_at"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})(?:T|$)",
+          "operation": "Read the listed field; duplicate its as-written ISO date prefix. Do not convert timezone or infer a price-data date beyond the recorded date."
+        },
+        {
+          "entry_id": "D6-I05",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-post-incomplete.json",
+          "sha256": "3e88b88012ce7e05b127d7149ba5ae5a362ef39278f42dadbf3525b2e125663e",
+          "source_spans": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "span_sha256": "b6bd9f18edd78afcc7dff5d58b1d061a668137a2be52457bc068f7718c6c08f5"
+            }
+          ],
+          "parser_kind": "singleton_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/generated_at"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})(?:T|$)",
+          "operation": "Read the listed field; duplicate its as-written ISO date prefix. Do not convert timezone or infer a price-data date beyond the recorded date."
+        },
+        {
+          "entry_id": "D6-N01",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260923.json",
+          "sha256": "28b9db92ecef7ef16e27774f9266d0bf9ddb7f55259d645ee2356c316464099a",
+          "source_spans": [
+            {
+              "lines": [
+                170,
+                170
+              ],
+              "span_sha256": "be24404eac272d781b1a3fd24514788d3e0248d9db3ec785f7ee3125817808e2"
+            },
+            {
+              "lines": [
+                160,
+                160
+              ],
+              "span_sha256": "21a3ae91a2b7c4fe7547911e07104ddf4f70c8809499ce73c3f19a7a476800da"
+            }
+          ],
+          "parser_kind": "timestamp_pair_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/started_at",
+            "/finished_at"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})T",
+          "operation": "Read the listed start/end fields; use their as-written ISO date prefixes in that order, without timezone conversion."
+        },
+        {
+          "entry_id": "D6-N02",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260924t143905.json",
+          "sha256": "e3cec5a67b2030589b114cbf6822965c140049b15836c669ef01dca782b3a105",
+          "source_spans": [
+            {
+              "lines": [
+                191,
+                191
+              ],
+              "span_sha256": "32daaec04f5c555ce130a3f83f4e186c9e558d439df5f16bf93edbd4196aa836"
+            },
+            {
+              "lines": [
+                181,
+                181
+              ],
+              "span_sha256": "613995712e43e310005ffdba746957b583f33f89132533c8923b0dad537983db"
+            }
+          ],
+          "parser_kind": "timestamp_pair_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/started_at",
+            "/finished_at"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})T",
+          "operation": "Read the listed start/end fields; use their as-written ISO date prefixes in that order, without timezone conversion."
+        },
+        {
+          "entry_id": "D6-N03",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260924t185811.json",
+          "sha256": "d7f1cf2f9eff872094ba3e89b8aa6c95247cf47ea98d7551db5a854566f8469c",
+          "source_spans": [
+            {
+              "lines": [
+                192,
+                192
+              ],
+              "span_sha256": "99f29dcf096c99d21ad8e94195c06b0fd2206517091974f6ddfa681b36cf25fd"
+            },
+            {
+              "lines": [
+                182,
+                182
+              ],
+              "span_sha256": "04f6e2be179264f11c95f98bc39951a3ac2178ab9f27f3e08deace8de28c6948"
+            }
+          ],
+          "parser_kind": "timestamp_pair_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/started_at",
+            "/finished_at"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})T",
+          "operation": "Read the listed start/end fields; use their as-written ISO date prefixes in that order, without timezone conversion."
+        },
+        {
+          "entry_id": "D6-N04",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260925t182513.json",
+          "sha256": "31c112e3f1ff4471543b5ca034ef879561467a85e6d456000971f075d605e90d",
+          "source_spans": [
+            {
+              "lines": [
+                192,
+                192
+              ],
+              "span_sha256": "d631da53cf852dfd58edc281e612c213506b60b4f9b5a16710b15a89d2dc5232"
+            },
+            {
+              "lines": [
+                182,
+                182
+              ],
+              "span_sha256": "095fa1828ee1f5c979aaffa255778eb380c75add4c07f3df63280182c4598229"
+            }
+          ],
+          "parser_kind": "timestamp_pair_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/started_at",
+            "/finished_at"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})T",
+          "operation": "Read the listed start/end fields; use their as-written ISO date prefixes in that order, without timezone conversion."
+        },
+        {
+          "entry_id": "D6-P01",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/order-throughput/evidence/index-20260924.json",
+          "sha256": "082b68473dcfd1a52eb47abdb5f5365ac28570d3f42c2342f75a83fc04246a61",
+          "source_spans": [
+            {
+              "lines": [
+                3,
+                7
+              ],
+              "span_sha256": "8f1e2ca205aa4ff4c7536dd7b8d218a413495161557505dbf4cc714da3e1148c"
+            }
+          ],
+          "parser_kind": "singleton_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/date"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})(?:T|$)",
+          "operation": "Read the listed field; duplicate its as-written ISO date prefix. Do not convert timezone or infer a price-data date beyond the recorded date."
+        },
+        {
+          "entry_id": "D6-S02",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json",
+          "sha256": "45dd2f15f0576098b87d73b8771b1d518868b3fc12d23e7262c00c18251d8646",
+          "source_spans": [
+            {
+              "lines": [
+                1467,
+                1470
+              ],
+              "span_sha256": "cb4fcb40ea972c014510ecfd5e189a9183547d9d4d886d3d1a511a3bdaabcb04"
+            }
+          ],
+          "parser_kind": "timestamp_pair_json",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "json_field_paths": [
+            "/trial_window_utc/0",
+            "/trial_window_utc/1"
+          ],
+          "date_pattern": "^(?P<day>\\d{4}-\\d{2}-\\d{2})T",
+          "operation": "Read the listed start/end fields; use their as-written ISO date prefixes in that order, without timezone conversion."
+        },
+        {
+          "entry_id": "D6-T14",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-native-faults/README.md",
+          "sha256": "51b44f362e66f1351ec03dccd63fc836ef90490187d29baba40ffdf76485b5fd",
+          "source_spans": [
+            {
+              "lines": [
+                1,
+                8
+              ],
+              "span_sha256": "3c6ead0cd4d09f3588d1568c9e9e850ef97d1a213e995736f8e632d7ec4afc5d"
+            }
+          ],
+          "parser_kind": "singleton_prose",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "date_pattern": "^# Native-fault harness on macOS, (?P<day>\\d{4}-\\d{2}-\\d{2}) ",
+          "pattern_flags": [
+            "MULTILINE"
+          ],
+          "required_matches": 1,
+          "capture_order": [
+            "day",
+            "day"
+          ]
+        },
+        {
+          "entry_id": "D6-O-N01",
+          "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "path": "blueprints/us-equities/pit-availability/README.md",
+          "sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+          "source_spans": [
+            {
+              "lines": [
+                35,
+                47
+              ],
+              "span_sha256": "70b8f3f5e2d75223acd72cee69d66e6fef1672bfa5d2327c5b2865424ae5a928"
+            }
+          ],
+          "parser_kind": "prose",
+          "output_type": "two inclusive ISO calendar dates, as written",
+          "on_missing_or_ambiguous_field": "unknown under D1; no D6 fallback",
+          "date_pattern": "parent form\\), (?P<start>\\d{4}-\\d{2}-\\d{2})\\.\\.(?P<end>\\d{4}-\\d{2}-\\d{2})\\. User-Agent",
+          "pattern_flags": [
+            "MULTILINE"
+          ],
+          "required_matches": 1,
+          "capture_order": [
+            "start",
+            "end"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D7.3",
+      "finding": "No new mapping rule is authorized for other fields.",
+      "rule": "For all 57 D6 entries, scope_kind, identifiers_or_universe and access_kind are unknown by D1's own rule unless an already frozen rule with its cited retained source applies. This record supplies no such rule. D6's proposed values and the superseded D7 draft are not frozen source rules. The other 42 date-range fields get no new derivation from this record: preserve any already applicable frozen source rule, otherwise record unknown under D1. An unresolved endpoint is unknown, never filled from the oracle or window."
+    },
+    {
+      "id": "D7.4",
+      "finding": "Unknown derivations and D6's independent pins may differ.",
+      "rule": "Recompute source-derived fields and compare every authoritative field strictly to its D6 pin. Any mismatch follows unchanged D1 REJECTED_DERIVATION (11); do not waive comparison, replace pins, drop an entry or assign a success status in advance. Lookup retains D1's conservative unknown/missing-identity refusal. The already reported zero eligibility is context, never a model-supplied count or gate."
+    },
+    {
+      "id": "D7.5",
+      "finding": "Earlier fixtures and gates remain frozen.",
+      "rule": "D4.1 fixtures and A1-A8, D4.2 integer exits and precedence, D5.3's exactly two external records and their member/field restrictions, and all 57 D6 entries / 49 out_items remain unchanged. In particular C02's independent pin and C10's additional full-range pin are not edited. No new mapping resolves them by fiat."
+    },
+    {
+      "id": "D7.6",
+      "finding": "J808 P2-2 requires the concrete expected unknown rerun behavior.",
+      "rule": "Unknown fields stay present for completeness; they are not a new automatic rejection. Their potential scope is covered conservatively under D1. An unbounded unknown covers every case; lookup returns no record when any relevant scope/case is unresolved, so reserved_access refuses. Keep all 57 mandatory D6 entries and every known/critic-cited read; unknown entries count as present. With prerequisites met and no lower-numbered rejection, the required unknown derivations differ from known D6 oracle pins (for example C01), so the expected completed rerun status is REJECTED_DERIVATION, integer exit 11. The already reported eligible-session counts are zero, reported rather than gated and recomputed by deterministic code. This is an expected outcome, not a preassigned native result."
+    }
+  ],
+  "all_D6_entry_ids": [
+    "D6-C01",
+    "D6-C02",
+    "D6-C03",
+    "D6-C04",
+    "D6-C05",
+    "D6-C06",
+    "D6-C07",
+    "D6-C08",
+    "D6-C09",
+    "D6-C10",
+    "D6-C11",
+    "D6-C12-w1",
+    "D6-C12-w2",
+    "D6-C12-w3",
+    "D6-C12-w4",
+    "D6-C12-w5",
+    "D6-C12-w6",
+    "D6-C13-w1",
+    "D6-C13-w2",
+    "D6-C14",
+    "D6-G01",
+    "D6-G02",
+    "D6-I01",
+    "D6-I02",
+    "D6-I03",
+    "D6-I04",
+    "D6-I05",
+    "D6-N01",
+    "D6-N02",
+    "D6-N03",
+    "D6-N04",
+    "D6-P01",
+    "D6-P02",
+    "D6-S01",
+    "D6-S02",
+    "D6-T01",
+    "D6-T02",
+    "D6-T03",
+    "D6-T04",
+    "D6-T05",
+    "D6-T06",
+    "D6-T07",
+    "D6-T08",
+    "D6-T09",
+    "D6-T10",
+    "D6-T11",
+    "D6-T12",
+    "D6-T13",
+    "D6-T14",
+    "D6-T15",
+    "D6-T16",
+    "D6-T17",
+    "D6-T18",
+    "D6-T19",
+    "D6-O-N01",
+    "D6-O-N02",
+    "D6-O-N03"
+  ],
+  "date_range_without_new_binding": [
+    "D6-C01",
+    "D6-C02",
+    "D6-C03",
+    "D6-C05",
+    "D6-C07",
+    "D6-C09",
+    "D6-C10",
+    "D6-C12-w1",
+    "D6-C12-w2",
+    "D6-C12-w3",
+    "D6-C12-w4",
+    "D6-C12-w5",
+    "D6-C12-w6",
+    "D6-C13-w2",
+    "D6-C14",
+    "D6-G01",
+    "D6-G02",
+    "D6-I01",
+    "D6-I02",
+    "D6-I03",
+    "D6-P02",
+    "D6-S01",
+    "D6-T01",
+    "D6-T02",
+    "D6-T03",
+    "D6-T04",
+    "D6-T05",
+    "D6-T06",
+    "D6-T07",
+    "D6-T08",
+    "D6-T09",
+    "D6-T10",
+    "D6-T11",
+    "D6-T12",
+    "D6-T13",
+    "D6-T15",
+    "D6-T16",
+    "D6-T17",
+    "D6-T18",
+    "D6-T19",
+    "D6-O-N02",
+    "D6-O-N03"
+  ],
+  "unknown_representation": "The frozen D1 marker is the literal unknown. A date interval with no determined bounds is [unknown, unknown]; a pre-existing applicable frozen rule may preserve a known endpoint. This record invents no new partial-bound rule.",
+  "review_inputs": {
+    "table_sha256": "685c67f919d0b6450f9a566975197f3720c164ad670eec22a16669c29bf7ae1e",
+    "table_json_sha256": "4661411437a683a54839a2760594dcee70a7bc90e171db2324b52f28222d6428",
+    "D6_sha256": "c3eb8594f3da2acbc54ce331cf104e146e57a9418ca9b806968bae8cff3aa87c"
+  },
+  "execution_gate": "DRAFT ONLY until a GPT read and the command center's ACK of this exact dated record. No gate-bearing registry before that ACK. The later authorized rerun uses nice 19 outside 19:50Z-00:10Z, follows D1's status rules with these unknowns, retains all native/sanitizer exits and failed/refused artifacts, and leaves attempt 1 untouched.",
+  "rerun_outcome_expectation": {
+    "prerequisites": "Unchanged D2/D5/D6 checks first. The source base must be clean; protected catalyst files must be byte-identical; required retained records and pins must satisfy the frozen gates. An unmet prerequisite or missing required record is NOT_STARTED (30) and no wave command runs. D5.3 external hash mismatch is also NOT_STARTED (30); D6 source/citation hash mismatch follows REJECTED_DERIVATION (11).",
+    "coverage": "D1 unknown fields cover every case whose security or date could lie in their scope. An unbounded unknown covers every case. A resolved covering entry yields inspected=true; otherwise any relevant unresolved entry/case makes lookup return no record, and contract.reserved_access refuses. No missing-identity or unknown case is admitted.",
+    "completeness": "D2 counts an entry with unknown fields as present. Retain all 57 D6 entries, existing known reads and every critic-cited read; do not drop unknowns or unmatched pins. If a required read has no entry, REJECTED_COMPLETENESS (10) takes precedence over 11.",
+    "eligibility": "The frozen D6 result and the current conservative coverage imply eligible-session counts of 0 per v1 segment. Counts remain deterministic reported-not-gated outputs; do not hardcode this context value into a gate.",
+    "expected_status": "After prerequisites and completed checks, expect REJECTED_DERIVATION (11) because required unknown derivations do not equal the retained known D6 pins. Unknown alone is not a new rejection rule. Actual native computation determines the recorded status.",
+    "precedence": "Unchanged D4.2: when completed checks have several rejection statuses, report the lowest-numbered rejection and list every failing check. Retain 10 completeness, 11 derivation, 12 refusal, 13 protocol, 14 byte reproducibility, 15 acceptance and 16 fixture rejection semantics. A command that never reaches a verdict retains ERROR (2); do not turn an outer-tool code into a native verdict.",
+    "receipts": "Every command retains native exit and any sanitizer/wrapper exit separately, original stdout/stderr, both builder outputs and every refusal/failure artifact in private durable state. Attempt 1 remains unchanged."
+  },
+  "review_note_C06": "J808's verification gap requires scoped adjudication of the stale-bar exposure. The proposed lower bound stays unknown pending the exact record ACK; no oracle value is copied. There are 15 authorized date-field bindings, including this partial bound, not 15 claimed complete data-read intervals."
+}
