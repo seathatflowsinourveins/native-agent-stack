@@ -1,0 +1,8 @@
+[Unit]
+Description=DRILL F09 alert lifecycle controlled scratch unit
+OnFailure=paper-alert@%n.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/grep -qx healthy %h/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/overlap-token-durable/f09-alert-lifecycle-20261007/drill-mode

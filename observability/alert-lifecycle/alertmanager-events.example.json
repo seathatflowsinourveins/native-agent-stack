@@ -1,0 +1,62 @@
+{
+  "route": {
+    "receiver": "telegram-state",
+    "group_by": [
+      "alertname",
+      "host",
+      "unit"
+    ],
+    "group_wait": "30s",
+    "group_interval": "5m",
+    "repeat_interval": "4h",
+    "routes": [
+      {
+        "matchers": [
+          "alertname=~\"^(PaperLaneUnitFailed|StackUnitFailed)$\""
+        ],
+        "receiver": "unit-event-record-only",
+        "group_wait": "0s"
+      },
+      {
+        "matchers": [
+          "alertname=~\"^(PaperLaneUnitDown|StackUnitDown)$\""
+        ],
+        "receiver": "telegram-state"
+      },
+      {
+        "matchers": [
+          "alertname=\"DaguDagFailed\""
+        ],
+        "receiver": "telegram-event",
+        "group_wait": "0s"
+      }
+    ]
+  },
+  "receivers": [
+    {
+      "name": "unit-event-record-only"
+    },
+    {
+      "name": "telegram-state",
+      "telegram_configs": [
+        {
+          "bot_token_file": "private/telegram-bot-token",
+          "chat_id_file": "private/telegram-chat-id",
+          "send_resolved": true,
+          "parse_mode": "HTML"
+        }
+      ]
+    },
+    {
+      "name": "telegram-event",
+      "telegram_configs": [
+        {
+          "bot_token_file": "private/telegram-bot-token",
+          "chat_id_file": "private/telegram-chat-id",
+          "send_resolved": false,
+          "parse_mode": "HTML"
+        }
+      ]
+    }
+  ]
+}

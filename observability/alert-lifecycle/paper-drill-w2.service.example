@@ -1,0 +1,13 @@
+# Proposed W2 origin, CC022242Z; no lane installation or enablement.
+[Unit]
+Description=DRILL: W2 user-unit failed-state lifecycle
+OnFailure=paper-alert@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/false
+Restart=no
+Nice=19
+IOSchedulingClass=idle
+
+# Explicit CC start once; recovery is reset-failed, then reviewed cleanup.

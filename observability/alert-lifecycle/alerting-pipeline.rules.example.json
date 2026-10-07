@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "alerting-pipeline",
+      "rules": [
+        {
+          "alert": "AlertmanagerFailedToSendAlerts",
+          "expr": "rate(alertmanager_notifications_failed_total{job=\"alertmanager\"}[15m]) / ignoring (reason) group_left rate(alertmanager_notifications_total{job=\"alertmanager\"}[15m]) > 0.01",
+          "for": "5m",
+          "labels": {
+            "severity": "warning",
+            "host": "NativeStack2604"
+          },
+          "annotations": {
+            "summary": "Alertmanager notification delivery failures",
+            "description": "More than one percent of attempted notifications failed in the last fifteen minutes. This ratio alone cannot detect zero traffic or a dead sender."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -17662,6 +17662,11 @@
       "bytes": 3898
     },
     {
+      "path": "docs/decisions/2026-10-07-user-unit-alert-lifecycle.md",
+      "sha256": "65703f14099a27f51cee58b8b765338affaa2cf90955efbba2d0c05a50a4b057",
+      "bytes": 11159
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -54342,6 +54347,96 @@
       "bytes": 16714
     },
     {
+      "path": "observability/alert-lifecycle/5F-HANDOFF.md",
+      "sha256": "32623b112286c025b06b2227d1f36dc63dbc9b5a8560917e45749eeb1abb7e4e",
+      "bytes": 3077
+    },
+    {
+      "path": "observability/alert-lifecycle/README.md",
+      "sha256": "265c275260a0856664803ead77db884f7f115995ffa37afbde70c7d3b748c03d",
+      "bytes": 6484
+    },
+    {
+      "path": "observability/alert-lifecycle/WINDOW.md",
+      "sha256": "706889075fa87c6f6401a5529229099a38cc343e432b2966b586616f28d48a3c",
+      "bytes": 7203
+    },
+    {
+      "path": "observability/alert-lifecycle/alerting-pipeline.rules.example.json",
+      "sha256": "4ed30d570066bb881feca948c5d25f0cc27635913c23eea5298163ccd2219a19",
+      "bytes": 781
+    },
+    {
+      "path": "observability/alert-lifecycle/alertmanager-A-fallback.example.json",
+      "sha256": "2ec162b6e2b8283a109a8b63a4fabb2330c4587ecf58ca574e9bf0fecd39dd39",
+      "bytes": 1151
+    },
+    {
+      "path": "observability/alert-lifecycle/alertmanager-events.example.json",
+      "sha256": "4a9761af9d428d588c3cbc4b2ad4e21d35e6f3db1f410c92b747c6b42415a70b",
+      "bytes": 1352
+    },
+    {
+      "path": "observability/alert-lifecycle/deadman.disabled.fragments.example.json",
+      "sha256": "4a49dcf0349c81575014a7e9eab37d7a6d096549b59e4e5d0732b15bba89f224",
+      "bytes": 677
+    },
+    {
+      "path": "observability/alert-lifecycle/ns2604-F09-DRILL.service.example",
+      "sha256": "bef20ee0dae56c771c51684e142168914a5dcf036ddebf836a4a27f272c03b2d",
+      "bytes": 310
+    },
+    {
+      "path": "observability/alert-lifecycle/paper-drill-w2.service.example",
+      "sha256": "11d234814ff36049eb781815b285b9e39d157d5b592369d3fdd2003d1b6b8731",
+      "bytes": 327
+    },
+    {
+      "path": "observability/alert-lifecycle/pipeline-scrape.example.json",
+      "sha256": "3a03675e45910ece8031309f652060f8d93bb7177d21edf417585624d2d5c8cc",
+      "bytes": 733
+    },
+    {
+      "path": "observability/alert-lifecycle/policy.example.json",
+      "sha256": "4334c42c7e6fcadacf460c41fe6cff8b57943458019675d7d32162ddf99891d2",
+      "bytes": 860
+    },
+    {
+      "path": "observability/alert-lifecycle/receiver.example.json",
+      "sha256": "0ae82a0d6abc9e2ef54384836ab23707c1455e266c03ed18cbefdf3521a892d1",
+      "bytes": 2286
+    },
+    {
+      "path": "observability/alert-lifecycle/render.py",
+      "sha256": "02f4b30071b35c97f0b6a75669036347108b5eb7c35b41d714568ab88f2f1311",
+      "bytes": 11479
+    },
+    {
+      "path": "observability/alert-lifecycle/rules.example.json",
+      "sha256": "5be7bfa80980889393d740d99d7663493d750bbc5f7ff13d9996effe88dd635f",
+      "bytes": 5300
+    },
+    {
+      "path": "observability/alert-lifecycle/scrape.example.json",
+      "sha256": "83b3c368863033a729fe9508a1b107bd67ff006a62297e6543fb96a67ff6b78e",
+      "bytes": 269
+    },
+    {
+      "path": "observability/alert-lifecycle/user-unit-alerts.rules.json",
+      "sha256": "21b226e95dbef59b0e403d5a01ab4ff18d888bfd6170b413b8d0454ff9441fcf",
+      "bytes": 3886
+    },
+    {
+      "path": "observability/alert-lifecycle/user-unit-alerts.test.json",
+      "sha256": "74b394be7853e2c0a7bfe1ea3dfa871597b283beb35069ef4da925d0bd866872",
+      "bytes": 118271
+    },
+    {
+      "path": "observability/alert-lifecycle/watchdog.disabled.rules.example.json",
+      "sha256": "b24e4c38447758645bb55900637f9e6feb725cbb2048571d9cb4da989b64e0c5",
+      "bytes": 529
+    },
+    {
       "path": "observability/backends/README.md",
       "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
       "bytes": 25778
@@ -54530,6 +54625,16 @@
       "path": "observability/grand-dashboard/state.json",
       "sha256": "6dc4f85e48a3ddc5b3b9f9f5e485aa66aaeb53b9a1e173c57d857a4e04da6274",
       "bytes": 24794
+    },
+    {
+      "path": "observability/invoke-rates/README.md",
+      "sha256": "8282a95d194d8606ac9317345ee20ba977d2ab931ee3149b5e0233327bd105b7",
+      "bytes": 6136
+    },
+    {
+      "path": "observability/invoke-rates/collector-identity.example.yaml",
+      "sha256": "58765e49dc158738c877b01c1c565de45b76b71eae9b04754626c1ebddd96521",
+      "bytes": 1588
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -56070,6 +56175,16 @@
       "path": "tests/test_us_equities_hosting.py",
       "sha256": "bd947c5a67c6265c3cae717dc0396ebe7fd1aa0919cdc5e89c8872b0c211f459",
       "bytes": 55117
+    },
+    {
+      "path": "tests/test_user_unit_alert_notifier_config.py",
+      "sha256": "f6cb3cbeb83cc57a646459121fcecbe1c4e637171aa0efc82481089ac3a588f0",
+      "bytes": 4875
+    },
+    {
+      "path": "tests/test_user_unit_alert_renderer.py",
+      "sha256": "3a771279f0837c0a9ec0e3791832912189238fe34418fc3c86e4e49bb433e05e",
+      "bytes": 10428
     },
     {
       "path": "tests/test_validate.py",

@@ -1,0 +1,42 @@
+{
+  "groups": [
+    {
+      "name": "ns2604-user-unit-alert-lifecycle",
+      "interval": "15s",
+      "rules": [
+        {
+          "record": "ns2604_user_unit_fresh_state",
+          "expr": "(systemd_unit_state{job=\"ns2604-user-unit-state\"} == 1) and (time() - timestamp(systemd_unit_state{job=\"ns2604-user-unit-state\"}) >= 0) and (time() - timestamp(systemd_unit_state{job=\"ns2604-user-unit-state\"}) <= 45) and on (job, instance) (up{job=\"ns2604-user-unit-state\"} == 1)"
+        },
+        {
+          "record": "ns2604_user_unit_fresh_state_observation_timestamp",
+          "expr": "timestamp(systemd_unit_state{job=\"ns2604-user-unit-state\"}) and ns2604_user_unit_fresh_state"
+        },
+        {
+          "record": "ns2604_user_unit_recovery",
+          "expr": "(((ns2604_user_unit_fresh_state{state=\"active\"} == 1) and on (host, unit) (max by (host, unit) (ns2604_user_unit_fresh_state_observation_timestamp{state=\"active\"}) unless on (host, unit) (max by (host, unit) (ns2604_user_unit_fresh_state_observation_timestamp{state!=\"active\"}) >= on (host, unit) max by (host, unit) (ns2604_user_unit_fresh_state_observation_timestamp{state=\"active\"})))) and on (host, unit) (ns2604_user_unit_expected{recovery_contract=\"active\"} == 1) or (((ns2604_user_unit_fresh_state{state=~\"active|reloading|inactive|activating|deactivating|maintenance|refreshing\"} == 1) and on (host, unit) (max by (host, unit) (ns2604_user_unit_fresh_state_observation_timestamp{state=~\"active|reloading|inactive|activating|deactivating|maintenance|refreshing\"}) unless on (host, unit) (max by (host, unit) (ns2604_user_unit_fresh_state_observation_timestamp{state!~\"active|reloading|inactive|activating|deactivating|maintenance|refreshing\"}) >= on (host, unit) max by (host, unit) (ns2604_user_unit_fresh_state_observation_timestamp{state=~\"active|reloading|inactive|activating|deactivating|maintenance|refreshing\"})))) and on (host, unit) (ns2604_user_unit_expected{recovery_contract=\"failure-cleared\"} == 1))) unless on (host, unit) (ns2604_user_unit_fresh_state{state=\"failed\"} == 1)"
+        },
+        {
+          "alert": "StackUnitDown",
+          "expr": "sum by (host, unit, severity) ((ns2604_user_unit_expected{failure_class=\"StackUnitDown\"} == 1) unless on (host, unit) ns2604_user_unit_recovery)",
+          "for": "30s",
+          "keep_firing_for": "30s",
+          "annotations": {
+            "summary": "{{ if match \"DRILL|^paper-drill-w2[.]service$\" $labels.unit }}DRILL: {{ end }}User unit {{ $labels.unit }} needs attention",
+            "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+          }
+        },
+        {
+          "alert": "PaperLaneUnitDown",
+          "expr": "sum by (host, unit, severity) ((ns2604_user_unit_expected{failure_class=\"PaperLaneUnitDown\"} == 1) unless on (host, unit) ns2604_user_unit_recovery)",
+          "for": "30s",
+          "keep_firing_for": "30s",
+          "annotations": {
+            "summary": "{{ if match \"DRILL|^paper-drill-w2[.]service$\" $labels.unit }}DRILL: {{ end }}User unit {{ $labels.unit }} needs attention",
+            "description": "Unit is failed or lacks fresh evidence satisfying its declared recovery contract; missing, stale, exporter, or bus data remains unknown. Continuous services require active evidence newer than every contradictory state; failure-cleared units accept known nonfailed state without claiming completion or cadence. Fresh failed evidence wins. Recovery holds for 30 seconds."
+          }
+        }
+      ]
+    }
+  ]
+}

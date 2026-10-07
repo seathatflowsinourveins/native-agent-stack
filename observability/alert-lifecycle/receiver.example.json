@@ -1,0 +1,96 @@
+{
+  "exporters": {
+    "prometheus/f09": {
+      "endpoint": "127.0.0.1:21890",
+      "metric_expiration": "1m",
+      "resource_to_telemetry_conversion": {
+        "enabled": false
+      },
+      "send_timestamps": true,
+      "translation_strategy": "UnderscoreEscapingWithoutSuffixes",
+      "without_scope_info": true
+    }
+  },
+  "processors": {
+    "filter/f09": {
+      "error_mode": "propagate",
+      "metrics": {
+        "metric": [
+          "name != \"systemd.unit.state\""
+        ]
+      }
+    },
+    "transform/f09": {
+      "error_mode": "propagate",
+      "metric_statements": [
+        {
+          "context": "datapoint",
+          "statements": [
+            "set(attributes[\"unit\"], resource.attributes[\"systemd.unit.name\"])",
+            "set(attributes[\"host\"], \"NativeStack2604\")",
+            "set(attributes[\"state\"], attributes[\"systemd.unit.active_state\"])",
+            "keep_keys(attributes, [\"host\", \"unit\", \"state\"])"
+          ]
+        },
+        {
+          "context": "resource",
+          "statements": [
+            "keep_keys(attributes, [])"
+          ]
+        },
+        {
+          "context": "metric",
+          "statements": [
+            "convert_sum_to_gauge() where type == METRIC_DATA_TYPE_SUM"
+          ]
+        }
+      ]
+    }
+  },
+  "receivers": {
+    "systemd/f09": {
+      "collection_interval": "15s",
+      "metrics": {
+        "systemd.service.cpu.time": {
+          "enabled": false
+        },
+        "systemd.service.memory.usage": {
+          "enabled": false
+        },
+        "systemd.service.memory.usage.max": {
+          "enabled": false
+        },
+        "systemd.service.restarts": {
+          "enabled": false
+        },
+        "systemd.unit.state": {
+          "enabled": true
+        }
+      },
+      "scope": "user",
+      "units": [
+        "paper-drill-w2.service",
+        "example-reused-oneshot.service",
+        "example-timer-run.service"
+      ]
+    }
+  },
+  "service": {
+    "pipelines": {
+      "metrics/f09": {
+        "exporters": [
+          "prometheus/f09"
+        ],
+        "processors": [
+          "memory_limiter",
+          "filter/f09",
+          "transform/f09",
+          "batch"
+        ],
+        "receivers": [
+          "systemd/f09"
+        ]
+      }
+    }
+  }
+}
