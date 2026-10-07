@@ -24,10 +24,11 @@ python3 -m pip install --only-binary=:all: --require-hashes -r .github/requireme
 ```
 
 The shared checksum lock covers Linux x86_64 and macOS x86_64/arm64, Python
-3.12-3.14. The main Linux and macOS validator jobs provision it. The three direct
-freshness/publisher calls need the prerequisite patch from their owner in
-[PR642](https://github.com/seathatflowsinourveins/native-agent-stack/pull/642)
-before this validation change can land. No host install is performed by the renderer.
+3.12-3.14. The Linux and macOS validator jobs provision it; the catalog
+freshness/publisher prerequisite landed in
+[PR642](https://github.com/seathatflowsinourveins/native-agent-stack/pull/642).
+Each PyYAML bump refreshes all nine platform hashes from the release's PyPI JSON.
+No host install is performed by the renderer.
 
 Pending dependencies have inert routes. Their proposed roles and rules remain
 under `pending-agents/` and `pending-rules/`, outside active registries. Activate a
@@ -47,8 +48,12 @@ consume this manifest merely because the definition validates.
 
 The routing hook is held for the upstream A/B and command-center ACK. Existing
 native descriptions remain available; a proposed channel or frontmatter grant is
-not organic-use or end-to-end acceptance. See the [decision record](../../docs/decisions/2026-10-06-sota-workflow-manifest.md)
-for thresholds, source distinctions and ownership.
+not organic-use or end-to-end acceptance. See the
+[routing source record](../../docs/decisions/2026-10-06-sota-workflow-manifest.md)
+and its [acceptance amendment](../../docs/decisions/2026-10-06-skill-row-acceptance-amendment.md).
+Skill rows use upstream choice evidence, lifecycle installation, one real-use
+smoke per consuming client and native organic counters. S1's skill-used assertions
+gate no row and are not run as a campaign; S9's hook A/B-before-live hold remains.
 
 The [before/after role tables](role-tool-measurements.md) retain the observed
 counter scope and pending native measurement gate. Missing per-role attribution

@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "kind": "a15_native_before_census_limit",
+  "evidence_class": "independent_observation",
+  "status": "UNKNOWN",
+  "command_exit_code": 2,
+  "complete": false,
+  "adapter_sha256": "76c7095e1e76f692365c8821ce42e8962435897294f128a8eb656cee86327a33",
+  "grader_source_pin": "536487a42af0fa0f959d25a34ee8159694c9868b",
+  "frozen_grader_files": {
+    "LICENSE": "cdaba0c8e8dec15da68c3b182eefabc9d9bbc36cab255545e25853f8fd3fc49d",
+    "evidence/artifacts/organic-e2e-20261005/harness/collect.py": "07f47c69500a101b021484cfdaf029b2a15a9c15531bd2b3e01ff968b4218764",
+    "evidence/artifacts/organic-e2e-20261005/harness/common.py": "4e94976a269cb765db006540bd00a0a9df6b595080f144fa52dc637c983db7e2",
+    "evidence/artifacts/organic-e2e-20261005/harness/grade.py": "5b76326e5447581612113ba32f3dd5c16cca0436dee2cbe940d64f882e80179d",
+    "evidence/artifacts/organic-e2e-20261005/harness/suite.py": "363a701644f542db39c61b5ef4d4dae8049a465fc63eb6db69635506d4df3ba3",
+    "tools/skill-usage/skill_usage.py": "d8f37f929fc9f7fc170b6ac794c9e23d84c4a7e70f6328e565f3d9ac9595b65b"
+  },
+  "window_utc": {
+    "since": "2026-09-29T12:00:00Z",
+    "until_exclusive": "2026-10-06T12:00:00Z"
+  },
+  "scope": {
+    "call_window_rule": "request inside window and native completion before cutoff",
+    "child_window_rule": "any native row timestamp inside the half-open window",
+    "family_rule": "exact family name or family followed by a hyphen",
+    "project_name_contains": "native-agent-stack",
+    "strict_spawn_or_fixture_mentions_excluded": true
+  },
+  "source_bytes_read": 2147275318,
+  "source_files_hashed": 3681,
+  "native_source_hash_list_sha256": "33d6ea33b9db48154e65ea9ff0dd5864e3e411de0eb5b4b66260d86674a44d2e",
+  "limits": [
+    "Native result flags prove completion, not semantic task success.",
+    "No labels, descriptions, first-spawner fallback, current policy files, or model judgments.",
+    "No native identity, input/output text, or individual metadata is retained.",
+    "UNKNOWN is not a zero; confirmed partial counts are separately retained."
+  ],
+  "stop_reason": "source_budget",
+  "budget": {
+    "max_source_bytes": 2147483648,
+    "max_files": 12000
+  },
+  "private_receipt_sha256": "dfc12712600743b3aebae3dad93d72de8ac21216fb33bf15ac7bbd1f0ab0ce0d",
+  "native_table_sha256": "b7b3afc959c860dfcf45ee36f5c3b6ae0652edcacab40292e4078427b1bcdc24",
+  "after": "pending deployment plus seven days",
+  "unknown_children": null,
+  "unassigned_unknown_children_lower_bound": 1,
+  "role_rows": [
+    {
+      "role": "isolated-builder",
+      "eligible_children": null,
+      "organic_counts": "UNKNOWN for every layer",
+      "attributed_candidates_with_unresolved_eligibility_lower_bound": 50,
+      "gap_counts": {
+        "historical_agent_definition_not_captured": 50,
+        "native_skill_or_input_binding_unproven": 50,
+        "prior_directive_content_unproven": 50
+      },
+      "observed_successful_native_calls_lower_bound": {
+        "codebase-memory": 0,
+        "context-mode": 717,
+        "headroom": 0,
+        "jcodemunch": 0,
+        "semble": 0,
+        "serena": 0,
+        "socraticode": 0
+      }
+    },
+    {
+      "role": "stack-researcher",
+      "eligible_children": null,
+      "organic_counts": "UNKNOWN for every layer",
+      "attributed_candidates_with_unresolved_eligibility_lower_bound": 466,
+      "gap_counts": {
+        "exact_role_join_incomplete": 1,
+        "historical_agent_definition_not_captured": 466,
+        "native_skill_or_input_binding_unproven": 465,
+        "prior_directive_content_unproven": 465
+      },
+      "observed_successful_native_calls_lower_bound": {
+        "codebase-memory": 0,
+        "context-mode": 5010,
+        "headroom": 0,
+        "jcodemunch": 0,
+        "semble": 0,
+        "serena": 0,
+        "socraticode": 0
+      }
+    },
+    {
+      "role": "evidence-reviewer",
+      "eligible_children": null,
+      "organic_counts": "UNKNOWN for every layer",
+      "attributed_candidates_with_unresolved_eligibility_lower_bound": 242,
+      "gap_counts": {
+        "historical_agent_definition_not_captured": 242,
+        "native_skill_or_input_binding_unproven": 236,
+        "prior_directive_content_unproven": 236
+      },
+      "observed_successful_native_calls_lower_bound": {
+        "codebase-memory": 0,
+        "context-mode": 2584,
+        "headroom": 0,
+        "jcodemunch": 0,
+        "semble": 0,
+        "serena": 0,
+        "socraticode": 0
+      }
+    },
+    {
+      "role": "stack-verifier",
+      "eligible_children": null,
+      "organic_counts": "UNKNOWN for every layer",
+      "attributed_candidates_with_unresolved_eligibility_lower_bound": 174,
+      "gap_counts": {
+        "historical_agent_definition_not_captured": 174,
+        "historical_policy_not_captured": 174,
+        "native_skill_or_input_binding_unproven": 174,
+        "per_reference_skill_history_unproven": 29,
+        "prior_directive_content_unproven": 174
+      },
+      "observed_successful_native_calls_lower_bound": {
+        "codebase-memory": 0,
+        "context-mode": 1832,
+        "headroom": 0,
+        "jcodemunch": 0,
+        "semble": 0,
+        "serena": 0,
+        "socraticode": 0
+      }
+    },
+    {
+      "role": "security-reviewer",
+      "eligible_children": null,
+      "organic_counts": "UNKNOWN for every layer",
+      "attributed_candidates_with_unresolved_eligibility_lower_bound": 15,
+      "gap_counts": {
+        "historical_agent_definition_not_captured": 15,
+        "native_skill_or_input_binding_unproven": 15,
+        "prior_directive_content_unproven": 15
+      },
+      "observed_successful_native_calls_lower_bound": {
+        "codebase-memory": 0,
+        "context-mode": 0,
+        "headroom": 0,
+        "jcodemunch": 0,
+        "semble": 0,
+        "serena": 0,
+        "socraticode": 0
+      }
+    }
+  ],
+  "claim_boundary": "Partial native successful calls are separate from organic eligibility. Zero observed lower bounds are not full-window absence; aliases and policy are unresolved. These are historical metadata counts, no new model execution or unchanged upstream tests.",
+  "native_source_hash_list_method": "SHA256 of the UTF-8 compact JSON native_source_sha256 list using sort_keys=True and separators=(',',':'); list order is preserved."
+}

@@ -5,7 +5,7 @@ The five pinned base roles remain byte-identical to the ecfa1127 source. Their
 preload-only variants preserve base tool grants. P0-1 token-tool changes are held
 as private plan inputs by the newer client-wiring hold, including Serena.
 
-## Before (native source aggregation pending)
+## Before (native run retained as incomplete)
 
 The accepted measure is organic use in Claude Code's native transcripts, not
 prompted paired controls. The predeployment snapshot cutoff is 2026-10-06T12:00:00Z;
@@ -16,7 +16,12 @@ Use the unchanged organic-E2E v1.1 grader rules at native-agent-stack@
 536487a42af0fa0f959d25a34ee8159694c9868b:
 evidence/artifacts/organic-e2e-20261005/harness/grade.py. Count successful calls
 only, key MCP calls by native server prefix, match skills by SKILL.md realpath,
-and exclude policy-named/prompted calls. No full history scan has run yet.
+and exclude policy-named/prompted calls. The bounded native reader ran once:
+exit 2, source_budget, 2,147,275,318 bytes read and 3,681 native source hashes.
+Its fixed 2 GiB condition and UNKNOWN result are retained without a larger-budget rerun.
+The [actual emitted table](../../evidence/artifacts/skills-role-organic-before-20261007/before.md)
+and [compact receipt](../../evidence/artifacts/skills-role-organic-before-20261007/receipt.json)
+keep the missing historical bindings and partial native observations.
 
 The supplied 2026-10-06 census has SHA256
 `66d2a74064400e36e8fadb5e5f61e4732ae988bb589818e437f872f17ccfce4f`.
@@ -26,8 +31,8 @@ child denominators. `/synthesis/verdict` reports the aggregate ten roles/81.3% S
 spend; `/synthesis/fixes/0` names five families. Neither supplies role attribution.
 Global counters include workflow parents and remain separate from this table.
 Each layer cell is eligible children with at least one successful call / total
-successful calls in that layer. Both values remain unknown until the native
-aggregation is retained; availability is not substituted for either count.
+successful calls in that layer. Both values remain unknown after this incomplete
+aggregation; availability is not substituted for either count.
 
 | Base role | Eligible children | Semble | Headroom | codebase-memory | context-mode | Serena | jCodeMunch | SocratiCode |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -39,6 +44,25 @@ aggregation is retained; availability is not substituted for either count.
 
 Unknown does not mean zero. The census's global zero counters are not assigned to
 role rows. The original private census and raw sessions are not copied here.
+
+The three returned gaps are historical_agent_definition_not_captured,
+prior_directive_content_unproven and native_skill_or_input_binding_unproven.
+Their per-role counts are in the compact receipt. Increasing only the byte budget
+does not establish those missing bindings. Git history supplies candidates;
+uncommitted edits and what a child actually loaded remain unknowable without
+native capture. Current policy files are not retrospective evidence.
+
+Separately labelled partial successful-result-flag context-mode observations are
+717 for isolated-builder, 5,010 for stack-researcher, 2,584 for evidence-reviewer,
+1,832 for stack-verifier and 0 for security-reviewer. These are observed lower
+bounds in examined records, not organic totals or whole-window non-use. Other
+layers remain unresolved; zero observed witnesses do not establish absence.
+
+Next skills-sweep input and forward-capture requirement: retain each child's
+agent-definition hash, instruction-carrier hashes and lifecycle-manifest hash
+through the existing hooks at run time. Exact role joins, per-reference skill
+identity and complete window/source coverage also need evidence. The command
+center owns that deployment; this record changes no hook or client configuration.
 
 ## After (pending deployment)
 
