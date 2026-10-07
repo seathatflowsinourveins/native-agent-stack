@@ -54463,8 +54463,8 @@
     },
     {
       "path": "tests/lane_gateway_transport.py",
-      "sha256": "26fc91e1bfa6f57beeb8be395575db8d13ac5ba7bc7080acf0ff6978c020a803",
-      "bytes": 26103
+      "sha256": "ef86559e970bf55a4a82816d1b06b9531d6af81438dca933475a9176dc96d93d",
+      "bytes": 32779
     },
     {
       "path": "tests/legacy_gateway_ports_allow.json",
@@ -55068,8 +55068,8 @@
     },
     {
       "path": "tests/test_lane_gateway_transport.py",
-      "sha256": "be5915036f62dadf172962c947e77340f97fe2ab1515c9c847745094c09178ba",
-      "bytes": 3998
+      "sha256": "ba8999c424663b90bdc1028e47d0b1aa46715e96101514e8cca1b72a634f7b99",
+      "bytes": 8590
     },
     {
       "path": "tests/test_lane_packets.py",
