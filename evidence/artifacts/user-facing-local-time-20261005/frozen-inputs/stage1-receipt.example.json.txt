@@ -1,0 +1,1404 @@
+{
+  "schema_version": 1,
+  "artifact_class": "synthetic_fixture",
+  "id": "wsl-new-distro-stage1-<host>-<YYYYMMDD>",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd"
+  ],
+  "claim": "<One or two sentences quoting only this run's output: P1's good signature, P2's valid schema and P3's baseline and storage age; the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, W7 read 1000:1000, W5's paired record showed the same uid, distinct namespaces and two active user managers, and F1 met F1's pass condition, F2 printed Linger yes and a user-owned bus socket.>",
+  "limitations": [
+    "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
+    "Stage 1 and first boot only: stage 2 (the bootstrap), native sign-in, services and the Windows Terminal PATH proof are not covered.",
+    "Sanitized: Windows and Linux user names, home and profile paths and the checkout path are replaced by placeholders; the raw transcript stays private on the host.",
+    "jcodemunch_registration records F11's state only: a registration is not evidence that a session or subagent uses jCodeMunch.",
+    "The rehearsal block records a separate run on a throwaway name, removed by R1; its observations sit beside this run's, not in place of them.",
+    "Synthetic fixture only: placeholders and unrun comparison arms are not upstream tests, new-host acceptance or fresh model/GPU runs."
+  ],
+  "recorded_at_utc": "<YYYY-MM-DDTHH:MM:SSZ>",
+  "recipe": {
+    "path": "adoption/platforms/linux-wsl2-new-distro.md",
+    "catalog_revision": "<F7: git rev-parse HEAD of the new clone>",
+    "creation_path": "<A (cloud-init) or B (import and manual user)>"
+  },
+  "supported_images": {
+    "26.04.1": {
+      "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+      "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+      "catalog_name": "Ubuntu-26.04",
+      "bytes": 418495746
+    },
+    "24.04.5": {
+      "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+      "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+      "catalog_name": "Ubuntu-24.04",
+      "bytes": 388975696
+    }
+  },
+  "rehearsal": {
+    "name": "<R1: the throwaway name, never the real <Name> or the workstation's>",
+    "result": "<R1: passed through F3, or the first step whose proof failed>",
+    "creation_path": "<R1: A or B for the rehearsal>",
+    "schema_system": "<R1: the rehearsal's W5 schema --system line and exit code, or skipped (path B)>",
+    "ownership_probe": "<R1: the rehearsal's W7 stat -c %u:%g output after the terminate>",
+    "idle_observation": "<R1: whether the throwaway name stayed in every F2 poll, or the time it left>",
+    "storage_readings": "<R1: the rehearsal's P3 baseline and newest error line time, and its W5 second count>",
+    "export": {
+      "file": "<R1, failed rehearsal only: Z:\\WSL\\downloads\\<Name>-rehearsal.tar; null when it passed>",
+      "sha256": "<R1: the Get-FileHash line's lower-case hash of that file; null when it passed>",
+      "bytes": "<R1: the Get-Item line's Length; null when it passed>"
+    }
+  },
+  "pre_checks": {
+    "signed_sums": "<P1: both releases' gpgv exits, RSA key/Good signature lines and exact signed image hashes>",
+    "user_data_schema": "<P2: workstation cloud-init version/schema exit and render hash equal to W3; selected image qualification is W5>"
+  },
+  "storage_errors": {
+    "baseline": "<P3: the hv_storvsc count without the registration line or kernel command-line echo, before anything is installed>",
+    "newest_line_time": "<P3: the newest error line's kernel time in seconds, the first number of /proc/uptime and the age they give; none when no line; an age under 3600 s stopped the run>",
+    "swap": "<P3: the swapon --show lines>",
+    "second_count": "<W5, both paths: count after the first launch compared with the P3 baseline before the import; an attachment-only increase before cloud-init starts does not stop>",
+    "new_lines": "<W5, when the count grew: new lines without device ids, their attachment window and kernel times against cloud-init start; later storage errors or provisioning failure with a storage cause stop; unknown window stops for review; null otherwise>"
+  },
+  "host": {
+    "wsl_version": [
+      "<each line of wsl.exe --version in W1>"
+    ],
+    "default_distribution_before": "<starred line of wsl.exe --list --verbose in W1>",
+    "default_distribution_after": "<starred line in W5; equal to the line above>",
+    "z_free_bytes": "<Free of Get-PSDrive Z in W1>",
+    "idle_keys": "<W1: the instanceIdleTimeout and vmIdleTimeout lines of the .wslconfig read, with their section headers, or absent (defaults 15000 and 60000 ms)>",
+    "workstation_baseline": {
+      "uid": "<W1: id -u printed natively; must equal the planned default uid 1000>",
+      "system_state": "<W1: running with no failed unit, or degraded with failed set contained in {systemd-binfmt.service, getty@tty1.service}; otherwise stop>",
+      "failed_units": "<W1: first column of each systemctl --failed --no-legend --plain row, or none; failed getty only as an earlier collision with Result=start-limit-hit>",
+      "user_manager": "<W1: systemctl is-active user@<uid>.service; active>",
+      "cgroup_namespace": "<W1: readlink /proc/self/ns/cgroup; must not be cgroup:[4026531835]; W5 must prove isolation>",
+      "getty_tty1_result": "<W1, optional: present only when systemctl show getty@tty1.service -p Result -p NRestarts ran for a failed getty; Result=start-limit-hit required and actual NRestarts recorded; otherwise omit this key>"
+    }
+  },
+  "image": {
+    "release": "<RELEASE>",
+    "file": "ubuntu-<RELEASE>-wsl-amd64.wsl",
+    "url": "https://releases.ubuntu.com/<RELEASE>/ubuntu-<RELEASE>-wsl-amd64.wsl",
+    "bytes": "<W2: Get-Item Length of this run's selected image; run 2 observed 418495746 for 26.04.1>",
+    "sha256_published": "<W2: exact selected-release sha256 from the recipe, supported_images and Canonical's signed sums>",
+    "sha256_distributioninfo": "<W2: $Listed.Amd64Url.Sha256; must equal the recipe's selected-release digest and the signed publication>",
+    "sha256_computed": "<W2: Get-FileHash .Hash in lower case; must equal the recipe's selected-release digest and the signed publication>"
+  },
+  "first_launch": {
+    "user_prompt_marker": "<true when the W5 output contains 'Create a default Unix user account:'>",
+    "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>",
+    "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>",
+    "cloud_init_version": "<W5: selected image cloud-init --version and its exit>",
+    "cgroup_isolation": "<W5, after launch before F1, while both run: common active system unit, process ids with no 0 entry read natively from the running distribution, and active new user@<uid>.service; the paired five-value record is paired_isolation; any failed W5 proof uses the guarded w5_failure_export/removal>",
+    "systemd_user_session_warning": "<W5: warning text and stop if wsl: Failed to start the systemd user session appears, even with launch exit 0; absent otherwise>",
+    "getty_mask": {
+      "is_enabled": "<W5: masked; is-enabled exit 1 is normal for a masked unit>",
+      "load_state": "<W5: LoadState=masked>",
+      "active_state": "<W5: ActiveState=inactive>",
+      "n_restarts": "<W5: NRestarts=0>"
+    }
+  },
+  "paired_isolation": {
+    "recorded_with": "<W5: the WSL version and kernel lines of W1's wsl.exe --version and the image release and SHA-256 of W2 that these observations were made on>",
+    "workstation": {
+      "uid": "<W5: id -u printed natively in the workstation's shell; equal to the new distribution's; equal to host.workstation_baseline>",
+      "system_state": "<W5: workstation systemctl is-system-running; equal to host.workstation_baseline>",
+      "failed_units": "<W5: the unit names of systemctl --failed --no-legend --plain, or none; equal to host.workstation_baseline>",
+      "user_manager": "<W5: systemctl is-active user@<uid>.service; active; equal to host.workstation_baseline>",
+      "cgroup_namespace": "<W5: readlink /proc/self/ns/cgroup; differs from the new distribution's, is not cgroup:[4026531835] and equal to host.workstation_baseline>"
+    },
+    "new_distribution": {
+      "uid": "<W5: id -u printed inside <Name> through wsl.exe; equal to the workstation's>",
+      "system_state": "<W5: running with no failed unit, or degraded with systemd-binfmt.service as its only failed unit; message proved at F1>",
+      "failed_units": "<W5: first column of each failed-unit row inside <Name>, or none; getty@tty1.service must not be failed>",
+      "user_manager": "<W5: systemctl is-active user@<uid>.service inside <Name>; active>",
+      "cgroup_namespace": "<W5: readlink /proc/self/ns/cgroup inside <Name>; differs from the workstation's and is not cgroup:[4026531835]>"
+    }
+  },
+  "ownership_probe": "<W7: the stat -c %u:%g output for the file created from Windows after the terminate; 1000:1000 passes>",
+  "idle_observation": "<F2: the twelve poll times and whether <Name> was in every list, or the time of the first list without it>",
+  "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
+  "jcodemunch_registration": "<F11: registered (the scope and command lines of claude mcp get jcodemunch), not installed (test -x exited 1), or skipped with the reason>",
+  "authorization_settings": "<F9: the plain --apply, or who asked for --with-authorization-settings, when, and the line --apply printed about the authorization settings, which says `left to the clients' own defaults`, `applied`, `partly applied`, `kept` or `not applied` (a dry run says `would be applied` or `would be partly applied`), with what it added, kept, found already the same and did not reach>",
+  "failed_attempt_export": {
+    "file": "<W6, path B only: Z:\\WSL\\downloads\\<Name>-failed.tar; null on path A>",
+    "sha256": "<W6: the Get-FileHash line's lower-case hash of that file; null on path A>",
+    "bytes": "<W6: the Get-Item line's Length; null on path A>"
+  },
+  "steps": [
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec test -c /dev/dxg",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'node --version'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Hash.ToLowerInvariant()",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Length",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "ls /proc/sys/fs/binfmt_misc",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "systemctl status systemd-binfmt.service --no-pager",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "P1",
+      "cmd": "for RELEASE in 26.04.1 24.04.5; do",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "SUMS_DIR=\"$(mktemp -d)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS\" || exit 1",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg\" || exit 1",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "gpgv --homedir \"$SUMS_DIR\" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \"$SUMS_DIR/SHA256SUMS.gpg\" \"$SUMS_DIR/SHA256SUMS\"",
+      "exit": 0,
+      "output_excerpt": "<the using RSA key and Good signature lines>"
+    },
+    {
+      "step": "P1",
+      "cmd": "if [ \"$?\" -ne 0 ]; then exit 1; fi",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "grep -F \" *ubuntu-$RELEASE-wsl-amd64.wsl\" \"$SUMS_DIR/SHA256SUMS\" || exit 1",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "done",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P2",
+      "cmd": "RENDER_DIR=\"$(mktemp -d)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init --version",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init schema -c \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": 0,
+      "output_excerpt": "<the Valid schema line>"
+    },
+    {
+      "step": "P2",
+      "cmd": "sha256sum \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
+      "exit": "<0, or 1 when the count is 0>",
+      "output_excerpt": "<the count: the baseline>"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -Ev 'registering driver hv_storvsc|[Cc]ommand line:' | tail -n 1",
+      "exit": "<exit code>",
+      "output_excerpt": "<the newest error line's kernel time and shape without device ids, or nothing>"
+    },
+    {
+      "step": "P3",
+      "cmd": "cat /proc/uptime",
+      "exit": "<exit code>",
+      "output_excerpt": "<the two numbers; the first is the seconds since boot>"
+    },
+    {
+      "step": "P3",
+      "cmd": "swapon --show",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "New-Item -ItemType Directory -Force -Path 'Z:\\WSL\\downloads'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --version",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath 'Z:\\WSL\\<Name>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\<Name>.user-data')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', '^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output: section headers and the two idle keys, values only>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "id -u",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-system-running",
+      "exit": "<0 for running; 1 for degraded, expected and recorded>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl show getty@tty1.service -p Result -p NRestarts",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1, only when the baseline has a failed getty: Result=start-limit-hit and actual NRestarts; omit this entry when the command did not run>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ProgressPreference = 'SilentlyContinue'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Release = '<RELEASE>'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "switch ($Release) {",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "'26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "'24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "default { throw 'unsupported release: do not download or install' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "}",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Image = \"ubuntu-$Release-wsl-amd64.wsl\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImagePath = \"Z:\\WSL\\downloads\\$Image\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImageUrl = \"https://releases.ubuntu.com/$Release/$Image\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$SumsPath = \"Z:\\WSL\\downloads\\$Release-SHA256SUMS\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri \"https://releases.ubuntu.com/$Release/SHA256SUMS\" -OutFile $SumsPath",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \\*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "\"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<W2: selected-release computed/published/listed exact hashes and release URL>"
+    },
+    {
+      "step": "W2",
+      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "(Get-Item -LiteralPath $ImagePath).Length",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W3",
+      "cmd": "New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "$Text = [System.IO.File]::ReadAllText('<checkout>\\adoption\\templates\\wsl\\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data'), $Text)",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "Get-Content -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -TotalCount 1",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -Pattern '^- name: ', '^    default='",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data')).Hash.ToLowerInvariant()",
+      "exit": "<exit code>",
+      "output_excerpt": "<the hash; equal to P2's sha256sum value>"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -SimpleMatch -Pattern '${'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W4",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W4: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W4",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "cmd.exe /d /c \"wsl.exe -d <Name> < NUL\"",
+      "exit": 0,
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec id -u",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl is-enabled getty@tty1.service",
+      "exit": "<1 for masked, this command's normal exit>",
+      "output_excerpt": "<W5: masked>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: LoadState=masked, ActiveState=inactive, NRestarts=0>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init --version",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --long",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init schema --system",
+      "exit": "<path A: exit code; null on path B (skipped)>",
+      "output_excerpt": "<path A: the Valid schema user-data line; null on path B>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active '<COMMON_UNIT>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "id -u",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-system-running",
+      "exit": "<0 for running; 1 for degraded, expected and recorded>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running",
+      "exit": "<0 for running; 1 for degraded, expected and recorded>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Hash.ToLowerInvariant()",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Length",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
+      "exit": "<0, or 1 when the count is 0>",
+      "output_excerpt": "<the second count, both paths>"
+    },
+    {
+      "step": "W6",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-failed.tar'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Hash.ToLowerInvariant()",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Length",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W6: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W6: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W6: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "systemctl mask --now getty@tty1.service",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W6: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W6",
+      "cmd": "id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "printf '%s ALL=(ALL) NOPASSWD:ALL\\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "chmod 0440 /etc/sudoers.d/90-wsl-default-user",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "visudo -cf /etc/sudoers.d/90-wsl-default-user",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "grep -q '^\\[user\\]' /etc/wsl.conf || printf '\\n[user]\\ndefault=%s\\n' '<WSL_USER>' >> /etc/wsl.conf",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "touch /etc/cloud/cloud-init.disabled",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --running",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W7",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --list --running --quiet",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output; <Name> absent>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": "<exit code>",
+      "output_excerpt": "<WSL_USER>"
+    },
+    {
+      "step": "W7",
+      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "1000:1000"
+    },
+    {
+      "step": "W7",
+      "cmd": "Remove-Item -LiteralPath '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl is-system-running --wait",
+      "exit": "<recorded exit code: 0 for running, 1 for degraded>",
+      "output_excerpt": "<F1: running, or degraded with systemd-binfmt.service as the only failed unit>"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output: nothing when running, exactly systemd-binfmt.service when degraded>"
+    },
+    {
+      "step": "F1",
+      "cmd": "journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output: with degraded, the Failed to flush binfmt_misc rules, ignoring: Read-only file system line>"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl list-unit-files --type=service --no-pager",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F1",
+      "cmd": "sudo journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<F1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "F2",
+      "cmd": "sudo loginctl enable-linger \"$(id -un)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F2",
+      "cmd": "loginctl show-user \"$(id -un)\" --property=Linger --value",
+      "exit": 0,
+      "output_excerpt": "yes"
+    },
+    {
+      "step": "F2",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F2",
+      "cmd": "foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); wsl.exe --list --running --quiet }",
+      "exit": "<exit code>",
+      "output_excerpt": "<the twelve poll times and the running distributions after each>"
+    },
+    {
+      "step": "F3",
+      "cmd": "stat -c '%U %F' \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER> directory\n<WSL_USER> socket"
+    },
+    {
+      "step": "F3",
+      "cmd": "systemctl --user is-system-running --wait",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless info --format '{{json .SecurityOptions}}'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<F3: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless run --rm hello-world",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<F3: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get update",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzip xz-utils jq libatomic1 uidmap",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F4",
+      "cmd": "dpkg-query -W -f='${Package} ${Version}\\n' jq libatomic1 uidmap",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep -q \"^$(id -un):\" /etc/subuid || sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F6",
+      "cmd": "test -e ~/.bash_profile || printf '%s\\n' 'if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi' > ~/.bash_profile",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F6",
+      "cmd": "cat ~/.bash_profile",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "mkdir -p ~/code",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "git clone https://github.com/seathatflowsinourveins/native-agent-stack.git ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack rev-parse HEAD",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack ls-remote origin refs/heads/main",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template \"$(id -un)\" > 'adoption/hosts/<host>.json'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -m json.tool 'adoption/hosts/<host>.json'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "git check-ignore 'adoption/hosts/<host>.json'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "test -x \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp add --scope local jcodemunch -e \"CODE_INDEX_PATH=$HOME/.code-index\" -e JCODEMUNCH_SHARE_SAVINGS=0 -- \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp get jcodemunch",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    }
+  ],
+  "comparison_arms": {
+    "26.04.1": {
+      "status": "unrun",
+      "name": "<R1: this release's separate throwaway name>",
+      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1's pass condition>",
+      "systemd_user_from_second_instance": "<R1: second-instance user-owned directory/socket, manager running and F2 linger/idle observation>",
+      "wsl_gpu": "<R1: /dev/dxg character-device and native nvidia-smi exits/output on the same Windows driver; failed or skipped stays explicit>",
+      "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
+      "node_24": "<R1: bootstrap Node v24.21.0 exit/output or loader failure>"
+    },
+    "24.04.5": {
+      "status": "unrun",
+      "name": "<R1: this release's separate throwaway name>",
+      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1's pass condition>",
+      "systemd_user_from_second_instance": "<R1: second-instance user-owned directory/socket, manager running and F2 linger/idle observation>",
+      "wsl_gpu": "<R1: /dev/dxg character-device and native nvidia-smi exits/output on the same Windows driver; failed or skipped stays explicit>",
+      "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
+      "node_24": "<R1: bootstrap Node v24.21.0 exit/output or loader failure>"
+    }
+  },
+  "w5_failure_export": {
+    "file": "<W5, any failed proof: Z:\\\\WSL\\\\downloads\\\\<Name>-w5-failed.tar; null otherwise>",
+    "sha256": "<W5: the export's lower-case Get-FileHash value; null otherwise>",
+    "bytes": "<W5: the export's Get-Item Length; null otherwise>",
+    "cause": "<W5: cgroup, tty or a short text naming the failed proof; null otherwise>"
+  },
+  "interop_after_unregister": "<R1/W5/W6: after each actual unregister, surviving WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches; on a failed check, the outputs of R1's three native commands (the check again, ls /proc/sys/fs/binfmt_misc and systemctl status systemd-binfmt.service --no-pager), then a stop for review with nothing imported or provisioned>",
+  "rootless_container": "<F3: rootless context info includes name=rootless; hello-world output and exit, or owed pending F4/F5 and supported rootless setup; required on the first run after update before F9 or accepting R1>"
+}

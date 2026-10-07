@@ -1192,7 +1192,7 @@
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "layer_id": "token-efficiency",
       "owner_layer_id": "token-efficiency",
-      "pin": "1.108.319",
+      "pin": "1.108.327",
       "component_id": "jcodemunch-mcp",
       "source_selection_layer": "token-efficiency",
       "source_selection_name": "jcodemunch-mcp",
@@ -1203,22 +1203,22 @@
       "default_precedence": null,
       "default_install": true,
       "blocking_gaps": [
-        "No artifact digest is recorded for this pin: the checksum is the source commit (manifests/stack.json), and uv's index hashes are the only artifact check."
+        "This profile records source identity only (manifests/stack.json); the W1 receipt evidence/receipts/jcodemunch-1108327-qualification-20261003.json records the qualified wheel digest and its limitations. uv checks its index hashes."
       ],
       "artifact": {
-        "name": "jcodemunch-mcp==1.108.319",
-        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.319/"
+        "name": "jcodemunch-mcp==1.108.327",
+        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.327/"
       },
       "checksum": {
         "algorithm": "git-sha1",
-        "value": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "value": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
         "kind": "source"
       },
       "integrity_observation": "source_identity_only",
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.319",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "command": "uv tool install jcodemunch-mcp==1.108.327",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
         "execution_status": "UNRUN",
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
         "prerequisites": [
@@ -1227,7 +1227,7 @@
       },
       "acceptance": {
         "command": "order({\"action\":\"get_session_stats\",\"args\":{}})",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L141",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
@@ -1242,11 +1242,13 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "manifests/stack.json (components[id=jcodemunch-mcp])",
+        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
       ],
       "release": {
-        "tag": "v1.108.319",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "tag": "v1.108.327",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"
@@ -3472,7 +3474,8 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "G4 revised installation and native runtime acceptance are UNRUN on the destination."
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
+        "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117)."
       ],
       "artifact": {
         "name": "otelcol-contrib_0.162.0_linux_amd64.tar.gz",
@@ -3493,17 +3496,19 @@
         "command": null,
         "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96",
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job."
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117)."
       },
       "provisioning_status": "unprovisioned_optional_service",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+        "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
       ],
       "release": {
         "tag": "v0.162.0",
@@ -3640,7 +3645,8 @@
       "blocking_gaps": [
         "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
         "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
-        "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass."
+        "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass.",
+        "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head."
       ],
       "artifact": {
         "name": "grafana_13.2.3_36482603486_linux_amd64.tar.gz",
@@ -3661,17 +3667,19 @@
         "command": null,
         "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657",
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job."
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head."
       },
       "provisioning_status": "unprovisioned_optional_service",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
       ],
       "release": {
         "tag": "v13.2.3",

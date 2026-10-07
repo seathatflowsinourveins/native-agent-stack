@@ -453,7 +453,7 @@ The conditions that would overturn these decisions are in Overturn condition, it
 2. **Creation path.**
    - **Path A.** Render `%USERPROFILE%\.cloud-init\<Name>.user-data` from the template (W3). The user is `<WSL_USER>`,
      uid 1000, in groups `adm, cdrom, sudo, dip, plugdev`, with `sudo: "ALL=(ALL) NOPASSWD:ALL"`, a locked password and
-     `[user] default` appended to `/etc/wsl.conf`. Then run
+     `[time] useWindowsTimezone=true` and `[user] default` appended to `/etc/wsl.conf` (amended 2026-10-05). Then run
      `wsl --install --from-file <dir>\ubuntu-<RELEASE>-wsl-amd64.wsl --name <Name> --location Z:\WSL\<Name> --no-launch` (W4),
      then a first launch with standard input at end of file (W5).
    - **Rehearsals first (R1).** Each release runs on its own throwaway name and folder through F3, recording W5's schema,
@@ -498,7 +498,8 @@ The conditions that would overturn these decisions are in Overturn condition, it
      `wsl --export <Name> Z:\WSL\downloads\<Name>-failed.tar` keep its cloud-init logs, `/var/lib/cloud/instance` and its
      configuration. Its SHA-256 and size go to the receipt's `failed_attempt_export`. A nonzero export exit throws
      before any deletion. Then `--unregister` the literal new name, check surviving interop, `--import ... --version 2`, then a manual user with
-     the same groups and NOPASSWD drop-in, `[user] default`, the marker and `wsl --terminate <Name>`.
+     the same groups and NOPASSWD drop-in, `[user] default`, `[time] useWindowsTimezone=true` (amended 2026-10-05), the
+     marker and `wsl --terminate <Name>`.
    - **Stage-1 receipt.** The private PowerShell transcript, sanitized into the shape of
      `adoption/templates/wsl/stage1-receipt.example.json`. Its payload keys are those `scripts/validate.py` compares with a
      `receipts[]` row; `kind` is `native_cli_e2e` and `component_ids` is `systemd` (stack row `255.4-1ubuntu8.17`, the
@@ -699,7 +700,10 @@ workstation distribution (Evidence classes).
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json` | `"datasource": "DataSourceWSL"` and `"errors": []`: the run completed without errors |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json` | each of the four stages `finished` with empty `errors`; `recoverable_errors` recorded |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init schema --system` | path A: a line matching `^\s*Valid schema user-data$` and exit 0; skipped on path B |
-| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf` | `[boot]`, `systemd=true`, `[user]`, `default=<WSL_USER>`, each once |
+| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf` | `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]`, `default=<WSL_USER>`, each once |
+| W5 | powershell | `wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value` | the IANA zone that CLDR's `windowsZones` mapping gives for `tzutil /g`'s zone and the Windows region, for example `America/New_York`; recorded; a mismatch stops the run for review without the failed-proof export and unregister |
+| W5 | powershell | `tzutil /g` | the Windows time zone ID, for example `Eastern Standard Time`; recorded |
+| W5 | powershell | `if (-not ('WslRegionProof.Native' -as [type])) { Add-Type -Namespace WslRegionProof -Name Native -MemberDefinition '[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling=true, SetLastError=true)] public static extern int GetUserDefaultGeoName(System.Text.StringBuilder geoName, int geoNameCount);' -ErrorAction Stop }; $wslRegionBuffer = [System.Text.StringBuilder]::new(16); if ([WslRegionProof.Native]::GetUserDefaultGeoName($wslRegionBuffer, $wslRegionBuffer.Capacity) -eq 0) { throw [System.ComponentModel.Win32Exception]::new([System.Runtime.InteropServices.Marshal]::GetLastWin32Error()) }; $wslRegionBuffer.ToString()` | exact ISO alpha-2 or UN M.49 GeoName under the Windows account launching WSL, recorded separately as `windows_region`; native API failure stops W5 |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled` | the marker exists |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'` | `(ALL) NOPASSWD: ALL` |
 | W5 | powershell | `wsl.exe --list --verbose` | the starred line equals W1's |
@@ -749,6 +753,7 @@ workstation distribution (Evidence classes).
 | W6 | sh | `chmod 0440 /etc/sudoers.d/90-wsl-default-user` | mode 0440 |
 | W6 | sh | `visudo -cf /etc/sudoers.d/90-wsl-default-user` | `parsed OK` |
 | W6 | sh | `grep -q '^\[user\]' /etc/wsl.conf \|\| printf '\n[user]\ndefault=%s\n' '<WSL_USER>' >> /etc/wsl.conf` | one `[user]` section naming the user |
+| W6 | sh | `python3 -c 'import configparser, io; from pathlib import Path; p = Path("/etc/wsl.conf"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else ""); c.has_section("time") or c.add_section("time"); c.set("time", "useWindowsTimezone", "true"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' \|\| exit "$?"` | updates false/missing key or adds [time]; preserves other values; setter failure exits before the marker; W5 read-back/relaunch proves resulting zone |
 | W6 | sh | `touch /etc/cloud/cloud-init.disabled` | the marker exists |
 | W6 | powershell | `wsl.exe --terminate '<Name>'` | exit 0 |
 | W6 | powershell | `wsl.exe --list --running` | `<Name>` absent |
@@ -1423,3 +1428,26 @@ or when the manifest installs a tool whose pieces the map leaves out.
 Not established: any run of `install.sh`, `accept.sh` or `--apply` on the destination distribution; the after-sign-in
 checks of `agent-runtime-worker` and `research-harnesses` run upstream model examples (plan README, stage descriptions), and whether the two
 native sign-ins are enough for them was not read from their sources and not run.
+
+## Amendment 2026-10-05 (explicit `[time]` in `/etc/wsl.conf`)
+
+The user-data now writes `[time]` with `useWindowsTimezone=true` before `[user]`, and W6 appends the same key on path
+B when `/etc/wsl.conf` has no `[time]` section. The key restates WSL's default: Microsoft documents it as a boolean that
+defaults to `true` (MicrosoftDocs/WSL `7ea1c6f9`, `WSL/wsl-config.md:152-158`, the pin in Sources), and the WSL 3.0.1
+source holds the same default (microsoft/WSL `91f161fa`, `src/linux/init/WslDistributionConfig.h:58`). Writing it
+leaves WSL's behavior unchanged and records the intent. W5 reads it back, so the first boot fails W5 when it finds
+another value or no `[time]` section; path B repeats W5's checks once after W6. Nothing reads `/etc/wsl.conf` after
+provisioning, so a later change of the key is not detected. W5 also pairs `timedatectl show -p Timezone --value` with
+`tzutil /g`, so the receipt holds the zone the distribution reports beside the Windows zone, not only the file's text.
+A mismatch is recorded and stops the run for review without the failed-proof export and unregister, because WSL leaves
+`/etc/localtime` unchanged when the mapping is empty or the zone's file is missing; the recipe names the remedy. While
+the key was true at an instance's start, WSL relinks the zone at that start and again whenever Windows' time zone
+changes during the run (the decision record cites both paths).
+The 26.04.1 image's `wsl-setup` 0.6.3 (`73418e32`, `wsl-setup:55-73`) only appends or completes `[user]`, so the
+section survives the first run. The coordinator measured on 2026-10-05 that NativeStack2604's `/etc/wsl.conf` held
+`useWindowsTimezone=false` with no repository record, and set it to `true` on that host. Only the content listings
+change here (path A and path B under Decision, the W5 commands and proof, the new W5 and W6 rows); "What the image
+contains" is a historical read and stays. This is a source review and local integration: no first launch or import
+ran for it. The experiment's frozen inputs that this amendment changed keep their recorded hashes
+under `evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/`. Decision:
+[`2026-10-05-user-facing-local-time.md`](2026-10-05-user-facing-local-time.md).

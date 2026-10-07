@@ -1093,3 +1093,17 @@ After the refresh onto main 9e9553277, which carries wave 5's four browser-regis
 
 ```text
 ```
+
+## Addendum 2026-10-05: user-facing local time
+
+The [local-time decision](2026-10-05-user-facing-local-time.md) adds one sentence to the portable Claude block (a Core rule bullet) and to the Codex block's `session-lanes` lines. The piece tables above are unchanged. The current instruction projection follows; earlier dated projections keep their own counts.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 59 of 59 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 70 of 70 lines stay):
+
+```text
+```

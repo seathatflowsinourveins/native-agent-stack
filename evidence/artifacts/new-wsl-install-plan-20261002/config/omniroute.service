@@ -1,6 +1,8 @@
 # Destination adaptation of adoption/templates/systemd/omniroute.service at
 # this PR: adoption/templates/systemd/omniroute.service:65-100. No daemon under systemd.
-# OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:bin/cli/commands/serve.mjs and docs/reference/ENVIRONMENT.md.
+# Supplied composition: PR #744 at 0fb32ee583589f1a0809b20d18dff40ce2f65a1c,
+# docs/decisions/2026-10-05-omniroute-gateway-composition.md:31-38.
+# Wrapper SHA256 672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc.
 # The native client-config writer handles the Codex profile, not this unit.
 [Unit]
 Description=OmniRoute destination gateway (loopback only)
@@ -24,7 +26,7 @@ Environment=STREAM_READINESS_TIMEOUT_MS=600000
 Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000
 Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
 Environment=CLI_ALLOW_CONFIG_WRITES=false
-ExecStart=%h/.local/bin/omniroute serve --port 21128 --no-open --no-tray
+ExecStart=%h/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167/omniroute-serve.sh
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

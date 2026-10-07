@@ -30,7 +30,7 @@ gh release download v0.51.0 --repo rtk-ai/rtk \
 )
 uv venv "$REPORT_TOOLS/headroom-0.37.0"
 uv pip install --python "$REPORT_TOOLS/headroom-0.37.0/bin/python" headroom-ai==0.37.0
-uv tool install jcodemunch-mcp==1.108.319
+uv tool install jcodemunch-mcp==1.108.327
 npm install --prefix "$REPORT_TOOLS/mcporter-0.14.2" mcporter@0.14.2
 export PATH="$REPORT_TOOLS/rtk-0.51.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.14.2/node_modules/.bin:$HOME/.local/bin:$PATH"
 ```

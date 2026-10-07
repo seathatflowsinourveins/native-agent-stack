@@ -5,7 +5,8 @@ hook events, environment variables, built-in mods, Codex config keys and feature
 diffs what the current upstream releases expose against the committed
 [baseline](../catalogs/foundation/upstream-surface-baseline.json), and lists every new name without a row in the
 [dispositions catalog](../catalogs/foundation/upstream-surface-dispositions.json) as *unreviewed*. That list is the
-work list of the resolver loop (owned by another session). Release-version drift stays with `scripts/currency_due.py`
+work list of the resolver loop (owned by the currency lane on NativeStack2604).
+Release-version drift stays with `scripts/currency_due.py`
 and `tools/sota-convergence/github_freshness.py`; this watch adds the feature names they do not see. Why these
 sources, and what no maintained tool covers:
 [decision record](decisions/2026-10-04-upstream-surface-watch.md).

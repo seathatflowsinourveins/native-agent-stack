@@ -209,8 +209,8 @@ HEADING = re.compile(r"^(#{1,6})\s")
 SENTENCE_BREAK = re.compile(r"(?<=[.!?])(\s+)(?=[A-Z`\[(<\"'*_])")
 SENTENCE_END = re.compile(r"[.!?][\"')\]`*_]*$")
 # Wrap width of the verbatim rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md.
-# The rendered Codex carrier is 8,373 bytes; the local 8,192-byte test covers only
-# adoption/templates/codex.AGENTS.template.md's compact source (7,307 bytes).
+# The rendered Codex carrier is 8,701 bytes; the local 8,192-byte test covers only
+# adoption/templates/codex.AGENTS.template.md's compact source (7,635 bytes).
 # A run of lines this short with a sentence running into the next line is one
 # wrapped paragraph; longer lines are one statement each.
 WRAP_WIDTH = 80
@@ -1145,6 +1145,10 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
             override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
                 host_only))
             servers[name] = {**spec, **override}
+            if "env" in override:
+                # Native MCP env is a variable map (https://code.claude.com/docs/en/mcp). A host's partial override
+                # replaces those variables while retaining the pinned template's required provider/model settings.
+                servers[name]["env"] = {**spec.get("env", {}), **override["env"]}
     files["mcp-servers.json"] = json.dumps({"mcpServers": servers}, indent=2, ensure_ascii=False) + "\n"
     # Codex: the user config (placeholders filled), the hooks and the two profiles.
     keep, replaced = keep_of("codex/config")
@@ -1475,6 +1479,48 @@ def short(text: str, width: int = 170) -> str:
     return text if len(text) <= width else text[:width - 3] + "..."
 
 
+def rendered_mcp_endpoint_errors(root: Path) -> list:
+    """Local integration guard for the native MCP url/env fields in https://code.claude.com/docs/en/mcp and
+    https://developers.openai.com/codex/mcp (openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json).
+    Compare shared servers after varying only host endpoint values. The synthetic render catches an example-host
+    literal even when the ordinary example render agrees. Client-specific paths and non-host env stay out.
+    """
+    try:
+        results, manifest, plan, _, _ = analyse(root, check_blocks=False)
+        values = host_values(EXAMPLE_HOST, plan, None, wired_path_dirs(results))
+        probe_values = dict(values)
+        endpoint_keys = sorted(key for key in values if key.endswith(("_URL", "_ENDPOINT", "_HOST")))
+        for index, key in enumerate(endpoint_keys):
+            probe_values[key] = f"127.0.0.2:{30000 + index}"
+        before = render(root, results, plan, values, manifest)
+        after = render(root, results, plan, probe_values, manifest)
+
+        def servers(files: dict) -> tuple:
+            return (json.loads(files["mcp-servers.json"])["mcpServers"],
+                    tomllib.loads(files["codex.config.toml"]).get("mcp_servers", {}))
+
+        def fields(spec: dict) -> dict:
+            return {**({"url": spec["url"]} if "url" in spec else {}),
+                    **{f"env.{key}": value for key, value in spec.get("env", {}).items()}}
+
+        claude_before, codex_before = servers(before)
+        claude_after, codex_after = servers(after)
+        errors = []
+        for name in sorted(claude_after.keys() & codex_after.keys()):
+            old_claude, old_codex = fields(claude_before[name]), fields(codex_before[name])
+            new_claude, new_codex = fields(claude_after[name]), fields(codex_after[name])
+            for field in sorted(old_claude.keys() | old_codex.keys() | new_claude.keys() | new_codex.keys()):
+                host_valued = (old_claude.get(field) != new_claude.get(field) or
+                               old_codex.get(field) != new_codex.get(field))
+                if host_valued and (old_claude.get(field) != old_codex.get(field) or
+                                   new_claude.get(field) != new_codex.get(field)):
+                    errors.append(f"the host endpoint probe: MCP server {name} {field} differs between Claude and "
+                                  "Codex renders")
+        return errors
+    except (ConfigError, render_config.RenderError, OSError, KeyError, ValueError) as error:
+        return [f"the host endpoint probe failed, so the renders could not be compared: {error}"]
+
+
 def cmd_check(args: argparse.Namespace) -> int:
     root = args.root
     try:
@@ -1482,7 +1528,7 @@ def cmd_check(args: argparse.Namespace) -> int:
     except (ConfigError, OSError, KeyError, ValueError) as error:
         print(f"check failed: {error}", file=sys.stderr)
         return 1
-    errors = errors + rendered_name_errors(root)
+    errors = errors + rendered_name_errors(root) + rendered_mcp_endpoint_errors(root)
     if args.json:
         sys.stdout.write(wiring_table(results))
     elif args.markdown:
@@ -2058,7 +2104,7 @@ class Apply:
                   "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                   "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                   f"and a value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file "
-                  "lacks)")
+                  "lacks, except existing create-only profile files)")
             return
         verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
         by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
@@ -2528,20 +2574,39 @@ class Apply:
         states = []
         for source, target in items:
             data = source.read_bytes()
-            state = lane.file_state(target.read_bytes() if target.is_file() else None, data)
+            original = target.read_bytes() if target.is_file() else None
+            state = lane.file_state(original, data)
+            found = {}
+            profile_verdicts = [v for v in self.results if v.authorization and v.wired
+                                and target in groups and v.piece.group == groups[target]]
+            if profile_verdicts:
+                try:
+                    rendered = tomllib.loads(data.decode("utf-8"))
+                    existing = tomllib.loads(original.decode("utf-8")) if original is not None else {}
+                except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+                    raise MergeError(f"{target}: cannot classify the profile's authorization settings: {error}") from error
+                for verdict in profile_verdicts:
+                    path = [string.Template(part).safe_substitute(self.values) if isinstance(part, str) else part
+                            for part in verdict.piece.path]
+                    have = lane.get_path(existing, path)
+                    if state == "create":
+                        found[verdict.piece.key] = "added"
+                    elif have[0]:
+                        found[verdict.piece.key] = ("same" if strict_equal(
+                            have[1], lane.get_path(rendered, path)[1]) else "kept")
+                    # A create-only existing profile is preserved; absent keys were not reached.
             if state == "create" and not self.dry:
                 target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
                 os.chmod(target.parent, 0o700)
                 lane.atomic_write(target, data, 0o600, None, create_only=True)
-            if target in groups:   # an authorization setting of the profile: added with the file, or the file's own stays
-                self.authorization.update({v.piece.key: {"create": "added", "same": "same", "differs": "kept"}[state]
-                                           for v in self.results if v.authorization and v.wired
-                                           and v.piece.group == groups[target]})
+            self.authorization.update(found)   # only after a requested create succeeds
             states.append(state)
             shown = {"create": "would create" if self.dry else "created", "same": "already there",
                      "differs": "differs from the render and is never overwritten"}[state]
             self.say("codex-files", f"  {target.name}: {shown}")
         done = ("planned" if self.dry else "applied") if "create" in states else "current"
+        if "differs" in states:
+            done = (done + "; " if "create" in states else "") + "differs, not written"
         self.record("codex-files", done, f"{len(items)} file(s)")
 
     # -- login shell

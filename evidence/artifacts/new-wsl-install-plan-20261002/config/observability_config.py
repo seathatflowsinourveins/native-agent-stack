@@ -26,6 +26,25 @@ PRISTINE = {
 }
 
 
+# Exact user-designated retired host renders; their bytes were hashed, but their
+# historical rendered inputs were not reconstructed. Never recognize a header
+# or acquire an operator-custody file solely because its digest is listed here.
+HISTORICAL_PLAN_RENDER_DIGESTS = {
+    "prometheus.yaml": {"1568a5025ee2e6cab6e0a853031e438d7f04ae03a0d700aa5eb6a406b3e89e65"},
+    "otel.yaml": {"d928bbb9dbd61a5245933e94c4e371289e8b7bf0013488116c6d76de5c346a1e"},
+}
+
+
+# Co-op A30 (2026-10-05): exact retired provisioning paths remain custodian-owned.
+# Their historical digests are provenance, never permission to publish/migrate.
+# Grafana@6193dc03:docs/sources/administration/provisioning/index.md:90,339,371.
+LEGACY_GRAFANA_PATHS = (
+    "grafana-provisioning/datasources/ns2604.yaml",
+    "grafana-provisioning/dashboards/token-layer.yaml",
+    "grafana-dashboards/token-layer/token-layer.json",
+)
+
+
 def digest(text):
     return hashlib.sha256(text.encode()).hexdigest()
 
@@ -80,12 +99,25 @@ def destination():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check"))
+    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus"))
     parser.add_argument("--config-root", type=Path, required=True)
     parser.add_argument("--source-root", type=Path)
+    parser.add_argument("--tools-root", type=Path)
+    parser.add_argument("--plan-file", type=Path)
     args = parser.parse_args()
     root = args.config_root
     source = args.source_root or root
+    if args.action in ("grafana", "grafana-check"):
+        # CPython@v3.13.16:Lib/pathlib/_abc.py:432-437, unlike exists(),
+        # lstat sees a dangling symlink. Check before any ledger read or write.
+        for name in LEGACY_GRAFANA_PATHS:
+            try:
+                (root / name).lstat()
+            except FileNotFoundError:
+                continue
+            except OSError as error:
+                raise ValueError(f"needs_owner: cannot verify legacy Grafana path {name}") from error
+            raise ValueError(f"needs_owner: retained legacy Grafana path {name}; co-op custody required")
     data = Path(os.environ.get("NS2604_OBSERVABILITY_DATA", str(
         Path(os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local/share"))) / "new-wsl-native-stack/observability")))
     if not data.is_absolute():
@@ -93,14 +125,24 @@ def main():
     ledger_path = root / ".g4-source-digests.json"
     ledger = json.loads(ledger_path.read_text()) if ledger_path.exists() else {}
 
+    def known_plan_render(name, text, template):
+        if name in ledger.get("operator_migrations", {}):
+            return False
+        value = digest(text)
+        return (value in (PRISTINE.get(name), ledger.get(name),
+                         digest(template) if template is not None else None)
+                or value in HISTORICAL_PLAN_RENDER_DIGESTS.get(name, set()))
+
     def publish(name, text, template=None, validate=None, owned=True):
         path = root / name
+        if owned and name in ledger.get("operator_migrations", {}):
+            raise ValueError(f"needs_owner: retained operator custody for {name}")
         if path.is_symlink():
-            raise ValueError(f"retained symlink for {name}; migrate its owner configuration separately")
+            raise ValueError(f"needs_owner: retained symlink for {name}; migrate its owner configuration separately")
         if path.exists():
             old = path.read_text()
-            if old != text and digest(old) not in (PRISTINE.get(name), ledger.get(name), digest(template or "")):
-                raise ValueError(f"retained operator configuration for {name}; merge the G4 source separately")
+            if old != text and not ((not owned and old == template) or known_plan_render(name, old, template)):
+                raise ValueError(f"needs_owner: retained operator configuration for {name}; merge the G4 source separately")
         if validate:
             fd, temporary = tempfile.mkstemp(prefix=".g4-validate-", dir=root)
             try:
@@ -119,7 +161,46 @@ def main():
             ledger.setdefault("operator_migrations", {})[name] = digest(text)
         atomic(ledger_path, json.dumps(ledger, indent=2) + "\n")
 
-    if args.action == "otel":
+    if args.action == "prometheus":
+        # Render a candidate only. The co-op owns active-unit apply and activation.
+        # native-agent-stack@f946c6d4:observability/backends/configure.py:100,107-110.
+        if args.tools_root is None or args.plan_file is None:
+            raise ValueError("prometheus rendering requires --tools-root and --plan-file")
+        rows = [row for row in json.loads(args.plan_file.read_text())["owners"]
+                if row.get("slot") == "prometheus"]
+        if len(rows) != 1:
+            raise ValueError("prometheus rendering requires exactly one plan row")
+        row = rows[0]
+        release = row.get("release")
+        features = (row.get("service") or {}).get("enable_features")
+        port = (row.get("service") or {}).get("port")
+        if not isinstance(release, str) or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", release):
+            raise ValueError("invalid plan Prometheus release")
+        if (not isinstance(features, list) or not features
+                or any(not isinstance(value, str) or not re.fullmatch(r"[a-z][a-z0-9-]*", value) for value in features)
+                or len(set(features)) != len(features)):
+            raise ValueError("invalid plan Prometheus feature list")
+        if type(port) is not int or not 0 < port < 65536:
+            raise ValueError("invalid plan Prometheus loopback port")
+        tools = args.tools_root
+        for path in (root, data, tools):
+            if not path.is_absolute() or re.search(r"[\s'\"%\\$]", str(path)):
+                raise ValueError("unit render paths must be absolute without whitespace, quotes, percent, backslash or dollar")
+        markers = {
+            "@CONFIG_ROOT@": str(root),
+            "@DATA_ROOT@": str(data),
+            "@PROMETHEUS_TOOL@": str(tools / "prometheus" / ("prometheus-" + release[1:] + ".linux-amd64") / "prometheus"),
+            "@PROMETHEUS_PORT@": str(port),
+            "@PROMETHEUS_FEATURES@": ",".join(features),
+        }
+        template = (source / "ns2604-prometheus.service.example").read_text()
+        rendered = template
+        for marker, value in markers.items():
+            rendered = rendered.replace(marker, value)
+        if re.search(r"@[A-Z_]+@", rendered):
+            raise ValueError("unresolved Prometheus unit template marker")
+        publish("ns2604-prometheus.service", rendered, template)
+    elif args.action == "otel":
         for name in ("otelcol/queue", "collector", "sdk-receipts"):
             (data / name).mkdir(parents=True, exist_ok=True, mode=0o700)
         target = root / "otel.yaml"
@@ -129,14 +210,15 @@ def main():
         backup = target.with_name("otel.yaml.pre-g4-observability")
         # Recover the earlier ledger bug as well as retaining new migrations.
         # A migration backup/receipt records operator custody, never template ownership.
-        operator_custody = backup.exists() or "otel.yaml" in ledger.get("operator_migrations", {})
+        operator_custody = (backup.exists() or backup.is_symlink()
+                            or "otel.yaml" in ledger.get("operator_migrations", {}))
         if operator_custody:
             if ledger.pop("otel.yaml", None) is not None:
                 atomic(ledger_path, json.dumps(ledger, indent=2) + "\n")
             if not target.exists():
-                return 0
-        if operator_custody or (target.exists() and digest(target.read_text()) not in (
-                digest(template), PRISTINE["otel.yaml"], ledger.get("otel.yaml"))):
+                print("needs_owner: otel.yaml is absent under retained operator custody", file=sys.stderr)
+                return 3
+        if operator_custody or (target.exists() and not known_plan_render("otel.yaml", target.read_text(), template)):
             # Port only the earlier repair's exact container-directory migration; preserve all pipelines.
             original = target.read_text()
             pattern = r"(?m)^(\s*directory:\s*)([\"']?)/otelcol/queue/?\2(\s*(?:#.*)?)$"
@@ -160,7 +242,8 @@ def main():
                         os.environ.pop("NS2604_OBSERVABILITY_DATA", None)
                     else:
                         os.environ["NS2604_OBSERVABILITY_DATA"] = previous
-            return 0
+            print("needs_owner: retained operator otel.yaml; G4 source was not applied", file=sys.stderr)
+            return 3
         publish("otel.yaml", template)
     elif args.action == "grafana":
         for name in ("grafana", "grafana/logs", "grafana/plugins"):

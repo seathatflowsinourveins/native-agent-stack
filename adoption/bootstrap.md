@@ -173,6 +173,17 @@ GitHub-hosted macOS runner; see
    retain the host failures and limits. Darwin artifacts are
    artifact-checked only; the Mac host collects its own execution evidence.
 
+   On 2026-10-03, `pins-linux-x86_64.json` changed again after `v2026.09.26.2`:
+   `orx` 0.2.7 to 0.2.15 (URLs, hashes and install notes). The file is also
+   changed after `v2026.10.05.1`, which still pins 0.2.7, so a host at either
+   tag retains OpenResearch 0.2.7. W1 held the mcporter 0.14.2 candidate on
+   2026-10-03 because its resolved tree was inconsistent and its persistent
+   daemon/`serve` role was unqualified; the selected Linux pin then remained
+   0.14.1. Main's 2026-10-04 move in #693 selected Linux mcporter 0.14.2; see
+   [that receipt's limitations](../evidence/receipts/mcporter-0142-qualification-20261004.json).
+   The W1 scratch qualification and its functional limits remain dated history
+   in [the decision](../docs/decisions/2026-10-03-currency-wave-w1.md).
+
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode`, taking the `token-efficiency` row's
@@ -406,9 +417,9 @@ GitHub-hosted macOS runner; see
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
      uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-     uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+     uv tool install --python 3.13 jcodemunch-mcp==1.108.327
    "$eco/bin/serena" --version           # Serena 2.0.0.dev0
-   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.327
    ```
    Then run the installer:
    ```sh
@@ -607,6 +618,35 @@ GitHub-hosted macOS runner; see
    claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
    claude plugin install codex@openai-codex --scope user --json
    ```
+
+   **Upgrade an existing claude-hud 0.8.0 installation:** first apply the
+   template's `extraKnownMarketplaces.claude-hud.source.ref` value `v0.10.0`
+   in the host's user settings, retaining the other marketplace declarations.
+   [The loading reference](https://code.claude.com/docs/en/plugins/loading#plugins-and-marketplaces-that-arent-on-disk-at-session-start)
+   documents re-fetching a changed declared source at the next native session
+   start. Let that synchronization finish before updating. A marketplace
+   refresh follows its configured tag; it does not advance a source that still
+   names `v0.8.0` ([CLI reference](https://code.claude.com/docs/en/plugins/cli-reference#plugin-marketplace-update)).
+   Then refresh the retargeted marketplace and update the installed plugin:
+   ```sh
+   claude plugin marketplace update claude-hud
+   claude plugin update claude-hud@claude-hud --scope user
+   ```
+   These are separate steps: the shell marketplace command refreshes the
+   listing, and the plugin command updates the installed plugin
+   ([Update plugins now](https://code.claude.com/docs/en/plugins/install#update-plugins-now)).
+   Restart Claude Code or run `/reload-plugins`, then use the revision check
+   below to compare the installed `gitCommitSha` with `75683c6de1ac07f6bbef00d739001679dba0740c`.
+   Status: **documented, host verification pending**. R642b checked the native
+   2.1.288 command help with both `HOME` and `CLAUDE_CONFIG_DIR` in temporary
+   directories; it did not execute a marketplace or plugin update. A safe
+   offline reproduction of the GitHub-tag transition remains unverified.
+   Main's [2026-10-04 host receipt and limitations](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
+   record the observed path after a tagged marketplace add failed on the old
+   source entry: the host ran `claude plugin marketplace remove claude-hud`,
+   repeated the tagged add and ran `claude plugin install claude-hud@claude-hud --scope user --json`
+   successfully; W1's marketplace-update/plugin-update path above remains unverified.
+
    Then compare the `gitCommitSha` that landed with the reviewed revisions in
    those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
    Code does). `context-mode`, installed from the default branch, also passes

@@ -1,34 +1,41 @@
 ---
 name: native-stack-research
-description: Gather public research with the installed GPT Researcher and embedded DeerFlow routes, including a second independent gatherer when the task requests it.
+description: Use for current public facts, source-backed technical research, and comparisons of upstream tools with GPT Researcher. Use DeerFlow when the task requires two independent research outputs.
 ---
 
-For authorized public research, run the installed copy of the repository's
-`tools/research/gpt_researcher.sh`:
+For authorized public research, run the installed GPT Researcher route:
 
 ```bash
 bash "${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/gpt-researcher.sh" "short current-month query"
 ```
 
-The runner owns its
-preflight, provider scrub, loopback route and 1500-second watchdog. A preflight
-alone produces no research report.
+Run the command in the foreground and wait for its final exit. Allow at least
+1500 seconds per call; request a 1560000 ms foreground tool timeout when the
+tool accepts milliseconds. Native session tools continue with their returned
+session id until final exit. The route's 1500-second watchdog owns execution;
+preflight alone produces no research report.
 
-Use embedded DeerFlow as the second independent gatherer when the task calls for
-both routes:
+When the task requests a second independent output, run the installed DeerFlow
+headless route with its native default public configuration:
 
 ```bash
 bash "${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/deer-flow-research.sh" "short public research query with source URLs"
 ```
 
-Each route prints its run directory. Inspect the GPT Researcher report's
-References and DeerFlow's `answer.md`, then re-read the claims at their primary
-sources. Report the two actual outputs and any failure separately. DeerFlow uses
-the installed `DeerFlowClient.chat()` with a configured model and DuckDuckGo;
-its embedded invocation starts no HTTP service. Keep account secrets out of
-queries, reports and environment files.
+Apply the same foreground wait and per-call timeout. Each route prints its run
+directory. Inspect the GPT Researcher report's References and DeerFlow's
+`answer.md`, then verify the claims in the primary sources. Completion requires
+the returned command result and a retained report with sources; a completed
+session or background start alone is insufficient.
+
+Report the two outputs and each failed attempt separately. The exact DDGS
+empty-result outcome records provider availability and leaves the research
+answer unqualified. Keep unknown usage unknown and keep account secrets out
+of queries, reports and environment files.
 
 Sources: [GPT Researcher CLI](https://github.com/assafelovic/gpt-researcher/blob/v3.7.0/cli.py#L336),
-[DeerFlow embedded example](https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1658),
+[DeerFlow native CLI](https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1837),
 [DeerFlow model and tools](https://github.com/bytedance/deer-flow/blob/v2.1.0/config.example.yaml#L250),
-and the repository's `tools/research/gpt_researcher.sh`.
+[DDGS adapter](https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/packages/harness/deerflow/community/ddg_search/tools.py#L190).
+The installed repository routes supply the default config and per-call watchdog;
+`install-plan.json` carries provider custody decisions.

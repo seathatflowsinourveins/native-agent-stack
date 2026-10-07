@@ -1,15 +1,34 @@
 {
   "schema": "native-agent-stack/gpt-gateway-topology/v1",
-  "decision": "docs/decisions/2026-10-04-round2-plan-g4-config.md",
+  "decision": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
   "gateway": {
     "owner": "OmniRoute",
     "release": "3.8.51",
-    "adoption_status": "Published 3.8.51 already qualified and selected in #637; destination recipe matches that pin and supersedes #704's canary. No gateway or model run in this repair.",
+    "adoption_status": "Source parity with the supplied 3.8.51 composition selected by merged PR #744 at 0fb32ee583589f1a0809b20d18dff40ce2f65a1c. Historical co-op readback joined one Sol/max call; this revised recipe and native profile qualification remain UNRUN.",
     "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
     "endpoint": "http://127.0.0.1:21128/v1",
     "role": "account pool and fallback",
-    "sol_effort_cap": "xhigh",
-    "local_carries": []
+    "sol_effort_cap": "max",
+    "local_carries": [
+      "upstream PR15167@0585aba5589d5a1f49243a13a8db249558e7c9e3",
+      "affinity patch@045aa81f30cb9a1fc4f6b426ed940c1956cceda2"
+    ],
+    "build_sha": "5f4b3d577",
+    "source_tree": "f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f",
+    "prefix": "$HOME/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167",
+    "artifact": {
+      "pointer": "${OMNIROUTE_COMPOSITION_TARBALL:-$HOME/.local/state/native-agent-stack/coordination/cc-handover-staging/omniroute-artifacts-20261005/omniroute-3.8.51.tgz}",
+      "sha256": "d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2",
+      "bytes": 137823643,
+      "public_download_url": null,
+      "install": "npm install -g --prefix <prefix> --no-audit --no-fund <supplied-tarball>"
+    },
+    "wrapper_sha256": "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc",
+    "shim_sha256": "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854",
+    "service_drop_in": "omniroute.service.d/10-show-log.conf",
+    "standalone_web_search": "held out; this composition does not carry PR13788",
+    "claude_route": "pending canonical owner decision; no guessed binding",
+    "oauth_routing_combos": "forbidden while the affinity patch runs (F1)"
   },
   "sol_max": {
     "client": "native Codex",
@@ -21,18 +40,23 @@
   "pool_fallback": {
     "profile": "omniroute",
     "model_provider": "omniroute",
-    "model": "cx/gpt-6.1-sol",
-    "model_reasoning_effort": "xhigh"
+    "model": "cx/gpt-6.1-sol-max",
+    "model_reasoning_effort": "max",
+    "base_url": "http://127.0.0.1:21128/v1",
+    "command": "OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute -m cx/gpt-6.1-sol-max -c model_reasoning_effort=max -c model_provider=omniroute -c 'model_providers.omniroute.base_url=\"http://127.0.0.1:21128/v1\"' -c web_search=disabled --json --ephemeral"
   },
   "re_pin": {
     "source": "https://github.com/diegosouzapw/OmniRoute/pull/15167",
-    "condition": "An upstream release includes gpt-6.1-sol in both CODEX_MAX_ALIAS_MODELS and CODEX_ULTRA_ALIAS_MODELS. Re-pin only to that published release and require one gateway request with wire reasoning.effort=max.",
-    "status": "open and unmerged on 2026-10-04; gateway Sol/max remains unqualified"
+    "condition": "Move to an official release carrying PR15167 when the pinned executor probe and independently joined live gateway call both show Sol/max. Remove the affinity patch when upstream's affinity-outranks-occupancy-8940 test passes without it. The supplied composition already excludes PR13788.",
+    "status": "PR15167 is a cited upstream carry, not a merged release claim. The historical 2604 readback joined one Sol/max call, with original effort/header controls retained; it is not new native-profile qualification."
   },
   "sources": [
-    "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:docs/guides/SETUP_GUIDE.md:28",
-    "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/executors/codex/reasoningSuffix.ts:11",
-    "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/executors/codex.ts:331",
+    "native-agent-stack@0fb32ee583589f1a0809b20d18dff40ce2f65a1c:docs/decisions/2026-10-05-omniroute-gateway-composition.md:14-15,31-38,117",
+    "native-agent-stack@0fb32ee583589f1a0809b20d18dff40ce2f65a1c:evidence/artifacts/omniroute-wire-effort-20261005/patches/045aa81f3.patch; sha256 e1006768090218fdac18edb0f9732e9e2ef892fbbadfb7aa8afc8e96e4993c69",
+    "supplied omniroute-artifacts-20261005/README.txt:10; sha256 70386711f33d9cf28c6156c47d39d8ce52ffe6fb62262de14fdae269671c5693",
+    "diegosouzapw/OmniRoute@0585aba5589d5a1f49243a13a8db249558e7c9e3:bin/cli/runtime/processSupervisor.mjs:77,89-106; bin/cli/commands/serve.mjs:63,496",
+    "native-agent-stack:evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt; sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html (drop-in files)",
     "https://developers.openai.com/codex/config-reference/"
   ]
 }

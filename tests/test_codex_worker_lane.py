@@ -47,9 +47,10 @@ from scripts import adoption_status  # noqa: E402
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # The canonical routing move is recorded in 2026-10-05-harness-context-budget.md.
+# The session-lanes local-time line is recorded in 2026-10-05-user-facing-local-time.md.
 # RTK's unchanged 0.51.0 awareness fixture is pinned to e001f773 and checked
 # byte for byte in the rendered block, with local exceptions kept separately.
-TOP_RULE_SHA256 = "568ee365aeef3455fc901e648eb72d28cc3b49c39f1bfba7f5e39beed20479a8"
+TOP_RULE_SHA256 = "d21bb3bc0a2e68fb362af1d085da3761a08cc5ccec18ebd7ed16dd83d80bb3cd"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n'
 
@@ -434,8 +435,8 @@ class TemplateTests(unittest.TestCase):
         self.assertNotIn(lane.managed_block.RTK_INCLUDE, rendered)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
         self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
-        # This local 8,192-byte check covers the compact source (7,307 bytes).
-        # The rendered Codex carrier is 8,373 bytes, counted by the startup budget.
+        # This local 8,192-byte check covers the compact source (7,635 bytes).
+        # The rendered Codex carrier is 8,701 bytes, counted by the startup budget.
         self.assertLess(len(text.encode("utf-8")), 8192)
 
     def test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source(self):

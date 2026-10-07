@@ -7,7 +7,9 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
   ``${WSL_USER}`` placeholder, so the recipe's PowerShell ``.Replace`` writes the same bytes; the
   render starts with the ``#cloud-config`` header (no byte order mark, LF line ends) and creates the
   user the recipe describes: uid 1000, the groups the image's wsl-setup gives an interactive user,
-  passwordless sudo, a locked password and ``[user] default`` appended to /etc/wsl.conf;
+  passwordless sudo, a locked password and ``[user] default`` appended to /etc/wsl.conf, after a ``[time]``
+  section whose one key is ``useWindowsTimezone=true``, WSL's default, written so W5 reads it back (2026-10-05); the
+  check reads the appended text by section, so a key moved to another section or ``[user]`` ahead of ``[time]`` fails;
 - the host value template renders to JSON with exactly adoption/hosts/example.json's keys, every
   service on 127.0.0.1 at a port outside the workstation distribution's ports (WSL 2 distributions
   share one network namespace), and the recipe's ``ss`` probe checks exactly those ports;
@@ -88,6 +90,11 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
     for naming a skill or timer that neither lists, and that this step does not establish those skills;
   - F9 says what the line ``--apply`` prints about the authorization settings says: every outcome, in the words the tool
     prints;
+- the review of the 2026-10-05 local-time change: W5 reads the zone the distribution reports,
+  ``timedatectl show -p Timezone --value``, beside the Windows zone, ``tzutil /g``, once each and after ``id -u`` (so
+  path B's repeat covers them); its proof names CLDR's ``windowsZones`` mapping, and the record's command table, the
+  checklist and the receipt example carry the pair. A mismatch is recorded and stops for review without the
+  failed-proof export and unregister, on both paths, and the proof names the remedy and the CLDR and tzutil pins.
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
@@ -96,8 +103,13 @@ Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is
 from __future__ import annotations
 
 import json
+import configparser
 import re
+import shlex
 import string
+import subprocess
+import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -291,6 +303,20 @@ W3_HASH = ("(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPRO
 SCHEMA_SYSTEM = "wsl.exe -d '<Name>' -u root --exec cloud-init schema --system"
 SCHEMA_LINE = "`^\\s*Valid schema user-data$`"
 CLOUD_INIT_HOWTO = "https://ubuntu.com/wsl/docs/stable/howto/cloud-init/"
+# The review of the 2026-10-05 local-time change: W5 pairs the zone the distribution reports with the Windows zone.
+ZONE_DISTRIBUTION = "wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value"
+ZONE_WINDOWS = "tzutil /g"
+# Its round-3 review: a mismatch is recorded and stops for review without the failed-proof export and unregister, since
+# WSL leaves /etc/localtime alone when the mapping is empty or the zone's file is missing (timezone.cpp:54-58, :66-70);
+# the proof names the remedy and pins the CLDR mapping and the tzutil page it compares against.
+ZONE_MISMATCH_RULE = ("a mismatch is recorded with both outputs and stops the run for review, without the failed-proof "
+                      "recovery below")
+ZONE_EXCEPTION = "The time-zone pair is the one exception"
+ZONE_REMEDY = "the image's `tzdata`"
+ZONE_PINS = ("`release-48-2`", "`48fd0532`")
+CHECKLIST_ZONE_RULE = "stops for review without the export and unregister"
+WSL_CONF_SECTIONS_ERROR = ("the appended /etc/wsl.conf text is not [time] holding only useWindowsTimezone=true, then [user] "
+                           "holding only the default user")
 STORVSC_COUNT = ("sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | "
                  "grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'")
 # The coordinator's P3 rule (2026-10-01): the count is a baseline; the newest error line's kernel time against the
@@ -410,6 +436,22 @@ def command_table_errors(recipe: str, record: str) -> list[str]:
     return errors
 
 
+def wsl_conf_sections(rendered: str) -> list[tuple[str, list[str]]]:
+    """The /etc/wsl.conf text the user-data appends, its write_files ``content: |`` block of four-space lines, as
+    (section header, key lines) in order, blank lines left out; a key line before any header has the header ``""``."""
+    match = re.search(r"^  content: \|\n((?:    [^\n]*\n|\n)+)", rendered, re.M)
+    sections: list[tuple[str, list[str]]] = []
+    for line in (match[1].splitlines() if match else []):
+        line = line.strip()
+        if line.startswith("["):
+            sections.append((line, []))
+        elif line:
+            if not sections:
+                sections.append(("", []))
+            sections[-1][1].append(line)
+    return sections
+
+
 def user_data_errors(template: str, user: str = "example") -> list[str]:
     errors = []
     if "$" in template.replace(PLACEHOLDER, ""):
@@ -430,9 +472,14 @@ def user_data_errors(template: str, user: str = "example") -> list[str]:
     required = (r"^users:$", rf"^- name: {re.escape(user)}$", r"^  uid: 1000$",
                 r"^  groups: \[adm, cdrom, sudo, dip, plugdev\]$", r'^  sudo: "ALL=\(ALL\) NOPASSWD:ALL"$',
                 r"^  shell: /bin/bash$", r"^  lock_passwd: true$", r"^write_files:$", r"^- path: /etc/wsl\.conf$",
-                r"^  append: true$", r"^  content: \|$", r"^    \[user\]$", rf"^    default={re.escape(user)}$")
+                r"^  append: true$", r"^  content: \|$", r"^    \[time\]$", r"^    useWindowsTimezone=true$",
+                r"^    \[user\]$", rf"^    default={re.escape(user)}$")
     errors += [f"the render lacks a line matching {pattern}" for pattern in required
                if not re.search(pattern, rendered, re.M)]
+    # Each line above may sit anywhere, so the appended text is also read by section: the key belongs to [time], which
+    # comes before [user] (the review of the 2026-10-05 local-time change).
+    if wsl_conf_sections(rendered) != [("[time]", ["useWindowsTimezone=true"]), ("[user]", [f"default={user}"])]:
+        errors.append(WSL_CONF_SECTIONS_ERROR)
     if template.count(GETTY_BOOTCMD) != 1:
         errors.append("the user-data must hold the exact bootcmd getty mask once")
     if not re.search(r"^    default=\$\{WSL_USER\}\n\n(?:#[^\n]*\n){1,4}" + re.escape(GETTY_BOOTCMD), template, re.M):
@@ -476,8 +523,9 @@ def plan_loopback_ports() -> set[int]:
     """Every loopback port the install plan's services (their ``service.port``) and configuration files use."""
     ports = {int(row["service"]["port"]) for row in plan_rows()
              if isinstance(row.get("service"), dict) and row["service"].get("port") is not None}
-    for config in sorted((PLAN_DIR / "config").iterdir()):
-        ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
+    for config in sorted((PLAN_DIR / "config").rglob("*")):
+        if config.is_file():
+            ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
     return ports | set(plan_collector_ports())
 
 
@@ -1089,6 +1137,56 @@ def schema_system_errors(recipe: str, record: str, checklist: str, receipt: dict
     return errors
 
 
+def time_zone_pair_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """The review of the 2026-10-05 local-time change. The /etc/wsl.conf read-back proves the key's text only, so W5
+    also reads the zone the distribution reports beside the Windows zone, once each and after ``id -u`` (path B
+    repeats W5's checks from ``id -u`` on). Its proof says how the two agree: CLDR's ``windowsZones`` mapping for the
+    Windows region, which WSL applies through the ICU that Windows ships (microsoft/WSL 3.0.1,
+    src/windows/common/helpers.cpp:358-413). Round 3 of the review: a mismatch is recorded and stops for review
+    without the failed-proof export and unregister, on both paths; the proof names the remedy and pins the CLDR
+    release and the tzutil page, and the record's row and the checklist say the same."""
+    errors = []
+    commands = [command for shell, command in step_commands(recipe, "W5") if shell == "powershell"]
+    for command in (ZONE_DISTRIBUTION, ZONE_WINDOWS):
+        if commands.count(command) != 1:
+            errors.append(f"W5 does not run `{command}` once")
+    first_id = "wsl.exe -d '<Name>' --exec id -u"
+    if all(command in commands for command in (ZONE_DISTRIBUTION, ZONE_WINDOWS, first_id)) and min(
+            commands.index(ZONE_DISTRIBUTION), commands.index(ZONE_WINDOWS)) < commands.index(first_id):
+        errors.append("the zone pair runs before `id -u`, so path B's repeat of W5's checks skips it")
+    w5 = prose(section(recipe, "W5"))
+    if "windowsZones" not in w5 or "`timedatectl show -p Timezone --value`" not in w5:
+        errors.append("W5's proof does not say how the two zones agree (CLDR's windowsZones mapping)")
+    for phrase, what in ((ZONE_MISMATCH_RULE, "what a mismatch does"), (ZONE_EXCEPTION, "the failed-proof rule's exception"),
+                         (ZONE_REMEDY, "the remedy"), *((pin, "the CLDR or tzutil pin") for pin in ZONE_PINS)):
+        if phrase not in w5:
+            errors.append(f"W5 lacks {what}: {phrase}")
+    rows = [command for step, _, command, _ in command_table_rows(record) if step == "W5"]
+    if rows.count(ZONE_DISTRIBUTION) != 1 or rows.count(ZONE_WINDOWS) != 1:
+        errors.append("the record's command table does not hold each W5 zone row once")
+    proofs = [proof for step, _, command, proof in command_table_rows(record) if step == "W5" and command == ZONE_DISTRIBUTION]
+    if len(proofs) != 1 or "stops the run for review" not in proofs[0]:
+        errors.append("the record's W5 zone row does not say that a mismatch stops for review")
+    line = checklist_line(checklist, "W5")
+    if "`timedatectl show -p Timezone --value`" not in line or f"`{ZONE_WINDOWS}`" not in line:
+        errors.append("the checklist's W5 line does not name both zone commands")
+    if CHECKLIST_ZONE_RULE not in line:
+        errors.append("the checklist's W5 line does not say what a mismatch does")
+    listed = [(entry.get("step"), entry.get("cmd")) for entry in receipt.get("steps", []) if isinstance(entry, dict)]
+    if listed.count(("W5", ZONE_DISTRIBUTION)) != 1 or listed.count(("W5", ZONE_WINDOWS)) != 1:
+        errors.append("the receipt example does not record each zone command once under W5")
+    region_commands = [c for c in commands if "GetUserDefaultGeoName" in c and "$wslRegionBuffer.ToString()" in c]
+    if len(region_commands) != 1:
+        errors.append("W5 lacks the exact Windows GeoName API readback")
+    elif rows.count(region_commands[0]) != 1 or listed.count(("W5", region_commands[0])) != 1:
+        errors.append("the Windows GeoName readback is not recorded in both the command table and receipt")
+    if not is_placeholder(field(receipt, "first_launch", "windows_region"), "<W5"):
+        errors.append("the receipt has no exact Windows-region field")
+    if "GetUserDefaultGeoName" not in line:
+        errors.append("the W5 checklist lacks the Windows GeoName mapping input")
+    return errors
+
+
 def kernel_storage_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
     """Item D (critic item 3), under the coordinator's rule of 2026-10-01. The workstation distribution shares the
     kernel. Before stage 1, P3 counts the current boot's ``hv_storvsc`` kernel journal lines (sudo: the user cannot read
@@ -1277,6 +1375,11 @@ def rehearsal_errors(recipe: str, record: str, checklist: str, receipt: dict, ex
 
 
 class UserDataTemplateTests(unittest.TestCase):
+    # The template's appended /etc/wsl.conf text, and two rearrangements that keep every one of its lines.
+    WSL_CONF_BLOCK = "    [time]\n    useWindowsTimezone=true\n\n    [user]\n    default=${WSL_USER}\n"
+    KEY_UNDER_USER = "    [time]\n\n    [user]\n    useWindowsTimezone=true\n    default=${WSL_USER}\n"
+    USER_FIRST = "    [user]\n    default=${WSL_USER}\n\n    [time]\n    useWindowsTimezone=true\n"
+
     def test_the_template_renders_to_the_recipe_user(self):
         self.assertEqual(user_data_errors(read(USER_DATA)), [])
 
@@ -1289,14 +1392,41 @@ class UserDataTemplateTests(unittest.TestCase):
             "sudo with a password": good.replace("NOPASSWD:ALL", "ALL"),
             "no default user": good.replace("default=", "default_user="),
             "header": good.replace("#cloud-config", "# cloud-config", 1),
+            "no time section": good.replace("    [time]\n", ""),
+            "zone not from Windows": good.replace("useWindowsTimezone=true", "useWindowsTimezone=false"),
+            "time key under [user]": good.replace(self.WSL_CONF_BLOCK, self.KEY_UNDER_USER),
+            "[user] before [time]": good.replace(self.WSL_CONF_BLOCK, self.USER_FIRST),
         }
         for name, mutant in mutants.items():
             with self.subTest(mutant=name):
                 self.assertNotEqual(mutant, good)
                 self.assertTrue(user_data_errors(mutant))
 
+    def test_a_key_in_another_section_fails_the_section_reading(self):
+        """The moved key keeps every required line and the bootcmd's place, so only the section reading rejects it; with
+        [user] ahead of [time] the section reading rejects it too (the default user also leaves the bootcmd's side)."""
+        good = read(USER_DATA)
+        self.assertIn(self.WSL_CONF_BLOCK, good)
+        self.assertEqual(user_data_errors(good.replace(self.WSL_CONF_BLOCK, self.KEY_UNDER_USER)),
+                         [WSL_CONF_SECTIONS_ERROR])
+        self.assertIn(WSL_CONF_SECTIONS_ERROR, user_data_errors(good.replace(self.WSL_CONF_BLOCK, self.USER_FIRST)))
+        self.assertEqual(wsl_conf_sections(string.Template(good).substitute(WSL_USER="example")),
+                         [("[time]", ["useWindowsTimezone=true"]), ("[user]", ["default=example"])])
+
 
 class HostTemplateTests(unittest.TestCase):
+    def test_nested_config_file_ports_remain_reserved(self):
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nested = root / "config/fixture.service.d"
+            nested.mkdir(parents=True)
+            (nested / "endpoint.conf").write_text("Endpoint=http://127.0.0.1:29996\n")
+            with patch(__name__ + ".PLAN_DIR", root), patch(__name__ + ".plan_rows", return_value=[]), \
+                    patch(__name__ + ".plan_collector_ports", return_value=(21317, 21318)):
+                self.assertEqual(plan_loopback_ports(), {29996, 21317, 21318})
+
     def test_the_host_template_renders_with_example_keys_and_free_ports(self):
         example = json.loads(read(HOST_EXAMPLE))
         self.assertEqual(host_template_errors(read(HOST_TEMPLATE), example, read(RECIPE)), [])
@@ -1414,7 +1544,7 @@ class StageTwoTests(unittest.TestCase):
             path = re.search(r"(?:bash|python3 -B) (\S+)", command).group(1)
             self.assertTrue((ROOT / path).is_file(), path)
         self.assertEqual(sorted(path.name for path in PLAN_DIR.iterdir() if path.name.endswith(".sh")),
-                         ["accept.sh", "install.sh"])
+                         ["accept.sh", "inspector-client-probe.sh", "install.sh"])
 
     def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
         owners = plan_after_sign_in_slots()
@@ -1922,6 +2052,106 @@ class SchemaSystemTests(FollowUpCase):
             "checklist without the check": (recipe, record, checklist.replace("Valid schema user-data", "a schema"),
                                             receipt),
             "no receipt field": (recipe, record, checklist, without(receipt, "first_launch", "schema_system")),
+        })
+
+
+class TimeZonePairTests(FollowUpCase):
+    """The review of the 2026-10-05 local-time change: W5 pairs the zone the distribution reports with the Windows zone."""
+
+    def test_w5_reads_the_distribution_zone_beside_the_windows_zone(self):
+        self.assertEqual(time_zone_pair_errors(*self.inputs()), [])
+
+    def test_missing_region_input_or_record_is_rejected(self):
+        recipe, record, checklist, receipt = self.inputs()
+        cmd = next(c for shell, c in step_commands(recipe, "W5") if "GetUserDefaultGeoName" in c)
+        self.assertTrue(time_zone_pair_errors(recipe.replace(cmd + "\n", ""), record, checklist, receipt))
+        self.assertTrue(time_zone_pair_errors(recipe, record, checklist, dict(receipt, first_launch={
+            k: v for k, v in receipt["first_launch"].items() if k != "windows_region"})))
+        self.assertTrue(time_zone_pair_errors(recipe, record, checklist, dict(receipt, steps=[
+            e for e in receipt["steps"] if e.get("cmd") != cmd])))
+
+    def test_path_b_sets_actual_time_key_and_preserves_other_section_values(self):
+        command = next(c for shell, c in step_commands(read(RECIPE), "W6")
+                       if shell == "sh" and c.startswith("python3 -c ") and "useWindowsTimezone" in c)
+        source = shlex.split(command)[2]
+        prefix = "[boot]\nsystemd=true\n[user]\ndefault=example\n[automount]\noptions=metadata,uid=1000%literal\n"
+        for time_section in ("", "[time]\nuseWindowsTimezone=false\n", "[time]\n"):
+            with self.subTest(initial=time_section), tempfile.TemporaryDirectory() as d:
+                path = Path(d) / "wsl.conf"
+                path.write_text(prefix + time_section, encoding="utf-8")
+                # Only redirect the documented file path; execute the actual upstream-API recipe.
+                fixture_source = source.replace('Path("/etc/wsl.conf")', "Path(" + repr(str(path)) + ")")
+                self.assertNotEqual(source, fixture_source)
+                for repeat in range(2):
+                    result = subprocess.run([sys.executable, "-c", fixture_source], capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    parsed = configparser.ConfigParser(interpolation=None)
+                    parsed.read(path)
+                    self.assertTrue(parsed.getboolean("time", "useWindowsTimezone"))
+                    self.assertEqual(parsed.get("boot", "systemd"), "true")
+                    self.assertEqual(parsed.get("user", "default"), "example")
+                    self.assertEqual(parsed.get("automount", "options"), "metadata,uid=1000%literal")
+                    self.assertEqual(path.read_text().count("useWindowsTimezone=true"), 1)
+
+    def test_path_b_parse_failure_stops_before_the_completion_marker(self):
+        command = next(c for shell, c in step_commands(read(RECIPE), "W6")
+                       if shell == "sh" and c.startswith("python3 -c ") and "useWindowsTimezone" in c)
+        for original in ("not an INI file\n", "[time]\nuseWindowsTimezone=false\n[time]\n",
+                         "[time]\nuseWindowsTimezone=false\nuseWindowsTimezone=true\n"):
+            with self.subTest(original=original), tempfile.TemporaryDirectory() as d:
+                path, marker = Path(d) / "wsl.conf", Path(d) / "cloud-init.disabled"
+                path.write_text(original, encoding="utf-8")
+                script = command.replace("/etc/wsl.conf", str(path)) + "\ntouch " + shlex.quote(str(marker)) + "\n"
+                result = subprocess.run(["bash", "-s"], input=script, capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(path.read_text(), original)
+                self.assertFalse(marker.exists())
+
+    def test_the_check_rejects_a_lost_command_an_early_pair_a_lost_mapping_and_lost_records(self):
+        recipe, record, checklist, receipt = self.inputs()
+        w5 = section(recipe, "W5")
+        pair, first_launch_user = ZONE_DISTRIBUTION + "\n" + ZONE_WINDOWS + "\n", "wsl.exe -d '<Name>' --exec id -un\n"
+        self.assertIn(pair, w5)
+        self.assertIn(first_launch_user, w5)
+        rows = [line for line in record.splitlines() if line.startswith("| W5 |")
+                and (f"`{ZONE_DISTRIBUTION}`" in line or f"`{ZONE_WINDOWS}`" in line)]
+        self.assertEqual(len(rows), 2)
+        steps = [entry for entry in receipt["steps"]
+                 if (entry.get("step"), entry.get("cmd")) not in {("W5", ZONE_DISTRIBUTION), ("W5", ZONE_WINDOWS)}]
+        self.assert_mutants_fail(time_zone_pair_errors, {
+            "no distribution zone": (recipe.replace(w5, w5.replace(ZONE_DISTRIBUTION + "\n", "")), record, checklist,
+                                     receipt),
+            "no Windows zone": (recipe.replace(w5, w5.replace("\n" + ZONE_WINDOWS + "\n", "\n")), record, checklist,
+                                receipt),
+            "pair before id -u": (recipe.replace(w5, w5.replace(pair, "").replace(first_launch_user,
+                                                                                   pair + first_launch_user)),
+                                  record, checklist, receipt),
+            "no mapping in the proof": (recipe.replace(w5, w5.replace("windowsZones", "zone table")), record, checklist,
+                                        receipt),
+            "record without the rows": (recipe, "\n".join(line for line in record.splitlines() if line not in rows),
+                                        checklist, receipt),
+            "checklist without the pair": (recipe, record, checklist.replace(f"`{ZONE_WINDOWS}`", "the Windows zone"),
+                                           receipt),
+            "receipt without the entries": (recipe, record, checklist, dict(receipt, steps=steps)),
+        })
+
+    def test_the_check_rejects_a_mismatch_that_unregisters_a_lost_remedy_and_lost_pins(self):
+        recipe, record, checklist, receipt = self.inputs()
+        w5 = section(recipe, "W5")
+        row_rule = "; a mismatch stops the run for review without the failed-proof export and unregister |"
+        self.assertIn(row_rule, record)
+        self.assert_mutants_fail(time_zone_pair_errors, {
+            "the mismatch runs the recovery": (recipe.replace(w5, reword(w5, "without the failed-proof recovery below",
+                                                                         "with the failed-proof recovery below")),
+                                               record, checklist, receipt),
+            "no exception in the failure rule": (recipe.replace(w5, w5.replace(ZONE_EXCEPTION,
+                                                                               "The time-zone pair is no exception")),
+                                                 record, checklist, receipt),
+            "no remedy": (recipe.replace(w5, w5.replace(ZONE_REMEDY, "the image")), record, checklist, receipt),
+            "no CLDR pin": (recipe.replace(w5, w5.replace(ZONE_PINS[0], "a CLDR release")), record, checklist, receipt),
+            "no tzutil pin": (recipe.replace(w5, w5.replace(ZONE_PINS[1], "the docs")), record, checklist, receipt),
+            "record row without the rule": (recipe, record.replace(row_rule, " |"), checklist, receipt),
+            "checklist without the rule": (recipe, record, checklist.replace(CHECKLIST_ZONE_RULE, "fails W5"), receipt),
         })
 
 

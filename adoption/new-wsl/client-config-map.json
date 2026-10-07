@@ -414,8 +414,13 @@
       "override": {
         "args": [
           "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-        ]
+        ],
+        "env": {
+          "QDRANT_URL": "http://${QDRANT_URL}",
+          "LMSTUDIO_URL": "http://${EMBED_URL}/v1"
+        }
       },
+      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#configuration documents QDRANT_URL and LMSTUDIO_URL (including /v1). https://code.claude.com/docs/en/mcp documents the native server env object. Fill both endpoint variables from the selected host, as adoption/templates/codex.config.template.toml does, and retain the template's other env settings.",
       "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
     },
     {
@@ -753,9 +758,9 @@
       ],
       "wiring": "slot:gpt-gateway",
       "owner": "OmniRoute",
-      "override": "cx/gpt-6.1-sol",
-      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
-      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+      "override": "cx/gpt-6.1-sol-max",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31; https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L11",
+      "note": "J-744 source parity: supplied 3.8.51 + PR15167 + cited affinity composition, build 5f4b3d577, explicitly requests Sol/max on 21128. Native Codex/openai retains Sol/max too. PR13788 is absent, so standalone search stays held out. Revised recipe and native-profile qualification remain UNRUN; canonical Claude route is owner-pending and active host profiles stay owner-owned."
     },
     {
       "match": [
@@ -763,9 +768,9 @@
       ],
       "wiring": "slot:gpt-gateway",
       "owner": "OmniRoute",
-      "override": "xhigh",
-      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
-      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+      "override": "max",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31; https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/open-sse/executors/codex/reasoningSuffix.ts#L11",
+      "note": "J-744 source parity: supplied 3.8.51 + PR15167 + cited affinity composition, build 5f4b3d577, explicitly requests Sol/max on 21128. Native Codex/openai retains Sol/max too. PR13788 is absent, so standalone search stays held out. Revised recipe and native-profile qualification remain UNRUN; canonical Claude route is owner-pending and active host profiles stay owner-owned."
     },
     {
       "match": [
@@ -774,8 +779,8 @@
       "wiring": "slot:gpt-gateway",
       "owner": "OmniRoute",
       "override": "disabled",
-      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
-      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31",
+      "note": "The supplied 3.8.51 composition carries PR15167 and the cited affinity patch, not PR13788. Standalone web search remains held out; this source edit does not qualify or change a live host profile."
     },
     {
       "match": [
@@ -784,8 +789,8 @@
       "wiring": "slot:gpt-gateway",
       "owner": "OmniRoute",
       "override": false,
-      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
-      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31",
+      "note": "The supplied 3.8.51 composition carries PR15167 and the cited affinity patch, not PR13788. Standalone web search remains held out; this source edit does not qualify or change a live host profile."
     },
     {
       "match": [
@@ -794,8 +799,8 @@
       "wiring": "slot:gpt-gateway",
       "owner": "OmniRoute",
       "override": false,
-      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
-      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0fb32ee583589f1a0809b20d18dff40ce2f65a1c/docs/decisions/2026-10-05-omniroute-gateway-composition.md#L31",
+      "note": "The supplied 3.8.51 composition carries PR15167 and the cited affinity patch, not PR13788. Standalone web search remains held out; this source edit does not qualify or change a live host profile."
     },
     {
       "match": [

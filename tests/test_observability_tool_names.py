@@ -2,13 +2,14 @@
 (observability/collector/README.md#tool-mcp-skill-and-subagent-invoke-rates).
 
 Structural checks always run (the YAML ones need PyYAML). One class runs the committed logs pipeline on the pinned
-otelcol-contrib 0.161.0 with synthetic OTLP log records when the binary is installed at its documented path, and
+otelcol-contrib version in manifests/stack.json with synthetic OTLP log records when the binary is available, and
 skips otherwise. It is a local integration check on synthetic data, not a model run or host acceptance; the replay
 of real Claude Code and Codex captures and the post-apply host proof are recorded separately.
 """
 from __future__ import annotations
 
 import json
+import os
 import re
 import socket
 import subprocess
@@ -26,7 +27,11 @@ DASHBOARD = ROOT / "observability/backends/templates/ecosystem-dashboard.json.ex
 CLAUDE_TEMPLATES = (ROOT / "observability/collector/claude-settings.json.example",
                     ROOT / "adoption/templates/claude.settings.template.json")
 CODEX_TEMPLATE = ROOT / "adoption/templates/codex.config.template.toml"
-OTELCOL = Path.home() / ".local/share/codex-ecosystem/tools/otelcol-0.161.0/otelcol-contrib"  # README pins 0.161.0
+OTELCOL_VERSION = next(component["version"] for component in
+                       json.loads((ROOT / "manifests/stack.json").read_text())["components"]
+                       if component["id"] == "opentelemetry-collector-contrib")
+OTELCOL = Path(os.environ.get("OTELCOL_TEST_BIN", str(Path.home() /
+               f".local/share/codex-ecosystem/tools/otelcol-{OTELCOL_VERSION}/otelcol-contrib")))
 
 CONTENT_KEYS = ["tool_parameters", "tool_input", "arguments", "output", "content", "error"]
 DERIVED_KEYS = ["tool_family", "actor", "shell_rtk", "tool_details", "client"]
@@ -226,7 +231,8 @@ def otlp_attrs(mapping):
     return [{"key": k, "value": {"stringValue": v}} for k, v in mapping.items()]
 
 
-@unittest.skipUnless(OTELCOL.exists() and HAVE_YAML, "otelcol-contrib 0.161.0 not installed at the documented path")
+@unittest.skipUnless(OTELCOL.exists() and HAVE_YAML,
+                     f"requires PyYAML and otelcol-contrib {OTELCOL_VERSION}; set OTELCOL_TEST_BIN for a scratch install")
 class NativeCollectorTests(unittest.TestCase):
     """The committed logs pipeline on the pinned otelcol-contrib, with synthetic OTLP JSON (no model call)."""
 

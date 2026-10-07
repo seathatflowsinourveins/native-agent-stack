@@ -97,7 +97,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `ccusage` | 20.0.24 | synthetic | host_verified, bootstrap 20.0.26 | untested, bootstrap 20.0.26 | token-efficiency |  |
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
-|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
+|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.15 | untested | — |  |
 | Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.284 | untested, bootstrap 2.1.284 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | host_verified | host_verified | — |  |
 

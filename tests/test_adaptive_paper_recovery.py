@@ -102,6 +102,15 @@ class FakePort:
         self.snapshots += 1
         if self.mode == "slow_snapshot":
             await asyncio.sleep(5)
+        if self.mode in ("snapshot_chained", "snapshot_suppressed"):
+            # the shape of transport.snapshot's failure: a TransportError over the failing read
+            from transport import TransportError
+            try:
+                raise ConnectionError("read failed for " + "/".join(["", "ho" + "me", "someone", ".config", "x"]) + " token " + "A" * 40)
+            except ConnectionError as cause:
+                if self.mode == "snapshot_chained":
+                    raise TransportError("snapshot incomplete; admissions remain frozen") from cause
+                raise TransportError("snapshot incomplete; admissions remain frozen") from None
         for row in self.rows.values():
             self.c.observe(row)
         return {"complete": True, "account": {"cash": str(self.cash)}, "orders": list(self.rows.values()),
@@ -404,6 +413,175 @@ class RecoveryTests(unittest.TestCase):
         result = self.recover()
         self.assertEqual(result["status"], "passed")
 
+    def test_receipt_carries_the_message_and_its_context(self):
+        # 2026-10-06 (the command center's item for account 2): `errors` keeps the code; `error_details` adds the
+        # message and the chained or suppressed context, with home paths and long tokens redacted
+        import json
+        for mode in ("snapshot_chained", "snapshot_suppressed"):
+            with self.subTest(mode):
+                self.setUp()
+                self.original_buy()
+                self.port.mode = mode
+                result = self.recover()
+                self.assertEqual(result["errors"][0], "TransportError")
+                detail = result["error_details"][0]
+                self.assertEqual((detail["code"], detail["type"]), ("TransportError", "TransportError"))
+                self.assertIn("snapshot incomplete", detail["message"])
+                self.assertEqual(detail["context_type"], "ConnectionError")
+                self.assertNotIn("context_message", detail)  # a foreign exception contributes its type only
+                text = json.dumps(result)
+                self.assertNotIn("/" + "ho" + "me" + "/", text)
+                self.assertNotIn("A" * 40, text)
+                self.assertNotIn("token", text)
+
+    def test_engine_authored_context_is_kept_and_redacted(self):
+        import json
+        from transport import TransportError
+
+        class EnginePort(FakePort):
+            async def snapshot(self):
+                try:
+                    raise TransportError("fee activity page bound reached; path " + "/".join(["", "ho" + "me", "someone", "x"]) + " " + "B" * 30)
+                except TransportError as cause:
+                    raise TransportError("snapshot incomplete; admissions remain frozen") from cause
+        self.original_buy()
+        self.port.__class__ = EnginePort
+        detail = self.recover()["error_details"][0]
+        self.assertEqual(detail["context_type"], "TransportError")
+        self.assertIn("fee activity page bound reached; path <path>", detail["context_message"])
+        self.assertIn("<redacted>", detail["context_message"])
+        self.assertNotIn("B" * 30, json.dumps(detail))
+
+    def test_readiness_failure_keeps_each_subscription_reason(self):
+        # The command center's #809 review (P2): the engine's fixed reason codes (28-33 characters) survive the
+        # long-token redaction, so the receipt names which subscription was rejected
+        from transport import TransportError
+        for reason in ("orders_subscription_rejected", "quotes_subscription_rejected",
+                       "halt_status_subscription_rejected"):
+            with self.subTest(reason):
+                self.setUp()
+                # the shape of transport.start's readiness failure: the sorted freeze reasons in parentheses
+                message = ("stream authentication/subscription/quote readiness failed ("
+                           + ",".join(sorted([reason, "start_not_ready"])) + ")")
+
+                class ReadinessPort(FakePort):
+                    async def start(self, on_quote, on_order):
+                        raise TransportError(message)
+                self.original_buy()
+                self.port.__class__ = ReadinessPort
+                result = self.recover()
+                self.assertEqual(result["errors"], ["TransportError"])
+                self.assertEqual(result["error_details"][0]["message"], message)
+
+    def test_engine_codes_stay_and_other_long_tokens_are_redacted(self):
+        import recovery
+        kept = ("halt_status_subscription_rejected", "recovery_observation_integrity_lost",
+                "authentication/subscription/quote")
+        redacted = ("Kx7Pq2Wm9Rt4Yb8Nc3Vd6Hf1Lz", "abcdefghijklmnopqrstuvwxyz0123", "UPPER_CASE_WORDS_ARE_NOT_CODES",
+                    "lowercase-words-joined-by-hyphens", "relative/path/with/digit9/inside", "/srv/engine/state/directory/file")
+        text = recovery._text(" ".join(kept + redacted))
+        for token in kept:
+            self.assertIn(token, text)
+        for token in redacted:
+            self.assertNotIn(token, text)
+
+    def test_a_home_path_and_a_long_token_cannot_shorten_each_other(self):
+        # #809 delta reads r2 and r3 (P3s): replacing paths first left a 20-character token prefix, and replacing
+        # tokens first left a punctuated path suffix. Both spans are now found in the original text and joined.
+        from transport import TransportError
+        for root in ("home", "Users", "root"):
+            path = "/" + root + "/user"  # built here: no literal home path in this file
+            for value, expected in (("read failed " + "A" * 20 + path, "read failed <path>"),
+                                    ("read failed " + "A" * 24 + path + "/.secret/key.txt", "read failed <path>"),
+                                    ("read failed " + path + "/<redacted>/x.y " + "B" * 30, "read failed <path> <redacted>")):
+                with self.subTest(root=root, value=value[12:40]):
+                    self.setUp()
+
+                    class PathPort(FakePort):
+                        async def snapshot(self):
+                            try:
+                                raise TransportError(value)
+                            except TransportError as cause:
+                                raise TransportError(value) from cause
+                    self.original_buy()
+                    self.port.__class__ = PathPort
+                    detail = self.recover()["error_details"][0]
+                    for key in ("message", "context_message"):
+                        self.assertEqual(detail[key], expected)
+        import recovery
+        home = "/".join(["", "ho" + "me", "someone"])
+        self.assertEqual(recovery._text("kept engine/words data" + home + "/secret_value"),
+                         "kept engine/words data<path>")  # a home path inside a kept engine word is still replaced
+        self.assertEqual(recovery._text("kept datadatadata" + home + ".secret.value"),
+                         "kept datadatadata<path>")  # ... and its punctuated suffix with it
+
+    def test_random_texts_match_a_character_mask_oracle(self):
+        # A seeded check of the joined-span rule against an independent formulation: mask every character that a
+        # home path or a non-engine long token covers in the ORIGINAL text, then replace each maximal masked run
+        # once. The r2 (paths first) and r3 (tokens first) orders both fail it.
+        import random
+        import recovery
+        rng = random.Random(809)
+        roots = ["/" + r + "/" for r in ("ho" + "me", "Us" + "ers", "ro" + "ot")]
+        pieces = [lambda: "Q" * rng.randint(1, 40), lambda: rng.choice(roots) + rng.choice(["u", "Qx", "a.Q", "<path>", ""]),
+                  lambda: "a" * rng.randint(1, 30), lambda: "quotes_subscription_rejected",
+                  lambda: "authentication/subscription/quote", lambda: "data_set",
+                  lambda: rng.choice([" ", ".", ",", "<redacted>", "(", ")", "/", "-", "x", "_"])]
+
+        def oracle(text):
+            mask, path = [False] * len(text), [False] * len(text)
+            for m in recovery._HOME_PATH.finditer(text):
+                for i in range(m.start(), m.end()):
+                    mask[i] = path[i] = True
+            for m in recovery._LONG_TOKEN.finditer(text):
+                if not recovery._ENGINE_WORDS.fullmatch(m.group(0)):
+                    for i in range(m.start(), m.end()):
+                        mask[i] = True
+            out, i = [], 0
+            while i < len(text):
+                if not mask[i]:
+                    out.append(text[i]); i += 1
+                    continue
+                j, held = i, False
+                while j < len(text) and mask[j]:
+                    held, j = held or path[j], j + 1
+                out.append("<path>" if held else "<redacted>"); i = j
+            return "".join(out)[:300]
+        for _ in range(4000):
+            text = "".join(rng.choice(pieces)() for _ in range(rng.randint(1, 14)))
+            out = recovery._text(text)
+            self.assertEqual(out, oracle(text), text)
+            for root in roots:
+                self.assertNotIn(root, out, text)
+
+    def test_redaction_runs_before_the_length_cap(self):
+        # #809 review (P3): a long token that crosses character 300 is redacted whole, never cut into a short
+        # fragment, in the message and in an engine-authored context alike
+        from transport import TransportError
+        boundary = "word " * 56 + " " + "A" * 40
+
+        class BoundaryPort(FakePort):
+            async def snapshot(self):
+                try:
+                    raise TransportError(boundary)
+                except TransportError as cause:
+                    raise TransportError(boundary) from cause
+        self.original_buy()
+        self.port.__class__ = BoundaryPort
+        detail = self.recover()["error_details"][0]
+        for key in ("message", "context_message"):
+            with self.subTest(key):
+                self.assertLessEqual(len(detail[key]), 300)
+                self.assertNotIn("AA", detail[key])
+                self.assertTrue(detail[key].endswith(" <redacted>"))
+        import recovery
+        long_text = recovery._text("word " * 100)
+        self.assertEqual(len(long_text), 300)
+
+    def test_a_clean_recovery_has_no_error_details(self):
+        self.original_buy()
+        self.assertEqual(self.recover()["error_details"], [])
+
     def test_ambiguous_exit_is_retained_never_retried_or_rejected(self):
         self.original_buy()
         self.port.mode = "ambiguous_submit"
@@ -493,6 +671,30 @@ class RecoveryTests(unittest.TestCase):
             return await task
         result = asyncio.run(exercise())
         self.assertEqual(result["errors"], ["recovery_cancelled"])
+        self.assertEqual(result["error_details"], [{"code": "recovery_cancelled", "type": "CancelledError"}])
+        self.assertEqual(self.port.stopped, 1)
+        self.assertFalse(result["flat"])
+
+    def test_cancellation_then_teardown_failure_keeps_both_details(self):
+        # #809 review (P3): one detail per failure, the cancellation's included
+        class FailingStopPort(FakePort):
+            async def stop(self):
+                await super().stop()
+                raise RuntimeError("teardown failed for " + "/".join(["", "ho" + "me", "someone"]))
+        self.original_buy()
+        self.port.__class__ = FailingStopPort
+        self.port.mode = "slow_snapshot"
+        async def exercise():
+            task = asyncio.create_task(recover(self.controller, self.meta, self.config, reconcile_fn=proof))
+            await asyncio.sleep(.02)
+            task.cancel()
+            return await task
+        result = asyncio.run(exercise())
+        self.assertEqual(result["errors"], ["recovery_cancelled", "stop_RuntimeError"])
+        self.assertEqual(result["error_details"][0], {"code": "recovery_cancelled", "type": "CancelledError"})
+        teardown = result["error_details"][1]
+        self.assertEqual((teardown["code"], teardown["type"]), ("stop_RuntimeError", "RuntimeError"))
+        self.assertNotIn("message", teardown)  # a foreign exception contributes its type only
         self.assertEqual(self.port.stopped, 1)
         self.assertFalse(result["flat"])
 

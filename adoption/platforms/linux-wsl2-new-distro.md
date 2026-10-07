@@ -279,6 +279,8 @@ and the real run waits until the failure is understood. The rehearsal's private 
 outlive `--unregister`. After the required comparison records, run the page again from P1 for the default real
 `<Name>`, or the qualified rollback, without R1.
 
+`pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its `orx` entry (0.2.7 to 0.2.15); the Node 24.21.0 pin used here is unchanged.
+
 ## Pre-checks in the workstation distribution
 
 P1 to P3 run as `sh` in the workstation's distribution, before W1, so before anything is downloaded on Windows or
@@ -449,7 +451,7 @@ systemctl show getty@tty1.service -p Result -p NRestarts
   Pro for WSL writes it), that line lists its top-level keys: record them, and stop if `users:` or `write_files:` is among
   them. cloud-init 26.1 merges `agent.yaml` over the user-data one top-level key at a time, and an agent key replaces the
   user-data key entirely (`DataSourceWSL.py:317-336`, called at `:490`). Either key would replace the user or the
-  `[user] default` of W3.
+  `[time]` and `[user] default` of W3.
 - The `.wslconfig` line only reads: it prints the file's section headers and its `instanceIdleTimeout` and
   `vmIdleTimeout` lines, or nothing when the file or the keys are absent. Record both values in the receipt's
   `idle_keys`; a missing key has its default. `instanceIdleTimeout` (under `[general]`, default 15000 ms, `-1` turns it
@@ -560,6 +562,9 @@ wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json
 wsl.exe -d '<Name>' -u root --exec cloud-init schema --system
 wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf
+wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value
+tzutil /g
+if (-not ('WslRegionProof.Native' -as [type])) { Add-Type -Namespace WslRegionProof -Name Native -MemberDefinition '[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet=System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling=true, SetLastError=true)] public static extern int GetUserDefaultGeoName(System.Text.StringBuilder geoName, int geoNameCount);' -ErrorAction Stop }; $wslRegionBuffer = [System.Text.StringBuilder]::new(16); if ([WslRegionProof.Native]::GetUserDefaultGeoName($wslRegionBuffer, $wslRegionBuffer.Capacity) -eq 0) { throw [System.ComponentModel.Win32Exception]::new([System.Runtime.InteropServices.Marshal]::GetLastWin32Error()) }; $wslRegionBuffer.ToString()
 wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled
 wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'
 wsl.exe --list --verbose
@@ -620,7 +625,34 @@ Proof (path A, cloud-init provisioned the instance):
   schema exits 1 (`:1493-1498`). The `schema` subcommand never reads the marker (`cloudinit/cmd/main.py:1240-1241`,
   `:1286-1293`). The 26.04.1 rehearsal returned `Valid schema user-data` after the marker on both host releases;
   each run must repeat that observation. Record the output (`schema_system`).
-- `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[user]` and `default=<WSL_USER>`, each once.
+- `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]` and
+  `default=<WSL_USER>`, each once. The `[time]` key restates WSL's default and records the intent
+  ([Microsoft wsl-config, "Time settings"](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#time-settings), read
+  2026-10-05: MicrosoftDocs/WSL `7ea1c6f9`, `WSL/wsl-config.md:152-158`, `useWindowsTimezone`, default `true`); W6
+  writes the same key on path B. This read-back proves the file's text at this boot only; nothing reads it later.
+- `timedatectl show -p Timezone --value` prints the IANA zone that CLDR's `windowsZones` mapping gives for the Windows
+  zone that `tzutil /g` prints and the Windows region: the first zone of the region's row, else the `001` row, for
+  example `America/New_York` for `Eastern Standard Time` in the US (unicode-org/cldr `release-48-2`, `11299982`,
+  `common/supplemental/windowsZones.xml:130` and `:133`). `tzutil /g` displays the current time zone ID
+  ([tzutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil), read 2026-10-05:
+  MicrosoftDocs/windowsserverdocs `48fd0532`, `tzutil.md:18` and `:25`). WSL maps the zone with the ICU that Windows
+  ships and, while `useWindowsTimezone` was true when the instance started, links `/etc/localtime` to it at each
+  instance start and again in a running instance when Windows' time zone changes (microsoft/WSL `91f161fa`, tag 3.0.1:
+  `src/windows/common/helpers.cpp:358-413`, `src/linux/init/timezone.cpp:22-110`; the decision record cites both
+  paths). The region command calls the same `GetUserDefaultGeoName` API under the Windows account that launches
+  `<Name>`; record its exact ISO 3166-1 alpha-2 or numeric UN M.49 result separately from both zone outputs, as
+  `windows_region`. A culture name or `Get-WinHomeLocation`'s numeric GeoID is not this mapping input. API failure
+  throws and stops W5 rather than substituting a region. This small PowerShell bridge follows Microsoft's
+  [native-API Add-Type pattern](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/5b129a73fbe761fc12516c5f9776700daa0aa8a4/reference/5.1/Microsoft.PowerShell.Utility/Add-Type.md#L200)
+  and [GetUserDefaultGeoName contract](https://github.com/MicrosoftDocs/sdk-api/blob/7b93b54da4b144f042bef2ed25aa902d58916dc4/sdk-api-src/content/winnls/nf-winnls-getuserdefaultgeoname.md#L54).
+  The CLDR pin is a reference mapping; Windows' shipped ICU data version is not established here. These sequential
+  reads must be repeated if the zone or region changes during the proof. On either path, a mismatch is recorded with
+  both outputs and stops the run for review,
+  without the failed-proof recovery below: WSL leaves `/etc/localtime` unchanged when the Windows-to-IANA mapping is
+  empty (`Windows to Linux timezone mapping was not possible.`, `timezone.cpp:54-58`) or the image lacks the zone's
+  file (`... not found. Is the tzdata package installed?`, `:66-70`). The remedy is to check the Windows region and
+  zone against that mapping and the image's `tzdata` (`/usr/share/zoneinfo/<zone>`); unregistering the distribution
+  would not change either.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
 
@@ -670,8 +702,10 @@ proof: the mask did not take effect before the unit started. Record all of it, w
 kernel from W1 and the image revision from W2, in the receipt's `paired_isolation`: one object for the workstation and
 one for `<Name>`, each with `uid`, `system_state`, `failed_units`, `user_manager` and `cgroup_namespace`.
 
-When any W5 proof fails, or the user-session warning appears, stop the run and never stop or restart a unit in either
-distribution. Terminate only the new distribution, export its failed state, and unregister only that name. Do not
+The time-zone pair is the one exception, on path A and in path B's repeat: a mismatch is recorded and stops the run for
+review, as its proof above says, and the recovery below does not run for it. When any W5 proof fails, or the
+user-session warning appears, stop the run and never stop or restart a unit in either distribution. Terminate only the
+new distribution, export its failed state, and unregister only that name. Do not
 take path B for any such failure. Record its cause (`cgroup`, `tty` or a short text); this recovery block serves every
 failed W5 proof:
 
@@ -778,10 +812,18 @@ printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-defaul
 chmod 0440 /etc/sudoers.d/90-wsl-default-user
 visudo -cf /etc/sudoers.d/90-wsl-default-user
 grep -q '^\[user\]' /etc/wsl.conf || printf '\n[user]\ndefault=%s\n' '<WSL_USER>' >> /etc/wsl.conf
+python3 -c 'import configparser, io; from pathlib import Path; p = Path("/etc/wsl.conf"); c = configparser.ConfigParser(interpolation=None); c.optionxform = str; c.read_string(p.read_text() if p.exists() else ""); c.has_section("time") or c.add_section("time"); c.set("time", "useWindowsTimezone", "true"); out = io.StringIO(); c.write(out, space_around_delimiters=False); p.write_text(out.getvalue())' || exit "$?"
 touch /etc/cloud/cloud-init.disabled
 ```
 
-The last line writes the marker the official first-run command writes after cloud-init. `/etc/wsl.conf` takes effect at
+The Python command updates the actual key when `[time]` already exists, including `false` or a missing key, and adds
+the section only when absent. It uses the maintained standard-library
+[ConfigParser read/set/write API](https://github.com/python/cpython/blob/v3.13.16/Doc/library/configparser.rst),
+preserves other section values and key case, and writes compact `key=value` text. Its INI serialization normalizes
+formatting and drops comments; malformed or duplicate-section input fails before writing and exits the root block
+before the completion marker. This is a provisioning
+step, not a host command to run during a paper session. The last line writes the marker the official first-run
+command writes after cloud-init. `/etc/wsl.conf` takes effect at
 the next start, so terminate the new distribution only and wait until it is no longer running:
 
 ```powershell
@@ -943,6 +985,8 @@ dpkg-query -W -f='${Package} ${Version}\n' jq libatomic1 uidmap
 
 Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages. The historical
 24.04.5 image lacked them; do not assume the selected 26.04.1 image has the same package gaps.
+
+`pins-linux-x86_64.json` changed after `v2026.10.05.1` only in its `orx` entry (0.2.7 to 0.2.15); the Node 24.21.0 pin used here is unchanged.
 
 ### F5. Subordinate ids
 

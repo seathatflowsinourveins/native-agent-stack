@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @unittest.skipUnless(native.yaml and native.OTELCOL.exists() and native.LOKI.exists(),
-                     "requires PyYAML, otelcol-contrib 0.161.0 and Loki 3.7.8")
+                     f"requires PyYAML, otelcol-contrib {native.OTELCOL_VERSION} and Loki 3.7.8; set OTELCOL_TEST_BIN for a scratch install")
 class NativeSDKUsageScopeTests(unittest.TestCase):
     """Exercise the actual SDK file receiver, processors, and Loki aggregation."""
 

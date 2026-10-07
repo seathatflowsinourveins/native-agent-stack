@@ -2366,5 +2366,2132 @@ class ModelServerGuard(unittest.TestCase):
                     self.assertIn("reports version 0.36.0, not 0.35.0", result.stderr, message)
 
 
+class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
+    """Synthetic native-config loading; no gateway, provider or account calls."""
+
+    def render(self, topology, env=None):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copyfile(PLAN / "config/promptfoo-gateway.cjs", root / "promptfoo-gateway.cjs")
+            (root / "gpt-gateway-topology.json").write_text(json.dumps(topology))
+            return subprocess.run(
+                ["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))",
+                 str(root / "promptfoo-gateway.cjs")],
+                env={**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                     **(env or {})}, capture_output=True, text=True, timeout=10,
+            )
+
+    def topology(self):
+        return {"gateway": {"endpoint": "http://127.0.0.1:21128/v1"},
+                "pool_fallback": {"model": "fixture/gpt-a", "model_reasoning_effort": "xhigh"},
+                "promptfoo": {"claude_model": "fixture/claude-a"}}
+
+    def test_both_providers_follow_changed_canonical_routes_on_the_owned_endpoint(self):
+        import copy
+        original = self.topology()
+        changed = copy.deepcopy(original)
+        changed["pool_fallback"]["model"] = "fixture/gpt-b"
+        changed["promptfoo"]["claude_model"] = "fixture/claude-b"
+        for topology in (original, changed):
+            with self.subTest(topology=topology):
+                result = self.render(topology)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                config = json.loads(result.stdout)
+                self.assertEqual([p["id"] for p in config["providers"]],
+                                 ["openai:chat:" + topology["pool_fallback"]["model"],
+                                  "openai:chat:" + topology["promptfoo"]["claude_model"]])
+                self.assertEqual({p["config"]["apiBaseUrl"] for p in config["providers"]},
+                                 {topology["gateway"]["endpoint"]})
+                self.assertFalse(config["sharing"])
+                self.assertEqual(config["providers"][0]["config"]["reasoning_effort"], "xhigh")
+                self.assertNotIn("reasoning_effort", config["providers"][1]["config"])
+                self.assertTrue(all(p["config"]["omitDefaults"] for p in config["providers"]))
+
+    def test_synthetic_node_load_does_not_inherit_unrelated_ambient_variables(self):
+        from unittest import mock
+        with mock.patch.dict(os.environ, {"PROMPTFOO_AMBIENT_FIXTURE": "synthetic-unused-ambient"}):
+            with mock.patch("subprocess.run", wraps=subprocess.run) as run:
+                result = self.render(self.topology())
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("PROMPTFOO_AMBIENT_FIXTURE", run.call_args.kwargs["env"])
+        self.assertLessEqual(set(run.call_args.kwargs["env"]), {"PATH", "TMPDIR"})
+
+    def test_config_keeps_only_the_inventory_key_pointer(self):
+        sentinel = "SYNTHETIC_UNUSED_ENVIRONMENT_VALUE"
+        result = self.render(self.topology(), {"OMNIROUTE_API_KEY": sentinel})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn(sentinel, result.stdout + result.stderr)
+        config = json.loads(result.stdout)
+        self.assertNotIn("env", config)
+        inventory = load(ROOT / "adoption/credential-inventory.json")
+        entry = next(r for r in inventory["entries"] if r["id"] == "omniroute")
+        for provider in config["providers"]:
+            self.assertEqual(provider["config"]["apiKeyEnvar"], "OMNIROUTE_API_KEY")
+            self.assertIn(provider["config"]["apiKeyEnvar"], entry["variables"])
+            self.assertNotIn("apiKey", provider["config"])
+            self.assertFalse(provider["config"]["apiKeyRequired"])
+            self.assertFalse(provider["config"]["useDefaultApiKey"])
+
+    def test_native_client_result_oracles_require_the_frozen_pair(self):
+        import copy
+        expected = ["openai:chat:fixture/gpt-a", "openai:chat:fixture/claude-a"]
+        native = {"tool": "run_evaluation", "success": True, "data": {
+            "eval": {"status": "completed"},
+            "configuration": {"options": {"cache": False, "share": False}},
+            "results": {"totalEvals": 2, "stats": {"successes": 2, "failures": 0, "errors": 0},
+                        "results": [{"provider": {"id": value}, "eval": {"success": True}}
+                                    for value in expected]}}}
+        for client in ("claude", "codex"):
+            for case in ("valid", "reordered", "other-gpt", "other-claude", "two-gpt", "failed"):
+                with self.subTest(client=client, case=case):
+                    result = copy.deepcopy(native)
+                    rows = result["data"]["results"]["results"]
+                    if case == "reordered":
+                        rows.reverse()
+                    elif case == "other-gpt":
+                        rows[0]["provider"]["id"] = "openai:chat:fixture/gpt-b"
+                    elif case in ("other-claude", "two-gpt"):
+                        rows[1]["provider"]["id"] = "openai:chat:fixture/" + (
+                            "claude-b" if case == "other-claude" else "gpt-b")
+                    elif case == "failed":
+                        result["data"]["results"]["stats"]["failures"] = 1
+                    if client == "claude":
+                        events = [{"type": "assistant", "message": {"content": [{
+                            "type": "tool_use", "name": "mcp__promptfoo__run_evaluation", "id": "fixture-call"}]}},
+                                  {"type": "user", "message": {"content": [{
+                                      "type": "tool_result", "tool_use_id": "fixture-call", "content": json.dumps(result)}]}},
+                                  {"type": "result", "is_error": False}]
+                    else:
+                        events = [{"type": "item.completed", "item": {
+                            "type": "mcp_tool_call", "server": "promptfoo", "tool": "run_evaluation",
+                            "status": "completed", "error": None,
+                            "result": {"content": [{"type": "text", "text": json.dumps(result)}]}}},
+                                  {"type": "turn.completed"}]
+                    observed = subprocess.run(
+                        ["jq", "-s", "-e", "--arg", "client", client, "--argjson", "expected",
+                         json.dumps(expected), "-f", str(PLAN / "config/promptfoo-session.jq")],
+                        input="\n".join(json.dumps(event) for event in events),
+                        capture_output=True, text=True, timeout=10,
+                    )
+                    self.assertEqual(observed.returncode, 0 if case in ("valid", "reordered") else 1,
+                                     observed.stderr)
+
+    def test_missing_placeholder_and_duplicate_routes_fail_closed(self):
+        import copy
+        baseline = self.topology()
+        for field, bad_value in (("endpoint", None), ("endpoint", "gateway.example.com"),
+                                 ("endpoint", "https://gateway.example.com/v1"),
+                                 ("endpoint", "http://127.0.0.1:21991/v1"),
+                                 ("endpoint", "http://127.0.0.1.example.com:21128/v1"),
+                                 ("endpoint", "http://evil.example:21128/v1?gateway.example.com"),
+                                 ("endpoint", "http://127.0.0.1:21128@evil.example/v1"),
+                                 ("endpoint", "http://evil.example:21128/127.0.0.1/v1"),
+                                 ("endpoint", "http://127.0.0.1:21128/v1#ignored"),
+                                 ("endpoint", "http://127.0.0.1:21128/v1?ignored=1"),
+                                 ("endpoint", "https://127.0.0.1:21128/v1"),
+                                 ("gpt", None), ("gpt", "your-gpt-model-id"),
+                                 ("gpt", "fixture/gpt\x00a"),
+                                 ("claude", None), ("claude", "your-claude-model-id"),
+                                 ("claude", "fixture/gpt-a"), ("claude", "fixture/claude a")):
+            with self.subTest(field=field, bad_value=bad_value):
+                topology = copy.deepcopy(baseline)
+                target, key = {"endpoint": ("gateway", "endpoint"),
+                               "gpt": ("pool_fallback", "model"),
+                               "claude": ("promptfoo", "claude_model")}[field]
+                topology[target][key] = bad_value
+                result = self.render(topology)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("plan gateway topology must declare", result.stderr)
+                self.assertEqual(result.stdout, "")
+
+    def test_explicit_owner_pending_is_78_before_config_loading(self):
+        import copy
+        import importlib.util
+        import shlex
+        command = next(row for row in load(PLAN / "install-plan.json")["owners"]
+                       if row["slot"] == "promptfoo")["acceptance"]["after_sign_in"]["command"]
+        preflight = command.split('\nexpected="', 1)[0]
+        spec = importlib.util.spec_from_file_location("pending_plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        functions = checker.functions((PLAN / "accept.sh").read_text())
+        dispatcher = functions["check"]
+        tokens = shlex.split(functions["promptfoo"], comments=True)
+        pending_kind = tokens[tokens.index(command) + 1]
+        self.assertEqual(pending_kind, "needs_owner")
+        pending = self.topology()
+        pending["promptfoo"] = {}
+        pending["gateway"]["claude_route"] = "pending canonical owner decision; no guessed binding"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "config").mkdir()
+            # A poison config proves the preflight does not load it or run providers.
+            (root / "config/promptfoo-gateway.cjs").write_text('throw new Error("CONFIG_LOADED");')
+            for case in ("pending", "supplied-bad-route", "missing-ownership", "wrong-port",
+                         "endpoint-array", "promptfoo-array", "promptfoo-string", "promptfoo-null", "gpt-nul"):
+                with self.subTest(case=case):
+                    topology = copy.deepcopy(pending)
+                    if case == "supplied-bad-route":
+                        topology["promptfoo"]["claude_model"] = "your-claude-model-id"
+                    elif case == "missing-ownership":
+                        del topology["gateway"]["claude_route"]
+                    elif case == "wrong-port":
+                        topology["gateway"]["endpoint"] = "http://127.0.0.1:20128/v1"
+                    elif case == "endpoint-array":
+                        topology["gateway"]["endpoint"] = [topology["gateway"]["endpoint"]]
+                    elif case.startswith("promptfoo-"):
+                        topology["promptfoo"] = {"promptfoo-array": [], "promptfoo-string": "bad",
+                                                 "promptfoo-null": None}[case]
+                    elif case == "gpt-nul":
+                        topology["pool_fallback"]["model"] = "fixture/gpt\x00a"
+                    (root / "config/gpt-gateway-topology.json").write_text(json.dumps(topology))
+                    program = preflight + '\nnode "$gateway"'
+                    stage = ('stage=after_sign_in; failed=0; prepare_path() { :; };\ncheck() {\n' +
+                             dispatcher + '\n}\ncheck promptfoo smoke ' + shlex.quote(program) +
+                             ' ' + pending_kind + '\nexit "$failed"')
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", stage],
+                                            env={"PATH": os.environ["PATH"], "HOME": str(root),
+                                                 "plan_dir": str(root)},
+                                            capture_output=True, text=True, timeout=10)
+                    if case == "pending":
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(result.stdout, "promptfoo | after_sign_in | needs_owner (78)\n")
+                        self.assertIn("needs_owner:", result.stderr)
+                        self.assertNotIn("CONFIG_LOADED", result.stderr)
+                    else:
+                        self.assertEqual(result.returncode, 1, result.stderr)
+                        self.assertNotIn("needs_owner (78)", result.stdout)
+                        self.assertNotIn("needs_user", result.stdout)
+
+
+class FixwaveAcceptanceRepairs(unittest.TestCase):
+    """Local regression checks of native argv, task paths and owned alias migration."""
+
+    def row(self, slot):
+        return next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == slot)
+
+    def test_gateway_example_retention_and_nonregular_preflight(self):
+        # Independent filesystem control of the preflight seam and copy_config:
+        # native-agent-stack@84c79f7f:install.sh:82-126.
+        command = self.row("gpt-gateway")["commands"][0]
+        loop_start = command.index('for gateway_name in "gpt-gateway-topology.json"')
+        loop_end = command.index('; for gateway_name in omniroute-serve.sh', loop_start)
+        staged_loop = command[loop_start:loop_end]
+        install_text = (PLAN / "install.sh").read_text()
+        copy_start = install_text.index("copy_config() {")
+        copy_end = install_text.index("\n}\n", copy_start) + 3
+        copy_function = install_text[copy_start:copy_end]
+        guard = 'gateway_asset_known() { return 1; }; gateway_needs_owner() { printf "needs_owner: %s\\n" "$1" >&2; exit 1; }; '
+        for mode in ("regular", "symlink", "dangling", "directory", "unknown_asset"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                plan_dir, config_root = root / "plan", root / "config"
+                (plan_dir / "config").mkdir(parents=True)
+                config_root.mkdir()
+                (plan_dir / "config/omniroute.env.example").write_bytes(b"approved example\n")
+                target = config_root / "omniroute.env.example"
+                retained = b"operator example bytes\n"
+                external = root / "outside-example"
+                if mode in ("regular", "unknown_asset"):
+                    target.write_bytes(retained)
+                elif mode in ("symlink", "dangling"):
+                    if mode == "symlink":
+                        external.write_bytes(retained)
+                    target.symlink_to(external)
+                else:
+                    target.mkdir()
+                if mode == "unknown_asset":
+                    (config_root / "gpt-gateway-topology.json").write_bytes(retained)
+                env = {"PATH": os.environ["PATH"], "plan_dir": str(plan_dir), "config_root": str(config_root)}
+                result = subprocess.run(
+                    ["bash", "-euo", "pipefail", "-c", copy_function + "\n" + guard + staged_loop + "; copy_config omniroute.env.example"],
+                    env=env, capture_output=True, text=True, timeout=10,
+                )
+                if mode == "regular":
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("retained", result.stderr)
+                    self.assertEqual(target.read_bytes(), retained)
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn("needs_owner", result.stderr)
+                    if mode in ("symlink", "dangling"):
+                        self.assertTrue(target.is_symlink())
+                        self.assertEqual(os.readlink(target), str(external))
+                        if mode == "symlink":
+                            self.assertEqual(external.read_bytes(), retained)
+                    elif mode == "directory":
+                        self.assertTrue(target.is_dir())
+                    else:
+                        self.assertEqual(target.read_bytes(), retained)
+                        self.assertEqual((config_root / "gpt-gateway-topology.json").read_bytes(), retained)
+
+    def test_hcom_start_capture_selects_one_native_base_name(self):
+        # hcom@2c5f343: start.rs:843-848 deliberately repeats the marker;
+        # tests/support/mod.rs:949-959 selects its first occurrence.
+        command = self.row("agent-messaging")["acceptance"]["post_install"]["command"]
+        begin = command.index('sender="$(')
+        end = command.index('\n"${isolated[@]}" "$hcom_binary" send "@$recipient"')
+        selection = command[begin:end]
+        cases = [
+            ("repeated bootstrap", "[hcom:nova]\nbootstrap\n[hcom:nova]\n",
+             "[hcom:luna]\nbootstrap\n[hcom:luna]\n", ("nova", "luna")),
+            ("native trim", "  [hcom:nova]\n[hcom:nova]\n", "\t[hcom:luna]\n", ("nova", "luna")),
+            ("native base characters", "[hcom:_7]\n[hcom:_7]\n", "[hcom:2lane]\n", ("_7", "2lane")),
+            ("trailing bootstrap", "[hcom:nova] continued\n[hcom:nova]\n", "[hcom:luna]\n", ("nova", "luna")),
+            ("empty capture", "", "[hcom:luna]\n", None),
+            ("empty marker", "[hcom:]\n", "[hcom:luna]\n", None),
+            ("invalid base", "[hcom:bad-name]\n", "[hcom:luna]\n", None),
+            ("uppercase base", "[hcom:Nova]\n", "[hcom:luna]\n", None),
+            ("first marker invalid", "[hcom:bad-name]\n[hcom:nova]\n", "[hcom:luna]\n", None),
+            ("same identity", "[hcom:nova]\n", "[hcom:nova]\n", None),
+            ("narrative marker", "bootstrap mentions [hcom:nova]\n", "[hcom:luna]\n", None),
+        ]
+        for name, sender, recipient, expected in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "sender.txt").write_text(sender)
+                (root / "recipient.txt").write_text(recipient)
+                env = {"PATH": os.environ["PATH"], "smoke": str(root), "TMPDIR": str(root)}
+                result = subprocess.run(
+                    ["bash", "-euo", "pipefail", "-c", selection + '\nprintf "%s\\n" "$sender" "$recipient"'],
+                    env=env, capture_output=True, text=True, timeout=10,
+                )
+                if expected is None:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                else:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(tuple(result.stdout.splitlines()), expected)
+
+    def test_skillspector_scans_bind_the_native_topology_model_and_keep_report_gates(self):
+        # Local integration fixture for the native SKILLSPECTOR_MODEL carrier.
+        # No Codex sign-in, scan provider, credential store or model is contacted.
+        command = self.row("skill-vetting")["acceptance"]["after_sign_in"]["command"]
+        self.assertIn('"$plan_dir/config/gpt-gateway-topology.json"', command)
+        cases = [
+            ("native", {"model_provider": "openai", "model": "fixture-native"}, "complete", "fixture-native"),
+            ("canonical change", {"model_provider": "openai", "model": "fixture-next"}, "complete", "fixture-next"),
+            ("empty", {"model_provider": "openai", "model": ""}, "complete", None),
+            ("missing model", {"model_provider": "openai"}, "complete", None),
+            ("wrong type", {"model_provider": "openai", "model": 42}, "complete", None),
+            ("wrong provider", {"model_provider": "omniroute", "model": "fixture-native"}, "complete", None),
+            ("incomplete malicious", {"model_provider": "openai", "model": "fixture-native"}, "bad-incomplete", None),
+            ("incomplete safe", {"model_provider": "openai", "model": "fixture-native"}, "safe-incomplete", None),
+            ("obsolete findings field", {"model_provider": "openai", "model": "fixture-native"}, "bad-legacy-field", None),
+            ("malformed issues", {"model_provider": "openai", "model": "fixture-native"}, "bad-issues-type", None),
+            ("safe no meta needed", {"model_provider": "openai", "model": "fixture-native"}, "safe-no-meta", "fixture-native"),
+            ("safe static only", {"model_provider": "openai", "model": "fixture-native"}, "safe-no-calls", None),
+            ("safe partial calls", {"model_provider": "openai", "model": "fixture-native"}, "safe-partial-calls", None),
+            ("safe boolean counters", {"model_provider": "openai", "model": "fixture-native"}, "safe-bool-calls", None),
+            ("safe findings", {"model_provider": "openai", "model": "fixture-native"}, "safe-issues", None),
+            ("malicious static only", {"model_provider": "openai", "model": "fixture-native"}, "bad-no-calls", None),
+            ("malicious partial calls", {"model_provider": "openai", "model": "fixture-native"}, "bad-partial-calls", None),
+            ("malicious missing meta", {"model_provider": "openai", "model": "fixture-native"}, "bad-no-meta", None),
+            ("safe degraded", {"model_provider": "openai", "model": "fixture-native"}, "safe-degraded", None),
+        ]
+        for name, route, report_case, expected in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binary = root / "bin"
+                binary.mkdir()
+                config = root / "plan/config"
+                config.mkdir(parents=True)
+                (config / "gpt-gateway-topology.json").write_text(json.dumps({
+                    "sol_max": route, "pool_fallback": {"model": "cx/fixture-unrelated", "model_reasoning_effort": "xhigh"},
+                }))
+                (binary / "codex").write_text("#!/bin/sh\n[ \"$*\" = 'login status' ]\n")
+                (binary / "uv").write_text("#!/bin/sh\n[ \"$*\" = 'tool dir' ] || exit 42\nprintf '%s\\n' \"$FIXTURE_UV_TOOLS\"\n")
+                (binary / "skillspector").write_text(
+                    "#!/usr/bin/env python3\nimport json,os,sys\nfrom pathlib import Path\n"
+                    "assert os.environ['SKILLSPECTOR_PROVIDER'] == 'codex_cli'\n"
+                    "args=sys.argv[1:]; bad='malicious_skill' in args[1]\n"
+                    "with open(os.environ['FIXTURE_CALLS'],'a') as f: f.write(json.dumps({'model':os.environ.get('SKILLSPECTOR_MODEL'),'bad':bad})+'\\n')\n"
+                    "case=os.environ['FIXTURE_REPORT_CASE']\n"
+                    "complete=not ((bad and case=='bad-incomplete') or (not bad and case=='safe-incomplete'))\n"
+                    "report={'analysis_completeness':{'is_complete':complete},'execution_successful':True,'issues':[{'fixture':True}] if bad else [],"
+                    "'metadata':{'llm_requested':True,'llm_available':True,'meta_analysis_applied':bad,'llm_calls_attempted':3,'llm_calls_succeeded':3}}\n"
+                    "if bad and case=='bad-legacy-field': report['findings']=report.pop('issues')\n"
+                    "if bad and case=='bad-issues-type': report['issues']='invalid'\n"
+                    "if not bad and case=='safe-no-calls': report['metadata'].update(llm_calls_attempted=0,llm_calls_succeeded=0)\n"
+                    "if not bad and case=='safe-partial-calls': report['metadata']['llm_calls_succeeded']=2\n"
+                    "if not bad and case=='safe-bool-calls': report['metadata'].update(llm_calls_attempted=True,llm_calls_succeeded=True)\n"
+                    "if not bad and case=='safe-issues': report['issues']=[{'fixture':True}]\n"
+                    "if bad and case=='bad-no-calls': report['metadata'].update(llm_calls_attempted=0,llm_calls_succeeded=0)\n"
+                    "if bad and case=='bad-partial-calls': report['metadata']['llm_calls_succeeded']=2\n"
+                    "if bad and case=='bad-no-meta': report['metadata']['meta_analysis_applied']=False\n"
+                    "if not bad and case=='safe-degraded': report['metadata']['llm_degraded']=True\n"
+                    "Path(args[args.index('--output')+1]).write_text(json.dumps(report))\n"
+                    "sys.exit(1 if bad else 0)\n"
+                )
+                for path in binary.iterdir():
+                    path.chmod(0o755)
+                tools = root / "uv-tools"
+                (tools / "skillspector/bin").mkdir(parents=True)
+                (tools / "skillspector/bin/python").symlink_to(sys.executable)
+                calls = root / "calls.jsonl"
+                env = {"PATH": str(binary) + os.pathsep + os.environ["PATH"], "TMPDIR": str(root),
+                       "plan_dir": str(root / "plan"), "config_root": str(root / "unpopulated-client-config"),
+                       "tool_root": str(root / "tools"), "XDG_STATE_HOME": str(root / "state"),
+                       "FIXTURE_UV_TOOLS": str(tools), "FIXTURE_CALLS": str(calls), "FIXTURE_REPORT_CASE": report_case}
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                        env=env, capture_output=True, text=True, timeout=15)
+                observed = [json.loads(line) for line in calls.read_text().splitlines()] if calls.exists() else []
+                if expected is not None:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(observed, [{"model": expected, "bad": True}, {"model": expected, "bad": False}])
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    if report_case == "complete":
+                        self.assertEqual(observed, [], "Invalid topology reached a provider scan")
+
+    def test_conformance_release_cli_is_not_resolved_from_the_same_named_source_package(self):
+        # npm@bfacd33 libnpmexec:49-60 can select an unbuilt same-name checkout.
+        # Exercise the real row's working-directory transition with fixture CLIs.
+        command = self.row("mcp-protocol-conformance")["acceptance"]["post_install"]["command"]
+        probe = subprocess.run(["unshare", "--user", "--map-root-user", "--pid", "--fork", "--mount-proc",
+                                "--kill-child", "true"], capture_output=True, timeout=10)
+        if probe.returncode:
+            self.skipTest("Unprivileged namespace unavailable; native acceptance remains fail-closed")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "tools/mcp-conformance-source-0.2.0-alpha.11"
+            source.mkdir(parents=True)
+            (source / "package.json").write_text(json.dumps({
+                "name": "@modelcontextprotocol/conformance", "version": "0.2.0-alpha.11",
+                "bin": {"conformance": "dist/index.js"},
+            }))
+            neutral = root / "plan"
+            neutral.mkdir()
+            (neutral / "config").mkdir()
+            (neutral / "config/mcp-conformance-accept.sh").write_bytes((PLAN / "config/mcp-conformance-accept.sh").read_bytes())
+            binaries = root / "bin"
+            binaries.mkdir()
+            for executable in ("npm", "npx"):
+                script = binaries / executable
+                script.write_text(
+                    "#!/usr/bin/env python3\nimport json,os,sys\nfrom pathlib import Path\n"
+                    "name=Path(sys.argv[0]).name; cwd=Path.cwd(); args=sys.argv[1:]\n"
+                    "with open(os.environ['FIXTURE_CALLS'],'a') as f: f.write(json.dumps({'tool':name,'args':args,'cwd':str(cwd)})+'\\n')\n"
+                    "if name=='npx' and (cwd/'package.json').is_file():\n"
+                    " print('conformance: not found (same-named source package)',file=sys.stderr); sys.exit(127)\n"
+                )
+                script.chmod(0o755)
+            calls = root / "calls.jsonl"
+            env = {"PATH": str(binaries) + os.pathsep + os.environ["PATH"], "TMPDIR": str(root),
+                   "tool_root": str(root / "tools"), "plan_dir": str(neutral), "FIXTURE_CALLS": str(calls),
+                   "HOME": os.environ["HOME"], "XDG_STATE_HOME": str(root / "state"), "XDG_CACHE_HOME": str(root)}
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                    env=env, capture_output=True, text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            observed = [json.loads(line) for line in calls.read_text().splitlines()]
+            self.assertEqual([c["args"] for c in observed if c["tool"] == "npm"],
+                             [["ci", "--ignore-scripts"], ["run", "check"], ["test"]])
+            release, = [c for c in observed if c["tool"] == "npx" and "list" in c["args"]]
+            self.assertEqual(release["cwd"], str(neutral))
+            self.assertEqual(release["args"], ["--offline", "--yes", "--ignore-scripts", "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+                                               "list", "--requirements", "2026-07-28"])
+
+    def test_scout_scoped_dispatch_does_not_reinstall_the_inspect_owner(self):
+        text = (PLAN / "install.sh").read_text()
+        dispatch = text[text.index("if selected 'playwright-cli';"):]
+        for slot in ("trajectory-analysis", "inspect-ai"):
+            with self.subTest(slot=slot):
+                prelude = '''
+selected() { [[ "$only" == "$1" ]]; }
+named() { selected "$1"; }
+run_slot() { printf '%s\\n' "$1"; }
+measured_slot() { if selected "$1"; then run_slot "$1"; fi; }
+needs_docker=false
+failed=0
+'''
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", prelude + dispatch],
+                                        env={"PATH": os.environ["PATH"], "only": slot},
+                                        capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout.splitlines(), [slot])
+
+    def test_scout_alias_migration_preserves_foreign_executables(self):
+        command = next(c for c in self.row("trajectory-analysis")["commands"] if "scout_alias=" in c)
+        cases = ("absent", "previous owner", "current owner", "foreign file", "foreign link", "dangling")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binary = root / "bin"
+                binary.mkdir()
+                tools = root / "uv-tools"
+                for name in ("inspect-ai", "inspect-scout", "foreign"):
+                    (tools / name / "bin").mkdir(parents=True)
+                    (tools / name / "bin/scout").write_text("fixture")
+                alias = binary / "scout"
+                if case == "previous owner":
+                    alias.symlink_to(tools / "inspect-ai/bin/scout")
+                elif case == "current owner":
+                    alias.symlink_to(tools / "inspect-scout/bin/scout")
+                elif case == "foreign file":
+                    alias.write_text("foreign bytes")
+                elif case in ("foreign link", "dangling"):
+                    alias.symlink_to(tools / "foreign/bin/scout" if case == "foreign link" else root / "missing/scout")
+                before = alias.lstat() if alias.is_symlink() or alias.exists() else None
+                target = os.readlink(alias) if alias.is_symlink() else None
+                calls = root / "install-called"
+                uv = binary / "uv"
+                uv.write_text("#!/bin/sh\nif [ \"$*\" = 'tool dir --bin' ]; then printf '%s\\n' \"$FIXTURE_BIN\"; "
+                              "elif [ \"$*\" = 'tool dir' ]; then printf '%s\\n' \"$FIXTURE_TOOLS\"; "
+                              "else : > \"$FIXTURE_CALLED\"; fi\n")
+                uv.chmod(0o755)
+                env = {"PATH": str(binary) + os.pathsep + os.environ["PATH"], "TMPDIR": str(root),
+                       "tool_root": str(root / "tools"), "FIXTURE_BIN": str(binary),
+                       "FIXTURE_TOOLS": str(tools), "FIXTURE_CALLED": str(calls)}
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                        env=env, capture_output=True, text=True, timeout=10)
+                allowed = case in ("absent", "previous owner", "current owner")
+                self.assertEqual(result.returncode == 0, allowed, result.stderr)
+                self.assertEqual(calls.exists(), allowed)
+                if before is not None:
+                    after = alias.lstat()
+                    self.assertEqual((after.st_ino, after.st_mtime_ns, after.st_mode),
+                                     (before.st_ino, before.st_mtime_ns, before.st_mode))
+                    if target is not None:
+                        self.assertEqual(os.readlink(alias), target)
+                    else:
+                        self.assertEqual(alias.read_text(), "foreign bytes")
+
+    def test_research_post_install_binds_landed_model_metadata_without_relaxing_keyless_gates(self):
+        import copy
+        command = self.row("research-harnesses")["acceptance"]["post_install"]["command"]
+        program = command.split("<<'PY'\n", 1)[1].split("\nPY", 1)[0]
+        active = {"models": [{"name": "gpt-runtime", "use": "langchain_openai:ChatOpenAI",
+                              "model": "cx/gpt-6.1-sol-max", "base_url": "http://127.0.0.1:21128/v1",
+                              "supports_reasoning_effort": False}],
+                  "tools": [{"name": "web_search", "use": "deerflow.community.ddg_search.tools:web_search_tool"}]}
+        cases = [("landed metadata", active, True)]
+        for field, value in (("model", "cx/gpt-6.1-sol"), ("base_url", "http://127.0.0.1:1/v1"),
+                             ("supports_reasoning_effort", True), ("reasoning_effort", "xhigh")):
+            wrong = copy.deepcopy(active)
+            wrong["models"][0][field] = value
+            cases.append((field, wrong, False))
+        wrong = copy.deepcopy(active)
+        wrong["tools"][0]["use"] = "deerflow.community.tavily.tools:web_search_tool"
+        cases.append(("provider custody", wrong, False))
+        for name, config, expected in cases:
+            with self.subTest(name=name):
+                driver = '''import json,sys,types,os
+data=json.loads(sys.argv[1])
+client=types.ModuleType("deerflow.client")
+class Client:
+ def __init__(self,**kwargs): assert kwargs['config_path']==os.environ['DEER_FLOW_CONFIG_PATH']
+ def list_models(self): return {'models':[{'name':'gpt-runtime'}]}
+client.DeerFlowClient=Client
+app=types.ModuleType("deerflow.config.app_config")
+class Config:
+ def model_dump(self): return data
+app.get_app_config=lambda:Config()
+sys.modules['deerflow.client']=client
+sys.modules['deerflow.config.app_config']=app
+exec(sys.stdin.read())
+'''
+                result = subprocess.run([sys.executable, "-c", driver, json.dumps(config)], input=program,
+                                        env={"PATH": os.environ["PATH"], "DEER_FLOW_CONFIG_PATH": "fixture-public.yaml"},
+                                        capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode == 0, expected, result.stderr)
+
+    def capture_claude(self, slot):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            binary = root / "claude"
+            binary.write_text(
+                "#!/usr/bin/env python3\nimport fcntl,json,os,sys\n"
+                "assert os.environ.get('CLAUDE_CODE_DISABLE_BACKGROUND_TASKS') == '1'\n"
+                "with open(os.environ['NATIVE_STACK_CLAUDE_SESSION_LOCK'], 'a') as lock:\n"
+                " try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)\n"
+                " except BlockingIOError: pass\n"
+                " else: raise AssertionError('Fresh Claude command ran without the shared lock')\n"
+                "print(json.dumps(sys.argv[1:]), file=sys.stderr)\nsys.exit(42)\n")
+            binary.chmod(0o755)
+            env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                   "plan_dir": str(PLAN), "repo_root": str(ROOT), "XDG_STATE_HOME": str(root / "state"),
+                   "NATIVE_STACK_CLAUDE_SESSION_LOCK": str(root / "fixture-claude-session.lock")}
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c",
+                                     self.row(slot)["acceptance"]["after_sign_in"]["command"]],
+                                    env=env, capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 42, result.stderr)
+            # The program redirects the native stream into its private run directory.
+            stderr = next((root / "state").rglob("claude.stderr")).read_text()
+            return json.loads(stderr)
+
+    def test_deer_flow_synthetic_stream_oracle_and_cold_native_argv(self):
+        import copy
+        # Synthetic records of bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:
+        # client.py:491-538,1191-1223; tui/cli.py:274-285; ddg_search/tools.py:190-191.
+        # Local integration tests: no provider call or upstream acceptance.
+        url = "https://example.org/fixture-source"
+        final = f"Supported fixture answer [source]({url}).\n"
+        baseline = [
+            {"type": "messages-tuple", "data": {"type": "ai", "id": "planner",
+             "content": "Planner draft https://example.org/planner-only\n"}},
+            {"type": "messages-tuple", "data": {"type": "ai", "id": "search",
+             "content": "", "tool_calls": [{"id": "search-1", "name": "web_search", "args": {"query": "fixture"}}]}},
+            {"type": "messages-tuple", "data": {"type": "tool", "id": "result",
+             "name": "web_search", "tool_call_id": "search-1", "content": json.dumps([
+                 {"title": "Fixture source", "url": url, "snippet": "Substantive public source content for this fixture."}])}},
+            {"type": "messages-tuple", "data": {"type": "ai", "id": "final", "content": "Supported fixture answer [source]("}},
+            {"type": "messages-tuple", "data": {"type": "ai", "id": "final", "content": f"{url}).\n"}},
+            {"type": "messages-tuple", "data": {"type": "ai", "id": "empty-tail", "content": ""}},
+            {"type": "end", "data": {"usage": {"input_tokens": 12, "output_tokens": 5, "total_tokens": 17}}},
+        ]
+        cases = ("valid", "missing_end", "unmatched_id", "wrong_tool", "error_only",
+                 "short_result", "foreign_citation", "zero_usage", "string_usage",
+                 "bool_usage", "duplicate_end", "empty_complete", "empty_native_failure",
+                 "empty_unmatched", "empty_wrong_query", "native_failure_with_results", "malformed_stream",
+                 "malformed_data", "malformed_call", "malformed_result", "malformed_end")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                events = copy.deepcopy(baseline)
+                native_rc = 75 if case in ("empty_native_failure", "native_failure_with_results") else 0
+                if case == "missing_end":
+                    events.pop()
+                elif case == "unmatched_id":
+                    events[2]["data"]["tool_call_id"] = "unrelated-call"
+                elif case == "wrong_tool":
+                    events[1]["data"]["tool_calls"][0]["name"] = "read_file"
+                elif case == "error_only":
+                    events[2]["data"]["content"] = json.dumps({"error": "Fixture search provider failed", "url": url})
+                elif case == "short_result":
+                    events[2]["data"]["content"] = json.dumps([
+                        {"title": "Fixture source", "url": url, "snippet": "Too short"}])
+                elif case == "foreign_citation":
+                    events[0]["data"]["content"] = f"Intermediate planner cited {url}\n"
+                    events[4]["data"]["content"] = "https://example.org/unreturned-source).\n"
+                elif case in ("zero_usage", "string_usage", "bool_usage"):
+                    events[-1]["data"]["usage"]["total_tokens"] = {"zero_usage": 0, "string_usage": "17", "bool_usage": True}[case]
+                elif case == "duplicate_end":
+                    events.append(copy.deepcopy(events[-1]))
+                if case == "malformed_data":
+                    events[2]["data"] = ["not a native message object"]
+                elif case == "malformed_call":
+                    events[1]["data"]["tool_calls"] = [{"name": "web_search", "args": {"query": "fixture"}}]
+                elif case == "malformed_result":
+                    events[2]["data"]["content"] = json.dumps([{"title": 42, "url": url, "snippet": None}])
+                elif case == "malformed_end":
+                    events[-1]["data"] = ["not a native end object"]
+                if case.startswith("empty_"):
+                    events[2]["data"]["content"] = json.dumps({"error": "No results found", "query": "fixture"})
+                    if case == "empty_native_failure":
+                        events.pop()
+                    elif case == "empty_unmatched":
+                        events[2]["data"]["tool_call_id"] = "unrelated-call"
+                    elif case == "empty_wrong_query":
+                        events[2]["data"]["content"] = json.dumps({"error": "No results found", "query": "another query"})
+                tool_root = root / "data/new-wsl-native-stack/tools"
+                native = tool_root / "deer-flow/backend/.venv/bin/deerflow"
+                native.parent.mkdir(parents=True)
+                config = root / "config with spaces.yaml"
+                # Same ModuleType/exec(stdin) seam as the adjacent metadata fixture.
+                # CPython 3.13 json docs: default JSON is a YAML 1.0/1.1/1.2 subset.
+                # This synthetic codec tests the unchanged header mutation, not PyYAML.
+                reader = native.with_name("python")
+                reader.write_text(
+                    f"#!{sys.executable}\n"
+                    "import json, sys, types\n"
+                    "assert sys.argv[1] == '-'\n"
+                    "sys.argv = sys.argv[1:]\n"
+                    "yaml = types.ModuleType('yaml')\n"
+                    "yaml.safe_load = json.loads\n"
+                    "yaml.safe_dump = json.dumps\n"
+                    "sys.modules['yaml'] = yaml\n"
+                    "exec(sys.stdin.read())\n")
+                reader.chmod(0o755)
+                config.write_text(json.dumps({"models": [{"name": "gpt-runtime",
+                    "model": "cx/gpt-6.1-sol", "reasoning_effort": "xhigh",
+                    "base_url": "http://127.0.0.1:21128/v1", "fixture_option": "preserved"}]}))
+                temporary = root / "tmp"
+                temporary.mkdir()
+                native_record = root / "native.json"
+                carrier = root / "unused-fixture-carrier.py"
+                carrier.write_text("raise SystemExit('Keyless route must not invoke a credential carrier')\n")
+                native.write_text(
+                    "#!/usr/bin/env python3\nimport json, os, sys\nfrom pathlib import Path\n"
+                    "keys = ['HOME', 'TMPDIR', 'DEER_FLOW_PROJECT_ROOT', 'DEER_FLOW_HOME', 'DEER_FLOW_CONFIG_PATH']\n"
+                    "record = {'argv': sys.argv[1:], 'cwd': os.getcwd(), "
+                    "'environment': {k: os.environ.get(k) for k in keys}, "
+                    "'names': sorted(os.environ), "
+                    "'jina_empty': os.environ.get('JINA_API_KEY') == '', "
+                    "'tavily_empty': os.environ.get('TAVILY_API_KEY') == ''}\n"
+                    f"Path({str(native_record)!r}).write_text(json.dumps(record))\n"
+                    f"events = {events!r}\n"
+                    "for event in events:\n    print(json.dumps(event))\n"
+                    + ("print('malformed synthetic line')\n" if case == "malformed_stream" else "")
+                    + f"raise SystemExit({native_rc})\n")
+                native.chmod(0o755)
+                query = "public fixture query 'with spaces'"
+                env = {"PATH": os.environ["PATH"], "HOME": str(root / "inherited-home"), "LANG": "C.UTF-8",
+                       "XDG_DATA_HOME": str(root / "data"), "XDG_STATE_HOME": str(root / "state"),
+                       "XDG_CONFIG_HOME": str(root / "config"), "TMPDIR": str(temporary),
+                       "DEER_FLOW_CONFIG_PATH": str(config), "NATIVE_STACK_CREDENTIAL_RUNNER": str(carrier),
+                       "FIXTURE_PARENT_SENTINEL": "must-be-dropped", "JINA_API_KEY": "synthetic-unused",
+                       "TAVILY_API_KEY": "synthetic-inherited-unused"}
+                result = subprocess.run(["bash", str(PLAN / "config/deer-flow-research.sh"), query],
+                                        env=env, capture_output=True, text=True, timeout=20)
+                expected_rc = 0 if case == "valid" else native_rc or 1
+                self.assertEqual(result.returncode, expected_rc, result.stderr)
+                runs = list((root / "state/native-agent-stack/research/deer-flow").glob("run.*"))
+                self.assertEqual(len(runs), 1)
+                run = runs[0]
+                seen = json.loads(native_record.read_text())
+                self.assertEqual(seen["argv"], ["--recursion-limit", "100", "--json", query])
+                self.assertEqual(Path(seen["cwd"]), run.resolve())
+                self.assertEqual(seen["environment"], {
+                    "HOME": str(run / "home"), "TMPDIR": str(temporary),
+                    "DEER_FLOW_PROJECT_ROOT": str(tool_root / "deer-flow"),
+                    "DEER_FLOW_HOME": str(run / "state"), "DEER_FLOW_CONFIG_PATH": str(run / "config.yaml")})
+                observed = json.loads((run / "config.yaml").read_text())["models"][0]
+                self.assertEqual(observed["default_headers"],
+                                 {"x-omniroute-session-id": "deerflow-" + run.name})
+                self.assertEqual(observed["model"], "cx/gpt-6.1-sol")
+                self.assertEqual(observed["reasoning_effort"], "xhigh")
+                self.assertEqual(observed["fixture_option"], "preserved")
+                self.assertNotIn("default_headers", json.loads(config.read_text())["models"][0])
+                self.assertTrue(seen["jina_empty"])
+                self.assertTrue(seen["tavily_empty"])
+                self.assertTrue({"FIXTURE_PARENT_SENTINEL", "NATIVE_STACK_CREDENTIAL_RUNNER",
+                                 "XDG_STATE_HOME"}.isdisjoint(seen["names"]))
+                raw = (run / "events.jsonl").read_text().splitlines()
+                self.assertEqual([json.loads(line) for line in raw if line.startswith("{")], events)
+                self.assertTrue((run / "answer.md").is_file())
+                proof = json.loads((run / "integration-check.json").read_text())
+                self.assertEqual(proof["native_exit_code"], native_rc)
+                self.assertEqual(proof["integration_exit_code"], expected_rc)
+                self.assertEqual(proof["acceptance_status"], "passed" if case == "valid" else "failed")
+                expected_empty = 1 if case in ("empty_complete", "empty_native_failure") else 0
+                self.assertEqual(proof["matched_provider_empty_results"], expected_empty)
+                if expected_empty:
+                    self.assertEqual(proof["provider_status"], "empty_results")
+                    self.assertEqual(proof["matched_search_failures"], 0)
+                self.assertEqual(proof["answer_status"], "final_cited" if case == "valid" else "unqualified_last_text")
+                if case in ("missing_end", "empty_native_failure", "duplicate_end", "malformed_end"):
+                    self.assertIsNone(proof["native_end_usage"])
+                if native_rc:
+                    self.assertEqual(proof["gatherer_status"], "native_failed")
+                    self.assertIn("native_cli_failed", proof["failure_reasons"])
+                if case == "empty_complete":
+                    self.assertEqual(proof["gatherer_status"], "complete")
+                    self.assertEqual(proof["native_end_usage"], baseline[-1]["data"]["usage"])
+                if case.startswith("malformed_"):
+                    self.assertEqual(proof["malformed_event_lines"], 1)
+                    self.assertEqual(proof["gatherer_status"], "stream_invalid")
+                if case == "valid":
+                    self.assertEqual((run / "answer.md").read_text(), final)
+                    self.assertIn(final, result.stdout)
+                    self.assertNotIn("planner-only", result.stdout)
+                    self.assertEqual(proof["matched_search_successes"], 1)
+                    self.assertEqual(proof["matched_search_failures"], 0)
+                    self.assertEqual(proof["final_answer_citations_in_results"], 1)
+                    self.assertEqual(proof["native_end_usage"], baseline[-1]["data"]["usage"])
+                else:
+                    self.assertIn("Native DeerFlow acceptance failed", result.stderr)
+
+    def test_original_fresh_recipes_reject_incomplete_foreground_shell_results(self):
+        import ast
+        import copy
+        rows = {slot: self.row(slot)["acceptance"]["after_sign_in"]["command"]
+                for slot in ("worktrunk", "difftastic", "mcp-inspector", "cross-family-review")}
+        helper = (PLAN / "config/srt-client-accept.sh").read_text()
+        rows["sandbox-runtime-srt"] = helper
+        for slot, command in rows.items():
+            start = command.index("def completed_foreground_shell_calls(events):")
+            rest = command[start:]
+            end = next((m.start() for m in re.finditer(r"(?m)^(?!def completed_foreground_shell_calls)(?:def |events =|c, g =)", rest)), len(rest))
+            function = ast.parse(rest[:end]).body[0]
+            namespace = {}
+            exec(compile(ast.Module(body=[function], type_ignores=[]), "<synthetic foreground oracle>", "exec"), namespace)
+            baseline = [
+                {"type": "assistant", "message": {"content": [
+                    {"type": "tool_use", "id": "call", "name": "Bash",
+                     "input": {"command": "public fixture command", "run_in_background": False}}]}},
+                {"type": "user", "message": {"content": [
+                    {"type": "tool_result", "tool_use_id": "call", "content": "Completed fixture output\n"}]}},
+            ]
+            for case in ("valid", "requested_background", "automatic_background", "timeout",
+                         "tool_error", "unlinked", "missing", "empty", "soft_exit",
+                         "automatic_timeout", "manual_background", "message_background"):
+                with self.subTest(slot=slot, case=case):
+                    events = copy.deepcopy(baseline)
+                    if case == "requested_background":
+                        events[0]["message"]["content"][0]["input"]["run_in_background"] = True
+                    elif case == "automatic_background":
+                        events[1]["message"]["content"][0]["content"] += "Command running in background with ID: fixture\n"
+                    elif case in ("automatic_timeout", "manual_background", "message_background"):
+                        header = {"automatic_timeout": "Command did not complete within its 10s timeout and was moved to the background (ID: fixture).",
+                                  "manual_background": "Command was manually backgrounded by user with ID: fixture",
+                                  "message_background": "Command was moved to the background (ID: fixture)."}[case]
+                        events[1]["message"]["content"][0]["content"] += header + "\n"
+                    elif case == "timeout":
+                        events[1]["message"]["content"][0]["content"] += "_(timed out after 1000 ms)_\n"
+                    elif case == "tool_error":
+                        events[1]["message"]["content"][0]["is_error"] = True
+                    elif case == "unlinked":
+                        events[1]["message"]["content"][0]["tool_use_id"] = "another-call"
+                    elif case == "missing":
+                        events.pop()
+                    elif case == "empty":
+                        events[1]["message"]["content"][0]["content"] = ""
+                    elif case == "soft_exit":
+                        events[1]["message"]["content"][0]["content"] = "Prepared only\nExit code: 1\n"
+                    # Metadata is not a tool event; exercise every failure gate with it present.
+                    events[:0] = [{"type": "system", "subtype": "permission_denied", "message": value}
+                                  for value in ("Native notice", None, [], 1, True)]
+                    self.assertEqual(namespace["completed_foreground_shell_calls"](events),
+                                     {"call"} if case in ("valid", "empty") else set())
+            # A quoted marker in source text is not a native partial-output header.
+            baseline[1]["message"]["content"][0]["content"] = '+    markers = ("Exit code:",)\n'
+            self.assertEqual(namespace["completed_foreground_shell_calls"](baseline), {"call"})
+
+    def test_research_completion_includes_final_recipe_assertions(self):
+        import ast
+        import shlex
+        program = self.row("research-harnesses")["acceptance"]["after_sign_in"]["command"]
+        block = next(b for b in re.findall(r"<<'PY'\n(.*?)\nPY", program, re.S)
+                     if "def native_commands" in b)
+        nodes = []
+        for node in ast.parse(block).body:
+            if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Tuple):
+                break  # Artifact checks have their own independently constructed fixtures.
+            if not isinstance(node, (ast.Import, ast.ImportFrom)):
+                nodes.append(node)
+        expected = [
+            f"bash '{ROOT / 'tools/research/gpt_researcher.sh'}' 'synthetic query'",
+            f"bash '{PLAN / 'config/deer-flow-research.sh'}' 'synthetic query'",
+        ]
+        markers = ["native-stage-complete:fixture:gptr", "native-stage-complete:fixture:deerflow"]
+        for client in ("claude", "codex"):
+            for case in ("valid", "native_polling", "in_progress_only", "mcp_timeout", "missing_gpt", "wrong_helper", "missing_marker"):
+                with self.subTest(client=client, case=case), tempfile.TemporaryDirectory() as directory:
+                    path = Path(directory) / "stream.jsonl"
+                    events = []
+                    for i, command in enumerate(expected):
+                        if case == "missing_gpt" and i == 0:
+                            continue
+                        if case == "wrong_helper" and i == 0:
+                            command = command.replace("gpt_researcher.sh", "gpt-researcher.sh")
+                        output = "" if case == "missing_marker" and i == 0 else markers[i] + "\n"
+                        if client == "claude":
+                            events.extend([
+                                {"type": "assistant", "message": {"content": [{
+                                    "type": "tool_use", "id": f"call-{i}", "name": "Bash",
+                                    "input": {"command": command}}]}},
+                                {"type": "user", "message": {"content": [{
+                                    "type": "tool_result", "tool_use_id": f"call-{i}",
+                                    "content": output, "is_error": False}]}},
+                            ])
+                        else:
+                            item = {"id": f"call-{i}", "type": "command_execution", "command": command,
+                                    "status": "completed", "exit_code": 0, "aggregated_output": output}
+                            if case in ("native_polling", "in_progress_only"):
+                                pending = {**item, "status": "in_progress", "exit_code": None,
+                                           "aggregated_output": ""}
+                                events.extend([{"type": "item.started", "item": pending},
+                                               {"type": "item.updated", "item": pending}])
+                                if case == "in_progress_only" and i == 0:
+                                    continue  # Later disk output cannot finish this native item.
+                            if case == "mcp_timeout" and i == 0:
+                                args = {"language": "shell", "code": command, "timeout": 600000}
+                                events.extend([
+                                    {"type": "item.started", "item": {"id": f"call-{i}", "type": "mcp_tool_call",
+                                     "server": "context-mode", "tool": "ctx_execute", "arguments": args}},
+                                    {"type": "item.completed", "item": {"id": f"call-{i}", "type": "mcp_tool_call",
+                                     "server": "context-mode", "tool": "ctx_execute", "arguments": args,
+                                     "status": "failed", "error": {"message": "timed out awaiting tools/call after 300s"}}}
+                                ])
+                            else:
+                                events.append({"type": "item.completed", "item": item})
+                    events.append({"type": "result", "subtype": "success", "is_error": False}
+                                  if client == "claude" else {"type": "turn.completed"})
+                    path.write_text("\n".join(json.dumps(e) for e in events))
+                    namespace = {"json": json, "shlex": shlex, "Path": Path, "re": re,
+                                 "sys": types.SimpleNamespace(argv=[
+                                     "fixture", directory, "unused-marker", str(path), client,
+                                     *expected, *markers])}
+                    code = compile(ast.Module(body=nodes, type_ignores=[]), "synthetic-complete-research-gate", "exec")
+                    valid = case in ("valid", "native_polling") or (client == "claude" and
+                                case in ("in_progress_only", "mcp_timeout"))
+                    if valid:
+                        exec(code, namespace)
+                    else:
+                        with self.assertRaisesRegex(AssertionError, "No completed native GPT Researcher call"):
+                            exec(code, namespace)
+
+
+    def test_research_native_transport_data_preserves_claude_prompt_and_commands(self):
+        import shlex
+        program = self.row("research-harnesses")["acceptance"]["after_sign_in"]["command"]
+        block = "  gpt_marker=" + program.split("  gpt_marker=", 1)[1].split(
+            '  if [[ "$client" == claude ]]; then', 1)[0]
+        legacy = ("Use native-stack-research to complete BOTH real gatherers using foreground shell calls "
+                  "with 1560000 ms timeouts, waiting for each to finish. Execute each supplied command once. "
+                  "If a call fails, inspect its retained receipt/stdout/stderr, report the actual failure and stop; "
+                  "do not retry or switch providers. Run these exact commands with their supplied keyless public "
+                  "config and isolated state. Inspect the retained call stdout/stderr in the supplied per-client "
+                  "state and both resulting reports; print their run directories. Preflight/import checks are insufficient.")
+        for client in ("claude", "codex"):
+            env = {k: os.environ[k] for k in ("PATH", "TMPDIR") if k in os.environ}
+            env.update(client=client, session="/synthetic/session", client_state="/synthetic/state",
+                       repo_root=str(ROOT), plan_dir=str(PLAN))
+            capture = block + "\n" + shlex.join([
+                sys.executable, "-c", "import json,sys;print(json.dumps(sys.argv[1:]))"
+            ]) + ' "$prompt" "$gpt_command" "$deer_command"'
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", capture],
+                                    env=env, capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            prompt, gpt_command, deer_command = json.loads(result.stdout)
+            prefix, commands = prompt.split("\n", 1)
+            self.assertEqual(commands, gpt_command + "\n" + deer_command)
+            self.assertIn("Execute each supplied command once.", prefix)
+            self.assertIn("do not retry or switch providers", prefix)
+            self.assertIn("keyless public config and isolated state", prefix)
+            if client == "claude":
+                self.assertEqual(prefix, legacy)
+            else:
+                self.assertIn("native exec_command with yield_time_ms=30000", prefix)
+                self.assertIn("write_stdin (empty chars, yield_time_ms=30000)", prefix)
+                self.assertIn("until its final exit", prefix)
+                self.assertIn("Do not run these long commands through an MCP tool", prefix)
+                self.assertNotIn("600000 ms", prefix)
+
+
+    def test_research_claude_queue_is_outside_execution_budget_and_background_is_disabled(self):
+        import shlex
+        program = self.row("research-harnesses")["acceptance"]["after_sign_in"]["command"]
+        line = next(x.strip() for x in program.splitlines() if "claude -p" in x)
+        launch = line.split("&& ", 1)[1].split(") >", 1)[0]
+        self.assertNotIn("timeout 3300 flock", launch)
+        with tempfile.TemporaryDirectory(prefix="ns-research-argv-") as temp:
+            root = Path(temp)
+            binaries = root / "bin"
+            binaries.mkdir()
+            fixture = ("#!"+sys.executable+"\n"
+                       "import json,os,sys\nfrom pathlib import Path\n"
+                       "name=Path(sys.argv[0]).name; args=sys.argv[1:]\n"
+                       "chain=json.loads(os.environ.get('FIXTURE_CHAIN','[]')); chain.append([name,*args])\n"
+                       "if name == 'claude':\n"
+                       " print(json.dumps({'chain':chain,'argv':args,'background':os.environ.get('CLAUDE_CODE_DISABLE_BACKGROUND_TASKS')}))\n"
+                       "else:\n"
+                       " os.environ['FIXTURE_CHAIN']=json.dumps(chain)\n"
+                       " command=args[3:] if name == 'flock' else args[1:]\n"
+                       " os.execvpe(command[0],command,os.environ)\n")
+            for name in ("flock", "timeout", "claude"):
+                path = binaries / name
+                path.write_text(fixture)
+                path.chmod(0o755)
+            lock = root / "private.lock"
+            env = {"PATH":str(binaries)+os.pathsep+os.environ["PATH"],
+                   "HOME":str(root), "NATIVE_STACK_CLAUDE_SESSION_LOCK":str(lock),
+                   "plan_dir":str(PLAN), "prompt":"frozen supplied commands"}
+            result = subprocess.run(["bash","-euo","pipefail","-c",launch],
+                                    env=env,text=True,capture_output=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr)
+            observed = json.loads(result.stdout)
+            queue, execution, client = observed["chain"]
+            self.assertEqual(queue[:4],["flock","-w","3600",str(lock)])
+            self.assertEqual(queue[4:6],["timeout","3300"])
+            self.assertEqual(execution[:4],["timeout","3300","env","CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1"])
+            self.assertEqual(client[0],"claude")
+            self.assertEqual(observed["background"],"1")
+            self.assertEqual(observed["argv"][0],"-p")
+            self.assertEqual(observed["argv"][observed["argv"].index("--max-turns")+1],"48")
+
+    def test_research_skill_uses_working_native_default_and_long_foreground_wait(self):
+        skill = (PLAN / "config/research-harnesses-skill.md").read_text()
+        self.assertNotIn("/absolute/path/",skill)
+        self.assertNotIn("DEER_FLOW_CONFIG_PATH=",skill)
+        self.assertNotIn("configuration supplied by the coordinator",skill)
+        self.assertNotIn("Tavily",skill)
+        self.assertIn("1500 seconds per call",skill)
+        self.assertIn("1560000 ms",skill)
+        self.assertIn("wait for its final exit",skill)
+        self.assertIn("two independent research outputs",skill)
+
+    def test_foreground_native_completion_rejects_background_and_partial_results(self):
+        import ast
+        import copy
+        import shlex
+        # Synthetic native records exercise the repository integration boundary.
+        # Codex rust-v0.160.0:exec_events.rs:161,286; context-mode@6f0cc684:
+        # src/server.ts:1844; src/exit-classify.ts:22. These are not upstream acceptance.
+        expected = "bash '/public/source.sh' 'query with spaces'"
+        for slot in ("agent-runtime-worker", "research-harnesses"):
+            program = self.row(slot)["acceptance"]["after_sign_in"]["command"]
+            block = next(b for b in re.findall(r"<<'PY'\n(.*?)\nPY", program, re.S)
+                         if "def native_commands" in b)
+            function = next(n for n in ast.parse(block).body if isinstance(n, ast.FunctionDef)
+                            and n.name == "native_commands")
+            namespace = {"json": json, "shlex": shlex, "Path": Path, "re": re}
+            exec(compile(ast.Module(body=[function], type_ignores=[]), "synthetic-native-oracle", "exec"), namespace)
+            oracle = namespace["native_commands"]
+            for client in ("claude", "codex"):
+                for route in ("shell", "mcp"):
+                    for case in ("valid", "background", "partial", "wrong_command", "tool_error", "native_failure", "soft_failure", "marker_echo_only", "automatic_timeout", "manual_background", "message_background"):
+                        with self.subTest(slot=slot, client=client, route=route, case=case), tempfile.TemporaryDirectory() as directory:
+                            args = {"language": "shell", "code": expected} if route == "mcp" else {"command": expected}
+                            if client == "claude":
+                                tool = {"type": "tool_use", "id": "call-1", "name": "mcp__context_mode__ctx_execute" if route == "mcp" else "Bash", "input": args}
+                                result = {"type": "tool_result", "tool_use_id": "call-1", "content": "Fixture operation completed", "is_error": False}
+                                events = [{"message": {"content": [tool]}}, {"message": {"content": [result]}},
+                                          {"type": "result", "subtype": "success", "is_error": False}]
+                                events[:0] = [{"type": "system", "subtype": "permission_denied",
+                                              "message": value}
+                                             for value in ("Native notice", None, [], 1, True)]
+                                if case == "background":
+                                    args["background" if route == "mcp" else "run_in_background"] = True
+                                elif case == "partial":
+                                    result["content"] = "_(process backgrounded after 30 seconds)_" if route == "mcp" else "Command running in background with ID: fixture"
+                                elif case == "tool_error":
+                                    result["is_error"] = True
+                                elif case == "native_failure":
+                                    events[-1]["is_error"] = True
+                            else:
+                                if route == "mcp":
+                                    initial = {"id": "call-1", "type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_execute", "arguments": args}
+                                    result = {"isError": False, "content": [{"type": "text", "text": "Fixture operation completed"}]}
+                                    item = {**initial, "status": "completed", "result": result}
+                                    events = [{"type": "item.started", "item": copy.deepcopy(initial)}, {"type": "item.completed", "item": item}, {"type": "turn.completed"}]
+                                    if case == "background":
+                                        args["background"] = True
+                                        events[0]["item"]["arguments"]["background"] = True
+                                    elif case == "partial":
+                                        result["content"][0]["text"] = "_(timed out after 30 seconds)_"
+                                    elif case == "tool_error":
+                                        result["isError"] = True
+                                else:
+                                    item = {"type": "command_execution", "command": expected, "status": "completed", "exit_code": 0, "aggregated_output": "Fixture operation completed"}
+                                    args = item
+                                    events = [{"type": "item.completed", "item": item}, {"type": "turn.completed"}]
+                                    if case in ("background", "partial"):
+                                        item["status"] = "in_progress"
+                                    elif case == "tool_error":
+                                        item["exit_code"] = 1
+                                if case == "native_failure":
+                                    events[-1]["type"] = "turn.failed"
+                            if case == "wrong_command":
+                                args["code" if route == "mcp" else "command"] = expected.replace("source.sh", "unrelated.sh")
+                            if case in ("automatic_timeout", "manual_background", "message_background"):
+                                header = {"automatic_timeout": "Command did not complete within its 10s timeout and was moved to the background (ID: fixture).",
+                                          "manual_background": "Command was manually backgrounded by user with ID: fixture",
+                                          "message_background": "Command was moved to the background (ID: fixture)."}[case]
+                                text = "Fixture operation completed\n" + header
+                                if client == "claude":
+                                    result["content"] = text
+                                elif route == "mcp":
+                                    result["content"][0]["text"] = text
+                                else:
+                                    item["aggregated_output"] = text
+                            if case in ("soft_failure", "marker_echo_only"):
+                                text = "Prepared only" if case == "soft_failure" else "```shell\nprintf '%s\\n' 'Fixture operation completed'\n```\nPrepared only"
+                                if client == "claude":
+                                    result["content"] = text
+                                elif route == "mcp":
+                                    result["content"][0]["text"] = text
+                                else:
+                                    item["aggregated_output"] = text
+                            path = Path(directory) / "native.jsonl"
+                            path.write_text("\n".join(json.dumps(e) for e in events) + "\n")
+                            if case == "native_failure":
+                                with self.assertRaises(AssertionError):
+                                    oracle(path, client, [expected], ["Fixture operation completed"])
+                            else:
+                                self.assertEqual(oracle(path, client, [expected], ["Fixture operation completed"]), [expected] if case == "valid" else [])
+
+    def test_worker_recipe_keeps_bus_bindings_in_an_empty_environment(self):
+        # A local systemd stand-in tests native argument and public bus-binding custody.
+        # systemd@v259.5:src/shared/bus-util.c:273-300,510-540; no output wrapper is required.
+        line = next(l for l in self.row("agent-runtime-worker")["acceptance"]["after_sign_in"]["command"].splitlines()
+                    if l.startswith("  printf -v worker_command "))
+        with tempfile.TemporaryDirectory(prefix="worker recipe ") as directory:
+            root = Path(directory)
+            cfg, state, run, binaries = [root / p for p in ("config space", "state space", "run space", "bin")]
+            for path in (cfg, state, run / "tmp", binaries):
+                path.mkdir(parents=True)
+            worker = cfg / "worker.py"
+            worker.write_text(
+                "import json, sys\nfrom pathlib import Path\n"
+                "assert sys.argv[1:] == ['--prepare', 'fixture-job']\n"
+                f"p=Path({str(state / 'fixture-job')!r}); (p/'workspace').mkdir(parents=True)\n"
+                "(p/'run-report.json').write_text(json.dumps({'success':True,'requests_to_model':2}))\n"
+                "(p/'workspace/result.txt').write_text('55\\n')\n")
+            bus = binaries / "systemctl"
+            bus.write_text(
+                f"#!{sys.executable}\nimport os, sys\n"
+                "assert sys.argv[1:] == ['--user','start','--wait','openhands-job@fixture-job.service']\n"
+                f"assert os.environ['XDG_RUNTIME_DIR'] == {str(root / 'runtime space')!r}\n"
+                f"assert os.environ['DBUS_SESSION_BUS_ADDRESS'] == {'unix:path='+str(root / 'runtime space/bus')!r}\n"
+                f"assert os.environ['TMPDIR'] == {str(run / 'tmp')!r}\n")
+            bus.chmod(0o755)
+            environment = {"PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                           "cfg": str(cfg), "worker_state": str(state), "run": str(run), "id": "fixture-job",
+                           "XDG_RUNTIME_DIR": str(root / "runtime space"),
+                           "DBUS_SESSION_BUS_ADDRESS": "unix:path=" + str(root / "runtime space/bus")}
+            command = subprocess.run(["bash", "-euo", "pipefail", "-c", line + '\nprintf "%s" "$worker_command"'],
+                                     env=environment, capture_output=True, text=True, check=True).stdout
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                    env={"PATH": environment["PATH"]}, capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("Completed worker job: 55; positive model responses: 2", result.stdout)
+
+    def test_variadic_tool_values_do_not_consume_the_prompt(self):
+        for slot in ("difftastic", "worktrunk"):
+            with self.subTest(slot=slot):
+                argv = self.capture_claude(slot)
+                prompt = next(a for a in argv if "Use your shell tool" in a)
+                self.assertLess(argv.index(prompt), argv.index("--allowedTools"))
+
+    def test_alert_closed_port_requires_failed_connect_and_no_listener(self):
+        from unittest.mock import patch
+        command = self.row("alerting")["acceptance"]["after_sign_in"]["command"]
+        start = command.index("import socket\nimport subprocess\n")
+        check = command[start:command.index("\nPY", start)]
+        # Execute the actual plan predicate. Errno alone cannot prove no listener.
+        for errno, listener, ss_failed in ((111, "", False), (11, "", False),
+                                           (0, "", False), (111, "LISTEN fixture\n", False),
+                                           (11, "", True)):
+            with self.subTest(errno=errno, listener=bool(listener), ss_failed=ss_failed):
+                with patch("socket.socket") as sock, patch("subprocess.run") as ss:
+                    sock.return_value.__enter__.return_value.connect_ex.return_value = errno
+                    ss.return_value.stdout = listener
+                    if ss_failed:
+                        ss.side_effect = subprocess.CalledProcessError(1, "ss")
+                    if errno != 0 and not listener and not ss_failed:
+                        exec(compile(check, "<actual-alert-closed-port-predicate>", "exec"), {})
+                        ss.assert_called_once_with(["ss", "-ltnH", "sport = :21997"],
+                                                   check=True, capture_output=True, text=True)
+                    else:
+                        with self.assertRaises((AssertionError, subprocess.CalledProcessError)):
+                            exec(compile(check, "<actual-alert-closed-port-predicate>", "exec"), {})
+
+    def test_fresh_sessions_use_bounded_native_cli_and_keep_context(self):
+        for slot in ("difftastic", "worktrunk"):
+            with self.subTest(slot=slot):
+                argv = self.capture_claude(slot)
+                self.assertEqual(argv[0], "-p")
+                self.assertIn("Use your shell tool", argv[1])
+                self.assertEqual(argv[argv.index("--max-turns") + 1], "48")
+                instruction_file = Path(argv[argv.index("--append-system-prompt-file") + 1])
+                self.assertEqual(instruction_file, PLAN / "config/acceptance-execution-instructions.txt")
+                self.assertIn("supplied execution or review", instruction_file.read_text())
+                self.assertIn("Do not request background execution", instruction_file.read_text())
+                self.assertNotIn("--bare", argv)
+                self.assertNotIn("--disable-slash-commands", argv)
+
+    def test_every_fresh_claude_command_uses_the_shared_lock(self):
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        callers = {r["slot"]: a.get("command") or "" for r in plan["owners"]
+                   for a in r["acceptance"].values() if isinstance(a, dict)
+                   and "claude -p" in (a.get("command") or "")}
+        callers["sandbox-runtime-srt"] = (PLAN / "config/srt-client-accept.sh").read_text()
+        self.assertEqual(len(callers), 13)
+        for slot, command in callers.items():
+            with self.subTest(slot=slot):
+                if slot == "cross-family-review":
+                    line = next(line for line in command.splitlines()
+                                if 'flock -w 3600' in line and '"${claude_review_argv[@]}"' in line)
+                    self.assertIn("claude_review_argv=(claude -p ", command)
+                else:
+                    line = next(line for line in command.splitlines() if "claude -p" in line)
+                    self.assertIn("flock -w 3600", line[:line.index("claude -p")])
+                self.assertIn("native-agent-stack/coordination/ns2604-coop/claude-session.lock", line)
+
+
+    def test_cross_review_binds_actual_argv_to_native_session_metadata(self):
+        import copy
+        import uuid
+        command = self.row("cross-family-review")["acceptance"]["after_sign_in"]["command"]
+        proof = command.split("<<'BINDING'\n", 1)[1].split("\nBINDING\n", 1)[0]
+        self.assertEqual(command.count("timeout --kill-after=15s 1200s"), 2)
+        self.assertIn('"${gpt_review_argv[@]}" < /dev/null', command)
+        self.assertIn('"${claude_review_argv[@]}" < "$run_dir/gpt-authored.diff"', command)
+        self.assertNotIn("Deliver the review in this session as the requested structured object:", command)
+        thread = str(uuid.UUID(int=1))
+        gpt = ["codex", "exec", "-m", "gpt-6.1-sol", "-c", 'review_model="gpt-6.1-sol"', "-c", 'model_reasoning_effort="max"',
+               "review", "Review read-only immutable Claude-authored commit synthetic-fixture"]
+        claude = ["claude", "-p", "Frozen fixture review", "--model", "opus", "--effort", "max", "--max-turns", "48", "--tools", "Read,Glob,Grep",
+                  "--disallowedTools", "Workflow,Agent,mcp__*", "--permission-mode", "dontAsk"]
+        cases = ("valid", "gpt_model", "gpt_effort", "claude_model", "claude_effort", "claude_turns",
+                 "claude_plan", "missing_tools", "expanded_tools", "missing_mcp_denial", "duplicate_tools",
+                 "changed_target", "commit_target", "ephemeral", "duplicate_model",
+                 "missing_thread", "invalid_thread", "missing_rollout", "metadata_model",
+                 "metadata_effort", "missing_context", "missing_claude_init", "missing_child", "wrong_parent", "wrong_source", "ambiguous_child")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                ga, ca = copy.deepcopy(gpt), copy.deepcopy(claude)
+                context = {"type": "turn_context", "payload": {"model": "gpt-6.1-sol", "effort": "max"}}
+                if case == "gpt_model":
+                    ga[ga.index("-m") + 1] = "different-model"
+                elif case == "gpt_effort":
+                    ga[ga.index('model_reasoning_effort="max"')] = 'model_reasoning_effort="high"'
+                elif case == "claude_model":
+                    ca[ca.index("--model") + 1] = "sonnet"
+                elif case == "claude_effort":
+                    ca[ca.index("--effort") + 1] = "high"
+                elif case == "claude_turns":
+                    ca[ca.index("--max-turns") + 1] = "4"
+                elif case == "claude_plan":
+                    ca[ca.index("--permission-mode") + 1] = "plan"
+                elif case == "missing_tools":
+                    index = ca.index("--tools")
+                    del ca[index:index + 2]
+                elif case == "expanded_tools":
+                    ca[ca.index("--tools") + 1] = "Read,Glob,Grep,Bash,EnterPlanMode"
+                elif case == "missing_mcp_denial":
+                    ca[ca.index("--disallowedTools") + 1] = "Workflow,Agent"
+                elif case == "duplicate_tools":
+                    ca.extend(["--tools", "Bash"])
+                elif case == "changed_target":
+                    ga[-1] = "Unbound mutable repository review"
+                elif case in ("commit_target", "ephemeral", "duplicate_model"):
+                    inserted = {"commit_target": ["--commit", "synthetic-sha"], "ephemeral": ["--ephemeral"],
+                                "duplicate_model": ["-m", "different-model"]}[case]
+                    ga[2:2] = inserted
+                elif case == "metadata_model":
+                    context["payload"]["model"] = "different-model"
+                elif case == "metadata_effort":
+                    context["payload"]["effort"] = "high"
+                (root / "gpt-review.argv.json").write_text(json.dumps(ga))
+                (root / "claude-review.argv.json").write_text(json.dumps(ca))
+                events = [] if case == "missing_thread" else [
+                    {"type": "thread.started", "thread_id": "invalid" if case == "invalid_thread" else thread}]
+                (root / "gpt-review.jsonl").write_text("\n".join(json.dumps(event) for event in events))
+                initial = [] if case == "missing_claude_init" else [
+                    {"type": "system", "subtype": "init", "model": "claude-opus-5-5"}]
+                (root / "claude-review.jsonl").write_text("\n".join(json.dumps(event) for event in initial))
+                native = root / "codex" / "sessions" / "2026" / "10" / "05"
+                native.mkdir(parents=True)
+                rollout = native / ("rollout-synthetic-" + thread + ".jsonl")
+                parent = {"type": "session_meta", "payload": {"id": thread, "cli_version": "0.160.0", "model_provider": "fixture"}}
+                metadata = [{"type": "session_meta", "payload": {"cli_version": "0.160.0", "model_provider": "fixture",
+                             "parent_thread_id": thread, "source": {"subagent": "review"}}}]
+                if case == "wrong_parent":
+                    metadata[0]["payload"]["parent_thread_id"] = str(uuid.UUID(int=3))
+                elif case == "wrong_source":
+                    metadata[0]["payload"]["source"] = {"subagent": "compact"}
+                if case != "missing_context":
+                    metadata.append(context)
+                if case != "missing_rollout":
+                    rollout.write_text(json.dumps(parent))
+                    if case != "missing_child":
+                        child = native / ("rollout-synthetic-" + str(uuid.UUID(int=2)) + ".jsonl")
+                        child.write_text("\n".join(json.dumps(event) for event in metadata))
+                    if case == "ambiguous_child":
+                        extra = native / ("rollout-synthetic-" + str(uuid.UUID(int=4)) + ".jsonl")
+                        extra.write_text("\n".join(json.dumps(event) for event in metadata))
+                checked = subprocess.run([sys.executable, "-c", proof, str(root)],
+                                         env={**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                                              "CODEX_HOME": str(root / "codex")},
+                                         capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
+                if case == "valid":
+                    bound = json.loads((root / "review-binding.json").read_text())
+                    self.assertEqual(bound["gpt"]["target_type"], "custom")
+                    self.assertEqual(bound["gpt"]["native_turn_contexts"], [context["payload"]])
+                    self.assertIsNone(bound["claude"]["effort_from_native_init"])
+                    self.assertIn("independent owner observation", bound["gateway_wire_model_effort"])
+                    self.assertEqual(bound["observation_deadline_seconds"]["sequential_total"], 2400)
+
+    def test_ollama_health_loads_once_before_exact_positive_gpu_residency(self):
+        command = self.row("local-model-server")["acceptance"]["service_health"]["command"]
+        canonical = "qwen3-embedding-8k:latest"
+        healthy_model = {"name": canonical, "model": canonical, "size": 4096, "size_vram": 4096}
+        cases = ("valid", "disabled", "inactive", "embed_http_error", "empty_vector", "wrong_embedder",
+                 "ps_http_error", "missing_model", "other_model_gpu", "wrong_tag", "name_model_mismatch",
+                 "cpu", "partial_gpu", "zero_sizes", "missing_sizes", "string_sizes", "duplicate")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                trace = root / "trace.jsonl"
+                vector = {"model": "qwen3-embedding-8k", "embeddings": [[0.1, 0.2]]}
+                models = [dict(healthy_model)]
+                if case == "empty_vector":
+                    vector["embeddings"] = [[]]
+                elif case == "wrong_embedder":
+                    vector["model"] = "another-embedder"
+                elif case in ("missing_model", "other_model_gpu"):
+                    models = [] if case == "missing_model" else [dict(healthy_model, name="another:latest", model="another:latest")]
+                elif case == "wrong_tag":
+                    models[0].update(name="qwen3-embedding-8k:old", model="qwen3-embedding-8k:old")
+                elif case == "name_model_mismatch":
+                    models[0]["model"] = "another:latest"
+                elif case == "cpu":
+                    models[0]["size_vram"] = 0
+                elif case == "partial_gpu":
+                    models[0]["size_vram"] = 2048
+                elif case == "zero_sizes":
+                    models[0].update(size=0, size_vram=0)
+                elif case == "missing_sizes":
+                    models[0].pop("size")
+                    models[0].pop("size_vram")
+                elif case == "string_sizes":
+                    models[0].update(size="4096", size_vram="4096")
+                elif case == "duplicate":
+                    models.append(dict(healthy_model))
+                (root / "embed.json").write_text(json.dumps(vector))
+                (root / "ps.json").write_text(json.dumps({"models": models}))
+                systemctl = root / "systemctl"
+                systemctl.write_text("#!/usr/bin/env python3\nimport os,sys,pathlib,json\n"
+                                     "assert sys.argv[1]=='--user' and sys.argv[3]=='ollama.service'\n"
+                                     "kind=sys.argv[2]\n"
+                                     "with open(os.environ['FIXTURE_TRACE'],'a') as f: f.write(json.dumps(kind)+'\\n')\n"
+                                     "sys.exit(1 if (kind=='is-enabled' and os.environ['FIXTURE_CASE']=='disabled') or "
+                                     "(kind=='is-active' and os.environ['FIXTURE_CASE']=='inactive') else 0)\n")
+                systemctl.chmod(0o700)
+                curl = root / "curl"
+                curl.write_text("#!/usr/bin/env python3\nimport os,sys,pathlib,json\n"
+                                "args=sys.argv[1:]; endpoint=next(x for x in args if x.startswith('http://'))\n"
+                                "assert endpoint.startswith('http://127.0.0.1:21434/api/')\n"
+                                "operation=endpoint.rsplit('/',1)[1]\n"
+                                "with open(os.environ['FIXTURE_TRACE'],'a') as f: f.write(json.dumps(operation)+'\\n')\n"
+                                "if operation=='embed':\n"
+                                "    assert json.loads(args[args.index('-d')+1])=={'model':'qwen3-embedding-8k','input':'Hello world'}\n"
+                                "elif operation=='ps': assert '-d' not in args\n"
+                                "else: raise AssertionError(operation)\n"
+                                "if os.environ['FIXTURE_CASE']==operation+'_http_error': sys.exit(22)\n"
+                                "print((pathlib.Path(os.environ['FIXTURE_ROOT'])/(operation+'.json')).read_text())\n")
+                curl.chmod(0o700)
+                env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                env.update({"PATH": str(root) + os.pathsep + os.environ["PATH"],
+                            "FIXTURE_TRACE": str(trace), "FIXTURE_ROOT": str(root), "FIXTURE_CASE": case})
+                checked = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                         env=env, capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
+                actual = [json.loads(line) for line in trace.read_text().splitlines()]
+                expected = ["is-enabled"] if case == "disabled" else ["is-enabled", "is-active"]
+                if case not in ("disabled", "inactive"):
+                    expected.append("embed")
+                    if case not in ("embed_http_error", "empty_vector", "wrong_embedder"):
+                        expected.append("ps")
+                self.assertEqual(actual, expected)
+
+    def test_ollama_unit_placement_preserves_unrelated_warmup_and_foreign_units(self):
+        row = self.row("local-model-server")
+        command = row["commands"][1]
+        self.assertFalse((PLAN / "config/ollama-warmup.sh").exists())
+        self.assertNotIn("ollama-warmup.sh", json.dumps(row))
+        expected = (PLAN / "config/ollama.service").read_bytes()
+        self.assertEqual(hashlib.sha256(expected).hexdigest(),
+                         "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db")
+        self.assertNotIn(b"ExecStartPost=", expected)
+        for case in ("absent", "same", "different", "directory", "live_symlink", "dangling_symlink"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                fixture_home = root / "home"
+                unit = fixture_home / ".config/systemd/user/ollama.service"
+                unit.parent.mkdir(parents=True)
+                config = root / "config"
+                config.mkdir()
+                (config / "ollama.service").write_bytes(expected)
+                old_warmup = fixture_home / ".local/share/new-wsl-native-stack/bin/ollama-warmup.sh"
+                old_warmup.parent.mkdir(parents=True)
+                old_warmup.write_bytes(b"unreferenced host-owned warmup bytes\n")
+                if case == "same":
+                    unit.write_bytes(expected)
+                elif case == "different":
+                    unit.write_bytes(b"operator unit\n")
+                elif case == "directory":
+                    unit.mkdir()
+                    (unit / "preserved").write_bytes(b"operator directory bytes\n")
+                elif case.endswith("symlink"):
+                    target = root / "operator-unit"
+                    if case == "live_symlink":
+                        target.write_bytes(b"operator target bytes\n")
+                    unit.symlink_to(target)
+                info = unit.lstat() if case != "absent" else None
+                env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                env.update({"HOME": str(fixture_home), "config_root": str(config)})
+                checked = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                         env=env, capture_output=True, text=True, timeout=20)
+                passed = case in ("absent", "same")
+                self.assertEqual(checked.returncode == 0, passed, checked.stderr)
+                if passed:
+                    self.assertEqual(unit.read_bytes(), expected)
+                else:
+                    self.assertIn("needs_owner:", checked.stderr)
+                    self.assertEqual(unit.lstat().st_ino, info.st_ino)
+                    if case == "different": self.assertEqual(unit.read_bytes(), b"operator unit\n")
+                    elif case == "directory": self.assertEqual((unit / "preserved").read_bytes(), b"operator directory bytes\n")
+                    elif case == "live_symlink": self.assertEqual(target.read_bytes(), b"operator target bytes\n")
+                    else: self.assertFalse(target.exists())
+                self.assertEqual(old_warmup.read_bytes(), b"unreferenced host-owned warmup bytes\n")
+
+    def test_prometheus_health_requires_exact_plan_startup_features(self):
+        row = self.row("prometheus")
+        self.assertEqual(row["service"]["enable_features"],
+                         ["created-timestamp-zero-ingestion", "promql-extended-range-selectors"])
+        command = row["acceptance"]["service_health"]["command"]
+        proof = command.split("<<'PY'\n", 1)[1].split("\nPY", 1)[0]
+        cases = {
+            "valid": {"status": "success", "data": {"enable-feature": ",".join(row["service"]["enable_features"])}},
+            "superset": {"status": "success", "data": {"enable-feature": "created-timestamp-zero-ingestion,promql-extended-range-selectors,extra-fixture-feature"}},
+            "missing_both": {"status": "success", "data": {"enable-feature": ""}},
+            "missing_zero": {"status": "success", "data": {"enable-feature": "promql-extended-range-selectors"}},
+            "missing_range": {"status": "success", "data": {"enable-feature": "created-timestamp-zero-ingestion"}},
+            "near_names": {"status": "success", "data": {"enable-feature": "created-timestamp-zero-ingestion-extra,promql-extended-range-selectors-extra"}},
+            "bad_type": {"status": "success", "data": {"enable-feature": True}},
+            "bad_data": {"status": "success", "data": None},
+            "missing_flags": {"status": "success", "data": {}},
+            "failed_request": {"status": "error", "data": {"enable-feature": ",".join(row["service"]["enable_features"])}},
+            "malformed": None,
+        }
+        for case, response in cases.items():
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                flags = root / "native-flags.json"
+                flags.write_text("not JSON" if case == "malformed" else json.dumps(response))
+                checked = subprocess.run([sys.executable, "-c", proof, str(PLAN / "install-plan.json"), str(flags)],
+                                         env={k: os.environ[k] for k in ("PATH", "TMPDIR") if k in os.environ},
+                                         capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case in ("valid", "superset"), checked.stderr)
+
+
+    def test_claude_review_actual_argv_keeps_frozen_read_only_contract(self):
+        import shlex
+        program = self.row("cross-family-review")["acceptance"]["after_sign_in"]["command"]
+        assignment = next(line for line in program.splitlines() if line.startswith("claude_review_argv=("))
+        base, head = "3" * 40, "4" * 40
+        env = {k: os.environ[k] for k in ("PATH", "TMPDIR") if k in os.environ}
+        env.update(plan_dir=str(PLAN), gpt_base=base, gpt_head=head)
+        capture = assignment + "\n" + shlex.join([
+            sys.executable, "-c", "import json,sys;print(json.dumps(sys.argv[1:]))"
+        ]) + ' "${claude_review_argv[@]}"'
+        result = subprocess.run(["bash", "-euo", "pipefail", "-c", capture],
+                                env=env, capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        argv = json.loads(result.stdout)
+        self.assertEqual(argv[:3], ["claude", "-p",
+            f"Review this GPT-authored diff read-only; report file:line correctness findings. "
+            f"The immutable base is {base} and head is {head}. "
+            "Read the original repository files for each finding. Do not edit or publish."])
+        expected = {"--tools": "Read,Glob,Grep", "--disallowedTools": "Workflow,Agent,mcp__*",
+                    "--permission-mode": "dontAsk", "--max-turns": "48", "--model": "opus", "--effort": "max"}
+        for flag, value in expected.items():
+            self.assertEqual(argv.count(flag), 1)
+            self.assertEqual(argv[argv.index(flag) + 1], value)
+        self.assertEqual(json.loads(argv[argv.index("--json-schema") + 1]),
+                         json.loads((PLAN / "cross-review-delivery.schema.json").read_text()))
+        self.assertEqual(program.count("timeout --kill-after=15s 1200s"), 2)
+
+    def test_review_requires_delivered_head_bound_native_structured_output(self):
+        import copy
+        import shlex
+        command = self.row("cross-family-review")["acceptance"]["after_sign_in"]["command"]
+        self.assertIn("--json-schema", command)
+        proof = command.split("<<'PY'\n", 1)[1].split("\nPY\n", 1)[0]
+        claude_head, gpt_head = "1" * 40, "2" * 40
+        gpt = [{"type": "item.completed", "item": {"type": "command_execution", "status": "completed",
+                "exit_code": 0, "command": shlex.join(["git", "-C", str(ROOT), "show", claude_head])}},
+               {"type": "item.completed", "item": {"type": "agent_message", "text": "Delivered GPT review"}},
+               {"type": "turn.completed"}]
+        report = {"reviewed_head": gpt_head, "verdict": "findings",
+                  "findings": [{"file": "fixture.py", "line": 8, "description": "Concrete fixture defect"}],
+                  "summary": "Completed review of the immutable fixture."}
+        cases = ("valid_findings", "valid_no_findings", "valid_native_system_metadata", "status_only", "list_output", "wrong_head", "missing_head",
+                 "inconsistent_verdict", "unknown_verdict", "string_findings", "bool_line", "zero_line",
+                 "blank_file", "blank_description", "blank_summary", "unexpected_field", "native_failure",
+                 "duplicate_terminal", "native_error", "workflow_handoff", "background_terminated")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                delivered = copy.deepcopy(report)
+                if case == "valid_no_findings":
+                    delivered.update(verdict="no_findings", findings=[])
+                elif case == "wrong_head":
+                    delivered["reviewed_head"] = claude_head
+                elif case == "missing_head":
+                    del delivered["reviewed_head"]
+                elif case == "inconsistent_verdict":
+                    delivered["verdict"] = "no_findings"
+                elif case == "unknown_verdict":
+                    delivered["verdict"] = "started"
+                elif case == "string_findings":
+                    delivered["findings"] = "None"
+                elif case in ("bool_line", "zero_line"):
+                    delivered["findings"][0]["line"] = True if case == "bool_line" else 0
+                elif case in ("blank_file", "blank_description"):
+                    delivered["findings"][0][case.removeprefix("blank_")] = " "
+                elif case == "blank_summary":
+                    delivered["summary"] = " "
+                elif case == "unexpected_field":
+                    delivered["status"] = "started"
+                terminal = {"type": "result", "subtype": "success", "is_error": False,
+                            "result": "Review complete", "structured_output": delivered}
+                if case == "status_only":
+                    del terminal["structured_output"]
+                elif case == "list_output":
+                    terminal["structured_output"] = []
+                elif case == "native_failure":
+                    terminal.update(subtype="error_max_turns", is_error=True)
+                claude = [terminal]
+                if case == "valid_native_system_metadata":
+                    claude[:0] = [{"type": "system", "subtype": "permission_denied",
+                                   "message": "Synthetic native permission notice", "tool_name": tool}
+                                  for tool in ("Read", "Grep")]
+                elif case == "duplicate_terminal":
+                    claude.append(copy.deepcopy(terminal))
+                elif case == "native_error":
+                    claude.insert(0, {"type": "error", "error": "Synthetic native failure"})
+                elif case == "workflow_handoff":
+                    claude.insert(0, {"type": "assistant", "message": {"content": [
+                        {"type": "tool_use", "id": "handoff", "name": "Workflow", "input": {}}]}})
+                (root / "gpt-review.jsonl").write_text("\n".join(json.dumps(e) for e in gpt))
+                (root / "claude-review.jsonl").write_text("\n".join(json.dumps(e) for e in claude))
+                (root / "claude-review.stderr").write_text(
+                    "Terminated background workflow at session exit\n" if case == "background_terminated" else "")
+                checked = subprocess.run(["python3", "-c", proof, str(root), claude_head, str(ROOT), gpt_head],
+                                         capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case in ("valid_findings", "valid_no_findings", "valid_native_system_metadata"), checked.stderr)
+                self.assertEqual((root / "claude-review.json").exists(), checked.returncode == 0)
+
+    def test_inspector_native_metadata_preserves_linked_recipe_requirement(self):
+        import hashlib
+        import shlex
+        command = self.row("mcp-inspector")["acceptance"]["after_sign_in"]["command"]
+        proof = next(b for b in re.findall(r"<<'PY'\n(.*?)\nPY", command, re.S)
+                     if "Frozen Inspector recipe changed" in b)
+        for case in ("valid", "missing_result", "tool_error", "wrong_recipe"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "probe.sh").write_text("Synthetic frozen probe\n")
+                digest = hashlib.sha256((root / "probe.sh").read_bytes()).hexdigest()
+                recipe = shlex.join(["bash", str(root / "probe.sh"), str(root), "claude"])
+                events = [{"type": "system", "subtype": "permission_denied", "message": value}
+                          for value in ("Native notice", None, [], 1, True)]
+                events.append({"type": "assistant", "message": {"content": [{
+                    "type": "tool_use", "id": "probe", "name": "Bash", "input": {
+                        "command": recipe if case != "wrong_recipe" else "bash /different/probe.sh"}}]}})
+                if case != "missing_result":
+                    events.append({"type": "user", "message": {"content": [{
+                        "type": "tool_result", "tool_use_id": "probe", "is_error": case == "tool_error",
+                        "content": "INSPECTOR_CLI_OK\nINSPECTOR_WEB_OK\nINSPECTOR_STOPPED\n"}]}})
+                events.append({"type": "result", "subtype": "success", "is_error": False})
+                (root / "claude.jsonl").write_text("\n".join(json.dumps(e) for e in events))
+                (root / "claude-tools.json").write_text(json.dumps({"tools": [{"name": "fixture"}]}))
+                (root / "claude-page.html").write_text("<html>synthetic fixture</html>")
+                (root / "claude-env.txt").write_text("false\n")
+                checked = subprocess.run(["python3", "-c", proof, str(root), "claude", digest],
+                                         capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
+
+    def test_skill_listing_uses_regular_capture_and_cleans_up_on_failure(self):
+        native_jq = shutil.which("jq")
+        self.assertIsNotNone(native_jq)
+        command = self.row("skill-discovery")["acceptance"]["post_install"]["command"]
+        for case in ("valid", "missing_claude", "missing_codex", "empty", "malformed", "producer_failure", "wrong_hash"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binaries, scratch, state = root / "bin", root / "tmp", root / "state"
+                for p in (binaries, scratch, state / "skills"):
+                    p.mkdir(parents=True)
+                trace = root / "trace.jsonl"
+                lock = state / "skills/.skill-lock.json"
+                lock.write_text(json.dumps({"skills": {"find-skills": {"skillFolderHash":
+                    "wrong" if case == "wrong_hash" else "76a98a285cb0434f3d39e1a873823556330e398b"}}}))
+                npx = binaries / "npx"
+                npx.write_text("#!" + sys.executable + "\n" + """
+import json, os, stat, sys
+assert sys.argv[1:] == ['--yes', 'skills@1.7.0', 'list', '-g', '-a', 'claude-code', 'codex', '--json']
+assert stat.S_ISREG(os.fstat(1).st_mode), 'listing stdout must be a regular file'
+with open(os.environ['FIXTURE_TRACE'], 'a') as stream:
+    stream.write(json.dumps(['producer', os.readlink('/proc/self/fd/1')]) + '\\n')
+case = os.environ['FIXTURE_CASE']
+agents = ['Claude Code', 'Codex']
+if case == 'missing_claude': agents.remove('Claude Code')
+if case == 'missing_codex': agents.remove('Codex')
+if case == 'malformed': print('{broken')
+elif case != 'empty': print(json.dumps([{'name':'find-skills', 'agents':agents}]))
+sys.exit(42 if case == 'producer_failure' else 0)
+""")
+                npx.chmod(0o755)
+                jq = binaries / "jq"
+                jq.write_text("#!" + sys.executable + "\n" + """
+import json, os, stat, sys
+path = sys.argv[-1]
+assert stat.S_ISREG(os.stat(path).st_mode)
+with open(os.environ['FIXTURE_TRACE'], 'a') as stream:
+    stream.write(json.dumps(['reader', path]) + '\\n')
+os.execv(os.environ['FIXTURE_JQ'], [os.environ['FIXTURE_JQ'], *sys.argv[1:]])
+""")
+                jq.chmod(0o755)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                    env={"HOME": str(root / "home"), "XDG_STATE_HOME": str(state),
+                         "TMPDIR": str(scratch), "PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                         "FIXTURE_TRACE": str(trace), "FIXTURE_CASE": case, "FIXTURE_JQ": native_jq},
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode == 0, case == "valid", result.stderr)
+                observations = [json.loads(s) for s in trace.read_text().splitlines()]
+                capture = observations[0][1]
+                readers = [item[1] for item in observations if item[0] == "reader" and item[1] != str(lock)]
+                self.assertTrue(all(path == capture for path in readers))
+                if case == "valid":
+                    self.assertEqual(readers, [capture, capture])
+                self.assertEqual(list(scratch.iterdir()), [])
+
+    def test_agentsview_sync_wakes_idle_backend_and_health_remains_discriminating(self):
+        cases = ("valid", "sync_failure", "stopped", "unresponsive",
+                 *(f"{issue}:{agent}" for issue in ("empty_sessions", "wrong_agent", "zero_messages", "empty_days", "zero_usage")
+                   for agent in ("claude", "codex")))
+        command = self.row("session-analytics")["acceptance"]["service_health"]["command"]
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binary = root / "eco/bin/agentsview"
+                binary.parent.mkdir(parents=True)
+                trace = root / "trace.jsonl"
+                binary.write_text("#!" + sys.executable + "\n" + """
+import json, os, sys
+from pathlib import Path
+argv = sys.argv[1:]
+case = os.environ['FIXTURE_CASE']
+trace = Path(os.environ['FIXTURE_TRACE'])
+active = trace.with_suffix('.active')
+with trace.open('a') as stream:
+    stream.write(json.dumps(argv) + '\\n')
+if argv == ['sync']:
+    if case == 'sync_failure': sys.exit(42)
+    if case != 'stopped': active.write_text('fixture backend awake')
+elif argv == ['daemon', 'status']:
+    if not active.exists(): print('agentsview not running')
+    elif case == 'unresponsive': print('agentsview running at fixture; not responding')
+    else: print('agentsview running at fixture')
+else:
+    agent = argv[argv.index('--agent') + 1]
+    issue = case.removesuffix(':' + agent) if case.endswith(':' + agent) else ''
+    if argv[:2] == ['session', 'list']:
+        sessions = [{'agent': 'foreign' if issue == 'wrong_agent' else agent,
+                     'message_count': 0 if issue == 'zero_messages' else 1}]
+        print(json.dumps({'sessions': [] if issue == 'empty_sessions' else sessions}))
+    elif argv[:2] == ['usage', 'daily']:
+        totals = dict(inputTokens=1, outputTokens=0, cacheReadTokens=0, cacheCreationTokens=0)
+        if issue == 'zero_usage': totals['inputTokens'] = 0
+        print(json.dumps({'daily': [] if issue == 'empty_days' else [{}], 'totals':totals}))
+    else: sys.exit(8)
+""")
+                binary.chmod(0o755)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                    env={"PATH": os.environ["PATH"], "HOME": str(root / "home"), "ECO_ROOT": str(root / "eco"),
+                         "XDG_STATE_HOME": str(root / "state"), "TMPDIR": str(root),
+                         "FIXTURE_CASE": case, "FIXTURE_TRACE": str(trace)},
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode == 0, case == "valid", result.stderr)
+                calls = [json.loads(s) for s in trace.read_text().splitlines()]
+                self.assertEqual(calls[0], ["sync"])
+                if case == "sync_failure":
+                    self.assertEqual(calls, [["sync"]])
+                    self.assertEqual(result.returncode, 42)
+                else:
+                    self.assertEqual(calls[1], ["daemon", "status"])
+                if case == "valid":
+                    self.assertEqual([(a[0], a[1] if len(a) > 1 else "") for a in calls],
+                                                                          [("sync", ""), ("daemon", "status"), ("session", "list"),
+                                      ("usage", "daily"), ("session", "list"), ("usage", "daily")])
+
+    def test_betterleaks_native_test_output_survives_discarded_stdout(self):
+        helper = PLAN / "config/betterleaks-accept.sh"
+        for code in (0, 42):
+            with self.subTest(upstream_exit=code), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binaries = root / "bin"
+                binaries.mkdir()
+                for name, program in {
+                    "git": """import sys
+from pathlib import Path
+if 'clone' in sys.argv: Path(sys.argv[-1]).mkdir()
+elif 'rev-parse' in sys.argv: print('81aff7a638638aae3a659845d089043e1d8fe9ac')
+else: sys.exit(8)
+""",
+                    "mise": """import os,sys
+assert sys.argv[1:5] == ['exec','go@1.25.12','--','make']
+assert sys.argv[-1] == 'test'
+print('=== RUN SyntheticUpstreamOutput')
+print('--- SKIP SyntheticUpstreamSkip')
+sys.exit(int(os.environ['FIXTURE_UPSTREAM_EXIT']))
+""",
+                    "betterleaks": """import os,sys
+from pathlib import Path
+assert sys.argv[1] == 'dir' and '--redact' in sys.argv and '--no-banner' in sys.argv
+Path(os.environ['FIXTURE_SCAN_MARKER']).write_text('native scan reached')
+""",
+                }.items():
+                    binary = binaries / name
+                    binary.write_text("#!" + sys.executable + "\n" + program)
+                    binary.chmod(0o755)
+                marker = root / "scan.txt"
+                result = subprocess.run(["bash", str(helper)],
+                    env={"PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                         "TMPDIR": str(root), "plan_dir": str(root),
+                         "FIXTURE_UPSTREAM_EXIT": str(code), "FIXTURE_SCAN_MARKER": str(marker)},
+                    stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=20)
+                self.assertEqual(result.returncode, code, result.stderr)
+                self.assertIn("=== RUN SyntheticUpstreamOutput", result.stderr)
+                self.assertIn("--- SKIP SyntheticUpstreamSkip", result.stderr)
+                self.assertEqual(marker.exists(), code == 0)
+
+    def test_srt_checker_requires_exact_completed_recipe_and_unique_controls(self):
+        import copy
+        import shlex
+        helper = (PLAN / "config/srt-client-accept.sh").read_text()
+        checker = helper.split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+        recipe = helper.split("srt_native_recipe=\"$(cat <<'SRT'\n", 1)[1].split("\nSRT\n", 1)[0]
+        positives = ("HELLO", "READ_CONTROL", "WRITE_CONTROL", "NETWORK_CONTROL", "ALLOW_WRITE",
+                     "ALLOW_WRITE_VERIFY", "APPEND_CONTROL", "APPEND_VERIFY", "WRITE_DIGEST_CONTROL")
+        good = ["hello world", *(f"SRT_{p}_EXIT=0" for p in positives),
+                "SRT_DENY_READ_EXIT=13", "SRT_DENY_WRITE_EXIT=13", "SRT_DENY_NETWORK_EXIT=13",
+                "SRT_ALLOW_WRITE_CONTROL=passed", "SRT_DENY_WRITE_PRESERVATION=passed", "SRT_NATIVE_USE_OK"]
+        cases = ("valid", "text_blocks", "wrapped", "zero_deny", "negative_deny", "large_deny", "malformed_deny",
+                 "duplicate_deny", "missing_positive", "duplicate_positive", "nonzero_positive",
+                 "missing_preservation", "missing_terminal", "duplicate_terminal", "native_error",
+                 "native_failure", "missing_result", "tool_error", "wrong_recipe", "unlinked",
+                 "background", "partial", "in_progress", "marker_only_command")
+        for client in ("claude", "codex"):
+            for case in cases:
+                with self.subTest(client=client, case=case), tempfile.TemporaryDirectory() as directory:
+                    path = Path(directory) / "events.jsonl"
+                    output = "\n".join(good) + "\n"
+                    for bad, value in (("zero_deny", "0"), ("negative_deny", "-1"),
+                                       ("large_deny", "256"), ("malformed_deny", "1x")):
+                        if case == bad:
+                            output = output.replace("SRT_DENY_READ_EXIT=13", "SRT_DENY_READ_EXIT=" + value)
+                    if case == "duplicate_deny":
+                        output += "SRT_DENY_READ_EXIT=13\n"
+                    elif case == "missing_positive":
+                        output = output.replace("SRT_HELLO_EXIT=0\n", "")
+                    elif case == "duplicate_positive":
+                        output += "SRT_HELLO_EXIT=0\n"
+                    elif case == "nonzero_positive":
+                        output = output.replace("SRT_HELLO_EXIT=0", "SRT_HELLO_EXIT=42")
+                    elif case == "missing_preservation":
+                        output = output.replace("SRT_DENY_WRITE_PRESERVATION=passed\n", "")
+                    elif case == "partial":
+                        output += "Command running in background with ID: fixture\n"
+                    command = shlex.join(["rtk", "proxy", "bash", "-lc", recipe]) if case == "wrapped" else recipe
+                    if case == "wrong_recipe":
+                        command = command.replace('srt echo "hello world"', 'srt echo "different operation"')
+                    elif case == "marker_only_command":
+                        command = "printf '%s\\n' " + shlex.quote(recipe)
+                    if client == "claude":
+                        use = {"type": "tool_use", "id": "run", "name": "Bash", "input": {
+                            "command": command, "run_in_background": case == "background"}}
+                        returned = {"type": "tool_result", "tool_use_id": "other" if case == "unlinked" else "run",
+                                    "content": [{"type": "text", "text": output}] if case == "text_blocks" else output,
+                                    "is_error": case == "tool_error"}
+                        events = [{"type": "assistant", "message": {"content": [use]}},
+                                  {"type": "user", "message": {"content": [returned]}}]
+                        terminal = {"type": "result", "subtype": "success", "is_error": False}
+                        if case == "native_failure":
+                            terminal.update(subtype="error_max_turns", is_error=True)
+                        if case in ("missing_result", "in_progress"):
+                            events.pop()
+                    else:
+                        item = {"type": "command_execution", "command": command,
+                                "status": "in_progress" if case in ("in_progress", "background", "partial") else "completed",
+                                "exit_code": 42 if case == "tool_error" else 0, "aggregated_output": output}
+                        events = [{"type": "item.started" if case in ("missing_result", "unlinked") else "item.completed",
+                                   "item": item}]
+                        terminal = {"type": "turn.failed" if case == "native_failure" else "turn.completed"}
+                    if case != "missing_terminal":
+                        events.append(terminal)
+                    if case == "duplicate_terminal":
+                        events.append(copy.deepcopy(terminal))
+                    if case == "native_error":
+                        events.append({"type": "error", "error": "Synthetic native failure"})
+                    events[:0] = [{"type": "system", "subtype": "permission_denied", "message": value}
+                                  for value in ("Native notice", None, [], 1, True)]
+                    path.write_text("\n".join(json.dumps(e) for e in events))
+                    result = subprocess.run(["python3", "-c", checker, str(path), client, recipe],
+                                            capture_output=True, text=True, timeout=20)
+                    self.assertEqual(result.returncode == 0, case in ("valid", "text_blocks", "wrapped"), result.stderr)
+
+    def test_srt_recipe_preserves_each_step_exit_when_errexit_is_suppressed(self):
+        helper = (PLAN / "config/srt-client-accept.sh").read_text()
+        recipe = helper.split("srt_native_recipe=\"$(cat <<'SRT'\n", 1)[1].split("\nSRT\n", 1)[0]
+        cases = ("valid", "HELLO", "READ_CONTROL", "WRITE_CONTROL", "NETWORK_CONTROL",
+                 "ALLOW_WRITE", "ALLOW_WRITE_VERIFY", "APPEND_CONTROL", "APPEND_VERIFY",
+                 "WRITE_DIGEST_CONTROL", "AFTER_DIGEST")
+        for case in cases:
+            with self.subTest(failing_step=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binaries, allowed = root / "bin", root / "allowed"
+                binaries.mkdir()
+                allowed.mkdir()
+                protected, read, policy = root / "protected.txt", root / "read.txt", root / "policy.json"
+                protected.write_text("synthetic protected file\n")
+                read.write_text("synthetic readable file\n")
+                policy.write_text("{}\n")
+                program = """
+import hashlib, os, subprocess, sys
+from pathlib import Path
+name, args, case = Path(sys.argv[0]).name, sys.argv[1:], os.environ['FIXTURE_CASE']
+fail = False
+if name == 'srt':
+    if args[0] == 'echo':
+        print('hello world')
+        fail = case == 'HELLO'
+    else:
+        args = args[2:]
+        if args[0] == '--': args = args[1:]
+        if args[0] in ('cat', 'curl') or args[-1] == os.environ['SRT_ACCEPT_DENY_WRITE']:
+            sys.exit(13)
+        label = 'APPEND_CONTROL' if '>>' in args[2] else 'ALLOW_WRITE'
+        if case == label: sys.exit(42)
+        sys.exit(subprocess.run(args).returncode)
+elif name == 'curl':
+    fail = case == 'NETWORK_CONTROL'
+elif name == 'sh':
+    status = subprocess.run(['/bin/sh', *args]).returncode
+    fail = case == 'WRITE_CONTROL' and 'unsandboxed control' in args[1]
+    if not fail: sys.exit(status)
+elif name in ('cat', 'tail'):
+    path = Path(args[-1])
+    text = path.read_text()
+    if name == 'tail': text = text.splitlines()[-1] + '\\n'
+    sys.stdout.write(text)
+    label = 'APPEND_VERIFY' if name == 'tail' else ('READ_CONTROL' if str(path) == os.environ['SRT_ACCEPT_DENY_READ'] else 'ALLOW_WRITE_VERIFY')
+    fail = case == label
+elif name == 'sha256sum':
+    path = Path(args[-1])
+    print(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + str(path))
+    count = Path(os.environ['FIXTURE_HASH_COUNT'])
+    previous = int(count.read_text()) if count.exists() else 0
+    count.write_text(str(previous + 1))
+    fail = case == ('WRITE_DIGEST_CONTROL' if previous == 0 else 'AFTER_DIGEST')
+sys.exit(42 if fail else 0)
+"""
+                for name in ("srt", "cat", "tail", "curl", "sh", "sha256sum"):
+                    binary = binaries / name
+                    binary.write_text("#!" + sys.executable + "\n" + program)
+                    binary.chmod(0o755)
+                # Calling a function in an if condition suppresses Bash's implicit errexit.
+                # This intentionally challenges each explicit per-step guard.
+                wrapped = "probe() {\n" + recipe + "\n}\nif probe; then exit 0; else exit \"$?\"; fi"
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", wrapped],
+                    env={"PATH": str(binaries) + os.pathsep + os.environ["PATH"],
+                         "SRT_ACCEPT_POLICY": str(policy), "SRT_ACCEPT_DENY_READ": str(read),
+                         "SRT_ACCEPT_DENY_WRITE": str(protected), "SRT_ACCEPT_ALLOWED_DIR": str(allowed),
+                         "SRT_ACCEPT_DENIED_URL": "https://synthetic.invalid",
+                         "FIXTURE_CASE": case, "FIXTURE_HASH_COUNT": str(root / "hash-count")},
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode, 0 if case == "valid" else 42, result.stderr)
+                self.assertEqual("SRT_NATIVE_USE_OK" in result.stdout, case == "valid")
+
+    def test_inspect_example_resolves_from_its_checkout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            checkout = root / "inspect-ai-0.3.273"
+            checkout.mkdir()
+            binary = root / "inspect"
+            binary.write_text("#!/usr/bin/env python3\nimport os,sys\nassert os.getcwd().endswith('/inspect-ai-0.3.273')\nassert sys.argv[2] == 'examples/theory_of_mind.py'\nsys.exit(42)\n")
+            binary.chmod(0o755)
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c",
+                                     self.row("inspect-ai")["acceptance"]["after_sign_in"]["command"]],
+                                    env={**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                                         "tool_root": str(root), "XDG_STATE_HOME": str(root / "state")},
+                                    capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 42, result.stderr)
+
+    def test_srt_fixture_bindings_survive_an_empty_child_environment(self):
+        import shlex
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fixture = root / "fixtures ' $literal"
+            fixture.mkdir()
+            allowed = fixture / "allowed"
+            allowed.mkdir()
+            paths = {"SRT_ACCEPT_POLICY": fixture / "policy.json",
+                     "SRT_ACCEPT_DENY_READ": fixture / "read.txt",
+                     "SRT_ACCEPT_DENY_WRITE": fixture / "write.txt",
+                     "SRT_ACCEPT_ALLOWED_DIR": allowed}
+            for path in list(paths.values())[:3]:
+                path.write_text("synthetic fixture\n")
+            binary = root / "codex"
+            binary.write_text("#!/usr/bin/env python3\nimport json,sys\nprint(json.dumps(sys.argv[1:]))\nsys.exit(42)\n")
+            binary.chmod(0o755)
+            env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                   "SRT_ACCEPT_CLIENT": "codex", "SRT_ACCEPT_FIXTURE_ROOT": str(fixture),
+                   "XDG_STATE_HOME": str(root / "state"), **{k: str(v) for k, v in paths.items()}}
+            result = subprocess.run(["bash", str(PLAN / "config/srt-client-accept.sh")],
+                                    env=env, capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 42, result.stderr)
+            argv = json.loads(next((root / "state").rglob("events.jsonl")).read_text())
+            self.assertIn("--skip-git-repo-check", argv)
+            self.assertEqual(argv[argv.index("-C") + 1], str(fixture))
+            bindings = argv[-1].split("\n\n", 1)[1].split('srt echo "hello world"', 1)[0]
+            probe = subprocess.run(["bash", "-c", bindings + '\nprintf "%s\\n" "$SRT_ACCEPT_POLICY" "$SRT_ACCEPT_DENY_READ" "$SRT_ACCEPT_DENY_WRITE" "$SRT_ACCEPT_ALLOWED_DIR"'],
+                                   env={"PATH": os.environ["PATH"]}, capture_output=True, text=True, timeout=20)
+            self.assertEqual(probe.returncode, 0, probe.stderr)
+            self.assertEqual(probe.stdout.splitlines(), [str(p) for p in paths.values()])
+            child = subprocess.run(["bash", "-c", bindings + "\npython3 -c " +
+                                    shlex.quote('import os; print(os.environ.get("TMPDIR"))')],
+                                   env={"PATH": os.environ["PATH"]}, capture_output=True, text=True, timeout=20)
+            self.assertEqual(child.returncode, 0, child.stderr)
+            self.assertEqual(child.stdout.strip(), str(allowed))
+
+    def test_owned_old_agentsview_links_migrate_but_foreign_aliases_are_retained(self):
+        # 2026-10-06 known-alias migration fixtures retain the superseded launcher versions.
+        cases = (
+            ("old binary", "0.43.0", "agentsview", False),
+            ("old launcher", "0.43.0", "launcher", False),
+            ("current binary", "0.44.0", "agentsview", False),
+            ("current launcher", "0.44.0", "launcher", False),
+            ("foreign symlink", None, None, False),
+            ("regular aliases", None, None, True),
+        )
+        row = self.row("session-analytics")
+        self.assertEqual(row["release"], "v0.44.0")
+        self.assertIn("agentsview_0.44.0_linux_amd64.tar.gz", row["commands"][0])
+        self.assertIn("037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+                      row["commands"][0])
+        for name, version, executable, regular in cases:
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                eco = root / "eco"
+                current = eco / "tools/agentsview-0.44.0"
+                foreign = version is None
+                target = root / "foreign" if foreign else eco / f"tools/agentsview-{version}" / executable
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("retained fixture")
+                aliases = (eco / "bin/agentsview", root / ".local/bin/agentsview")
+                for alias in aliases:
+                    alias.parent.mkdir(parents=True, exist_ok=True)
+                    if regular:
+                        alias.write_text("regular fixture")
+                    else:
+                        alias.symlink_to(target)
+                package = root / "release"
+                package.mkdir()
+                (package / "agentsview").write_text("current archive fixture")
+                (package / "agentsview").chmod(0o755)
+                archive = eco / "downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz"
+                archive.parent.mkdir(parents=True)
+                subprocess.run(["tar", "-czf", str(archive), "-C", str(package), "agentsview"], check=True)
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", row["commands"][1]],
+                                        env={"PATH": os.environ["PATH"], "TMPDIR": str(root),
+                                             "HOME": str(root), "ECO_ROOT": str(eco), "plan_dir": str(PLAN)},
+                                        capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode, 1 if foreign else 0, result.stderr)
+                for alias in aliases:
+                    if regular:
+                        self.assertFalse(alias.is_symlink())
+                        self.assertEqual(alias.read_text(), "regular fixture")
+                    else:
+                        self.assertEqual(alias.resolve(), target if foreign else current / "launcher")
+                if foreign:
+                    self.assertEqual(target.read_text(), "retained fixture")
+                    self.assertFalse((current / "agentsview").exists(), "Foreign refusal extracted the archive")
+                else:
+                    self.assertEqual((current / "agentsview").read_text(), "current archive fixture")
+                    self.assertEqual((current / "launcher").read_bytes(),
+                                     (PLAN / "config/agentsview.sh").read_bytes())
+                    if version == "0.43.0":
+                        self.assertEqual(target.read_text(), "retained fixture")
+
+
+    def test_inspector_probe_rejects_env_drift_and_port_collision_and_cleans_up(self):
+        for inherited, occupied in (("false", "none"), ("true", "none"), (None, "none"),
+                                    ("false", "LISTEN"), ("false", "ESTAB"), ("false", "BOUND-INACTIVE")):
+            with self.subTest(inherited=inherited, occupied=occupied), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                pid = root / "web.pid"
+                binaries = {
+                    "npx": "#!/usr/bin/env python3\nimport json,os,sys,time\nfrom pathlib import Path\nif '--cli' in sys.argv:\n print(json.dumps({'tools':[{'name':'fixture'}]}))\nelse:\n Path(os.environ['INSPECTOR_TEST_PID']).write_text(str(os.getpid()))\n time.sleep(300)\n",
+                    "curl": "#!/usr/bin/env python3\nimport os,sys\nfrom pathlib import Path\nif not Path(os.environ['INSPECTOR_TEST_PID']).exists(): sys.exit(7)\nPath(sys.argv[sys.argv.index('--output')+1]).write_text('<html>fixture</html>')\n",
+                    "ss": "#!/bin/sh\ncase \"$*\" in *-tan*) state=\"$INSPECTOR_TEST_OCCUPIED\";; *) state=LISTEN; [ \"$INSPECTOR_TEST_OCCUPIED\" = LISTEN ] || exit 0;; esac\nif [ \"$state\" != none ]; then printf '%s 0 128 127.0.0.1:16399 0.0.0.0:*\\n' \"$state\"; fi\n",
+                }
+                for name, body in binaries.items():
+                    binary = root / name
+                    binary.write_text(body)
+                    binary.chmod(0o755)
+                env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                       "INSPECTOR_TEST_PID": str(pid), "INSPECTOR_TEST_OCCUPIED": occupied}
+                env.pop("MCP_AUTO_OPEN_ENABLED", None)
+                if inherited is not None:
+                    env["MCP_AUTO_OPEN_ENABLED"] = inherited
+                result = subprocess.run(["bash", str(PLAN / "inspector-client-probe.sh"), str(root), "claude"],
+                                        env=env, capture_output=True, text=True, timeout=20)
+                succeeds = inherited == "false" and occupied == "none"
+                self.assertEqual(result.returncode == 0, succeeds, result.stderr)
+                if succeeds:
+                    self.assertIn("INSPECTOR_STOPPED", result.stdout)
+                    self.assertEqual((root / "claude-env.txt").read_text().strip(), "false")
+                    with self.assertRaises(ProcessLookupError):
+                        os.kill(int(pid.read_text()), 0)
+                else:
+                    self.assertNotIn("INSPECTOR_WEB_OK", result.stdout)
+                    self.assertFalse(pid.exists())
+
+    def test_native_review_allows_completed_analysis_failure_but_rejects_incomplete_and_session_failure(self):
+        import copy
+        import shlex
+        command = self.row("cross-family-review")["acceptance"]["after_sign_in"]["command"]
+        proof = command.split("<<'PY'\n", 1)[1].split("\nPY\n", 1)[0]
+        sha = "8c32a84b246da66e43a6188c973741b09329e223"
+        gpt_sha = "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4"
+        delivered = {"reviewed_head": gpt_sha, "verdict": "no_findings", "findings": [],
+                     "summary": "No correctness defects found in the supplied immutable diff."}
+        gpt = [
+            {"type": "item.completed", "item": {"id": "read", "type": "command_execution",
+             "status": "completed", "exit_code": 0,
+             "command": shlex.join(["git", "-C", str(ROOT), "show", sha])}},
+            {"type": "item.completed", "item": {"type": "agent_message", "text": "Review text"}},
+            {"type": "turn.completed"},
+        ]
+        baseline = [
+            {"type": "assistant", "message": {"content": [
+                {"type": "tool_use", "id": "analysis", "name": "Bash",
+                 "input": {"command": "public receipt analysis", "run_in_background": False}}]}},
+            {"type": "user", "message": {"content": [
+                {"type": "tool_result", "tool_use_id": "analysis", "is_error": True,
+                 "content": "Exit code 1\nSyntaxError: invalid public analysis expression\n"}]}},
+            {"type": "result", "subtype": "success", "is_error": False, "result": "Review text", "structured_output": delivered},
+        ]
+        cases = ("read", "glob", "grep", "recovered_read", "write", "edit", "enter_plan", "exit_plan",
+                 "workflow", "agent", "ordinary_failure", "ordinary_127", "timeout_124", "signal_130", "kill_137",
+                 "interrupt_143", "extended_255", "error_zero", "missing_exit", "timeout_text",
+                 "abort_xml", "requested_background", "automatic_background", "unlinked",
+                 "missing_result", "mcp_error", "session_error", "empty_review", "missing_final")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                events = copy.deepcopy(baseline)
+                call = events[0]["message"]["content"][0]
+                result = events[1]["message"]["content"][0]
+                codes = {"ordinary_127": 127, "timeout_124": 124, "signal_130": 130,
+                         "kill_137": 137, "interrupt_143": 143, "extended_255": 255, "error_zero": 0}
+                if case in ("read", "glob", "grep", "recovered_read"):
+                    call["name"] = {"read": "Read", "glob": "Glob", "grep": "Grep",
+                                    "recovered_read": "Read"}[case]
+                    call["input"] = {"file_path": "/synthetic/original.py"}
+                    result.update(is_error=False, content="Original source text without a shell footer")
+                    if case == "recovered_read":
+                        result.update(is_error=True, content="Native file-not-found error")
+                        corrected = copy.deepcopy(events[:2])
+                        corrected[0]["message"]["content"][0]["id"] = "corrected-read"
+                        corrected[1]["message"]["content"][0].update(
+                            tool_use_id="corrected-read", is_error=False, content="Correct original source")
+                        events[2:2] = corrected
+                elif case in ("write", "edit", "enter_plan", "exit_plan", "workflow", "agent"):
+                    call["name"] = {"write": "Write", "edit": "Edit", "enter_plan": "EnterPlanMode",
+                                    "exit_plan": "ExitPlanMode", "workflow": "Workflow", "agent": "Agent"}[case]
+                    result.update(is_error=False, content="Forbidden tool completed")
+                elif case in codes:
+                    result["content"] = f"Exit code {codes[case]}\nRetained failed analysis\n"
+                elif case == "missing_exit":
+                    result["content"] = "An unresolved tool error\n"
+                elif case == "timeout_text":
+                    result["content"] += "Command timed out after 600000 milliseconds\n"
+                elif case == "abort_xml":
+                    result["content"] += "<error>Command was aborted before completion</error>\n"
+                elif case == "requested_background":
+                    call["input"]["run_in_background"] = True
+                elif case == "automatic_background":
+                    result["content"] += "Command running in background with ID: fixture\n"
+                elif case == "unlinked":
+                    result["tool_use_id"] = "another-call"
+                elif case == "missing_result":
+                    events.pop(1)
+                elif case == "mcp_error":
+                    call["name"] = "mcp__context_mode__ctx_execute"
+                    call["input"] = {"language": "shell", "code": "public receipt analysis"}
+                elif case == "session_error":
+                    events[-1]["is_error"] = True
+                    events[-1]["result"] = "Native session limit"
+                elif case == "empty_review":
+                    events[-1]["result"] = ""
+                elif case == "missing_final":
+                    events.pop()
+                root = Path(directory)
+                (root / "claude-review.stderr").write_text("")
+                (root / "gpt-review.jsonl").write_text("\n".join(json.dumps(e) for e in gpt))
+                (root / "claude-review.jsonl").write_text("\n".join(json.dumps(e) for e in events))
+                checked = subprocess.run(["python3", "-c", proof, str(root), sha, str(ROOT), gpt_sha],
+                                         capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case in ("read", "glob", "grep", "recovered_read"),
+                                 checked.stderr)
+
+    def test_native_review_source_proof_rejects_echo_and_partial_mcp_results(self):
+        import copy
+        command = self.row("cross-family-review")["acceptance"]["after_sign_in"]["command"]
+        proof = command.split("<<'PY'\n", 1)[1].split("\nPY\n", 1)[0]
+        sha = "8c32a84b246da66e43a6188c973741b09329e223"
+        gpt_sha = "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4"
+        delivered = {"reviewed_head": gpt_sha, "verdict": "no_findings", "findings": [],
+                     "summary": "No correctness defects found in the supplied immutable diff."}
+        args = {"language": "shell", "code": f"git -C {ROOT} show {sha}"}
+        initial = {"id": "source", "type": "mcp_tool_call", "server": "context-mode",
+                   "tool": "ctx_execute", "arguments": args, "status": "in_progress"}
+        completed = {**initial, "status": "completed", "error": None,
+                     "result": {"content": [{"type": "text", "text": "Indexed immutable Git output"}]}}
+        baseline = [{"type": "item.started", "item": initial},
+                    {"type": "item.completed", "item": completed},
+                    {"type": "item.completed", "item": {"type": "agent_message", "text": "Review text"}},
+                    {"type": "turn.completed"}]
+        for mutation in ("none", "echo", "timeout", "background", "failed", "missing_start", "different_start"):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                events = copy.deepcopy(baseline)
+                end = events[1]["item"]
+                if mutation == "echo":
+                    end["arguments"]["code"] = f"printf 'show {sha}'"
+                elif mutation == "timeout":
+                    end["result"]["content"][0]["text"] += "\n_(timed out after 60000ms — partial output shown above)_"
+                elif mutation == "background":
+                    end["arguments"]["background"] = True
+                elif mutation == "failed":
+                    end["status"] = "failed"
+                elif mutation == "missing_start":
+                    events.pop(0)
+                elif mutation == "different_start":
+                    events[0]["item"]["server"] = "other-server"
+                (root / "claude-review.stderr").write_text("")
+                (root / "gpt-review.jsonl").write_text("\n".join(json.dumps(e) for e in events))
+                (root / "claude-review.jsonl").write_text(json.dumps(
+                    {"type": "result", "subtype": "success", "is_error": False, "result": "Review text", "structured_output": delivered}))
+                result = subprocess.run(["python3", "-c", proof, str(root), sha, str(ROOT), gpt_sha],
+                                        capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode == 0, mutation == "none", result.stderr)
+
+
+    def test_review_snapshots_detect_same_status_worktree_and_index_edits(self):
+        import shlex
+        command = self.row("cross-family-review")["acceptance"]["after_sign_in"]["command"]
+        snapshot_commands = [line.split(" > ", 1)[0] for line in command.splitlines()
+                             if line.endswith('> "$run_dir/worktree-before.diff"')
+                             or line.endswith('> "$run_dir/index-before.diff"')]
+        self.assertEqual(len(snapshot_commands), 2)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            def git(*args):
+                return subprocess.check_output(["git", *args], cwd=root, stderr=subprocess.DEVNULL)
+            def snapshots():
+                return [subprocess.check_output(shlex.split(line), cwd=root) for line in snapshot_commands]
+            git("init", "-q")
+            file = root / "fixture"
+            file.write_text("original\n")
+            git("add", "fixture")
+            git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                "commit", "--no-gpg-sign", "-qm", "fixture")
+            file.write_text("indexed\n")
+            git("add", "fixture")
+            file.write_text("dirty\n")
+            status = git("status", "--porcelain=v1", "-z")
+            before = snapshots()
+            file.write_text("different dirty\n")
+            self.assertEqual(git("status", "--porcelain=v1", "-z"), status)
+            working_edit = snapshots()
+            self.assertNotEqual(working_edit[0], before[0])
+            self.assertEqual(working_edit[1], before[1])
+            git("add", "fixture")
+            file.write_text("different dirty\nextra\n")
+            git("add", "fixture")
+            file.write_text("different dirty\n")
+            self.assertEqual(git("status", "--porcelain=v1", "-z"), status)
+            index_edit = snapshots()
+            self.assertEqual(index_edit[0], working_edit[0])
+            self.assertNotEqual(index_edit[1], working_edit[1])
+
+
 if __name__ == "__main__":
     unittest.main()

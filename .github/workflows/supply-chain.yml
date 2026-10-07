@@ -78,9 +78,9 @@ jobs:
           "$python" -m pip --isolated check >"$output/pip-check.stdout" 2>"$output/pip-check.stderr"
       - name: Install checksum-verified pinned syft
         env:
-          SYFT_VERSION: '1.52.0'
-          # https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt (fetched 2026-09-22)
-          SYFT_SHA256: caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d
+          SYFT_VERSION: '1.54.0'
+          # https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt (fetched and rehashed 2026-10-03)
+          SYFT_SHA256: 54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860
         run: |
           mkdir -p "$RUNNER_TEMP/syft"
           curl --fail --silent --show-error --location --retry 3 \
@@ -130,7 +130,7 @@ jobs:
               by_severity[severity] = by_severity.get(severity, 0) + 1
           spdx = json.loads((scan_root / "sbom/venv.spdx.json").read_text())
           summary = {
-              "syft_version": "1.52.0",
+              "syft_version": "1.54.0",
               "grype_version": "0.119.0",
               "grype_db_status": (scan_root / "sbom/grype-db-status.txt").read_text().strip(),
               "package_count": len(spdx.get("packages", [])),
