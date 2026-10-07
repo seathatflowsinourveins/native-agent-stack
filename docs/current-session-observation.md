@@ -96,12 +96,6 @@ Collector, Prometheus and Grafana health returned HTTP 200. Loki initially
 returned HTTP 503 with its 15-second readiness delay, then HTTP 200 at 14:18:31
 UTC. Both outcomes are retained.
 
-These are the workstation's ports. On NativeStack2604 (2026-10-06) the same
-checks use the `ns2604-*` units and Grafana 21301, Loki 21300, Prometheus 21090
-and the collector's health endpoint 21333 (install plan
-`evidence/artifacts/new-wsl-install-plan-20261002/`, rows `grafana`, `loki`,
-`prometheus` and `otel-collector-contrib`).
-
 Set `DESKTOP_THREAD_ID` to the actual parent task identity before this native
 Loki query. Public evidence identifies that scope by SHA-256 and omits the raw ID.
 
@@ -146,3 +140,11 @@ current native snapshots. Keep native estimates, unique artifact comparisons and
 provider consumption separate. Verification calls themselves can increment
 counters; they must not be presented as productive savings or multiplied by the
 repository count.
+
+## Amendment (2026-10-06): NativeStack2604 workstation-port scope
+
+These are the workstation's ports. On NativeStack2604 (2026-10-06) the same
+checks use the `ns2604-*` units and Grafana 21301, Loki 21300, Prometheus 21090
+and the collector's health endpoint 21333 (install plan
+`evidence/artifacts/new-wsl-install-plan-20261002/`, rows `grafana`, `loki`,
+`prometheus` and `otel-collector-contrib`).
