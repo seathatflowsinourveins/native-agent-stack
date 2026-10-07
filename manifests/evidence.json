@@ -55183,6 +55183,21 @@
       "bytes": 55887
     },
     {
+      "path": "tools/invocation-monitoring/codex-counter-prototype-manifest.json",
+      "sha256": "e339e3039ae044a1ca5f63edb62f4c5d7af2981b246c51d930a537dacfbda5ba",
+      "bytes": 3634
+    },
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "d44d5ea4dcb9cf3c69f606fc25aba847084d593597025f853d76d67528d46eec",
+      "bytes": 24770
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "519e9f54bc9e0c901aae97865abbb62c9516a0537337c968068a484f91e5ac5a",
+      "bytes": 6941
+    },
+    {
       "path": "tools/omniroute/gateway_record.py",
       "sha256": "d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6",
       "bytes": 4963
