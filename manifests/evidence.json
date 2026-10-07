@@ -17637,9 +17637,19 @@
       "bytes": 21371
     },
     {
+      "path": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
+      "sha256": "458384923606322df77c216e51358c162de5203e75da3ce47bb590d56486c1a9",
+      "bytes": 7698
+    },
+    {
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "sha256": "0492af2bb409d9843a41d2baa2d55eb5247158357c0065e7aa8a1af6b89cbfb7",
       "bytes": 19235
+    },
+    {
+      "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
+      "sha256": "f5bad3e1a844cd540eeb00b33e8d6355487f526be1d26fbdc2de467042d12a49",
+      "bytes": 18825
     },
     {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
@@ -18043,8 +18053,8 @@
     },
     {
       "path": "docs/upstream-surface-watch.md",
-      "sha256": "b2f5d71f0a7d931166dd53b00ec91bb2728a2829df1e335c25363035464da7a5",
-      "bytes": 20291
+      "sha256": "f6a26af19fcca7610ab0fea3a51dce9a5ee5d275626efec42dda8eb34e0e24f4",
+      "bytes": 20312
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -41227,6 +41237,16 @@
       "bytes": 23333
     },
     {
+      "path": "evidence/artifacts/ns2604-context-audit-20261006/resolver-assignment.json",
+      "sha256": "003c7819956d4633e1768be258f4e76eaecffd0f8804471799a27290b6ba2505",
+      "bytes": 783
+    },
+    {
+      "path": "evidence/artifacts/ns2604-context-audit-20261006/review.json",
+      "sha256": "4f852add6729758d147ac08b5108f6fdfd15e76277d702c442598aac74c989b8",
+      "bytes": 8310
+    },
+    {
       "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
       "sha256": "2905791626d06cc9ba44215cecd1a346482ba2c718dcbc0b00e567bba7101843",
       "bytes": 2111
@@ -41255,6 +41275,11 @@
       "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
       "sha256": "e8347f73a917c7efb9b2a72050ca6c4f104e8f7a2fb9c89d53ee58b49d0aeffd",
       "bytes": 4589
+    },
+    {
+      "path": "evidence/artifacts/ns2604-pin-decision-20261006/selection.json",
+      "sha256": "ba388865d8507e849ebf4a9fdcc3feeacce592b6d7538a684f92913ca03d2801",
+      "bytes": 5042
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
