@@ -4342,6 +4342,22 @@
         "The 30-day observational recheck limit reuses the existing freshness default and is not a protocol qualification threshold."
       ],
       "path": "evidence/receipts/ns2604-organic-use-pilot-20261005.json"
+    },
+    {
+      "id": "ns2604-saturation-requirement-binding-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Additive versioned saturation requirement text/identity snapshots preserve all prior scope digests and records. Deterministic checker/fixture evidence only; no new sweep, trading text correction, native adoption or readiness change.",
+      "limitations": [
+        "Historical ledger records remain unchanged. Old requirement_sha256 values are retained as legacy_hash in new snapshots; they are not rehashed in place.",
+        "Local structural checks and synthetic fixtures are not upstream acceptance, an independent cross-family review or a new model-run qualification.",
+        "The actual model-run producer paths need convergence-practice custody and compatible propagation before any future run claims text-bound qualification; this publication does not claim those integrations are enabled.",
+        "Trading requirement text corrections remain the trading owner's work. No host operation, model execution, installation, closure or gating count changed."
+      ],
+      "path": "evidence/receipts/ns2604-saturation-requirement-binding-20261007.json"
     }
   ],
   "files": [
@@ -16008,13 +16024,18 @@
     },
     {
       "path": "catalogs/saturation/README.md",
-      "sha256": "ef675914ceb8917d0164175fb57b44ad6df850a13f6b984f49b8ef3febc3c77d",
-      "bytes": 12723
+      "sha256": "12c7e3ccc3c8ec840475b1fb219d62775d548b9ac3578c79c4434fe8deafbe09",
+      "bytes": 14350
     },
     {
       "path": "catalogs/saturation/ledger.json",
       "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
       "bytes": 403074
+    },
+    {
+      "path": "catalogs/saturation/ledger.schema.json",
+      "sha256": "fb5f5002508a653860b5763dc2cc4a58fedcdf155f725813001025a184fafe09",
+      "bytes": 8309
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -16975,6 +16996,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
+      "sha256": "dac41a540114e2e5868f8ec354e800f11569eb2406eed8e15b4cdb492b40bb3f",
+      "bytes": 5767
     },
     {
       "path": "docs/direct-results.md",
@@ -52402,6 +52428,11 @@
       "bytes": 18024
     },
     {
+      "path": "evidence/receipts/ns2604-saturation-requirement-binding-20261007.json",
+      "sha256": "568788d410f64509640e55819420a20c9228b3be0bdc4638f4a994dcceb13b40",
+      "bytes": 8701
+    },
+    {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
       "sha256": "0f6a0c171872cde9689d9d5f2ff60b881ae2328b96769dc78613f625cf9d1017",
       "bytes": 16128
@@ -53628,8 +53659,8 @@
     },
     {
       "path": "scripts/saturation_ledger.py",
-      "sha256": "04c898a42a43da11d87b74f338612bb00c0593f6ac87388f5ee142ec4f9afb28",
-      "bytes": 112669
+      "sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6",
+      "bytes": 120756
     },
     {
       "path": "scripts/skills_status.py",
@@ -54748,8 +54779,8 @@
     },
     {
       "path": "tests/test_saturation_ledger.py",
-      "sha256": "1fd9355d47cab5940bc12298727e0b08a6ddeec33c22fe40165bfb763549a381",
-      "bytes": 114021
+      "sha256": "c2b52378cb817995be919f9e83dc175a619a62d8c127701a6f43555511d15f43",
+      "bytes": 122869
     },
     {
       "path": "tests/test_sdk_usage_scope.py",
