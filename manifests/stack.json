@@ -2395,6 +2395,22 @@
       "runtime": "codebase-memory-mcp"
     },
     {
+      "id": "claude-haiku-4-5-20251001",
+      "revision": "claude-haiku-4-5-20251001",
+      "release_date": "2025-10-15",
+      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "release_date_basis": "Vendor public release date; the identifier suffix is its earlier snapshot date.",
+      "role": "Simple Claude Code background tasks",
+      "consumer_limit": "Titles, safety checks and quick summaries; latest Haiku line retained as the owner's dated exception, without heavier-line promotion for currency.",
+      "currency_status": "in_use",
+      "currency_rows": ["background-haiku"],
+      "landscape_checked_at": "2026-10-07",
+      "overturn": "An Anthropic Haiku 5.x model ID becomes available.",
+      "selection_scope": "Owner ruling and reported application at 2026-10-07T04:15Z; no new configuration read-back or model run by this wave.",
+      "route": "Native Claude account",
+      "distribution": "Hosted dated snapshot ID; no local weights or CI calls"
+    },
+    {
       "id": "unsloth/Qwen3.8-27B-GGUF",
       "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
       "license": "Apache-2.0",
