@@ -4697,6 +4697,23 @@
         "Command-center exact-head delta review and hosted validation are pending; recorded consistency does not prove external truth."
       ],
       "path": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json"
+    },
+    {
+      "id": "ns2604-catalog-fix3-20261007",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Repair case-sensitive named-tool masking and lossy completed-command attribution with separately retained synthetic controls.",
+      "limitations": [
+        "These checks are synthetic fixtures and source/structural review, not actual organic use, native host acceptance or upstream tests.",
+        "Supported cross-kind serialization does not prove external execution or shell environment equivalence; unproved command representations remain conflicting.",
+        "Recorded CanonicalRef declarations still need actual owner-controlled native provenance before publication of qualified counts.",
+        "The legacy raw/provisional prompt filter is unchanged and cannot supply a qualified organic verdict.",
+        "Command-center exact-head delta review is pending; hosted validate has not run because the draft conflicts with main.",
+        "Recorded malformed command value types outside the pinned native formats remain an open source limitation; this unit adds no format qualification."
+      ],
+      "path": "evidence/receipts/ns2604-catalog-fix3-20261007.json"
     }
   ],
   "files": [
@@ -17708,8 +17725,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
-      "sha256": "81c58a4eaa497c6974b6766659d406e80791b139a30c167169fbb3cbaef90f6c",
-      "bytes": 9145
+      "sha256": "73e6f8a99afaf3cb340d41ebe89b62a24914d5ab2fb00515292faf40a6ef06cd",
+      "bytes": 12349
     },
     {
       "path": "docs/decisions/2026-10-07-saturation-requirement-binding-v2.md",
@@ -53372,6 +53389,11 @@
       "bytes": 9026
     },
     {
+      "path": "evidence/receipts/ns2604-catalog-fix3-20261007.json",
+      "sha256": "15ba25045295469f122bfb6082217ea438b821303ac3e2c9d41309bb17f90c77",
+      "bytes": 18082
+    },
+    {
       "path": "evidence/receipts/ns2604-catalog-native-wiring-contract-20261007.json",
       "sha256": "419665cb9b8aa2baea4282784636fba8bc537e63e09ced307fb1f1464744ec92",
       "bytes": 7731
@@ -56268,18 +56290,18 @@
     },
     {
       "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
-      "sha256": "0b5614cdb6ea68c037d1e6c873651c182a04fb2c6598c67fe971c2124a005571",
-      "bytes": 4528
+      "sha256": "dc1bb12b51e4ca5cbd0bb5d509feb2e47ec8da51d8a19986ea83f3c89f45dd4a",
+      "bytes": 5887
     },
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
-      "bytes": 55328
+      "sha256": "c3b70e2e69b63e51f0743a14b8dc4db57c9d59efbbf2c8e57c1bd2cd5905480b",
+      "bytes": 57756
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3",
-      "bytes": 46076
+      "sha256": "7835fb4384bde70733a11e7800249a7430d908db5668a60b445f727b9f56f526",
+      "bytes": 63962
     },
     {
       "path": "tools/omniroute/gateway_record.py",
