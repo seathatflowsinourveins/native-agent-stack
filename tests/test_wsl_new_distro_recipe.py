@@ -523,8 +523,9 @@ def plan_loopback_ports() -> set[int]:
     """Every loopback port the install plan's services (their ``service.port``) and configuration files use."""
     ports = {int(row["service"]["port"]) for row in plan_rows()
              if isinstance(row.get("service"), dict) and row["service"].get("port") is not None}
-    for config in sorted((PLAN_DIR / "config").iterdir()):
-        ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
+    for config in sorted((PLAN_DIR / "config").rglob("*")):
+        if config.is_file():
+            ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
     return ports | set(plan_collector_ports())
 
 
@@ -1414,6 +1415,18 @@ class UserDataTemplateTests(unittest.TestCase):
 
 
 class HostTemplateTests(unittest.TestCase):
+    def test_nested_config_file_ports_remain_reserved(self):
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nested = root / "config/fixture.service.d"
+            nested.mkdir(parents=True)
+            (nested / "endpoint.conf").write_text("Endpoint=http://127.0.0.1:29996\n")
+            with patch(__name__ + ".PLAN_DIR", root), patch(__name__ + ".plan_rows", return_value=[]), \
+                    patch(__name__ + ".plan_collector_ports", return_value=(21317, 21318)):
+                self.assertEqual(plan_loopback_ports(), {29996, 21317, 21318})
+
     def test_the_host_template_renders_with_example_keys_and_free_ports(self):
         example = json.loads(read(HOST_EXAMPLE))
         self.assertEqual(host_template_errors(read(HOST_TEMPLATE), example, read(RECIPE)), [])
@@ -1531,7 +1544,7 @@ class StageTwoTests(unittest.TestCase):
             path = re.search(r"(?:bash|python3 -B) (\S+)", command).group(1)
             self.assertTrue((ROOT / path).is_file(), path)
         self.assertEqual(sorted(path.name for path in PLAN_DIR.iterdir() if path.name.endswith(".sh")),
-                         ["accept.sh", "install.sh"])
+                         ["accept.sh", "inspector-client-probe.sh", "install.sh"])
 
     def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
         owners = plan_after_sign_in_slots()

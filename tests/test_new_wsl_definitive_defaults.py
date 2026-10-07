@@ -3317,7 +3317,7 @@ exec(sys.stdin.read())
         # Synthetic native records exercise the repository integration boundary.
         # Codex rust-v0.160.0:exec_events.rs:161,286; context-mode@6f0cc684:
         # src/server.ts:1844; src/exit-classify.ts:22. These are not upstream acceptance.
-        expected = "rtk bash '/public/source.sh' 'query with spaces'"
+        expected = "bash '/public/source.sh' 'query with spaces'"
         for slot in ("agent-runtime-worker", "research-harnesses"):
             program = self.row(slot)["acceptance"]["after_sign_in"]["command"]
             block = next(b for b in re.findall(r"<<'PY'\n(.*?)\nPY", program, re.S)
@@ -3401,8 +3401,8 @@ exec(sys.stdin.read())
                                 self.assertEqual(oracle(path, client, [expected], ["Fixture operation completed"]), [expected] if case == "valid" else [])
 
     def test_worker_recipe_keeps_bus_bindings_in_an_empty_environment(self):
-        # Local RTK/systemd stand-ins test argument and public bus-binding custody.
-        # systemd@v259.5:src/shared/bus-util.c:273-300,510-540; native rtk proxy --help.
+        # A local systemd stand-in tests native argument and public bus-binding custody.
+        # systemd@v259.5:src/shared/bus-util.c:273-300,510-540; no output wrapper is required.
         line = next(l for l in self.row("agent-runtime-worker")["acceptance"]["after_sign_in"]["command"].splitlines()
                     if l.startswith("  printf -v worker_command "))
         with tempfile.TemporaryDirectory(prefix="worker recipe ") as directory:
@@ -4231,6 +4231,7 @@ sys.exit(42 if fail else 0)
             self.assertEqual(child.stdout.strip(), str(allowed))
 
     def test_owned_old_agentsview_links_migrate_but_foreign_aliases_are_retained(self):
+        # 2026-10-06 known-alias migration fixtures retain the superseded launcher versions.
         cases = (
             ("old binary", "0.43.0", "agentsview", False),
             ("old launcher", "0.43.0", "launcher", False),
@@ -4418,7 +4419,7 @@ sys.exit(42 if fail else 0)
         gpt_sha = "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4"
         delivered = {"reviewed_head": gpt_sha, "verdict": "no_findings", "findings": [],
                      "summary": "No correctness defects found in the supplied immutable diff."}
-        args = {"language": "shell", "code": f"rtk proxy git -C {ROOT} show {sha}"}
+        args = {"language": "shell", "code": f"git -C {ROOT} show {sha}"}
         initial = {"id": "source", "type": "mcp_tool_call", "server": "context-mode",
                    "tool": "ctx_execute", "arguments": args, "status": "in_progress"}
         completed = {**initial, "status": "completed", "error": None,
