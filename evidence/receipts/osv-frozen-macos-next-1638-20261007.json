@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "id": "osv-frozen-macos-next-1638-20261007",
+  "record": "Six next advisories excepted for the frozen macOS application variant lock under its dedicated OSV config",
+  "kind": "source_review_and_local_integration",
+  "evidence_class": "source_review",
+  "checked_commit": "b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276",
+  "observed_utc": "2026-10-07T21:46:01Z",
+  "claim": "OSV-Scanner 2.6.0 reports six advisories published 2026-10-07 for next 16.3.5 in the frozen variant lock, all first patched in 16.3.8. Each gets one dated exception in .github/osv-scanner-frozen-macos.toml, which the workflow applies to that lock alone; the lock bytes, the ordinary config and the inventory are unchanged. With the exceptions, the workflow's own scan step exits 0 locally. Reachability is not claimed: the exceptions rest on the absence of a supported consumer of the variant.",
+  "lock": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+  "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+  "byte_identical": true,
+  "package": {
+    "ecosystem": "npm",
+    "name": "next",
+    "locked_version": "16.3.5",
+    "first_patched": "16.3.8"
+  },
+  "advisories": [
+    "GHSA-39w2-rjm5-chcv",
+    "GHSA-3w37-wq28-93x7",
+    "GHSA-4jqv-mc3x-m676",
+    "GHSA-cjq9-62q9-8jv4",
+    "GHSA-f87g-xv8r-7p7x",
+    "GHSA-mcj8-r9mp-w47p"
+  ],
+  "ignore_until": "2026-12-24",
+  "ignore_until_basis": "The date of the three existing entries in the frozen config, of REVIEW_DATE in tests/test_frozen_macos_variant_no_use.py and of the closure decision's frozen-lock exception; within the 90-day bound tests/test_osv_lockfile_coverage.py enforces (2026-10-07 plus 90 days is 2027-01-05).",
+  "authorization": "Command-center ruling relayed in the coordinator's brief of 2026-10-07 for this change, the same as the earlier ruling quoted in evidence/receipts/osv-frozen-macos-source-map-js-20261005.json (task-ns2604-coop-20261006T003954Z, ruling1): a dated isolated-config exception per advisory, lock bytes preserved, no exception added to .github/osv-scanner.toml.",
+  "carried_forward_review": [
+    "evidence/receipts/osv-urllib3-next-20260930.json",
+    "evidence/receipts/osv-frozen-macos-source-map-js-20261005.json",
+    "evidence/receipts/sharp-0355-qualification-20261006.json"
+  ],
+  "advisory_records": {
+    "read_with": "gh api /advisories/<id> (GitHub global advisory database), 2026-10-07T21:33:15Z",
+    "common": "Each record lists npm next with first patched version 16.3.8 for the range that contains 16.3.5, references https://github.com/vercel/next.js/releases/tag/v16.3.8, and was published in the GitHub database between 2026-10-07T20:30:55Z and 20:32:13Z (NVD 2026-10-02). The hosted OSV table's CVSS column shows 5.4, 6.3, 6.3, 8.3, 6.3 and 6.3 in the order below.",
+    "records": [
+      {
+        "id": "GHSA-39w2-rjm5-chcv",
+        "cve": "CVE-2026-94486",
+        "url": "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+        "published_utc": "2026-10-07T20:31:51Z",
+        "github_severity": "low",
+        "cvss_v3_1": {"score": 5.4, "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N"},
+        "cvss_v4_0": {"score": 2.3, "vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N"},
+        "cwe": ["CWE-346"],
+        "ranges": [{"affected": ">= 16.0.0, < 16.3.8", "first_patched": "16.3.8"}],
+        "fix_commits": ["vercel/next.js@2d9f50a409312696145b82b3157aadb6b1fef476"],
+        "precondition": "Only applications run with next dev: the development server's Model Context Protocol endpoint does not verify a request's origin; production deployments do not serve it.",
+        "in_retained_files": "variant/package.json declares scripts.dev as next dev --hostname 127.0.0.1 --port 18080; the source review found no route that runs it."
+      },
+      {
+        "id": "GHSA-3w37-wq28-93x7",
+        "cve": "CVE-2026-94544",
+        "url": "https://github.com/advisories/GHSA-3w37-wq28-93x7",
+        "published_utc": "2026-10-07T20:32:13Z",
+        "github_severity": "medium",
+        "cvss_v3_1": {"score": 4.2, "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N"},
+        "cvss_v4_0": {"score": 6.3, "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"},
+        "cwe": ["CWE-524"],
+        "ranges": [{"affected": ">= 16.3.0, < 16.3.8", "first_patched": "16.3.8"}],
+        "fix_commits": ["vercel/next.js@bd9214f9a32854a011bf5fe58e481dffe1bbf598"],
+        "precondition": "Cache Components (or experimental.useCache) enabled and Draft Mode previews whose cached functions return draft-dependent content.",
+        "in_retained_files": "not established: no application source or Next.js configuration is retained"
+      },
+      {
+        "id": "GHSA-4jqv-mc3x-m676",
+        "cve": "CVE-2026-94543",
+        "url": "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+        "published_utc": "2026-10-07T20:32:06Z",
+        "github_severity": "medium",
+        "cvss_v3_1": {"score": 5.3, "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"},
+        "cvss_v4_0": {"score": 6.3, "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N"},
+        "cwe": ["CWE-524"],
+        "ranges": [
+          {"affected": ">= 15.0.0, < 15.5.27", "first_patched": "15.5.27", "applies_to_16.3.5": false},
+          {"affected": ">= 16.0.0, < 16.3.8", "first_patched": "16.3.8", "applies_to_16.3.5": true}
+        ],
+        "fix_commits": ["vercel/next.js@52c94abdd2ea5f416f5e8353ea8a2edd3fe311b8", "vercel/next.js@719e4c67d6e92df60246f95e1d96e2dd60789a52"],
+        "precondition": "Self-hosted applications using the Pages Router with SSG or ISR pages; applications deployed on Vercel are not affected.",
+        "in_retained_files": "not established: no application source or Next.js configuration is retained"
+      },
+      {
+        "id": "GHSA-cjq9-62q9-8jv4",
+        "cve": "CVE-2026-94483",
+        "url": "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+        "published_utc": "2026-10-07T20:30:55Z",
+        "github_severity": "high",
+        "cvss_v3_1": {"score": 6.5, "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N"},
+        "cvss_v4_0": {"score": 8.3, "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N"},
+        "cwe": ["CWE-918"],
+        "ranges": [{"affected": ">= 16.0.0, < 16.3.8", "first_patched": "16.3.8"}],
+        "fix_commits": ["vercel/next.js@e002ad68bd676bb0ed0c87bb22e3590304763e0b"],
+        "precondition": "An attacker-controlled, allow-listed remote URL can lead to server-side request forgery during Image Optimization; an application with no images.remotePatterns configured is not affected.",
+        "in_retained_files": "not established: no Next.js configuration is retained, so whether images.remotePatterns was configured is unknown here"
+      },
+      {
+        "id": "GHSA-f87g-xv8r-7p7x",
+        "cve": "CVE-2026-94485",
+        "url": "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+        "published_utc": "2026-10-07T20:31:33Z",
+        "github_severity": "medium",
+        "cvss_v3_1": {"score": 5.3, "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"},
+        "cvss_v4_0": {"score": 6.3, "vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"},
+        "cwe": ["CWE-346"],
+        "ranges": [{"affected": ">= 16.0.0, < 16.3.8", "first_patched": "16.3.8"}],
+        "fix_commits": ["vercel/next.js@2d9f50a409312696145b82b3157aadb6b1fef476"],
+        "precondition": "App Router applications built with webpack whose metadata image routes (opengraph-image, twitter-image) ignore dynamicParams for dynamic segments excluded from generateStaticParams().",
+        "in_retained_files": "not established: no application source or Next.js configuration is retained"
+      },
+      {
+        "id": "GHSA-mcj8-r9mp-w47p",
+        "cve": "CVE-2026-94484",
+        "url": "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+        "published_utc": "2026-10-07T20:31:13Z",
+        "github_severity": "medium",
+        "cvss_v3_1": {"score": 4.8, "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L"},
+        "cvss_v4_0": {"score": 6.3, "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N"},
+        "cwe": ["CWE-524"],
+        "ranges": [
+          {"affected": ">= 16.0.0, < 16.3.8", "first_patched": "16.3.8", "applies_to_16.3.5": true},
+          {"affected": ">= 15.0.0, < 15.5.27", "first_patched": "15.5.27", "applies_to_16.3.5": false}
+        ],
+        "fix_commits": ["vercel/next.js@52c94abdd2ea5f416f5e8353ea8a2edd3fe311b8", "vercel/next.js@719e4c67d6e92df60246f95e1d96e2dd60789a52"],
+        "precondition": "A root-level catch-all page together with SSG or ISR routes; one unauthenticated crafted request can poison the shared response cache.",
+        "in_retained_files": "not established: no application source or Next.js configuration is retained"
+      }
+    ]
+  },
+  "hosted_failure": {
+    "run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37689576446",
+    "event": "pull_request",
+    "head_sha": "1b4ea7d373ba689ecbf9726fb18244fc585d2cc3",
+    "created_utc": "2026-10-07T21:27:51Z",
+    "observed_lines": [
+      "Ran 21 tests in 0.584s / OK (the step's preflight)",
+      "No issues found (ordinary scan)",
+      "Total 1 package affected by 6 known vulnerabilities (0 Critical, 1 High, 5 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+      "OSV primary exit codes: ordinary=0 frozen-macos=1"
+    ],
+    "earlier_passes": [
+      "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37667431606 (push to main at b16cb8cf, 2026-10-07T18:31:00Z, success)",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37683363803 (pull_request, 2026-10-07T20:37:00Z, success)"
+    ],
+    "cause": "New advisory records: the frozen lock's only commit is 67666d6e (#201, 2026-09-24), and the six records were published in the GitHub database at 20:30:55Z to 20:32:13Z, after which OSV reported them for next 16.3.5."
+  },
+  "source_review": {
+    "commit": "b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276",
+    "observed_utc": "2026-10-07T21:35:17Z",
+    "method": "The no-consumer checks of the 2026-09-30 transcript (blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt:185-214), re-run at this commit.",
+    "checks": [
+      {"command": "git ls-tree -r --name-only b16cb8cf -- evidence/artifacts/macos-application-20260924", "exit_code": 0, "result": "run-summary.json, variant/package.json, variant/pnpm-lock.yaml"},
+      {"command": "git log --format='%h %ad %s' --date=short b16cb8cf -- evidence/artifacts/macos-application-20260924", "exit_code": 0, "result": "one commit: 67666d6e 2026-09-24 (#201)"},
+      {"command": "git grep -l -F macos-application-20260924/variant/pnpm-lock b16cb8cf -- . ':(exclude)evidence/artifacts/macos-application-20260924'", "exit_code": 0, "result": "46 files: .github/osv-scanner-frozen-macos.toml, .github/osv-scanner-lockfiles.json, .github/workflows/security-scan.yml, 5 under blueprints/convergence-practice/application-delivery (the experiment record and four retained OSV outputs), 15 under blueprints/runtime-workers/openhands (retained OSV outputs, controls, reviews, a transcript and a path listing), 17 under evidence/artifacts (retained scan copies and outputs, guard-mutation results, path listings and a retained copy of the experiment record), 4 receipts, manifests/evidence.json and tests/test_osv_lockfile_coverage.py"},
+      {"command": "grep each of those 46 files for a line naming the artifact together with pnpm, corepack, npm, npx, next, make or playwright commands", "exit_code": 0, "result": "no such line"},
+      {"command": "git grep -n -i pnpm b16cb8cf -- .github/workflows", "exit_code": 0, "result": "one line, .github/workflows/security-scan.yml:104, the frozen config's jq assignment check; no workflow references the application-delivery directory or corepack"},
+      {"command": "sha256sum evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml", "exit_code": 0, "result": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2"},
+      {"command": "python3 -m unittest tests.test_frozen_macos_variant_no_use", "exit_code": 0, "result": "Ran 10 tests, OK (2026-10-07T21:36:40Z, before this change)"},
+      {"command": "python3 -m unittest tests.test_osv_lockfile_coverage", "exit_code": 0, "result": "Ran 57 tests, OK (before this change)"}
+    ],
+    "retained_files": {
+      "package_json_scripts": "dev: next dev --hostname 127.0.0.1 --port 18080; build: next build; start: next start --hostname 127.0.0.1 --port 18080",
+      "run_summary": "Records the 2026-09-24 historical run's Makefile targets (setup, verify with a production build and one browser test, restart) for blueprints/convergence-practice/application-delivery at 4911baf411370517b1c5e0e83ca4d49c14e36db3, with the variant relocked by pnpm install --lockfile-only; it names no Next.js server command.",
+      "application_source": "None in the artifact directory. This review did not analyze the blueprint source at 4911baf4 for the advisories' preconditions."
+    }
+  },
+  "live_lock": {
+    "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+    "sha256": "b657db5288b38fd1aa667c656b06154ed5c613bfb7bb6d0ab754ea5d65c979d7",
+    "next": "16.3.8",
+    "scanned_under": ".github/osv-scanner.toml, which holds no entry for these advisories"
+  },
+  "local_scan": {
+    "evidence_class": "local_integration",
+    "binary": {
+      "url": "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64",
+      "sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+      "matches": [
+        "OSV_SCANNER_SHA256 in .github/workflows/security-scan.yml (sha256sum --check exit 0)",
+        "the osv-scanner_linux_amd64 line of the release's osv-scanner_SHA256SUMS",
+        "the release asset digest reported by the GitHub releases API"
+      ],
+      "version_output": "osv-scanner version: 2.6.0; osv-scalibr version: 0.5.2; commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6; built at: 2026-09-14T01:44:58Z",
+      "verified_utc": "2026-10-07T21:44:40Z"
+    },
+    "method": "The step 'Scan every listed lockfile and manifest' extracted from .github/workflows/security-scan.yml as SyntheticWorkflowInvocationTests.run_step extracts it (66 lines, sha256 8761afeda6dfdd5fef25434dd0ae72d8f2d4f0953febf114b372c86e320672ca), run from the worktree root by /usr/bin/bash --noprofile --norc -e -o pipefail with RUNNER_TEMP=<scratch>/runner holding the verified binary and WRITE_SARIF=false, the pull_request form. The preflight needs this receipt's path to exist; the scan's outcome does not depend on its content.",
+    "final_run": {
+      "config_sha256": "a00d1e2df72d7aca121ae39380e9c0f761a5d3d32d0392fa598502bdae2a89c6",
+      "started_utc": "2026-10-07T21:45:58Z",
+      "ended_utc": "2026-10-07T21:46:01Z",
+      "exit_code": 0,
+      "key_lines": [
+        "Ran 21 tests in 0.281s / OK",
+        "Filtered 4 vulnerabilities from output / No issues found (ordinary group)",
+        "GHSA-39w2-rjm5-chcv, GHSA-3w37-wq28-93x7, GHSA-4jqv-mc3x-m676, GHSA-cjq9-62q9-8jv4, GHSA-f87g-xv8r-7p7x and GHSA-mcj8-r9mp-w47p: and 1 alias have been filtered out because: next 16.3.5 is in the advisory's affected range ...",
+        "GHSA-vcvr-r3jv-pc5j, GHSA-wq5f-xc86-pv6w and GHSA-68fv-2mgg-jv7q filtered as before",
+        "Filtered 9 vulnerabilities from output / No issues found (frozen group)",
+        "OSV primary exit codes: ordinary=0 frozen-macos=0"
+      ]
+    },
+    "first_run": "The same step against an earlier wording of the six reasons (2026-10-07T21:44:58Z to 21:45:00Z) also exited 0 with ordinary=0 frozen-macos=0 and 9 filtered; only the reasons' description of the 46 files changed before the final run.",
+    "control": {
+      "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+      "exit_code": 1,
+      "result": "Total 3 packages affected by 9 known vulnerabilities (1 Critical, 3 High, 5 Medium, 0 Low, 0 Unknown): the six next advisories with fixed version 16.3.8, GHSA-vcvr-r3jv-pc5j, GHSA-wq5f-xc86-pv6w and GHSA-68fv-2mgg-jv7q. The ordinary config hides none of the frozen exceptions.",
+      "when": "the same batch as the first run, after 2026-10-07T21:45:00Z"
+    }
+  },
+  "sources": [
+    "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+    "https://github.com/advisories/GHSA-3w37-wq28-93x7",
+    "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+    "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+    "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+    "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+    "https://github.com/vercel/next.js/releases/tag/v16.3.8",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "google/osv-scanner@e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6:docs/configuration.md:23,27-44",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37689576446",
+    "native-agent-stack@b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276:.github/workflows/security-scan.yml:50-133",
+    "native-agent-stack@b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276:tests/test_frozen_macos_variant_no_use.py:47-59",
+    "native-agent-stack@b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276:docs/decisions/2026-09-22-github-automation-closure.md:325-371"
+  ],
+  "scope": "Six exceptions only under .github/osv-scanner-frozen-macos.toml, which security-scan.yml applies in an invocation of its own to this one digest-bound inventory entry. .github/osv-scanner.toml and .github/osv-scanner-lockfiles.json are unchanged and hold no next exception.",
+  "reachability": "Each advisory's precondition is taken from its text (advisory_records). The retained artifact holds no application source or Next.js configuration, so whether the captured application met a precondition is not established here; its package.json declares a dev script that runs next dev, the only mode GHSA-39w2-rjm5-chcv affects. The exceptions rest on non-use: no supported installer, build, server or replay route consuming the variant was found.",
+  "limits": "Source review and a local scan, not universal unreachability, safe manual replay, fresh application execution or hosted acceptance. The no-use tripwire catches direct references only; indirect loaders, globs, fragmented paths and external commands exceed its demonstrated boundary (tests/test_frozen_macos_variant_no_use.py, Limits). Dependabot alerts come from GitHub's dependency graph, not OSV configs, so any alerts for these advisories on the variant's package.json are outside this change.",
+  "overturn": "Remove the six exceptions and re-review before manual installation, replay, a new consuming route, adoption, changed lock bytes or 2026-12-24. The .frozen rename remains a separately tracked follow-up.",
+  "sanitization": "Local scratch paths are written as <scratch>; no credential, token or personal path is recorded."
+}

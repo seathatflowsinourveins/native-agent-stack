@@ -90,9 +90,12 @@ FROZEN_LOCKS = {
     # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
     "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
         "config": FROZEN_CONFIG,
-        "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q", "GHSA-wq5f-xc86-pv6w"],
+        "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q", "GHSA-wq5f-xc86-pv6w",
+                       # next 16.3.5; first patched in 16.3.8 (advisories published 2026-10-07)
+                       "GHSA-39w2-rjm5-chcv", "GHSA-3w37-wq28-93x7", "GHSA-4jqv-mc3x-m676",
+                       "GHSA-cjq9-62q9-8jv4", "GHSA-f87g-xv8r-7p7x", "GHSA-mcj8-r9mp-w47p"],
         "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
-        "evidence": "evidence/receipts/sharp-0355-qualification-20261006.json",
+        "evidence": "evidence/receipts/osv-frozen-macos-next-1638-20261007.json",
     },
 }
 
