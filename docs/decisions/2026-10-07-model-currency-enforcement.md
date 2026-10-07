@@ -95,3 +95,71 @@ uses the same existing ignored `.runtime/` carrier; its rerun returned 0,
 addendum corrects only its scratch-location classification. Raw logs remain in
 private coordination state. This also corrects the worktree scratch convention
 for subsequent checks.
+
+## Amendment (2026-10-07): ruled partial fill and current carriers
+
+The command center's model refresh was ruled at 2026-10-07T01:35Z. Its verified
+source-record SHA-256 is `44679fd1d26dfec36b3b57cdbde2df4290d1b068118562cb8811bf3eb7cd6941`.
+The current catalog now declares 20 strict artifact/model-consumer rows and seven
+primary package snapshots. It stays pending: [the new source-review record](../../evidence/artifacts/model-currency-enforcement-20261007/fill-source-review.json)
+preserves date/revision bases, corrections and eight unresolved groups. The
+original scaffold receipt and decided policy above remain unchanged.
+
+The five frontier selections retain canonical IDs. The CC reports the separate
+Sonnet 5.5 background-slot override applied at 01:46Z; this wave changes no live
+client configuration and asserts no new background-usage smoke. Local KEEP
+exceptions use the ruling's UTC date, October 7, and sourced alternatives/overturn
+conditions. Planned QMD retirement is not actual retirement: its interim vector
+model needs a scoped exception or an applied cutover before a strict row can be
+claimed. Unpinned bundled loaders, mismatched enclosing versions and uncovered
+roles remain pending; no invented date, SHA or landscape check fills them.
+
+Current independent embedding carriers name Nemotron-3-Embed-8B, 4096 dimensions
+and exact query/document prefixes. Claude's template names NativeStack2604's
+21633/28231 services; parameterized Codex/OpenHands templates keep host inputs.
+OpenHands' disabled entries and container-visible proxy contract are unchanged.
+The ai-memory example explicitly requires 2.5.2 prefix support; component pins,
+qualification receipts and installer alignment stay with their owners. The
+generated install script needs its maintained generator/owner fold, not a manual
+script edit. Its unresolved source-generation boundary is not counted complete.
+
+Sources: `akitaonrails/ai-memory@v2.5.2/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83`,
+[top-level prefix configuration](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L454-L502)
+and [factory wiring](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/factory.rs#L262-L269);
+`giancarloerra/SocratiCode@f6191f076a42405f0d5508139f3a8b505cfef93a`,
+[embedding configuration](https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/embedding-config.ts#L62-L69);
+and [the pinned NVIDIA card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md).
+The card's 32768-token capacity, declared server's 8192 bound and SocratiCode's
+4096 input limit are distinct consumer constraints.
+
+The Claude SDK example's former implicit DVA Opus 5 candidate is superseded.
+It now requires an explicit advertised Claude-family model. Opus-role work uses
+the existing native Claude Code route with Opus 5.5; changing the gateway model
+string alone would retain the gateway transport. No new transport wrapper is
+introduced. The September 27 decision's dormant #359 binding remains historical;
+its next use selects GPT-6.1 Sol unless the existing preregistered comparison at
+that decision's line 469 establishes a different choice. Historical experiment
+results and trading carriers are preserved; trading amendments are routed to 5f.
+
+Source boundaries: OmniRoute at `c1e30b7676975feb298b49eff6ff58923c04b89e`
+and `8ad6b1c46eaea49ab6b6e9929817c08a90c5067b` has the same
+[Devin Opus 5 catalog](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/config/providers/registry/devin/catalog.ts#L48-L76).
+This verifies that catalog, not every gateway or the actual serving identity.
+Installed Claude Code 2.1.292 version/help supports the proposed native model and
+effort flags; its [changelog](https://github.com/anthropics/claude-code/blob/v2.1.292/CHANGELOG.md#L1226-L1228)
+and [vendor release notes](https://platform.claude.com/docs/en/release-notes/overview)
+date the selected frontier models. The unchanged pinned SDK passes model/env
+options through its [subprocess transport](https://github.com/anthropics/claude-agent-sdk-python/blob/f2204bb956bab02907aaf3cb88eb9dead28eaa35/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L622-L626).
+OpenAI's [model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol)
+and [September 29 changelog](https://developers.openai.com/api/docs/changelog)
+confirm GPT-6.1 Sol's exact ID/date; native account and gateway availability are
+separate from currency. These primary pages were re-read October 7.
+
+The CC selected a persistent MinerU user unit as the model-source carrier.
+[Its recipe](../../recipes/mineru-local-service.md) runs the shipped foreground
+module with the supported local-source environment override and the CC alert
+handler. Activation, native status and a fresh-shell PDF smoke are CC window
+items. The embedded engine's CPU guard remains unqualified: its explicit
+99-GPU-layer argument is not overridden by the separate external wrapper's
+environment variable. The template supplies source only and does not claim
+CPU-only acceptance or a native running-source getter.

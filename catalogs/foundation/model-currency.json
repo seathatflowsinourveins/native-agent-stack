@@ -6,6 +6,547 @@
     "max_landscape_age_days": 7,
     "refresh_lead_days": 2
   },
-  "packages": [],
-  "models": []
+  "packages": [
+    {
+      "id": "headroom-ai",
+      "latest_version": "0.40.0",
+      "release_date": "2026-10-06",
+      "release_source": "https://pypi.org/project/headroom-ai/0.40.0/",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "pypi",
+        "package": "headroom-ai"
+      }
+    },
+    {
+      "id": "magika",
+      "latest_version": "1.0.3",
+      "release_date": "2026-05-04",
+      "release_source": "https://pypi.org/project/magika/1.0.3/",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "pypi",
+        "package": "magika"
+      }
+    },
+    {
+      "id": "markitdown",
+      "latest_version": "0.1.8",
+      "release_date": "2026-09-21",
+      "release_source": "https://pypi.org/project/markitdown/0.1.8/",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "pypi",
+        "package": "markitdown"
+      }
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "latest_version": "v0.11.0",
+      "release_date": "2026-09-15",
+      "release_source": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "github_release",
+        "repository": "DeusData/codebase-memory-mcp"
+      }
+    },
+    {
+      "id": "omniroute",
+      "latest_version": "v3.8.51",
+      "release_date": "2026-09-30",
+      "release_source": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "github_release",
+        "repository": "diegosouzapw/OmniRoute"
+      }
+    },
+    {
+      "id": "SpeechRecognition",
+      "latest_version": "3.17.0",
+      "release_date": "2026-06-17",
+      "release_source": "https://pypi.org/project/SpeechRecognition/3.17.0/",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "pypi",
+        "package": "SpeechRecognition"
+      }
+    },
+    {
+      "id": "mineru",
+      "latest_version": "4.0.10",
+      "release_date": "2026-09-29",
+      "release_source": "https://pypi.org/project/mineru/4.0.10/",
+      "checked_at": "2026-10-07",
+      "release_line": {
+        "kind": "pypi",
+        "package": "mineru"
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "claude-opus-5-5",
+      "role": "frontier judgment and subagents",
+      "consumer": "Claude Code opus alias and reviewed workflow agent definitions; consumer assignment follows the 01:35Z source packet.",
+      "model_id": "claude-opus-5-5",
+      "revision": "claude-opus-5-5",
+      "release_date": "2026-09-22",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#september-22-2026",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://platform.claude.com/docs/en/release-notes/overview"
+      },
+      "overturn": "A maintainer release-note entry publishes a newer Opus model ID."
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "role": "frontier fan-out",
+      "consumer": "Claude Code sonnet alias for fan-out agents, as recorded in the source packet.",
+      "model_id": "claude-sonnet-5-5",
+      "revision": "claude-sonnet-5-5",
+      "release_date": "2026-09-28",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#september-28-2026",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://platform.claude.com/docs/en/release-notes/overview"
+      },
+      "overturn": "A maintainer release-note entry publishes a newer Sonnet model ID."
+    },
+    {
+      "id": "claude-fable-5-1",
+      "role": "frontier main and advisor",
+      "consumer": "Claude Code main and advisor selections reported by the command center's model-refresh packet.",
+      "model_id": "claude-fable-5-1",
+      "revision": "claude-fable-5-1",
+      "release_date": "2026-09-01",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#september-1-2026",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://platform.claude.com/docs/en/release-notes/overview"
+      },
+      "overturn": "A newer Fable model ID appears. Restoring Opus as main/advisor is a selector decision, separate from model currency."
+    },
+    {
+      "id": "gpt-6-1-sol",
+      "role": "frontier coordination and workers",
+      "consumer": "Native Codex and the reviewed OmniRoute/stack-worker profiles; gateway-routed research and worker consumers named by the source packet.",
+      "model_id": "gpt-6.1-sol",
+      "revision": "gpt-6.1-sol",
+      "release_date": "2026-09-29",
+      "release_source": "https://developers.openai.com/api/docs/changelog",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+      },
+      "overturn": "A newer Sol model ID appears, or the first OmniRoute release carrying upstream PR 15167 triggers the declared gateway re-pin."
+    },
+    {
+      "id": "gpt-6-astra",
+      "role": "frontier consequential judgment",
+      "consumer": "Codex judgment and complex-workflow coordination; landscape-sweep codex_job.py default and the gateway aliases recorded by the source packet.",
+      "model_id": "gpt-6-astra",
+      "revision": "gpt-6-astra",
+      "release_date": "2026-09-03",
+      "release_source": "https://developers.openai.com/api/docs/changelog",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "vendor_page",
+        "url": "https://developers.openai.com/api/docs/models/gpt-6-astra"
+      },
+      "overturn": "A newer Astra model ID appears in the maintainer's release notes."
+    },
+    {
+      "id": "nemotron-3-embed-8b",
+      "role": "dense text embedding endpoint",
+      "consumer": "vLLM 0.31.0 OpenAI-compatible endpoint; ai-memory and SocratiCode send plain prefixed strings. No re-embedding is proposed.",
+      "model_id": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+      "release_date": "2026-07-16",
+      "release_source": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "nvidia/Nemotron-3-Embed-8B-BF16",
+        "ref": "main"
+      },
+      "overturn": "NVIDIA publishes a successor or official FP8/NVFP4 checkpoint; or a released compatible dense text model fits the declared budget and has admissible LMEB/RTEB superiority. Re-open EmbeddingGemma 2 when its benchmark submissions and released server support meet the recorded gates.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+          "https://huggingface.co/google/embeddinggemma-2/blob/914f7f89142e33e77833254d9c9b90c3cef7303b/README.md",
+          "https://huggingface.co/nvidia"
+        ],
+        "newer_candidates": [
+          {
+            "model_id": "google/embeddinggemma-2",
+            "revision": "914f7f89142e33e77833254d9c9b90c3cef7303b",
+            "source": "https://huggingface.co/google/embeddinggemma-2/blob/914f7f89142e33e77833254d9c9b90c3cef7303b/README.md",
+            "reason": "The command-center KEEP review rejects the current consumer/server and evidence fit: 768-dimensional successor, no accepted LMEB/complete RTEB parity, and no released vLLM 0.31.0 registration. The October 6 public release is also within the clean-release cooldown at the ruled timestamp. This child checks identity/source only, not those capabilities or benchmark behavior."
+          }
+        ],
+        "reason": "Retain the ruled Nemotron checkpoint. The source packet's corrected comparison finds no newer candidate satisfying the current server, plain-string input, quality evidence and memory gates; it does not claim every alternative is worse. The child confirms the selected ID/SHA and the card's product date, and preserves the command center's sourced KEEP reasoning without executing a comparison."
+      }
+    },
+    {
+      "id": "qmd-qwen3-reranker",
+      "role": "qmd rank GGUF reranker",
+      "consumer": "qmd 2.8.3 node-llama-cpp 3.20.0 rank-pooling loader; CPU fallback is a dated packet observation, not an enforced registration read-back.",
+      "model_id": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+      "revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
+      "release_date": "2025-10-03",
+      "release_source": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/qwen3-reranker-0.6b-q8_0.gguf",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+        "ref": "main"
+      },
+      "overturn": "Qwen/ggml-org publishes a newer stock-loadable rank GGUF, qmd changes its loader/default or remote rerank support, or an upstream-harness CPU comparison accepts the 4B candidate's latency and quality.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/qwen3-reranker-0.6b-q8_0.gguf",
+          "https://github.com/tobi/qmd/blob/v2.8.3/src/llm.ts",
+          "https://huggingface.co/Horizon-Labs/multilingual-reranker-base/blob/1302619c8478dd630e06a934d4064ae345a7d0da/README.md",
+          "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/blob/bde5202b1001731471f8e4bbda0f4c6315859904/README.md"
+        ],
+        "newer_candidates": [
+          {
+            "model_id": "Horizon-Labs/multilingual-reranker-base",
+            "revision": "1302619c8478dd630e06a934d4064ae345a7d0da",
+            "source": "https://huggingface.co/Horizon-Labs/multilingual-reranker-base/blob/1302619c8478dd630e06a934d4064ae345a7d0da/README.md",
+            "reason": "The primary card publishes safetensors/ONNX, while the current qmd loader needs rank GGUF. Its publisher table records 0.841 against the selected base model's 0.845; those are publisher observations, not our test."
+          },
+          {
+            "model_id": "americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF",
+            "revision": "bde5202b1001731471f8e4bbda0f4c6315859904",
+            "source": "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/blob/bde5202b1001731471f8e4bbda0f4c6315859904/README.md",
+            "reason": "The refuter confirms the loader markers and stronger base-model evidence. Keep the maintained qmd/ggml-org default until a real same-protocol CPU-latency and quality comparison resolves the 6.75x-parameter tradeoff. Do not claim this candidate failed the loader or quality gate."
+          }
+        ],
+        "reason": "Named exception, not current-by-age. The KEEP decision rests on the maintained qmd default and publisher and on an unresolved latency/qualification tradeoff; the corrected 4B candidate remains an overturn lead."
+      }
+    },
+    {
+      "id": "qmd-query-expansion",
+      "role": "qmd lex/vec/hyde query expansion",
+      "consumer": "qmd 2.8.3 generate slot and its fixed expansion prompt/grammar. The packet observes a floating URI resolving to these bytes; pin wiring goes live only through CC apply.",
+      "model_id": "tobil/qmd-query-expansion-1.7B-gguf",
+      "revision": "7816de0b72572c6c860ca1eddf97ba9e7fb8cc65",
+      "release_date": "2026-01-29",
+      "release_source": "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/qmd-query-expansion-1.7B-q4_k_m.gguf",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "tobil/qmd-query-expansion-1.7B-gguf",
+        "ref": "main"
+      },
+      "overturn": "tobil or qmd changes the expansion GGUF/default/loader, or a maintainer-harness or promptfoo comparison favors another compatible GGUF. Compare the LFM2.5 candidate first and preserve cache/config migration gates.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/qmd-query-expansion-1.7B-q4_k_m.gguf",
+          "https://github.com/tobi/qmd/blob/v2.8.3/src/llm.ts",
+          "https://huggingface.co/langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2/blob/c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc/README.md"
+        ],
+        "newer_candidates": [
+          {
+            "model_id": "langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2",
+            "revision": "c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc",
+            "source": "https://huggingface.co/langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2/blob/c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc/README.md",
+            "reason": "The source review finds a compatible newer expansion GGUF, but its self-reported QMD reward omits a stated query set and same-run qmd-default comparison. It is the first candidate for a measured upstream-harness A/B; no such run was authorized here."
+          }
+        ],
+        "reason": "Named exception. Retain qmd's maintained default; the packet's newer maintainer adapter is not GGUF, the smaller GGUF has weaker non-comparable publisher evidence, and the leading third-party GGUF awaits a same-protocol comparison."
+      }
+    },
+    {
+      "id": "potion-code-16m-v2",
+      "role": "static semantic code retrieval",
+      "consumer": "Semble 0.6.2 StaticModel/model2vec 0.9.0 fused with BM25; pinned model copy reported by the source packet.",
+      "model_id": "minishlab/potion-code-16M-v2",
+      "revision": "e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b",
+      "release_date": "2026-07-04",
+      "release_source": "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/model.safetensors",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "minishlab/potion-code-16M-v2",
+        "ref": "main"
+      },
+      "overturn": "MinishLab publishes a newer code model, Semble changes its default, or Semble's own same-protocol benchmark finds a complete compatible static code model better. A switch requires cached-repository reindexing.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/model.safetensors",
+          "https://huggingface.co/Takara-DS1/miru-codev3-tokenlearn/blob/56cfb2cb71f8d34b9f8c889a8a3206c418b8c471/README.md",
+          "https://huggingface.co/Takara-DS1/miru-codev3-dual/blob/44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8/README.md"
+        ],
+        "newer_candidates": [
+          {
+            "model_id": "Takara-DS1/miru-codev3-tokenlearn",
+            "revision": "56cfb2cb71f8d34b9f8c889a8a3206c418b8c471",
+            "source": "https://huggingface.co/Takara-DS1/miru-codev3-tokenlearn/blob/56cfb2cb71f8d34b9f8c889a8a3206c418b8c471/README.md",
+            "reason": "Compatible single-bag candidate remains a benchmark lead. Its card comparison imports Potion numbers from a different harness and does not establish complete same-run superiority; individual tasks can improve, so no categorical worse claim is made."
+          },
+          {
+            "model_id": "Takara-DS1/miru-codev3-dual",
+            "revision": "44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8",
+            "source": "https://huggingface.co/Takara-DS1/miru-codev3-dual/blob/44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8/README.md",
+            "reason": "The source packet records a custom DualConcatEncoder requirement outside Semble's StaticModel.from_pretrained loader and incomplete comparable task evidence."
+          }
+        ],
+        "reason": "KEEP rests on the absence of admissible evidence for a better compatible current model, not proof every candidate is worse. The packet's refuter found omitted candidate families and crossed harnesses; that completeness limitation remains explicit."
+      }
+    },
+    {
+      "id": "mineru-vlm-gguf",
+      "role": "document parsing VLM",
+      "consumer": "MinerU 4.0.10 standard tier, llama-cpp VLM engine and its protocol-specific prompts/layout tokens; Q8_0 model and matching mmproj.",
+      "model_id": "jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF",
+      "revision": "9185688a0495e1577d521a757c7c0b62dd38ca48",
+      "release_date": "2026-08-13",
+      "release_source": "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/blob/9185688a0495e1577d521a757c7c0b62dd38ca48/MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF",
+        "ref": "main"
+      },
+      "overturn": "OpenDataLab publishes a newer protocol-compatible parsing VLM or MinerU changes its registry; a compatible GGUF/mmproj candidate earns same-scorer ParseBench evidence; the registry adopts PP-DocLayoutV3; or a qualified runtime/memory route changes the fit.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/blob/9185688a0495e1577d521a757c7c0b62dd38ca48/MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
+          "https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/model/registry.py",
+          "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/7fa09b7328898ceedf6c52b6665a943286fa6413/README.md"
+        ],
+        "newer_candidates": [
+          {
+            "model_id": "aeddix-labs/aeddix-alpine-ocr",
+            "revision": "7fa09b7328898ceedf6c52b6665a943286fa6413",
+            "source": "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/7fa09b7328898ceedf6c52b6665a943286fa6413/README.md",
+            "reason": "A newer MinerU-base fine-tune and publisher ParseBench lead, but no selected compatible GGUF plus mmproj path is qualified. Its October 6 release remains in cooldown at the ruling timestamp. Do not rebuild or substitute it into MinerU's protocol by assumption."
+          }
+        ],
+        "reason": "KEEP the upstream registry's selected GGUF pair. The packet's corrected comparison finds newer fine-tunes without the CPU GGUF/mmproj delivery needed here and other OCR runtimes with different protocol, device or scoring contracts."
+      }
+    },
+    {
+      "id": "mineru-onnx-bundle",
+      "role": "document layout OCR formula and table export bundle",
+      "consumer": "MinerU 4.0.10 standard-tier ONNX companion set. This bundle row does not complete the separate original-checkpoint inventory.",
+      "model_id": "opendatalab/MinerU-4_models_onnx",
+      "revision": "358310b4f64b95f9fefc372ad899356e4111f376",
+      "release_date": "2026-09-10",
+      "release_source": "https://huggingface.co/opendatalab/MinerU-4_models_onnx/blob/358310b4f64b95f9fefc372ad899356e4111f376/manifest.json",
+      "checked_at": "2026-10-07",
+      "status": "in_use",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "opendatalab/MinerU-4_models_onnx",
+        "ref": "main"
+      },
+      "overturn": "OpenDataLab publishes a newer protocol-compatible parsing VLM or MinerU changes its registry; a compatible GGUF/mmproj candidate earns same-scorer ParseBench evidence; the registry adopts PP-DocLayoutV3; or a qualified runtime/memory route changes the fit."
+    },
+    {
+      "id": "headroom-kompress-int8-wo",
+      "role": "token compression selected ONNX artifact",
+      "consumer": "Headroom 0.40.0 Python ONNX CPU loader. Held: the packet reports the [mcp]-only environment lacks onnxruntime/transformers; no local execution or remote enablement is claimed.",
+      "model_id": "chopratejas/kompress-v2-base",
+      "revision": "b1563631b35bfdcee37587ad530147497d820d4c",
+      "release_date": "2026-06-10",
+      "release_source": "https://huggingface.co/chopratejas/kompress-v2-base/blob/b1563631b35bfdcee37587ad530147497d820d4c/onnx/kompress-int8-wo.onnx",
+      "checked_at": "2026-10-07",
+      "status": "held",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "chopratejas/kompress-v2-base",
+        "ref": "main"
+      },
+      "overturn": "Headroom's selected extra or native backend changes; the maintainer publishes another compatible Kompress export; a Headroom release changes HF_MODEL_ID/_PINNED_REVISIONS; or an explicitly authorized qualified remote route is selected.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/chopratejas/kompress-v2-base/blob/b1563631b35bfdcee37587ad530147497d820d4c/onnx/kompress-int8-wo.onnx",
+          "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
+          "https://pypi.org/project/headroom-ai/0.40.0/"
+        ],
+        "newer_candidates": [
+          {
+            "model_id": "chopratejas/kompress-v2-base",
+            "revision": "e00cc5e60ff73b01674ef8fa6da6c5acf6d54181",
+            "source": "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
+            "reason": "This newer repository revision preserves the exact selected int8-wo artifact: last modifying commit b1563631..., LFS SHA c47ddd76.... It is a metadata/card revision, not a new weight release. The packet finds no newer compatible two-input/final_scores export."
+          }
+        ],
+        "reason": "Retain the pinned export as held until its supported runtime extra is qualified. The source packet rejects other compression formats and an unqualified remote shim; a README-only head does not reset the selected weight date."
+      }
+    },
+    {
+      "id": "kompress-modernbert-tokenizer",
+      "role": "paired tokenizer configuration",
+      "consumer": "Headroom 0.40.0 selected Python Kompress tokenizer; held with the unavailable Kompress runtime extra.",
+      "model_id": "answerdotai/ModernBERT-base",
+      "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+      "release_date": "2025-01-15",
+      "release_source": "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
+      "checked_at": "2026-10-07",
+      "status": "held",
+      "release_line": {
+        "kind": "huggingface",
+        "repository": "answerdotai/ModernBERT-base",
+        "ref": "main"
+      },
+      "overturn": "Headroom's selected extra or native backend changes; the maintainer publishes another compatible Kompress export; a Headroom release changes HF_MODEL_ID/_PINNED_REVISIONS; or an explicitly authorized qualified remote route is selected.",
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
+          "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md"
+        ],
+        "newer_candidates": [],
+        "reason": "The maintained Kompress checkpoint prescribes ModernBERT-base, and the current upstream main SHA remains the selected tokenizer pin. No newer paired tokenizer revision was found in this exact line; arbitrary tokenizer substitution is not equivalent to adopting a compatible newer model. The source packet's hold and runtime-extra gate remain."
+      }
+    },
+    {
+      "id": "headroom-bge-onnx",
+      "role": "relevance embedding default",
+      "consumer": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "model_id": "Qdrant/bge-small-en-v1.5-onnx-Q",
+      "revision": "52398278842ec682c6f32300af41344b1c0b0bb2",
+      "release_date": "2024-01-15",
+      "release_source": "https://huggingface.co/Qdrant/bge-small-en-v1.5-onnx-Q/blob/52398278842ec682c6f32300af41344b1c0b0bb2/model_optimized.onnx",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "A Headroom release changes the selected pin or the token lane qualifies an extra that makes this loader usable.",
+      "package": {
+        "id": "headroom-ai",
+        "version": "0.40.0"
+      }
+    },
+    {
+      "id": "headroom-minilm-onnx",
+      "role": "memory embedding default",
+      "consumer": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "model_id": "Qdrant/all-MiniLM-L6-v2-onnx",
+      "revision": "5f1b8cd78bc4fb444dd171e59b18f3a3af89a079",
+      "release_date": "2024-01-16",
+      "release_source": "https://huggingface.co/Qdrant/all-MiniLM-L6-v2-onnx/blob/5f1b8cd78bc4fb444dd171e59b18f3a3af89a079/model.onnx",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "A Headroom release changes the selected pin or the token lane qualifies an extra that makes this loader usable.",
+      "package": {
+        "id": "headroom-ai",
+        "version": "0.40.0"
+      }
+    },
+    {
+      "id": "headroom-technique-router-onnx",
+      "role": "image technique routing default",
+      "consumer": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "model_id": "chopratejas/technique-router-onnx",
+      "revision": "27b0b4bfa510a1cff66d888072c0b807082721a8",
+      "release_date": "2026-04-09",
+      "release_source": "https://huggingface.co/chopratejas/technique-router-onnx/blob/27b0b4bfa510a1cff66d888072c0b807082721a8/model_quantized.onnx",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "A Headroom release changes the selected pin or the token lane qualifies an extra that makes this loader usable.",
+      "package": {
+        "id": "headroom-ai",
+        "version": "0.40.0"
+      }
+    },
+    {
+      "id": "headroom-siglip-onnx",
+      "role": "image encoder default",
+      "consumer": "Headroom 0.40.0 package default. The source packet reports the [mcp]-only installation cannot load this optional path; package declaration is not observed model execution.",
+      "model_id": "chopratejas/siglip-image-encoder-onnx",
+      "revision": "d0a9fbd66d4bd8c761bff592d44831f7c2ae184e",
+      "release_date": "2026-04-09",
+      "release_source": "https://huggingface.co/chopratejas/siglip-image-encoder-onnx/blob/d0a9fbd66d4bd8c761bff592d44831f7c2ae184e/image_encoder_int8.onnx",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "A Headroom release changes the selected pin or the token lane qualifies an extra that makes this loader usable.",
+      "package": {
+        "id": "headroom-ai",
+        "version": "0.40.0"
+      }
+    },
+    {
+      "id": "magika-standard-v3-3",
+      "role": "file-type model bundled in Magika",
+      "consumer": "Magika 1.0.3 as used by MinerU/docvortex, with the same model identity reported in the source packet's Rust consumers.",
+      "model_id": "google/magika:assets/models/standard_v3_3/model.onnx",
+      "revision": "git-blob:e669a1120903d93417f57a1aedd1bc0000819b8b",
+      "release_date": "2025-04-11",
+      "release_source": "https://github.com/google/magika/blob/3f2cb8537dce123587bfb3535a402145adcba2c7/assets/models/CHANGELOG.md",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "Google Magika ships a newer model than standard_v3_3, or the enclosing consumer changes its model/library contract.",
+      "package": {
+        "id": "magika",
+        "version": "1.0.3"
+      },
+      "landscape_check": {
+        "date": "2026-10-07",
+        "sources": [
+          "https://github.com/google/magika/blob/3f2cb8537dce123587bfb3535a402145adcba2c7/assets/models/CHANGELOG.md",
+          "https://github.com/google/magika/tree/main/assets/models",
+          "https://pypi.org/project/magika/1.0.3/"
+        ],
+        "newer_candidates": [],
+        "reason": "The primary model changelog's latest standard model is standard_v3_3 and the current model-directory listing contains no successor. PyPI's latest non-yanked shipping release is still Magika 1.0.3. Retain the package-bundled model under the source packet's PACKAGE_BOUND decision; no runtime or GPU inference acceptance is added."
+      }
+    },
+    {
+      "id": "markitdown-magika-standard-v3-3",
+      "role": "file-type model through maintained converter dependency",
+      "consumer": "MarkItDown 0.1.8 pins Magika approximately 0.6.1 and the source packet observes 0.6.3 carrying identical standard_v3_3 bytes. This row binds the converter package, without asserting Magika 0.6.3 is the latest Magika line.",
+      "model_id": "google/magika:assets/models/standard_v3_3/model.onnx",
+      "revision": "git-blob:e669a1120903d93417f57a1aedd1bc0000819b8b",
+      "release_date": "2025-04-11",
+      "release_source": "https://github.com/google/magika/blob/3f2cb8537dce123587bfb3535a402145adcba2c7/assets/models/CHANGELOG.md",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "MarkItDown lifts the dependency/model pin or upstream Magika changes the model; re-check dependent converters instead of silently replacing their declared dependency.",
+      "package": {
+        "id": "markitdown",
+        "version": "0.1.8"
+      }
+    },
+    {
+      "id": "codebase-memory-static-nomic",
+      "role": "package-derived static semantic token vectors",
+      "consumer": "Codebase Memory MCP v0.11.0 optional semantic pass; source packet reports registrations leave the semantic option unset. No daemon environment or native semantic pass was read or run by this child.",
+      "model_id": "DeusData/codebase-memory-mcp:vendored/nomic/code_vectors.bin",
+      "revision": "git-blob:6889c7cfe9a29beb87a8b63db9cbdc8f5eb34a38",
+      "release_date": "2025-03-24",
+      "release_source": "https://huggingface.co/nomic-ai/nomic-embed-code/commit/9a0457648f060c4279d4a3982d2d27a4df6fac59",
+      "checked_at": "2026-10-07",
+      "status": "package_bound",
+      "overturn": "A Codebase Memory release changes the vendored tree or a native semantic pass is enabled; then re-check the derived artifact, source model and runtime evidence.",
+      "package": {
+        "id": "codebase-memory-mcp",
+        "version": "v0.11.0"
+      }
+    }
+  ]
 }
