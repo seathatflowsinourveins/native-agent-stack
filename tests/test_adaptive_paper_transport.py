@@ -1334,6 +1334,21 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             with self.assertRaisesRegex(t.TransportError, "completeness"):
                 self.port._pages("open")
 
+    async def test_snapshot_failure_keeps_the_foreign_read_out_of_tracebacks(self):
+        # #809 review: no caller's traceback or log prints the failing read's foreign text; a recovery receipt
+        # still records its type from __context__ (tests/test_adaptive_paper_recovery.py)
+        import traceback
+        foreign = "read failed token " + "Q" * 40
+        with patch.object(self.port._client, "get_account", side_effect=ConnectionError(foreign)):
+            with self.assertRaisesRegex(t.TransportError, "snapshot incomplete") as caught:
+                await self.port.snapshot()
+        error = caught.exception
+        self.assertIsNone(error.__cause__)
+        self.assertTrue(error.__suppress_context__)
+        self.assertIsInstance(error.__context__, ConnectionError)
+        self.assertNotIn("Q" * 40, "".join(traceback.format_exception(error)))
+        self.assertIn("snapshot_incomplete", self.port.health["reasons"])
+
     async def test_native_stream_threads_start_and_join(self):
         await self.port.stop()
         with patch.object(t, "_stream_classes", return_value=(FakeStream, FakeStream)):

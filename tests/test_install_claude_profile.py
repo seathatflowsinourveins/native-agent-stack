@@ -1781,6 +1781,21 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 with self.subTest(surface=name, dropped=phrase):
                     self.assertNotIn(phrase, text)
 
+    # A user-level reporting rule (docs/decisions/2026-10-05-user-facing-local-time.md): one wording in the two client
+    # blocks and in the carriers F9 renders from them, once each. It is not a standing clause of the repository
+    # AGENTS.md, so SHARED does not hold it.
+    LOCAL_TIME = ("When you tell the user a time, give it first in the host's local time zone (read it with "
+                  "`timedatectl` or `date`), with UTC beside it, for example \"4:00 PM EDT (20:00Z)\". Write timestamps in "
+                  "ledger rows, receipts, evidence and commit messages in UTC (RFC 3339 with `Z`); "
+                  "Git author/committer metadata retains its native format.")
+    LOCAL_TIME_SURFACES = ("examples/claude-native/CLAUDE.md", "adoption/templates/codex.AGENTS.template.md",
+                           "adoption/new-wsl/claude-user-instructions.md", "adoption/new-wsl/codex-user-instructions.md")
+
+    def test_the_user_level_blocks_and_their_carriers_carry_the_local_time_rule_once(self):
+        for relative in self.LOCAL_TIME_SURFACES:
+            with self.subTest(surface=relative):
+                self.assertEqual((ROOT / relative).read_text(encoding="utf-8").count(self.LOCAL_TIME), 1)
+
 
 class PortableTopRuleTests(unittest.TestCase):
     """Portable procedure and fixed rendered startup bytes (2026-10-05).

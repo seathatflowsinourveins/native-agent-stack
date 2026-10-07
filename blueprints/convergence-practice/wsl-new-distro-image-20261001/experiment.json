@@ -85,11 +85,11 @@
         "sha256": "ff94e93390875a4c6d2baa352fa7075e66acc7a966b33f1ef62338fb9988b7f3"
       },
       {
-        "path": "adoption/templates/wsl/cloud-init.user-data.template",
+        "path": "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/cloud-init.user-data.template.txt",
         "sha256": "08e6a3f6b078dfa54d78297596d54729d10528d57147b9b9eae063c37160eeb9"
       },
       {
-        "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
+        "path": "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/2026-10-01-new-wsl-distro-recipe.md.txt",
         "sha256": "ec03a494aa4d80ac004f74710250bf1ac7cf18e0506758d97a1cf98a0cee42a3"
       }
     ],
@@ -101,11 +101,11 @@
     ],
     "evaluation": [
       {
-        "path": "adoption/templates/wsl/first-boot-checklist.md",
+        "path": "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/first-boot-checklist.md.txt",
         "sha256": "1a06df0e6d50b07b439317a61a450e450127052589f63254e769d99166e3603b"
       },
       {
-        "path": "adoption/templates/wsl/stage1-receipt.example.json",
+        "path": "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/stage1-receipt.example.json.txt",
         "sha256": "7c0811c460fe8732f413b954cd7ddadb5cc41a5300f8686b5b83aefcd80a971a"
       },
       {
