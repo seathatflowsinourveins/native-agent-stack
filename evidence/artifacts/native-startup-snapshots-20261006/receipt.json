@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "host": "NativeStack2604",
+  "unit": "whole-startup-counter-scopes",
+  "evidence_classes": ["native renderer read-back", "historical owner-reported native counters"],
+  "codex": {
+    "client": "codex-cli0.160.1",
+    "command": "nice -n19 ionice -c3 codex debug prompt-input",
+    "cwd_scope": "main checkout, read-only",
+    "exit": 0,
+    "captured_utc": "2026-10-06T23:48:44.183768Z",
+    "private_json_bytes": 50253,
+    "private_json_sha256": "a13c7c26c10b43737f92b8b12988bfce84c2d5a5e3e12c718086a481e3f40b2d",
+    "model_visible_messages": 4,
+    "native_usage_field_present": false,
+    "message_text_aggregates": [
+      {"index": 0, "role": "developer", "content_parts": 4, "characters": 20328, "utf8_bytes": 20346},
+      {"index": 1, "role": "developer", "content_parts": 1, "characters": 2429, "utf8_bytes": 2429},
+      {"index": 2, "role": "developer", "content_parts": 1, "characters": 520, "utf8_bytes": 520},
+      {"index": 3, "role": "user", "content_parts": 2, "characters": 24455, "utf8_bytes": 24463}
+    ],
+    "selected_text_parts": {
+      "skills_wrapper": {"message": 0, "part": 0, "characters": 18299, "utf8_bytes": 18317},
+      "agents_instructions": {"message": 3, "part": 0, "characters": 24055, "utf8_bytes": 24063},
+      "environment_context": {"message": 3, "part": 1, "characters": 400, "utf8_bytes": 400}
+    },
+    "current_main_provider_input_tokens": null,
+    "historical_owner_report": {
+      "source": "IMPROVEMENT-MANIFEST.md C8:169",
+      "fresh_thread_input_tokens_display": "about 24.9–26.1k",
+      "forked_thread_input_tokens_display": "40.9–71.1k",
+      "session_ids_and_capture_times": "not supplied in the source",
+      "fresh_measurement_claimed": false
+    }
+  },
+  "claude": {
+    "evidence_class": "historical owner-reported native /context display, transcribed",
+    "source": "IMPROVEMENT-MANIFEST.md C8:154-168, owner session d91d55ad",
+    "capture_time": null,
+    "native_display_units": true,
+    "tokens_display": {
+      "system_prompt": "2.6k",
+      "system_tools": "17.6–19.5k",
+      "mcp_server_instructions": "1.8k",
+      "custom_agents": "1.2k",
+      "memory_user_claude": "4k",
+      "memory_agents": "3.7k",
+      "memory_auto_memory": "3.4k",
+      "memory_total": "11.5k",
+      "skills": "7.8k"
+    },
+    "deferred_tools_display": {"mcp_tools": "74.1k", "system_tools": "21.6k"},
+    "deferred_tools_in_usage": false,
+    "fresh_claude_run": false,
+    "independent_raw_context_table_observed": false
+  },
+  "corrections": [
+    "Characters divided by four is not a token count; use the client's own counter.",
+    "The owner's 20328/24455-character labels match whole native message-text bundles, not the isolated Skills and AGENTS parts.",
+    "Sum native text parts without adding invented separator characters; serialized JSON bytes have another scope."
+  ],
+  "sources": [
+    "installed codex-cli0.160.1 debug prompt-input --help: model-visible input JSON renderer",
+    "owner IMPROVEMENT-MANIFEST.md C8, dated 2026-10-06",
+    "https://code.claude.com/docs/en/context-window"
+  ],
+  "limits": [
+    "Prompt-input is a structural snapshot, not a provider token counter or a complete tools/schema token total.",
+    "Native token displays are preserved as rounded/range strings; no conversion to exact integers or summing overlapping counters.",
+    "The historical owner ranges are not a new main-checkout model run. No extra model request was made for this snapshot.",
+    "Other hosts remain unmeasured until their own native snapshots exist.",
+    "Raw instruction/conversation/configuration content remains private; this sanitized receipt contains only scopes and aggregates.",
+    "No main checkout, instruction file, credential file, client setting, gateway or host service changed."
+  ]
+}

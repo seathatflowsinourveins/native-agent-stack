@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "unit": "fold-template-memory-proposal-into-startup-snapshots",
+  "authorization": "A14, 2026-10-07T01:27:52Z: fold822 into823 by content push, co-op closes the original",
+  "source_pr": 822,
+  "source_head": "6f354e93f0a765e2245cafec8e0e4ca31e67754f",
+  "target_pr": 823,
+  "target_base_head": "886d0a97ff664d80e5a3a16bf008974c1bc16ef5",
+  "source_base": "d9eb68750311d5f888adec140723da174f9fe10c",
+  "copied_byte_for_byte": [
+    ".claude/settings.json",
+    "docs/decisions/2026-10-06-claude-template-memory-exclusions.md",
+    "evidence/artifacts/claude-template-memory-exclusions-20261006/receipt.json"
+  ],
+  "native_byte_comparison_exit": 0,
+  "copied_old_observations_and_proposed_decision_unchanged": true,
+  "existing_startup_receipt_unchanged": true,
+  "local_integration": {
+    "command": "nice -n19 ionice -c3 python3 -B -m unittest tests.test_secret_path_guard.SecretPathGuardTests.test_project_settings_register_hook_and_deny_rules tests.test_secret_path_guard.SecretPathGuardTests.test_every_anchored_read_deny_has_a_context_mode_twin tests.test_install_claude_profile.SecretGuardProfileTests tests.test_install_claude_profile.CommittedSettingsFallbackGuardTests tests.test_install_claude_profile.PortableTopRuleTests tests.test_adoption_docs_consistency",
+    "execution_prefix": "rtk proxy",
+    "exit": 0,
+    "raw_log_sha256": "e970b98b553acf1f5e13cd3d81b0079d4f3f977e89e0b1e1862f25d36072dd43",
+    "raw_log": "private durable C8 directory, fold822-tests.log"
+  },
+  "limits": [
+    "This is a source-preserving content fold and repository integration check, not a new provider or Claude context run.",
+    "The command center still decides/applies the template-memory setting and retains native context acceptance.",
+    "No client configuration, role grant, credential store, gateway or host service changed.",
+    "No branch rebase, merge or PR close; the co-op handles original PR closure after verification."
+  ]
+}
