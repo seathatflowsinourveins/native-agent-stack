@@ -4477,37 +4477,37 @@
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
-      "sha256": "e3bf86c89ca5f5f686b89119108d302908997632af2a34378d092bd272e957b5",
+      "sha256": "a9408027d950dbfe37f99ca78488d9acb11f964002458e8022cd9c56d55d323e",
       "bytes": 174
     },
     {
       "path": "adoption/agents/codex/stack-researcher.toml",
-      "sha256": "a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f",
-      "bytes": 7220
+      "sha256": "a2f4d1c2df821d36850486c424cb3fee466bba087d7d81e2a8dee0faa4f0b618",
+      "bytes": 7215
     },
     {
       "path": "adoption/agents/codex/stack-verifier.toml",
-      "sha256": "d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561",
-      "bytes": 6682
+      "sha256": "f78fbf58252ac699b4dd9ad9825450512748c6be82ebca748b98cacdae76d0b3",
+      "bytes": 6677
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "5dffbf3173782b66daa82294412db057bd3325621dc46e3af0649908a9564b24",
+      "sha256": "a04c324efddac48cf4fcd20bd97239ee2c3a1c21048a3b3bbf3419d46edd0e8e",
       "bytes": 275
     },
     {
       "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
-      "sha256": "27b98b399fea6377a8b9afbf3bb01541d96281bd70cb3f1a42c699afac48c7c5",
+      "sha256": "d0062d538b100c55ddc2f061cd22682511a809a3c54a1139405351ad928e67b8",
       "bytes": 6152
     },
     {
       "path": "adoption/agents/codex/workers/isolated-builder.toml",
-      "sha256": "2c855056c579e979a1e1410cfebfcd6262fdfd997317ca09e8a558fe6a189b3c",
+      "sha256": "05e8df2396b1b7871c500afea87131c82a8cc81d9aaf2ba2d9dc89b5ddf053d4",
       "bytes": 6660
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "1efdcb37e2eda74b7407a78c8cf4e766046c6b894a03f04da42a41f21e4d4134",
+      "sha256": "cbf1825164fe683f09a5fc1dcb77bce5607c562f0f283de3312bc8d733bdb0f1",
       "bytes": 6254
     },
     {
@@ -4657,7 +4657,7 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "f570b56170d2ec53f382cbdb9e319b22e4e52671733f1b9a4eb84f1d3b062c86",
+      "sha256": "dcc066ad202be7874f86c465c41d8614e23be7e4e8bbded900d73254d2e493c2",
       "bytes": 8191
     },
     {
@@ -4787,7 +4787,7 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "f570b56170d2ec53f382cbdb9e319b22e4e52671733f1b9a4eb84f1d3b062c86",
+      "sha256": "dcc066ad202be7874f86c465c41d8614e23be7e4e8bbded900d73254d2e493c2",
       "bytes": 8191
     },
     {
@@ -15603,7 +15603,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "2b8d918eadc27d957330ea0a7616b8a255cdf4ef1998b9e75a1c5d0379ab236e",
+      "sha256": "2e9a2bc91edd85c38e0151d7b0785590fb51aee9f67840926bc22922d77facc2",
       "bytes": 153291
     },
     {
@@ -16603,8 +16603,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-rtk-051-f4-exceptions.md",
-      "sha256": "f317dd5e4f24d37250c6549b391b72e13943167e20103f4722145497bea67c88",
-      "bytes": 16010
+      "sha256": "e4106204925489593fc3ba8434bc31a7b20eb3625633580b92ca04d7fc1468ef",
+      "bytes": 17852
     },
     {
       "path": "docs/decisions/2026-10-04-rtk-file-list-control.md",
@@ -44657,6 +44657,11 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/rtk-f4-custody-20261007/receipt.json",
+      "sha256": "d8ee04cac3ab5de1b31cc35c45d26403d10cf14b2d1af8a447de891468e86819",
+      "bytes": 6693
+    },
+    {
       "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json",
       "sha256": "d5251099fa4a0d42b13e988e3b16aa66a45ab0d36a13521e1f9ee55834368789",
       "bytes": 30800
@@ -52078,33 +52083,33 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "5dcdf3e461fbbc66b9c70ff94a3eebdb3ef6bd4ae8e12326c801a98603262c6f",
-      "bytes": 28107
+      "sha256": "186acf099f8aa983d573dfbe2d983fcd00e79083f77c4118d72c2a2a12b8928e",
+      "bytes": 28110
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
-      "sha256": "1e709c15946bd99e181c28134aba6e540b0ac725e2b0963e62c431ce8419b74a",
+      "sha256": "635dec10c1c6d14f3487a494381736eade32f3a2ccc62ac5bd97379fd618ff53",
       "bytes": 3131
     },
     {
       "path": "examples/codex-native/agents/isolated-builder.toml",
-      "sha256": "1da5122e0fa6fd81abc3ceab68cb852eb44debe02bbba9ef929e1aa7c9be28c9",
+      "sha256": "6c84cc4b55ed9e481343b44a5c47cc27911f21cac23cd5eaa7638c541c8202ae",
       "bytes": 3187
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "c0518681409f8618b55f813a80afd9b117545475b73dbe08c4ec2bd2f17677ec",
+      "sha256": "eb04ee23dddf97e397f7630a70d46d0775a2d327ca1186fa321d3374d61f68ff",
       "bytes": 4790
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
-      "sha256": "a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f",
-      "bytes": 7220
+      "sha256": "a2f4d1c2df821d36850486c424cb3fee466bba087d7d81e2a8dee0faa4f0b618",
+      "bytes": 7215
     },
     {
       "path": "examples/codex-native/agents/stack-verifier.toml",
-      "sha256": "d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561",
-      "bytes": 6682
+      "sha256": "f78fbf58252ac699b4dd9ad9825450512748c6be82ebca748b98cacdae76d0b3",
+      "bytes": 6677
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
@@ -53333,8 +53338,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "2517af8017a953dc4b97bded6340e92dec578a1da2ae947001068d9898d05820",
-      "bytes": 39915
+      "sha256": "fbc110cf5f175843cdd882cbef10fbe4982206c2837b4a3a8fa62b2d372ac9e6",
+      "bytes": 39905
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -53343,12 +53348,12 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "fe2ad5b46b2fe91c54e03a88c39b50c38746c604d2b6460d1a4aae17885f2bb2",
+      "sha256": "a619340bbed8fe472d67a6816e6544eb71fa90e775107cab4ff1e6192edd7390",
       "bytes": 33204
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "86ec9db291fbfa23e09ee6a41254f228abcf4de4caaf151faaf6feeb44f2e595",
+      "sha256": "e31c639d28b6d28eac21dc46eb74f7e9a6d08ffd5b81ac10de0904fb6db24a81",
       "bytes": 191667
     },
     {
@@ -54138,8 +54143,8 @@
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "b32ff615c5a48b452a95fb370de6a79ae49698963419ad6608cf00459426d7c8",
-      "bytes": 34215
+      "sha256": "4b7dd77c5c06d036f288f662e322ca6aa51f89a4e50291fef0fa81792349d038",
+      "bytes": 34205
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
