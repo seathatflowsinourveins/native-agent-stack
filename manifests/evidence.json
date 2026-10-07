@@ -4626,6 +4626,35 @@
         "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
       ],
       "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json"
+    },
+    {
+      "id": "agent-browser-0382-qualification-20261003",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "agent-browser"
+      ],
+      "claim": "W1-r2 records install exit 0, version output \"agent-browser 0.38.2\", and offline smoke output \"All four positive commands exit 0 on 0.38.2 (and 0.38.1)\"; \"skills list\" and \"skills get core\" are recorded as byte-identical to 0.38.1. W1b independently repeated --version and skills list (both exit 0) and rehashed the qualified tarball to 2bb1d6e4660b2a109c912c8bb552f727125dbcd681c6d1eefc1af573b4546c49.",
+      "limitations": [
+        "UNTESTED: live fixture workflow, `agent-browser install`, Chrome launch on WSL2, any model run; darwin, arm64, musl and win32 binaries are hash-checked only. This is a version check plus offline smoke on one host, not live acceptance.",
+        "NOT run: the live fixture workflow (open file://.../fixtures/greeting.html, snapshot -i -c --json, fill, click, get text '#status', close) and `agent-browser install` (Chrome download); that is the untested boundary.",
+        "W1b reuses recorded W1-r2 install and offline comparison evidence. The integration commands are additional native observations; they do not replay the installation or establish live browser or model acceptance."
+      ],
+      "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json"
+    },
+    {
+      "id": "grafana-1323-qualification-20261003",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "grafana"
+      ],
+      "claim": "W1-r2 records install exit 0 and native synthetic integration results: /api/health returned {\"database\":\"ok\",\"version\":\"13.2.3\",\"commit\":\"90ffed056f0884267356c12a0eeb72a022af53f1\"}; anonymous POST /api/datasources returned 403; the query output reports 36 targets, 36 http_ok, 36 result_ok, 36 frames and errors []. The upgrade record reports migration_log rows 719 before and after. W1b independently repeated --version (\"grafana version 13.2.3\", exit 0) and server --version (\"Version 13.2.3 (commit: 90ffed056f0884267356c12a0eeb72a022af53f1, branch: release-13.2.3#patched)\", exit 0), and rehashed the archive to 6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235.",
+      "limitations": [
+        "SMOKE EVIDENCE CLASS: locally authored synthetic integration checks run in a private user/net/pid namespace (unshare ... --mount-proc), not upstream acceptance and not check_persistence.py (which restarts host units and was deliberately not run). No real credentials (inline synthetic GF_SECURITY_* constants; the configure.py-generated scratch ecosystem-grafana.env files were never read or used), no live service reachable (the namespace has only its own loopback).",
+        "LIMITS: not tested: browser rendering (stat/table/Loki issues #132901, #132502 and #132879 are unverified here), real Prometheus/Loki data or production cardinality, Grafana-managed alerting, a restart onto the host's real database, Grafana's own upstream test suite.",
+        "W1b reuses the recorded W1-r2 synthetic integration outputs; it does not replay the namespace smoke or activate the host service. The tarball build commit and public tag commit are recorded separately.",
+        "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
+      ],
+      "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
     }
   ],
   "files": [
@@ -5066,8 +5095,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
-      "bytes": 260542
+      "sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
+      "bytes": 260809
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -5136,8 +5165,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "7e210c9c56953ff5091c35909a0e3b5c94a4a519932eeda82878afb22b3c2961",
-      "bytes": 37151
+      "sha256": "0ede232552fa0ac9666f6a52ea6f037539668e1517e6de9c2fc4602b2e797691",
+      "bytes": 37218
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -10962,8 +10991,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "286c6898529e89ae3b1582f6db149f0dabf968adc917faf653057dc9d22dab21",
-      "bytes": 494497
+      "sha256": "57b0a8b511d4141c6d587d6a4254428b1e0e843f26e3c79a94daa70152b75f88",
+      "bytes": 495718
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -16472,7 +16501,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "f9ba8f70ffd7350178ef4cdb5226a5cd7040a1f43f0f416855aa156dda6f8b23",
+      "sha256": "ac44cbe2e51590ef256b69d7cb5c360b764b483c53cbdbdf128d4d8d789aade9",
       "bytes": 325528
     },
     {
@@ -16577,7 +16606,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "4b45aa982068205635f95776bbfc7a4c73d283ea48586e480f3870e613450ecf",
+      "sha256": "aabf9027d87fb0a4287569e2c15bfd486b190fe577bcdb9f9f89fc817196bc95",
       "bytes": 287577
     },
     {
@@ -16587,8 +16616,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "e5987d047e09f2f16ed9592cba1f7d2a7a350a6428f2904b9e481298a5f9ab5e",
-      "bytes": 286532
+      "sha256": "da49a384a240c28ee7dbee035c8b163ff423ccacd9a05a32dc92f498f82b0090",
+      "bytes": 294837
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17356,6 +17385,11 @@
       "bytes": 50522
     },
     {
+      "path": "docs/decisions/2026-10-03-currency-wave-w1b.md",
+      "sha256": "36f5494a6e55a207ace59a3222cfa98a622530d8ef86c296d16cb45f2c2bb287",
+      "bytes": 16990
+    },
+    {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
       "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
       "bytes": 16588
@@ -17867,7 +17901,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "c1b9e9cd27feb0ed823a2c0e942a741671e5ad2b84753e5196e09442b0fb1e3c",
+      "sha256": "10be0b93bf691307de4bfbf32101b02a2f550a6c0dded95e12d46d20c4ddfefd",
       "bytes": 18484
     },
     {
@@ -17877,13 +17911,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "e85827c513b80cf075792edbcaf0c1b03c59ca89ca0c31e8fe846f2f3d1fa174",
-      "bytes": 692584
+      "sha256": "4d4487162044e7e4581dd8864248a1434b66870cead089e07f038118178e069e",
+      "bytes": 692762
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "c6a357756080c7651a3890f5ff2c9bcd4d5c14a0e596d7a7fa7372d2e08c2303",
-      "bytes": 368585
+      "sha256": "ea242737d1cdce686c3e1feb534f9688fb7d5af0116a8139ab963864fe41d829",
+      "bytes": 368763
     },
     {
       "path": "docs/next-host-stages.md",
@@ -17977,8 +18011,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "82dd8fabc8348c4297395f54f8af7b60d4fe8f75c00bcf4b50dd6af6c91376dc",
-      "bytes": 594844
+      "sha256": "a0f70bf8793b30e152ec5f97779d26057ddff0e8d54e01dc1cc111df03ac37ea",
+      "bytes": 595149
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -19679,6 +19713,96 @@
       "path": "evidence/artifacts/currency-wave-w1-20261003/review-repair-checks.json",
       "sha256": "11fe9d5941ecc06385093613e9f6e63f582f5ecb1a721a179866e0d06d71039f",
       "bytes": 26125
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+      "sha256": "12a72072978b21d012eb337685b396bf3ddc225fe07dcc336fd5fe9c4d3253d9",
+      "bytes": 47321
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/github-metadata.json",
+      "sha256": "36731be8722018d77547c53638c45c8ab97bdca7f5b10fde2d7777f6cd8f434f",
+      "bytes": 3389
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/qualification-record.json",
+      "sha256": "fc21e1b1fdd90ca281f1631fe93222abe5f251ed85e17d95fb985387aa36c945",
+      "bytes": 22746
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.1.stdout.txt",
+      "sha256": "03c63627e990ceede97ae12d5938bc6fd37d7c6a30751e926d66dadd2bd8a852",
+      "bytes": 898
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/skills-list-0.38.2.stdout.txt",
+      "sha256": "03c63627e990ceede97ae12d5938bc6fd37d7c6a30751e926d66dadd2bd8a852",
+      "bytes": 898
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/github-metadata.json",
+      "sha256": "7067d7dfbabafa73266aaa909fb6bd28d1d22d53a2ca843d2cd67304d0a2e176",
+      "bytes": 3271
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/installation.json",
+      "sha256": "8af667a097b2e64d78f77e186a78c27006d4b14a6984fd31cf67a84277708eb5",
+      "bytes": 708
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/qualification-record.json",
+      "sha256": "febed953a2049eeea3345770e27d88a0375b29ba222956399792e70c9fce260c",
+      "bytes": 30509
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-fresh.stdout.txt",
+      "sha256": "d23e03bfd1e507d498eb853430a4d9c347c705512e439c9d8cda833decfb479e",
+      "bytes": 6851
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-queries.stdout.txt",
+      "sha256": "00655c36b580851bae97165c29ed099eeb0a7c40ffbf0ba51487428af6aad330",
+      "bytes": 12485
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/grafana/smoke-upgrade.stdout.txt",
+      "sha256": "e34d5f96a4b940a22e83be62df4ba43133b07c35310d8fa22575e22df08eab2e",
+      "bytes": 11612
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/integration-commands.json",
+      "sha256": "5fb0e0f31cbcb1448d70c271b840cf252d6922069440a87b33ba6f387107d0e6",
+      "bytes": 6515
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/move-hold-judges.json",
+      "sha256": "f50e4ed112f596cf05206e6bdb5e3ee99c5fd892214a42634b2ae0093aba6ca2",
+      "bytes": 42160
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/repair-round-replies.md",
+      "sha256": "57c7ac53ea6c12d23c45f1feab5979814c60f7ecc622b03e1e46ce861579ff67",
+      "bytes": 17182
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/review-round-findings.json",
+      "sha256": "109fac651186384944dafd29e8cf084a7f1293dd785beee67fb413cd8b5bc51d",
+      "bytes": 12370
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stderr.txt",
+      "sha256": "7379e23243ff91eda3a028f525c3b2506ea1b5d3af8494718d1bd7d086e3a146",
+      "bytes": 129476
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/r645/required-unittests-failed.stdout.txt",
+      "sha256": "218009ef7d10a4a842bbb74f17cacb1afed3ca4cf06f2e084ebf9d7c2a9ec82d",
+      "bytes": 150
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/review-decisions.json",
+      "sha256": "b163526176d933371fb64c3fd15adef9fb4851838bdf5fa1fd2ad3ef267ac5fc",
+      "bytes": 32284
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -40077,8 +40201,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "ef3cc8d69fe92ae8a50c97dd2b5fa43d028edd8b0f751dbd4ab497136b3eeedf",
-      "bytes": 40332
+      "sha256": "882d037c222662c196f7df3f4841cab1d2398408bfc3fa3a3d5f567f2dc3a789",
+      "bytes": 43235
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40087,13 +40211,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "acd86662a43ba86258fd77c5209912af7be7269bd91c6e7eb9396b129a8ee7c0",
-      "bytes": 81773
+      "sha256": "0446a9d2945718b90e7693f29fa879b31ffb96bb726fd9d569c3fc42d7b73216",
+      "bytes": 81862
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "f6db1aba035e6c3938429f49286504b2beef910cd42ba6e0164b1a6e1d1bc13f",
-      "bytes": 175637
+      "sha256": "b6bdbb81ca6f6e24865bbcb2ce0c1f0f3f84368bf9bc583e28750d3360371e58",
+      "bytes": 175726
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -40402,8 +40526,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "f63f69ffcd17339faffe7fafc90be38eed9e57bf05ef852e1596b234eb40fd76",
-      "bytes": 391171
+      "sha256": "3d6d1704fb2cb7d4a0287f6328ef615e355ef2c4e9bfc36a493d538695c04cdd",
+      "bytes": 391260
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -52651,6 +52775,11 @@
       "bytes": 4676
     },
     {
+      "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json",
+      "sha256": "051bd9e94f82426529f6d1a779c4427535cdcfdf584d3909c47b19b5f46cb3a8",
+      "bytes": 4842
+    },
+    {
       "path": "evidence/receipts/agent-browser-lna-20260930.json",
       "sha256": "d26374a40b8b74fbe14dcf63c65257d3370a84831553740ef679ca9362aa8d1b",
       "bytes": 5305
@@ -52924,6 +53053,11 @@
       "path": "evidence/receipts/gpt-tokenizer-400-qualification-20260929.json",
       "sha256": "5c1c1e5e98882f76373825f057db81c50f1c7bc2ae0ca0be5f821cd039aa2bbf",
       "bytes": 21687
+    },
+    {
+      "path": "evidence/receipts/grafana-1323-qualification-20261003.json",
+      "sha256": "51acc9245a3a0f1e349cec54c94537cbaf3d1592770ab2d7a61eaf7b4b70944b",
+      "bytes": 6314
     },
     {
       "path": "evidence/receipts/guard-k3-verification-20260930.json",
@@ -54167,18 +54301,18 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "cbc65770d505fcc1253aa270db6d9930d884c9b22abeb34de450405b670c21a3",
-      "bytes": 106396
+      "sha256": "61b4ba29eed8b537b6af5c37e0b7dfc7d11802b940e3d37a564912b46b227fdf",
+      "bytes": 106928
     },
     {
       "path": "observability/README.md",
-      "sha256": "adbefdbdb1f427f172c8d4b4899aaf188bf5c50e8861d117c74705d07738a38f",
-      "bytes": 16714
+      "sha256": "59300865ac8a410ac2896319ae0cd04e9a0370c398b8191874db1b08542d9d13",
+      "bytes": 17017
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "28d512ce7b62b9c87d6fc3ec1e4c2f4d1b616de498f48ddad02b062096c65212",
-      "bytes": 25778
+      "sha256": "e75d16a8ff9e0d651f9e33474c47fb9982d83fe5ce7b6d65328988d9cc8b0f61",
+      "bytes": 25850
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -54207,7 +54341,7 @@
     },
     {
       "path": "observability/backends/pins.json",
-      "sha256": "8a230843fdcfbe228ac4d8568739ff82d0b98ddc9ca7d0d4b1ba5f6fe6d4aefe",
+      "sha256": "feb9a5c580b76f3e4d0884d231bab0349c4bc7cbcd4a761e2371301c6a64bf49",
       "bytes": 3040
     },
     {
@@ -54397,8 +54531,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "0ced49d094ec8ab7737da7ef008216b053ee8c2622c82508966f854b326786f8",
-      "bytes": 16655
+      "sha256": "63bab52fea451f4dc941b8e02e5d0c0176d96899403cd03c063798b9374a9b20",
+      "bytes": 16711
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -54452,7 +54586,7 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "cf1b7a7276d3836fa09d9ea49e7b626d1db4efb578da286b6cd8cb6b3d8888e9",
+      "sha256": "20e492f2541f368bfb1c318a9b4de4fd3c04d59053860cacaae0f32488036cd9",
       "bytes": 132632
     },
     {
