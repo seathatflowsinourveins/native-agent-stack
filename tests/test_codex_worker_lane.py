@@ -52,8 +52,8 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # byte for byte in the rendered block, with local exceptions kept separately.
 # Protected canonical block stops at the session-lanes marker. The current pre-RTK
 # prefix also includes the approved session guidance; those are separate scopes.
-TOP_RULE_SHA256 = "f4b66fb52b0fceeed8b6207e0003de792cabfaef5ece49b6f5d6a445ee2d26ef"
-PRE_RTK_SHA256 = "ae8784589d6a042b1feedfbdb746544ba547dac8a38dfb84991923af591764fc"
+TOP_RULE_SHA256 = "3bb84cf0a741dd0ea2816405b92181f3063695d98b3d44766d286f39b622ff02"
+PRE_RTK_SHA256 = "aaec8938456bd1dbb0e2d7c450918901ca674b83ada01bcf32c09e6cdc3ff13a"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n'
 
@@ -574,7 +574,7 @@ class TemplateTests(unittest.TestCase):
         # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
-        for name in ("serena", "codebase-memory"):
+        for name in ("serena", "codebase-memory-mcp"):
             with self.subTest(server=name):
                 self.assertIn("command", user["mcp_servers"][name])
                 expected = {"startup_timeout_sec": 60}
@@ -1103,7 +1103,7 @@ class ApplyFlowTests(unittest.TestCase):
         # FakeHost registers socraticode without startup_timeout_sec; add serena the same way (a `codex mcp add`
         # registration). codebase-memory has no template allowance and is left alone.
         self.host.config["mcp_servers"]["serena"] = {"command": f"{self.host.eco}/bin/serena"}
-        self.host.config["mcp_servers"]["codebase-memory"] = {"command": f"{self.host.eco}/bin/codebase-memory-mcp"}
+        self.host.config["mcp_servers"]["codebase-memory-mcp"] = {"command": f"{self.host.eco}/bin/codebase-memory-mcp"}
         self.host.write_config(self.host.config)
         before = self.host.read_config()
         code, out = self.host.run()
@@ -1115,7 +1115,7 @@ class ApplyFlowTests(unittest.TestCase):
         after = self.host.read_config()
         self.assertEqual(after["mcp_servers"]["serena"]["startup_timeout_sec"], 60)
         self.assertEqual(after["mcp_servers"]["socraticode"]["startup_timeout_sec"], 120)
-        self.assertNotIn("startup_timeout_sec", after["mcp_servers"]["codebase-memory"])
+        self.assertNotIn("startup_timeout_sec", after["mcp_servers"]["codebase-memory-mcp"])
         code, out = self.host.run("--rollback", str(self.host.latest_run()))
         self.assertEqual(code, 0, out)
         self.assertEqual(self.host.read_config(), before)
@@ -1354,7 +1354,7 @@ class SerenaReadbackTests(unittest.TestCase):
         self.assertIn("-p stack-worker serena required is False (default)", out)
 
     def test_a_recorded_lookup_error_fails_the_read_back(self):
-        for name in ("serena", "codebase-memory"):  # neither table has a key the old comparisons read
+        for name in ("serena", "codebase-memory-mcp"):  # neither table has a key the old comparisons read
             with self.subTest(server=name):
                 host = FakeHost(self)
                 (host.codex.parent / "mcp-get-fail").write_text(name + "\n")
@@ -2918,7 +2918,7 @@ class CodexIntegrationTests(unittest.TestCase):
                 f'[features]\ndaemon_auto_start = false\n\n[shell_environment_policy.set]\n'
                 f'PATH = "{host.eco}/bin:/usr/bin:/bin"\n\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n\n'
                 f'[mcp_servers.serena]\ncommand = {json.dumps(sys.executable)}\nargs = {json.dumps([str(server)])}\n\n'
-                '[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n\n'
+                '[mcp_servers.codebase-memory-mcp]\ncommand = "/bin/false"\n\n'
                 f'[mcp_servers.socraticode]\ncommand = "{host.eco}/bin/node"\nstartup_timeout_sec = 120\n\n'
                 f'[mcp_servers.headroom]\ncommand = "{host.eco}/bin/headroom"\n\n[mcp_servers.headroom.env]\n'
                 'HEADROOM_OFFLINE = "1"\n\n[plugins."context-mode@context-mode"]\nenabled = true\n')
@@ -3057,7 +3057,7 @@ class CodexIntegrationTests(unittest.TestCase):
                 'model_reasoning_effort = "max"\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n'
                 '[mcp_servers.socraticode]\ncommand = "/bin/false"\n[mcp_servers.headroom]\ncommand = "/bin/false"\n'
                 f'[mcp_servers.serena]\ncommand = {json.dumps(sys.executable)}\nargs = {json.dumps([str(server)])}\n'
-                '[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n'
+                '[mcp_servers.codebase-memory-mcp]\ncommand = "/bin/false"\n'
                 f'[mcp_servers.context-mode]\ncommand = "/bin/false"\n[projects."{project}"]\ntrust_level = "trusted"\n')
             (project / ".codex" / "config.toml").write_text('model_reasoning_effort = "ultra"\n')
             subprocess.run(["git", "-C", str(project), "init", "-q"], check=True)

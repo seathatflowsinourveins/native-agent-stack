@@ -715,7 +715,7 @@ const PYPI_LANES = new Map([['jcodemunch-mcp', 'jcodemunch-mcp'], ['headroom-ai'
 const MODULE_LANES = new Map([['markitdown', 'markitdown']])
 // An mcporter call reaches a lane only through these config server names, seeded from manifests/stack.json:280
 // (codebase-memory) and :407 (context-mode); every other server is counted in mcporter_downstream only.
-const MCPORTER_ALIASES = new Map([['codebase-memory', 'codebase-memory-mcp'], ['context-mode', 'context-mode']])
+const MCPORTER_ALIASES = new Map([['codebase-memory-mcp', 'codebase-memory-mcp'], ['codebase-memory', 'codebase-memory-mcp'], ['context-mode', 'context-mode']])
 const nameStart = (c) => c === '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 // NAME=value or NAME+=value before the command name (XCU 2.9.1 Rule 7; bash(1) PARAMETERS), unquoted up to the =.
 function isAssignment(e) {
@@ -973,7 +973,7 @@ const stdioSelector = (s) => hasBlank(s) || s.startsWith('./') || s.startsWith('
 // manifests/stack.json:280 (codebase-memory), :407 (context-mode), :629 and :966 (socraticode), and jcodemunch, serena, qmd, headroom and
 // ai-memory from the coordinator's list in the pivot brief. An HTTP URL or ad-hoc stdio command never reaches here; an expansion is
 // (unresolved); any other name is (other).
-const MCPORTER_SERVERS = new Set(['codebase-memory', 'context-mode', 'jcodemunch', 'serena', 'socraticode', 'qmd', 'headroom', 'ai-memory'])
+const MCPORTER_SERVERS = new Set(['codebase-memory-mcp', 'codebase-memory', 'context-mode', 'jcodemunch', 'serena', 'socraticode', 'qmd', 'headroom', 'ai-memory'])
 const serverKey = (name) => !name || name.includes('$') || name.includes('`') ? '(unresolved)' : MCPORTER_SERVERS.has(name) ? name : '(other)'
 // The server an mcporter call reaches. Ephemeral flags anywhere (src/cli/ephemeral-flags.ts:9-128, which does not stop at
 // `--`) and --output/--raw (src/cli/output-format.ts:10-59) are removed first; then words up to `--` are read with the call

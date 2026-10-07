@@ -49,7 +49,7 @@ startup_timeout_sec = 60
 # Trial and scope: docs/decisions/2026-09-26-codex-worker-lane.md, addendum 2026-10-03.
 required = true
 
-[mcp_servers.codebase-memory]
+[mcp_servers.codebase-memory-mcp]
 startup_timeout_sec = 60
 
 # These three servers declare no MCP tool annotations, so under approval_policy = "never" Codex refuses every call

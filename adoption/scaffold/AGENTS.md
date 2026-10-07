@@ -18,7 +18,7 @@ The harness exists to build complex systems, projects and the north-star R&D; ea
 `codex -p omniroute` is the GPT-6 lane, and Claude-side judgment runs on Opus 5.5 at max through the cooperation lanes.
 A coordinator records each decision in a dated `docs/decisions/YYYY-MM-DD-<slug>.md` naming its alternatives and the comparison that would overturn it.
 No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed.
-Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
+Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory-mcp` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
 
 <!-- native-agent-stack:repository-expectations -->
 ## Repository expectations
