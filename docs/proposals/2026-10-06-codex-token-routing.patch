@@ -1,0 +1,15 @@
+diff --git a/adoption/templates/codex.AGENTS.template.md b/adoption/templates/codex.AGENTS.template.md
+--- a/adoption/templates/codex.AGENTS.template.md
++++ b/adoption/templates/codex.AGENTS.template.md
+@@ -20 +20,10 @@
+-Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
++Token lanes: choose one owner for the task's information contract; verify original source before editing or judging retrieved text.
++
++- Known path, short observation, mutation or full exact content: use native bounded reads and commands.
++- Symbol definitions and references: use the selected ready `serena` or `jcodemunch` surface with the correct repository and language/index coverage.
++- Call/dependency graphs: use `codebase-memory` against the selected repository's current index.
++- Conceptual code questions: use the selected `socraticode` or connected `semble` engine; use native search for literal identifiers and errors.
++- Indexed Markdown/catalog discovery: use scoped `qmd` search, then recover the original document.
++- Prior decisions across sessions: use scoped `ai-memory` retrieval, then verify the current canonical source.
++- Large output/file questions requiring parsing or aggregation: use `context-mode` execution/file processing and return the derived answer.
++- Compressing selected existing large text: use `headroom` compression and retain its recovery hash; recover requested original details. Use the original when the task requires all exact content.
