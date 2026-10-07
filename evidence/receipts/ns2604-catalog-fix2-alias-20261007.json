@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-catalog-fix2-alias-20261007",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex"
+  ],
+  "date": "2026-10-07",
+  "evidence_class": "local_integration",
+  "claim": "Complete the declared command-conflict guard across explicit one-hop native identity aliases, including sibling completion originals.",
+  "limitations": [
+    "These execution checks are synthetic fixtures, not native organic usage, host acceptance or actual adoption.",
+    "Identity groups use the existing projection's direct links.get(id,id) mapping; no transitive alias inference is introduced.",
+    "Each prior failed or passing stage retains its actual source hashes and returned outputs.",
+    "Command-center exact-head delta review and hosted validation are pending; recorded consistency does not prove external truth."
+  ],
+  "prior_record": {
+    "path": "evidence/receipts/ns2604-catalog-fix2-20261007.json",
+    "sha256": "73731148a4cae941da307936105581fdb65753c97c3e1f884dc34a5cf1e8f109",
+    "source_commit": "5530276d1df426db36ce2ddbd0f92e59105c0f1e",
+    "disposition": "First repair, P1/P2a fixtures and the pending alias source finding preserved byte-identically."
+  },
+  "source_files": [
+    {
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249"
+    },
+    {
+      "path": "tools/invocation-monitoring/test_codex_counter.py",
+      "sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3"
+    },
+    {
+      "path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+      "sha256": "0b5614cdb6ea68c037d1e6c873651c182a04fb2c6598c67fe971c2124a005571"
+    }
+  ],
+  "checks": [
+    {
+      "started_utc": "2026-10-07T07:23:20Z",
+      "ended_utc": "2026-10-07T07:23:22Z",
+      "exit_code": 1,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a",
+        "tools/invocation-monitoring/test_codex_counter.py": "9ef83021f413781640bef4cd45cf7d986033f6a16f60954a20db5fc46dec6574"
+      },
+      "id": "alias-red",
+      "stderr_sha256": "ec270f37e6da00517eae45f51d3d421d30c6ebeb47bc35ff83d05b7f7924f7f8",
+      "tests": 2,
+      "failure_counts": {
+        "failures": 6,
+        "errors": 6
+      },
+      "evidence_class": "synthetic"
+    },
+    {
+      "started_utc": "2026-10-07T07:24:43Z",
+      "ended_utc": "2026-10-07T07:24:45Z",
+      "exit_code": 0,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "5b0f0d057ebbb8d8c93e91a8da4f61901f77c6f46aa5e2a3be318d71de2e2180",
+        "tools/invocation-monitoring/test_codex_counter.py": "9ef83021f413781640bef4cd45cf7d986033f6a16f60954a20db5fc46dec6574"
+      },
+      "id": "alias-green",
+      "stderr_sha256": "f081c9a061d8cf7c14628c62f20b9bf98fc1487d621aa42232d2254d01629b66",
+      "tests": 2,
+      "evidence_class": "synthetic"
+    },
+    {
+      "started_utc": "2026-10-07T07:25:07Z",
+      "ended_utc": "2026-10-07T07:25:18Z",
+      "exit_code": 0,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "5b0f0d057ebbb8d8c93e91a8da4f61901f77c6f46aa5e2a3be318d71de2e2180",
+        "tools/invocation-monitoring/test_codex_counter.py": "9ef83021f413781640bef4cd45cf7d986033f6a16f60954a20db5fc46dec6574"
+      },
+      "id": "final-control",
+      "stderr_sha256": "7fd283261f3f72a40f924b0b89de29452c0e064b80605d0ca2df66c9e2e6439a",
+      "tests": 42,
+      "evidence_class": "synthetic"
+    },
+    {
+      "started_utc": "2026-10-07T07:33:40Z",
+      "ended_utc": "2026-10-07T07:33:42Z",
+      "exit_code": 1,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "5b0f0d057ebbb8d8c93e91a8da4f61901f77c6f46aa5e2a3be318d71de2e2180",
+        "tools/invocation-monitoring/test_codex_counter.py": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3"
+      },
+      "id": "sibling-alias-red",
+      "stderr_sha256": "55f998fb49c68e869a4e96bcfc7348c718ddf357e68a905a3ab04aa4bab5919f",
+      "tests": 2,
+      "failure_counts": {
+        "failures": 16
+      },
+      "evidence_class": "synthetic"
+    },
+    {
+      "started_utc": "2026-10-07T07:35:22Z",
+      "ended_utc": "2026-10-07T07:35:24Z",
+      "exit_code": 0,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+        "tools/invocation-monitoring/test_codex_counter.py": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3"
+      },
+      "id": "sibling-alias-green",
+      "stderr_sha256": "d93f135f6f0410b0fb9d615a3ac1a159e9ddb6cc1e4648a7e8d64b78aad6d0ca",
+      "tests": 2,
+      "evidence_class": "synthetic"
+    },
+    {
+      "started_utc": "2026-10-07T07:36:03Z",
+      "ended_utc": "2026-10-07T07:36:17Z",
+      "exit_code": 0,
+      "source_sha256": {
+        "tools/invocation-monitoring/codex_counter.py": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+        "tools/invocation-monitoring/test_codex_counter.py": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3"
+      },
+      "id": "sibling-final-control",
+      "stderr_sha256": "3a69cb650fbcebecee9189e2b4c8e87892f00f267556a6fd45389caf19b3dd1a",
+      "tests": 44,
+      "evidence_class": "synthetic"
+    }
+  ],
+  "commands": {
+    "full_counter": "rtk proxy env TMPDIR=<owned-cache> nice -n19 ionice -c3 python3 -B -m unittest discover -s tools/invocation-monitoring -p test_codex_counter.py -v",
+    "focused": "Exact selected test names and argument vectors remain in the individual durable command metadata; host-specific locators are omitted here."
+  },
+  "discriminating_conditions": [
+    "Conflicting completed commands and known statuses under explicit response-ID/call-ID aliases, in both orders, with repeated completion and split same-owner sources.",
+    "Canonical request-only C with agreeing R1/R2 completion aliases deduplicates to one supported native call.",
+    "At the pair-only guard, contradictory sibling completion commands incorrectly yielded organic_count=1 in eight cases; sixteen assertion failures are retained.",
+    "The final guard requires known completion fields to agree within that same canonical group and makes incomplete identity sticky for every member.",
+    "Supported request/completion enrichment and equivalent duplicates remain valid; the three baseline tests and legacy scan are byte-identical."
+  ],
+  "preservation": {
+    "raw_ledger": "Unchanged maintained native adapter/ledger.",
+    "historical_receipts": "No edits to previous observations or source snapshots.",
+    "decisions": "Append-only dated amendments.",
+    "private_outputs": "All exact argv/cwd, stdout/stderr, UTC records, stage sources and patches retained in the owned counter worktree .local/j820-fix2."
+  },
+  "review": {
+    "same_family_source_critic": "pending_final_group_micro_review",
+    "independent_delta": "pending",
+    "command_center": "pending"
+  },
+  "subsequent_source_micro_review": {
+    "evidence_class": "source_review",
+    "reviewer_family": "gpt6",
+    "scope": "P1 and P2a reuse their prior clear; final P2b known completion fields, direct identity groups and sticky unknown attribution.",
+    "remaining_findings": 0,
+    "counter_sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249",
+    "test_sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3",
+    "validator_sha256": "8201cd367bf142c785c240bd8feb768499cdf1b69a9d33c0c88d92a7788e1700",
+    "execution": "No tests or native run by this reviewer; source review within the same model family only.",
+    "chronology": "Completes the final group micro-review that was pending when this supplement was staged. Independent delta and command-center reads remain pending."
+  },
+  "native_counts": null,
+  "organic_verdict": null,
+  "adoption_status": null,
+  "synthesis_status": "pending_synthesis",
+  "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "5530276d1df426db36ce2ddbd0f92e59105c0f1e",
+      "path": "tools/invocation-monitoring/codex_counter.py",
+      "lines": "350-360,440-455,615-640"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+      "path": "examples/claude-native/workflows/child-usage.mjs",
+      "lines": "2854-2878"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "d27764b82f7118f674371e6d6e76271d9d606edb",
+      "tag": "rust-v0.160.1",
+      "path": "codex-rs/protocol/src/models.rs",
+      "lines": "1061-1155"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "77d35e41911c0f8c28a5561790cd8d8a8cd68175",
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "26-33,42-69"
+    }
+  ]
+}

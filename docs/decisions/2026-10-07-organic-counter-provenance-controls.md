@@ -118,3 +118,25 @@ and `examples/claude-native/workflows/child-usage.mjs:2854-2878`;
 the [Python 3.12 regular-expression reference](https://docs.python.org/3.12/library/re.html)
 for literal escaping and boundary assertions; the pinned Codex native protocol
 sources listed above for original request/completion identities.
+
+## Amendment (2026-10-07): Explicit native identity groups
+
+The completeness review found that comparing completed commands only under the
+same storage key missed explicit response-ID/call-ID aliases. A discriminating
+fixture also confirmed that sibling response IDs sharing a request's call ID
+could carry conflicting completions. Apply the same completion-command/status
+agreement rule to the exact one-hop identity groups used by the existing
+controlled projection. Incomplete attribution stays incomplete for every member,
+including after duplicate records. This adds no transitive alias inference.
+
+Retain the first repair at `5530276d1df426db36ce2ddbd0f92e59105c0f1e` and
+its receipt. The separately dated
+[`alias supplement`](../../evidence/receipts/ns2604-catalog-fix2-alias-20261007.json)
+records each subsequent failed condition, passing counterpart and source binding.
+Native organic proof remains pending; these checks are synthetic fixtures.
+
+Sources: `native-agent-stack@5530276d1df426db36ce2ddbd0f92e59105c0f1e:tools/invocation-monitoring/codex_counter.py:350-360,440-455,615-640`
+and the existing native call/result ledger at
+`native-agent-stack@77d35e41911c0f8c28a5561790cd8d8a8cd68175:examples/claude-native/workflows/child-usage.mjs:2854-2878`.
+The Codex protocol's required call ID and optional response item ID are pinned
+in the upstream sources above; matching names or timestamps do not create an alias.

@@ -449,13 +449,34 @@ def _record_facts(records):
         if left and right and ((left["tool"] and right["tool"] and left["tool"] != right["tool"]) or left["turn_id"] != right["turn_id"]):
             notes["conflicting_native_identity"] += 1
             left["identity_complete"] = right["identity_complete"] = False
+        if left and right and any(left[field] is not None and right[field] is not None and left[field] != right[field]
+                                  for field in ("completion_command", "completion_status")):
+            notes["conflicting_native_representation"] += 1
+            left["identity_complete"] = right["identity_complete"] = False
         if left and right and left["completion_at"] is not None and right["timestamp"] is not None and left["completion_at"] < right["timestamp"]:
             notes["invalid_native_chronology"] += 1
             left["identity_complete"] = right["identity_complete"] = False
+        if left and right:
+            left["identity_complete"] = right["identity_complete"] = left["identity_complete"] and right["identity_complete"]
     for fact in facts.values():
         if fact["model_call"] and fact["completion_at"] is not None and fact["timestamp"] is not None and fact["completion_at"] < fact["timestamp"]:
             notes["invalid_native_chronology"] += 1
             fact["identity_complete"] = False
+    # Compare every completed fact that the projection deduplicates by its
+    # one-hop native key, even when the canonical fact is only a request.
+    alias_groups = defaultdict(list)
+    for ident, fact in facts.items():
+        alias_groups[links.get(ident, ident)].append(fact)
+    for group in alias_groups.values():
+        conflict = False
+        for field in ("completion_command", "completion_status"):
+            values = [fact[field] for fact in group if fact[field] is not None]
+            conflict |= any(value != values[0] for value in values[1:])
+        if conflict:
+            notes["conflicting_native_representation"] += 1
+        if conflict or not all(fact["identity_complete"] for fact in group):
+            for fact in group:
+                fact["identity_complete"] = False
     return {"meta": meta, "facts": facts, "names": names, "links": links,
             "results": results, "first_turn": starts[0] if starts else None,
             "root_turns": root_turns, "notes": notes}

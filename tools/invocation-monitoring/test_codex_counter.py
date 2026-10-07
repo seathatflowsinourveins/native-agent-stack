@@ -501,6 +501,82 @@ class OrganicControlChecks(unittest.TestCase):
         self.assertEqual(result["status"], "unknown")
         self.assertIn("conflicting_native_representation", result["diagnostics"])
 
+    def test_conflicting_completed_alias_representations_are_unknown(self):
+        request, outcome = function("C", response_id="R"), returned("C")
+        for field in ("command", "status"):
+            response = command("R", command="echo fixture")
+            canonical = command("C", command="rtk cat /fixture/skills/openai-docs/SKILL.md" if field == "command" else "echo fixture",
+                                status="failed" if field == "status" else "completed")
+            for ordered in ((response, canonical), (canonical, response)):
+                cases = ([records(request, outcome, *ordered)],
+                         [records(request, outcome, *ordered, copy.deepcopy(ordered[-1]))],
+                         [records(request, outcome), records(*ordered)])
+                for streams in cases:
+                    with self.subTest(field=field, first=ordered[0]["payload"]["item"]["id"],
+                                      sources=len(streams), rows=sum(len(stream) for stream in streams)):
+                        result = self.run_controls(streams)
+                        self.assertEqual(result["status"], "unknown")
+                        self.assertEqual(result["native_call_attempts"], 1)
+                        self.assertIn("conflicting_native_representation", result["diagnostics"])
+                        self.assertEqual(result["by_tool"]["command"]["reasons"]["native_call_identity_unknown"], 1)
+                        for cell in result["by_tool"].values():
+                            self.assertIsNone(cell["organic_count"])
+                            self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_completed_alias_enrichment_and_duplicates_remain_complete(self):
+        script = "rtk cat /fixture/skills/openai-docs/SKILL.md"
+        request, outcome = function("C", args={"cmd": script}, response_id="R"), returned("C")
+        response = command("R", command=script)
+        canonical = command("C", command=["/bin/bash", "-lc", script])
+        for completions in ((response,), (response, canonical), (canonical, response)):
+            for streams in ([records(request, outcome, *completions)], [records(request, outcome), records(*completions)]):
+                with self.subTest(first=completions[0]["payload"]["item"]["id"], completions=len(completions), sources=len(streams)):
+                    result = self.run_controls(streams)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    for key in ("command", "rtk", "openai-docs-read"):
+                        self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+                    self.assertNotIn("conflicting_native_representation", result["diagnostics"])
+
+    def test_conflicting_sibling_alias_completions_are_unknown(self):
+        originals = (function("C", response_id="R1"), function("C", response_id="R2"), returned("C"))
+        for field in ("command", "status"):
+            first = command("R1", command="echo fixture")
+            second = command("R2", command="rtk cat /fixture/skills/openai-docs/SKILL.md" if field == "command" else "echo fixture",
+                             status="failed" if field == "status" else "completed")
+            for ordered in ((first, second), (second, first)):
+                for repeated in ((), (copy.deepcopy(ordered[-1]),)):
+                    cases = ([records(*originals, *ordered, *repeated)],
+                             [records(*originals), records(ordered[0]), records(ordered[1], *repeated)])
+                    for streams in cases:
+                        with self.subTest(field=field, first=ordered[0]["payload"]["item"]["id"],
+                                          sources=len(streams), repeated=bool(repeated)):
+                            result = self.run_controls(streams)
+                            self.assertIsNone(result["by_tool"]["command"]["organic_count"])
+                            self.assertEqual(result["status"], "unknown")
+                            self.assertEqual(result["native_call_attempts"], 1)
+                            self.assertIn("conflicting_native_representation", result["diagnostics"])
+                            self.assertEqual(result["by_tool"]["command"]["reasons"].get("native_call_identity_unknown"), 1)
+                            for cell in result["by_tool"].values():
+                                self.assertIsNone(cell["organic_count"])
+                                self.assertEqual(cell["eligible_invocation_lower_bound"], 0)
+
+    def test_agreeing_sibling_alias_completions_remain_complete(self):
+        script = "rtk cat /fixture/skills/openai-docs/SKILL.md"
+        originals = (function("C", args={"cmd": script}, response_id="R1"),
+                     function("C", args={"cmd": script}, response_id="R2"), returned("C"))
+        first = command("R1", command=script)
+        second = command("R2", command=["/bin/bash", "-lc", script])
+        for ordered in ((first, second), (second, first)):
+            for streams in ([records(*originals, *ordered)], [records(*originals), records(*ordered)]):
+                with self.subTest(first=ordered[0]["payload"]["item"]["id"], sources=len(streams)):
+                    result = self.run_controls(streams)
+                    self.assertEqual(result["status"], "controls_complete")
+                    self.assertEqual(result["native_call_attempts"], 1)
+                    for key in ("command", "rtk", "openai-docs-read"):
+                        self.assertEqual(result["by_tool"][key]["organic_count"], 1)
+                    self.assertNotIn("conflicting_native_representation", result["diagnostics"])
+
     def test_conflicting_completed_commands_are_unknown(self):
         first = command(command="echo fixture")
         second = command(command="rtk cat /fixture/skills/openai-docs/SKILL.md")

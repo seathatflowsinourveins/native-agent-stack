@@ -9,11 +9,11 @@
   "files": [
     {
       "path": "tools/invocation-monitoring/codex_counter.py",
-      "sha256": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a"
+      "sha256": "92f83389d1131553c1e06050779876ead04941616948e7b357ad2273f6299249"
     },
     {
       "path": "tools/invocation-monitoring/test_codex_counter.py",
-      "sha256": "b655bfdaa8fdf9af2b3a65932de04905ae81f183afd91255065c8e1a868b90c8"
+      "sha256": "d4973be70b384bf31f90c660c46c95dd9a44f2172835c77701707f274f837be3"
     }
   ],
   "prior_snapshot": {
@@ -40,7 +40,8 @@
     "Full original streams joined per native owner before maintained native ledger, identity/window/dedup and masks.",
     "Original response aliases and outcomes across split sources; missing ID/time/unsupported native call forms remain unknown.",
     "Prose punctuation still excludes configured names while internal punctuation and distinct longer names are preserved.",
-    "Contradictory completed commands sharing a native identity remain unknown; supported enrichment and identical duplicates are preserved."
+    "Contradictory completed commands sharing a native identity remain unknown; supported enrichment and identical duplicates are preserved.",
+    "Explicit one-hop native ID groups require agreeing completion commands/statuses across canonical and sibling alias originals, with sticky incomplete identity."
   ],
   "reference_boundary": "CanonicalRef shape declarations are not external hash resolution or original-context truth proof. Actual publication counts need the matching owner-controlled native evidence.",
   "historical_fixture_binding": {
@@ -55,5 +56,15 @@
     "claude_scope": "Not implemented by this Codex code unit; equivalent Claude provenance remains separate."
   },
   "decision_ref": "docs/decisions/2026-10-07-organic-counter-provenance-controls.md",
-  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix2-20261007.json"
+  "repair_receipt_ref": "evidence/receipts/ns2604-catalog-fix2-alias-20261007.json",
+  "prior_repair_snapshot": {
+    "source_commit": "5530276d1df426db36ce2ddbd0f92e59105c0f1e",
+    "manifest_path": "tools/invocation-monitoring/codex-organic-controls-manifest.json",
+    "manifest_sha256": "2ce8f1607bdd4e4cf8ec8206e4f348830351d09e596d7a14390bef862004e475",
+    "counter_sha256": "1150eac338c8725e38dd7dcb8591de4b50726e612bed59ccec0ba32caf7ec72a",
+    "test_sha256": "b655bfdaa8fdf9af2b3a65932de04905ae81f183afd91255065c8e1a868b90c8",
+    "receipt_path": "evidence/receipts/ns2604-catalog-fix2-20261007.json",
+    "receipt_sha256": "73731148a4cae941da307936105581fdb65753c97c3e1f884dc34a5cf1e8f109",
+    "scope": "First repair and passing fixture stages precede the linked-ID counterexamples; their recorded bytes and results remain unchanged."
+  }
 }
