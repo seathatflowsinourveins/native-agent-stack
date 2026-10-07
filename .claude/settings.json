@@ -5,6 +5,11 @@
   "effortLevel": "xhigh",
   "workflowSizeGuideline": "unrestricted",
   "switchModelsOnFlag": false,
+  "claudeMdExcludes": [
+    "**/examples/claude-native/CLAUDE.md",
+    "**/adoption/scaffold/CLAUDE.md",
+    "**/adoption/scaffold/AGENTS.md"
+  ],
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
