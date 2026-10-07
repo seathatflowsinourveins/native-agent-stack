@@ -127,8 +127,14 @@ HF_HUB_OFFLINE = "1"
 TRANSFORMERS_OFFLINE = "1"
 DO_NOT_TRACK = "1"
 
-[mcp_servers.codebase-memory]
+# DeusData/codebase-memory-mcp v0.11.0 at 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798:
+# the native binary's install --skip-binary --clients=codex route owns this registration,
+# the context-only hooks, skill, three graph agents and managed AGENTS.md activation pointer.
+# The CC's Codex-only window read back the canonical key and these forwarded names;
+# their values remain host state. The separate Claude window later registered the same canonical key.
+[mcp_servers.codebase-memory-mcp]
 command = "${ECO_ROOT}/bin/codebase-memory-mcp"
+env_vars = ["CBM_CACHE_DIR", "CBM_RUNTIME_DIR"]
 
 [mcp_servers.qmd]
 command = "${ECO_ROOT}/bin/qmd"
@@ -155,7 +161,7 @@ RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 CONTEXT_MODE_PLATFORM = "codex"
 
-# jgravelle/jcodemunch-mcp 1.108.319, README.md at 8f7b34abe16fb459e0bf1c04747d584216dfe32e (L119-122: `claude mcp add -s user
+# jgravelle/jcodemunch-mcp 1.108.330, README.md at 288033668f0425ab0547f420dd647c14bd186c7f (`claude mcp add -s user
 # jcodemunch jcodemunch-mcp`): the native MCP registration at user scope, on the user's directive of 2026-10-04 that every fresh
 # session starts with the tools ready (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md; it overturns the project scope
 # of 2026-09-25 for NativeStack and NativeStack2604). JCODEMUNCH_SHARE_SAVINGS=0 in the env block is the documented opt-out of its
@@ -163,12 +169,11 @@ CONTEXT_MODE_PLATFORM = "codex"
 # prompt policy and hooks, is not run. The entry is the one project.codex.config.template.toml registers per project: the tools
 # carry no MCP annotations, so under approval_policy = "never" Codex refuses every unapproved call, and
 # default_tools_approval_mode = "approve" auto-approves even then (codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1);
-# enabled_tools names the three verbs of its front door (counter.py FRONT_DOOR at 1.108.319). CODE_INDEX_PATH stays unset:
-# upstream's default is ~/.code-index (README.md L225).
+# No enabled_tools allowlist: the CC's Codex window removed the old three-verb restriction,
+# leaving the native resident tools available. CODE_INDEX_PATH stays unset; upstream's default is ~/.code-index.
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
 startup_timeout_sec = 60
-enabled_tools = ["route", "menu", "order"]
 default_tools_approval_mode = "approve"
 
 [mcp_servers.jcodemunch.env]

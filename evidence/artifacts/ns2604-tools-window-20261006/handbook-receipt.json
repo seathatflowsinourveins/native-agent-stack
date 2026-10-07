@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-profile-integration",
+  "recorded_at_utc": "2026-10-06T22:58:14Z",
+  "evidence_class": "local_integration",
+  "source_base": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "prior_receipt": {
+    "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+    "sha256": "6cd23bd1aaf31d67c110f0973b0b6972421cdcd1f2eedaebf8f03534b456c3ed"
+  },
+  "supersession_scope": "New current regeneration mirror under CC223917 point6; the complete dated prior receipt remains byte-identical. Native generator is unchanged. No historical host acceptance or decision is replaced.",
+  "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+  "profile_sha256": "bf96a1d0b9d7610a4e5ca7f52a9d57c3f3a50c14a5f1cae2e0d08a7becb8fde0",
+  "outputs": {
+    "docs/new-wsl-handbook.md": "c6cf822f7033ebdd47e6aee04ef277d3334b4b355f4aa9c8ea168a0a140e07b4",
+    "docs/new-wsl-handbook.json": "50acc8c9ba8c85ff7eab810e64a05275d6fe56ac69aa2d6ebacd30edb02d6489"
+  },
+  "inventory": {
+    "layers": 37,
+    "profile_entries": 78,
+    "projected_tools": 82,
+    "canonical_package_ids": 26
+  },
+  "regenerations": [
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "N28 reflects the actual shared-package and Codex/Claude tools windows through the unchanged handbook builder. Current hash mirror follows the regenerated files; every earlier regeneration and acceptance remains retained.",
+      "source_base": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "evidence_class": "local_integration",
+      "previous_profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+        "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
+      },
+      "previous_inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 25
+      },
+      "native_exit_code": 0,
+      "sanitizer_exit_code": 0,
+      "native_output": "coordination:ns2604-coop/readiness-20261005/jobs/N28-20261006/checks/handbook-generate.out",
+      "failed_condition_retained": {
+        "command": "python3 -m unittest tests.test_new_wsl_handbook tests.test_handbook_summary tests.test_new_wsl_profile tests.test_landscape",
+        "native_exit_code": 1,
+        "tests": 201,
+        "failures": 1,
+        "returned_output": "Ran201tests in44.428s; stale current profile hash in handbook receipt",
+        "correction": "Refresh this maintained current hash/inventory mirror from actual generated files; retain all prior hashes and the failed attempt."
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_status": "PASS: native handbook --check0 and the previously failing hash/inventory contract test0; sanitizer0 for both"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "N28 rebase onto main e28d0eec: regenerate through the unchanged native builder, preserving every main regeneration plus the original N28 record. No handbook conflict was hand-merged.",
+      "regenerated_against_main": "e28d0eec112527ac02659ac23753533b8ed39a73",
+      "previous_main_outputs": {
+        "docs/new-wsl-handbook.md": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
+        "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
+      },
+      "previous_n28_outputs": {
+        "docs/new-wsl-handbook.md": "a9d086f3ebb2e6a860eb42acd1f57111d6aeb2d5e2f59758dfaa07491835672c",
+        "docs/new-wsl-handbook.json": "f3ca109b83e1cdb03effa162a6dad579eb1038b836a94814d6099985fc8ed46e"
+      },
+      "native_exit_code": 0,
+      "sanitizer_exit_code": 0,
+      "native_output": "coordination:ns2604-coop/readiness-20261005/jobs/N28-20261006/checks/handbook-generate-after-rebase.out",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_status": "PASS: native rebased handbook current-hash contract0 (including its native --check0); sanitizer0. Publication validation after re-registration0."
+    }
+  ],
+  "validation_status": "PASS: native tests.test_new_wsl_handbook after current-pointer/prior-link correction returned0, sanitizer0; every existing generator/profile/output/inventory and byte-change control retained. Final registration/publication integrity check follows separately.",
+  "native_validation_record": "coordination:ns2604-coop/readiness-20261005/jobs/N28-20261006/checks/immutable-handbook-contract.meta"
+}

@@ -18,6 +18,16 @@ Start from the requested outcome, the current repository state and a concrete ac
 
 Select only the foundation layers needed for the task. Reuse accepted receipts while their inputs, version, platform and scope still match. Resolve a demonstrated missing dependency or broken connection directly; a healthy environment does not need another installation sweep.
 
+Keep recorded observations/results and decision records' decided text immutable.
+Living plans and generator-owned content and inputs may change through validated
+PRs. A new regeneration or correction record links the previous path and digest;
+current instruction carriers and their publication-contract pointer follow the
+new record. The current handbook mirror is
+`evidence/artifacts/ns2604-tools-window-20261006/handbook-receipt.json`; the
+original `new-wsl-handbook-20261001/receipt.json` remains historical. The
+[2026-10-06 custody decision](decisions/2026-10-06-native-handbook-receipt-custody.md)
+supersedes the earlier live-mirror convention without rewriting that history.
+
 Prefer the installed upstream executable, SDK and supported client integration, and maintained upstream skills, examples and CI patterns that fit the actual task; record the selected source revision and the reason for any remaining glue. Discover alternatives through owned/starred repositories, curated lists and research, then record why a candidate closes a gap or improves a comparable workload; author benchmarks and installation success do not establish the best workflow. Follow the [acceptance evidence policy](acceptance-evidence-policy.md): unchanged upstream tests and native command results are primary evidence, while our own integration checks and synthetic fixtures stay explicitly identified. A generated receipt or locally authored test suite cannot certify itself as upstream end-to-end acceptance.
 
 For requested harness capabilities, follow the [check order](#check-a-capability-claim-in-order) below (installed client, upstream changelog or release notes, upstream source at the tag, official documentation), then review relevant community alternatives. Resolve discoverable names and capabilities before asking the user, record source pins and adoption reasons, and execute the selected native path through actual returned results. A dated exclusion or missing catalog row is not current availability evidence. This research is task-triggered, not a full-catalog startup ritual. The [native Ultracode recipe](../recipes/claude-native-ultracode.md) records the current dispatch, messaging and dashboard boundary.

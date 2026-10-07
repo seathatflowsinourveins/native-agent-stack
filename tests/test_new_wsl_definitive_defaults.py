@@ -1374,9 +1374,11 @@ class Manifest(unittest.TestCase):
             added = [sid for sid, row in self.owner_rows.items() if row["layer_id"] == layer_id]
             self.assertEqual(in_layer[-len(added):], added, layer_id)
 
-    def test_owner_pins_are_the_repository_pins(self):
-        """The original owner pins follow the host stack; wave 5 adds destination owners without moving host pins."""
+    def test_current_profile_pins_are_the_repository_pins(self):
+        """Current installation pins follow the host stack; dated consensus rows retain their recorded versions."""
         stack = {component["id"]: component["version"] for component in load(ROOT / "manifests/stack.json")["components"]}
+        current_profile = {entry["component_id"]: entry for entry in load(ROOT / "adoption/new-wsl-profile.json")["entries"]
+                           if entry.get("component_id")}
         components = {"command-output": "rtk", "output-compression": "headroom", "code-index": "jcodemunch-mcp",
                       "code-graph": "codebase-memory-mcp", "repo-packing": "repomix", "structured-data": "toon",
                       "doc-conversion": "markitdown", "api-docs": "context-hub", "trace-viewer": "otel-tui",
@@ -1387,9 +1389,9 @@ class Manifest(unittest.TestCase):
         rows = {row["slot_id"]: row for row in self.rows}
         for sid, component in components.items():
             with self.subTest(slot=sid):
-                self.assertRegex(rows[sid]["default"], r"(?<![0-9.])" + re.escape(stack[component]) + r"(?![0-9.])")
+                self.assertEqual(current_profile[component]["pin"], stack[component])
         interim = rows["code-search"]["interim"]["default"]
-        self.assertIn("SocratiCode " + stack["socraticode"], interim)
+        self.assertEqual(interim, self.owner_amends["code-search"]["interim"]["default"])
         self.assertIn("semble 0.6.1", interim)
         wave5 = {r["slot_id"]: r for r in self.wave5["add_rows"]}
         wave5.update({e["slot_id"]: e["owner_default"] for e in self.wave5["amend_rows"]})

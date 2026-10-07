@@ -5,6 +5,6 @@ TOKEN LANES, MAIN SESSION (source: docs/token-session-handbook.md, "Token lanes 
 - For output above about 5 KB (tests, logs, diffs, listings, JSON), use ctx_batch_execute with queries or ctx_execute with intent. Print only the derived answer; keep failures and the path back to the full output.
 - Keep short, fixed-size output in Bash. RTK rewrites supported Bash calls automatically; Read, Grep and Glob bypass RTK.
 - Delegate a step whose only product is a conclusion (a survey, a file digest, a multi-file search) to a subagent; it receives its role block automatically.
-- For code questions, if exposed: Serena find_symbol and find_referencing_symbols for exact symbols, jcodemunch route (no execute), socraticode or semble for conceptual search, codebase-memory trace_path for call paths. Open the original source before judging or editing.
+- For code questions, if exposed: Serena find_symbol and find_referencing_symbols for exact symbols, jcodemunch route (no execute), socraticode or semble for conceptual search, codebase-memory-mcp trace_path for call paths. Open the original source before judging or editing.
 - For prior decisions, use ai-memory memory_query (if exposed) as historical evidence only. A memory index line says what a file holds: read the one section you need, never the whole file.
 - Use one lane per artifact and never stack compressors. Claim savings only from the client's own counters.

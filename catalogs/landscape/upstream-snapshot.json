@@ -4041,8 +4041,8 @@
       "component_id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "selected_repository_url": "https://github.com/jgravelle/jcodemunch-mcp",
-      "selected_version": "1.108.319",
-      "selected_source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "selected_version": "1.108.330",
+      "selected_source_pin": "288033668f0425ab0547f420dd647c14bd186c7f",
       "checks": [
         {
           "endpoint": "repos/jgravelle/jcodemunch-mcp",
@@ -4075,6 +4075,30 @@
           "ended_at": "2026-09-21T22:34:03.360901+00:00",
           "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-06T22:25:46Z",
+          "ended_at": "2026-10-06T22:25:46Z",
+          "stdout_sha256": "70c432a713383b32df16488c5b2c7d42ad70ad0d8489e3fa2518b719c5f5cee3",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/288033668f0425ab0547f420dd647c14bd186c7f",
+          "exit_code": 0,
+          "started_at": "2026-10-06T22:25:46Z",
+          "ended_at": "2026-10-06T22:25:46Z",
+          "stdout_sha256": "122fa4fd992810003ccbe7c1e8f374fe21c9ed8b970be5893f92cd2894e90a0b",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/v1.108.331",
+          "exit_code": 0,
+          "started_at": "2026-10-06T22:25:57Z",
+          "ended_at": "2026-10-06T22:25:57Z",
+          "stdout_sha256": "3248e49e2138480434b382acbe4d55282b141c3684812f2c402feb66438a2ca5",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/jgravelle/jcodemunch-mcp",
@@ -4084,31 +4108,31 @@
       "pushed_at": "2026-09-21T20:58:37Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v1.108.319",
-        "published_at": "2026-09-16T14:04:32Z",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "tag_name": "v1.108.331",
+        "published_at": "2026-10-06T18:34:31Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.331",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "committed_at": "2026-09-16T11:26:45Z"
+        "ref": "288033668f0425ab0547f420dd647c14bd186c7f",
+        "sha": "288033668f0425ab0547f420dd647c14bd186c7f",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/288033668f0425ab0547f420dd647c14bd186c7f",
+        "committed_at": "2026-10-06T10:37:35Z"
       },
       "latest_release_source": {
-        "ref": "v1.108.319",
-        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "committed_at": "2026-09-16T11:26:45Z"
+        "ref": "v1.108.331",
+        "sha": "d94049d03e3ec21a90253c9a619598211157f00b",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/d94049d03e3ec21a90253c9a619598211157f00b",
+        "committed_at": "2026-10-06T18:19:59Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "release_relationship": "newer_stable_release_review_pending",
+      "selected_pin_matches_latest_release_commit": false
     },
     {
       "component_id": "nextjs",

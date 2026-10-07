@@ -1441,8 +1441,12 @@ class NewWslHandbookTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(ROOT / "scripts/build_new_wsl_handbook.py"), "--check"],
                                 capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
-        # The receipt freezes the generator, the profile and both outputs; its hashes follow the regenerated files.
-        receipt = json.loads(self.committed("evidence/artifacts/new-wsl-handbook-20261001/receipt.json"))
+        # The current regeneration record links the immutable dated receipt and binds current outputs.
+        receipt = json.loads(self.committed("evidence/artifacts/ns2604-tools-window-20261006/handbook-fold-776-20261007.json"))
+        self.assertEqual(receipt["prior_receipt"]["path"],
+                         "evidence/artifacts/new-wsl-handbook-20261001/receipt.json")
+        self.assertEqual(receipt["prior_receipt"]["sha256"],
+                         handbook.digest((ROOT / receipt["prior_receipt"]["path"]).read_bytes()))
         profile = json.loads(self.committed(handbook.PROFILE))
         data = json.loads(self.committed(handbook.OUTPUTS[1]))
         self.assertEqual(receipt["generator_sha256"],

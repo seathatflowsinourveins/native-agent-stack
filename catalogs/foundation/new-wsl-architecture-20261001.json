@@ -552,9 +552,9 @@
         {
           "component_id": "jcodemunch-mcp",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-          "pin": "1.108.319",
+          "pin": "1.108.330",
           "pin_source": "manifests/stack.json:1689",
-          "install": {"command": "eco=\"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}\"; UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319", "kind": "repo_recipe", "source_path": "recipes/README.md"},
+          "install": {"command": "eco=\"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}\"; UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" uv tool install --python 3.13 'jcodemunch-mcp[watch]==1.108.330'", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "a deliberately scoped local code index, then search_symbols and get_symbol_source through jcodemunch-mcp's native MCP tools (called through mcporter): the exact requested function returned (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-jcodemunch-20260920.json"},
           "upstream_currency": {"latest_release": "v1.108.320 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/jgravelle/jcodemunch-mcp/releases"}
         }

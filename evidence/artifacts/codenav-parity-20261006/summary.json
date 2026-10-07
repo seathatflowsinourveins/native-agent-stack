@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "codex_codenav_parity_snapshot",
+  "recorded_utc": "2026-10-06T06:09:12Z",
+  "repository_base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "decision": "docs/decisions/2026-10-06-codex-codenav-parity-proposal.md",
+  "native_client": {
+    "version": "0.160.0",
+    "upstream": "https://github.com/openai/codex",
+    "tag": "rust-v0.160.0",
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "version_exit_code": 0
+  },
+  "registration": {
+    "evidence_class": "installed_observation",
+    "command": "rtk proxy codex mcp get <server>",
+    "environment_values": "native human-readable output masks all values; no JSON config environment inspected",
+    "servers": {
+      "serena": {"exit_code": 0, "registered": true, "enabled": true, "transport": "stdio", "startup_timeout_sec": 60, "project_from_cwd": true, "codex_context": true},
+      "jcodemunch": {"exit_code": 0, "registered": true, "enabled": true, "transport": "stdio", "startup_timeout_sec": 60, "enabled_tools": ["route", "menu", "order"], "preinstalled_binary": true},
+      "semble": {"exit_code": 0, "registered": true, "enabled": true, "transport": "stdio", "enabled_tools": ["search", "find_related"]},
+      "codebase-memory": {"exit_code": 0, "registered": true, "enabled": true, "transport": "stdio", "explicit_environment_names": []},
+      "socraticode": {"exit_code": 0, "registered": true, "enabled": true, "transport": "stdio", "startup_timeout_sec": 120, "engine_path_pin": "1.15.0"}
+    },
+    "effective_required_readiness_and_shared_grace": "unknown; selected native CLI human-readable fields do not expose them"
+  },
+  "resumed_turn_discovery": {
+    "evidence_class": "installed_observation",
+    "tool_counts": {"serena": 24, "jcodemunch": 3, "semble": 2, "codebase-memory": 17, "socraticode": 26},
+    "returned_target_calls_in_this_unit": 0,
+    "fresh_profile_acceptance": false
+  },
+  "rollout_counts": {
+    "evidence_class": "recorded_native_transport_telemetry",
+    "interval_start_utc": "2026-10-05T04:04:58Z",
+    "interval_end_utc": "2026-10-06T06:04:36Z",
+    "registered_root_sessions": 12,
+    "native_linked_descendant_sessions": 72,
+    "predicate": "event_msg / payload.type=item_completed / payload.item.type=McpToolCall / target server / owning thread_id",
+    "deduplication": "session ID plus item ID",
+    "duplicates": 0,
+    "wrong_thread_matching_records": 0,
+    "independently_reproduced": true,
+    "servers": {
+      "serena": {"root_completed": 8, "descendant_completed": 51, "total_completed": 59, "descendant_failed": 1},
+      "jcodemunch": {"root_completed": 0, "descendant_completed": 0, "total_completed": 0, "descendant_failed": 0},
+      "semble": {"root_completed": 2, "descendant_completed": 3, "total_completed": 5, "descendant_failed": 0},
+      "codebase-memory": {"root_completed": 3, "descendant_completed": 0, "total_completed": 3, "descendant_failed": 0},
+      "socraticode": {"root_completed": 0, "descendant_completed": 0, "total_completed": 0, "descendant_failed": 0}
+    },
+    "first_turn_contexts_examined": 12,
+    "contexts_with_explicit_mcp_tool_set": 0,
+    "excluded": ["unfinished calls", "unregistered sessions", "organic pilot sessions", "CLI transports"],
+    "raw_arguments_and_results_published": false,
+    "organic_choice_classified": false,
+    "functional_success_graded": false
+  },
+  "native_plugin_observation": {
+    "command": "rtk proxy codex plugin list --json",
+    "exit_code": 0,
+    "installed_entries": 9,
+    "socraticode_named_entry_found": false,
+    "standalone_skill_installation_elsewhere": "unverified"
+  },
+  "source_review": {
+    "all_five_explicitly_document_codex": true,
+    "codex_readiness": "codex-rs/config/src/mcp_types.rs:216-256; codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs:278-331",
+    "codex_grace": "codex-rs/config/src/config_toml.rs:318-322",
+    "codebase_memory_env_forwarding": "DeusData/codebase-memory-mcp@v0.11.0:src/cli/cli.c:3754-3784",
+    "socraticode_native_skill_split": "giancarloerra/SocratiCode@f6191f076a42405f0d5508139f3a8b505cfef93a:README.md:108,222-259",
+    "jcodemunch_task_version": "1.108.319",
+    "jcodemunch_installed_version": "1.108.327",
+    "new_currency_leads": ["Semble 0.6.2", "SocratiCode 1.16.0"],
+    "quality_or_owner_promotion": false
+  },
+  "work": {
+    "host_or_client_configuration_changed": false,
+    "new_trials_launched": false,
+    "headless_native_acceptance_sessions_launched": false,
+    "separate_cli_gpt_jobs_launched": false,
+    "existing_inherited_research_workers_resumed": true,
+    "credentials_read_or_published": false,
+    "first_recount_attempt_exit_code": 1,
+    "recount_correction": "guard native source/subagent variants before reading thread_spawn metadata",
+    "final_recount_exit_code": 0,
+    "configuration_fix_status": "co-op forwards decision proposal to command center; carrying PR/application order after 752 and 770",
+    "template_files_changed": false,
+    "proposed_intervention_evidence_class": "harness_configuration_proposal_not_U1_native_arm",
+    "related_routing_proposal": "overlap-token Q2 / draft PR 749; separate AGENTS-template bullets",
+    "owner_or_exclusion_status_changed": false
+  }
+}
