@@ -373,7 +373,7 @@ change the accepted semantic profile above or disable an existing user's service
 After reviewing scope, copy [ai-memory-project.toml.example](../examples/ai-memory-project.toml.example) to **only this project's** `.ai-memory.toml`. It names both workspace and project and excludes selected sensitive paths. Exclusions cover recognized file tools; they do not sanitize arbitrary shell output by path. Start the upstream service directly:
 
 ```sh
-ai-memory serve --transport http --enable-web --bind 127.0.0.1:49374 --workspace default --project native-agent-stack
+ai-memory serve --transport http --enable-web --bind 127.0.0.1:49374 --workspace local --project native-agent-stack
 ```
 
 The upstream `packaging/systemd/ai-memory-user.service` can be adapted into a user unit, preserving the same data/config location. Do not use `--force` to take over another active instance. Register MCP using the project examples or native registration above, then install the native hooks in allowlist mode:
