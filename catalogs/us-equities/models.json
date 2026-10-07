@@ -522,16 +522,17 @@
       "id": "google/timesfm-3.0-pytorch",
       "provider": "Hugging Face publisher repository",
       "role": "Time-series forecasting",
-      "decision": "excluded",
+      "decision": "conditional",
       "revision": "43046b85ec22d584a13f8098c2ed39c889e129c2",
       "repository_created_at": "2026-08-24T22:05:51+00:00",
       "last_modified": "2026-09-02T15:44:59+00:00",
       "release_evidence_date": "2026-08-28",
       "release_evidence_kind": "TimesFM v3.0.0 source release; model announcement August 2026",
       "license": "TimesFM Non-Commercial License v1.0",
-      "task_fit": "Recent forecasting research only; excluded from the commercial/production path under current weights license.",
+      "task_fit": "The TimesFM line's pick from 2026-10-07 (see currency): its newest release, with native multivariate forecasting and past-only or past-and-future covariates, as a research baseline for a properly lagged comparison. The weights license is recorded as information only, under the owner's rule: TimesFM Non-Commercial License v1.0, non-commercial and non-production use.",
       "limitations": [
-        "TimesFM Non-Commercial License v1.0 is separate from Apache source code. Forecast accuracy is not equity alpha or execution evidence."
+        "TimesFM Non-Commercial License v1.0 covers these weights; the source code is Apache-2.0. Recorded, not a selection criterion. Forecast accuracy is not equity alpha or execution evidence.",
+        "The publisher's benchmark ranks (fev-bench, TIME, GIFT-Eval) are its own claims, not evidence for this lane. No inference or financial out-of-sample evaluation has been run here."
       ],
       "evidence_level": "source_review",
       "evidence_refs": [
@@ -541,25 +542,26 @@
         "hf models info google/timesfm-3.0-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json",
         "hf models card google/timesfm-3.0-pytorch --text --format human"
       ],
-      "inference_recipe": null,
+      "inference_recipe": "from timesfm3 import TimesFM3Evaluator, ModelConfig; TimesFM3Evaluator(ModelConfig(checkpoint_path='google/timesfm-3.0-pytorch', per_core_batch_size=32, device='cuda')).predict_batch([series, ...], horizon=H, return_quantiles=True)",
       "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
       "sources": [
         "https://huggingface.co/google/timesfm-3.0-pytorch/blob/43046b85ec22d584a13f8098c2ed39c889e129c2/README.md",
-        "https://github.com/google-research/timesfm/releases/tag/v3.0.0"
+        "https://github.com/google-research/timesfm/releases/tag/v3.0.0",
+        "https://github.com/google-research/timesfm/blob/331c6d33cb1ac2611de3056d0ac7164aab6301eb/README.md"
       ]
     },
     {
       "id": "google/timesfm-2.5-200m-pytorch",
       "provider": "Hugging Face publisher repository",
       "role": "Time-series forecasting baseline",
-      "decision": "conditional",
+      "decision": "alternative",
       "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
       "repository_created_at": "2025-09-02T18:55:45+00:00",
       "last_modified": "2025-10-02T17:21:38+00:00",
       "release_evidence_date": "2025-09-15",
       "release_evidence_kind": "Publisher model announcement; older compatible baseline",
       "license": "apache-2.0",
-      "task_fit": "Apache-licensed 200M forecasting baseline for a properly lagged comparison, despite not being a recent model.",
+      "task_fit": "Superseded as the TimesFM line's pick by TimesFM 3.0 (release 2026-08-28) on 2026-10-07; kept only as an older Apache-licensed comparison baseline, not a pick.",
       "limitations": [
         "Package 3.0.2 is not model 3.0 permission. No financial out-of-sample evaluation performed. Forecasted prices alone are not a strategy."
       ],
@@ -589,7 +591,7 @@
       "release_evidence_date": "2025-10-20",
       "release_evidence_kind": "Upstream model announcement; this HF repository created October 30",
       "license": "apache-2.0",
-      "task_fit": "120M probabilistic baseline with covariates for research comparisons; current library release does not make the weights recent.",
+      "task_fit": "120M probabilistic baseline with covariates for research comparisons, and the Chronos line's newest model generation as of 2026-10-07 (see currency); the chronos-forecasting library is newer (v2.3.2, 2026-09-08) but ships no newer weights.",
       "limitations": [
         "Keep covariates available at prediction time, embargo overlaps and evaluate net trading utility separately. No inference or finance benchmark run."
       ],
@@ -608,5 +610,55 @@
         "https://github.com/amazon-science/chronos-forecasting"
       ]
     }
-  ]
+  ],
+  "currency": {
+    "rule": "Every model in use is the newest release of its line, or carries a dated exception with an overturn trigger (the owner's rule); a license is information only.",
+    "landscape_check": {
+      "date": "2026-10-07",
+      "method": [
+        "GitHub releases of google-research/timesfm and amazon-science/chronos-forecasting (gh api, 2026-10-07)",
+        "Hugging Face models API: author google search timesfm and author amazon search chronos, newest first; pipeline_tag time-series-forecasting by downloads, and by creation date for 2026-06-21..2026-10-07"
+      ],
+      "candidates_noted": [
+        "LG-AI-Research/EXAONE-Forecast-for-Finance-1.0 (created 2026-09-03; finance-specific)",
+        "theforecastingcompany/t0-beta (created 2026-09-16)",
+        "ibm-granite/granite-timeseries-patchtst-fm-r2 (created 2026-08-07)",
+        "NeoQuasar/Kronos (2025-06/07; financial candlestick model family)"
+      ],
+      "candidates_status": "Discovery only: noted for the trading lane's next model wave, not evaluated, installed or selected. Downloads and stars guide discovery; they are not evidence."
+    },
+    "rows": [
+      {
+        "line": "TimesFM (google-research)",
+        "pick_before": "google/timesfm-2.5-200m-pytorch (release 2025-09-15)",
+        "newest_release": {
+          "id": "google/timesfm-3.0-pytorch",
+          "revision": "43046b85ec22d584a13f8098c2ed39c889e129c2",
+          "release_date": "2026-08-28",
+          "source": "https://github.com/google-research/timesfm/releases/tag/v3.0.0 (tag commit 331c6d33cb1ac2611de3056d0ac7164aab6301eb; Hugging Face repository created 2026-08-24)"
+        },
+        "decision": "SWITCH",
+        "pick_after": "google/timesfm-3.0-pytorch",
+        "why": "The only exclusion basis was the weights license, which the owner's rule treats as information.",
+        "exception": null,
+        "overturn_trigger": "A newer TimesFM release (a google-research/timesfm tag or a google/timesfm-* model newer than 3.0), or a measured regression of 3.0 against 2.5 in the lane's lagged comparison once a research-pair run exists."
+      },
+      {
+        "line": "Chronos (amazon-science)",
+        "pick_before": "amazon/chronos-2 (release 2025-10-20)",
+        "newest_release": {
+          "id": "amazon/chronos-2",
+          "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+          "release_date": "2025-10-20",
+          "source": "Hugging Face amazon/chronos-2 (created 2025-10-30) is the newest amazon chronos model; same-generation variants autogluon/chronos-2-small (2025-12-03) and autogluon/chronos-2-synth (2025-11-24); library v2.3.2 (2026-09-08) adds no weights."
+        },
+        "decision": "KEEP",
+        "pick_after": "amazon/chronos-2",
+        "why": "Already the newest generation of its line; no exception needed.",
+        "exception": null,
+        "overturn_trigger": "A new Chronos generation from amazon or autogluon on Hugging Face, or a chronos-forecasting release that ships newer weights."
+      }
+    ],
+    "effect": "Catalog decision only: no research-pair DAG runs on the trading host, so no paper or start effect."
+  }
 }
