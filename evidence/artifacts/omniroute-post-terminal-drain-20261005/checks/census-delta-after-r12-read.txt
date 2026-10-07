@@ -1,4 +1,4 @@
-# The complete diff of the window census between the head that the full-scope read r12 read (4624137290; superseded/window-census-r13.py.txt, sha256 9350953cd4d6a005a4aa1817f8b3de743d6b15ae4d8697bb91b8c61a9c45fb9c) and this head (scripts/window-census.py.txt, sha256 4229f076f1dcbf1e4562c523402252ad90ca7e87da964498b5f57d8ee4b07c47), as `diff -u` with one line of context. Nothing else of the census differs.
+# The complete diff of the window census between the head that the full-scope read r12 read (4624137290; superseded/window-census-r13.py.txt, sha256 9350953cd4d6a005a4aa1817f8b3de743d6b15ae4d8697bb91b8c61a9c45fb9c) and this head (scripts/window-census.py.txt, sha256 0502cfff9f168c7b0e85ab2ffc50d50460de73246faf4ffee2aac369e704f337), as `diff -u` with one line of context. Nothing else of the census differs.
 # The causes: the findings of the full-scope read r12 (its table in checks/census-adversarial-reviews.txt: the completion-anchored journal record and the start agreement, the serving-process check, the widths in estimated-start terms, the reserved-word and canary-pin fixes), the third and the fourth independent adversarial review (the same file), and the command center's ruling on the residual (2026-10-06): the receipt states the residual verbatim as an untested boundary and states its evidence classes (controls J21a and J21b). The controls are J22-J39 and X4-X7 (the fourth review's findings are J30-J35 and X4; X5 reads the real stream-end lines of the patched build; J36-J39, X6 and X7 answer the read r13 of ec4b489d9, whose delta is checks/census-delta-after-r13-read.txt).
 
 --- superseded/window-census-r13.py.txt
@@ -6,7 +6,7 @@
 @@ -11,3 +11,3 @@
    (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad, and exactly (the pad alone leaves a sliver at its edge) every call row that is not this run's and could own a usage row an own call row can claim (the candidate query seen from the usage row, the same association) is a problem wherever it lies;
 -  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier; the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
-+  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and an INFO line (if the receipt has one) that shows no change of the gateway's own pending-request counter during the observation (round 27, the command center's second condition on the item (2) residual: a window whose idle receipt shows a foreign arrival is INCONCLUSIVE; the flag `pending_changed=True`, or two different totals, shows one); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
++  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and, on the receipt's INFO and sample lines (read by field name, in any order), the gateway's own pending-request counter complete, readable and UNCHANGED (pending_total_before, pending_total_after, pending_changed), no active client connection, no process of another lane and no call_logs row younger than 120 s (rounds 27 and 28, the command center's second condition on the item (2) residual: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE; a repeated, missing, unreadable or contradictory field is refused); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
          no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
 @@ -19,5 +19,21 @@
  (ix)  the rows an association rests on are plausible numbers (a present latency, duration or time to first token is finite and non-negative and the time to first token is not longer than the latency: true of every row of this host's store, 30,129 usage rows and 24,522 call rows; a NULL time to first token is not compared, as in the scripts, and is routine here), every timestamp of both tables is a calendar-valid gateway stamp of 2000-2100 (checked row by row, not by shape), every reserved record of an arm output (RESULT, SUMMARY, FROZEN, RUN-STATUS, IDENTITY, the journal line) is parsed or refused, a script stamp that is present but invalid is never rescued by another stamp, the canary gate requires the frozen request counts per arm (17, 6, 4, 8) and every query runs in ONE read transaction;
@@ -805,12 +805,79 @@
 +        elif arm["cwd"] and "\x00" in arm["cwd"]:
 +            arm["problems"].append("the FROZEN cwd= holds a NUL: the store the script read is not established")
          elif arm["cwd"] and os.path.isabs(arm["cwd"]):
-@@ -497,2 +1169,4 @@
+@@ -484,2 +1156,66 @@
+ 
++ACTIVITY_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed", "connections_active", "active_so_far", "workers", "last_call_log_age_s")
++COUNTER_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed")
++
++
++def activity_problems(line):
++    """Round 27 (the command center's second condition on the item (2) residual: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE) and round 28 (5f's delta check r16, r16-P2-1: the fields are read BY NAME, in any order, and an incomplete, unreadable or contradictory field is refused instead of being taken as absent).
++    The activity-bearing fields of one line of the guard receipt (the guard prints them on its INFO line and on every sample line): the gateway's own pending-request counter (pending_total_before, pending_total_after, pending_changed) must be complete, readable and UNCHANGED, no client connection may be active (connections_active, active_so_far),
++    no process of another lane may run (workers) and no call_logs row may be younger than 120 s (last_call_log_age_s). Returns (problems, changed): `changed` is True when the line shows that the counter changed, False when it shows the counter complete and unchanged, None when it carries no counter."""
++    found, repeated = {}, set()
++    for name, value in re.findall(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[=:]\s*([^\s,;]+)", line):
++        key = name.lower()
++        if key in ACTIVITY_FIELDS:
++            if key in found:
++                repeated.add(key)
++            found[key] = value.strip("'\"")
++    if not found:
++        return [], None
++    reasons, changed = [], None
++    if repeated:
++        reasons.append("repeated field(s) " + ", ".join(sorted(repeated)))
++    counter = [k for k in COUNTER_FIELDS if k in found]
++    if counter:
++        totals = {}
++        for key in ("pending_total_before", "pending_total_after"):
++            if key in found:
++                if re.fullmatch(r"-?[0-9]{1,18}", found[key]):
++                    totals[key] = int(found[key])
++                else:
++                    reasons.append(f"{key}={found[key]} is not a readable number")
++        flag = None
++        if "pending_changed" in found:
++            if found["pending_changed"].lower() in ("true", "false"):
++                flag = found["pending_changed"].lower() == "true"
++            else:
++                reasons.append(f"pending_changed={found['pending_changed']} is neither True nor False")
++        missing = [k for k in COUNTER_FIELDS if k not in found]
++        if missing:
++            reasons.append("the pending-request counter is incomplete (" + ", ".join(missing) + " missing)")
++        differ = len(totals) == 2 and totals["pending_total_before"] != totals["pending_total_after"]
++        if flag is True:
++            reasons.append("pending_changed=True")
++        if differ:
++            reasons.append(f"the totals differ ({totals['pending_total_before']} and {totals['pending_total_after']})")
++        if flag is True or differ:
++            changed = True
++        elif flag is False and len(totals) == 2 and not missing and not repeated:
++            changed = False
++    for key in ("connections_active", "active_so_far", "workers"):
++        if key in found:
++            if not re.fullmatch(r"[0-9]{1,9}", found[key]):
++                reasons.append(f"{key}={found[key]} is not a readable number")
++            elif int(found[key]) > 0:
++                reasons.append(f"{key}={found[key]}")
++    if "last_call_log_age_s" in found and found["last_call_log_age_s"].lower() != "none":
++        if not re.fullmatch(r"[0-9]{1,12}(\.[0-9]+)?", found["last_call_log_age_s"]):
++            reasons.append(f"last_call_log_age_s={found['last_call_log_age_s']} is not a readable number")
++        elif float(found["last_call_log_age_s"]) < 120:
++            reasons.append(f"last_call_log_age_s={found['last_call_log_age_s']} (a call_logs row younger than 120 s)")
++    if not reasons:
++        return [], changed
++    return [f"the idle receipt shows foreign activity, or cannot show its absence ({'; '.join(reasons)}): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, process of another lane or recent call_logs row may appear, on the line {line.strip()[:120]!r} "
++            "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX; review r16, P2-1)"], changed
++
++
+ def parse_guard(path):
+@@ -497,2 +1233,4 @@
              g["problems"].append(f"a CHECK line of the receipt says FAIL: {line[:70]!r}")
 +        if line.startswith("GUARD version=") and len(re.findall(r"\bstart=", line)) > 1:
 +            g["problems"].append("the GUARD line holds more than one start= field: the first would be taken")
          m = re.match(r"^GUARD version=(\S+) mode=(\S+) script_sha256=([0-9a-f]{64}) start=(\S+) .*?\bclean_for=(\S+)", line)
-@@ -520,2 +1194,10 @@
+@@ -520,2 +1258,14 @@
              results.append((m.group(1) == "True", m.group(2), parse_ts(m.group(3))))
 +        m = re.match(r"^\s*INFO\b.*?\bpending_total_before=(\S+)\s+pending_total_after=(\S+)\s+pending_changed=(True|False)\b", line)
 +        if m:   # round 27: the gateway's own pending-request counter, which the guard prints as informational; a change during the idle observation shows a request that arrived or finished while the lane was to be idle
@@ -820,13 +887,17 @@
 +            if flag or differ:
 +                g["problems"].append(f"the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before={before}, pending_total_after={after}, pending_changed={flag}): a request arrived or finished while the lane was to be idle, so the idle receipt shows foreign traffic "
 +                                     "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX)")
++        line_problems, line_changed = activity_problems(line)   # round 28: the activity-bearing fields of every line (the INFO line, the sample lines), read by name, in any order; the round-27 statement above is kept as it stands (a complete line in the normal order)
++        g["problems"].extend(line_problems)
++        if line_changed is not None:
++            g["pending_changed"] = True if (line_changed or g.get("pending_changed")) else False
      if g.get("guard_lines", 0) != 1 or g.get("identity_lines", 0) > 1:
-@@ -524,3 +1206,3 @@
+@@ -524,3 +1274,3 @@
          g["problems"].append(f"{g.get('result_lines', 0)} IDLE-RESULT or GUARD-RESULT line(s) in the receipt (exactly one IDLE-RESULT is needed; another result line, even a malformed one, is refused)")
 -    if g["version"] == "5" and g.get("script_sha") != GUARD_SCRIPT_SHA:
 +    if g["version"] == "5" and g.get("script_sha") not in (GUARD_SCRIPT_SHA, GUARD_SCRIPT_SHA_BEFORE_R12):
          g["problems"].append(f"the receipt is from a guard script of sha256 {str(g.get('script_sha'))[:12]}, not guard 5 ({GUARD_SCRIPT_SHA[:12]})")
-@@ -626,4 +1308,6 @@
+@@ -626,4 +1376,6 @@
      canary_gate = require_arms == DEFAULT_REQUIRED_ARMS and not diagnostic   # the canary contract: four wrapper arms (raw set, race set, native one-request set, native tool-call set, from `run-acceptance.sh canary`), each with the wrapper's header and identity lines
 -    scope = "canary" if canary_gate else "trial"
 -    rep.say(f"SCOPE {scope}" + ("" if canary_gate else ": not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance"))
@@ -835,7 +906,7 @@
 +    rep.say(f"SCOPE {scope}" + ("" if canary_gate else ": not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance")
 +            + (f" FIXTURE ({'; '.join(fixture_reasons)}): the process, socket and journal evidence may not be the host's, so this run can never be canary acceptance (the protocol accepts only `scope=canary`)" if fixture_reasons else ""))
      if canary_gate:
-@@ -646,2 +1330,7 @@
+@@ -646,2 +1398,7 @@
                  rep.bad(f"arm {index} ({a['name']}) holds {a['header_n']} wrapper header(s) and {a['finished_n']} `# finished` line(s): the wrapper's output is complete only with one of each")
 +        for index, a in enumerate(arms, 1):
 +            if (a["expect"], a["wait1"], a["wait2"]) != ("all-logged", "12.0", "60.0"):
@@ -843,7 +914,7 @@
 +            if a["summary_exit"] != "0":
 +                rep.bad(f"arm {index} ({a['name']}) holds a SUMMARY line with exit={a['summary_exit']}: the canary needs the script's own exit status 0 next to the wrapper's RUN-STATUS 0")
          for index, a in enumerate(arms, 1):
-@@ -666,5 +1355,7 @@
+@@ -666,5 +1423,7 @@
          guard = parse_guard(guard_path)
 -        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']}")
 +        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']} pending_changed={guard.get('pending_changed')}")
@@ -852,15 +923,15 @@
 +        if canary_gate and guard.get("script_sha") == GUARD_SCRIPT_SHA_BEFORE_R12:
 +            rep.bad(f"the idle receipt is from the guard of sha256 {GUARD_SCRIPT_SHA_BEFORE_R12[:12]} (guard 5 before round 13's repair of the prefix checks): the canary needs the repaired guard ({GUARD_SCRIPT_SHA[:12]})")
          compared = 0
-@@ -686,3 +1377,3 @@
+@@ -686,3 +1445,3 @@
              rep.bad(f"the gateway process identity was compared for {compared} of {len(arms)} arm(s): the canary gate needs every comparison to succeed")
 -        rep.say(f"IDENTITY-CHECK guard MainPID={guard['pid']} started={guard['unit_started']}; compared with {compared} of {len(arms)} arm(s)" + ("" if canary_gate else " (a direct run carries no identity line)"))
 +        rep.say(f"IDENTITY-CHECK guard MainPID={guard['pid']} started={guard['unit_started']}; compared with {compared} of {len(arms)} arm(s)" + ("" if compared == len(arms) else " (a direct run carries no identity line)"))
          if guard["end"] is not None and timed:
-@@ -708,7 +1399,7 @@
+@@ -708,7 +1467,7 @@
              f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
 -    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
-+    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO line, if it has one, shows no change of the gateway's pending-request counter) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
++    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO and sample lines show the gateway's pending-request counter complete and unchanged, no active connection and no recent row) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
      # ---- queries (printed first, so a failure below still leaves them in the receipt)
 -    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
 +    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("incarnation-calls", SQL_INCARNATION_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
@@ -868,12 +939,12 @@
 -    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <window start - {JOURNAL_LEAD_S + JOURNAL_PAD_S:.0f} s> UTC --until <window end + {JOURNAL_PAD_S} s> UTC -o json --all --no-pager (every `tag=HTTP method=POST` line whose message starts with the inbound-request marker, counted by the journal's own timestamp from {JOURNAL_LEAD_S:.0f} s before the window's start to its end and compared with the own call rows; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line)")
 +    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s, and for the canary the serving process's start; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed; for the canary a second run, `journalctl --user -u {JOURNAL_UNIT} _BOOT_ID=<this boot> _PID=<each listener> -o json --all --no-pager`, reads the listeners' own entries from their birth with no wall-clock lower bound: the INCARNATION-JOURNAL-COMMAND and INCARNATION-BIRTH lines)")
      rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({u0s}, {w1s}) (the window's start padded by the same {CANDIDATE_SECONDS} s as the usage rows); window-usage: ({u0s}, {u1s}); "
-@@ -743,3 +1434,3 @@
+@@ -743,3 +1502,3 @@
      try:
 -        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds)
 +        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary_gate)
      except Exception as error:   # whatever fails here, the receipt printed so far stays and the result is INCONCLUSIVE, never a crash without a receipt and never a PASS
-@@ -748,3 +1439,8 @@
+@@ -748,3 +1507,8 @@
          con.close()
 -    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore rests on the gateway's journal as the independent record: the number of inbound POST requests it logged in the window equals the number of own call rows and the lines pair with them one to one by time and path within 3 s (so a foreign request leaves a line even when its call row was never written), and the rows are paired one to one. What stays outside: a foreign request that the gateway did not log on arrival while the own requests' lines are all present, a lost own line balanced by a foreign line of the same path that arrives within 3 s of it or of a chain of neighbouring own requests' lines (3 s per link), a persistence failure that is not logged (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup), and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
 +    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the request's lifecycle: measured within about 0.2 s of the rows of a completed request on this host (checks/census-calibration-measurements.txt: one host over one range, NOT a bound: an unread downstream queue delays a successful stream's line behind its rows without bound, 5.7 s in the native reproduction, r13-P1-2), and up to the disconnect grace before the rows of a request whose client left: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
@@ -883,12 +954,12 @@
 +            "Journald's drops are bounded only by the unit's entry rate against its limit (its suppression notice is in the system journal, which this user cannot read), a vacuum or rotation gap is not detected, and the serving process, its start and the holders of the store are read at one point in time (a transient listener or writer inside the window is not seen)")
 +    rep.say("EVIDENCE-CLASS local_integration and synthetic controls, plus the stated real rows (the baseline arms and the quiet-window live trial of 2026-10-06: checks/census-baseline-real-data.txt and checks/census-live-trial.txt in the evidence folder of PR #757): the census is validated by its controls and those rows")
      rep.say(f"CENSUS-RESULT {rep.state} exit={0 if rep.state == 'PASS' else 2} problems={len(rep.reasons)} scope={scope}")
-@@ -753,3 +1449,3 @@
+@@ -753,3 +1517,3 @@
  
 -def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
 +def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary=False):
      # ---- timestamp format: a row whose timestamp has another format would be skipped by the string bounds, silently
-@@ -795,15 +1491,56 @@
+@@ -795,15 +1559,56 @@
      rep.say(f"OWN call rows={len(own)} per arm={dict(sorted(per_arm_own.items()))}")
 -    # ---- the gateway's journal: an independent record of every inbound request, written when it ARRIVES (a foreign request leaves a line even when its call row was never written)
 +    # ---- review 4, F1: Responses-over-WebSocket turns. The gateway's WebSocket proxy (dist/server-ws.mjs) persists a turn through POST /api/internal/codex-responses-ws with BOTH rows stamped at the turn's START (its length is the duration and the latency) and writes neither an arrival line
@@ -954,14 +1025,14 @@
 +        inside = [(t, label, lpath) for t, label, lpath, _pid in posts if lo <= t <= c_hi]
 +        rep.say(f"JOURNAL unit={JOURNAL_UNIT} readable=True inbound_POST_lines_in_window={len(inside)} own_call_rows={len(own)} (counted by the gateway's own clock (the line's `time`) from {utc(lo)}, {JOURNAL_LEAD_S:.0f} s before the window's start, to {utc(c_hi)}, the end of the window padded by the {CANDIDATE_SECONDS} s usage pad and {COMPLETION_MARGIN_S:g} s)")
          if len(inside) != len(own):
-@@ -811,4 +1548,4 @@
+@@ -811,4 +1616,4 @@
                  rep.say(f"   journal request line at {utc(t)} {label}")
 -            rep.bad(f"the gateway's journal shows {len(inside)} inbound POST request(s) in the window (counted from {JOURNAL_LEAD_S:.0f} s before its start) and the store holds {len(own)} own call row(s): a request that left no call row (dropped, or another client's) cannot be excluded")
 -        # pairing by time and path: a count alone can be balanced by an own request's missing line and a foreign request's line elsewhere
 +            rep.bad(f"the gateway's journal shows {len(inside)} inbound POST request(s) in the counted range (from {JOURNAL_LEAD_S:.0f} s before the window's start) and the store holds {len(own)} own call row(s): " + ("more lines than rows: a request that left no call row (dropped, or another client's) cannot be excluded" if len(inside) > len(own) else "fewer lines than rows: an own request's arrival line is missing"))
 +        # estimated start of each own request: its call row's timestamp minus its duration (NOT its physical arrival: the clock starts after the arrival line)
          arrivals = {}
-@@ -822,12 +1559,5 @@
+@@ -822,12 +1627,5 @@
          pair_edges = {cid: ([j for j, (t, _label, lpath) in enumerate(inside) if lpath is not None and lpath == own[cid]["path"] and abs((t - arr).total_seconds()) <= JOURNAL_PAIR_S] if arr is not None else []) for cid, arr in arrivals.items()}
 -        used = {j2 for js in pair_edges.values() for j2 in js}
 -        left_lines = [j for j in range(len(inside)) if j not in used]
@@ -976,7 +1047,7 @@
 -        rep.say(f"JOURNAL-PAIRING each own call row to one inbound line of the same path within {JOURNAL_PAIR_S:.0f} s of (its timestamp - its duration): own_call_rows_without_a_line={unpaired_own} inbound_lines_without_an_own_call_row={unpaired_lines}")
 +        rep.say(f"JOURNAL-PAIRING each own call row to one inbound line of the same path within {JOURNAL_PAIR_S:.0f} s of its ESTIMATED START (its timestamp - its duration, not its physical arrival): own_call_rows_without_a_line={unpaired_own} inbound_lines_without_an_own_call_row={unpaired_lines}")
          if unpaired_own or unpaired_lines:
-@@ -835,3 +1565,35 @@
+@@ -835,3 +1633,35 @@
                  rep.say(f"   inbound line with no own call row at {utc(inside[j][0])} {inside[j][1]}")
 -            rep.bad(f"the gateway's journal and the own call rows do not pair one to one by time and path: {unpaired_own} own call row(s) have no inbound line of their path within {JOURNAL_PAIR_S:.0f} s of their arrival and {unpaired_lines} inbound line(s) have no own call row (a lost line balanced by another client's request cannot pass)")
 +            rep.bad(f"the gateway's journal and the own call rows do not pair one to one by estimated start and path: {unpaired_own} own call row(s) have no inbound line of their path within {JOURNAL_PAIR_S:.0f} s of their estimated start and {unpaired_lines} inbound line(s) have no own call row (a lost line balanced by another client's line of the same path within {JOURNAL_PAIR_S:.0f} s of the lost request's estimated start cannot be told apart; the lost request's physical arrival may lie earlier than its estimated start by a delay that nothing bounds)")
@@ -1013,11 +1084,11 @@
 +        # -- what journald keeps (r12 design check, hole 4): the unit's targets and rate limit against the busiest stretch of the range
 +        journal_limit_check(rep, events)
      # ---- clocks: own rows inside their arm's interval and inside the window
-@@ -877,2 +1639,3 @@
+@@ -877,2 +1707,3 @@
      edges, lookalikes, edge_rows = {}, 0, {}
 +    start_checked, start_bad = 0, 0
      for cid, c in sorted(own.items(), key=lambda kv: (str(kv[1]["timestamp"]), str(kv[0]))):
-@@ -934,4 +1697,13 @@
+@@ -934,4 +1765,13 @@
          adj = {c: edges[c] for c in calls}
 -        status, _pairs = matching_status(adj, calls, usages)
 +        status, pairs = matching_status(adj, calls, usages)
@@ -1032,7 +1103,7 @@
 +                    start_bad += 1
 +                    rep.bad(f"usage row {id8(u['id'])} (matched to own call row {id8(cid_)}) started {start_gap:+.2f} s from its call row's own start (its timestamp - its latency against the call row's timestamp - duration: both rows come from ONE duration clock and differ by milliseconds for one request; the tolerance is {USAGE_START_TOLERANCE_S:g} s): it is another request's row that stands in for this one")
          if status != "unique":
-@@ -943,2 +1715,3 @@
+@@ -943,2 +1783,3 @@
          rep.bad(f"own call row {id8(cid)} ({own[cid]['path']}, status {own[cid]['status']}, tokens {own[cid]['tokens_in']}/{own[cid]['tokens_out']}) has no associated usage row (same model and token counts within {CANDIDATE_SECONDS} s, and provider, account, endpoint, latency, time to first token)")
 +    rep.say(f"START-AGREEMENT matched_usage_rows_checked={start_checked} usage_rows_whose_clock_start_differs_from_their_call_row_by_more_than_{USAGE_START_TOLERANCE_S:g}_s={start_bad}")
      rep.say(f"MATCHING own_call_rows={len(edges)} components={len(comps)} statuses={dict(sorted(statuses.items()))} own_call_rows_without_usage_row={len(uncovered)} look_alike_usage_rows_that_do_not_associate={lookalikes}")

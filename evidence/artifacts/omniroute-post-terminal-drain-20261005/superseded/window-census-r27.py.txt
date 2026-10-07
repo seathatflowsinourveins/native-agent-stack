@@ -9,7 +9,7 @@ The census closes that over the whole window, on the gateway's own rows (SQLite 
   (ii)  completeness: exactly one own call row per raw request, at least the printed min_rows per judged native turn; and the own call rows and the usage rows of the window form connected components, each with as many usage rows as call rows and a UNIQUE PERFECT MATCHING
         (the candidate query and `associated()` are the scripts' own, copied byte for byte; unique perfect matching: a perfect matching M exists and no edge of M can be left out without losing perfection);
   (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad, and exactly (the pad alone leaves a sliver at its edge) every call row that is not this run's and could own a usage row an own call row can claim (the candidate query seen from the usage row, the same association) is a problem wherever it lies;
-  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and, on the receipt's INFO and sample lines (read by field name, in any order), the gateway's own pending-request counter complete, readable and UNCHANGED (pending_total_before, pending_total_after, pending_changed), no active client connection, no process of another lane and no call_logs row younger than 120 s (rounds 27 and 28, the command center's second condition on the item (2) residual: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE; a repeated, missing, unreadable or contradictory field is refused); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
+  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and an INFO line (if the receipt has one) that shows no change of the gateway's own pending-request counter during the observation (round 27, the command center's second condition on the item (2) residual: a window whose idle receipt shows a foreign arrival is INCONCLUSIVE; the flag `pending_changed=True`, or two different totals, shows one); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
         no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
   (v)   the clocks agree: every own call row lies inside its arm's recorded interval with a margin of 2 s (the arm's interval is taken from the output's own lines: the wrapper's `started`/`# finished` stamps when present and the frozen script's FROZEN start= / SUMMARY end=; those are the host clock, the rows' timestamps are the gateway process's own clock, on the same machine); the arms must not overlap (the wrapper's stamps are whole seconds, so 1 s of overlap is tolerated);
   (vi)  the gateway is the same process throughout: the MainPID and ExecMainStartTimestamp of the guard receipt's identity line equal those of every arm's first identity line (the wrapper's); the canary gate (the default four arms) requires that line in the receipt and in all four arms and every comparison to succeed, a trial of another number of arms compares the arms that carry one;
@@ -1154,70 +1154,6 @@ def parse_arm(path):
     return arm
 
 
-ACTIVITY_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed", "connections_active", "active_so_far", "workers", "last_call_log_age_s")
-COUNTER_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed")
-
-
-def activity_problems(line):
-    """Round 27 (the command center's second condition on the item (2) residual: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE) and round 28 (5f's delta check r16, r16-P2-1: the fields are read BY NAME, in any order, and an incomplete, unreadable or contradictory field is refused instead of being taken as absent).
-    The activity-bearing fields of one line of the guard receipt (the guard prints them on its INFO line and on every sample line): the gateway's own pending-request counter (pending_total_before, pending_total_after, pending_changed) must be complete, readable and UNCHANGED, no client connection may be active (connections_active, active_so_far),
-    no process of another lane may run (workers) and no call_logs row may be younger than 120 s (last_call_log_age_s). Returns (problems, changed): `changed` is True when the line shows that the counter changed, False when it shows the counter complete and unchanged, None when it carries no counter."""
-    found, repeated = {}, set()
-    for name, value in re.findall(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[=:]\s*([^\s,;]+)", line):
-        key = name.lower()
-        if key in ACTIVITY_FIELDS:
-            if key in found:
-                repeated.add(key)
-            found[key] = value.strip("'\"")
-    if not found:
-        return [], None
-    reasons, changed = [], None
-    if repeated:
-        reasons.append("repeated field(s) " + ", ".join(sorted(repeated)))
-    counter = [k for k in COUNTER_FIELDS if k in found]
-    if counter:
-        totals = {}
-        for key in ("pending_total_before", "pending_total_after"):
-            if key in found:
-                if re.fullmatch(r"-?[0-9]{1,18}", found[key]):
-                    totals[key] = int(found[key])
-                else:
-                    reasons.append(f"{key}={found[key]} is not a readable number")
-        flag = None
-        if "pending_changed" in found:
-            if found["pending_changed"].lower() in ("true", "false"):
-                flag = found["pending_changed"].lower() == "true"
-            else:
-                reasons.append(f"pending_changed={found['pending_changed']} is neither True nor False")
-        missing = [k for k in COUNTER_FIELDS if k not in found]
-        if missing:
-            reasons.append("the pending-request counter is incomplete (" + ", ".join(missing) + " missing)")
-        differ = len(totals) == 2 and totals["pending_total_before"] != totals["pending_total_after"]
-        if flag is True:
-            reasons.append("pending_changed=True")
-        if differ:
-            reasons.append(f"the totals differ ({totals['pending_total_before']} and {totals['pending_total_after']})")
-        if flag is True or differ:
-            changed = True
-        elif flag is False and len(totals) == 2 and not missing and not repeated:
-            changed = False
-    for key in ("connections_active", "active_so_far", "workers"):
-        if key in found:
-            if not re.fullmatch(r"[0-9]{1,9}", found[key]):
-                reasons.append(f"{key}={found[key]} is not a readable number")
-            elif int(found[key]) > 0:
-                reasons.append(f"{key}={found[key]}")
-    if "last_call_log_age_s" in found and found["last_call_log_age_s"].lower() != "none":
-        if not re.fullmatch(r"[0-9]{1,12}(\.[0-9]+)?", found["last_call_log_age_s"]):
-            reasons.append(f"last_call_log_age_s={found['last_call_log_age_s']} is not a readable number")
-        elif float(found["last_call_log_age_s"]) < 120:
-            reasons.append(f"last_call_log_age_s={found['last_call_log_age_s']} (a call_logs row younger than 120 s)")
-    if not reasons:
-        return [], changed
-    return [f"the idle receipt shows foreign activity, or cannot show its absence ({'; '.join(reasons)}): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, process of another lane or recent call_logs row may appear, on the line {line.strip()[:120]!r} "
-            "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX; review r16, P2-1)"], changed
-
-
 def parse_guard(path):
     """The guard 5 --idle-only receipt -> a dict: version, mode, start, end, clean, problems."""
     g = {"pid": None, "unit_started": None, "name": os.path.basename(path), "version": None, "mode": None, "start": None, "end": None, "clean": None, "problems": [], "clean_for": None}
@@ -1264,10 +1200,6 @@ def parse_guard(path):
             if flag or differ:
                 g["problems"].append(f"the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before={before}, pending_total_after={after}, pending_changed={flag}): a request arrived or finished while the lane was to be idle, so the idle receipt shows foreign traffic "
                                      "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX)")
-        line_problems, line_changed = activity_problems(line)   # round 28: the activity-bearing fields of every line (the INFO line, the sample lines), read by name, in any order; the round-27 statement above is kept as it stands (a complete line in the normal order)
-        g["problems"].extend(line_problems)
-        if line_changed is not None:
-            g["pending_changed"] = True if (line_changed or g.get("pending_changed")) else False
     if g.get("guard_lines", 0) != 1 or g.get("identity_lines", 0) > 1:
         g["problems"].append(f"the receipt holds {g.get('guard_lines', 0)} GUARD line(s) and {g.get('identity_lines', 0)} IDENTITY line(s): one run per file is expected (a hand-concatenated receipt is refused)")
     if g.get("result_lines", 0) != 1:
@@ -1465,7 +1397,7 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
     rep.say("TILES " + " | ".join(f"{k}: {a['name']} {utc(bounds[k - 1])}..{utc(bounds[k])}" for k, a in enumerate(timed, 1)))
     rep.say("CLOCKS arm intervals: the host clock (the wrapper's date -u stamps, the scripts' datetime.now(UTC)); rows: the gateway process's own clock (new Date() in UTC), same machine; own rows must lie inside their arm's interval with a margin of "
             f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
-    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO and sample lines show the gateway's pending-request counter complete and unchanged, no active connection and no recent row) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
+    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO line, if it has one, shows no change of the gateway's pending-request counter) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
     # ---- queries (printed first, so a failure below still leaves them in the receipt)
     for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("incarnation-calls", SQL_INCARNATION_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
         rep.say(f"QUERY {name}: {sql}")

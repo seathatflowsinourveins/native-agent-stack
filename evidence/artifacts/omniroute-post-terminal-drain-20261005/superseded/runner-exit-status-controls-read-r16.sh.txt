@@ -20,7 +20,7 @@ EV=${1:?evidence folder}
 DRAIN=${2:?drain-prototype script}
 E2E_SCRIPT=${3:?handler-e2e script}
 TAG_SCRIPT=${4:?handler-e2e-session-tag script}
-# review r15, P3-1: every pipeline stage's exit status counts. awk, sed, grep, wc, cut, tr, tail, paste, sha256sum and basename (every external command of the control's pipelines, and the tools of its command substitutions) run through producer() below, which records any status other than 0 (grep: other than 0 and 1; no status is exempt: none of the control's pipelines has a consumer that leaves early, so a SIGPIPE, status 141, is a failure like any other: review r16, P3-1) in $FAILLOG whatever
+# review r15, P3-1: every pipeline stage's exit status counts. awk, sed, grep, wc, cut, tr, tail, paste, sha256sum and basename (every external command of the control's pipelines, and the tools of its command substitutions) run through producer() below, which records any status other than 0 (grep: other than 0 and 1; 141, SIGPIPE, is the reader leaving early) in $FAILLOG whatever
 # the tool printed, so a tool that prints a correct result and then fails (a wc that prints the right count and exits 42) is a failed producer in every call of these ten tools; each failure counts into FATAL and the verdict is `INVALID RUN`. Not wrapped: mktemp, git, date, python3 and cat, which the control calls outside its pipelines (mktemp and the synthetic-log builder are checked where they are called).
 # review r14, P3-1: the expected inventory. A parser that fails (an awk that exits non-zero) used to make every stage and case vanish, and "cases as required 0 of 0" was a success. The control now requires the 11 recorded stages (6 + 2 + 3) and all 66 cases (11 stages x 6 case types),
 # and counts every producer that fails or input that cannot be read (FATAL): the verdict is `INVALID RUN` unless the inventory and every producer are intact.
@@ -43,7 +43,7 @@ producer() { # tool args...: runs the real tool and records a failed status what
   shift
   command "$tool" "$@"
   rc=$?
-  if [ "$rc" -ne 0 ] && { [ "$tool" != grep ] || [ "$rc" -gt 1 ]; }; then echo "$tool exit=$rc" >> "$FAILLOG"; fi
+  if [ "$rc" -ne 0 ] && [ "$rc" -ne 141 ] && { [ "$tool" != grep ] || [ "$rc" -gt 1 ]; }; then echo "$tool exit=$rc" >> "$FAILLOG"; fi
   return "$rc"
 }
 for t in awk sed grep wc cut tr tail paste sha256sum basename; do eval "$t() { producer $t \"\$@\"; }"; done
@@ -168,7 +168,7 @@ echo "# runner-exit-status-controls: run $(date -u +%Y-%m-%dT%H:%M:%SZ); scratch
 echo "== fixture logs (committed copies: sha256 compared with checks/logs/MANIFEST.txt; synthetic ones built from checks/drain-prototype-results.txt)"
 for f in "$EV"/checks/logs/*.log; do
   b=$(basename "$f"); s=$(sha256sum "$f" | cut -d' ' -f1); m="not listed in MANIFEST"
-  if grep -qF "\`$b\` " "$EV/checks/logs/MANIFEST.txt"; then entry=$(grep -F "\`$b\` " "$EV/checks/logs/MANIFEST.txt"); case $entry in *"$s"*) m="equals MANIFEST retained_sha256";; *) m="DIFFERS from MANIFEST";; esac; fi
+  if grep -qF "\`$b\` " "$EV/checks/logs/MANIFEST.txt"; then m=$(grep -F "\`$b\` " "$EV/checks/logs/MANIFEST.txt" | grep -qF "$s" && echo "equals MANIFEST retained_sha256" || echo "DIFFERS from MANIFEST"); fi
   echo "  $b sha256 $s counters $(counters_of "$f") ($m)"
 done
 run_script drain-prototype "$DRAIN" "$EV/checks/drain-prototype-results.txt"

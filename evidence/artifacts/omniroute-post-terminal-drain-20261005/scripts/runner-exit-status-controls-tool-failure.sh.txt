@@ -1,15 +1,17 @@
 #!/bin/bash
 # Control of the control (5f's read r14 of 115b885ba, P3-1, and r15 of 1004174e3, P3-1): scripts/runner-exit-status-controls.sh.txt must never report success when a tool it relies on fails, whatever the tool printed first. For each tool of TOOLS (default: awk sed grep wc cut tr tail paste sha256sum
-# basename, the tools the control runs its pipeline stages and command substitutions through) and each mode of MODES (default: silent passthrough), a scratch executable of that name first on PATH is installed and the control is run on the given scripts:
+# basename, the tools the control runs its pipeline stages and command substitutions through) and each mode of MODES (default: silent passthrough passthrough141 sigpipe), a scratch executable of that name first on PATH is installed and the control is run on the given scripts:
 #   silent        prints a diagnostic and exits 42 (the r14 reproduction: with a failing awk every stage and case vanished and "cases as required 0 of 0" was a success)
 #   passthrough   runs the REAL tool with the same arguments, so that its output is exactly right, and then exits 42 (the r15 reproduction: a wc that printed the correct count and exited 42 was accepted: 66 of 66, 11 stages, the success verdict)
+#   passthrough141  runs the REAL tool and then exits 141 (5f's r16 reproduction: a wc or cut that printed the right result and exited 141, the status of a SIGPIPE, was accepted because producer() exempted 141)
+#   sigpipe         runs the REAL tool and then kills itself with SIGPIPE (`kill -PIPE $$`): the status is 141 for the parent, as for a real signal death
 # Each run must exit 1 and say `VERDICT: INVALID RUN`.
 # usage: runner-exit-status-controls-tool-failure.sh <the control> <evidence folder> <drain-prototype script> <handler-e2e script> <handler-e2e-session-tag script>   (exit 0 when the control refused every failing tool in every mode as required, 1 otherwise)
 set -u
 CONTROL=${1:?the control (scripts/runner-exit-status-controls.sh.txt)}
 shift
 TOOLS=${TOOLS:-"awk sed grep wc cut tr tail paste sha256sum basename"}
-MODES=${MODES:-"silent passthrough"}
+MODES=${MODES:-"silent passthrough passthrough141 sigpipe"}
 W=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/runner-tool-failure-XXXXXX") || exit 2
 BAD=0
 RUNS=0
@@ -23,6 +25,8 @@ for tool in $TOOLS; do
     case $mode in
       silent) printf '#!/bin/sh\necho "%s: simulated failure" >&2\nexit 42\n' "$tool" > "$d/$tool";;
       passthrough) printf '#!/bin/sh\n%s "$@"\nexit 42\n' "$real" > "$d/$tool";;
+      passthrough141) printf '#!/bin/sh\n%s "$@"\nexit 141\n' "$real" > "$d/$tool";;
+      sigpipe) printf '#!/bin/sh\n%s "$@"\nkill -PIPE $$\n' "$real" > "$d/$tool";;
       *) echo "unknown mode $mode" >&2; exit 2;;
     esac
     chmod 755 "$d/$tool"
@@ -32,7 +36,7 @@ for tool in $TOOLS; do
     summary=$(grep -a '^== summary' "$W/$tool-$mode.out" | tail -1 | cut -c1-210)
     verdict=$(grep -a '^VERDICT' "$W/$tool-$mode.out" | tail -1 | cut -c1-120)
     if [ "$rc" = 1 ] && grep -aq '^VERDICT: INVALID RUN' "$W/$tool-$mode.out"; then mark="as required"; else mark="NOT AS REQUIRED"; BAD=$((BAD + 1)); fi
-    echo "  failing $tool, $mode (every call exits 42): control exit=$rc | ${summary:-no summary line} | ${verdict:-no verdict line} -> $mark"
+    echo "  failing $tool, $mode (every call): control exit=$rc | ${summary:-no summary line} | ${verdict:-no verdict line} -> $mark"
   done
 done
 rm -rf "$W"
