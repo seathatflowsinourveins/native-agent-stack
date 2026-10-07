@@ -81,6 +81,12 @@ Check each affected exec/SDK role's true lane resource keys and returned native
 identity. Missing fields are unknown, not zero. Raw event totals remain separate
 from qualified organic counts and requested smokes.
 
+Record the activation time: adding event changes counter/histogram series
+identity and supplies no historical backfill. Partial24-hour windows remain
+unknown/incomplete, never measured zero. Keep the7-day p95 comparison disabled
+until sufficient complete baseline history exists. Client activity, wired state
+and qualified prompt provenance remain required before organic-use notices.
+
 Rollback removes only this follower overlay and the reviewed launch additions,
 restoring the prior ACKed configuration while preserving queues, cursors and
 observations. It does not withdraw #775 or fabricate historical attribution.
