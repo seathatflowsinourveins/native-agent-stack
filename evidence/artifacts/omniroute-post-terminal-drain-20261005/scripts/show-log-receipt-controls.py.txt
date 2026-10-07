@@ -1,0 +1,274 @@
+#!/usr/bin/env python3
+"""Controls for the show-log receipt helper (scripts/show-log-receipt.py.txt), round 13 (full-scope read r12, P2-3 and P3-9): the helper as it was before this round (`--before`) and the fixed helper (`--fixed`) on the
+same synthetic observations, case by case. Every run is the whole helper as a subprocess with `systemctl` and `journalctl` shims first on PATH (each prints the case's fixture, or fails as the case says, and logs its
+argument vector), INSIDE A PRIVATE NETWORK NAMESPACE (`unshare -rn`) whose 127.0.0.1:20128 and 127.0.0.1:20129 are the controls' own stubs of the one endpoint the helper reads there (/api/health), so no request of
+these controls can reach the host's gateways (S0 checks the isolation first; every run prints what reached each stub). No systemd unit, journal or gateway is read; the helper's own reads of the host's
+/etc/systemd/journald.conf(.d) are real. The credential-shaped strings of the journal fixtures are synthetic and assembled at run time (this file holds none); the helper prints counts only.
+Cases: a (both commands succeed: the counts as before), b (journalctl exits non-zero with empty stdout), c1 (systemctl exits non-zero), c2 (systemctl succeeds but the unit has no start timestamp), d (journalctl
+succeeds with no credential-shaped line: a genuine zero), d2 (journalctl succeeds with no entry at all), f (the disk-usage read fails), e1-e7 (the logging boolean on Environment assignments).
+usage: show-log-receipt-controls.py --before FILE --fixed FILE [--work-root DIR]
+"""
+import argparse
+import hashlib
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--before", required=True, help="the helper as it was before round 13 (git 4624137290244eb7044ff3fd935c693042e337fe, sha256 7dd746bc...)")
+ap.add_argument("--fixed", required=True, help="the fixed helper")
+ap.add_argument("--work-root", default=str(Path.home() / ".cache"), help="directory in which the scratch work directory is created")
+args = ap.parse_args()
+HOME = str(Path.home())
+USER = os.environ.get("USER") or os.environ.get("LOGNAME") or ""
+UNEXPECTED = []
+UNITS = ("omniroute.service", "omniroute-fw.service")
+
+
+def mask(text):
+    return str(text).replace(HOME + "/", "$HOME/")
+
+
+work = Path(tempfile.mkdtemp(prefix="show-log-controls-", dir=args.work_root))
+os.chmod(work, 0o700)
+print("# show-log receipt controls: the helper before round 13 and the fixed helper on synthetic systemctl and journalctl observations, in a private network namespace")
+print(f"# before: sha256 {hashlib.sha256(Path(args.before).read_bytes()).hexdigest()}; fixed: sha256 {hashlib.sha256(Path(args.fixed).read_bytes()).hexdigest()}")
+print(f"# started {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; python {sys.version.split()[0]}\n")
+
+# ---- shims and the namespace launcher -----------------------------------------------------------------------------------------------------------------------
+shim_dir = work / "shim"
+shim_dir.mkdir()
+(shim_dir / "systemctl").write_text('#!/bin/sh\n# `systemctl --user show UNIT -p ...`: the case\'s fixture for UNIT, its stderr and its exit status\necho "systemctl $*" >> "$CTL_CASE/calls.log"\nunit=$3\n'
+                                    '[ -f "$CTL_CASE/systemctl-$unit.err" ] && cat "$CTL_CASE/systemctl-$unit.err" >&2\n[ -f "$CTL_CASE/systemctl-$unit.out" ] && cat "$CTL_CASE/systemctl-$unit.out"\n'
+                                    'exit "$(cat "$CTL_CASE/systemctl-$unit.rc" 2>/dev/null || echo 0)"\n')
+(shim_dir / "journalctl").write_text('#!/bin/sh\n# `journalctl --user -u UNIT --since TS -o cat --no-pager`: the case\'s journal of UNIT; `journalctl --user --disk-usage`: the case\'s disk-usage line\n'
+                                     'echo "journalctl $*" >> "$CTL_CASE/calls.log"\nif [ "$2" = "--disk-usage" ]; then key=disk; else key=$3; fi\n'
+                                     '[ -f "$CTL_CASE/journal-$key.err" ] && cat "$CTL_CASE/journal-$key.err" >&2\n[ -f "$CTL_CASE/journal-$key.out" ] && cat "$CTL_CASE/journal-$key.out"\n'
+                                     'exit "$(cat "$CTL_CASE/journal-$key.rc" 2>/dev/null || echo 0)"\n')
+for name in ("systemctl", "journalctl"):
+    (shim_dir / name).chmod(0o755)
+
+LAUNCHER = r'''import http.server, json, os, subprocess, sys, threading
+# runs INSIDE the private network namespace: bring loopback up, serve /api/health on 127.0.0.1:20128 and 127.0.0.1:20129 (marked with X-Controls-Stub), run the command, report the namespace and what reached each stub
+subprocess.run(["ip", "link", "set", "lo", "up"], check=True)
+hits = {20128: [], 20129: []}
+
+
+def handler(port):
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            hits[port].append(self.path)
+            body = json.dumps({"status": "ok", "stub": "show-log-receipt-controls"}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("X-Controls-Stub", "1")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *a):
+            pass
+    return H
+
+
+for port in hits:
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler(port))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+p = subprocess.run(sys.argv[1:], capture_output=True, text=True)
+sys.stdout.write(p.stdout)
+sys.stderr.write(p.stderr)
+sys.stderr.write("NETNS-STUB netns=%s hits_20128=%d hits_20129=%d paths=%s\\n" % (os.readlink("/proc/self/ns/net"), len(hits[20128]), len(hits[20129]), sorted(set(hits[20128] + hits[20129]))))
+sys.exit(p.returncode)
+'''
+launcher = work / "netns-launcher.py"
+launcher.write_text(LAUNCHER)
+HOST_NETNS = os.readlink("/proc/self/ns/net")
+
+
+def in_netns(cmd, env=None, timeout=120):
+    """Run cmd inside a fresh private network namespace with the stubs on 127.0.0.1:20128 and :20129; (CompletedProcess, {port: hits}, netns id)."""
+    p = subprocess.run(["unshare", "-rn", "--", sys.executable, str(launcher)] + cmd, capture_output=True, text=True, env=env, timeout=timeout)
+    m = re.search(r"NETNS-STUB netns=(\S+) hits_20128=(\d+) hits_20129=(\d+)", p.stderr)
+    return p, ({20128: int(m.group(2)), 20129: int(m.group(3))} if m else None), (m.group(1) if m else None)
+
+
+# S0: the isolation itself. Inside the namespace a GET to each port is answered by the controls' stub (its marker header), and the namespace is not the host's.
+probe = ("import urllib.request\nfor port in (20128, 20129):\n    r = urllib.request.urlopen(f'http://127.0.0.1:{port}/api/health', timeout=5)\n    print(f'{port} marker=' + str(r.headers.get('X-Controls-Stub')))")
+p0, hits0, netns0 = in_netns([sys.executable, "-c", probe])
+ok0 = p0.returncode == 0 and "20128 marker=1" in p0.stdout and "20129 marker=1" in p0.stdout and hits0 == {20128: 1, 20129: 1} and netns0 is not None and netns0 != HOST_NETNS
+print(f"### S0: a private network namespace answers 127.0.0.1:20128 and 127.0.0.1:20129 with the controls' own stubs: exit={p0.returncode} {' '.join(p0.stdout.split())} stub_hits={hits0} namespace {netns0} vs the host's {HOST_NETNS}"
+      f"   [{'as expected' if ok0 else 'UNEXPECTED'}]")
+if not ok0:
+    print(f"    {mask(p0.stderr.strip()[-300:])}")
+    print("    the cases are NOT RUN: without the private namespace the helper would reach the host's gateways")
+    print(f"# finished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; runs not as expected: ['S0']")
+    sys.exit(1)
+
+# ---- fixtures -----------------------------------------------------------------------------------------------------------------------------------------------
+STARTED = "Mon 2026-10-05 16:12:12 EDT"
+dropins = work / "dropins"
+for unit in UNITS:
+    (dropins / f"{unit}.d").mkdir(parents=True)
+    (dropins / f"{unit}.d/show-log.conf").write_text("[Service]\nEnvironment=OMNIROUTE_SHOW_LOG=1\n")
+    (dropins / f"{unit}.d/show-log.conf").chmod(0o600)
+
+
+def props(unit, environment="OMNIROUTE_SHOW_LOG=1", started=STARTED):
+    state = ("active", "running", "4242") if started else ("inactive", "dead", "0")
+    return (f"DropInPaths={dropins / (unit + '.d') / 'show-log.conf'}\nActiveState={state[0]}\nSubState={state[1]}\nMainPID={state[2]}\nActiveEnterTimestamp={started}\nNRestarts=0\nEnvironment={environment}\n")
+
+
+QUIET = "Started omniroute.service - OmniRoute gateway.\n[16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete\n✓ Ready in 0ms\n"
+EMAIL = "account" + "@" + "example.invalid"
+SYNTHETIC = [f"[ModelSync] synced {EMAIL}", f"[ModelSync] synced second-{EMAIL}", "[auth] header " + "Bear" + "er " + "Q" * 20, "[auth] key " + "s" + "k-" + "Q" * 18,
+             "[auth] " + "refresh" + "_token rotated", "[auth] " + "id" + "_token present", "[cfg] " + "api" + "_key=" + "Q" * 12]
+CREDENTIAL_SHAPED = QUIET + "\n".join(SYNTHETIC) + "\n"
+COUNTS_SYNTHETIC = "{'bearer_token': 1, 'sk_key': 1, 'refresh_token': 1, 'id_token': 1, 'email_shaped': 2, 'api_key_assignment_with_value': 1}"
+COUNTS_ZERO = "{'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}"
+DISK = "Archived and active journals take up 64.0M in the file system.\n"
+MACHINE = "0123456789abcdef" * 2   # a synthetic machine id, the shape of /var/log/journal/<machine id>/
+
+
+def make_case(cid, systemctl=None, journal=None, disk=(DISK, "", 0)):
+    """A case directory: per unit, systemctl (stdout, stderr, exit status) and journal (stdout, stderr, exit status); the disk-usage read; calls.log is written by the shims."""
+    d = work / f"case-{cid}"
+    d.mkdir()
+    for unit in UNITS:
+        for kind, spec in (("systemctl", (systemctl or {}).get(unit, (props(unit), "", 0))), ("journal", (journal or {}).get(unit, (QUIET, "", 0)))):
+            out, err, rc = spec
+            (d / f"{kind}-{unit}.out").write_text(out)
+            (d / f"{kind}-{unit}.err").write_text(err)
+            (d / f"{kind}-{unit}.rc").write_text(str(rc))
+    (d / "journal-disk.out").write_text(disk[0])
+    (d / "journal-disk.err").write_text(disk[1])
+    (d / "journal-disk.rc").write_text(str(disk[2]))
+    return d
+
+
+def per_unit(out, prefix):
+    """The value after `prefix` on each unit's line, in unit order."""
+    return [l[len(prefix):].strip() for l in out.splitlines() if l.startswith(prefix)]
+
+
+SHOW = "OMNIROUTE_SHOW_LOG=1 present in the unit's environment:"
+LINES = "journal lines since the unit's start:"
+COUNTS = "counts of credential-shaped strings in that journal (no values):"
+NOT_OBTAINED = "observations not obtained:"
+
+
+def comparable(out):
+    """The output without its `taken` time and without the fixed helper's closing list of the observations not obtained."""
+    lines = [l for l in out.splitlines() if not l.startswith("taken ")]
+    if lines[-1:] and lines[-1].startswith(NOT_OBTAINED):
+        lines = lines[:-2] if len(lines) > 1 and lines[-2] == "" else lines[:-1]
+    return lines
+
+
+def run_case(cid, title, case, expect_before, expect_fixed, same_output=False):
+    """Run both helpers on the case; each expectation is (exit status, a predicate on stdout, what the predicate checks, a label). same_output: the fixed helper must print what the helper before round 13
+    printed, apart from the `taken` time and its closing list of the observations not obtained (where both versions observe everything, the fix changes nothing)."""
+    print(f"### {cid}: {title}")
+    outputs = {}
+    for version, path, (exit_expected, check, what, label) in (("before", args.before, expect_before), ("fixed", args.fixed, expect_fixed)):
+        (case / "calls.log").write_text("")
+        env = dict(os.environ, PATH=f"{shim_dir}:{os.environ['PATH']}", CTL_CASE=str(case))
+        p, hits, netns = in_netns([sys.executable, path, f"control-{cid}"], env=env)
+        print(f"--- {cid} / {version}: python3 {Path(path).name} control-{cid}   [{label}]")
+        for line in mask(p.stdout).rstrip("\n").splitlines():
+            print("    " + line)
+        err = [l for l in p.stderr.splitlines() if not l.startswith("NETNS-STUB")]
+        for line in err[-6:]:
+            print("    stderr: " + mask(line)[:200])
+        calls = (case / "calls.log").read_text().splitlines()
+        journal_reads = sum(1 for c in calls if c.startswith("journalctl --user -u "))
+        print(f"    shim calls: {len(calls)} (journalctl -u reads: {journal_reads}); the helper's health reads reached the private stubs {hits}, in namespace {netns} (the host's is {HOST_NETNS})")
+        clean = "/home/" not in p.stdout + p.stderr and not (len(USER) >= 3 and re.search(r"\b" + re.escape(USER) + r"\b", p.stdout + p.stderr)) and MACHINE not in p.stdout + p.stderr
+        outputs[version] = p.stdout
+        same = comparable(outputs["before"]) == comparable(p.stdout) if same_output and version == "fixed" else None
+        ok = p.returncode == exit_expected and check(p.stdout, journal_reads) and hits == {20128: 1, 20129: 1} and netns is not None and netns != HOST_NETNS and clean and same is not False
+        print(f"CONTROL-RESULT {cid} {version} expected_exit={exit_expected} observed_exit={p.returncode} checked: {what}; no home path, user name or machine id in the output: {clean}"
+              + (f"; output identical to the version before round 13 apart from the taken time and the closing list: {same}" if same is not None else "") + f" {'OK' if ok else 'UNEXPECTED'}\n")
+        if not ok:
+            UNEXPECTED.append(f"{cid} {version}")
+
+
+def counts_are(value):
+    return lambda out, reads: per_unit(out, COUNTS) == [value, value]
+
+
+def unavailable_counts(out, reads):
+    counts = per_unit(out, COUNTS)
+    return len(counts) == 2 and all(c.startswith("unavailable") for c in counts)
+
+
+def show_is(value):
+    return lambda out, reads: per_unit(out, SHOW) == [value, value]
+
+
+def obtained_all(out):
+    return per_unit(out, NOT_OBTAINED) == ["none"]
+
+
+# ---- P2-3: failed and unavailable observations ---------------------------------------------------------------------------------------------------------------
+run_case("a", "both commands succeed, the journals hold one of each synthetic credential-shaped string and two email-shaped [ModelSync] labels: the counts are printed, by both versions",
+         make_case("a", journal={u: (CREDENTIAL_SHAPED, "", 0) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_SYNTHETIC] * 2 and per_unit(out, LINES) == ["10", "10"] and reads == 2, "the counts of the synthetic strings for both units, 10 journal lines each", "not a defect"),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_SYNTHETIC] * 2 and per_unit(out, LINES) == ["10", "10"] and reads == 2 and obtained_all(out), "the same counts and lines, and no observation missing", "the fixed helper"),
+         same_output=True)
+stderr_b = f"Failed to open journal file /var/log/journal/{MACHINE}/user-1000.journal: Permission denied (as {USER})\n"
+run_case("b", "journalctl exits 1 with empty stdout and an error on stderr (the journal cannot be read)",
+         make_case("b", journal={u: ("", stderr_b, 1) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["0", "0"], "zero journal lines and all-zero counts printed for a journal that was not read, exit 0", "the defect"),
+         (2, lambda out, reads: unavailable_counts(out, reads) and all("journalctl exited 1:" in l and "<hex>" in l for l in per_unit(out, LINES)) and per_unit(out, NOT_OBTAINED) == ["['20128 journal', '20129 journal']"],
+          "counts unavailable for both units, the diagnostic names the exit status with the machine id masked, both journals listed as not obtained", "the fixed helper"))
+run_case("c1", "systemctl exits 1 with empty stdout (no bus): no unit property, no start timestamp",
+         make_case("c1", systemctl={u: ("", "Failed to connect to bus: No medium found\n", 1) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, SHOW) == ["False", "False"] and reads == 0,
+          "the logging boolean False and all-zero counts printed, though no property was read and the journal was never read (0 journalctl -u calls), exit 0", "the defect"),
+         (2, lambda out, reads: unavailable_counts(out, reads) and per_unit(out, SHOW) == ["unavailable"] * 2 and per_unit(out, "unit properties:") == ["unavailable (systemctl exited 1: Failed to connect to bus: No medium found)"] * 2,
+          "properties, the boolean and the counts unavailable, with systemctl's exit status and stderr", "the fixed helper"))
+run_case("c2", "systemctl succeeds but the units have no ActiveEnterTimestamp (inactive, never started)",
+         make_case("c2", systemctl={u: (props(u, started=""), "", 0) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and reads == 0, "all-zero counts printed although the journal was never read (0 journalctl -u calls), exit 0", "the defect"),
+         (2, lambda out, reads: unavailable_counts(out, reads) and reads == 0 and all("no ActiveEnterTimestamp" in l for l in per_unit(out, LINES)), "counts unavailable: no start timestamp, so no journal since the start", "the fixed helper"))
+run_case("d", "journalctl succeeds and the journals hold ordinary lines only (no credential-shaped string): a genuine zero",
+         make_case("d"),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["3", "3"] and reads == 2, "all-zero counts of 3 journal lines each", "not a defect"),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["3", "3"] and reads == 2 and obtained_all(out), "all-zero counts of 3 journal lines each, exit 0, no observation missing", "the fixed helper"),
+         same_output=True)
+run_case("d2", "journalctl succeeds but prints no entry since the units' start, only its `-- No entries --` line (beyond the finding: an empty journal where at least the manager's start line is expected)",
+         make_case("d2", journal={u: ("-- No entries --\n", "", 0) for u in UNITS}),
+         (0, lambda out, reads: per_unit(out, COUNTS) == [COUNTS_ZERO] * 2 and per_unit(out, LINES) == ["1", "1"], "all-zero counts of `1` journal line (the marker line), exit 0", "the defect"),
+         (2, lambda out, reads: unavailable_counts(out, reads) and all("no entry" in l for l in per_unit(out, LINES)), "counts unavailable: no entry since the start", "the fixed helper"))
+run_case("f", "the disk-usage read fails (journalctl --user --disk-usage exits 1)",
+         make_case("f", disk=("", "Failed to get disk usage: Input/output error\n", 1)),
+         (0, lambda out, reads: "\n## user journal\n\nretention keys" in out, "an empty disk-usage line, exit 0", "the defect"),
+         (2, lambda out, reads: "journal disk usage: unavailable (journalctl exited 1: Failed to get disk usage: Input/output error)" in out and per_unit(out, COUNTS) == [COUNTS_ZERO] * 2,
+          "the disk usage unavailable with its diagnostic; the unit journals still read (genuine zeros)", "the fixed helper"))
+
+# ---- P3-9: the logging boolean ---------------------------------------------------------------------------------------------------------------------------------
+for cid, environment, before, fixed, title in (
+        ("e1", "OMNIROUTE_SHOW_LOG=10 PATH=/usr/bin", "True", "False", "the variable set to 10: the gateway's predicate (=== \"1\") does not hold"),
+        ("e2", "X_OMNIROUTE_SHOW_LOG=1", "True", "False", "a longer variable name that contains OMNIROUTE_SHOW_LOG=1"),
+        ("e3", "OMNIROUTE_SHOW_LOG=1", "True", "True", "the exact assignment OMNIROUTE_SHOW_LOG=1"),
+        ("e4", "PATH=/usr/bin OMNIROUTE_SHOW_LOG=1 LANG=C.UTF-8", "True", "True", "the exact assignment among others"),
+        ("e5", "OMNIROUTE_SHOW_LOG=1 OMNIROUTE_SHOW_LOG=0", "True", "False", "a later assignment of the same variable to 0 (the last assignment applies; a shape systemd may never print)"),
+        ("e6", "", "False", "False", "no Environment entry at all"),
+        ("e7", "OMNIROUTE_SHOW_LOG=1 [unprintable]", "True", None, "an entry systemctl prints as [unprintable] follows the assignment of 1 (it could assign the variable again; beyond the finding)")):
+    if fixed is None:
+        expect_fixed = (2, lambda out, reads: all(v.startswith("undetermined") for v in per_unit(out, SHOW)) and per_unit(out, NOT_OBTAINED) == ["['20128 OMNIROUTE_SHOW_LOG', '20129 OMNIROUTE_SHOW_LOG']"],
+                        "the boolean undetermined, listed as not obtained, exit 2", "the fixed helper")
+        before_label = "not a demonstrated defect: the conservative case of the new parse"
+    else:
+        expect_fixed = (0, lambda out, reads, v=fixed: per_unit(out, SHOW) == [v, v] and obtained_all(out), f"the boolean {fixed}", "the fixed helper")
+        before_label = "the defect" if before != fixed else "not a defect"
+    run_case(cid, f"Environment={environment}: {title}", make_case(cid, systemctl={u: (props(u, environment=environment), "", 0) for u in UNITS}),
+             (0, show_is(before), f"the boolean {before}", before_label), expect_fixed, same_output=before == fixed)
+
+print(f"# scratch directory (remove with rm -rf after reading): {mask(work)}")
+print(f"# finished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; runs not as expected: {UNEXPECTED or 'none'}")
+sys.exit(1 if UNEXPECTED else 0)

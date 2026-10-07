@@ -1,0 +1,83 @@
+#!/bin/bash
+# Control for scripts/real-run-gate.sh.txt, the external gate of the frozen wrapper scripts/run-acceptance.sh.txt (full-scope read r12, P3-8).
+# usage: real-run-gate-control.sh <wrapper file> <its frozen sha256> <gate script, or `none`> <ABSOLUTE path of the committed raw baseline file>
+#   `none` is the state of the commit before the gate (4624137): nothing stands between the environment and a real run, modelled as a pre-check that accepts everything (`true`). Raw output goes to stdout; exit 0 when every
+#   gate case is as required, 1 when one is not, 2 on a usage error. Nothing here runs the wrapper, a script it calls or anything that reaches a gateway.
+# Part 1, the defect on the frozen wrapper itself: the wrapper's own lines from `FROZEN_LIVE=` through `N_TWO_PRE=` (its constants, the kind's case with its baseline-file check, and assignments only) are cut out by those
+#   anchors and evaluated as the wrapper evaluates them, for kinds precontrol, baseline, canary and test, with and without ACCEPT_TEST_N_TWO_PRE=1 or ACCEPT_TEST_N_RACE=1 in the environment. Expected: the real precontrol
+#   takes N_TWO_PRE=1 (the protocol's sample is 4), the canary's eight-turn count N_TWO stays 8, and ACCEPT_TEST_N_RACE changes kind test only.
+# Part 2, the gate: every case runs the gate under test in a clean `env -i` environment (PATH and HOME, plus the case's variables):
+#   G1 nothing else                                                                         required: exit 0 and one line starting with `REAL-RUN-GATE clean`
+#   G2 ACCEPT_TEST_N_TWO_PRE=1, and again with a value that must not appear in the output  required: exit 1, the name printed, the value not
+#   G3 each of the ACCEPT_TEST_* names the wrapper reads (taken from the wrapper's text)    required: exit 1 and that name printed
+#   G4 ACCEPT_TEST_N_TWO_PRE set to the empty value; G5 ACCEPT_TEST_ANYTHING=1, a name the wrapper does not read   required: exit 1
+#   G6 an expected sha256 that is not the wrapper's, and the frozen sha256 with a wrapper copy that has one extra byte                     required: exit 1
+#   G7 ACCEPT_TEST_ text only in VALUES (one of them a newline followed by ACCEPT_TEST_N_TWO_PRE=1), or a name with another prefix
+#      (XACCEPT_TEST_N_TWO_PRE, ACCEPT_TESTS, ACCEPT_TEST, accept_test_n_two_pre)                                                         required: exit 0
+#   G8 usage errors: no arguments, an uppercase or 63-digit expected value, a missing wrapper file                                       required: exit 2
+set -u
+WRAPPER=${1:?wrapper file}
+FROZEN=${2:?frozen sha256 of the wrapper}
+GATE=${3:?gate script or none}
+BASEFILE=${4:?absolute path of the raw baseline file}
+[ -f "$WRAPPER" ] || { echo "no wrapper file $WRAPPER" >&2; exit 2; }
+[ "$GATE" = none ] || [ -f "$GATE" ] || { echo "no gate script $GATE" >&2; exit 2; }
+W=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/real-run-gate-control-XXXXXX") || exit 2
+mask() { sed "s#$HOME#\$HOME#g"; }
+echo "# real-run-gate-control: run $(date -u +%Y-%m-%dT%H:%M:%SZ); wrapper $(basename "$WRAPPER") git blob $(git hash-object "$WRAPPER") sha256 $(sha256sum "$WRAPPER" | cut -d' ' -f1); gate under test: $([ "$GATE" = none ] && echo "none (the state before the gate)" || echo "$(basename "$GATE") git blob $(git hash-object "$GATE") sha256 $(sha256sum "$GATE" | cut -d' ' -f1)")"
+echo "== Part 1: the frozen wrapper's own lines from FROZEN_LIVE= through N_TWO_PRE=, evaluated per kind"
+awk '!on && /^FROZEN_LIVE=/ { on = 1 } on { print } on && /^N_TWO_PRE=/ { exit }' "$WRAPPER" > "$W/wrapper-head.sh"
+echo "   lines $(grep -n '^FROZEN_LIVE=' "$WRAPPER" | cut -d: -f1)-$(grep -n '^N_TWO_PRE=' "$WRAPPER" | cut -d: -f1) of the wrapper, sha256 $(sha256sum "$W/wrapper-head.sh" | cut -d' ' -f1)"
+evaluate() { # kind env-assignment-or-empty: prints what the wrapper's head sets for that kind
+  ( [ -n "$2" ] && export "${2?}"
+    set -- "$1" "$W/out" "$BASEFILE"
+    . "$W/wrapper-head.sh"
+    echo "PRE=$PRE N_TWO_PRE=$N_TWO_PRE N_TWO=$N_TWO N_RACE=$N_RACE EXPECT=$EXPECT" ) 2>&1
+}
+DEFECT=no
+for kind in precontrol baseline canary test; do
+  for assignment in "" ACCEPT_TEST_N_TWO_PRE=1 ACCEPT_TEST_N_RACE=1; do
+    r=$(evaluate "$kind" "$assignment" | mask)
+    echo "   kind=$kind env=${assignment:-none}: $r"
+    [ "$kind" = precontrol ] && [ "$assignment" = ACCEPT_TEST_N_TWO_PRE=1 ] && case "$r" in *"PRE=1 N_TWO_PRE=1 "*) DEFECT=yes;; esac
+  done
+done
+echo "   the real precontrol (PRE=1) takes N_TWO_PRE=1 from ACCEPT_TEST_N_TWO_PRE, so its two-request sample would be 1 turn instead of 4: $([ $DEFECT = yes ] && echo "yes, DEFECT REPRODUCED (the gate guards against it)" || echo "NO: not reproduced")"
+echo "== Part 2: the gate cases"
+CLEAN_ENV="PATH=/usr/local/bin:/usr/bin:/bin HOME=$HOME"
+FAILED=0
+gate_case() { # name required-exit must-print(or empty) must-not-print(or empty) -- gate arguments... ; the case's variables come from the array CASE_ENV
+  local name=$1 req=$2 must=$3 mustnot=$4 out rc ok=yes
+  shift 5
+  if [ "$GATE" = none ]; then out=$(env -i $CLEAN_ENV "${CASE_ENV[@]}" true 2>&1); rc=$?
+  else out=$(env -i $CLEAN_ENV "${CASE_ENV[@]}" bash "$GATE" "$@" 2>&1); rc=$?; fi
+  [ "$rc" = "$req" ] || ok=no
+  [ -z "$must" ] || printf '%s\n' "$out" | grep -qF -- "$must" || ok=no
+  [ -z "$mustnot" ] || ! printf '%s\n' "$out" | grep -qF -- "$mustnot" || ok=no
+  [ "$ok" = yes ] || FAILED=$((FAILED + 1))
+  echo "   $name: exit=$rc (required $req${must:+, printing \"$must\"}${mustnot:+, never printing \"$mustnot\"}) -> $([ "$ok" = yes ] && echo "as required" || echo "NOT AS REQUIRED")"
+  [ -z "$out" ] || printf '%s\n' "$out" | cut -c1-300 | mask | sed 's/^/      | /'
+}
+CASE_ENV=(); gate_case "G1 clean environment" 0 "REAL-RUN-GATE clean" "" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=(ACCEPT_TEST_N_TWO_PRE=1); gate_case "G2 ACCEPT_TEST_N_TWO_PRE=1" 1 "ACCEPT_TEST_N_TWO_PRE" "" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=(ACCEPT_TEST_N_TWO_PRE=value-the-gate-must-not-print); gate_case "G2b ACCEPT_TEST_N_TWO_PRE with a marker value" 1 "ACCEPT_TEST_N_TWO_PRE" "value-the-gate-must-not-print" -- "$WRAPPER" "$FROZEN"
+NAMES=$(grep -oE 'ACCEPT_TEST_[A-Z0-9_]*[A-Z0-9]' "$WRAPPER" | sort -u)
+echo "   the ACCEPT_TEST_ names the wrapper's text contains ($(printf '%s\n' "$NAMES" | grep -c .)): $(printf '%s\n' "$NAMES" | paste -sd' ')"
+for n in $NAMES; do CASE_ENV=("$n=1"); gate_case "G3 $n=1" 1 "$n" "" -- "$WRAPPER" "$FROZEN"; done
+CASE_ENV=(ACCEPT_TEST_N_TWO_PRE=); gate_case "G4 ACCEPT_TEST_N_TWO_PRE set to the empty value" 1 "ACCEPT_TEST_N_TWO_PRE" "" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=(ACCEPT_TEST_ANYTHING=1); gate_case "G5 ACCEPT_TEST_ANYTHING=1 (a name the wrapper does not read)" 1 "ACCEPT_TEST_ANYTHING" "" -- "$WRAPPER" "$FROZEN"
+OTHER_SHA=$(printf 'not the wrapper\n' | sha256sum | cut -d' ' -f1)
+CASE_ENV=(); gate_case "G6 an expected sha256 that is not the wrapper's" 1 "not the expected" "" -- "$WRAPPER" "$OTHER_SHA"
+cp "$WRAPPER" "$W/run-acceptance-20261006.sh"; printf '\n' >> "$W/run-acceptance-20261006.sh"
+CASE_ENV=(); gate_case "G6b the frozen sha256 with a wrapper copy that has one extra byte" 1 "not the expected" "" -- "$W/run-acceptance-20261006.sh" "$FROZEN"
+CASE_ENV=("NOTE=ACCEPT_TEST_N_TWO_PRE=1" "MULTILINE=x
+ACCEPT_TEST_N_TWO_PRE=1" XACCEPT_TEST_N_TWO_PRE=1 ACCEPT_TESTS=1 ACCEPT_TEST=1 accept_test_n_two_pre=1)
+gate_case "G7 ACCEPT_TEST_ only in values (one after a newline) or other prefixes" 0 "REAL-RUN-GATE clean" "" -- "$WRAPPER" "$FROZEN"
+CASE_ENV=(); gate_case "G8a no arguments" 2 "" "" --
+UPPER=$(printf '%s' "$FROZEN" | tr a-f A-F)
+CASE_ENV=(); gate_case "G8b an uppercase expected value" 2 "" "" -- "$WRAPPER" "$UPPER"
+CASE_ENV=(); gate_case "G8c a 63-digit expected value" 2 "" "" -- "$WRAPPER" "${FROZEN:0:63}"
+CASE_ENV=(); gate_case "G8d a missing wrapper file" 2 "" "" -- "$W/no-such-wrapper.sh" "$FROZEN"
+echo "gate cases not as required: $FAILED"
+echo "scratch directory (remove with rm -rf after reading): $(echo "$W" | mask)"
+[ "$FAILED" = 0 ]

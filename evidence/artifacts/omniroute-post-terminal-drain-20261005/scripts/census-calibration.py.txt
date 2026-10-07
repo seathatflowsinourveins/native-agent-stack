@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""Measurements behind the window census's parameters (new in the round after the full-scope read r12 of 4624137290, whose reviewer could not locate the command and output behind the figures the earlier texts quoted).
+usage: census-calibration.py --census omniroute-window-census-20261006.py --since "YYYY-MM-DD HH:MM:SS" --until "YYYY-MM-DD HH:MM:SS" [--db STORE]   (both bounds UTC)
+READ-ONLY: the store is opened with mode=ro, the journal is read with `journalctl --user -u omniroute.service` (explicit UTC bounds); nothing is written and no request is sent. The census module is imported (its parsers, `associated()` and `numbers_problem()` are the ones that measure), so the figures are the census's own.
+It prints what the parameters rest on: the whole-table plausibility of the numbers an association compares, how many associated pairs have a NULL time to first token on the call row only, the offsets between a call row's ESTIMATED start (timestamp minus duration) and its arrival line (signed, so the negative tail that the causality tolerance must cover is visible), and the stream-end lines against the same rows
+(implied start, time and ms). These are measurements of one host over one range, evidence class `native_proven` for the range only; they are the basis of the chosen parameters, not invariants of the gateway, and the census enforces its parameters, not these figures. No ids, paths of the host or account names are printed."""
+import argparse
+import bisect
+import collections
+import datetime as dt
+import importlib.util
+import os
+import sqlite3
+import statistics
+import sys
+from pathlib import Path
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--census", required=True)
+ap.add_argument("--since", required=True)
+ap.add_argument("--until", required=True)
+ap.add_argument("--db", default=os.path.expanduser("~/.local/share/omniroute/storage.sqlite"))
+args = ap.parse_args()
+spec = importlib.util.spec_from_file_location("census", args.census)
+census = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(census)
+
+since = dt.datetime.strptime(args.since, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+until = dt.datetime.strptime(args.until, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+iso = lambda t: t.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+print("# census-calibration: measurements behind the census's parameters (read-only)")
+print(f"RANGE since={args.since} UTC until={args.until} UTC run_at={dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')} census_sha256={census.hashlib.sha256(Path(args.census).read_bytes()).hexdigest()[:16]}")
+con = sqlite3.connect(f"file:{args.db}?mode=ro", uri=True)
+
+
+def percentile(sorted_values, f):
+    return sorted_values[min(len(sorted_values) - 1, int(f * len(sorted_values)))]
+
+
+def spread(name, values, unit="s", scale=1.0, signed=True):
+    if not values:
+        print(f"{name}: n=0")
+        return
+    v = sorted(values)
+    shown = lambda x: f"{x * scale:.3f}"
+    print(f"{name}: n={len(v)} " + (f"min={shown(v[0])} p1={shown(percentile(v, 0.01))} " if signed else "") + f"median={shown(statistics.median(v))} p99={shown(percentile(v, 0.99))} p99.9={shown(percentile(v, 0.999))} max={shown(v[-1])} ({unit})")
+
+
+# ---- A. the whole tables: formats and plausibility of the numbers an association compares
+calls_all = con.execute("select count(*) from call_logs").fetchone()[0]
+usage_all = con.execute("select count(*) from usage_history").fetchone()[0]
+odd_c = sum(1 for (v,) in con.execute(census.SQL_ALL_CALL_STAMPS) if not census.valid_gateway_ts(v))
+odd_u = sum(1 for (v,) in con.execute(census.SQL_ALL_USAGE_STAMPS) if not census.valid_gateway_ts(v))
+bad_c = sum(1 for d, t in con.execute("select duration, ttft_ms from call_logs") if census.numbers_problem(d, t))
+bad_u = sum(1 for d, t in con.execute("select latency_ms, ttft_ms from usage_history") if census.numbers_problem(d, t))
+print(f"STORE call_logs_rows={calls_all} usage_history_rows={usage_all} timestamps_that_are_not_a_gateway_stamp: call_logs={odd_c} usage_history={odd_u}; rows whose numbers are not plausible (finite, non-negative, ttft not above the latency, at most a week): call_logs={bad_c} usage_history={bad_u}")
+ws_all = con.execute("select count(*) from call_logs where request_type = 'responses_websocket' or method = 'WEBSOCKET'").fetchone()[0]
+ws_range = con.execute("select count(*) from call_logs where (request_type = 'responses_websocket' or method = 'WEBSOCKET') and timestamp >= ? and timestamp <= ?", (iso(since), iso(until))).fetchone()[0]
+print(f"WEBSOCKET call_logs rows with method WEBSOCKET or request_type responses_websocket (the gateway's Responses-over-WebSocket proxy writes them, stamped at the turn's start): whole table={ws_all} in this range={ws_range} (the census refuses a window that such a row reaches, padded by the usage pad)")
+
+# ---- B. the association in the range
+call_rows = [census.row_dict(census.CALL_COLUMNS, r) for r in con.execute(census._CALL_SELECT + "where timestamp >= ? and timestamp < ? order by timestamp", (iso(since), iso(until)))]
+real_calls = [c for c in call_rows if c["path"] != "/api/providers/test"]
+associated_pairs = null_ttft_call_only = null_both = 0
+start_gaps = []
+for c in real_calls:
+    lo, hi = census.shift(c["timestamp"], -census.CANDIDATE_SECONDS), census.shift(c["timestamp"], census.CANDIDATE_SECONDS)
+    rows = [census.row_dict(census.USAGE_COLUMNS, r) for r in con.execute(census.SQL_CANDIDATES, (lo, hi, c["model"], c["tokens_in"], c["tokens_out"]))]
+    strong = [u for u in rows if not census.numbers_problem(c["duration"], c["ttft_ms"]) and not census.numbers_problem(u["latency_ms"], u["ttft_ms"]) and census.associated(c, u)]
+    if len(strong) == 1:
+        associated_pairs += 1
+        u_ts, c_ts = census.parse_ts(strong[0]["timestamp"]), census.parse_ts(c["timestamp"])
+        if u_ts is not None and c_ts is not None:
+            start_gaps.append(((u_ts - dt.timedelta(milliseconds=float(strong[0]["latency_ms"]))) - (c_ts - dt.timedelta(milliseconds=float(c["duration"])))).total_seconds())
+        if c["ttft_ms"] is None and strong[0]["ttft_ms"] is not None:
+            null_ttft_call_only += 1
+        elif c["ttft_ms"] is None:
+            null_both += 1
+print(f"ASSOCIATION call_rows_in_range={len(call_rows)} (of which the gateway's own /api/providers/test rows: {len(call_rows) - len(real_calls)}) call_rows_with_exactly_one_associated_usage_row={associated_pairs} of_these_with_a_NULL_time_to_first_token_on_the_call_row_only={null_ttft_call_only} (on both: {null_both})")
+
+spread("ASSOCIATION clock start of the associated usage row (timestamp - latency) minus the call row's (timestamp - duration): one request, one duration clock", start_gaps)
+
+# ---- C. the journal: arrival lines and stream-end lines against the rows
+try:
+    events = census.journal_events(census.JOURNAL_UNIT, since - dt.timedelta(seconds=60), until + dt.timedelta(seconds=60))
+except census.JournalError as error:
+    print(f"JOURNAL readable=False error={error} command={error.info['argv']}")
+    sys.exit(0)
+info = events["info"]
+print(f"JOURNAL-COMMAND argv={info['argv']} version={info['version']!r} entries_read={info['entries']} arrival_lines={len(events['posts'])} stream_end_lines={len(events['streams'])} restart_or_startup_diagnostics={len(events['diagnostics'])} request_line_pids={sorted({p[3] for p in events['posts']} | {s[5] for s in events['streams']} - {None})}")
+
+
+def estimated_start(c):
+    ts = census.parse_ts(c["timestamp"])
+    return ts - dt.timedelta(milliseconds=float(c["duration"])) if ts is not None and c["duration"] is not None else None
+
+
+posts = sorted((p for p in events["posts"] if since <= p[0] < until), key=lambda p: p[0])
+ptimes = [p[0] for p in posts]
+used, signed = set(), []
+for c in real_calls:
+    est = estimated_start(c)
+    if est is None:
+        continue
+    k = bisect.bisect_left(ptimes, est)
+    best = None
+    for j in range(max(0, k - 12), min(len(posts), k + 13)):
+        if j in used or posts[j][2] != c["path"]:
+            continue
+        d = (est - posts[j][0]).total_seconds()
+        if abs(d) <= census.JOURNAL_PAIR_S and (best is None or abs(d) < abs(best[0])):
+            best = (d, j)
+    if best:
+        used.add(best[1])
+        signed.append(best[0])
+print(f"ARRIVAL-OFFSETS call rows paired with an arrival line of their path within {census.JOURNAL_PAIR_S:g} s of their estimated start: {len(signed)} of {len(real_calls)}")
+spread("ARRIVAL-OFFSETS signed (estimated start - arrival line; positive: the duration clock started after the arrival line)", signed)
+
+groups = census.stream_groups([s for s in events["streams"] if since <= s[0] < until])
+primaries = sorted((g for g in groups if g["primary"]), key=lambda g: g["t"])
+gtimes = [g["t"] for g in primaries]
+used, d_start, d_time, d_ms = set(), [], [], []
+by_status = {True: [], False: []}
+for c in real_calls:
+    est, ts = estimated_start(c), census.parse_ts(c["timestamp"])
+    if est is None or ts is None:
+        continue
+    k = bisect.bisect_left(gtimes, ts)
+    best = None
+    for j in range(max(0, k - 12), min(len(primaries), k + 13)):
+        g = primaries[j]
+        if j in used or g["provider"].lower() != str(c["provider"]).lower() or g["model"] != c["model"]:
+            continue
+        gap = abs((g["start"] - est).total_seconds())
+        if gap <= census.STREAM_PAIR_START_S * 4 and (best is None or gap < best[0]):
+            best = (gap, j)
+    if best:
+        used.add(best[1])
+        g = primaries[best[1]]
+        d_start.append((g["start"] - est).total_seconds())
+        d_time.append((g["t"] - ts).total_seconds())
+        by_status[c["status"] == 200].append((g["t"] - ts).total_seconds())
+        d_ms.append(g["ms"] - float(c["duration"]))
+print(f"STREAM-PAIRING call rows paired with a stream-end controller of their provider and model whose implied start lies within {census.STREAM_PAIR_START_S * 4:g} s of their estimated start (four times the parameter, so that the tail is visible): {len(d_start)} of {len(real_calls)}")
+spread("STREAM-PAIRING implied start (line time - ms) minus estimated start (timestamp - duration)", d_start)
+spread("STREAM-PAIRING line time minus the call row's timestamp (negative: the line precedes the row, as after a client that left before the drain ended)", d_time)
+spread("STREAM-PAIRING the same for call rows of status 200 (a completed request: its rows are written at its completion)", by_status[True])
+spread("STREAM-PAIRING the same for call rows of any other status (499 client closed, 503, 504: the row follows the disconnect line by the disconnect grace, 10 s by default; an error row can also precede its line)", by_status[False])
+spread("STREAM-PAIRING line ms minus the call row's duration", d_ms, unit="ms", scale=1.0)
+statuses = collections.Counter(g["status"].split(":")[0] + ":" if g["status"].startswith(("error:", "disconnect:")) else g["status"] for g in groups)
+echoes = sum(g["echoes"] for g in groups)
+print(f"STREAM-CONTROLLERS lines={len([s for s in events['streams'] if since <= s[0] < until])} controllers={len(groups)} post_abort_echoes_folded_in={echoes} statuses={dict(sorted(statuses.items()))} controllers_with_no_primary_line={sum(1 for g in groups if not g['primary'])}")
+close_pairs = 0
+for a, b in zip(primaries, primaries[1:]):
+    if (a["pid"], a["provider"], a["model"]) == (b["pid"], b["provider"], b["model"]) and abs((a["start"] - b["start"]).total_seconds()) <= census.STREAM_GROUP_S:
+        close_pairs += 1
+print(f"STREAM-CONTROLLERS primary lines of one provider and model whose implied starts differ by at most {census.STREAM_GROUP_S:g} s (two requests that started together): {close_pairs}")
+pids = collections.Counter(s[5] for s in events["streams"] if since <= s[0] < until)
+print(f"PROCESSES stream-end lines per writing process (a restart of the serving child changes the pid): {len(pids)} process(es), lines {sorted(pids.values(), reverse=True)}")

@@ -1,7 +1,7 @@
 # Build of the drain-patched composition with upstream's own release scripts (2026-10-05, node 24.21.0; this step deployed nothing)
 # tree b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 = the composition (tree f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f: the v3.8.51 tag commit + the affinity patch + PR 15167 at 0585aba55) + patches/drain-after-terminal.patch (sha256 74c0f449...), scratch commit 2a41147b7
 # This is the record of the FIRST build, made with version 1 of the build script (superseded/build-drain-v1-as-ran.sh.txt: fixed paths, a reused tree, no exit-code propagation to the script's own status; every step line below carries the step's real exit code, and the tree ids are above).
-# Version 2 of the script is scripts/build-drain.sh.txt (its controls: checks/build-controls.txt; a real run of it: checks/build-v2-results.txt); the install and smoke scripts are scripts/install-drain.sh.txt and scripts/smoke.sh.txt.
+# Version 2 of the script is superseded/build-drain-v2-as-ran.sh.txt (a real run of it: superseded/build-v2-results.txt); the current script is version 5, scripts/build-drain.sh.txt (its controls: checks/build-controls.txt; a real run of it: checks/build-v5-results.txt); the install and smoke scripts are scripts/install-drain.sh.txt and scripts/smoke.sh.txt.
 # check:pack-artifact ran with OMNIROUTE_ALLOW_CANARY_BUILD=1, upstream's own override for a build that is not a release tag (version 1 did not say so in its log), and check:pack-boot ran with upstream's defaults, whose scratch server binds all interfaces without an API key
 # (version 2 sets OMNIROUTE_SERVER_HOST=127.0.0.1 and REQUIRE_API_KEY=true). The block below is the first build's progress log, byte for byte except that the home directory is written $HOME.
 

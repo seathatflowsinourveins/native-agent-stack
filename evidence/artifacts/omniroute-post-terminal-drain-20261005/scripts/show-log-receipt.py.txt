@@ -5,9 +5,19 @@ Version 1 printed every effective line of show-log.conf verbatim, so an extra as
 reproduced it with a synthetic Environment line). Version 2 prints a drop-in file ONLY as an allowlist: whether the exact line Environment=OMNIROUTE_SHOW_LOG=1 is present (a boolean), the number of other
 non-comment lines (a count, never their text), the section headers [Service], [Unit] and [Install] if present, the size and the mode. `--describe-dropin FILE` prints that description of one file and nothing else.
 
+Round 13 (full-scope read r12, P2-3 and P3-9; still version 2). A systemctl or journalctl call that failed read as empty output: journalctl exiting non-zero, or a unit without a start timestamp (whose journal was then
+not read at all), was printed as zero journal lines and all-zero counts of credential-shaped strings in a receipt that completed normally. Every systemctl and journalctl observation is now checked: a command that
+exits non-zero or cannot be started, a unit without an ActiveEnterTimestamp, and a journal with no entry since the unit's start (an empty output, or journalctl's `-- No entries --`; at least the manager's start line
+is expected there) are printed as `unavailable`, never as zero, with a sanitized diagnostic (the command's exit status and the start of its stderr, on one line of at most 160 characters, with the home directory,
+the user name, UUID-shaped ids, long hex runs and credential-shaped strings masked). The receipt ends with the list of the observations it did not obtain, and the exit status is 2 when there is one.
+The logging boolean was a substring test on the Environment property, so OMNIROUTE_SHOW_LOG=10, or a longer variable name containing OMNIROUTE_SHOW_LOG=1, read as set. It is now the gateway's own predicate
+(OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e, bin/cli/runtime/processSupervisor.mjs:77: `process.env.OMNIROUTE_SHOW_LOG === "1"`) applied to the parsed assignments: the last assignment of the variable
+named exactly OMNIROUTE_SHOW_LOG has the value exactly 1.
+
 Prints, per unit: the drop-in paths and whether OMNIROUTE_SHOW_LOG=1 is set (a boolean; no other Environment value is printed, and /proc/<pid>/environ and the EnvironmentFile are never read),
 MainPID, the start timestamps, the health response, one journal line from the unit that shows its child's output reaches journald (chosen by a start-up pattern, rejected if it looks like a credential),
 and counts only (no values) of credential-shaped strings in the unit's journal since its start, plus the user journal's disk use and the retention keys that are set.
+Exit status: 0 when every systemctl and journalctl observation was obtained; 2 when one was not (printed as `unavailable`, see above); any other status is a crash of the helper.
 usage: omniroute-show-log-receipt-20261006.py [label]
        omniroute-show-log-receipt-20261006.py --describe-dropin FILE
 """
@@ -19,9 +29,19 @@ import sys
 import urllib.request
 
 HOME = os.path.expanduser("~")
+USER = os.environ.get("USER") or os.environ.get("LOGNAME") or ""
 UNITS = {"20128": "omniroute.service", "20129": "omniroute-fw.service"}
 ALLOWED_SECTIONS = ("[Service]", "[Unit]", "[Install]")
 SHOW_LOG_LINES = ("Environment=OMNIROUTE_SHOW_LOG=1", 'Environment="OMNIROUTE_SHOW_LOG=1"')
+PATTERNS = {
+    "bearer_token": r"Bearer\s+[A-Za-z0-9._~+/=-]{16,}",
+    "sk_key": r"\bsk-[A-Za-z0-9_-]{16,}",
+    "refresh_token": r"refresh_token",
+    "id_token": r"id_token",
+    "email_shaped": r"[\w.+-]+@[\w-]+\.[\w.-]+",
+    "api_key_assignment_with_value": r"(?i)(?<![A-Za-z_])api[_-]?key[\"']?\s*[:=]\s*[\"']?(?!false|null|true|undefined)[A-Za-z0-9._-]{8,}",
+}
+UNAVAILABLE = []   # the systemctl and journalctl observations that were not obtained; the exit status is 2 when there is one
 
 
 def describe_dropin(path):
@@ -41,33 +61,69 @@ if len(sys.argv) == 3 and sys.argv[1] == "--describe-dropin":
 label = sys.argv[1] if len(sys.argv) > 1 else "receipt"
 
 
-def run(*args):
-    return subprocess.run(args, capture_output=True, text=True).stdout
-
-
 def mask(text):
     return text.replace(HOME + "/", "$HOME/")
 
 
+def sanitize(text):
+    """A diagnostic that is safe to print: one line of at most 160 characters, with the home directory, the user name, UUID-shaped ids, long hex runs (a machine id in a journal path, say) and credential-shaped strings masked."""
+    text = mask(" | ".join(line.strip() for line in text.splitlines() if line.strip()))
+    if len(USER) >= 3:
+        text = re.sub(r"\b" + re.escape(USER) + r"\b", "$USER", text)
+    for name, rx in PATTERNS.items():
+        text = re.sub(rx, f"<{name}>", text)
+    text = re.sub(r"(?i)\b[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\b", "<uuid>", text)
+    text = re.sub(r"(?i)[0-9a-f]{16,}", "<hex>", text)
+    return text[:160]
+
+
+def run(*args):
+    """(stdout, "") of a command that exited 0; (None, a sanitized diagnostic) of one that exited non-zero or could not be started: a failed command is never read as empty output."""
+    try:
+        proc = subprocess.run(args, capture_output=True, text=True)
+    except OSError as error:
+        return None, f"{args[0]} could not be started ({type(error).__name__})"
+    if proc.returncode != 0:
+        return None, f"{args[0]} exited {proc.returncode}: {sanitize(proc.stderr) or '(nothing on stderr)'}"
+    return proc.stdout, ""
+
+
+def show_log_set(environment):
+    """The gateway's own predicate on the unit's Environment property (OmniRoute@c1e30b76 bin/cli/runtime/processSupervisor.mjs:77, `process.env.OMNIROUTE_SHOW_LOG === "1"`): True when the last assignment of the
+    variable named exactly OMNIROUTE_SHOW_LOG has the value exactly 1, else False. `systemctl show` separates the entries by single spaces; an entry it cannot print as one NAME=VALUE token (a value with a space or a
+    newline, printed as `[unprintable]` or quoted) is never that assignment, but when one FOLLOWS the assignment of the value 1 it might set the variable again: None (undetermined)."""
+    value, unparsed_after = None, False
+    for token in environment.split(" "):
+        name, sep, val = token.partition("=")
+        if sep and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+            if name == "OMNIROUTE_SHOW_LOG":
+                value, unparsed_after = val, False
+        elif token:
+            unparsed_after = True
+    if value == "1" and unparsed_after:
+        return None
+    return value == "1"
+
+
 print(f"# value-free receipt: {label}")
-print("taken", run("date", "-u", "+%Y-%m-%dT%H:%M:%SZ").strip())
-PATTERNS = {
-    "bearer_token": r"Bearer\s+[A-Za-z0-9._~+/=-]{16,}",
-    "sk_key": r"\bsk-[A-Za-z0-9_-]{16,}",
-    "refresh_token": r"refresh_token",
-    "id_token": r"id_token",
-    "email_shaped": r"[\w.+-]+@[\w-]+\.[\w.-]+",
-    "api_key_assignment_with_value": r"(?i)(?<![A-Za-z_])api[_-]?key[\"']?\s*[:=]\s*[\"']?(?!false|null|true|undefined)[A-Za-z0-9._-]{8,}",
-}
+print("taken", (run("date", "-u", "+%Y-%m-%dT%H:%M:%SZ")[0] or "unavailable").strip())
 for port, unit in UNITS.items():
-    props = run("systemctl", "--user", "show", unit, "-p", "DropInPaths", "-p", "ActiveState", "-p", "SubState", "-p", "MainPID", "-p", "ActiveEnterTimestamp", "-p", "NRestarts", "-p", "Environment")
-    fields = dict(line.split("=", 1) for line in props.splitlines() if "=" in line)
-    show_log = "OMNIROUTE_SHOW_LOG=1" in fields.get("Environment", "")
+    props, why = run("systemctl", "--user", "show", unit, "-p", "DropInPaths", "-p", "ActiveState", "-p", "SubState", "-p", "MainPID", "-p", "ActiveEnterTimestamp", "-p", "NRestarts", "-p", "Environment")
+    fields = dict(line.split("=", 1) for line in (props or "").splitlines() if "=" in line)
     print(f"\n## {port} {unit}")
-    print("DropInPaths:", mask(fields.get("DropInPaths", "")))
+    if props is None:
+        UNAVAILABLE.append(f"{port} unit properties")
+        print(f"unit properties: unavailable ({why})")
+        show_log = "unavailable"
+    else:
+        show_log = show_log_set(fields.get("Environment", ""))
+        if show_log is None:
+            UNAVAILABLE.append(f"{port} OMNIROUTE_SHOW_LOG")
+            show_log = "undetermined (an Environment entry that is not one NAME=VALUE token follows the assignment OMNIROUTE_SHOW_LOG=1 and may assign it again)"
+    print("DropInPaths:", mask(fields.get("DropInPaths", "")) if props is not None else "unavailable")
     print("OMNIROUTE_SHOW_LOG=1 present in the unit's environment:", show_log)
     for key in ("ActiveState", "SubState", "MainPID", "ActiveEnterTimestamp", "NRestarts"):
-        print(f"{key}: {fields.get(key)}")
+        print(f"{key}: {fields.get(key) if props is not None else 'unavailable'}")
     dropin = [p for p in fields.get("DropInPaths", "").split() if p.endswith("show-log.conf")]
     if dropin:
         print(describe_dropin(dropin[0]))
@@ -77,8 +133,22 @@ for port, unit in UNITS.items():
     except Exception as e:
         print("health: error", type(e).__name__)
     since = fields.get("ActiveEnterTimestamp", "")
-    journal = run("journalctl", "--user", "-u", unit, "--since", since, "-o", "cat", "--no-pager") if since else ""
-    lines = journal.splitlines()
+    if props is None:
+        journal, why = None, "the unit's properties are unavailable, so its start is not known"
+    elif not since:
+        journal, why = None, "the unit has no ActiveEnterTimestamp (not started, or not loaded): there is no journal since its start to read"
+    else:
+        journal, why = run("journalctl", "--user", "-u", unit, "--since", since, "-o", "cat", "--no-pager")
+    lines = [l for l in (journal or "").splitlines() if l != "-- No entries --"]
+    if journal is not None and not lines:
+        journal, why = None, "journalctl printed no entry since the unit's start, where at least the manager's start line is expected"
+    if journal is None:
+        UNAVAILABLE.append(f"{port} journal")
+        print(f"journal lines since the unit's start: unavailable ({why})")
+        print("one journal line that shows the child's output reaches journald: unavailable")
+        print("counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)")
+        print("log tags of the email-shaped matches (the addresses are not printed): unavailable")
+        continue
     print("journal lines since the unit's start:", len(lines))
     pick = None
     child = [l for l in lines if not re.match(r"(Started|Stopping|Stopped|Starting|systemd)\b", l)]  # the child's console output, not systemd's own unit messages
@@ -99,7 +169,10 @@ for port, unit in UNITS.items():
             tags[m.group(0) if m else "(no tag)"] = tags.get(m.group(0) if m else "(no tag)", 0) + 1
     print("log tags of the email-shaped matches (the addresses are not printed):", tags or "none")
 print("\n## user journal")
-print(run("journalctl", "--user", "--disk-usage").strip())
+usage, why = run("journalctl", "--user", "--disk-usage")
+if usage is None:
+    UNAVAILABLE.append("user journal disk usage")
+print(usage.strip() if usage is not None else f"journal disk usage: unavailable ({why})")
 keys = []
 for path in ["/etc/systemd/journald.conf"] + sorted(os.popen("ls /etc/systemd/journald.conf.d/*.conf 2>/dev/null").read().split()):
     try:
@@ -109,3 +182,5 @@ for path in ["/etc/systemd/journald.conf"] + sorted(os.popen("ls /etc/systemd/jo
     except OSError:
         pass
 print("retention keys set in /etc/systemd/journald.conf(.d):", keys or "none (the journald defaults apply)")
+print("\nobservations not obtained:", UNAVAILABLE or "none")
+sys.exit(2 if UNAVAILABLE else 0)

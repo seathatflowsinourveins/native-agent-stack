@@ -6,6 +6,7 @@ The ground truth is the construction: a fault of the first group means the windo
 a fault of the second group changes nothing that belongs to the window (a latency exactly at the tolerance, foreign rows well before or after the window) and the census must say PASS; the residual (an own usage row dropped AND a foreign usage row with identical metadata whose call row never existed: the four-fault coincidence) is the documented limit and is expected to PASS.
 A world with no fault must PASS. The test fails on any disagreement, and on any crash (a traceback, an exit status other than 0 and 2). It imports the controls' fixture builders (the controls module runs nothing at import) and runs the census as a subprocess, as the protocol does."""
 import argparse
+import shutil
 import datetime as dt
 import importlib.util
 import random
@@ -28,8 +29,8 @@ work.mkdir(parents=True, exist_ok=True)
 ctrl.ARGS = argparse.Namespace(work=str(work), schema=args.schema, census=args.census)
 rng = random.Random(args.seed)
 plus, call, usage_for = ctrl.plus, ctrl.call, ctrl.usage_for
-MUST_DETECT = ["drop_usage", "dup_usage", "foreign_call", "foreign_usage_distinct", "foreign_usage_second_candidate", "drop_call", "latency_outside", "usage_timestamp_outside", "foreign_post_only", "drop_post", "residual_logged"]
-NO_EFFECT = ["latency_at_tolerance", "foreign_after_window", "foreign_before_window", "post_outside_window"]
+MUST_DETECT = ["drop_usage", "dup_usage", "foreign_call", "foreign_usage_distinct", "foreign_usage_second_candidate", "drop_call", "latency_outside", "usage_timestamp_outside", "foreign_post_only", "drop_post", "residual_logged", "foreign_stream_only", "drop_stream", "restart_diag", "residual_stream", "listener_young", "second_writer", "ws_reaching", "arrival_skew"]
+NO_EFFECT = ["latency_at_tolerance", "foreign_after_window", "foreign_before_window", "post_outside_window", "stream_echo", "drain_tail", "stream_old", "ws_outside", "json_markers"]
 ALL = MUST_DETECT + NO_EFFECT
 print(f"# census property test: seed {args.seed}, {args.worlds} worlds; census {Path(args.census).name}")
 print("# fault groups: must be INCONCLUSIVE: " + ", ".join(MUST_DETECT) + "; must PASS: " + ", ".join(NO_EFFECT) + ", no fault; documented residual in its narrowest form (expected PASS: the foreign request is absent from the gateway journal too): drop_usage + a foreign usage row with identical metadata and no call row on the same request")
@@ -80,6 +81,49 @@ def apply(spec_, kind, a, r):
         spec_.setdefault("journal_extra", []).append(c["ts"] + dt.timedelta(seconds=rng.choice([2, 10, 25])))
     elif kind == "drop_post":   # an own request's inbound line is missing from the journal
         spec_.setdefault("journal_drop", set()).add((a, r, len(req["calls"]) - 1))
+    elif kind == "foreign_stream_only":   # a foreign stream that ended inside the window and left no row at all (round 19: the completion record)
+        spec_.setdefault("stream_extra", []).append((c["ts"] + dt.timedelta(seconds=rng.choice([2, 10, 25])), rng.choice([300, 800, 2500]), "CODEX", c["model"]))
+    elif kind == "drop_stream":   # an own request's stream-end line is missing from the journal
+        spec_.setdefault("stream_drop", set()).add((a, r, len(req["calls"]) - 1))
+    elif kind == "restart_diag":   # the supervisor restarted the serving child: its diagnostic is in the journal range
+        spec_.setdefault("journal_noise", []).append(ctrl.json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(rng.choice([40.0, 120.0, 200.0])).timestamp() * 1e6)), "_PID": "341", "_SYSTEMD_CGROUP": ctrl.CGROUP, "MESSAGE": rng.choice(["\u26a0 Server exited (code=1). Restarting in 1s... (1/5)", "\u2713 Ready in 0ms", "\u25b2 Next.js 16.3.5", "[DB] Driver: better-sqlite3 | file: x"])}))
+    elif kind == "residual_stream":   # a foreign stream whose usage row stands in for an own row (the own row dropped), the foreign request's arrival far before its clock: the completion record closes it
+        req["usage"].pop()
+        f_end = c["ts"] + dt.timedelta(milliseconds=rng.choice([300, 600, 900]))
+        spec_["foreign_usage"].append(usage_for(c, ts=f_end))
+        spec_.setdefault("journal_extra", []).append(c["ts"] - dt.timedelta(seconds=rng.choice([30, 60])))
+        spec_.setdefault("stream_extra", []).append((f_end + dt.timedelta(milliseconds=4), c["duration"] - 5, str(c["provider"]).upper(), c["model"]))
+    elif kind == "listener_young":   # the serving process started after the guard receipt began
+        spec_["listener_start_offset"] = rng.choice([1.0, 5.0, 20.0])
+    elif kind == "second_writer":   # another process holds the store open
+        spec_["holders"] = [1326, rng.choice([5555, 6666])]
+    elif kind == "stream_echo":   # the post-abort echo of an own request's stream-end line: one controller
+        spec_.setdefault("stream_extra", []).append((c["ts"] - dt.timedelta(milliseconds=1) + dt.timedelta(milliseconds=20), c["duration"] - 5 + 20, str(c["provider"]).upper(), c["model"], "client_disconnect (post-abort)"))
+    elif kind == "drain_tail":   # a client that left after the terminal event: the rows are written when the drain ends (the same start, a duration that includes the tail), the stream-end line when the client left
+        tail = rng.choice([2.0, 6.0, 9.0])
+        c["ts"] = c["ts"] + dt.timedelta(seconds=tail)
+        c["duration"] = c["duration"] + tail * 1000.0
+        req["usage"][-1] = usage_for(c)
+        spec_.setdefault("stream_tail", {})[(a, r, len(req["calls"]) - 1)] = tail
+    elif kind == "stream_old":   # a foreign stream-end line long before the window (outside the counted range)
+        spec_.setdefault("stream_extra", []).append((plus(-30 - rng.random() * 100), 800, "CODEX", "gpt-6-astra"))
+    elif kind == "ws_reaching":   # round 20 (F1): a Responses-over-WebSocket turn (method WEBSOCKET, request_type responses_websocket), stamped at its START: it began before the window and ran into the usage pad or the window, or began inside the window
+        start = plus(rng.choice([-30.0, -10.0, -5.0, 1.0, 50.0]))
+        spec_.setdefault("ws_turns", []).append(dict(start=start, duration=rng.choice([20000, 30000, 500]) if start < plus(0) else 500, **({"request_type": None} if rng.random() < 0.3 else {})))
+        if start < plus(0):
+            spec_["ws_turns"][-1]["duration"] = max(spec_["ws_turns"][-1]["duration"], int((plus(-3.0) - start).total_seconds() * 1000) + 100)
+    elif kind == "arrival_skew":   # round 20 (P3-6): journald's receive stamp and the gateway's own `time` more than 30 s apart, or the stamp earlier than the time
+        spec_["journal_lag"] = rng.choice([31.0, 40.0, 90.0, -2.0, -30.0])
+    elif kind == "ws_outside":   # round 20: a WebSocket turn that ended long before the window, or started long after it
+        if rng.random() < 0.5:
+            spec_.setdefault("ws_turns", []).append(dict(start=plus(-200 - rng.random() * 500), duration=rng.choice([500, 10000, 60000])))
+        else:
+            spec_.setdefault("ws_turns", []).append(dict(start=plus(600 + rng.random() * 500), duration=rng.choice([500, 10000, 60000])))
+    elif kind == "json_markers":   # round 20 (P3-1): JSON records (a GET) that carry text a supervisor or a stream controller would print: not diagnostics, not stream-end lines
+        for text_ in rng.sample(["Restarting in 1s", "\u2713 Ready in 3s", "Server exited (code=1)", "[12:00:00] \U0001F30A [STREAM] CODEX | gpt-6-astra | 800ms | complete", "Starting server..."], rng.choice([1, 2])):
+            when = plus(rng.choice([40.0, 120.0, 200.0]))
+            spec_.setdefault("journal_noise", []).append(ctrl.json.dumps({"__REALTIME_TIMESTAMP": str(int(when.timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": ctrl.CGROUP,
+                                                                         "MESSAGE": ctrl.json.dumps({"level": 30, "time": ctrl.utc(when), "tag": "HTTP", "method": "GET", "msg": "\U0001F4E5 GET /api/x | " + text_})}))
     elif kind == "post_outside_window":
         spec_.setdefault("journal_extra", []).append(plus(rng.choice([-1, 1]) * (500 + rng.random() * 100)) if rng.random() < 0.5 else plus(-60 - rng.random() * 100))
     else:
@@ -92,9 +136,9 @@ for i in range(args.worlds):
     pairs = [(a, r) for a, arm in enumerate(spec_["arms"]) for r in range(len(arm["requests"]))]
     rng.shuffle(pairs)
     kinds = [rng.choice(ALL + ["residual"] * 2) for _ in range(rng.choice([0, 0, 1, 1, 2, 3]))]
-    COUNT_UP = ("foreign_post_only", "residual_logged", "drop_call", "foreign_call")
-    if "drop_post" in kinds and any(k in COUNT_UP for k in kinds):   # a lost own line balanced by a foreign line: two journal faults that the pairing catches only outside its 3 s width (the controls J9 and J10): not generated here
-        kinds = [k for k in kinds if k != "drop_post"]
+    COUNT_UP = ("foreign_post_only", "residual_logged", "drop_call", "foreign_call", "foreign_stream_only", "residual_stream")
+    if ("drop_post" in kinds or "drop_stream" in kinds) and any(k in COUNT_UP for k in kinds):   # a lost own line balanced by a foreign line: two journal faults that the pairing catches only outside its 3 s width (the controls J9 and J10): not generated here
+        kinds = [k for k in kinds if k not in ("drop_post", "drop_stream")]
     for kind, (a, r) in zip(kinds, pairs):
         apply(spec_, kind, a, r)
     expect = 2 if any(k in MUST_DETECT for k in kinds) else 0
@@ -112,7 +156,7 @@ for i in range(args.worlds):
     else:
         t["agree"] += 1
     for f in work.glob(f"{name}*"):
-        f.unlink()
+        shutil.rmtree(f) if f.is_dir() else f.unlink()   # round 19: a world also has a fake /proc directory
 print(f"WORLDS {args.worlds}: " + ", ".join(f"{k}: {v['agree']} of {v['worlds']} as expected" for k, v in sorted(tally.items())))
 for b in bad[:20]:
     print("DISAGREEMENT", b)

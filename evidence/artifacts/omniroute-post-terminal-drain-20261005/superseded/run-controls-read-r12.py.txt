@@ -227,7 +227,6 @@ def make_tools(work):
         (base / "lib/node_modules/omniroute/dist/BUILD_SHA").write_text(build + "\n")
         (base / "shim").mkdir(exist_ok=True)
         (base / "shim/lsof").write_text(shim_text)
-        os.chmod(base / "shim/lsof", 0o755)   # executable, as install-drain.sh installs it (chmod 755): since round 13 the guard requires a readable and executable shim and entrypoint
     chunks = tools / "omniroute-ctl-target/lib/node_modules/omniroute/dist/.build/next/server/chunks"
     chunks.mkdir(parents=True, exist_ok=True)
     (chunks / "a.js").write_text("x;abort(),n.clearPendingRequest?.(),Promise.allSettled([y]);")
@@ -363,42 +362,41 @@ def guard_controls(fx, want=lambda sid: True):
         stop.set()
         th.join(timeout=3)
         busy.close()
-        if any(want(s) for s in ("G9", "G10", "G11", "G12")):   # the poller runs in a transient systemd scope (systemd-run --user --scope): an --only list without G9-G12 starts none
-            print("### G9: traffic from a poller in a TOLERATED unit (a transient systemd scope named by --tolerate-unit, as omniroute-fw.service is for the 20129 gateway's poll of 20128): reported as tolerated, exit 0")
-            scope = f"ctl-poller-{os.getpid()}"
-            poller = subprocess.Popen(["systemd-run", "--user", "--scope", "--quiet", f"--unit={scope}", sys.executable, str(HERE / "poller.py"), "--port", str(fx.port), "--duration", "120"])
-            time.sleep(1.5)
-            print(f"    poller process alive before G9: {poller.poll() is None}")
-            run(fx, "G9", "tolerated poller", [*common, "--tolerate-unit", f"{scope}.scope"], 0)
-            print("### G10: the same poller when its unit is NOT tolerated (the default tolerates only omniroute-fw.service): ACTIVE, exit 4")
-            print(f"    poller process alive before G10: {poller.poll() is None}")
-            run(fx, "G10", "poller not tolerated", common, 4)
-            print("### G11: a tolerated poller AND another client that carries traffic: the tolerance does not hide the other client, exit 4")
-            busy2 = socket.create_connection(("127.0.0.1", fx.port))
-            stop2 = threading.Event()
+        print("### G9: traffic from a poller in a TOLERATED unit (a transient systemd scope named by --tolerate-unit, as omniroute-fw.service is for the 20129 gateway's poll of 20128): reported as tolerated, exit 0")
+        scope = f"ctl-poller-{os.getpid()}"
+        poller = subprocess.Popen(["systemd-run", "--user", "--scope", "--quiet", f"--unit={scope}", sys.executable, str(HERE / "poller.py"), "--port", str(fx.port), "--duration", "120"])
+        time.sleep(1.5)
+        print(f"    poller process alive before G9: {poller.poll() is None}")
+        run(fx, "G9", "tolerated poller", [*common, "--tolerate-unit", f"{scope}.scope"], 0)
+        print("### G10: the same poller when its unit is NOT tolerated (the default tolerates only omniroute-fw.service): ACTIVE, exit 4")
+        print(f"    poller process alive before G10: {poller.poll() is None}")
+        run(fx, "G10", "poller not tolerated", common, 4)
+        print("### G11: a tolerated poller AND another client that carries traffic: the tolerance does not hide the other client, exit 4")
+        busy2 = socket.create_connection(("127.0.0.1", fx.port))
+        stop2 = threading.Event()
 
-            def trickle2():
-                busy2.sendall(b"GET /api/health HTTP/1.1\r\nHost: x\r\n")
-                while not stop2.is_set():
-                    try:
-                        busy2.sendall(b"X-Slow: 1\r\n")
-                    except OSError:
-                        return
-                    time.sleep(0.7)
-            th2 = threading.Thread(target=trickle2, daemon=True)
-            th2.start()
-            run(fx, "G11", "tolerated poller plus another active client", [*common, "--tolerate-unit", f"{scope}.scope"], 4)
-            stop2.set()
-            th2.join(timeout=3)
-            busy2.close()
-            print("### G12: the superseded guard (version 2) on the same fixture and the same poller, with the same options (it has no way to tolerate a unit): the poller counts as ACTIVE, exit 4: the failure of the first live trial that version 3 fixed (the 20129 gateway's poll of 20128)")
-            print(f"    poller process alive before G12: {poller.poll() is None}")
-            run(fx, "G12", "guard v2 with the poller", [GUARD_V2, *common[1:]], 4, defect=True)
-            poller.terminate()
-            try:
-                poller.wait(timeout=5)
-            except Exception:
-                poller.kill()
+        def trickle2():
+            busy2.sendall(b"GET /api/health HTTP/1.1\r\nHost: x\r\n")
+            while not stop2.is_set():
+                try:
+                    busy2.sendall(b"X-Slow: 1\r\n")
+                except OSError:
+                    return
+                time.sleep(0.7)
+        th2 = threading.Thread(target=trickle2, daemon=True)
+        th2.start()
+        run(fx, "G11", "tolerated poller plus another active client", [*common, "--tolerate-unit", f"{scope}.scope"], 4)
+        stop2.set()
+        th2.join(timeout=3)
+        busy2.close()
+        print("### G12: the superseded guard (version 2) on the same fixture and the same poller, with the same options (it has no way to tolerate a unit): the poller counts as ACTIVE, exit 4: the failure of the first live trial that version 3 fixed (the 20129 gateway's poll of 20128)")
+        print(f"    poller process alive before G12: {poller.poll() is None}")
+        run(fx, "G12", "guard v2 with the poller", [GUARD_V2, *common[1:]], 4, defect=True)
+        poller.terminate()
+        try:
+            poller.wait(timeout=5)
+        except Exception:
+            poller.kill()
         print("### G3: a call_logs row written a few seconds ago: exit 4")
         con = sqlite3.connect(fx.db, timeout=30)
         con.execute("insert into call_logs (id, timestamp, method, path, status, model, requested_model, provider, tokens_in, tokens_out, detail_state, session_tag) values (?,?,?,?,?,?,?,?,?,?,?,?)",

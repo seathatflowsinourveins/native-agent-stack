@@ -1,0 +1,28 @@
+#!/bin/bash
+# Real-run gate for the frozen acceptance wrapper scripts/run-acceptance.sh.txt (full-scope read r12, P3-8). The wrapper's usage text (its line 9) says that the ACCEPT_TEST_* variables apply to kind test and to no other, but
+# its line 60, N_TWO_PRE=${ACCEPT_TEST_N_TWO_PRE:-4}, is read for every kind, and kind precontrol uses N_TWO_PRE as the number of its native two-request turns (lines 165-166) and as the denominators of its PRECONTROL line
+# (line 180): an exported ACCEPT_TEST_N_TWO_PRE changes the protocol's four-turn pre-switch sample. The other thirteen ACCEPT_TEST_* names it reads are read only under kind test (lines 51-55, 59 and 96).
+# The wrapper stays frozen; the operator runs this gate immediately before every real wrapper run (kinds baseline, precontrol and canary), in the same shell and on the same command line, with no variable assignment in front of
+# either command: `bash real-run-gate-20261006.sh <wrapper> <frozen sha256> && bash <wrapper> <kind> ...` (an assignment written in front of the wrapper alone would not reach the gate).
+# It refuses (exit 1) when the NAME of any environment variable starts with ACCEPT_TEST_ (it prints each such name, never a value; the environment is read NUL-separated, so a value that contains a newline followed by
+# ACCEPT_TEST_ text is not taken for a name), and when the wrapper file's sha256 differs from the expected one, which the operator copies from the protocol's table of frozen scripts. A usage error (a missing argument, an
+# expected value that is not 64 lowercase hex digits, a missing or unreadable wrapper file) exits 2. A clean result prints one line that starts with `REAL-RUN-GATE clean` and exits 0.
+# usage: real-run-gate-20261006.sh <wrapper file> <expected sha256 of the wrapper>
+set -u
+WRAPPER=${1:-}
+EXPECTED=${2:-}
+{ [ -n "$WRAPPER" ] && [ -n "$EXPECTED" ]; } || { echo "usage: real-run-gate-20261006.sh <wrapper file> <expected sha256 of the wrapper>" >&2; exit 2; }
+[[ $EXPECTED =~ ^[0-9a-f]{64}$ ]] || { echo "REAL-RUN-GATE usage error: the expected sha256 must be 64 lowercase hex digits" >&2; exit 2; }
+{ [ -f "$WRAPPER" ] && [ -r "$WRAPPER" ]; } || { echo "REAL-RUN-GATE usage error: no readable wrapper file $(basename "$WRAPPER")" >&2; exit 2; }
+ACTUAL=$(sha256sum "$WRAPPER" | cut -d' ' -f1)
+[ -n "$ACTUAL" ] || { echo "REAL-RUN-GATE usage error: the sha256 of $(basename "$WRAPPER") could not be computed" >&2; exit 2; }
+REFUSED=0
+while IFS= read -r -d '' entry; do
+  name=${entry%%=*}
+  case "$name" in
+    ACCEPT_TEST_*) echo "REAL-RUN-GATE refused: $name is in the environment (its value is not printed)"; REFUSED=1;;
+  esac
+done < <(env -0)
+if [ "$ACTUAL" != "$EXPECTED" ]; then echo "REAL-RUN-GATE refused: $(basename "$WRAPPER") has sha256 $ACTUAL, not the expected $EXPECTED"; REFUSED=1; fi
+[ "$REFUSED" = 0 ] || exit 1
+echo "REAL-RUN-GATE clean: no ACCEPT_TEST_ variable in the environment, and $(basename "$WRAPPER") has the expected sha256 $ACTUAL"

@@ -4,13 +4,9 @@ Guard version 4 (pre-switch-guard-20261006-v4.py, superseded) runs on the same r
 part E: the whole guard in --idle-only mode as a subprocess with an `ss` shim first on PATH, a stub identity script and a scratch database, INSIDE A PRIVATE NETWORK NAMESPACE (`unshare -rn`; ROUND-13, full-scope read r10 P2-5)
 in which 127.0.0.1:20128, the guard's default port, is the controls' own stub of the one endpoint the guard reads (`/api/usage/history`): no request of Part E can reach the host's gateway. The earlier executions of Part E (before this
 round) did not have that isolation: the guard's `pending_total` sent read-only GETs to the live gateway (two per guard run at most); the recorded statement that no gateway request was sent was wrong for them.
-Round 13 (full-scope read r12, P2-4 and P3-1): part K adds the prefix checks K12-K19, check_prefix() of guard 5 and of guard 5 as it was before this round (`--guard5-r12`) on scratch install prefixes in which the entrypoint
-or the shim cannot be launched (in-process, as this user: inside the namespace the guard would run as the namespace's root, for whom a file without its read bit still reads); part E adds E7, the whole guard in full mode
-with an unlaunchable rollback shim; and E6, the usage error, now runs in the private namespace like every other guard run of part E (it exits before the guard's HTTP read, so its stub counts no request).
-usage: guard5-controls.py [--guard5 FILE] [--guard4 FILE] [--guard5-r12 FILE] [--work-root DIR]
+usage: guard5-controls.py [--guard5 FILE] [--guard4 FILE]
 """
 import argparse
-import hashlib
 import os
 import re
 import sqlite3
@@ -24,8 +20,6 @@ COORD = Path.home() / ".local/state/native-agent-stack/coordination/peer-99-2026
 ap = argparse.ArgumentParser()
 ap.add_argument("--guard5", default=str(COORD / "pre-switch-guard-20261006.py"))
 ap.add_argument("--guard4", default=str(COORD / "pre-switch-guard-20261006-v4.py"))
-ap.add_argument("--guard5-r12", default=str(COORD / "pre-switch-guard-20261006-v5-r12.py"), help="guard 5 as it was before round 13 (sha256 62dea3d2...), for the prefix checks K12-K19 and E7")
-ap.add_argument("--work-root", default=str(Path.home() / ".cache"), help="directory in which the scratch work directory is created")
 args = ap.parse_args()
 UNEXPECTED = []
 
@@ -39,7 +33,7 @@ def load(path):
     return ns
 
 
-G5, G4, G5R12 = load(args.guard5), load(args.guard4), load(args.guard5_r12)
+G5, G4 = load(args.guard5), load(args.guard4)
 
 # ---- records captured on the live host (the info strings are the real ones; only ports and pids are replaced below)
 REAL_INFO_IDLE = "cubic wscale:10,10 rto:200 rtt:0.293/0.146 mss:1448 pmtu:1500 rcvmss:536 advmss:1448 cwnd:10{tx} bytes_acked:1{rx} segs_out:2 segs_in:1 send 395000000bps lastsnd:20516 lastrcv:20516 lastack:20516 pacing_rate 790000000bps delivered:1 app_limited reordering:15 rcv_space:14480 rcv_ssthresh:64088 minrtt:0.293 snd_wnd:64512"
@@ -120,8 +114,7 @@ def conn(cip, cport, rx_server=0, tx_server=0, recvq=0, client_owner=FW, server_
 
 
 print("# guard 5 controls: the connection parser on records captured on the live host")
-print(f"# guard 5: sha256 {__import__('hashlib').sha256(Path(args.guard5).read_bytes()).hexdigest()}; guard 4 (superseded): sha256 {__import__('hashlib').sha256(Path(args.guard4).read_bytes()).hexdigest()}; "
-      f"guard 5 before round 13 (K12-K19, E7): sha256 {hashlib.sha256(Path(args.guard5_r12).read_bytes()).hexdigest()}")
+print(f"# guard 5: sha256 {__import__('hashlib').sha256(Path(args.guard5).read_bytes()).hexdigest()}; guard 4 (superseded): sha256 {__import__('hashlib').sha256(Path(args.guard4).read_bytes()).hexdigest()}")
 print(f"# started {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; python {sys.version.split()[0]}\n")
 
 # K1: record orders ------------------------------------------------------------------------------------------------------------------------------
@@ -184,105 +177,10 @@ show("K11a", "a blank line between records", "ObservationError", [conn("127.0.0.
 show("K11b", "no connections at all (empty output): an idle gateway, accepted", lambda k, r, u: k == "OK" and r == {}, [])
 show("K11c", "a line that is not a record (an error text on stdout)", "ObservationError", ["RTNETLINK answers: Invalid argument"] + conn("127.0.0.1", 57001))
 
-work = Path(tempfile.mkdtemp(prefix="guard5-controls-", dir=args.work_root))
+# ---- part E: the whole guard (idle-only) as a subprocess ------------------------------------------------------------------------------------------------
+print("\n### part E: the whole guard 5 in --idle-only mode against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1), every run inside a private network namespace (unshare -rn) whose 127.0.0.1:20128 is the controls' own stub")
+work = Path(tempfile.mkdtemp(prefix="guard5-controls-", dir=Path.home() / ".cache"))
 os.chmod(work, 0o700)
-
-# K12-K19: the prefix checks (round 13, full-scope read r12 P2-4) ------------------------------------------------------------------------------------------
-print("\n### part K, prefix checks (K12-K19): check_prefix() of guard 5 and of guard 5 before round 13 on scratch install prefixes built as installed, one file changed per scenario, in-process as this user (the guard's user is the units' user)")
-SHIM_TEXT = "shim v2 stand-in\n"
-SHIM_SHA = hashlib.sha256(SHIM_TEXT.encode()).hexdigest()
-PREFIXES = {"rollback": ("omniroute-ctl-rollback", "cf6748d04", False), "target": ("omniroute-ctl-target", "2a41147b7", True)}
-
-
-def make_prefix(tools, which):
-    """One install prefix under tools/ shaped as an installed one: bin/omniroute a relative symlink to lib/node_modules/omniroute/bin/omniroute.mjs (mode 0755, as npm links it), shim/lsof (0755) with the stand-in's
-    content and the matching pinned hash, dist/BUILD_SHA, and for the target the drain marker in a server chunk."""
-    name, build, marker = PREFIXES[which]
-    base = tools / name
-    entry = base / "lib/node_modules/omniroute/bin/omniroute.mjs"
-    entry.parent.mkdir(parents=True)
-    entry.write_text("#!/usr/bin/env node\n")
-    entry.chmod(0o755)
-    (base / "bin").mkdir()
-    (base / "bin/omniroute").symlink_to("../lib/node_modules/omniroute/bin/omniroute.mjs")
-    (base / "lib/node_modules/omniroute/dist").mkdir()
-    (base / "lib/node_modules/omniroute/dist/BUILD_SHA").write_text(build + "\n")
-    (base / "shim").mkdir()
-    (base / "shim/lsof").write_text(SHIM_TEXT)
-    (base / "shim/lsof").chmod(0o755)
-    if marker:
-        chunks = base / "lib/node_modules/omniroute/dist/.build/next/server/chunks"
-        chunks.mkdir(parents=True)
-        (chunks / "a.js").write_text("x;abort(),n.clearPendingRequest?.(),Promise.allSettled([y]);")
-    return base
-
-
-def prefix_verdict(ns, tools, which):
-    """('intact', []) or ('FAIL', problems) of check_prefix(), or ('CRASH', the exception): a guard that crashes on a prefix exits 3 as a whole (ERROR ...), with no CHECK line."""
-    name, build, marker = PREFIXES[which]
-    try:
-        problems = ns["check_prefix"](str(tools), name, build, SHIM_SHA, marker)
-        return ("FAIL" if problems else "intact"), problems
-    except Exception as e:
-        return "CRASH", f"{type(e).__name__}: {str(e)[:100]}"
-
-
-def show_prefix(case, title, which, change, expect5, expect_r12, r12_label):
-    """A fresh prefix, `change(base)` applied, then check_prefix() of guard 5 (expect5) and of guard 5 before round 13 (expect_r12); each is 'intact', 'FAIL' or 'CRASH'."""
-    print(f"### {case}: {title}")
-    tools = work / f"tools-{case}"
-    base = make_prefix(tools, which)
-    if change:
-        change(base)
-    for ns, label, expected in ((G5, "guard 5", expect5), (G5R12, f"guard 5 before round 13 ({r12_label})", expect_r12)):
-        kind, res = prefix_verdict(ns, tools, which)
-        print(f"    {label}: {kind} {res}   [{'as expected' if kind == expected else 'UNEXPECTED'}]")
-        if kind != expected:
-            UNEXPECTED.append(case + ("" if ns is G5 else "/r12"))
-
-
-def lose_mode(rel, mode):
-    return lambda base: os.chmod(os.path.realpath(base / rel), mode)
-
-
-def to_directory(rel):
-    def change(base):
-        (base / rel).unlink()
-        (base / rel).mkdir()
-    return change
-
-
-def dangling(rel):
-    def change(base):
-        (base / rel).unlink()
-        (base / rel).symlink_to("../lib/node_modules/omniroute/bin/removed.mjs")
-    return change
-
-
-def plain_entry(base):
-    (base / "bin/omniroute").unlink()
-    (base / "bin/omniroute").write_text("#!/bin/sh\n")
-    (base / "bin/omniroute").chmod(0o755)
-
-
-ENTRY, SHIM = "bin/omniroute", "shim/lsof"
-show_prefix("K12", "the ROLLBACK prefix's entrypoint lost its execute permission (bin/omniroute resolves to a file of mode 0644): a rollback that launches the prefix fails; before round 13 the prefix read as intact",
-            "rollback", lose_mode(ENTRY, 0o644), "FAIL", "intact", "the defect")
-show_prefix("K13", "the TARGET prefix's entrypoint lost its execute permission (mode 0644)", "target", lose_mode(ENTRY, 0o644), "FAIL", "intact", "the defect")
-show_prefix("K14", "the ROLLBACK prefix's shim lost its execute permission (shim/lsof mode 0644, its content still the pinned shim)", "rollback", lose_mode(SHIM, 0o644), "FAIL", "intact", "the defect")
-show_prefix("K15", "the TARGET prefix's shim lost its execute permission (mode 0644, the pinned content)", "target", lose_mode(SHIM, 0o644), "FAIL", "intact", "the defect")
-show_prefix("K16", "a directory in place of the rollback prefix's entrypoint (bin/omniroute)", "rollback", to_directory(ENTRY), "FAIL", "intact", "the defect")
-show_prefix("K16b", "a directory in place of the target prefix's shim (shim/lsof): guard 5 before round 13 crashes reading it for its hash (the whole guard exits 3 with ERROR IsADirectoryError, not with a CHECK FAIL)",
-            "target", to_directory(SHIM), "FAIL", "CRASH", "the defect: a crash, not a FAIL")
-show_prefix("K17", "the rollback prefix's entrypoint is a dangling symlink (its target file removed)", "rollback", dangling(ENTRY), "FAIL", "FAIL", "not a defect of that version: it reports it as missing")
-show_prefix("K17b", "the target prefix's shim is a dangling symlink", "target", dangling(SHIM), "FAIL", "FAIL", "not a defect of that version: it reports it as missing")
-show_prefix("K18", "the rollback prefix's entrypoint resolves to an execute-only file (mode 0111): its interpreter cannot read the script (the read bit, which guard 5 checks with the execute bit)", "rollback", lose_mode(ENTRY, 0o111), "FAIL", "intact", "the defect")
-show_prefix("K19a", "positive control: the rollback prefix as installed (an executable entrypoint behind its symlink, an executable shim with the pinned hash): intact", "rollback", None, "intact", "intact", "positive control")
-show_prefix("K19b", "positive control: the target prefix as installed, with the drain marker: intact", "target", None, "intact", "intact", "positive control")
-show_prefix("K19c", "positive control: the entrypoint a regular executable file instead of a symlink (the shape of run-controls' stand-in prefixes): intact", "rollback", plain_entry, "intact", "intact", "positive control")
-
-# ---- part E: the whole guard as a subprocess ---------------------------------------------------------------------------------------------------------------
-print("\n### part E: the whole guard 5 in --idle-only mode (E1-E6) and in full mode (E7) against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1), every run inside a private network namespace (unshare -rn) whose 127.0.0.1:20128 is the controls' own stub")
 db = work / "calls.sqlite"
 con = sqlite3.connect(db)
 con.execute("create table call_logs (id text, timestamp text)")
@@ -407,47 +305,10 @@ guard_e("E3", "a client-only record: the guard FAILS (exit 4)", [rec("client", "
 guard_e("E4a", "the same client port from two client addresses: an empty connection of the tolerated unit and a connection with queued data, idle one first: the busy one is ACTIVE (exit 4)", conn("127.0.0.1", 58003, client_owner=MINE) + conn("127.0.0.2", 58003, recvq=300, client_owner=None), 4, "ACTIVE connection")
 guard_e("E4b", "the same records, the busy connection first: the same verdict", conn("127.0.0.2", 58003, recvq=300, client_owner=None) + conn("127.0.0.1", 58003, client_owner=MINE), 4, "ACTIVE connection")
 guard_e("E5", "an unrelated remote :20128 record next to an idle gateway: exit 0 (not a failure)", [rec("client", "10.0.0.5", 44444, sip="10.0.0.9", owner=MINE)], 0, "IDLE-RESULT clean=True")
-p6, hits6, netns6 = in_netns([sys.executable, args.guard5, "--identity-script", str(ident)])
-err6 = [l for l in p6.stderr.splitlines() if not l.startswith("NETNS-STUB")]
-ok6 = p6.returncode == 3 and hits6 == 0 and netns6 is not None and netns6 != HOST_NETNS
-print(f"### E6: without --switch-tool and without --idle-only the guard refuses to start (usage error, exit 3), in a private namespace like E1-E5; the usage error comes before the guard's HTTP read, so the stub counts no request\n"
-      f"    exit={p6.returncode} {(err6[0] if err6 else '')[:120]}\n    the private stub counted {hits6} request(s), in namespace {netns6} (the host's is {HOST_NETNS})   [{'as expected' if ok6 else 'UNEXPECTED'}]")
-if not ok6:
+p = subprocess.run([sys.executable, args.guard5, "--identity-script", str(ident)], capture_output=True, text=True)
+print(f"### E6: without --switch-tool and without --idle-only the guard refuses to start (usage error, exit 3)\n    exit={p.returncode} {p.stderr.strip()[:120]}   [{'as expected' if p.returncode == 3 else 'UNEXPECTED'}]")
+if p.returncode != 3:
     UNEXPECTED.append("E6")
-
-# E7: the whole guard in FULL mode (the pre-switch gate) on prefixes built as installed, in the private namespace. The unlaunchable file has mode 0644: no execute bit, which fails os.access even for the namespace's
-# root (for whom a file without its READ bit would still read: that scenario is K18, in-process).
-ident_full = work / "identity-stub-full.py"
-ident_full.write_text("import sys\nprint('IDENTITY label=pre-switch stub health=ok expect_prefix_ok=True expect_build_ok=True')\nsys.exit(0)\n")
-switch = work / "switch-tool-standin.py"
-switch.write_text("# stand-in for the committed switch tool\n")
-no_records = work / "records-E7.txt"
-no_records.write_text("")
-
-
-def guard_full(case, title, guard, tools, expect_exit, expect_text):
-    env = dict(os.environ, PATH=f"{shim_dir}:{os.environ['PATH']}", SS_LISTEN=str(listen_file), SS_RECORDS=str(no_records))
-    cmd = [sys.executable, guard, "--switch-tool", str(switch), "--switch-sha256", hashlib.sha256(switch.read_bytes()).hexdigest(), "--tools", str(tools),
-           "--rollback-prefix", PREFIXES["rollback"][0], "--rollback-build", PREFIXES["rollback"][1], "--target-prefix", PREFIXES["target"][0], "--target-build", PREFIXES["target"][1], "--shim-sha256", SHIM_SHA,
-           "--identity-script", str(ident_full), "--db", str(db), "--worker-pattern", "nonexistent-process-pattern-for-the-controls", "--clean-for", "2", "--interval", "1", "--tolerate-unit", MY_UNIT]
-    p, hits, netns = in_netns(cmd, env=env)
-    out = p.stdout
-    last = [l for l in out.splitlines() if l.startswith(("IDLE-RESULT", "GUARD-RESULT"))][-1:]
-    prefix_lines = [l.strip()[:240] for l in out.splitlines() if l.startswith("CHECK") and "prefix intact" in l]
-    ok = p.returncode == expect_exit and expect_text in out and hits is not None and hits >= 1 and netns != HOST_NETNS
-    print(f"### {case}: {title}\n    exit={p.returncode} {last[0] if last else p.stderr.strip()[:160]}" + "".join(f"\n    {l}" for l in prefix_lines)
-          + f"\n    the guard's HTTP read reached the private stub {hits} time(s), in namespace {netns} (the host's is {HOST_NETNS})   [{'as expected' if ok else 'UNEXPECTED'}]")
-    if not ok:
-        UNEXPECTED.append(case)
-
-
-tools7 = work / "tools-E7"
-for which in ("rollback", "target"):
-    make_prefix(tools7, which)
-guard_full("E7a", "full mode, both prefixes as installed (positive control): guard 5 exits 0, GUARD-RESULT clean=True", args.guard5, tools7, 0, "GUARD-RESULT clean=True")
-os.chmod(tools7 / PREFIXES["rollback"][0] / SHIM, 0o644)
-guard_full("E7b", "full mode, the rollback prefix's shim without its execute permission (mode 0644): guard 5 before round 13 passes the pre-switch gate (exit 0, the defect)", args.guard5_r12, tools7, 0, "GUARD-RESULT clean=True")
-guard_full("E7c", "the same prefixes with guard 5: `rollback prefix intact` FAILS and the guard exits 4", args.guard5, tools7, 4, "CHECK rollback prefix intact: FAIL")
 print(f"\n# scratch directory (remove with rm -rf after reading): {work}")
 print(f"# finished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; scenarios not as expected: {UNEXPECTED or 'none'}")
 sys.exit(1 if UNEXPECTED else 0)

@@ -17,15 +17,14 @@ The census closes that over the whole window, on the gateway's own rows (SQLite 
         the wrapper's journal line of every arm (`journal_failed_to_save_call_log=0`) is 0: it covers the call-log save's logged failure only.
 (viii) the store is read only after the whole declared interval has elapsed on the host clock (the window's end, the 3 s usage pad and OBSERVE_SLACK_S of settling): the census waits for up to MAX_WAIT_S, and an interval that ends further ahead is a clock or stamp fault (INCONCLUSIVE).
 (ix)  the rows an association rests on are plausible numbers (a present latency, duration or time to first token is finite and non-negative and the time to first token is not longer than the latency: true of every row of this host's store, 30,129 usage rows and 24,522 call rows; a NULL time to first token is not compared, as in the scripts, and is routine here), every timestamp of both tables is a calendar-valid gateway stamp of 2000-2100 (checked row by row, not by shape), every reserved record of an arm output (RESULT, SUMMARY, FROZEN, RUN-STATUS, IDENTITY, the journal line) is parsed or refused, a script stamp that is present but invalid is never rescued by another stamp, the canary gate requires the frozen request counts per arm (17, 6, 4, 8) and every query runs in ONE read transaction;
-(x)   the gateway's journal (journalctl --user -u omniroute.service, `-o json --all`) holds exactly as many inbound request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`), counted by the gateway's own clock (the line's `time`, which must lie between 1 s after and 30 s before journald's receive stamp) from 4 s BEFORE the window's start to 4 s AFTER its end (the usage pad plus 1 s; the 3 s pairing tolerance is measured from the own row's ESTIMATED start, not from the request's arrival, which can precede it by a delay that nothing bounds), as there are own call rows, and they pair one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration); a journalctl that cannot be run, exits non-zero or reports a loss on stderr, and an entry the census cannot read (a line that is not JSON, a null or non-string message, a message that starts with `{` and does not parse, an arrival marker it did not count, a timestamp outside 2000-2100) make the window INCONCLUSIVE; the receipt prints the exact command, the binary, its version and its stderr, also when the observation failed;
-(xi)  the same journal run holds the stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`, printed by the stream controller when a stream ends or its client leaves: open-sse/utils/streamHandler.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e), whose time is anchored at the end of the request's lifecycle (for a completed request within about 0.2 s of its rows; after a client that left, the rows follow the line by up to the disconnect grace, and an error row can precede its line: checks/census-calibration-measurements.txt), whatever the delay between the arrival line and the
+(x)   the gateway's journal (journalctl --user -u omniroute.service, `-o json --all`) holds exactly as many inbound request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`), counted by the journal's own timestamp from 4 s BEFORE the window's start (a foreign request whose usage row could stand in for an own one arrived at most 3.1 s before the own request) to the window's end, as there are own call rows, and they pair one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration); a journalctl that cannot be run, exits non-zero or reports a loss on stderr, and an entry the census cannot read (a line that is not JSON, a null or non-string message, a message that starts with `{` and does not parse, an arrival marker it did not count, a timestamp outside 2000-2100) make the window INCONCLUSIVE; the receipt prints the exact command, the binary, its version and its stderr, also when the observation failed;
+(xi)  the same journal run holds the stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`, printed by the stream controller when a stream ends or its client leaves: open-sse/utils/streamHandler.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e), whose time is anchored at the end of the request's lifecycle, where its rows are written, whatever the delay between the arrival line and the
         duration clock was and whatever happened to the rows. Lines of one controller (a primary line and its `client_disconnect (post-abort)` echo) are one group; each own call row pairs one to one with a group of its provider and model whose implied start (line time minus its ms) lies within 0.25 s of the row's estimated start, and no group is left over whose line lies in the window padded by the 3 s usage pad, the serving process's
         STREAM_DISCONNECT_GRACE_PERIOD_MS (read from its environment, default 10 s: after a client that left once the terminal event was delivered the rows follow its line by at most that long) and 1 s; a claimed usage row's clock start (timestamp minus latency) agrees with its call row's (timestamp minus duration) within 0.25 s (one request has one duration clock: a foreign request's row standing in for it started elsewhere);
 (xii) the serving process is established where MainPID and its start time cannot (they identify the CLI supervisor, which restarts the serving child on a crash): the process listening on the guard receipt's port (ss -ltnp) is in the unit's cgroup, started before the guard receipt began (/proc starttime against /proc/uptime, margin 2 s), is the writer of every request line of the range (a restarted
         child leaves lines of two pids), no supervisor restart diagnostic or child startup banner occurs in the range, and no other process of this user holds the store open; the unit's journal limits are read and the range's busiest stretch must stay below a tenth of the rate limit (journald drops lines above it and says so only in the system journal);
-(xiii) no Responses-over-WebSocket turn reaches the window padded by the usage pad: such a turn (call_logs method WEBSOCKET or request_type responses_websocket, written by the gateway's WebSocket proxy through POST /api/internal/codex-responses-ws) is stamped at its START in both tables, with the turn's length as its duration and latency, and writes neither an arrival line nor a stream-end line, so no journal record covers it; a call row of such a turn whose [start, start + duration] reaches the padded window makes the result INCONCLUSIVE;
 The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE. The result line ends `scope=canary` for the canary's four-arm gate and `scope=trial` for anything else (fewer or more arms, a diagnostic run): only `PASS ... scope=canary` accepts the canary.
-What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row (for the endpoints whose handler logs an arrival line: the chat and responses handlers; `/v1/search` and the gateway's other endpoints log none). What stays outside, which the receipt states verbatim as an untested boundary (the line `UNTESTED-BOUNDARY`, refined by `UNTESTED-BOUNDARY-DETAIL`) next to its evidence classes (the line `EVIDENCE-CLASS`): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain (for the arrival lines measured from the lost request's estimated start, not from its arrival; for the stream-end lines within 0.25 s of the implied start); (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup); and traffic that is not an inbound POST (a non-streaming foreign request is covered by neither journal record, and neither is a Responses-over-WebSocket turn, whose rows are stamped at its start: a WebSocket turn whose call row reaches the padded window makes the window INCONCLUSIVE, and one whose call row was lost is a case of items (1) and (3)). A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal's inbound lines in the counted range pair one to one with the own requests and its stream-end groups with them too (the untested boundary above stays outside), the guard was idle at its start, the serving process was the same (listener, start, writer of the request lines) and the wrapper's journal line per arm was 0.
+What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row (for the endpoints whose handler logs an arrival line: the chat and responses handlers; `/v1/search` and the gateway's other endpoints log none). What stays outside, which the receipt states verbatim as an untested boundary (the line `UNTESTED-BOUNDARY`, refined by `UNTESTED-BOUNDARY-DETAIL`) next to its evidence classes (the line `EVIDENCE-CLASS`): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain (for the arrival lines measured from the lost request's estimated start, not from its arrival; for the stream-end lines within 0.25 s of the implied start); (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup); and traffic that is not an inbound POST (a non-streaming foreign request is covered by neither journal record). A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal's inbound lines in the counted range pair one to one with the own requests and its stream-end groups with them too (the untested boundary above stays outside), the guard was idle at its start, the serving process was the same (listener, start, writer of the request lines) and the wrapper's journal line per arm was 0.
 --require-arms N (default 4, the canary's four arms: raw, race, native, native tool-call): the number of arm outputs that must be given; fewer or more is INCONCLUSIVE, so that an omitted arm cannot pass unnoticed (a live trial of fewer arms states its own number).
 --diagnostic: measure and print without a guard receipt (for windows that had none, e.g. the baseline arms); the result can then only be INCONCLUSIVE.
 Exit status: 0 PASS, 2 INCONCLUSIVE, 3 usage error (bad arguments, an input file that cannot be read). The receipt on stdout holds the exact queries with their bounds, the window and its clock sources, the measured margins, all counts (own and foreign call rows, usage rows, components, orphans; per account (hashed), endpoint and model) and the verdict; ids appear only as 8 hex characters of their sha256.
@@ -57,10 +56,10 @@ DEFAULT_REQUIRED_ARMS = 4
 JOURNAL_UNIT = "omniroute.service"   # the gateway's user unit (the guard's standard invocation names the same one)
 JOURNAL_PAIR_S = 3.0   # an own call row is paired with the inbound journal line of its path within this long of its ESTIMATED START (its timestamp - its duration): the same 3 s as the scripts' candidate query. The estimate is not the request's physical arrival: the arrival line is written before the policy work, the credential refresh and the duration clock, by a delay that nothing bounds (what was measured on this host's rows is in checks/census-calibration-measurements.txt and is not an enforced invariant)
 JOURNAL_PAD_S = 2   # the journal is read this much beyond the counted range
-JOURNAL_LEAD_S = CANDIDATE_SECONDS + 1.0   # arrival lines are counted from this long BEFORE the window's start (the usage pad plus 1 s). It is a width, not a bound: a request's arrival can precede its estimated start (its row's timestamp minus its duration) by a delay that nothing bounds, because the arrival line is written before the policy work, the credential refresh and the duration clock (what this host measured: checks/census-calibration-measurements.txt)
+JOURNAL_LEAD_S = CANDIDATE_SECONDS + 1.0   # arrival lines are counted from this long BEFORE the window's start: a foreign request whose usage row could stand in for an own one (up to 3 s before the own row, a latency within 0.1 s of the own) arrived at most 3.1 s before that own request, which starts inside the window
 STREAM_PAIR_START_S = 0.25   # an own call row is paired with the stream-end controller whose implied start (line time - its ms) lies within this of the row's estimated start (measured on 590 pairs of 24 h of this host's traffic: at most 0.047 s; checks/census-calibration-measurements.txt)
 STREAM_GROUP_S = 0.1   # stream-end lines of one process, provider and model whose implied starts differ by at most this are the lines of ONE stream controller
-COMPLETION_MARGIN_S = 1.0   # the stream-end line of a COMPLETED request lies within about 0.2 s of its row (its console write against the row's timestamp, journald's own stamp 12-25 ms after the write; measured -0.177 to +0.002 s over 541 rows of status 200); after a client that left, the rows follow the line by up to the disconnect grace and an error row can precede its line, which is why the pairing uses the implied START and the counted range reaches the grace back (checks/census-calibration-measurements.txt)
+COMPLETION_MARGIN_S = 1.0   # the stream-end line may follow or precede the row by milliseconds (its console write against the row's timestamp, journald's own stamp 12-25 ms after the write)
 DEFAULT_DISCONNECT_GRACE_MS = 10000   # STREAM_DISCONNECT_GRACE_PERIOD_MS, src/shared/utils/runtimeTimeouts.ts:48 at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e: a client that left after the terminal event: the drain writes the rows at most this long after the stream-end line (streamHandler.ts drainCompletedToolHandoff)
 MAX_DISCONNECT_GRACE_MS = 120000   # a longer grace (the serving process's environment) is not covered: the counted range would have to be that long
 USAGE_START_TOLERANCE_S = 0.25   # a usage row claimed by an own call row must have started (its timestamp minus its latency) within this of the call row's own start (timestamp minus duration): one request has ONE duration clock, and the two rows of the 594 associated pairs measured on this host differ by at most 0.025 s (checks/census-calibration-measurements.txt); the frozen association tolerates 3 s of timestamp
@@ -86,10 +85,8 @@ RESTART_PATTERNS = tuple((name, re.compile(pattern)) for name, pattern in (
     ("child startup: ready", r"\u2713 Ready in"),
     ("child startup: database", r"\[DB\] Driver:"),
 ))
-JOURNAL_STDERR_ALARM = re.compile(r"(?i)truncat|corrupt|ignor|fail|error|inconsisten|skipp|missing|unavailable|denied|insufficient|not opened|permission")   # words with which journalctl reports data that it did not read
+JOURNAL_STDERR_ALARM = re.compile(r"(?i)truncat|corrupt|ignor|fail|error|inconsisten|skipp|missing|unavailable|denied")   # words with which journalctl reports data that it did not read
 MAX_DURATION_MS = 7 * 86400 * 1000   # a request that lasted longer than a week is not a measurement
-ARRIVAL_LAG_EARLY_S = 1.0   # an arrival line's own `time` may not be later than journald's receive stamp by more than this (the gateway writes the line, journald stamps it afterwards)
-ARRIVAL_LAG_MAX_S = 30.0   # ... nor earlier by more than this (measured on this host: 0.010-3.5 s under load, checks/census-calibration-measurements.txt): a larger difference is a clock fault or a forged field
 SETTLE_S = 5
 OBSERVE_SLACK_S = 2   # the store is read this long after the declared interval (window end + the usage pad) has ended: the gateway's last write of the window has landed
 MAX_WAIT_S = 30   # a declared interval that ends further ahead than this is a clock or stamp fault, not something to wait for
@@ -135,7 +132,6 @@ SQL_WINDOW_CALLS = _CALL_SELECT + "where timestamp >= ? and timestamp <= ? order
 SQL_COMPETING_CALLS = _CALL_SELECT + "where timestamp >= ? and timestamp <= ? and model = ? and tokens_in = ? and tokens_out = ? order by timestamp, id"
 SQL_WINDOW_USAGE = _USAGE_SELECT + "where timestamp >= ? and timestamp <= ? order by timestamp, id"
 SQL_ALL_CALL_STAMPS = "select timestamp from call_logs"
-SQL_WS_TURNS = "select id, timestamp, duration from call_logs where (request_type = 'responses_websocket' or method = 'WEBSOCKET') and timestamp >= ? and timestamp <= ? order by timestamp, id"   # review 4, F1
 SQL_ALL_USAGE_STAMPS = "select timestamp from usage_history"   # every timestamp of both tables is validated in Python (a glob matches the SHAPE of 2026-99-06 or xxxx-xx-xxTxx:xx:xx.xxxZ)
 GATEWAY_TS = re.compile(r"[0-9]{4}-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{3}Z")
 
@@ -248,7 +244,6 @@ def journal_events(unit, since, until):
     marker = "\U0001F4E5 POST"
     posts, streams, diagnostics, stamps, cgroups, losses = [], [], [], [], set(), []
     unreadable = 0
-    skewed = 0
     for line in p.stdout.decode("utf-8", "replace").splitlines():
         if not line.strip():
             continue
@@ -297,40 +292,30 @@ def journal_events(unit, since, until):
                 if own_time is None:
                     unreadable += 1
                     continue
-                lag = (stamp - own_time).total_seconds()   # journald's receive stamp minus the gateway's own `time` (measured 0.010-3.5 s on this host)
-                if lag < -ARRIVAL_LAG_EARLY_S or lag > ARRIVAL_LAG_MAX_S:
-                    skewed += 1
-                    continue
                 posts.append((own_time, msg[:90], path_match.group(1) if path_match else None, pid))
                 counted = True
-        if not message.startswith("{"):   # review 4, P3-1: the gateway's and the supervisor's CONSOLE lines. A JSON record (pino) carries client-controlled text (the model string, the path), is read as a record and is never searched for these markers
-            if STREAM_MARKER in plain:
-                m = STREAM_LINE.search(plain)
-                if m is None:
-                    unreadable += 1
-                    continue
-                streams.append((stamp, m.group(1), m.group(2), int(m.group(3)), m.group(4), pid))
-                counted = True
-            for name, pattern in RESTART_PATTERNS:
-                if pattern.search(plain):
-                    diagnostics.append((stamp, name, plain.strip()[:100], pid))
+        if STREAM_MARKER in plain:
+            m = STREAM_LINE.search(plain)
+            if m is None:
+                unreadable += 1
+                continue
+            streams.append((stamp, m.group(1), m.group(2), int(m.group(3)), m.group(4), pid))
+            counted = True
+        for name, pattern in RESTART_PATTERNS:
+            if pattern.search(plain):
+                diagnostics.append((stamp, name, plain.strip()[:100], pid))
         if entry.get("MESSAGE_ID") == SUPPRESSED_MESSAGE_ID or re.match(r"Suppressed [0-9]+ messages", plain):
             losses.append((stamp, plain.strip()[:100]))
         if not counted and marker in message:
             unreadable += 1
-    if unreadable or skewed:
-        parts = []
-        if unreadable:
-            parts.append(f"{unreadable} journal entry(ies) could not be read (an unparsable line, a null or non-string message, a timestamp outside 2000-2100, or a request marker that was not counted)")
-        if skewed:
-            parts.append(f"{skewed} arrival line(s) carry a `time` more than {ARRIVAL_LAG_MAX_S:g} s before or {ARRIVAL_LAG_EARLY_S:g} s after journald's receive stamp (the gateway's clock and journald's disagree, or the field was forged)")
-        raise JournalError("; ".join(parts) + ": the independent record of the window's requests cannot be trusted", info)
+    if unreadable:
+        raise JournalError(f"{unreadable} journal entry(ies) could not be read (an unparsable line, a null or non-string message, a timestamp outside 2000-2100, or a request marker that was not counted): the independent record of the window's requests cannot be trusted", info)
     return {"posts": posts, "streams": streams, "diagnostics": diagnostics, "stamps": stamps, "cgroups": cgroups, "losses": losses, "info": info}
 
 
 def stream_groups(streams):
     """Group the stream-end lines by stream controller. One controller prints one PRIMARY line (complete, disconnect: ..., aborted, error: ..., client_disconnect) and, when handleError runs after a disconnect or a completion, an ECHO (`client_disconnect (post-abort)`): all lines of one controller share its startTime, so lines of one process, provider and model whose
-    implied starts (line time minus its ms) differ by at most STREAM_GROUP_S belong together. Two primary lines that close together are two requests (two groups), an echo is attached to the nearest primary line of the same process, provider and model whose implied start lies within STREAM_GROUP_S (only that group's echo count rises); an echo with no such primary is a group of its own (primary False), and the census refuses the window for it.
+    implied starts (line time minus its ms) differ by at most STREAM_GROUP_S belong together. Two primary lines that close together are two requests (two groups), an echo with no primary is a group of its own (primary False: the grouping is ambiguous and the census says so).
     A group: {"t", "provider", "model", "ms", "status", "pid", "start" (implied start), "echoes", "primary"}."""
     primaries = sorted((s for s in streams if s[4] != POST_ABORT), key=lambda s: s[0] - dt.timedelta(milliseconds=s[3]))
     groups = [{"t": t, "provider": provider, "model": model, "ms": ms, "status": status, "pid": pid, "start": t - dt.timedelta(milliseconds=ms), "echoes": 0, "primary": True} for t, provider, model, ms, status, pid in primaries]
@@ -446,29 +431,9 @@ def store_holders(db):
     return holders
 
 
-GRACE_DECIMAL = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
-GRACE_RADIX = re.compile(r"0[xX][0-9a-fA-F]+|0[oO][0-7]+|0[bB][01]+|[+-]?Infinity")
-
-
-def gateway_grace(text):
-    """(milliseconds, source, problem): what readTimeoutMs(env, "STREAM_DISCONNECT_GRACE_PERIOD_MS", 10000, {allowZero: true}) in src/shared/utils/runtimeTimeouts.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e makes of the value: an unset, empty or blank value is the default; anything else goes through
-    JavaScript's Number(), and a result that is not finite or is negative is `Invalid ... Using default` (the gateway logs it and uses the default); the value is floored. The census reads the decimal forms that Number() accepts (surrounding whitespace, a sign, a fraction, an exponent: ' 30000', '30000.5', '1e4');
-    the radix and Infinity forms that Number() also accepts are not read (a problem, never a guess), and everything else is NaN there, so the default."""
-    raw = text.strip()
-    if raw == "":
-        return DEFAULT_DISCONNECT_GRACE_MS, "default (the variable is empty)", None
-    if GRACE_RADIX.fullmatch(raw):
-        return DEFAULT_DISCONNECT_GRACE_MS, "default", f"STREAM_DISCONNECT_GRACE_PERIOD_MS={raw[:20]!r} is a form of number that the census does not read (the gateway applies JavaScript's Number() to it)"
-    if GRACE_DECIMAL.fullmatch(raw):
-        value = float(raw)
-        if math.isfinite(value) and value >= 0:
-            return int(math.floor(value)), "the serving process's environment", None
-    return DEFAULT_DISCONNECT_GRACE_MS, f"default (the gateway rejects STREAM_DISCONNECT_GRACE_PERIOD_MS={raw[:20]!r} and uses the default)", None
-
-
 def serving_probe(guard):
     """The listener(s) on the guard receipt's port before the journal is read (the journal's range depends on the disconnect grace that the serving process runs with): their pids, start times, cgroups and STREAM_DISCONNECT_GRACE_PERIOD_MS (the drain after a client that left after the terminal event: rows follow the stream-end line by at most that long; default 10000 ms, src/shared/utils/runtimeTimeouts.ts:48 at OmniRoute c1e30b7)."""
-    probe = {"pids": set(), "starts": {}, "cgroups": {}, "binary": shutil.which("ss") or "?", "error": None, "port": None, "grace_ms": DEFAULT_DISCONNECT_GRACE_MS, "grace_source": "default", "grace_problem": None}
+    probe = {"pids": set(), "starts": {}, "cgroups": {}, "binary": shutil.which("ss") or "?", "error": None, "port": None, "grace_ms": DEFAULT_DISCONNECT_GRACE_MS, "grace_source": "default"}
     if guard is None:
         probe["error"] = "no guard receipt (a diagnostic run)"
         return probe
@@ -488,31 +453,26 @@ def serving_probe(guard):
         return probe
     if values != {None}:
         if None in values or len(values) != 1:
-            probe["grace_problem"] = f"the listeners disagree about STREAM_DISCONNECT_GRACE_PERIOD_MS ({sorted(str(v) for v in values)}), so the grace that the counted range must cover is not known"
-        else:
-            probe["grace_ms"], probe["grace_source"], probe["grace_problem"] = gateway_grace(values.pop())
-    if probe["grace_problem"] is None and probe["grace_ms"] > MAX_DISCONNECT_GRACE_MS:
-        probe["grace_problem"] = f"STREAM_DISCONNECT_GRACE_PERIOD_MS={probe['grace_ms']} is longer than the {MAX_DISCONNECT_GRACE_MS} ms the census covers"
+            probe["error"] = f"the listeners disagree about STREAM_DISCONNECT_GRACE_PERIOD_MS ({sorted(str(v) for v in values)})"
+            return probe
+        text = values.pop()
+        if not (text.isascii() and text.isdigit() and len(text) <= 9):
+            probe["error"] = f"STREAM_DISCONNECT_GRACE_PERIOD_MS={text[:20]!r} is not a number of milliseconds"
+            return probe
+        probe["grace_ms"], probe["grace_source"] = int(text), "the serving process's environment"
+    if probe["grace_ms"] > MAX_DISCONNECT_GRACE_MS:
+        probe["error"] = f"STREAM_DISCONNECT_GRACE_PERIOD_MS={probe['grace_ms']} is longer than the {MAX_DISCONNECT_GRACE_MS} ms the census covers"
     return probe
 
 
-TIME_UNITS = {"usec": 1e-6, "us": 1e-6, "\u00b5s": 1e-6, "\u03bcs": 1e-6, "msec": 1e-3, "ms": 1e-3, "seconds": 1.0, "second": 1.0, "sec": 1.0, "s": 1.0, "minutes": 60.0, "minute": 60.0, "min": 60.0, "m": 60.0,
-              "hours": 3600.0, "hour": 3600.0, "hr": 3600.0, "h": 3600.0, "days": 86400.0, "day": 86400.0, "d": 86400.0, "weeks": 604800.0, "week": 604800.0, "w": 604800.0,
-              "months": 2629800.0, "month": 2629800.0, "M": 2629800.0, "years": 31557600.0, "year": 31557600.0, "y": 31557600.0}   # systemd.time(7): a month is 30.4375 days, a year 365.25 days; the unit letters are case-sensitive (M is a month, m a minute)
-TIME_PART = r"[0-9]+(?:\.[0-9]+)?\s*(?:" + "|".join(re.escape(k) for k in sorted(TIME_UNITS, key=len, reverse=True)) + r")"
-TIME_SPAN = re.compile(r"\s*(?:" + TIME_PART + r"\s*)+")
-TIME_PIECE = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*(" + "|".join(re.escape(k) for k in sorted(TIME_UNITS, key=len, reverse=True)) + r")")
-
-
 def seconds_of(text):
-    """systemd.time(7) span such as `30s`, `1min 30s`, `500ms`, `1d`, `1w`, `1M`, `0` -> seconds; None when any part of it is not one. The whole value must be consumed (`30 foo` and `1.5.5s` are refused), the digits are ASCII, the unit letters
-    are case-sensitive, and a bare number (seconds) is a span only when it is the whole value."""
-    t = text.strip()
-    if re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", t):
-        return float(t)
-    if not TIME_SPAN.fullmatch(t):
-        return None
-    return sum(float(number) * TIME_UNITS[unit] for number, unit in TIME_PIECE.findall(t))
+    """systemd.time(7) span such as `30s`, `1min`, `500ms`, `0` -> seconds; None when it is not one."""
+    total, matched = 0.0, False
+    for number, unit in re.findall(r"([0-9]+(?:\.[0-9]+)?)\s*(usec|us|msec|ms|seconds|second|sec|s|minutes|minute|min|m|hours|hour|hr|h)?", text.strip()):
+        factor = {"": 1.0, "us": 1e-6, "usec": 1e-6, "ms": 1e-3, "msec": 1e-3, "s": 1.0, "sec": 1.0, "second": 1.0, "seconds": 1.0, "m": 60.0, "min": 60.0, "minute": 60.0, "minutes": 60.0, "h": 3600.0, "hr": 3600.0, "hour": 3600.0, "hours": 3600.0}[unit]
+        total += float(number) * factor
+        matched = True
+    return total if matched else None
 
 
 def journal_limits(unit):
@@ -528,22 +488,22 @@ def journal_limits(unit):
     props = dict(line.split("=", 1) for line in shown.stdout.decode("utf-8", "replace").splitlines() if "=" in line)
     interval, burst, source = 30.0, DEFAULT_RATE_BURST, "the compiled-in default"
     for line in merged.stdout.decode("utf-8", "replace").splitlines():
-        m = re.match(r"^\s*(RateLimitIntervalSec|RateLimitInterval|RateLimitBurst)\s*=\s*(.*?)\s*$", line)   # RateLimitInterval= is the deprecated name of RateLimitIntervalSec=
+        m = re.match(r"^\s*(RateLimitIntervalSec|RateLimitBurst)\s*=\s*(\S+)\s*$", line)
         if not m:
             continue
-        if m.group(1) in ("RateLimitIntervalSec", "RateLimitInterval"):
+        if m.group(1) == "RateLimitIntervalSec":
             value = seconds_of(m.group(2))
             if value is None:
-                return None, None, None, None, None, f"journald.conf holds {m.group(1)}={m.group(2)[:20]!r}, which is not a time span"
+                return None, None, None, None, None, f"journald.conf holds RateLimitIntervalSec={m.group(2)[:20]!r}, which is not a time span"
             interval = value
         else:
-            if not (m.group(2).isascii() and m.group(2).isdigit()) or len(m.group(2)) > 12:
+            if not m.group(2).isdigit() or len(m.group(2)) > 12:
                 return None, None, None, None, None, f"journald.conf holds RateLimitBurst={m.group(2)[:20]!r}, which is not a number"
             burst = int(m.group(2))
         source = "journald.conf"
     raw_interval, raw_burst = props.get("LogRateLimitIntervalUSec", "0"), props.get("LogRateLimitBurst", "0")
-    unit_interval = seconds_of(raw_interval + "us") if raw_interval.isascii() and raw_interval.isdigit() else seconds_of(raw_interval)
-    if unit_interval is None or not (raw_burst.isascii() and raw_burst.isdigit()) or len(raw_burst) > 12:
+    unit_interval = seconds_of(raw_interval + "us") if raw_interval.isdigit() else seconds_of(raw_interval)
+    if unit_interval is None or not raw_burst.isdigit() or len(raw_burst) > 12:
         return None, None, None, None, None, f"the unit's LogRateLimit settings are not numbers ({raw_interval[:20]!r}, {raw_burst[:20]!r})"
     if unit_interval or int(raw_burst):
         interval, burst, source = unit_interval or interval, int(raw_burst) or burst, "the unit's LogRateLimit settings"
@@ -585,8 +545,6 @@ def serving_check(rep, probe, guard, events, db):
     diagnostics = events["diagnostics"]
     rep.say(f"SERVING-PROCESS port={probe['port']} listener_pids={sorted(pids)} started={[utc(probe['starts'][p]) for p in sorted(pids)]} unit_cgroup={unit_cgroup} request_line_pids={sorted(p for p in line_pids if p is not None)} "
             f"store_holders={sorted(holders) if holders is not None else None} disconnect_grace_ms={probe['grace_ms']} ({probe['grace_source']}) restart_or_startup_diagnostics_in_range={len(diagnostics)} guard_start={utc(guard_start) if guard_start else None} ss={shown_db(probe['binary'])} {where}")
-    if probe["grace_problem"]:
-        rep.bad(f"the serving process's disconnect grace cannot be established: {probe['grace_problem']}")
     if unit_cgroup is None:
         rep.bad(f"the journal entries carry {len(cgroups)} different _SYSTEMD_CGROUP values (exactly one is needed): the unit's cgroup, and so the serving child, cannot be established")
     else:
@@ -597,14 +555,10 @@ def serving_check(rep, probe, guard, events, db):
         late = sorted(p for p in pids if probe["starts"][p] > guard_start - dt.timedelta(seconds=SERVING_MARGIN_S))
         if late:
             rep.bad(f"listener pid(s) {late} started after the guard receipt began (less than {SERVING_MARGIN_S:g} s before it, or later): the serving process was started inside the observation, so the idle claim and the window may belong to different processes")
-    named = {p for p in line_pids if p is not None}
-    if not named:
-        rep.bad("no request line (arrival or stream-end) in the journal range names a process (a valid _PID): nothing ties the window's requests to the serving process")
-    else:
-        if None in line_pids:
-            rep.bad("a request line of the range carries no valid _PID (a journal entry without the sender's process id): the process that wrote it cannot be established")
-        if named - pids:
-            rep.bad(f"request lines of the range were written by pid(s) {sorted(named)} but the listener(s) are {sorted(pids)}: the serving child was restarted inside the range (a restart under the supervisor leaves MainPID unchanged), or another process answered")
+    if not line_pids:
+        rep.bad("no request line (arrival or stream-end) in the journal range names a process: nothing ties the window's requests to the serving process")
+    elif None in line_pids or line_pids - pids:
+        rep.bad(f"request lines of the range were written by pid(s) {sorted(p for p in line_pids if p is not None)} but the listener(s) are {sorted(pids)}: the serving child was restarted inside the range (a restart under the supervisor leaves MainPID unchanged), or another process answered")
     if holders is not None:
         if not (holders & pids):
             rep.bad(f"no listener holds the store open (holders {sorted(holders)}): the serving process is not the writer of the rows that were measured")
@@ -1119,7 +1073,7 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
     # ---- queries (printed first, so a failure below still leaves them in the receipt)
     for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
         rep.say(f"QUERY {name}: {sql}")
-    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed)")
+    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted from {JOURNAL_LEAD_S:.0f} s before the window's start to its end; stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed)")
     rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({u0s}, {w1s}) (the window's start padded by the same {CANDIDATE_SECONDS} s as the usage rows); window-usage: ({u0s}, {u1s}); "
             f"candidates: (shift(call row timestamp, -{CANDIDATE_SECONDS}), shift(call row timestamp, {CANDIDATE_SECONDS}), model, tokens_in, tokens_out) per own call row; competing-calls: (shift(usage row timestamp, -{CANDIDATE_SECONDS}), shift(usage row timestamp, {CANDIDATE_SECONDS}), model, tokens_input, tokens_output) per usage row an own call row can claim; all-*-stamps: every timestamp of the two tables, each validated here (text, the gateway's format {TS_GLOB}, calendar-valid, year 2000-2100)")
     # ---- the store is read only after the whole declared interval (the window, the usage rows' pad and a settling slack) has elapsed on the host clock: a row of the window's tail cannot be missed because the census ran too early
@@ -1155,10 +1109,10 @@ def evaluate(arm_paths, guard_path, db, diagnostic=False, require_arms=DEFAULT_R
         rep.bad(f"the measurement failed ({type(error).__name__}: {str(error)[:80]}): the rest was not measured, so nothing here is a PASS")
     finally:
         con.close()
-    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the request's lifecycle: within about 0.2 s of the rows of a completed request, and up to the disconnect grace before the rows of a request whose client left: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
+    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the lifecycle where the rows are written: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
     rep.say("UNTESTED-BOUNDARY the residual of this check, stated as an untested boundary (no real run has observed these; the synthetic controls R3, J10, J15, J22e, J22f and J27a show that the census passes them): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain; (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup)")
     rep.say("UNTESTED-BOUNDARY-DETAIL (added after the full-scope read r12; these refine the three items above and do not replace them): (2) holds for each of the two journal records separately: for the arrival lines the 3 s is measured from the lost request's ESTIMATED start (timestamp minus duration), so its physical arrival may be earlier by a delay that nothing bounds and the two lines may lie further apart; "
-            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it passes the HTTP stream controller of chatCore: a non-streaming foreign request prints no stream-end line and its arrival line does not bound it (the delay before its duration clock starts is unbounded), so it is covered by neither; a Responses-over-WebSocket turn (dist/server-ws.mjs; its rows are written by POST /api/internal/codex-responses-ws, both stamped at the turn's START, with the turn's length as duration and latency) writes neither an arrival line nor a stream-end line, so it is covered by neither either: the census refuses a window that a WebSocket call row reaches (the WEBSOCKET line), and a WebSocket turn whose call row was lost is a case of items (1) and (3) above. "
+            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it streams: a non-streaming foreign request prints no stream-end line and its arrival line does not bound it (the delay before its duration clock starts is unbounded), so it is covered by neither. "
             "Journald's drops are bounded only by the unit's entry rate against its limit (its suppression notice is in the system journal, which this user cannot read), a vacuum or rotation gap is not detected, and the serving process, its start and the holders of the store are read at one point in time (a transient listener or writer inside the window is not seen)")
     rep.say("EVIDENCE-CLASS local_integration and synthetic controls, plus the stated real rows (the baseline arms and the quiet-window live trial of 2026-10-06: checks/census-baseline-real-data.txt and checks/census-live-trial.txt in the evidence folder of PR #757): the census is validated by its controls and those rows")
     rep.say(f"CENSUS-RESULT {rep.state} exit={0 if rep.state == 'PASS' else 2} problems={len(rep.reasons)} scope={scope}")
@@ -1207,32 +1161,11 @@ def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db):
         if len(who) > 1:
             rep.bad(f"own call row {id8(rid)} is claimed by {len(who)} requests {who}")
     rep.say(f"OWN call rows={len(own)} per arm={dict(sorted(per_arm_own.items()))}")
-    # ---- review 4, F1: Responses-over-WebSocket turns. The gateway's WebSocket proxy (dist/server-ws.mjs) persists a turn through POST /api/internal/codex-responses-ws with BOTH rows stamped at the turn's START (its length is the duration and the latency) and writes neither an arrival line
-    # nor a stream-end line (chat.ts logs the only arrival line, and a WebSocket turn never creates a stream controller), so no journal record covers it, and a turn that began before the usage pad leaves rows outside every range read here. A call row of such a turn that reaches the padded window is refused.
-    pad = dt.timedelta(seconds=CANDIDATE_SECONDS)
-    ws_lo, ws_hi = bounds[0] - pad - dt.timedelta(milliseconds=MAX_DURATION_MS), bounds[-1] + pad
-    ws_rows = con.execute(SQL_WS_TURNS, (utc(ws_lo), utc(ws_hi))).fetchall()
-    ws_reaching = []
-    for _wid, wts, wdur in ws_rows:
-        wstart = parse_ts(wts)
-        try:
-            wlen = float(wdur) if wdur is not None else 0.0
-        except (TypeError, ValueError, OverflowError):
-            wlen = float("nan")
-        if wstart is None or not math.isfinite(wlen) or wlen < 0 or wlen > MAX_DURATION_MS:
-            ws_reaching.append((wts, "its stamp or duration cannot be read"))
-        elif wstart <= bounds[-1] + pad and wstart + dt.timedelta(milliseconds=wlen) >= bounds[0] - pad:
-            ws_reaching.append((wts, f"duration {wlen:g} ms"))
-    rep.say(f"WEBSOCKET call_logs rows with method WEBSOCKET or request_type responses_websocket stamped from {utc(ws_lo)} (the longest duration measured plus the usage pad before the window) to {utc(ws_hi)}: {len(ws_rows)}; of these reaching the window padded by the usage pad: {len(ws_reaching)}")
-    for wts, why in ws_reaching[:10]:
-        rep.say(f"   Responses-WebSocket turn stamped {wts} ({why})")
-    if ws_reaching:
-        rep.bad(f"{len(ws_reaching)} Responses-over-WebSocket turn(s) reach the window padded by the usage pad (call_logs method WEBSOCKET or request_type responses_websocket; a turn is stamped at its START, with its length as duration, and writes neither an arrival line nor a stream-end line): no journal record covers such a turn, and its rows may stand in for an own request's or lie outside every range read here")
     # ---- the gateway's journal and the serving process: independent records of the window's requests (arrival lines, stream-end lines) and the process that served them
     w0, w1 = bounds[0], bounds[-1]
     probe = serving_probe(guard)
     grace_s = probe["grace_ms"] / 1000.0
-    lo = w0 - dt.timedelta(seconds=JOURNAL_LEAD_S)   # arrival lines are counted from here to c_hi, the end of the usage pad plus the completion margin after the window's end
+    lo = w0 - dt.timedelta(seconds=JOURNAL_LEAD_S)   # arrival lines are counted from here to the window's end
     c_lo = w0 - dt.timedelta(seconds=CANDIDATE_SECONDS + grace_s + COMPLETION_MARGIN_S)   # stream-end lines are counted from here ...
     c_hi = w1 + dt.timedelta(seconds=CANDIDATE_SECONDS + COMPLETION_MARGIN_S)   # ... to here
     earliest = min(lo, c_lo, guard["start"] if guard is not None and guard["start"] is not None else lo)   # the range also covers the guard receipt's observation (a restart of the serving process inside it)

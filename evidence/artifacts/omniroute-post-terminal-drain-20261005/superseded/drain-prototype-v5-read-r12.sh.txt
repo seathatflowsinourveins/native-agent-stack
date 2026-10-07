@@ -1,19 +1,17 @@
 #!/bin/bash
-# Validation of the post-terminal client-disconnect drain patch in a scratch tree built from public refs (nothing is deployed). Version 6 (2026-10-06): every stage's expectation includes the test runner's own exit status (full-scope read r12, P2-2);
-# version 5 recorded that status but checked only the printed counters, so a run that printed the expected counters and then crashed, timed out or ended some other way was accepted. Version 5 (2026-10-06): the blob id parsed from the patch's index line must be a hex id (a vacuous prefix match is no longer possible).
+# Validation of the post-terminal client-disconnect drain patch in a scratch tree built from public refs (nothing is deployed). Version 5 (2026-10-06): the blob id parsed from the patch's index line must be a hex id (a vacuous prefix match is no longer possible).
 # Patch under test: $DRAIN_DIR/drain-after-terminal.patch (one commit: the streamHandler.ts change plus tests/unit/stream-terminal-seen-client-disconnect.test.ts).
 # The unit test file is EXTRACTED from that patch (git apply --include) for the negative controls, and its git blob id is checked against the patch's own index line: no standalone copy exists to drift.
 # Reference implementation: drainCompletedToolHandoff in open-sse/utils/streamHandler.ts at upstream 0585aba5589d5a1f49243a13a8db249558e7c9e3 (L665-688), reused from cancel() for the terminal-seen case.
-# Steps (each logs its exit code to $OUT/progress.txt; a failed setup step, a tree-id mismatch or a violated expectation (counts, failing test names or the test runner's exit status) stops the script with exit 3):
+# Steps (each logs its exit code to $OUT/progress.txt; a failed setup step, a tree-id mismatch or a violated expectation stops the script with exit 3):
 #   composition C (v3.8.51 tag + affinity patch + PR 15167; its tree id is checked), npm ci, then
 #   A   baseline: the stream-related test files (name globs plus every unit test that mentions streamHandler), unchanged, on the unpatched tree
 #   N   the new test file (extracted from the patch) on the unpatched tree (negative control: exactly three of its six tests fail, by name)
 #   N2  the new test file with only the streamHandler.ts hunk of the first version of the patch, superseded after review (exactly two fail, by name: the tool-handoff drain that never starts, and the pending request that stays)
 #   P   the patch under test applied: its tree id must equal EXPECT_TREE, or the script stops here, before any patched test stage; then the new test file alone (six of six pass)
 #   A2  the same stream-related files plus the new test file on the patched tree; B2 the call-log, usage-history and chat-pipeline tests
-# Frozen expectations (constants below): test counts, failing test names and the test runner's exit status per stage (0 when every test passes; 1, the status of node --test when a test fails, for the stages that expect failures:
-# A and A2 with the one unrelated upstream failure, N and N2). The one failure of the 239 upstream files is the same unrelated test before and after.
-# For every stage the runner's summary counters (tests, suites, pass, fail, cancelled, skipped, todo), its exit status ($OUT/test-<label>.exit), the failing tests' names and the full log are kept in $OUT; the file lists are in $OUT/test-file-list.txt.
+# Frozen expectations (constants below): test counts and failing test names per stage. The one failure of the 239 upstream files is the same unrelated test before and after.
+# For every stage the runner's summary counters (tests, suites, pass, fail, cancelled, skipped, todo), the failing tests' names and the full log are kept in $OUT; the file lists are in $OUT/test-file-list.txt.
 # The script owns only the directory it creates (mktemp under $WORK_ROOT, default ~/.cache) and deletes nothing but its own temporary copy of the extracted test file, so it cannot touch another session's directories.
 # A missing input file or mirror stops it with exit 2 before anything is created.
 # usage: DRAIN_DIR=<directory with drain-after-terminal.patch and superseded-first-version.patch> EV=<evidence folder of omniroute-wire-effort-20261005> EXPECT_TREE=<tree id of the patched tree> omniroute-drain-prototype-20261005.sh
@@ -45,11 +43,9 @@ step() { local label=$1; shift; "$@"; local rc=$?; log "$label exit=$rc"; [ $rc 
 apply_pr_diff() { git --git-dir="$M" diff $PR^ $PR | G apply --index; }
 counter() { grep -aE "^ℹ $2 " "$OUT/test-$1.log" | awk '{print $3}'; }
 failing() { awk '/^✖ failing tests:/{f=1;next} f&&/^✖ /{sub(/ \([0-9.]+ms\)$/,""); sub(/^✖ /,""); print}' "$OUT/test-$1.log" | sort -u; }
-expect_counts() { # label tests pass fail exit-status (the test runner's own status, which run() keeps in $OUT/test-<label>.exit)
-  local t p f x; t=$(counter "$1" tests); p=$(counter "$1" pass); f=$(counter "$1" fail); x=$(cat "$OUT/test-$1.exit" 2>/dev/null)
-  { [ "$t" = "$2" ] && [ "$p" = "$3" ] && [ "$f" = "$4" ]; } || { log "$1 EXPECTATION VIOLATED: tests=$t pass=$p fail=$f, expected tests=$2 pass=$3 fail=$4: stopping"; exit 3; }
-  # version 6: a run can print the expected counters and still crash, time out or end some other way, so the stage's exit status is part of its expectation (a call that names none fails)
-  if [ -n "${5:-}" ] && [ "$x" = "$5" ]; then log "$1 expectation met: tests=$t pass=$p fail=$f"; else log "$1 EXIT STATUS VIOLATED: exit=${x:-none}, expected exit=${5:-none}: stopping"; exit 3; fi
+expect_counts() { # label tests pass fail
+  local t p f; t=$(counter "$1" tests); p=$(counter "$1" pass); f=$(counter "$1" fail)
+  if [ "$t" = "$2" ] && [ "$p" = "$3" ] && [ "$f" = "$4" ]; then log "$1 expectation met: tests=$t pass=$p fail=$f"; else log "$1 EXPECTATION VIOLATED: tests=$t pass=$p fail=$f, expected tests=$2 pass=$3 fail=$4: stopping"; exit 3; fi
 }
 expect_failing() { # label, the expected failing test names, one per line (may be empty)
   local got; got=$(failing "$1")
@@ -68,7 +64,6 @@ FLAGS="--import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./te
 run() {
   local label=$1; shift
   ( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node $FLAGS --test --test-force-exit --test-concurrency=4 "$@" > "$OUT/test-$label.log" 2>&1 ); local rc=$?
-  echo "$rc" > "$OUT/test-$label.exit"
   log "$label exit=$rc tests=$(counter "$label" tests) suites=$(counter "$label" suites) pass=$(counter "$label" pass) fail=$(counter "$label" fail) cancelled=$(counter "$label" cancelled) skipped=$(counter "$label" skipped) todo=$(counter "$label" todo)"
 }
 cd "$T" || exit 2
@@ -78,7 +73,7 @@ CALLUSE_TESTS="tests/unit/call-log-artifact-worker.test.ts tests/unit/call-log-s
 { echo "# stream-related upstream test files ($(echo $STREAM_TESTS | wc -w)): the name globs *stream*, *sse*, the Codex tool-handoff and empty-stream files, and every unit test file that mentions streamHandler"; for f in $STREAM_TESTS; do echo "$f"; done; echo; echo "# call-log, usage-history and chat-pipeline files ($(echo $CALLUSE_TESTS | wc -w))"; for f in $CALLUSE_TESTS; do echo "$f"; done; } > "$OUT/test-file-list.txt"
 log "stream-related test files: $(echo $STREAM_TESTS | wc -w)"
 run A-baseline $STREAM_TESTS
-expect_counts A-baseline 1746 1745 1 1
+expect_counts A-baseline 1746 1745 1
 expect_failing A-baseline "$UNRELATED_FAILURE"
 PATCH_BLOB=$(awk '/^diff --git a\/tests\/unit\/stream-terminal-seen-client-disconnect.test.ts/{f=1} f&&/^index /{print $2; exit}' "$D/drain-after-terminal.patch" | sed 's/.*\.\.//')
 # version 5: the prefix check below passes vacuously for an empty PATCH_BLOB, so the parsed id must be a hex blob id of 7 to 40 digits (a missing or reformatted index line stops the script with exit 3)
@@ -87,11 +82,11 @@ step "extract the new test file from the patch" G apply --include=$NEWTEST "$D/d
 ACTUAL_BLOB=$(G hash-object $NEWTEST)
 case "$ACTUAL_BLOB" in "$PATCH_BLOB"*) log "new test file blob $ACTUAL_BLOB matches the patch's index line ($PATCH_BLOB)";; *) log "new test file blob $ACTUAL_BLOB does not match the patch's index line ($PATCH_BLOB): stopping"; exit 3;; esac
 run N-new-test-unpatched $NEWTEST
-expect_counts N-new-test-unpatched 6 3 3 1
+expect_counts N-new-test-unpatched 6 3 3
 expect_failing N-new-test-unpatched "$(printf '%s\n%s\n%s' "$T1" "$T3" "$T6" | sort -u)"
 step "apply the first version's streamHandler.ts hunk" G apply --include=open-sse/utils/streamHandler.ts "$D/superseded-first-version.patch"
 run N2-new-test-first-version $NEWTEST
-expect_counts N2-new-test-first-version 6 4 2 1
+expect_counts N2-new-test-first-version 6 4 2
 expect_failing N2-new-test-first-version "$(printf '%s\n%s' "$T3" "$T6" | sort -u)"
 step "restore streamHandler.ts" G checkout -q -- open-sse/utils/streamHandler.ts
 rm -f $NEWTEST
@@ -100,12 +95,12 @@ step "commit patch under test" G commit -q -m "drain patch under test"
 PATCHED_TREE=$(G rev-parse 'HEAD^{tree}')
 if [ "$PATCHED_TREE" = "$EXPECT_TREE" ]; then log "patched tree=$PATCHED_TREE equals the expected tree"; else log "patched tree=$PATCHED_TREE DIFFERS from the expected tree $EXPECT_TREE: stopping before the patched test stages"; exit 3; fi
 run P-new-test-patched $NEWTEST
-expect_counts P-new-test-patched 6 6 0 0
+expect_counts P-new-test-patched 6 6 0
 expect_failing P-new-test-patched ""
 run A2-stream-tests-patched $STREAM_TESTS $NEWTEST
-expect_counts A2-stream-tests-patched 1752 1751 1 1
+expect_counts A2-stream-tests-patched 1752 1751 1
 expect_failing A2-stream-tests-patched "$UNRELATED_FAILURE"
 run B2-calllog-usage-chat-pipeline $CALLUSE_TESTS
-expect_counts B2-calllog-usage-chat-pipeline 126 126 0 0
+expect_counts B2-calllog-usage-chat-pipeline 126 126 0
 expect_failing B2-calllog-usage-chat-pipeline ""
 log "DONE; the scratch tree and the logs stay in $WORK (remove it with rm -rf after reading)"

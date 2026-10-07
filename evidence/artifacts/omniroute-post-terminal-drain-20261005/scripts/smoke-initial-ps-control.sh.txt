@@ -1,0 +1,129 @@
+#!/bin/bash
+# Control for the smoke script's first observation of the child's process group and its cleanup on an early exit (version 6; full-scope read r12, P2-5). SMOKE_SCRIPT selects the version under test (scripts/smoke.sh.txt; the
+# defect demonstration runs this same control on the version of an earlier commit, `git show <commit>:<path>`). Raw output goes to stdout; exit 0 when every variant is as required, 1 when one is not, 2 on a usage error.
+# Each variant runs the WHOLE smoke script against a FIXTURE prefix in a scratch HOME: the fake `omniroute serve` of smoke-observation-control.sh.txt (a health server on 127.0.0.1:PORT), which here records the pid of every process
+# it starts and carries this run's token in every process's command line, and a `ps` fixture first on the smoke's PATH that logs each call and treats the `ps -o pgid= -p <pid>` calls as the variant says (the first of them is the
+# smoke's launch-time observation):
+#   I1 the first one fails (exit 1, no output); every later call is the real ps                     required: the smoke exits non-zero and no fixture process survives it
+#   I2 the first one prints a wrong pgid (1) and exits 0; every later call is the real ps           required: the same
+#   I3 no ps failure; the fixture answers status "starting", never "ok", and the smoke gets SIGTERM (I3), SIGINT (I3b) or SIGHUP (I3c) while it polls the health endpoint
+#                                                                                                  required: the smoke exits 143, 130 or 129 and no fixture process survives it
+#   I4 every one fails, so the child's group can never be verified                                  required: the smoke signals no fixture process (the fixture's SIGTERM marker is still absent when the smoke has exited) and names the child's pid
+#      (the boundary: no version may signal a group it could not verify; I4 is NOT a no-survivor case, and its survivor is stopped by this control)
+# A survivor of any variant is stopped by this control, by its process group, only after the control observed with the real ps that the group is the fixture's: a surviving recorded pid whose command line carries this run's token
+# and whose PGID equals the recorded pid of the fixture's leader. The output says so. The scratch directory is made under $WORK_ROOT (default ~/.cache); the fixture HOME is inside it.
+set -u
+set -m
+SMOKE=${SMOKE_SCRIPT:?set SMOKE_SCRIPT to the smoke script under test (scripts/smoke.sh.txt)}
+[ -f "$SMOKE" ] || { echo "no smoke script $SMOKE" >&2; exit 2; }
+REAL_PS=$(command -v ps)
+W=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/omniroute-smoke-initial-ps-XXXXXX") || exit 2
+chmod 700 "$W"
+TOKEN=$(basename "$W")
+H=$W/home
+PREFIX=$H/.local/share/codex-ecosystem/tools/fixtureprefix
+mkdir -p "$PREFIX/bin" "$PREFIX/shim" "$H/.cache"
+mask() { sed "s#$HOME#\$HOME#g"; }
+cat > "$PREFIX/bin/omniroute" <<'FAKEEOF'
+#!/bin/bash
+# fixture `omniroute serve --port P`: a health server on 127.0.0.1:P answering {"status": $FAKE_STATUS}; it appends its own pid and the server's to $FAKE_PIDS, the server's command line carries $FAKE_TOKEN,
+# and the server's SIGTERM handler creates $FAKE_MARK before it exits
+echo "$$" >> "$FAKE_PIDS"
+PORT=""
+while [ $# -gt 0 ]; do case "$1" in --port) PORT=$2; shift 2;; *) shift;; esac; done
+python3 - "$PORT" "$FAKE_MARK" "$FAKE_PIDS" "$FAKE_STATUS" "$FAKE_TOKEN" <<'PYEOF' &
+import http.server, json, os, signal, sys
+port, mark, pids, status = int(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4]
+with open(pids, "a") as f:
+    f.write(str(os.getpid()) + "\n")
+class H(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        body = json.dumps({"status": status}).encode()
+        self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+    def log_message(self, *a):
+        pass
+def term(*a):
+    open(mark, "w").close()
+    os._exit(0)
+signal.signal(signal.SIGTERM, term)
+http.server.HTTPServer(("127.0.0.1", port), H).serve_forever()
+PYEOF
+wait
+FAKEEOF
+chmod 755 "$PREFIX/bin/omniroute"
+cat > "$PREFIX/shim/ps" <<'PSEOF'
+#!/bin/sh
+# fixture ps: logs every call to $FAKE_PS_LOG; FAKE_PS_MODE decides the `-o pgid= -p <pid>` calls: fail-first (the first fails: exit 1, no output), wrong-first (the first prints pgid 1 and exits 0),
+# fail-all (every one fails); every other call, and every call in mode none, is the real ps ($FAKE_REAL_PS). Before it fails or lies the first time, it waits (up to 10 s) until the fixture's server has recorded its pid,
+# so that the smoke's early exit always faces a group of two processes, the leader and its server child
+case "$*" in
+  "-o pgid= -p "*)
+    n=$(( $(cat "$FAKE_PS_LOG.count" 2>/dev/null || echo 0) + 1 )); echo "$n" > "$FAKE_PS_LOG.count"
+    if [ "$n" = 1 ] && [ "$FAKE_PS_MODE" != none ]; then i=0; while [ "$(grep -c . "$FAKE_PIDS" 2>/dev/null)" -lt 2 ] && [ $i -lt 40 ]; do sleep 0.25; i=$((i + 1)); done; fi
+    if [ "$FAKE_PS_MODE" = fail-all ] || { [ "$FAKE_PS_MODE" = fail-first ] && [ "$n" = 1 ]; }; then echo "ps $*: simulated failure, exit 1" >> "$FAKE_PS_LOG"; echo "ps: simulated failure" >&2; exit 1; fi
+    if [ "$FAKE_PS_MODE" = wrong-first ] && [ "$n" = 1 ]; then echo "ps $*: simulated wrong pgid 1, exit 0" >> "$FAKE_PS_LOG"; echo "    1"; exit 0; fi;;
+esac
+echo "ps $*: the real ps" >> "$FAKE_PS_LOG"
+exec "$FAKE_REAL_PS" "$@"
+PSEOF
+chmod 755 "$PREFIX/shim/ps"
+alive_fixture() { # pids file: the recorded pids still alive with this run's token in their command line, one per line
+  local p
+  for p in $(cat "$1"); do "$REAL_PS" -ww -o args= -p "$p" 2>/dev/null | grep -qF "$TOKEN" && echo "$p"; done
+}
+FAILED=0
+variant() { # name ps-mode fixture-status signal-to-send-while-polling(TERM, INT, HUP or none)
+  local name=$1 d=$W/$1 spid rc leader alive n marker req g p want
+  mkdir -p "$d"; : > "$d/pids"
+  ( export HOME="$H" FAKE_PIDS="$d/pids" FAKE_MARK="$d/term-marker" FAKE_STATUS="$3" FAKE_TOKEN="$TOKEN" FAKE_PS_MODE="$2" FAKE_PS_LOG="$d/ps-calls.log" FAKE_REAL_PS="$REAL_PS"
+    exec bash "$SMOKE" fixtureprefix ) > "$d/smoke-output.txt" 2>&1 &
+  spid=$!
+  if [ "$4" != none ]; then   # once the fixture server has recorded its pid, wait 1 s and send the signal to the smoke script (this control's own, unreaped child)
+    for _ in $(seq 1 40); do [ "$(grep -c . "$d/pids")" -ge 2 ] && break; sleep 0.25; done
+    sleep 1
+    kill -0 "$spid" 2>/dev/null && kill -"$4" "$spid" && echo "  $name: SIG$4 sent to the smoke script (pid $spid) while it polled the health endpoint"
+  fi
+  wait "$spid" 2>/dev/null; rc=$?   # (the redirection keeps this shell's own job notice of a signal death, which names this script's path, out of the output; the status is kept)
+  marker=no; [ -e "$d/term-marker" ] && marker=yes
+  sleep 0.5
+  leader=$(head -1 "$d/pids")
+  alive=$(alive_fixture "$d/pids" | paste -sd' ')
+  n=$(printf '%s' "$alive" | wc -w | tr -d ' ')
+  echo "  $name: smoke exit=$rc; the fixture's leader pid ${leader:-none} and server pid $(sed -n 2p "$d/pids"); the fixture server got SIGTERM before the smoke ended: $marker; fixture processes alive after the smoke: $n${alive:+ (pids $alive)}; pgrep -f token: $(pgrep -f "$TOKEN" | wc -l | tr -d ' ')"
+  echo "    the smoke's own lines:"
+  grep -E '^prefix=|^processes |not its own process group|early exit|refusing|ps: simulated' "$d/smoke-output.txt" | cut -c1-300 | mask | sed 's/^/      /'
+  echo "    the smoke's first ps calls, as the ps fixture logged them: $(head -3 "$d/ps-calls.log" 2>/dev/null | tr '\n' ';' | sed 's/;$//; s/;/ | /g' | cut -c1-300)"
+  case $name in
+    I1*|I2*) req="non-zero exit and no survivor"; { [ "$rc" -ne 0 ] && [ "$n" = 0 ]; } && ok=yes || ok=no;;
+    I3*) case $4 in TERM) want=143;; INT) want=130;; HUP) want=129;; *) want=none;; esac
+         req="exit $want and no survivor"; { [ "$rc" = "$want" ] && [ "$n" = 0 ]; } && ok=yes || ok=no;;
+    I4*) req="nothing signalled and the child's pid named"; { [ "$marker" = no ] && grep -qE "pid $leader[^0-9]" "$d/smoke-output.txt"; } && ok=yes || ok=no;;
+  esac
+  if [ "$ok" = yes ]; then echo "    -> as required ($req)"; else echo "    -> NOT AS REQUIRED ($req)"; FAILED=$((FAILED + 1)); fi
+  if [ "$n" != 0 ]; then
+    for p in $alive; do
+      g=$("$REAL_PS" -o pgid= -p "$p" 2>/dev/null | tr -d ' ')
+      if [ -n "$leader" ] && [ "$g" = "$leader" ]; then
+        echo "    the control stops the survivors: pid $p carries this run's token and its PGID $g is the recorded fixture leader, so the control signals process group $g"
+        kill -- "-$g" 2>/dev/null
+        break
+      fi
+    done
+    for _ in 1 2 3 4 5 6 7 8 9 10; do [ -z "$(alive_fixture "$d/pids")" ] && break; sleep 0.5; done
+    for p in $(alive_fixture "$d/pids"); do echo "    survivor pid $p still alive: the control sends it SIGKILL (pid only; it carries this run's token)"; kill -9 "$p" 2>/dev/null; done
+    sleep 0.5
+    echo "    after the control's cleanup: fixture processes alive: $(alive_fixture "$d/pids" | wc -l | tr -d ' ')"
+  fi
+  rm -rf "$H"/.cache/omniroute-smoke-*
+}
+echo "# smoke-initial-ps-control: run $(date -u +%Y-%m-%dT%H:%M:%SZ); smoke script under test: $(basename "$SMOKE") git blob $(git hash-object "$SMOKE") sha256 $(sha256sum "$SMOKE" | cut -d' ' -f1)"
+variant "I1-first-observation-fails" fail-first ok none
+variant "I2-first-observation-wrong-pgid" wrong-first ok none
+variant "I3-sigterm-while-polling" none starting TERM
+variant "I3b-sigint-while-polling" none starting INT
+variant "I3c-sighup-while-polling" none starting HUP
+variant "I4-observation-never-available" fail-all ok none
+echo "fixture processes left running after all variants: $(pgrep -f "$TOKEN" | wc -l | tr -d ' ')"
+echo "variants not as required: $FAILED"
+echo "scratch directory (remove with rm -rf after reading): $(echo "$W" | mask)"
+[ "$FAILED" = 0 ]

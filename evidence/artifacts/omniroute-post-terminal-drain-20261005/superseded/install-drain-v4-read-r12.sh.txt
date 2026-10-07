@@ -10,8 +10,7 @@
 # 1. The build output (what scripts/build-drain.sh.txt packs: omniroute-3.8.51.tgz, the same base name as the first composition tarball) is COPIED to a distinct name,
 #    omniroute-3.8.51-drain-b7c68690.tgz, in the artifact directory, and SHA256SUMS there is updated (the committed copy step).
 # 2. The copy must equal the pinned sha256, the pinned npm integrity (sha512) and the pinned entry count, checked with `sha256sum -c` and recomputed values.
-# 3. `npm install -g --prefix` of the copy (exit status checked), then the lsof shim is copied from SHIM_SOURCE (exit status checked): by default the repository's committed copy
-#    $REPO_DIR/evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt (REPO_DIR defaults to ~/code/native-agent-stack), whose sha256 was checked against the pinned value before `npm install`; set SHIM_SOURCE to use another file with that hash.
+# 3. `npm install -g --prefix` of the copy (exit status checked), then the lsof shim is copied from the live prefix (exit status checked).
 # 4. The installed prefix must have dist/BUILD_SHA 2a41147b7, the pinned shim sha256, and the drain's marker in its compiled server chunks (a controlled `.clearPendingRequest?.()` call after
 #    abort() in the grace timer): present in this build, absent in the earlier 3.8.51 builds. The same checks run alone against any installed prefix with --verify-prefix NAME (the controls).
 # 5. A hash of the installed dependency graph (sorted name@version of `npm ls -g --all --json`) is printed: the tarball bundles its server build, but npm resolves the runtime dependencies at install time,

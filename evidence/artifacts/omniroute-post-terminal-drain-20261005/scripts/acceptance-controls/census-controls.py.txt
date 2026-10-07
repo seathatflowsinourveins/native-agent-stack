@@ -7,9 +7,11 @@ Each scenario prints `CONTROL-RESULT <id> expected_exit=N observed_exit=M OK|UNE
   exact match (P1, P2), unique 2x2 (P3), replacement case (R1 distinguishable, R2 identical with a foreign call row, R3 identical with the foreign call row also dropped: the RESIDUAL, expected PASS), one row short (I1), one foreign call row (I2), the gateway's own provider-test rows (I3),
   two candidates (I4), complete 2x2 (I5), an orphan (I6), an unreadable store (U1-U4), and the guard, input, clock, tiling and format controls; X1-X3 check predicate parity with the frozen scripts (by AST, never by importing them: they run their main at import) and the matching functions
   against a brute force and scipy.
-Added after the full-scope reads r10 and r11 of #757: Y11-Y13b (the reviewers' reproductions and the exact boundary check), D1-D8 and K3 (the canary gate's contract and the frozen request counts), G11-G12b (the guard receipt), W1-W3b (the declared interval in real time), P5, R3b, S1 (one read snapshot) and J1-J20 (the gateway's journal as the independent record of every inbound request: every world carries a journal fixture served by a `journalctl` shim first on the census's PATH; J12a-J20 and J13j reproduce the second independent review of the journal check: the counted range from 4 s before the window, every journal form that cannot be read, the pairing by path and its documented chain width, the leftovers of a maximum matching, an overflowing duration, the exact command in the receipt, journalctl's stderr and the escaping of labels).
+Added after the full-scope reads r10 and r11 of #757: Y11-Y13b (the reviewers' reproductions and the exact boundary check), D1-D8 and K3 (the canary gate's contract and the frozen request counts), G11-G12b (the guard receipt), W1-W3b (the declared interval in real time), P5, R3b, S1 (one read snapshot) and J1-J21 (the gateway's journal as the independent record of every inbound request: every world carries a journal fixture served by a `journalctl` shim first on the census's PATH; J12a-J20 and J13j reproduce the second independent review of the journal check: the counted range from 4 s before the window, every journal form that cannot be read, the pairing by path and its documented chain width, the leftovers of a maximum matching, an overflowing duration, the exact command in the receipt, journalctl's stderr and the escaping of labels; J21a-J21b: the receipt states the residual verbatim as an untested boundary and its evidence classes, as the command center ruled).
 Exit status 0 when every scenario behaved as expected."""
 import argparse
+import math
+import shutil
 import ast
 import datetime as dt
 import hashlib
@@ -25,7 +27,9 @@ import sys
 import time
 from pathlib import Path
 
-GUARD_SHA = "62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b"   # pre-switch guard 5, pinned by the census
+CGROUP = "/user.slice/user-1000.slice/user@1000.service/app.slice/omniroute.service"   # the unit's cgroup as the journal entries and the fake /proc show it
+GUARD_SHA = "5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b"   # pre-switch guard 5 as repaired in round 13, pinned by the census
+GUARD_SHA_BEFORE_R12 = "62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b"   # guard 5 as read by r12: accepted for a trial
 RAW_SHA = "52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75"
 NATIVE_SHA = "db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd"
 FAILED = []
@@ -168,6 +172,10 @@ def materialize(spec, work):
         put_call(c, corr=corr_id("foreign-" + str(c["ts"])), rid=None)
     for c in spec["odd_calls"]:
         put_call(c)
+    for w in spec.get("ws_turns", ()):   # ROUND-20: a Responses-over-WebSocket turn as the gateway's proxy writes it (src/app/api/internal/codex-responses-ws/history.ts): method WEBSOCKET, request_type responses_websocket, stamped at the turn's START, its length as the duration; no journal line
+        n[0] += 1
+        con.execute("insert into call_logs (id, timestamp, path, status, model, requested_model, provider, connection_id, api_key_id, duration, tokens_in, tokens_out, method, request_type) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (f"ws-{spec['name']}-{n[0]}", w["start"] if isinstance(w["start"], str) else utc(w["start"]), "/v1/responses", 200, "gpt-6-astra", "codex/gpt-6-astra", "codex", "conn-a", "key-1", w["duration"], 10, 5, w.get("method", "WEBSOCKET"), w.get("request_type", "responses_websocket")))
     for u in spec["foreign_usage"]:
         put_usage(u)
     con.commit()
@@ -175,8 +183,12 @@ def materialize(spec, work):
     # ROUND-15: the gateway journal fixture: one inbound-request line per own and per foreign inference call row (the gateway logs it when the request ARRIVES, about `duration` before its row is written), plus noise
     journal = []
 
-    def post_line(ts, label="/v1/responses | cx/gpt-6-astra | 14 msgs | effort=max"):
-        journal.append(json.dumps({"__REALTIME_TIMESTAMP": str(int(ts.timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "time": utc(ts), "service": "omniroute", "module": "sse", "tag": "HTTP", "method": "POST", "path": label, "msg": "\U0001F4E5 POST " + label})}))
+    def post_line(ts, label="/v1/responses | cx/gpt-6-astra | 14 msgs | effort=max", pid=None):
+        journal.append(json.dumps({"__REALTIME_TIMESTAMP": str(int((ts + dt.timedelta(seconds=spec.get("journal_lag", 0.0))).timestamp() * 1e6)), "_PID": str(pid or spec.get("journal_pid", 1326)), "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": json.dumps({"level": 30, "time": utc(ts), "service": "omniroute", "module": "sse", "tag": "HTTP", "method": "POST", "path": label, "msg": "\U0001F4E5 POST " + label})}))
+
+    def stream_line(ts, ms, provider="CODEX", model="gpt-6-astra", status="complete", pid=None):
+        """ROUND-19: the console line of the stream controller when a stream ends (open-sse/utils/streamHandler.ts logStream), as journald stores it (a plain-text MESSAGE with a local time of day in front)."""
+        journal.append(json.dumps({"__REALTIME_TIMESTAMP": str(int((ts + dt.timedelta(seconds=spec.get("stream_lag", 0.0))).timestamp() * 1e6)), "_PID": str(pid or spec.get("journal_pid", 1326)), "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": f"[{ts.strftime('%H:%M:%S')}] \U0001F30A [STREAM] {provider} | {model} | {int(ms)}ms | {status}"}))
 
     for a_index, arm in enumerate(spec["arms"]):
         for r_index, r in enumerate(arm["requests"]):
@@ -188,19 +200,39 @@ def materialize(spec, work):
                 except (TypeError, ValueError, OverflowError):
                     arrival = arm["script_start"]   # a duration that is not a number or not representable (controls about exactly that): the arrival is taken at the arm's start
                 post_line(max(arrival, arm["script_start"]), f"{c['path']} | cx/{c['model']} | 14 msgs")
+    for a_index, arm in enumerate(spec["arms"]):   # ROUND-19: the stream-end line of every own call row: printed when the stream ends (or its client leaves), about the row's timestamp, `ms` about its duration; a drain tail (a client that left after the terminal event) writes the row that much later
+        for r_index, r in enumerate(arm["requests"]):
+            for c_index, c in enumerate(r["calls"]):
+                if isinstance(c["ts"], (str, bytes)) or (a_index, r_index, c_index) in spec.get("stream_drop", ()):
+                    continue
+                try:
+                    tail = float(spec.get("stream_tail", {}).get((a_index, r_index, c_index), 0.0))
+                    ms = float(c["duration"]) - tail * 1000.0 - 5.0
+                except (TypeError, ValueError, OverflowError):
+                    continue   # a duration that is not a number: no line (the controls about exactly that)
+                if not math.isfinite(ms) or ms > 1e11:
+                    continue
+                stream_line(c["ts"] - dt.timedelta(seconds=tail, milliseconds=1), max(0.0, ms), str(c["provider"]).upper(), c["model"], status=spec.get("stream_status", "complete"))
     for c in spec["foreign_calls"]:
         if not isinstance(c["ts"], (str, bytes)) and not str(c["path"]).startswith("/api/"):   # the gateway's own provider-test calls are not inbound requests
             post_line(c["ts"] - dt.timedelta(milliseconds=c["duration"] if isinstance(c["duration"], (int, float)) else 0), f"{c['path']} | cx/{c['model']} | 14 msgs")
+            if isinstance(c["duration"], (int, float)) and not spec.get("foreign_stream_none"):
+                stream_line(c["ts"] - dt.timedelta(milliseconds=1), max(0.0, c["duration"] - 5.0), str(c["provider"]).upper(), c["model"])
     for item in spec.get("journal_extra", ()):   # ROUND-17: a datetime, or (datetime, path)
         if isinstance(item, tuple):
             post_line(item[0], f"{item[1]} | cx/gpt-6-astra | 14 msgs")
         else:
             post_line(item)
+    for item in spec.get("stream_extra", ()):   # ROUND-19: (end time, ms[, provider, model, status, pid]): a foreign request's stream-end line
+        stream_line(*item)
+    for item in spec.get("journal_pid_lines", ()):   # ROUND-19: (kind, time, pid): an arrival line or a stream-end line written by another process (a restarted child)
+        kind, when, other = item
+        post_line(when, "/v1/responses | cx/gpt-6-astra | 14 msgs", pid=other) if kind == "post" else stream_line(when, 1000, pid=other)
     base = plus(-5)
-    journal += [json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": "[ProxyEgress] codex status=success"}),
-                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "time": utc(base), "tag": "AUTH", "msg": "Using codex account: ***..."})}),
-                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "time": utc(base), "tag": "HTTP", "method": "GET", "msg": "\U0001F4E5 GET /v1/models"})}),
-                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "MESSAGE": [27, 91, 51, 50, 109, 91, 85, 83, 65, 71, 69, 93, 27, 91, 48, 109]})]
+    journal += [json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": "[ProxyEgress] codex status=success"}),
+                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": json.dumps({"level": 30, "time": utc(base), "tag": "AUTH", "msg": "Using codex account: ***..."})}),
+                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": json.dumps({"level": 30, "time": utc(base), "tag": "HTTP", "method": "GET", "msg": "\U0001F4E5 GET /v1/models"})}),
+                json.dumps({"__REALTIME_TIMESTAMP": str(int(base.timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": [27, 91, 51, 50, 109, 91, 85, 83, 65, 71, 69, 93, 27, 91, 48, 109]})]
     journal += list(spec.get("journal_noise", ()))
     (Path(work) / f"{spec['name']}-journal.jsonl").write_text("\n".join(journal) + "\n")
     if spec.get("journal_raw"):   # raw bytes after the text lines (a journal line that is not valid UTF-8)
@@ -208,6 +240,9 @@ def materialize(spec, work):
             handle.write(spec["journal_raw"])
     (Path(work) / f"{spec['name']}-journal.rc").write_text(str(spec.get("journal_rc", 0)))
     (Path(work) / f"{spec['name']}-journal.err").write_text(spec.get("journal_stderr", ""))
+    (Path(work) / f"{spec['name']}-world.json").write_text(json.dumps({"guard_start": utc(spec["guard"]["start"]), "db": str(db), "listeners": spec.get("listeners", [1326]), "ss_text": spec.get("ss_text"), "ss_rc": spec.get("ss_rc", 0), "proc_pids": spec.get("proc_pids", spec.get("listeners", [1326])),
+                                                                          "listener_start_offset": spec.get("listener_start_offset", -3600.0), "start_offsets": {str(k): v for k, v in spec.get("start_offsets", {}).items()}, "cgroups": {str(k): v for k, v in spec.get("proc_cgroups", {}).items()}, "holders": spec.get("holders", [1326]),
+                                                                          "grace_env": spec.get("grace_env"), "proc_broken": spec.get("proc_broken", []), "unit_props": spec.get("unit_props", {}), "systemctl_rc": spec.get("systemctl_rc", 0), "journald_conf": spec.get("journald_conf", ""), "analyze_rc": spec.get("analyze_rc", 0)}))
     argv_log = Path(work) / f"{spec['name']}-journal.argv"
     if argv_log.exists():
         argv_log.unlink()
@@ -229,8 +264,57 @@ def journal_env(guard):
     (shim / "journalctl").chmod(0o755)
     fixture = Path(str(guard).replace("-guard.txt", "-journal.jsonl"))
     rc_file = Path(str(guard).replace("-guard.txt", "-journal.rc"))
+    world_file = Path(str(guard).replace("-guard.txt", "-world.json"))
+    try:
+        world = json.loads(world_file.read_text()) if world_file.exists() else {}
+    except (ValueError, OSError):   # a harness that renamed or truncated the world's files (the corpus of review 1 does): no fixture, the census then fails closed
+        world = {}
+    name = Path(guard).name.replace("-guard.txt", "")
+    (shim / "ss").write_text('#!/bin/sh\n[ -n "$SS_ARGV_LOG" ] && printf \'%s\\n\' "$*" >> "$SS_ARGV_LOG"\n[ -n "$SS_FIXTURE" ] && [ -f "$SS_FIXTURE" ] && cat "$SS_FIXTURE"\nexit "${SS_RC:-0}"\n')
+    (shim / "systemctl").write_text('#!/bin/sh\ncase "$1 $2" in "--user show") [ -f "$SYSTEMCTL_SHOW" ] && cat "$SYSTEMCTL_SHOW"; exit "${SYSTEMCTL_RC:-0}";; esac\nexit 1\n')
+    (shim / "systemd-analyze").write_text('#!/bin/sh\n[ -f "$ANALYZE_OUT" ] && cat "$ANALYZE_OUT"\nexit "${ANALYZE_RC:-0}"\n')
+    for tool in ("ss", "systemctl", "systemd-analyze"):
+        (shim / tool).chmod(0o755)
+    listeners = world.get("listeners", [1326])
+    ss_file = Path(ARGS.work) / f"{name}-ss.out"
+    ss_file.write_text(world["ss_text"] if world.get("ss_text") is not None else "".join(f'LISTEN 0      511    127.0.0.1:20128 0.0.0.0:* users:(("omniroute (v16.",pid={pid},fd=21))\n' for pid in listeners))
+    props = {"StandardOutput": "journal", "StandardError": "inherit", "LogRateLimitIntervalUSec": "0", "LogRateLimitBurst": "0"}
+    props.update(world.get("unit_props", {}))
+    show_file = Path(ARGS.work) / f"{name}-systemctl.out"
+    show_file.write_text("".join(f"{k}={v}\n" for k, v in props.items()))
+    analyze_file = Path(ARGS.work) / f"{name}-analyze.out"
+    analyze_file.write_text("# /etc/systemd/journald.conf\n[Journal]\nForwardToSyslog=yes\n" + world.get("journald_conf", ""))
+    root = build_proc_root(name, world) if world else Path("/nonexistent-proc-root")
     return dict(os.environ, PATH=f"{shim}:{os.environ['PATH']}", JOURNAL_FIXTURE=str(fixture), JOURNAL_RC=rc_file.read_text().strip() if rc_file.exists() else "0",
-                JOURNAL_STDERR_FILE=str(Path(str(guard).replace("-guard.txt", "-journal.err"))), JOURNAL_ARGV_LOG=str(Path(str(guard).replace("-guard.txt", "-journal.argv"))))
+                JOURNAL_STDERR_FILE=str(Path(str(guard).replace("-guard.txt", "-journal.err"))), JOURNAL_ARGV_LOG=str(Path(str(guard).replace("-guard.txt", "-journal.argv"))),
+                CENSUS_PROC_ROOT=str(root), SS_FIXTURE=str(ss_file), SS_RC=str(world.get("ss_rc", 0)), SS_ARGV_LOG=str(Path(ARGS.work) / f"{name}-ss.argv"), SYSTEMCTL_SHOW=str(show_file), SYSTEMCTL_RC=str(world.get("systemctl_rc", 0)), ANALYZE_OUT=str(analyze_file), ANALYZE_RC=str(world.get("analyze_rc", 0)))
+
+
+def build_proc_root(name, world):
+    """ROUND-19: a fake /proc for one world, written at run time (the census reads the host clock): /proc/uptime, the stat (field 22: starttime in clock ticks since boot), cgroup and environ of each listener, and a file descriptor onto the store for each holder. The listeners started `listener_start_offset` seconds
+    after the guard receipt began (negative: before), or at their own `start_offsets`."""
+    root = Path(ARGS.work) / f"{name}-proc"
+    shutil.rmtree(root, ignore_errors=True)
+    root.mkdir(parents=True)
+    now = dt.datetime.now(dt.timezone.utc)
+    guard_start = at(world["guard_start"])
+    starts = {pid: guard_start + dt.timedelta(seconds=world.get("start_offsets", {}).get(str(pid), world.get("listener_start_offset", -3600.0))) for pid in world.get("proc_pids", [1326])}
+    uptime = max([(now - s).total_seconds() for s in starts.values()] + [0.0]) + 1000.0
+    (root / "uptime").write_text(f"{uptime:.2f} 0.00\n")
+    for pid, started in starts.items():
+        d = root / str(pid)
+        d.mkdir(exist_ok=True)
+        ticks = int((uptime - (now - started).total_seconds()) * os.sysconf("SC_CLK_TCK"))
+        if "stat" not in world.get("proc_broken", []):
+            (d / "stat").write_text(f"{pid} (omniroute (v16.) S 341 {pid} {pid} 0 -1 4194560 0 0 0 0 0 0 0 0 20 0 20 0 {ticks} 0 0\n")
+        (d / "cgroup").write_text(f"0::{world.get('cgroups', {}).get(str(pid), CGROUP)}\n")
+        env = "PORT=20128\0NODE_ENV=production\0" + (f"STREAM_DISCONNECT_GRACE_PERIOD_MS={world['grace_env']}\0" if world.get("grace_env") is not None else "")
+        (d / "environ").write_bytes(env.encode())
+    for pid in world.get("holders", [1326]):
+        d = root / str(pid) / "fd"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "3").symlink_to(world["db"])
+    return root
 
 
 def run_census(db, files, guard, diagnostic=False, no_guard_arg=False, extra=None):
@@ -295,14 +379,18 @@ def add_foreign(spec, ts=120.0, tin=40, tout=7, dur=800, path="/v1/responses", w
 
 
 def main():
-    global ARGS
+    global ARGS, GUARD_SHA
     ap = argparse.ArgumentParser()
     ap.add_argument("--work", required=True)
     ap.add_argument("--schema", required=True)
     ap.add_argument("--census", required=True)
     ap.add_argument("--raw-script", required=True)
     ap.add_argument("--native-script", required=True)
+    ap.add_argument("--guard-sha", default=None, help="the sha256 that the fixtures guard receipts carry (default: the repaired guard 5); a negative control against a census from before the guard repair passes the sha256 that THAT census pins, so that the guard pin does not decide its answers")
     ARGS = ap.parse_args()
+    if ARGS.guard_sha:
+        assert re.fullmatch(r"[0-9a-f]{64}", ARGS.guard_sha), ARGS.guard_sha
+        GUARD_SHA = ARGS.guard_sha
     Path(ARGS.work).mkdir(parents=True, exist_ok=True)
     census_bytes = Path(ARGS.census).read_bytes()
     try:
@@ -314,6 +402,7 @@ def main():
     print(f"# Offline controls of the window census gate, version 1 (new, not frozen); python {sys.version.split()[0]}; {scipy_line}")
     print(f"# census: sha256 {hashlib.sha256(census_bytes).hexdigest()}")
     print(f"# this controls script: sha256 {hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}")
+    print(f"# the fixtures guard receipts carry the guard script sha256 {GUARD_SHA}")
     print(f"# raw script 2.2 (frozen, parsed never imported): sha256 {hashlib.sha256(Path(ARGS.raw_script).read_bytes()).hexdigest()}; native script 2.1: sha256 {hashlib.sha256(Path(ARGS.native_script).read_bytes()).hexdigest()}")
     print(f"# started {dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}\n", flush=True)
 
@@ -624,7 +713,7 @@ def main():
         for r in spec["arms"][0]["requests"][:1]:
             r["calls"][0]["path"] = None
             r["usage"][0]["endpoint"] = None
-    scenario("Y7a", "an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt", mutate=null_columns, want=2, must=["CENSUS-RESULT INCONCLUSIVE", "do not pair one to one by time and path"])
+    scenario("Y7a", "an own call row with a NULL path whose usage row has a NULL endpoint (they associate in the store): no crash; the journal pairing cannot pair a NULL path, so INCONCLUSIVE with the receipt", mutate=null_columns, want=2, must=["CENSUS-RESULT INCONCLUSIVE", "do not pair one to one by estimated start and path"])
 
     def null_foreign(spec):
         f = call(plus(120.0), 33, 3, 100, None, model=None)
@@ -885,21 +974,21 @@ def main():
         residual(spec)
         c = spec["arms"][0]["requests"][1]["calls"][0]
         spec["journal_extra"] = [c["ts"] - dt.timedelta(milliseconds=400)]   # the foreign request's arrival, which a real gateway logs whatever happens to its rows
-    scenario("J1", "the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution", mutate=j1, want=2, must=["the gateway's journal shows 7 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 6 own call row(s)"])
-    scenario("J2", "a foreign request that left NO row at all (a journal line only): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_extra", [plus(120.0)]), want=2, must=["inbound POST request(s) in the window (counted from 4 s before its start) and the store holds"])
-    scenario("J3", "an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed", mutate=lambda s: s.__setitem__("journal_drop", {(0, 1, 0)}), want=2, must=["the gateway's journal shows 5 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 6"])
+    scenario("J1", "the residual R3 world, but the foreign request's arrival is in the journal (as it is on a real gateway): INCONCLUSIVE: the independent record closes the substitution", mutate=j1, want=2, must=["the gateway's journal shows 7 inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds 6 own call row(s)"])
+    scenario("J2", "a foreign request that left NO row at all (a journal line only): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_extra", [plus(120.0)]), want=2, must=["inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds"])
+    scenario("J3", "an own request's inbound line is missing from the journal (a lost line or logging off): INCONCLUSIVE, fail closed", mutate=lambda s: s.__setitem__("journal_drop", {(0, 1, 0)}), want=2, must=["the gateway's journal shows 5 inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds 6"])
     scenario("J4", "journalctl fails (exit 1): INCONCLUSIVE, the independent record is missing", mutate=lambda s: s.__setitem__("journal_rc", 1), want=2, must=["the gateway journal cannot be read (journalctl exited with status 1)", "readable=False"])
     scenario("J5", "inbound lines 30 s before the window and 3 minutes after it are not the window's: PASS", mutate=lambda s: s.__setitem__("journal_extra", [plus(-30.0), plus(520.0)]), want=0, must=["CENSUS-RESULT PASS", "inbound_POST_lines_in_window=6"])
     scenario("J6", "noise in the journal (plain-text lines, a GET line, another tag, a message that is a byte array with control characters) is ignored: PASS", want=0, must=["CENSUS-RESULT PASS", "inbound_POST_lines_in_window=6"])
     scenario("J7", "a journal line that is not JSON (truncated output): INCONCLUSIVE, fail closed", mutate=lambda s: s.__setitem__("journal_noise", ["{not json"]), want=2, must=["journal entry(ies) could not be read"])
-    scenario("J8", "an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_extra", [max(a["wrapper_end"] for a in s["arms"]) + dt.timedelta(seconds=3.0)]), want=2, must=["inbound POST request(s) in the window"])
+    scenario("J8", "an inbound line 3 s after the last arm's end (inside the 5 s settle): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_extra", [max(a["wrapper_end"] for a in s["arms"]) + dt.timedelta(seconds=3.0)]), want=2, must=["inbound POST request(s) in the counted range"])
 
     def j9(spec):
         # a lost own line (arm 0, request 1) balanced by a foreign request's line elsewhere: the COUNT is exact, the PAIRING is not
         spec["journal_drop"] = {(0, 1, 0)}
         spec["journal_extra"] = [plus(120.0)]
-    scenario("J9", "a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time", mutate=j9, want=2, mustnot=["inbound POST request(s) in the window (counted from 4 s before its start) and the store holds"],
-             must=["do not pair one to one by time and path: 1 own call row(s) have no inbound line of their path", "1 inbound line(s) have no own call row"])
+    scenario("J9", "a lost own inbound line balanced by a foreign request's line elsewhere (the count matches): INCONCLUSIVE through the pairing by time", mutate=j9, want=2, mustnot=["inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds"],
+             must=["do not pair one to one by estimated start and path: 1 own call row(s) have no inbound line of their path", "1 inbound line(s) have no own call row"])
 
     def j10(spec):
         # the documented width of the pairing: the foreign line arrives within 3 s of the missing own line
@@ -912,7 +1001,7 @@ def main():
         c = spec["arms"][0]["requests"][1]["calls"][0]
         spec["journal_extra"] = [max(c["ts"] - dt.timedelta(milliseconds=c["duration"]), spec["arms"][0]["script_start"])]   # the same request's arrival line written twice
     scenario("J11", "an own request's arrival line written TWICE (arrival-line uniqueness: the 43 requests of the baseline arms left 43 lines, so a duplicate would be unexplained): INCONCLUSIVE, the second line has no own call row", mutate=j11, want=2,
-             must=["the gateway's journal shows 7 inbound POST request(s) in the window (counted from 4 s before its start) and the store holds 6", "1 inbound line(s) have no own call row"])
+             must=["the gateway's journal shows 7 inbound POST request(s) in the counted range (from 4 s before the window's start) and the store holds 6", "1 inbound line(s) have no own call row"])
 
     # ---- ROUND-16: the reproductions of the independent adversarial review of the census 385e891a (F1-F11)
     def sql_exec(db, statement, params=()):
@@ -1096,9 +1185,9 @@ def main():
             spec["journal_extra"] = [(plus(5.2 - arrival_before_w0), c["path"])]   # the foreign request's arrival line, this long before the window's start
         return m
     scenario("J12a", "review F-1 (P1): the R3 world in the canary's scope with the foreign request's arrival line 2.5 s BEFORE the window's start (the store side reads rows from 3 s before it): INCONCLUSIVE (it used to PASS with scope=canary)", mutate=f12(2.5), extra=NOREQ, want=2,
-             must=["inbound POST request(s) in the window (counted from 4 s before its start)"])
-    scenario("J12b", "review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE", mutate=f12(1.1), extra=NOREQ, want=2, must=["counted from 4 s before its start"])
-    scenario("J12c", "the counted range's own boundary: the same line 4.5 s before the window's start is not counted (a foreign request that early cannot be the stand-in of a request that starts inside the window): the store side passes the residual", mutate=f12(4.5), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS"])
+             must=["inbound POST request(s) in the counted range (from 4 s before the window's start)"])
+    scenario("J12b", "review F-1: the same with the arrival line 1.1 s before the window's start: INCONCLUSIVE", mutate=f12(1.1), extra=NOREQ, want=2, must=["in the counted range (from 4 s before the window's start)"])
+    scenario("J12c", "r12-P1-1, the reviewer's own world (it used to be expected to PASS: its foreign line lay outside the counted arrival range): a foreign request that arrived 4.5 s before the window stands in for an own one whose clock started 2.9 s later: INCONCLUSIVE, through the clock-start agreement of the claimed usage row (row only: no journal line needed)", mutate=f12(4.5), extra=NOREQ, want=2, must=["from its call row's own start"], mustnot=["CENSUS-RESULT PASS"])
 
     def jline(message, stamp=None):
         return json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(60.0).timestamp() * 1e6)) if stamp is None else stamp, "MESSAGE": message})
@@ -1106,18 +1195,18 @@ def main():
                              ("J13d", jline(7), "a numeric MESSAGE"), ("J13e", jline("{not json at all"), "a MESSAGE that starts with { and does not parse"), ("J13f", json.dumps({"__REALTIME_TIMESTAMP": "-5000000", "MESSAGE": "x"}), "a negative __REALTIME_TIMESTAMP"),
                              ("J13g", json.dumps({"__REALTIME_TIMESTAMP": True, "MESSAGE": "x"}), "a boolean __REALTIME_TIMESTAMP"), ("J13h", jline("an arrival marker \U0001F4E5 POST /v1/responses inside a message that is not a pino line"), "an arrival marker that is not counted")):
         scenario(sid, f"review F-2: {what} in the journal (a foreign request's arrival line may look like this): INCONCLUSIVE, fail closed (a null used to be skipped silently: PASS)", mutate=lambda s, noise=noise: s.__setitem__("journal_noise", [noise]), want=2, must=["journal entry(ies) could not be read"])
-    scenario("J13i", "review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)", mutate=lambda s: s.__setitem__("journal_extra", [(plus(120.0), "/v1/responses | " + "x" * 5000)]), want=2, must=["inbound POST request(s) in the window"])
+    scenario("J13i", "review F-2: a foreign arrival line whose label is over 4 KB, served as a string (as with --all): counted, so the window is INCONCLUSIVE (one line more than own rows)", mutate=lambda s: s.__setitem__("journal_extra", [(plus(120.0), "/v1/responses | " + "x" * 5000)]), want=2, must=["inbound POST request(s) in the counted range"])
 
     def raw_utf8_line(spec):
-        inner = json.dumps({"level": 30, "tag": "HTTP", "method": "POST", "msg": "\U0001F4E5 POST /v1/responses | x@ | 1 msgs"})
+        inner = json.dumps({"level": 30, "time": utc(plus(60.0)), "tag": "HTTP", "method": "POST", "msg": "\U0001F4E5 POST /v1/responses | x@ | 1 msgs"})
         outer = json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(60.0).timestamp() * 1e6)), "MESSAGE": inner})
         spec["journal_raw"] = outer.encode("utf-8").replace(b"x@", b"x\xff") + b"\n"
     scenario("J13j", "review F-8: a foreign arrival line with a byte that is not valid UTF-8 (0xFF) on journalctl's stdout: decoded with replacement and counted, so the window is INCONCLUSIVE with the whole receipt measured (it used to end with `the measurement failed (UnicodeDecodeError)` and no journal block)", mutate=raw_utf8_line, want=2,
-             must=["inbound POST request(s) in the window", "JOURNAL-PAIRING"], mustnot=["the measurement failed"])
+             must=["inbound POST request(s) in the counted range", "JOURNAL-PAIRING"], mustnot=["the measurement failed"])
 
     scenario("J14", "review F-9: the receipt prints the exact journalctl command, the binary and its version, and the census asks for `--user -u omniroute.service -o json --all` with an explicit UTC suffix", want=0,
              must=["CENSUS-RESULT PASS", "JOURNAL-COMMAND argv=journalctl --user -u omniroute.service --since", "--all --no-pager", "version='systemd 255"])
-    argv_first = (Path(ARGS.work) / "j14-journal.argv").read_text().splitlines()[0] if (Path(ARGS.work) / "j14-journal.argv").exists() else ""
+    argv_first = next((line for line in (Path(ARGS.work) / "j14-journal.argv").read_text().splitlines() if "--user" in line), "") if (Path(ARGS.work) / "j14-journal.argv").exists() else ""
     ok14 = all(x in argv_first for x in ("--user", "-u omniroute.service", "-o json", "--all", "--since ", " UTC --until ", " UTC -o json"))
     print(f"CONTROL-RESULT J14b {'OK' if ok14 else 'UNEXPECTED'} :: the argument vector the shim saw holds --user, -u omniroute.service, -o json, --all and an explicit UTC suffix on --since and --until: {argv_first[:150]!r}\n")
     if not ok14:
@@ -1138,7 +1227,7 @@ def main():
         c = spec["arms"][0]["requests"][1]["calls"][0]   # the chat request
         spec["journal_drop"] = {(0, 1, 0)}
         spec["journal_extra"] = [(c["ts"] - dt.timedelta(milliseconds=c["duration"]) + dt.timedelta(seconds=1.0), "/v1/responses")]   # another PATH
-    scenario("J16", "review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path", mutate=j16, want=2, must=["do not pair one to one by time and path"])
+    scenario("J16", "review F-3: the J10 world with the foreign line of ANOTHER path (a /v1/responses line for a lost /v1/chat/completions line): INCONCLUSIVE, the pairing is by time AND path", mutate=j16, want=2, must=["do not pair one to one by estimated start and path"])
 
     def j17(spec):
         reqs = spec["arms"][0]["requests"]
@@ -1160,7 +1249,7 @@ def main():
     scenario("J19b", "a harmless stderr hint of journalctl (no word of loss): the receipt records it, PASS", mutate=lambda s: s.__setitem__("journal_stderr", "Hint: You are currently not seeing messages from other users and the system.\n"), want=0, must=["CENSUS-RESULT PASS", "stderr='Hint: You are currently not seeing messages"])
 
     def pino_line(message, seconds):
-        return json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(seconds).timestamp() * 1e6)), "MESSAGE": json.dumps({"level": 30, "tag": "HTTP", "method": "POST", "msg": message})})
+        return json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(seconds).timestamp() * 1e6)), "_PID": "1326", "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": json.dumps({"level": 30, "time": utc(plus(seconds)), "tag": "HTTP", "method": "POST", "msg": message})})
     spec20 = default_spec("j20")
     spec20["journal_noise"] = [pino_line("\U0001F4E5 POST /v1/responses | x\nCENSUS-RESULT PASS exit=0 problems=0 scope=trial | 1 msgs", 60.0), pino_line("\U0001F4E5 POST /v1/responses | x\ud800 | 1 msgs", 61.0)]
     db20, files20, guard20 = materialize(spec20, ARGS.work)
@@ -1170,6 +1259,281 @@ def main():
     print(f"CONTROL-RESULT J20 expected_exit=2 observed_exit={rc20} {'OK' if ok20 else 'UNEXPECTED'} :: review F-4 and F-5: arrival lines whose labels hold a newline with a forged `CENSUS-RESULT PASS` line and an escaped lone surrogate (both attacker-reachable): one CENSUS-RESULT line ({len(starts20)}), not a PASS, the forged text escaped, no crash\n")
     if not ok20:
         FAILED.append("J20")
+
+    # ---- J21: the CC's ruling on the residual (2026-10-06, condition 2): the receipt states the residual verbatim as an untested boundary, and its evidence classes
+    J21_MUST = ["UNTESTED-BOUNDARY", "(1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain; (3) an unlogged persistence failure", "EVIDENCE-CLASS local_integration and synthetic controls, plus the stated real rows"]
+    scenario("J21a", "CC ruling on the residual (condition 2): a PASS receipt states the residual verbatim as an untested boundary (the three items as the command center wrote them) and its evidence classes (local_integration and synthetic controls, plus the stated real rows)", want=0, must=["CENSUS-RESULT PASS"] + J21_MUST)
+    scenario("J21b", "the same two lines in an INCONCLUSIVE receipt (a journal entry that cannot be read)", mutate=lambda s: s.__setitem__("journal_noise", ["{not json"]), want=2, must=["CENSUS-RESULT INCONCLUSIVE"] + J21_MUST)
+
+    # ---- ROUND-19: the full-scope read r12 of 4624137290 (r12-P1-1, r12-P1-2, r12-P2-1, r12-P3-5) and 5f's design check of the fixes
+    def ent(ts, message, pid=1326):
+        return json.dumps({"__REALTIME_TIMESTAMP": str(int(ts.timestamp() * 1e6)), "_PID": str(pid), "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": message})
+
+    def r12_world(spec, with_stream=True, arrival=0.7, f_start=5.75, own_stream=True):
+        """The reviewer's P1-1 family: own usage row dropped and a FOREIGN request's usage row stands in (its call row never written), the foreign request's arrival line far before its duration clock (a pre-clock delay of f_start - arrival seconds),
+        its duration clock starting `f_start` s after the run's origin (the own request's estimated start is 5.6 s; the row's clock start must agree within 0.25 s, so this is a TWIN request): its stream-end line (when it streamed) lies at its usage row's timestamp."""
+        four_arms(spec)
+        spec["guard"]["start"], spec["guard"]["end"] = plus(-25.0), plus(5.2)
+        r0 = spec["arms"][0]["requests"][0]
+        c = r0["calls"][0]
+        c["ts"], c["duration"] = plus(6.6), 1000
+        r0["usage"] = []
+        f_end = plus(f_start + 1.001)
+        spec["foreign_usage"].append(usage_for(c, ts=f_end))
+        spec["journal_extra"] = [(plus(arrival), c["path"])]
+        if with_stream:
+            spec["stream_extra"] = [(f_end + dt.timedelta(milliseconds=4), 997, "CODEX", c["model"])]
+        if not own_stream:
+            spec["stream_drop"] = {(0, 0, 0)}
+
+    scenario("J22a", "r12-P1-1 (P1): the reviewer's leading-edge substitution with a nonzero arrival-to-clock delay: the foreign request ARRIVED 4.5 s before the run's origin (outside the counted arrival range: its line is not counted), started its duration clock 5 s later (0.15 s after the own request's) and streamed: two stream-end lines for one own call row: INCONCLUSIVE (it used to PASS with scope=canary)",
+             mutate=lambda s: r12_world(s, arrival=0.7), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row", "stream-end controller with no own call row"], mustnot=["CENSUS-RESULT PASS"])
+    for sid, arrival, what in (("J22b", -20.0, "arrived 25 s before"), ("J22c", -120.0, "arrived 2 minutes before"), ("J22d", 5.5, "arrived just before its clock (inside the counted arrival range as well)")):
+        scenario(sid, f"r12-P1-1: the same world, the foreign request {what} the run's origin (any arrival-to-clock delay): INCONCLUSIVE through its stream-end line", mutate=lambda s, arrival=arrival: r12_world(s, arrival=arrival), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"])
+    scenario("J22e", "THE RESIDUAL that stays (expected PASS, stated in the receipt's UNTESTED-BOUNDARY-DETAIL): the same world with a NON-STREAMING foreign request (no stream-end line): its arrival line does not bound it (the delay before its clock is unbounded), so it is covered by neither record",
+             mutate=lambda s: r12_world(s, with_stream=False), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "UNTESTED-BOUNDARY-DETAIL", "a non-streaming foreign request prints no stream-end line"])
+    scenario("J22f", "the completion residual in its narrowest form (expected PASS): the own request's stream-end line is lost AND the foreign request's line (same provider and model, implied start 0.1 s from the own's) takes its place: the pairing cannot tell them apart",
+             mutate=lambda s: r12_world(s, f_start=5.7, own_stream=False), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS"])
+
+    def edge_world(shift_s, drop_own=True):
+        def m(spec):
+            four_arms(spec)
+            c = spec["arms"][0]["requests"][0]["calls"][0]
+            if drop_own:
+                spec["stream_drop"] = {(0, 0, 0)}
+            spec["stream_extra"] = [(c["ts"] - dt.timedelta(milliseconds=1) + dt.timedelta(seconds=shift_s), c["duration"] - 5, str(c["provider"]).upper(), c["model"])]
+        return m
+    scenario("J22g", "the pairing's tolerance, inside: the own request's stream-end line implied start 0.24 s from its estimated start: PASS", mutate=edge_world(0.24), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J22h", "the pairing's tolerance, outside: 0.26 s: INCONCLUSIVE (the own call row has no stream-end line within 0.25 s and the line has no own call row)", mutate=edge_world(0.26), extra=NOREQ, want=2, must=["own call row(s) have no stream-end line", "stream-end controller(s) in the counted range have no own call row"])
+
+    def stream_world(**options):
+        def m(spec):
+            four_arms(spec)
+            spec.update(options)
+        return m
+    scenario("J22i", "an own call row without a stream-end line: INCONCLUSIVE", mutate=stream_world(stream_drop={(0, 1, 0)}), extra=NOREQ, want=2, must=["own call row(s) have no stream-end line of their provider and model"])
+
+    def other_model(spec):
+        four_arms(spec)
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        spec["stream_drop"] = {(0, 1, 0)}
+        spec["stream_extra"] = [(c["ts"] - dt.timedelta(milliseconds=1), c["duration"] - 5, "CODEX", "another-model")]
+    scenario("J22j", "the stream-end line of the right time but ANOTHER model: no pair (the pairing needs the same provider and model): INCONCLUSIVE", mutate=other_model, extra=NOREQ, want=2, must=["own call row(s) have no stream-end line of their provider and model"])
+
+    def echo_world(primary_lost):
+        def m(spec):
+            four_arms(spec)
+            c = spec["arms"][0]["requests"][1]["calls"][0]
+            spec["stream_extra"] = [(c["ts"] - dt.timedelta(milliseconds=1) + dt.timedelta(milliseconds=20), c["duration"] - 5 + 20, str(c["provider"]).upper(), c["model"], "client_disconnect (post-abort)")]
+            if primary_lost:
+                spec["stream_drop"] = {(0, 1, 0)}
+        return m
+    scenario("J22k", "5f hole 1: ONE request, TWO lines: its primary line and the `client_disconnect (post-abort)` echo that streamHandler.ts handleError prints after a disconnect or a completion: one controller, PASS", mutate=echo_world(False), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "post-abort echoes folded in: 1"])
+    scenario("J22l", "an echo line whose primary line is missing: the grouping is ambiguous: INCONCLUSIVE", mutate=echo_world(True), extra=NOREQ, want=2, must=["stream-end echo line(s)", "ambiguous"])
+
+    def twins(spec):
+        four_arms(spec)
+        c = spec["arms"][0]["requests"][1]["calls"][0]
+        spec["stream_extra"] = [(c["ts"] - dt.timedelta(milliseconds=1) + dt.timedelta(milliseconds=30), c["duration"] - 5, str(c["provider"]).upper(), c["model"])]
+    scenario("J22m", "5f hole 1: a second request of the same provider and model that started 30 ms after the own one (two primary lines within the grouping tolerance are TWO requests): one own call row, two controllers: INCONCLUSIVE", mutate=twins, extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"])
+
+    def foreign_line_at(offset_from_w0):
+        def m(spec):
+            four_arms(spec)
+            spec["stream_extra"] = [(plus(offset_from_w0), 800, "CODEX", "gpt-6-astra")]
+        return m
+    scenario("J22n", "5f hole 3: a foreign stream-end line 8 s before the window (inside the disconnect grace of 10 s: its rows could land in the window's pad): INCONCLUSIVE", mutate=foreign_line_at(-8.0), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"])
+    scenario("J22o", "the counted range's own edge: a foreign stream-end line 20 s before the window (further than the 3 s pad + the 10 s grace + 1 s): not counted (its rows were written long before the window): PASS", mutate=foreign_line_at(-20.0), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS"])
+
+    def grace_world(value, line_at):
+        def m(spec):
+            four_arms(spec)
+            spec["grace_env"] = value
+            spec["stream_extra"] = [(plus(line_at), 800, "CODEX", "gpt-6-astra")]
+        return m
+    scenario("J22p", "the disconnect grace is read from the serving process's environment (STREAM_DISCONNECT_GRACE_PERIOD_MS=30000): the same foreign line 20 s before the window is now inside the counted range: INCONCLUSIVE", mutate=grace_world("30000", -20.0), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row", "disconnect_grace_ms=30000 (the serving process's environment)"])
+    scenario("J22q", "STREAM_DISCONNECT_GRACE_PERIOD_MS that JavaScript's Number() turns into NaN ('ten'): the gateway logs `Invalid` and uses its default 10 s, and so does the census (review 4, P3-4); the foreign line 20 s before the window is outside the default range: PASS", mutate=grace_world("ten", -20.0), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "default (the gateway rejects STREAM_DISCONNECT_GRACE_PERIOD_MS='ten' and uses the default)"])
+    scenario("J22r", "STREAM_DISCONNECT_GRACE_PERIOD_MS longer than the 120000 ms the census covers: INCONCLUSIVE", mutate=grace_world("130000", -20.0), extra=NOREQ, want=2, must=["is longer than the 120000 ms the census covers"])
+
+    def drained(spec):
+        four_arms(spec)
+        tails = {(0, 0, 0): 6.0, (0, 1, 0): 9.5}
+        for (a, r, i), tail in tails.items():   # the row is written when the drain ends: the same start, a duration that includes the tail
+            request = spec["arms"][a]["requests"][r]
+            c = request["calls"][i]
+            c["ts"] += dt.timedelta(seconds=tail)
+            c["duration"] += tail * 1000.0
+            request["usage"] = [usage_for(c)]
+        spec["stream_tail"] = tails
+    scenario("J22s", "a client that left after the terminal event: the stream-end line is printed when it left and the rows follow 6 s and 9.5 s later (the drain, bounded by the disconnect grace): the pairing is by implied start, not by end time: PASS", mutate=drained, extra=NOREQ, want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J22t", "a stream-end marker line that does not parse (`\U0001F30A [STREAM] CODEX | gpt-6-astra | soon`): INCONCLUSIVE, fail closed", mutate=lambda s: s.__setitem__("journal_noise", [ent(plus(60.0), "[12:01:00] \U0001F30A [STREAM] CODEX | gpt-6-astra | soon")]), want=2, must=["journal entry(ies) could not be read"])
+    scenario("J22u", "the status text of a stream-end line is free text (error: ..., disconnect: ...): pairing does not depend on it, the receipt counts them: PASS", mutate=stream_world(stream_status="error: upstream reset | in the middle"), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "statuses={'error:'"])
+
+    # -- causality (the claimed usage row cannot have started before its own request's arrival line)
+    def early_usage(seconds):
+        def m(spec):
+            drop_usage(spec, 0, 1)
+            c = spec["arms"][0]["requests"][1]["calls"][0]
+            spec["foreign_usage"].append(usage_for(c, ts=c["ts"] - dt.timedelta(seconds=seconds)))
+        return m
+    scenario("J23a", "r12-P1-1, the leading edge without any foreign line: a foreign usage row whose duration clock started 2 s before the own call row's stands in for the own one (a usage row and a call row of one request have one clock): INCONCLUSIVE", mutate=early_usage(2.0), want=2, must=["from its call row's own start", "usage_rows_whose_clock_start_differs_from_their_call_row_by_more_than_0.25_s=1"])
+    scenario("J23b", "the clock-start tolerance (0.25 s, against 0.025 s measured on 594 associated pairs): a stand-in row that started 0.2 s from the call row's start: still the documented narrow residual (a twin request): PASS", mutate=early_usage(0.2), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J23c", "the same tolerance, outside: 0.3 s: INCONCLUSIVE", mutate=early_usage(0.3), want=2, must=["from its call row's own start"])
+    scenario("J23d", "the other direction: a stand-in row that started 2 s AFTER the call row's start (its timestamp 2 s after): INCONCLUSIVE", mutate=early_usage(-2.0), want=2, must=["from its call row's own start"])
+
+    # -- the serving process (r12-P1-2)
+    scenario("J24a", "r12-P1-2: the process that listens on the port started 5 s AFTER the guard receipt began (the child restarted under the supervisor while MainPID and its start stayed equal): INCONCLUSIVE", mutate=lambda s: s.__setitem__("listener_start_offset", 5.0), want=2, must=["started after the guard receipt began"])
+    scenario("J24b", "the margin: the listener started 1 s before the guard receipt (inside the 2 s margin): INCONCLUSIVE", mutate=lambda s: s.__setitem__("listener_start_offset", -1.0), want=2, must=["started after the guard receipt began"])
+    scenario("J24c", "the margin, outside: 3 s before: PASS", mutate=lambda s: s.__setitem__("listener_start_offset", -3.0), want=0, must=["CENSUS-RESULT PASS"])
+    for index, (name, line) in enumerate((("server exited", "⚠ Server exited (code=1)."), ("restarting", "Restarting in 2s... (2/5)"), ("crash budget", "⚠ Server crashed 5 times in <30s."), ("MITM retry", "⚠ Disabling MITM and retrying...\n"),
+                                          ("spawn error", "⚠ Spawn error: code=ENOENT syscall=spawn"), ("crash log", "--- Server crash log ---"), ("starting", "⏳ Starting server..."), ("next", "▲ Next.js 16.3.5"), ("ready", "✓ Ready in 0ms"),
+                                          ("database", "[DB] Driver: better-sqlite3 | file: x")), 1):
+        scenario(f"J24d{index}", f"5f Q2: a {name} line (bin/cli/runtime/processSupervisor.mjs, or the child's startup banner) in the journal range with MainPID unchanged: INCONCLUSIVE", mutate=lambda s, line=line: s.__setitem__("journal_noise", [ent(plus(60.0), line, pid=341)]), want=2, must=["supervisor restart diagnostic(s) or child startup banner(s) in the journal range"])
+    scenario("J24e", "the serving child was restarted inside the range: request lines of the range are written by another pid than the listener: INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_pid", 2222), want=2, must=["request lines of the range were written by pid(s) [2222] but the listener(s) are [1326]"])
+    scenario("J24f", "ss fails (exit 1): the serving process cannot be established: INCONCLUSIVE", mutate=lambda s: s.__setitem__("ss_rc", 1), want=2, must=["ss exited with status 1"])
+    scenario("J24g", "ss shows no listener on the port: INCONCLUSIVE", mutate=lambda s: s.__setitem__("ss_text", ""), want=2, must=["no listener on port 20128"])
+    scenario("J24h", "an ss record without a pid (another user's process): INCONCLUSIVE", mutate=lambda s: s.__setitem__("ss_text", "LISTEN 0      511    127.0.0.1:20128 0.0.0.0:*\n"), want=2, must=["a listener record without a pid"])
+    scenario("J24i", "output that is not a listener record: INCONCLUSIVE", mutate=lambda s: s.__setitem__("ss_text", "Netid State\n"), want=2, must=["an ss line that is not a listener record"])
+    scenario("J24j", "the supervisor's inherited listener: two pids on the port, both in the unit's cgroup, both older than the guard receipt, request lines from one of them: PASS", mutate=lambda s: s.update(listeners=[1326, 1327], proc_pids=[1326, 1327]), want=0, must=["CENSUS-RESULT PASS", "listener_pids=[1326, 1327]"])
+    scenario("J24k", "a listener outside the unit's cgroup (another service answers on the port): INCONCLUSIVE", mutate=lambda s: s.update(listeners=[1326, 1327], proc_pids=[1326, 1327], proc_cgroups={1327: "/user.slice/user-1000.slice/user@1000.service/app.slice/omniroute-fw.service"}), want=2, must=["are not in the unit's cgroup"])
+    scenario("J24l", "5f hole 5: another process holds the store open besides the serving process (a second writer whose request lines are in another journal): INCONCLUSIVE", mutate=lambda s: s.__setitem__("holders", [1326, 5555]), want=2, must=["hold the store open besides the serving process"])
+    scenario("J24m", "no process holds the store open (the serving process is not the writer of these rows): INCONCLUSIVE", mutate=lambda s: s.__setitem__("holders", []), want=2, must=["no listener holds the store open"])
+    scenario("J24n", "the listener's /proc stat cannot be read: INCONCLUSIVE, no crash", mutate=lambda s: s.__setitem__("proc_broken", ["stat"]), want=2, must=["cannot be read"])
+
+    # -- what journald keeps (5f hole 4)
+    def noisy(n, **options):
+        def m(spec):
+            spec["journal_noise"] = [ent(plus(60.0 + i * 0.01), f"[ModelSync] tick {i}") for i in range(n)]
+            spec.update(options)
+        return m
+    scenario("J25a", "5f hole 4: the unit logged 1,100 entries within 30 s (a tenth of journald's 10,000 per 30 s is 1,000): journald may have dropped lines and its notice is in the system journal: INCONCLUSIVE", mutate=noisy(1100), want=2, must=["a tenth or more of the journald rate limit"])
+    scenario("J25b", "the same with 900 entries: PASS", mutate=noisy(900), want=0, must=["CENSUS-RESULT PASS", "JOURNAL-LIMITS unit=omniroute.service StandardOutput=journal StandardError=inherit rate_limit=10000 messages per 30 s (the compiled-in default)"])
+    scenario("J25c", "the unit's own LogRateLimitBurst=100 per 30 s (it overrides journald.conf) against 20 entries: INCONCLUSIVE", mutate=noisy(20, unit_props={"LogRateLimitBurst": "100", "LogRateLimitIntervalUSec": "30s"}), want=2, must=["a tenth or more of the journald rate limit (100 per 30 s, the unit's LogRateLimit settings)"])
+    scenario("J25d", "journald.conf RateLimitBurst=500 (merged by systemd-analyze cat-config) against 60 entries: INCONCLUSIVE", mutate=noisy(60, journald_conf="RateLimitBurst=500\n"), want=2, must=["(500 per 30 s, journald.conf)"])
+    scenario("J25e", "rate limiting switched off (RateLimitIntervalSec=0): nothing is dropped for rate: PASS", mutate=noisy(3000, journald_conf="RateLimitIntervalSec=0\n"), want=0, must=["CENSUS-RESULT PASS", "rate_limit=off"])
+    scenario("J25f", "the unit's StandardOutput is not the journal: INCONCLUSIVE", mutate=lambda s: s.__setitem__("unit_props", {"StandardOutput": "null"}), want=2, must=["the unit's StandardOutput is 'null'"])
+    scenario("J25g", "systemctl fails: the unit's journal settings cannot be read: INCONCLUSIVE", mutate=lambda s: s.__setitem__("systemctl_rc", 1), want=2, must=["the unit's journal settings cannot be read"])
+    scenario("J25h", "systemd-analyze fails: INCONCLUSIVE", mutate=lambda s: s.__setitem__("analyze_rc", 1), want=2, must=["the unit's journal settings cannot be read"])
+
+    # -- the command is printed when the observation fails (r12-P3-5)
+    scenario("J26a", "r12-P3-5: journalctl exits 1: the receipt still prints the exact command, the binary, its version and the stderr (it used to omit them exactly when they matter)", mutate=lambda s: s.__setitem__("journal_rc", 1), want=2, must=["JOURNAL-COMMAND argv=journalctl --user -u omniroute.service --since", "version='systemd 255", "readable=False error=journalctl exited with status 1"])
+    scenario("J26b", "journalctl writes a word of loss on stderr: the receipt prints the command and that stderr", mutate=lambda s: s.__setitem__("journal_stderr", "File /var/log/journal/x/user-1000.journal is truncated, ignoring file.\n"), want=2, must=["JOURNAL-COMMAND argv=journalctl", "stderr='File /var/log/journal/x/user-1000.journal is truncated", "readable=False"])
+    scenario("J26c", "an entry that cannot be read: the command is printed with the entries read so far", mutate=lambda s: s.__setitem__("journal_noise", ["{not json"]), want=2, must=["JOURNAL-COMMAND argv=journalctl", "entries_read=", "readable=False"])
+
+    # -- r12-P2-1: the pairing's width in terms of ESTIMATED starts: a lost own arrival line whose physical arrival lay 2.6 s before its estimated start, balanced by a foreign line 2.9 s after the estimate (5.5 s from the physical arrival)
+    def displaced(with_foreign_stream):
+        def m(spec):
+            four_arms(spec)
+            c = spec["arms"][0]["requests"][1]["calls"][0]
+            est = c["ts"] - dt.timedelta(milliseconds=c["duration"])
+            spec["journal_drop"] = {(0, 1, 0)}
+            spec["journal_extra"] = [(est + dt.timedelta(seconds=2.9), c["path"])]
+            if with_foreign_stream:
+                spec["stream_extra"] = [(est + dt.timedelta(seconds=3.9), 1000, str(c["provider"]).upper(), c["model"])]
+        return m
+    scenario("J27a", "r12-P2-1: the displacement world of the reviewer, non-streaming foreign request (expected PASS, the residual): the lost own arrival line's request had arrived 2.6 s before its estimated start, the foreign line is 2.9 s after the estimate, 5.5 s from the physical arrival: the width is measured from estimated starts and is not a bound on physical arrivals",
+             mutate=displaced(False), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "ESTIMATED START", "so its physical arrival may be earlier by a delay that nothing bounds"])
+    scenario("J27b", "the same world with the foreign request's STREAM-END line (it streamed): the completion record has a leftover controller: INCONCLUSIVE", mutate=displaced(True), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"])
+    scenario("J27c", "the pairing's edge: the foreign line 3.01 s after the estimate does not pair: INCONCLUSIVE (the arrival count)", mutate=lambda s: (displaced(False)(s), s.__setitem__("journal_extra", [(s["arms"][0]["requests"][1]["calls"][0]["ts"] - dt.timedelta(milliseconds=s["arms"][0]["requests"][1]["calls"][0]["duration"]) + dt.timedelta(seconds=3.01), s["arms"][0]["requests"][1]["calls"][0]["path"])])), extra=NOREQ, want=2, must=["do not pair one to one by estimated start and path"])
+
+    # ---- ROUND-19 (b): the third independent review of the census (N1-N9, E26)
+    def edit_file(index, old, new, count=1):
+        def post(db, files, guard):
+            text_ = files[index].read_text()
+            assert text_.count(old) >= 1, (old, text_[:200])
+            files[index].write_text(text_.replace(old, new, count))
+        return post
+
+    def append_line(index, line):
+        def post(db, files, guard):
+            files[index].write_text(files[index].read_text() + line + "\n")
+        return post
+
+    scenario("J28a", "N2: a RUN-STATUS line with 5,000 digits: no crash (it used to exit 3 with `Exceeds the limit (4300 digits)` and no receipt), INCONCLUSIVE with the receipt", post=append_line(0, "RUN-STATUS x status=" + "9" * 5000), want=2, must=["a reserved record the census cannot parse", "CENSUS-RESULT INCONCLUSIVE"])
+    scenario("J28b", "N3: a NUL in the FROZEN cwd= with a relative db=: no crash (it used to exit 3 with `embedded null character`), INCONCLUSIVE", post=lambda db, files, guard: files[0].write_text(files[0].read_text().replace(f" db={db}", " db=store.sqlite").replace(" cwd=/tmp ", " cwd=/tmp\x00x ")), want=2, must=["the FROZEN cwd= holds a NUL"])
+    for sid, line, what in (("J28c", "﻿IDENTITY-PROBLEM after: x: VOID", "a BOM-prefixed IDENTITY-PROBLEM line"), ("J28d", 'x SUMMARY {"FAIL": 1} end=2026-10-06T12:00:00.000Z exit=1', "a SUMMARY line after a letter prefix"), ("J28e", "#RUN-STATUS arm status=4 (VOID)", "a `#`-prefixed RUN-STATUS VOID line"),
+                            ("J28f", "x RESULT mode=responses:eof http=200 terminal=True corr=None response_id=None read1_call_logs=1", "a RESULT line after a letter prefix")):
+        scenario(sid, f"N4: {what}: refused (the claim `reserved words are recognised after any prefix` is now true: a reserved word anywhere in a line that no strict pattern took is a problem)", post=append_line(0, line), want=2, must=["CENSUS-RESULT INCONCLUSIVE"])
+    scenario("J28g", "N6: the canary gate pins the canary's own verdict mode: an arm that ran with expect=observe (the frozen script's OBSERVED verdict): INCONCLUSIVE", mutate=lambda s: four_arms(s), post=edit_file(0, "expect=all-logged", "expect=observe"), extra=NOREQ, want=2, must=["ran with expect=observe"])
+    scenario("J28h", "N6: an arm that ran with wait1=0.0 wait2=0.0 (the two reads of the canary are 12 s and 60 s after the requests): INCONCLUSIVE", mutate=lambda s: four_arms(s), post=edit_file(1, "wait1=12.0 wait2=60.0", "wait1=0.0 wait2=0.0"), extra=NOREQ, want=2, must=["wait1=0.0 wait2=0.0"])
+    scenario("J28i", "N6: a SUMMARY line with exit=1 next to a RUN-STATUS 0: INCONCLUSIVE", mutate=lambda s: four_arms(s), post=lambda db, files, guard: files[2].write_text("\n".join(("SUMMARY" in line and line.replace(" exit=0", " exit=1") or line) for line in files[2].read_text().splitlines()) + "\n"), extra=NOREQ, want=2, must=["holds a SUMMARY line with exit=1"])
+
+    def late_foreign(seconds_after_window):
+        def m(spec):
+            ends = [a["wrapper_end"] if a["wrapper_start"] is not None else a["script_end"] for a in spec["arms"]]
+            spec["journal_extra"] = [max(ends) + dt.timedelta(seconds=5.0 + seconds_after_window)]
+        return m
+    scenario("J28j", "N5: a foreign arrival line 2 s after the window's end (inside the usage pad): INCONCLUSIVE (the arrival range used to end at the window's end)", mutate=late_foreign(2.0), want=2, must=["inbound POST request(s) in the counted range"])
+    scenario("J28k", "N5, outside: 6 s after the window's end: not counted: PASS", mutate=late_foreign(6.0), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J28l", "N7: journald stamps every arrival line 3.4 s late (measured: up to 3.5 s under load): the census counts and pairs on the gateway's own `time`: PASS (it used to be INCONCLUSIVE once in about fifty runs)", mutate=lambda s: s.__setitem__("journal_lag", 3.4), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J28m", "N7: journald stamps every STREAM-END line 3.4 s late (there is no gateway clock to the millisecond on that line): the pairing fails closed, INCONCLUSIVE", mutate=lambda s: s.__setitem__("stream_lag", 3.4), want=2, must=["have no stream-end line of their provider and model"])
+    scenario("J28n", "N8: a journald notice `Suppressed 1234 messages from omniroute.service` in the range: lines were dropped: INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_noise", [json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(60.0).timestamp() * 1e6)), "_PID": "230", "MESSAGE_ID": "a596d6fe7bfa4994828e72309e95d61e", "MESSAGE": "Suppressed 1234 messages from omniroute.service"})]), want=2, must=["loss notice(s)"])
+    scenario("J28o", "N9: fewer lines than rows: the problem says an own request's arrival line is missing (it used to blame a request that left no call row)", mutate=lambda s: s.__setitem__("journal_drop", {(0, 0, 0)}), want=2, must=["fewer lines than rows: an own request's arrival line is missing"])
+    scenario("J28p", "N9: a canary receipt in which the identity of both... every arm was compared does not say `a direct run carries no identity line`", mutate=lambda s: four_arms(s), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "IDENTITY-CHECK guard MainPID=1"], mustnot=["a direct run carries no identity line"])
+    scenario("J28q", "E26: a GUARD line with two start= fields (the first would be taken): INCONCLUSIVE", post=lambda db, files, guard: guard.write_text(guard.read_text().replace("GUARD version=5", "GUARD version=5", 1).replace(" clean_for=", " start=2026-10-06T00:00:00.000Z clean_for=", 1)), want=2, must=["more than one start= field"])
+
+    scenario("J29a", "r12-P2-4 (the pin): the idle receipt of the guard of before round 13's repair (sha256 62dea3d2...) in a TRIAL: accepted (its idle-only observation is the same): PASS", post=edit_guard(lambda t: t.replace(GUARD_SHA, GUARD_SHA_BEFORE_R12, 1)), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J29b", "the same receipt in the CANARY's scope: INCONCLUSIVE, the canary needs the repaired guard", mutate=lambda s: four_arms(s), post=edit_guard(lambda t: t.replace(GUARD_SHA, GUARD_SHA_BEFORE_R12, 1)), extra=NOREQ, want=2, must=["the canary needs the repaired guard"])
+
+    # ---- ROUND-20: the fourth independent review of the census (r19, sha256 6a4a2c1c...): F1 (Responses-over-WebSocket turns), P3-1 (console-only matchers), P3-2 (systemd.time spans), P3-3 (stderr), P3-4 (the grace as the gateway reads it, a missing _PID), P3-6 (arrival lag)
+    def window_end(spec):
+        ends = [a["wrapper_end"] if a["wrapper_start"] is not None else a["script_end"] for a in spec["arms"]]
+        return max(ends) + dt.timedelta(seconds=5.0)
+
+    def ws(start, duration, **extra):
+        def m(spec):
+            spec.setdefault("ws_turns", []).append(dict(start=start(spec) if callable(start) else start, duration=duration, **extra))
+        return m
+    WS_MUST = ["Responses-over-WebSocket turn(s) reach the window padded by the usage pad"]
+    scenario("J30a", "F1 (the reviewer's W3 in the canary's scope): a foreign Responses-WebSocket turn that ran from 10 s before the window to 20 s inside it, both rows stamped at its START (outside every row range the census reads), no journal line: INCONCLUSIVE (it used to PASS)", mutate=lambda s: (four_arms(s), ws(plus(-10.0), 30000)(s)), extra=NOREQ, want=2, must=WS_MUST + ["WEBSOCKET call_logs rows with method WEBSOCKET or request_type responses_websocket"])
+    scenario("J30b", "F1: the same turn in the trial's scope: INCONCLUSIVE", mutate=ws(plus(-10.0), 30000), want=2, must=WS_MUST)
+    scenario("J30c", "F1, outside: a turn that ended 90 s before the window: not counted: PASS", mutate=ws(plus(-100.0), 10000), want=0, must=["CENSUS-RESULT PASS", "reaching the window padded by the usage pad: 0"])
+    scenario("J30d", "F1, the leading edge: a turn that ended exactly at the start of the usage pad (window start - 3 s): reaches it: INCONCLUSIVE", mutate=ws(plus(-13.0), 10000), want=2, must=WS_MUST)
+    scenario("J30e", "F1, 1 ms outside the leading edge: PASS", mutate=ws(plus(-13.0), 9999), want=0, must=["CENSUS-RESULT PASS", "reaching the window padded by the usage pad: 0"])
+    scenario("J30f", "F1, the trailing edge: a turn that started 2.5 s after the window's end (inside the usage pad): INCONCLUSIVE", mutate=ws(lambda s: window_end(s) + dt.timedelta(seconds=2.5), 500), want=2, must=WS_MUST)
+    scenario("J30g", "F1, outside the trailing edge: a turn that started 6 s after the window's end: not counted: PASS", mutate=ws(lambda s: window_end(s) + dt.timedelta(seconds=6.0), 500), want=0, must=["CENSUS-RESULT PASS", "reaching the window padded by the usage pad: 0"])
+    scenario("J30h", "F1: a row with method WEBSOCKET and no request_type: recognised: INCONCLUSIVE", mutate=ws(plus(-10.0), 30000, request_type=None), want=2, must=WS_MUST)
+    scenario("J30i", "F1: a row with request_type responses_websocket and no method: recognised: INCONCLUSIVE", mutate=ws(plus(-10.0), 30000, method=None), want=2, must=WS_MUST)
+    scenario("J30j", "F1: a WebSocket row inside the pad whose duration is not a number: its reach cannot be read: INCONCLUSIVE", mutate=ws(plus(-1.0), "abc"), want=2, must=WS_MUST + ["its stamp or duration cannot be read"])
+    scenario("J30k", "F1: a WebSocket turn 8 days before the window (longer than any duration the census reads): not counted: PASS", mutate=ws(plus(-8 * 86400.0), 500), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J30l", "F1: a WebSocket turn inside the window: INCONCLUSIVE (a foreign call row too), and the receipt names the WebSocket turn", mutate=ws(plus(50.0), 500), want=2, must=WS_MUST)
+
+    # -- P3-1: the restart patterns and the stream marker are searched in console lines, never in a JSON record that carries client-controlled text
+    def json_get(ts, text):
+        return ent(ts, json.dumps({"level": 30, "time": utc(ts), "tag": "HTTP", "method": "GET", "msg": "\U0001F4E5 GET /api/x | " + text}))
+    scenario("J31a", "P3-1: a JSON record (a GET) whose text says `Restarting in 1s` (a client-chosen string): not a supervisor restart: PASS (it was INCONCLUSIVE)", mutate=lambda s: s.__setitem__("journal_noise", [json_get(plus(70.0), "Restarting in 1s")]), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J31b", "P3-1: the same with `✓ Ready in 3s`: PASS", mutate=lambda s: s.__setitem__("journal_noise", [json_get(plus(70.0), "✓ Ready in 3s")]), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J31c", "P3-1: a JSON record that carries a forged stream-end line for a foreign request inside the window: not read as one: PASS (it was a leftover stream-end group)", mutate=lambda s: s.__setitem__("journal_noise", [json_get(plus(70.0), "[12:00:00] \U0001F30A [STREAM] CODEX | gpt-6-astra | 800ms | complete")]), want=0, must=["CENSUS-RESULT PASS"])
+    scenario("J31d", "P3-1, contrast: the same text as a CONSOLE line of the supervisor (`Restarting in 1s`): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_noise", [ent(plus(70.0), "Restarting in 1s")]), want=2, must=["supervisor restart diagnostic(s) or child startup banner(s)"])
+    scenario("J31e", "P3-1: a foreign POST arrival record whose model string says `✓ Ready in 3s`: counted as the foreign request it is (INCONCLUSIVE by the count), never as a startup banner", mutate=lambda s: s.__setitem__("journal_noise", [ent(plus(70.0), json.dumps({"level": 30, "time": utc(plus(70.0)), "tag": "HTTP", "method": "POST", "msg": "\U0001F4E5 POST /v1/responses | cx/✓ Ready in 3s | 1 msgs"}))]), want=2, must=["inbound POST request(s) in the counted range"], mustnot=["supervisor restart diagnostic(s) or child startup banner(s) in the journal range"])
+
+    # -- P3-2: systemd.time(7) spans in journald.conf
+    scenario("J32a", "P3-2: RateLimitIntervalSec=1d (a day, not a second) against 1,100 entries: the limit is 10000 per 86400 s: INCONCLUSIVE (it was read as 1 s and PASSed)", mutate=noisy(1100, journald_conf="RateLimitIntervalSec=1d\n"), want=2, must=["a tenth or more of the journald rate limit (10000 per 86400 s"])
+    scenario("J32b", "P3-2: RateLimitIntervalSec=1w: 604800 s: INCONCLUSIVE", mutate=noisy(1100, journald_conf="RateLimitIntervalSec=1w\n"), want=2, must=["(10000 per 604800 s"])
+    scenario("J32c", "P3-2: RateLimitIntervalSec=30 foo (trailing garbage): not a time span: INCONCLUSIVE", mutate=noisy(3, journald_conf="RateLimitIntervalSec=30 foo\n"), want=2, must=["which is not a time span"])
+    scenario("J32d", "P3-2: RateLimitIntervalSec=1.5.5s: not a time span: INCONCLUSIVE", mutate=noisy(3, journald_conf="RateLimitIntervalSec=1.5.5s\n"), want=2, must=["which is not a time span"])
+    scenario("J32e", "P3-2: the deprecated key RateLimitInterval=1d is read like RateLimitIntervalSec=: INCONCLUSIVE against 1,100 entries", mutate=noisy(1100, journald_conf="RateLimitInterval=1d\n"), want=2, must=["(10000 per 86400 s"])
+    scenario("J32f", "P3-2: RateLimitBurst with Arabic-Indic digits is not a number: INCONCLUSIVE", mutate=noisy(3, journald_conf="RateLimitBurst=٥٠٠\n"), want=2, must=["which is not a number"])
+    scenario("J32g", "P3-2: RateLimitIntervalSec=1min 30s (two parts) is 90 s: 10000 messages per 90 s against 900 entries: PASS", mutate=noisy(900, journald_conf="RateLimitIntervalSec=1min 30s\n"), want=0, must=["CENSUS-RESULT PASS", "rate_limit=10000 messages per 90 s (journald.conf)"])
+    scenario("J32h", "P3-2: RateLimitIntervalSec=2h: 7200 s: INCONCLUSIVE against 1,100 entries", mutate=noisy(1100, journald_conf="RateLimitIntervalSec=2h\n"), want=2, must=["(10000 per 7200 s"])
+    scenario("J32i", "P3-2: RateLimitIntervalSec=infinity is not a span the census reads: INCONCLUSIVE", mutate=noisy(3, journald_conf="RateLimitIntervalSec=infinity\n"), want=2, must=["which is not a time span"])
+
+    # -- P3-3: journalctl's partial-read warning
+    scenario("J33a", "P3-3: journalctl writes `Warning: some journal files were not opened due to insufficient permissions.` on stderr and exits 0: a partial read: INCONCLUSIVE (it PASSed)", mutate=lambda s: s.__setitem__("journal_stderr", "Warning: some journal files were not opened due to insufficient permissions."), want=2, must=["journalctl reported on stderr"])
+
+    # -- P3-4: the grace as the gateway reads it (JavaScript Number(); empty is the default), a problem with it is its own problem, a missing _PID is its own problem
+    scenario("J34a", "P3-4: STREAM_DISCONNECT_GRACE_PERIOD_MS=ten: Number() gives NaN, the gateway logs `Invalid` and uses its default 10 s, and so does the census (the foreign line 20 s before the window is outside the default range): PASS", mutate=grace_world("ten", -20.0), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "default (the gateway rejects STREAM_DISCONNECT_GRACE_PERIOD_MS='ten' and uses the default)"])
+    scenario("J34b", "P3-4: an empty STREAM_DISCONNECT_GRACE_PERIOD_MS is the default (the gateway's readTimeoutMs): PASS", mutate=grace_world("", -20.0), extra=NOREQ, want=0, must=["CENSUS-RESULT PASS", "default (the variable is empty)"])
+    scenario("J34c", "P3-4: ' 30000' (surrounding space) is 30000 for Number(): the foreign line 20 s before the window is inside the counted range: INCONCLUSIVE", mutate=grace_world(" 30000", -20.0), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"], mustnot=["cannot be established"])
+    scenario("J34d", "P3-4: '30000.5' is 30000 (floored): INCONCLUSIVE by the same foreign line", mutate=grace_world("30000.5", -20.0), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"], mustnot=["cannot be established"])
+    scenario("J34e", "P3-4: '3e4' is 30000: INCONCLUSIVE by the same foreign line", mutate=grace_world("3e4", -20.0), extra=NOREQ, want=2, must=["stream-end controller(s) in the counted range have no own call row"], mustnot=["cannot be established"])
+    scenario("J34f", "P3-4: '0x10' is a form that Number() reads and the census does not: its own problem, and the serving checks still run (no `cannot be established`)", mutate=grace_world("0x10", -20.0), extra=NOREQ, want=2, must=["is a form of number that the census does not read", "the serving process's disconnect grace cannot be established"], mustnot=["the process that serves the port cannot be established"])
+    scenario("J34g", "P3-4: a request line without a valid _PID: its own problem, not the restart message", mutate=lambda s: s.__setitem__("journal_noise", [json.dumps({"__REALTIME_TIMESTAMP": str(int(plus(70.0).timestamp() * 1e6)), "_SYSTEMD_CGROUP": CGROUP, "MESSAGE": json.dumps({"level": 30, "time": utc(plus(70.0)), "tag": "HTTP", "method": "POST", "msg": "\U0001F4E5 POST /v1/responses | cx/gpt-6-astra | 1 msgs"})})]), want=2, must=["carries no valid _PID"], mustnot=["was restarted inside the range"])
+
+    # -- P3-6: an arrival line's own `time` against journald's receive stamp
+    scenario("J35a", "P3-6: journald stamps every arrival line 40 s after the gateway's own `time` (the gateway's clock and journald's disagree, or the field was forged): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_lag", 40.0), want=2, must=["arrival line(s) carry a `time` more than 30 s before"])
+    scenario("J35b", "P3-6: journald stamps every arrival line 2 s BEFORE the gateway's own `time` (impossible for a line that journald received after the gateway wrote it): INCONCLUSIVE", mutate=lambda s: s.__setitem__("journal_lag", -2.0), want=2, must=["after journald's receive stamp"])
+    scenario("J35c", "P3-6: journald stamps every arrival line 29 s late (inside the 30 s the census tolerates; measured on this host 0.010-3.5 s): PASS", mutate=lambda s: s.__setitem__("journal_lag", 29.0), want=0, must=["CENSUS-RESULT PASS"])
 
     # ---- X1: predicate parity with the frozen scripts, by AST (the frozen scripts run main() at import: never import them)
     census_text = Path(ARGS.census).read_text()
@@ -1233,6 +1597,44 @@ def main():
     print(f"CONTROL-RESULT X2 {'OK' if ok else 'UNEXPECTED'} :: associated() of the census and of raw 2.2 (executed from its extracted source) agree on 40000 random and boundary pairs: mismatches={mismatches}, true={trues}, false={falses}\n")
     if not ok:
         FAILED.append("X2")
+
+    # ---- X4 (ROUND-20, review 4 P3-2 and P3-4): the census's span and grace parsers, called directly
+    spans = {"30s": 30.0, "1min 30s": 90.0, "500ms": 0.5, "1d": 86400.0, "1w": 604800.0, "1M": 2629800.0, "1m": 60.0, "0": 0.0, "30": 30.0, "1h30min": 5400.0, "1month": 2629800.0, "2 d": 172800.0, "1y": 31557600.0, "250us": 0.00025, "1.5s": 1.5,
+             "30 foo": None, "1.5.5s": None, "": None, "infinity": None, "\u0661\u0660s": None, "10 s 5": None, "1 D": None, "-5s": None, "s": None}
+    span_bad = [(k, census.seconds_of(k), v) for k, v in spans.items() if census.seconds_of(k) != v]
+    graces = {"": (10000, False), "   ": (10000, False), "30000": (30000, False), " 30000 ": (30000, False), "30000.5": (30000, False), "3e4": (30000, False), "0": (0, False), "-5": (10000, False), "ten": (10000, False), "1,000": (10000, False),
+              "1e999": (10000, False), "0x10": (10000, True), "Infinity": (10000, True), "-Infinity": (10000, True), "0b11": (10000, True), "0o7": (10000, True)}
+    grace_bad = [(k, census.gateway_grace(k)[0], census.gateway_grace(k)[2] is not None) for k, want_ in graces.items() if (census.gateway_grace(k)[0], census.gateway_grace(k)[2] is not None) != want_]
+    ok = not span_bad and not grace_bad
+    print(f"CONTROL-RESULT X4 {'OK' if ok else 'UNEXPECTED'} :: seconds_of() on {len(spans)} systemd.time(7) values and gateway_grace() on {len(graces)} STREAM_DISCONNECT_GRACE_PERIOD_MS values behave as systemd.time(7) and the gateway's readTimeoutMs say; mismatches {span_bad + grace_bad}")
+    print()
+    if not ok:
+        FAILED.append("X4")
+
+    # ---- X5 (ROUND-20, a check of the census's stream-end model against the REAL output of the drain-patched build): the lines that the real handleChat of the PATCHED tree printed for the five clients that close right after the terminal event
+    # (checks/logs/handler-e2e-P-e2e-patched.log, sha256 9c1e130ef408...) and of the UNPATCHED tree (checks/logs/handler-e2e-U-e2e-unpatched.log, sha256 60b340ee26a0...), fed to the census's own line grammar and grouping. In the patched tree cancel() prints ONE primary
+    # line (`complete`, through handleComplete at the leave time) and the drain's own handleComplete returns at `disconnected`, so a drained request is one group, never a leave line followed by a completion line (open-sse/utils/streamHandler.ts at ca7a2e2b4).
+    real_patched = ["[20:02:21] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 73ms | complete", "[20:02:22] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 7ms | complete", "[20:02:23] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 7ms | complete",
+                    "[20:02:24] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 6ms | complete", "[20:02:26] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 10ms | complete"]
+    real_unpatched = ["[20:01:49] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 160ms | complete", "[20:01:50] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 9ms | complete", "[20:01:57] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 10ms | complete",
+                      "[20:02:04] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 9ms | complete", "[20:02:11] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 13ms | complete", "[20:02:11] \U0001F30A [STREAM] CODEX | gpt-5.6-sol | 14ms | client_disconnect (post-abort)"]
+
+    def real_groups(lines):
+        streams = []
+        for line in lines:
+            m = census.STREAM_LINE.search(line)
+            if m is None or census.STREAM_MARKER not in line:
+                return None
+            h, mi, s = (int(x) for x in re.match(r"\[(\d\d):(\d\d):(\d\d)\]", line).groups())
+            streams.append((dt.datetime(2026, 10, 5, h, mi, s, tzinfo=dt.timezone.utc), m.group(1), m.group(2), int(m.group(3)), m.group(4), 1326))
+        return census.stream_groups(streams)
+    gp, gu = real_groups(real_patched), real_groups(real_unpatched)
+    ok = (gp is not None and len(gp) == 5 and all(g["primary"] and g["echoes"] == 0 and g["status"] == "complete" for g in gp)
+          and gu is not None and len(gu) == 5 and all(g["primary"] for g in gu) and sum(g["echoes"] for g in gu) == 1)
+    print(f"CONTROL-RESULT X5 {'OK' if ok else 'UNEXPECTED'} :: the census's line grammar and grouping on the REAL stream-end lines of the drain-patched build (5 lines for 5 clients that closed right after the terminal event: 5 groups, each a primary `complete` line, no echo, no second line when the drain ends) and of the unpatched build (6 lines: 5 groups, the post-abort echo folded into its primary); groups {None if gp is None else len(gp)} and {None if gu is None else len(gu)}")
+    print()
+    if not ok:
+        FAILED.append("X5")
 
     # ---- S1: the census's store connection is ONE read snapshot
     snap_db = Path(ARGS.work) / "snap.sqlite"

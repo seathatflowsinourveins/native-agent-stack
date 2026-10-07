@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""Value-free receipt for the OMNIROUTE_SHOW_LOG=1 drop-ins on NativeStack's two gateway units (read-only), VERSION 2.
+
+Version 1 printed every effective line of show-log.conf verbatim, so an extra assignment in that file (a credential, say) would have been disclosed by a "value-free" receipt (a full-scope read of 2026-10-06
+reproduced it with a synthetic Environment line). Version 2 prints a drop-in file ONLY as an allowlist: whether the exact line Environment=OMNIROUTE_SHOW_LOG=1 is present (a boolean), the number of other
+non-comment lines (a count, never their text), the section headers [Service], [Unit] and [Install] if present, the size and the mode. `--describe-dropin FILE` prints that description of one file and nothing else.
+
+Prints, per unit: the drop-in paths and whether OMNIROUTE_SHOW_LOG=1 is set (a boolean; no other Environment value is printed, and /proc/<pid>/environ and the EnvironmentFile are never read),
+MainPID, the start timestamps, the health response, one journal line from the unit that shows its child's output reaches journald (chosen by a start-up pattern, rejected if it looks like a credential),
+and counts only (no values) of credential-shaped strings in the unit's journal since its start, plus the user journal's disk use and the retention keys that are set.
+usage: omniroute-show-log-receipt-20261006.py [label]
+       omniroute-show-log-receipt-20261006.py --describe-dropin FILE
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.request
+
+HOME = os.path.expanduser("~")
+UNITS = {"20128": "omniroute.service", "20129": "omniroute-fw.service"}
+ALLOWED_SECTIONS = ("[Service]", "[Unit]", "[Install]")
+SHOW_LOG_LINES = ("Environment=OMNIROUTE_SHOW_LOG=1", 'Environment="OMNIROUTE_SHOW_LOG=1"')
+
+
+def describe_dropin(path):
+    """The allowlisted description of one drop-in file: no line of it is ever printed."""
+    body = open(path, encoding="utf-8").read()
+    effective = [l.strip() for l in body.splitlines() if l.strip() and not l.lstrip().startswith(("#", ";"))]
+    declares = any(l in SHOW_LOG_LINES for l in effective)
+    sections = [l for l in effective if l in ALLOWED_SECTIONS]
+    others = len(effective) - len(sections) - (1 if declares else 0)
+    return (f"drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: {declares} | section headers: {sections} | other non-comment lines: {others} (not printed) "
+            f"| size {len(body)} bytes | mode {oct(os.stat(path).st_mode & 0o777)}")
+
+
+if len(sys.argv) == 3 and sys.argv[1] == "--describe-dropin":
+    print(describe_dropin(sys.argv[2]))
+    sys.exit(0)
+label = sys.argv[1] if len(sys.argv) > 1 else "receipt"
+
+
+def run(*args):
+    return subprocess.run(args, capture_output=True, text=True).stdout
+
+
+def mask(text):
+    return text.replace(HOME + "/", "$HOME/")
+
+
+print(f"# value-free receipt: {label}")
+print("taken", run("date", "-u", "+%Y-%m-%dT%H:%M:%SZ").strip())
+PATTERNS = {
+    "bearer_token": r"Bearer\s+[A-Za-z0-9._~+/=-]{16,}",
+    "sk_key": r"\bsk-[A-Za-z0-9_-]{16,}",
+    "refresh_token": r"refresh_token",
+    "id_token": r"id_token",
+    "email_shaped": r"[\w.+-]+@[\w-]+\.[\w.-]+",
+    "api_key_assignment_with_value": r"(?i)(?<![A-Za-z_])api[_-]?key[\"']?\s*[:=]\s*[\"']?(?!false|null|true|undefined)[A-Za-z0-9._-]{8,}",
+}
+for port, unit in UNITS.items():
+    props = run("systemctl", "--user", "show", unit, "-p", "DropInPaths", "-p", "ActiveState", "-p", "SubState", "-p", "MainPID", "-p", "ActiveEnterTimestamp", "-p", "NRestarts", "-p", "Environment")
+    fields = dict(line.split("=", 1) for line in props.splitlines() if "=" in line)
+    show_log = "OMNIROUTE_SHOW_LOG=1" in fields.get("Environment", "")
+    print(f"\n## {port} {unit}")
+    print("DropInPaths:", mask(fields.get("DropInPaths", "")))
+    print("OMNIROUTE_SHOW_LOG=1 present in the unit's environment:", show_log)
+    for key in ("ActiveState", "SubState", "MainPID", "ActiveEnterTimestamp", "NRestarts"):
+        print(f"{key}: {fields.get(key)}")
+    dropin = [p for p in fields.get("DropInPaths", "").split() if p.endswith("show-log.conf")]
+    if dropin:
+        print(describe_dropin(dropin[0]))
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=5) as r:
+            print("health:", r.status, json.loads(r.read()))
+    except Exception as e:
+        print("health: error", type(e).__name__)
+    since = fields.get("ActiveEnterTimestamp", "")
+    journal = run("journalctl", "--user", "-u", unit, "--since", since, "-o", "cat", "--no-pager") if since else ""
+    lines = journal.splitlines()
+    print("journal lines since the unit's start:", len(lines))
+    pick = None
+    child = [l for l in lines if not re.match(r"(Started|Stopping|Stopped|Starting|systemd)\b", l)]  # the child's console output, not systemd's own unit messages
+    for rx in (r"\[STREAM\]", r"\[sse\]", r"\[(?:bootstrap|startup|server)\]", r"(?i)listening|ready"):
+        for line in child:
+            if re.search(rx, line) and not re.search(r"(?i)bearer|token|key|secret|password|@", line):
+                pick = line
+                break
+        if pick:
+            break
+    print("one journal line that shows the child's output reaches journald:", mask(pick[:220]) if pick else "(no suitable line)")
+    counts = {name: len(re.findall(rx, journal)) for name, rx in PATTERNS.items()}
+    print("counts of credential-shaped strings in that journal (no values):", counts)
+    tags = {}
+    for line in lines:
+        if re.search(PATTERNS["email_shaped"], line):
+            m = re.search(r"\[[A-Za-z][A-Za-z0-9_ -]{1,30}\]", re.sub(r"\x1b\[[0-9;]*m", "", line))
+            tags[m.group(0) if m else "(no tag)"] = tags.get(m.group(0) if m else "(no tag)", 0) + 1
+    print("log tags of the email-shaped matches (the addresses are not printed):", tags or "none")
+print("\n## user journal")
+print(run("journalctl", "--user", "--disk-usage").strip())
+keys = []
+for path in ["/etc/systemd/journald.conf"] + sorted(os.popen("ls /etc/systemd/journald.conf.d/*.conf 2>/dev/null").read().split()):
+    try:
+        for line in open(path, encoding="utf-8"):
+            if re.match(r"\s*(SystemMaxUse|RuntimeMaxUse|MaxRetentionSec|SystemMaxFileSize|MaxFileSec)\s*=", line):
+                keys.append(f"{os.path.basename(path)}: {line.strip()}")
+    except OSError:
+        pass
+print("retention keys set in /etc/systemd/journald.conf(.d):", keys or "none (the journald defaults apply)")

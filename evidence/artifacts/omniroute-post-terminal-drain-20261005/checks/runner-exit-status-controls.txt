@@ -1,0 +1,256 @@
+# Control for the exit-status enforcement of the three native test runners (full-scope read r12, P2-2), run 2026-10-06 UTC: scripts/runner-exit-status-controls.sh.txt (git blob e05c33da204240aad89c98ccf0d7d2ce86543763),
+# run from a scratch copy once per version. The control cuts each script's constants, helper block and run() block, and drives every recorded stage through that version's own call lines with a fixture node that replays
+# the stage's recorded log (committed checks/logs/ copies; synthetic logs from the recorded counters for the three stages whose logs are private) at the recorded exit status, at 42, 124 and the flipped status, with another
+# stage's counters, and with the exit expectation cut off; plus a static check that each expect_counts call names the recorded exit status. Nothing here builds a tree or runs a test.
+# (1) the scripts of 4624137, extracted with git show (drain-prototype.sh.txt git blob ff756add9dee15b49f96224f7ebc9e2aa799f087, handler-e2e.sh.txt d020982336dfac66fea56bfb830af8fe515fd084, handler-e2e-session-tag.sh.txt b433fa4e81e1171db3c7c22ab8138d7e993342f3):
+#     control exit=1; summary: cases as required 22 of 66; static check failures 11. By case type (cases, verdict, as required or not): C 11 rejected (as); M 11 accepted (NOT); R 11 accepted (as); X124 11 accepted (NOT); X42 11 accepted (NOT); XF 11 accepted (NOT).
+# (2) the fixed scripts (drain-prototype version 6 git blob ca8f8192fc38042df8a08a706e3893e8447d8197, handler-e2e version 3 9981341f47468fed763638520c5044df622370fa, handler-e2e-session-tag version 2 158fde99313006466d5d6a06e1c3515f89d6b91b):
+#     control exit=0; summary: cases as required 66 of 66; static check failures 0. By case type: C 11 rejected (as); M 11 rejected (as); R 11 accepted (as); X124 11 rejected (as); X42 11 rejected (as); XF 11 rejected (as).
+#     The static check finds each expect_counts call naming the exit status recorded for its stage, and the success-path log lines are unchanged, so the recorded runs in checks/*-results.txt are outputs these versions accept.
+# (3) the existing offline controls of these scripts, rerun on the fixed versions, and bash -n. Not run: drain-prototype-controls (1), (2) and (4), handler-e2e-tree-check-control and the full runs, which need npm ci (network).
+# Raw output; the controls write the home directory as $HOME themselves; in (3) the scripts' own path output is written $HOME by the recording command.
+
+## (1) the control on the scripts of 4624137
+# runner-exit-status-controls: run 2026-10-06T23:37:15Z; scratch $HOME/.cache/r13-s/runner/final/work/runner-exit-status-JQ62z6
+== fixture logs (committed copies: sha256 compared with checks/logs/MANIFEST.txt; synthetic ones built from checks/drain-prototype-results.txt)
+  handler-e2e-P-e2e-patched.log sha256 9c1e130ef4089258515d438a1ade981f66163305673751b89ae6d0d6f13a1400 counters 5/5/0 (equals MANIFEST retained_sha256)
+  handler-e2e-U-e2e-unpatched.log sha256 60b340ee26a01eddeb437c0771dd158e70b0525dcc8d41ce88016a65cb5adef0 counters 5/1/4 (equals MANIFEST retained_sha256)
+  handler-e2e-session-tag-N-session-tag-wrong-header.log sha256 5f5728416664889a33bde7f96b8aa8bf6ed67188198e9bb1835edab9ca85bb15 counters 4/1/3 (equals MANIFEST retained_sha256)
+  handler-e2e-session-tag-P-session-tag-patched.log sha256 00c4a1063526c8d952d37c3cb8a42ecb33040f56195db8ace9f02f4558a47ed2 counters 4/4/0 (equals MANIFEST retained_sha256)
+  handler-e2e-session-tag-U-session-tag-unpatched.log sha256 4a47a1e27d353ac33a16572ecc4c8fb0d2fc6e2dd597cbe1c6e1ff16a0e96910 counters 4/4/0 (equals MANIFEST retained_sha256)
+  validation-N-new-test-unpatched.log sha256 d6704d187e676ecfa0a1435be6c355b60851ae429d2b65d3d904fdc5506d9133 counters 6/3/3 (equals MANIFEST retained_sha256)
+  validation-N2-new-test-first-version.log sha256 11ee23e5b2711cb71794b708a266d2d89d02bdbd7a76e39f75da835d081cb820 counters 6/4/2 (equals MANIFEST retained_sha256)
+  validation-P-new-test-patched.log sha256 a25eca62ec133663c0deca6405f6eab84e09ebff472572f1c3bef196995530a6 counters 6/6/0 (equals MANIFEST retained_sha256)
+== drain-prototype: drain-prototype.sh git blob ff756add9dee15b49f96224f7ebc9e2aa799f087 sha256 d0b2a5b24897c74f54fc264450bf071d552d7ae643923ce03e8225edefea4090
+   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): 25 lines, sha256 277ec31bff973859b19f06da22cef135b2fe790bb72db78375f6a2ad8267d130
+   recorded stages in drain-prototype-results.txt: A-baseline=1 N-new-test-unpatched=1 N2-new-test-first-version=1 P-new-test-patched=0 A2-stream-tests-patched=1 B2-calllog-usage-chat-pipeline=0
+   static check (every expect_counts call names the recorded exit status):
+     A-baseline: 'expect_counts A-baseline 1746 1745 1' names no exit status (recorded exit=1): FAIL
+     N-new-test-unpatched: 'expect_counts N-new-test-unpatched 6 3 3' names no exit status (recorded exit=1): FAIL
+     N2-new-test-first-version: 'expect_counts N2-new-test-first-version 6 4 2' names no exit status (recorded exit=1): FAIL
+     P-new-test-patched: 'expect_counts P-new-test-patched 6 6 0' names no exit status (recorded exit=0): FAIL
+     A2-stream-tests-patched: 'expect_counts A2-stream-tests-patched 1752 1751 1' names no exit status (recorded exit=1): FAIL
+     B2-calllog-usage-chat-pipeline: 'expect_counts B2-calllog-usage-chat-pipeline 126 126 0' names no exit status (recorded exit=0): FAIL
+   cases:
+  drain-prototype A-baseline/R log=synthetic-A-baseline.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:15Z A-baseline failing tests are as expected: 1 name(s)
+  drain-prototype A-baseline/X42 log=synthetic-A-baseline.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z A-baseline failing tests are as expected: 1 name(s)
+  drain-prototype A-baseline/X124 log=synthetic-A-baseline.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z A-baseline failing tests are as expected: 1 name(s)
+  drain-prototype A-baseline/XF log=synthetic-A-baseline.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z A-baseline failing tests are as expected: 1 name(s)
+  drain-prototype A-baseline/C(6/3/3 for 1746/1745/1) log=validation-N-new-test-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:15Z A-baseline EXPECTATION VIOLATED: tests=6 pass=3 fail=3, expected tests=1746 pass=1745 fail=1: stopping
+  drain-prototype A-baseline/M log=synthetic-A-baseline.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z A-baseline failing tests are as expected: 1 name(s)
+  drain-prototype N-new-test-unpatched/R log=validation-N-new-test-unpatched.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:15Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+  drain-prototype N-new-test-unpatched/X42 log=validation-N-new-test-unpatched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+  drain-prototype N-new-test-unpatched/X124 log=validation-N-new-test-unpatched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+  drain-prototype N-new-test-unpatched/XF log=validation-N-new-test-unpatched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:15Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+  drain-prototype N-new-test-unpatched/C(1746/1745/1 for 6/3/3) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:16Z N-new-test-unpatched EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=6 pass=3 fail=3: stopping
+  drain-prototype N-new-test-unpatched/M log=validation-N-new-test-unpatched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+  drain-prototype N2-new-test-first-version/R log=validation-N2-new-test-first-version.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:16Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+  drain-prototype N2-new-test-first-version/X42 log=validation-N2-new-test-first-version.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+  drain-prototype N2-new-test-first-version/X124 log=validation-N2-new-test-first-version.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+  drain-prototype N2-new-test-first-version/XF log=validation-N2-new-test-first-version.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+  drain-prototype N2-new-test-first-version/C(1746/1745/1 for 6/4/2) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:16Z N2-new-test-first-version EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=6 pass=4 fail=2: stopping
+  drain-prototype N2-new-test-first-version/M log=validation-N2-new-test-first-version.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+  drain-prototype P-new-test-patched/R log=validation-P-new-test-patched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:16Z P-new-test-patched failing tests are as expected: 0 name(s)
+  drain-prototype P-new-test-patched/X42 log=validation-P-new-test-patched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z P-new-test-patched failing tests are as expected: 0 name(s)
+  drain-prototype P-new-test-patched/X124 log=validation-P-new-test-patched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z P-new-test-patched failing tests are as expected: 0 name(s)
+  drain-prototype P-new-test-patched/XF log=validation-P-new-test-patched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z P-new-test-patched failing tests are as expected: 0 name(s)
+  drain-prototype P-new-test-patched/C(1746/1745/1 for 6/6/0) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:16Z P-new-test-patched EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=6 pass=6 fail=0: stopping
+  drain-prototype P-new-test-patched/M log=validation-P-new-test-patched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:16Z P-new-test-patched failing tests are as expected: 0 name(s)
+  drain-prototype A2-stream-tests-patched/R log=synthetic-A2-stream-tests-patched.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:16Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+  drain-prototype A2-stream-tests-patched/X42 log=synthetic-A2-stream-tests-patched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+  drain-prototype A2-stream-tests-patched/X124 log=synthetic-A2-stream-tests-patched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+  drain-prototype A2-stream-tests-patched/XF log=synthetic-A2-stream-tests-patched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+  drain-prototype A2-stream-tests-patched/C(1746/1745/1 for 1752/1751/1) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:17Z A2-stream-tests-patched EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=1752 pass=1751 fail=1: stopping
+  drain-prototype A2-stream-tests-patched/M log=synthetic-A2-stream-tests-patched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+  drain-prototype B2-calllog-usage-chat-pipeline/R log=synthetic-B2-calllog-usage-chat-pipeline.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:17Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+  drain-prototype B2-calllog-usage-chat-pipeline/X42 log=synthetic-B2-calllog-usage-chat-pipeline.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+  drain-prototype B2-calllog-usage-chat-pipeline/X124 log=synthetic-B2-calllog-usage-chat-pipeline.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+  drain-prototype B2-calllog-usage-chat-pipeline/XF log=synthetic-B2-calllog-usage-chat-pipeline.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+  drain-prototype B2-calllog-usage-chat-pipeline/C(1746/1745/1 for 126/126/0) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:17Z B2-calllog-usage-chat-pipeline EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=126 pass=126 fail=0: stopping
+  drain-prototype B2-calllog-usage-chat-pipeline/M log=synthetic-B2-calllog-usage-chat-pipeline.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+  synthetic fixture synthetic-A-baseline.log: counters 1746/1745/1, sha256 2ceed69848ba11b3919a12ca15f16fb541b69fc61ab158c4d36e47e09a1cf02f
+  synthetic fixture synthetic-A2-stream-tests-patched.log: counters 1752/1751/1, sha256 03bb7a131f0436e6e2df3c09502d2804e9111aa3f708a015031674ebbc962ad6
+  synthetic fixture synthetic-B2-calllog-usage-chat-pipeline.log: counters 126/126/0, sha256 846310c6718f729ee8c5605abb536597574804dc8dbc58e27d7554796a6bb418
+== handler-e2e: handler-e2e.sh git blob d020982336dfac66fea56bfb830af8fe515fd084 sha256 3413c487e5dacfb64be29d1c5b20f9c4be90277107076c12a109a0d4f86b92c8
+   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): 27 lines, sha256 693ce35067c85011aff3fe1acd990a5131398354552ed3ef6f4f460964bd259a
+   recorded stages in handler-e2e-results.txt: U-e2e-unpatched=1 P-e2e-patched=0
+   static check (every expect_counts call names the recorded exit status):
+     U-e2e-unpatched: 'expect_counts U-e2e-unpatched 5 1 4' names no exit status (recorded exit=1): FAIL
+     P-e2e-patched: 'expect_counts P-e2e-patched 5 5 0' names no exit status (recorded exit=0): FAIL
+   cases:
+  handler-e2e U-e2e-unpatched/R log=handler-e2e-U-e2e-unpatched.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:17Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+  handler-e2e U-e2e-unpatched/X42 log=handler-e2e-U-e2e-unpatched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+  handler-e2e U-e2e-unpatched/X124 log=handler-e2e-U-e2e-unpatched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:17Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+  handler-e2e U-e2e-unpatched/XF log=handler-e2e-U-e2e-unpatched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+  handler-e2e U-e2e-unpatched/C(5/5/0 for 5/1/4) log=handler-e2e-P-e2e-patched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:18Z U-e2e-unpatched EXPECTATION VIOLATED: tests=5 pass=5 fail=0, expected tests=5 pass=1 fail=4: stopping
+  handler-e2e U-e2e-unpatched/M log=handler-e2e-U-e2e-unpatched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+  handler-e2e P-e2e-patched/R log=handler-e2e-P-e2e-patched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:18Z P-e2e-patched failing tests are as expected: 0 name(s)
+  handler-e2e P-e2e-patched/X42 log=handler-e2e-P-e2e-patched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z P-e2e-patched failing tests are as expected: 0 name(s)
+  handler-e2e P-e2e-patched/X124 log=handler-e2e-P-e2e-patched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z P-e2e-patched failing tests are as expected: 0 name(s)
+  handler-e2e P-e2e-patched/XF log=handler-e2e-P-e2e-patched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z P-e2e-patched failing tests are as expected: 0 name(s)
+  handler-e2e P-e2e-patched/C(5/1/4 for 5/5/0) log=handler-e2e-U-e2e-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:18Z P-e2e-patched EXPECTATION VIOLATED: tests=5 pass=1 fail=4, expected tests=5 pass=5 fail=0: stopping
+  handler-e2e P-e2e-patched/M log=handler-e2e-P-e2e-patched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z P-e2e-patched failing tests are as expected: 0 name(s)
+== handler-e2e-session-tag: handler-e2e-session-tag.sh git blob b433fa4e81e1171db3c7c22ab8138d7e993342f3 sha256 06dd85a3407081761548106a9c1896c9eaa02bf8ed30f1723df03a6fdf35b435
+   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): 27 lines, sha256 98e6b75fda5f512e2e8978df6283d92817608bc02b7fc4d78ded90ce0c54a7ca
+   recorded stages in handler-e2e-session-tag-results.txt: U-session-tag-unpatched=0 N-session-tag-wrong-header=1 P-session-tag-patched=0
+   static check (every expect_counts call names the recorded exit status):
+     U-session-tag-unpatched: 'expect_counts U-session-tag-unpatched 4 4 0' names no exit status (recorded exit=0): FAIL
+     N-session-tag-wrong-header: 'expect_counts N-session-tag-wrong-header 4 1 3' names no exit status (recorded exit=1): FAIL
+     P-session-tag-patched: 'expect_counts P-session-tag-patched 4 4 0' names no exit status (recorded exit=0): FAIL
+   cases:
+  handler-e2e-session-tag U-session-tag-unpatched/R log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:18Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag U-session-tag-unpatched/X42 log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag U-session-tag-unpatched/X124 log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag U-session-tag-unpatched/XF log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:18Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag U-session-tag-unpatched/C(4/1/3 for 4/4/0) log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:18Z U-session-tag-unpatched EXPECTATION VIOLATED: tests=4 pass=1 fail=3, expected tests=4 pass=4 fail=0: stopping
+  handler-e2e-session-tag U-session-tag-unpatched/M log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag N-session-tag-wrong-header/R log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:19Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+  handler-e2e-session-tag N-session-tag-wrong-header/X42 log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+  handler-e2e-session-tag N-session-tag-wrong-header/X124 log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+  handler-e2e-session-tag N-session-tag-wrong-header/XF log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+  handler-e2e-session-tag N-session-tag-wrong-header/C(4/4/0 for 4/1/3) log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:19Z N-session-tag-wrong-header EXPECTATION VIOLATED: tests=4 pass=4 fail=0, expected tests=4 pass=1 fail=3: stopping
+  handler-e2e-session-tag N-session-tag-wrong-header/M log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+  handler-e2e-session-tag P-session-tag-patched/R log=handler-e2e-session-tag-P-session-tag-patched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:19Z P-session-tag-patched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag P-session-tag-patched/X42 log=handler-e2e-session-tag-P-session-tag-patched.log exit=42 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z P-session-tag-patched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag P-session-tag-patched/X124 log=handler-e2e-session-tag-P-session-tag-patched.log exit=124 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z P-session-tag-patched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag P-session-tag-patched/XF log=handler-e2e-session-tag-P-session-tag-patched.log exit=1 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z P-session-tag-patched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag P-session-tag-patched/C(4/1/3 for 4/4/0) log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:19Z P-session-tag-patched EXPECTATION VIOLATED: tests=4 pass=1 fail=3, expected tests=4 pass=4 fail=0: stopping
+  handler-e2e-session-tag P-session-tag-patched/M log=handler-e2e-session-tag-P-session-tag-patched.log exit=0 -> accepted (required: rejected) NOT AS REQUIRED | last decision line: 23:37:19Z P-session-tag-patched failing tests are as expected: 0 name(s)
+== summary: cases as required 22 of 66; static check failures 11
+VERDICT: this version does NOT enforce the stages' exit status (44 case(s) not as required, 11 static check failure(s))
+scratch directory (remove with rm -rf after reading): $HOME/.cache/r13-s/runner/final/work/runner-exit-status-JQ62z6
+control exit=1
+
+## (2) the control on the fixed scripts
+# runner-exit-status-controls: run 2026-10-06T23:37:19Z; scratch $HOME/.cache/r13-s/runner/final/work/runner-exit-status-51TKYw
+== fixture logs (committed copies: sha256 compared with checks/logs/MANIFEST.txt; synthetic ones built from checks/drain-prototype-results.txt)
+  handler-e2e-P-e2e-patched.log sha256 9c1e130ef4089258515d438a1ade981f66163305673751b89ae6d0d6f13a1400 counters 5/5/0 (equals MANIFEST retained_sha256)
+  handler-e2e-U-e2e-unpatched.log sha256 60b340ee26a01eddeb437c0771dd158e70b0525dcc8d41ce88016a65cb5adef0 counters 5/1/4 (equals MANIFEST retained_sha256)
+  handler-e2e-session-tag-N-session-tag-wrong-header.log sha256 5f5728416664889a33bde7f96b8aa8bf6ed67188198e9bb1835edab9ca85bb15 counters 4/1/3 (equals MANIFEST retained_sha256)
+  handler-e2e-session-tag-P-session-tag-patched.log sha256 00c4a1063526c8d952d37c3cb8a42ecb33040f56195db8ace9f02f4558a47ed2 counters 4/4/0 (equals MANIFEST retained_sha256)
+  handler-e2e-session-tag-U-session-tag-unpatched.log sha256 4a47a1e27d353ac33a16572ecc4c8fb0d2fc6e2dd597cbe1c6e1ff16a0e96910 counters 4/4/0 (equals MANIFEST retained_sha256)
+  validation-N-new-test-unpatched.log sha256 d6704d187e676ecfa0a1435be6c355b60851ae429d2b65d3d904fdc5506d9133 counters 6/3/3 (equals MANIFEST retained_sha256)
+  validation-N2-new-test-first-version.log sha256 11ee23e5b2711cb71794b708a266d2d89d02bdbd7a76e39f75da835d081cb820 counters 6/4/2 (equals MANIFEST retained_sha256)
+  validation-P-new-test-patched.log sha256 a25eca62ec133663c0deca6405f6eab84e09ebff472572f1c3bef196995530a6 counters 6/6/0 (equals MANIFEST retained_sha256)
+== drain-prototype: drain-prototype.sh git blob ca8f8192fc38042df8a08a706e3893e8447d8197 sha256 f39aeeca727552d044d23d4923fc8e2bffa85e81bff4c717be60505cdb95f1de
+   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): 28 lines, sha256 2c8e24c17981da257fc94249d9f8b78f78a4669f4c900add1b26e799b0cf3bb9
+   recorded stages in drain-prototype-results.txt: A-baseline=1 N-new-test-unpatched=1 N2-new-test-first-version=1 P-new-test-patched=0 A2-stream-tests-patched=1 B2-calllog-usage-chat-pipeline=0
+   static check (every expect_counts call names the recorded exit status):
+     A-baseline: 'expect_counts A-baseline 1746 1745 1 1' expects exit=1 = recorded exit=1: ok
+     N-new-test-unpatched: 'expect_counts N-new-test-unpatched 6 3 3 1' expects exit=1 = recorded exit=1: ok
+     N2-new-test-first-version: 'expect_counts N2-new-test-first-version 6 4 2 1' expects exit=1 = recorded exit=1: ok
+     P-new-test-patched: 'expect_counts P-new-test-patched 6 6 0 0' expects exit=0 = recorded exit=0: ok
+     A2-stream-tests-patched: 'expect_counts A2-stream-tests-patched 1752 1751 1 1' expects exit=1 = recorded exit=1: ok
+     B2-calllog-usage-chat-pipeline: 'expect_counts B2-calllog-usage-chat-pipeline 126 126 0 0' expects exit=0 = recorded exit=0: ok
+   cases:
+  drain-prototype A-baseline/R log=synthetic-A-baseline.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:20Z A-baseline failing tests are as expected: 1 name(s)
+  drain-prototype A-baseline/X42 log=synthetic-A-baseline.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:20Z A-baseline EXIT STATUS VIOLATED: exit=42, expected exit=1: stopping
+  drain-prototype A-baseline/X124 log=synthetic-A-baseline.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:20Z A-baseline EXIT STATUS VIOLATED: exit=124, expected exit=1: stopping
+  drain-prototype A-baseline/XF log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:20Z A-baseline EXIT STATUS VIOLATED: exit=0, expected exit=1: stopping
+  drain-prototype A-baseline/C(6/3/3 for 1746/1745/1) log=validation-N-new-test-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:20Z A-baseline EXPECTATION VIOLATED: tests=6 pass=3 fail=3, expected tests=1746 pass=1745 fail=1: stopping
+  drain-prototype A-baseline/M log=synthetic-A-baseline.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:20Z A-baseline EXIT STATUS VIOLATED: exit=1, expected exit=none: stopping
+  drain-prototype N-new-test-unpatched/R log=validation-N-new-test-unpatched.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:20Z N-new-test-unpatched failing tests are as expected: 3 name(s)
+  drain-prototype N-new-test-unpatched/X42 log=validation-N-new-test-unpatched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:20Z N-new-test-unpatched EXIT STATUS VIOLATED: exit=42, expected exit=1: stopping
+  drain-prototype N-new-test-unpatched/X124 log=validation-N-new-test-unpatched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:20Z N-new-test-unpatched EXIT STATUS VIOLATED: exit=124, expected exit=1: stopping
+  drain-prototype N-new-test-unpatched/XF log=validation-N-new-test-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:20Z N-new-test-unpatched EXIT STATUS VIOLATED: exit=0, expected exit=1: stopping
+  drain-prototype N-new-test-unpatched/C(1746/1745/1 for 6/3/3) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:20Z N-new-test-unpatched EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=6 pass=3 fail=3: stopping
+  drain-prototype N-new-test-unpatched/M log=validation-N-new-test-unpatched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:20Z N-new-test-unpatched EXIT STATUS VIOLATED: exit=1, expected exit=none: stopping
+  drain-prototype N2-new-test-first-version/R log=validation-N2-new-test-first-version.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:20Z N2-new-test-first-version failing tests are as expected: 2 name(s)
+  drain-prototype N2-new-test-first-version/X42 log=validation-N2-new-test-first-version.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:21Z N2-new-test-first-version EXIT STATUS VIOLATED: exit=42, expected exit=1: stopping
+  drain-prototype N2-new-test-first-version/X124 log=validation-N2-new-test-first-version.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:21Z N2-new-test-first-version EXIT STATUS VIOLATED: exit=124, expected exit=1: stopping
+  drain-prototype N2-new-test-first-version/XF log=validation-N2-new-test-first-version.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:21Z N2-new-test-first-version EXIT STATUS VIOLATED: exit=0, expected exit=1: stopping
+  drain-prototype N2-new-test-first-version/C(1746/1745/1 for 6/4/2) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:21Z N2-new-test-first-version EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=6 pass=4 fail=2: stopping
+  drain-prototype N2-new-test-first-version/M log=validation-N2-new-test-first-version.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:21Z N2-new-test-first-version EXIT STATUS VIOLATED: exit=1, expected exit=none: stopping
+  drain-prototype P-new-test-patched/R log=validation-P-new-test-patched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:21Z P-new-test-patched failing tests are as expected: 0 name(s)
+  drain-prototype P-new-test-patched/X42 log=validation-P-new-test-patched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:21Z P-new-test-patched EXIT STATUS VIOLATED: exit=42, expected exit=0: stopping
+  drain-prototype P-new-test-patched/X124 log=validation-P-new-test-patched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:21Z P-new-test-patched EXIT STATUS VIOLATED: exit=124, expected exit=0: stopping
+  drain-prototype P-new-test-patched/XF log=validation-P-new-test-patched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:21Z P-new-test-patched EXIT STATUS VIOLATED: exit=1, expected exit=0: stopping
+  drain-prototype P-new-test-patched/C(1746/1745/1 for 6/6/0) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:21Z P-new-test-patched EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=6 pass=6 fail=0: stopping
+  drain-prototype P-new-test-patched/M log=validation-P-new-test-patched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:21Z P-new-test-patched EXIT STATUS VIOLATED: exit=0, expected exit=none: stopping
+  drain-prototype A2-stream-tests-patched/R log=synthetic-A2-stream-tests-patched.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:21Z A2-stream-tests-patched failing tests are as expected: 1 name(s)
+  drain-prototype A2-stream-tests-patched/X42 log=synthetic-A2-stream-tests-patched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:21Z A2-stream-tests-patched EXIT STATUS VIOLATED: exit=42, expected exit=1: stopping
+  drain-prototype A2-stream-tests-patched/X124 log=synthetic-A2-stream-tests-patched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:21Z A2-stream-tests-patched EXIT STATUS VIOLATED: exit=124, expected exit=1: stopping
+  drain-prototype A2-stream-tests-patched/XF log=synthetic-A2-stream-tests-patched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:21Z A2-stream-tests-patched EXIT STATUS VIOLATED: exit=0, expected exit=1: stopping
+  drain-prototype A2-stream-tests-patched/C(1746/1745/1 for 1752/1751/1) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:21Z A2-stream-tests-patched EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=1752 pass=1751 fail=1: stopping
+  drain-prototype A2-stream-tests-patched/M log=synthetic-A2-stream-tests-patched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:22Z A2-stream-tests-patched EXIT STATUS VIOLATED: exit=1, expected exit=none: stopping
+  drain-prototype B2-calllog-usage-chat-pipeline/R log=synthetic-B2-calllog-usage-chat-pipeline.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:22Z B2-calllog-usage-chat-pipeline failing tests are as expected: 0 name(s)
+  drain-prototype B2-calllog-usage-chat-pipeline/X42 log=synthetic-B2-calllog-usage-chat-pipeline.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:22Z B2-calllog-usage-chat-pipeline EXIT STATUS VIOLATED: exit=42, expected exit=0: stopping
+  drain-prototype B2-calllog-usage-chat-pipeline/X124 log=synthetic-B2-calllog-usage-chat-pipeline.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:22Z B2-calllog-usage-chat-pipeline EXIT STATUS VIOLATED: exit=124, expected exit=0: stopping
+  drain-prototype B2-calllog-usage-chat-pipeline/XF log=synthetic-B2-calllog-usage-chat-pipeline.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:22Z B2-calllog-usage-chat-pipeline EXIT STATUS VIOLATED: exit=1, expected exit=0: stopping
+  drain-prototype B2-calllog-usage-chat-pipeline/C(1746/1745/1 for 126/126/0) log=synthetic-A-baseline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:22Z B2-calllog-usage-chat-pipeline EXPECTATION VIOLATED: tests=1746 pass=1745 fail=1, expected tests=126 pass=126 fail=0: stopping
+  drain-prototype B2-calllog-usage-chat-pipeline/M log=synthetic-B2-calllog-usage-chat-pipeline.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:22Z B2-calllog-usage-chat-pipeline EXIT STATUS VIOLATED: exit=0, expected exit=none: stopping
+  synthetic fixture synthetic-A-baseline.log: counters 1746/1745/1, sha256 2ceed69848ba11b3919a12ca15f16fb541b69fc61ab158c4d36e47e09a1cf02f
+  synthetic fixture synthetic-A2-stream-tests-patched.log: counters 1752/1751/1, sha256 03bb7a131f0436e6e2df3c09502d2804e9111aa3f708a015031674ebbc962ad6
+  synthetic fixture synthetic-B2-calllog-usage-chat-pipeline.log: counters 126/126/0, sha256 846310c6718f729ee8c5605abb536597574804dc8dbc58e27d7554796a6bb418
+== handler-e2e: handler-e2e.sh git blob 9981341f47468fed763638520c5044df622370fa sha256 47df265f0624a7d90748b17d915a9f42ea8493bc546e2f883ea732a343cd1e2c
+   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): 30 lines, sha256 86ca5ad9d865f3704e9c4a349db4490aa6cafeaee5a4969a3043d7e3a663a5d2
+   recorded stages in handler-e2e-results.txt: U-e2e-unpatched=1 P-e2e-patched=0
+   static check (every expect_counts call names the recorded exit status):
+     U-e2e-unpatched: 'expect_counts U-e2e-unpatched 5 1 4 1' expects exit=1 = recorded exit=1: ok
+     P-e2e-patched: 'expect_counts P-e2e-patched 5 5 0 0' expects exit=0 = recorded exit=0: ok
+   cases:
+  handler-e2e U-e2e-unpatched/R log=handler-e2e-U-e2e-unpatched.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:22Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+  handler-e2e U-e2e-unpatched/X42 log=handler-e2e-U-e2e-unpatched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:22Z U-e2e-unpatched EXIT STATUS VIOLATED: exit=42, expected exit=1: stopping
+  handler-e2e U-e2e-unpatched/X124 log=handler-e2e-U-e2e-unpatched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:22Z U-e2e-unpatched EXIT STATUS VIOLATED: exit=124, expected exit=1: stopping
+  handler-e2e U-e2e-unpatched/XF log=handler-e2e-U-e2e-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:22Z U-e2e-unpatched EXIT STATUS VIOLATED: exit=0, expected exit=1: stopping
+  handler-e2e U-e2e-unpatched/C(5/5/0 for 5/1/4) log=handler-e2e-P-e2e-patched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:22Z U-e2e-unpatched EXPECTATION VIOLATED: tests=5 pass=5 fail=0, expected tests=5 pass=1 fail=4: stopping
+  handler-e2e U-e2e-unpatched/M log=handler-e2e-U-e2e-unpatched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:22Z U-e2e-unpatched EXIT STATUS VIOLATED: exit=1, expected exit=none: stopping
+  handler-e2e P-e2e-patched/R log=handler-e2e-P-e2e-patched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:22Z P-e2e-patched failing tests are as expected: 0 name(s)
+  handler-e2e P-e2e-patched/X42 log=handler-e2e-P-e2e-patched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:22Z P-e2e-patched EXIT STATUS VIOLATED: exit=42, expected exit=0: stopping
+  handler-e2e P-e2e-patched/X124 log=handler-e2e-P-e2e-patched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:22Z P-e2e-patched EXIT STATUS VIOLATED: exit=124, expected exit=0: stopping
+  handler-e2e P-e2e-patched/XF log=handler-e2e-P-e2e-patched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:23Z P-e2e-patched EXIT STATUS VIOLATED: exit=1, expected exit=0: stopping
+  handler-e2e P-e2e-patched/C(5/1/4 for 5/5/0) log=handler-e2e-U-e2e-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:23Z P-e2e-patched EXPECTATION VIOLATED: tests=5 pass=1 fail=4, expected tests=5 pass=5 fail=0: stopping
+  handler-e2e P-e2e-patched/M log=handler-e2e-P-e2e-patched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:23Z P-e2e-patched EXIT STATUS VIOLATED: exit=0, expected exit=none: stopping
+== handler-e2e-session-tag: handler-e2e-session-tag.sh git blob 158fde99313006466d5d6a06e1c3515f89d6b91b sha256 7babbb8dec50e913159f07e082bc80b2b3d6fe24ad237b55a21e641e08457bf0
+   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): 30 lines, sha256 813b0af0499f3a9b009cedc3e5fa517307f3d5b164c2e87ab75c994eadb2ac3f
+   recorded stages in handler-e2e-session-tag-results.txt: U-session-tag-unpatched=0 N-session-tag-wrong-header=1 P-session-tag-patched=0
+   static check (every expect_counts call names the recorded exit status):
+     U-session-tag-unpatched: 'expect_counts U-session-tag-unpatched 4 4 0 0' expects exit=0 = recorded exit=0: ok
+     N-session-tag-wrong-header: 'expect_counts N-session-tag-wrong-header 4 1 3 1' expects exit=1 = recorded exit=1: ok
+     P-session-tag-patched: 'expect_counts P-session-tag-patched 4 4 0 0' expects exit=0 = recorded exit=0: ok
+   cases:
+  handler-e2e-session-tag U-session-tag-unpatched/R log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:23Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag U-session-tag-unpatched/X42 log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:23Z U-session-tag-unpatched EXIT STATUS VIOLATED: exit=42, expected exit=0: stopping
+  handler-e2e-session-tag U-session-tag-unpatched/X124 log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:23Z U-session-tag-unpatched EXIT STATUS VIOLATED: exit=124, expected exit=0: stopping
+  handler-e2e-session-tag U-session-tag-unpatched/XF log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:23Z U-session-tag-unpatched EXIT STATUS VIOLATED: exit=1, expected exit=0: stopping
+  handler-e2e-session-tag U-session-tag-unpatched/C(4/1/3 for 4/4/0) log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:23Z U-session-tag-unpatched EXPECTATION VIOLATED: tests=4 pass=1 fail=3, expected tests=4 pass=4 fail=0: stopping
+  handler-e2e-session-tag U-session-tag-unpatched/M log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:23Z U-session-tag-unpatched EXIT STATUS VIOLATED: exit=0, expected exit=none: stopping
+  handler-e2e-session-tag N-session-tag-wrong-header/R log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=1 -> accepted (required: accepted) as required | last decision line: 23:37:23Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+  handler-e2e-session-tag N-session-tag-wrong-header/X42 log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:23Z N-session-tag-wrong-header EXIT STATUS VIOLATED: exit=42, expected exit=1: stopping
+  handler-e2e-session-tag N-session-tag-wrong-header/X124 log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:23Z N-session-tag-wrong-header EXIT STATUS VIOLATED: exit=124, expected exit=1: stopping
+  handler-e2e-session-tag N-session-tag-wrong-header/XF log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:23Z N-session-tag-wrong-header EXIT STATUS VIOLATED: exit=0, expected exit=1: stopping
+  handler-e2e-session-tag N-session-tag-wrong-header/C(4/4/0 for 4/1/3) log=handler-e2e-session-tag-U-session-tag-unpatched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:23Z N-session-tag-wrong-header EXPECTATION VIOLATED: tests=4 pass=4 fail=0, expected tests=4 pass=1 fail=3: stopping
+  handler-e2e-session-tag N-session-tag-wrong-header/M log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:23Z N-session-tag-wrong-header EXIT STATUS VIOLATED: exit=1, expected exit=none: stopping
+  handler-e2e-session-tag P-session-tag-patched/R log=handler-e2e-session-tag-P-session-tag-patched.log exit=0 -> accepted (required: accepted) as required | last decision line: 23:37:24Z P-session-tag-patched failing tests are as expected: 0 name(s)
+  handler-e2e-session-tag P-session-tag-patched/X42 log=handler-e2e-session-tag-P-session-tag-patched.log exit=42 -> rejected (required: rejected) as required | last decision line: 23:37:24Z P-session-tag-patched EXIT STATUS VIOLATED: exit=42, expected exit=0: stopping
+  handler-e2e-session-tag P-session-tag-patched/X124 log=handler-e2e-session-tag-P-session-tag-patched.log exit=124 -> rejected (required: rejected) as required | last decision line: 23:37:24Z P-session-tag-patched EXIT STATUS VIOLATED: exit=124, expected exit=0: stopping
+  handler-e2e-session-tag P-session-tag-patched/XF log=handler-e2e-session-tag-P-session-tag-patched.log exit=1 -> rejected (required: rejected) as required | last decision line: 23:37:24Z P-session-tag-patched EXIT STATUS VIOLATED: exit=1, expected exit=0: stopping
+  handler-e2e-session-tag P-session-tag-patched/C(4/1/3 for 4/4/0) log=handler-e2e-session-tag-N-session-tag-wrong-header.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:24Z P-session-tag-patched EXPECTATION VIOLATED: tests=4 pass=1 fail=3, expected tests=4 pass=4 fail=0: stopping
+  handler-e2e-session-tag P-session-tag-patched/M log=handler-e2e-session-tag-P-session-tag-patched.log exit=0 -> rejected (required: rejected) as required | last decision line: 23:37:24Z P-session-tag-patched EXIT STATUS VIOLATED: exit=0, expected exit=none: stopping
+== summary: cases as required 66 of 66; static check failures 0
+VERDICT: this version enforces each stage's exit status beside its counts and failing names (every case and the static check as required)
+scratch directory (remove with rm -rf after reading): $HOME/.cache/r13-s/runner/final/work/runner-exit-status-51TKYw
+control exit=0
+
+## (3) existing offline controls rerun on the fixed scripts
+### drain-prototype-controls (3), on drain-prototype.sh version 6: a DRAIN_DIR that holds no patch must stop with exit 2 before anything is created
+missing input file: $HOME/.cache/r13-s/runner/final/pre/empty-drain-dir/drain-after-terminal.patch
+script exit=2
+omniroute-drain-validate-* work directories before: 0, after: 0
+
+(the unmodified published copy scripts/handler-e2e-terminal-close.test.ts.txt has sha256 9ab6eae294a2b6912e5c2132f3210b34c1e1d08a90b4864d228c80fb3c69f190; the pin in handler-e2e.sh is 9ab6eae294a2b6912e5c2132f3210b34c1e1d08a90b4864d228c80fb3c69f190: equal, so the preflight below rejects the extra line, not the file)
+(the unmodified published copy scripts/handler-e2e-session-tag.test.ts.txt has sha256 f40472876b743faaa537ca80e3b58e8c7e3d35a2e0717b134f9fa54180e9b737; the pin in handler-e2e-session-tag.sh is f40472876b743faaa537ca80e3b58e8c7e3d35a2e0717b134f9fa54180e9b737: equal, so the preflight below rejects the extra line, not the file)
+### handler-e2e-pinned-file-control, on handler-e2e.sh version 3: a handler-e2e-terminal-close.test.ts with one extra comment line must stop with exit 2 before anything is created
+handler-e2e-terminal-close.test.ts is not the pinned file (sha256 9ab6eae294a2b6912e5c2132f3210b34c1e1d08a90b4864d228c80fb3c69f190)
+exit=2
+omniroute-handler-e2e-* work directories before the run: 0, after: 0
+
+### the same pinned-file preflight on handler-e2e-session-tag.sh version 2 (no recorded control of its own): a handler-e2e-session-tag.test.ts with one extra comment line must stop with exit 2 before anything is created
+handler-e2e-session-tag.test.ts is not the pinned file (sha256 f40472876b743faaa537ca80e3b58e8c7e3d35a2e0717b134f9fa54180e9b737)
+exit=2
+omniroute-handler-e2e-session-tag-* work directories before the run: 0, after: 0
+
+### bash -n (syntax) of the fixed scripts
+drain-prototype.sh: bash -n exit=0
+handler-e2e.sh: bash -n exit=0
+handler-e2e-session-tag.sh: bash -n exit=0

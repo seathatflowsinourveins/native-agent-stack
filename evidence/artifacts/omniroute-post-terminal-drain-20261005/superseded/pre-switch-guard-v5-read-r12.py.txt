@@ -5,9 +5,6 @@ two; do not switch unless it exits 0. It answers the questions the command cente
  1. Is the switch tool the pinned one? sha256 of the copy that will be run equals the committed evidence copy's (97d1b87b...).
  2. Is the first-hop rollback target intact? The prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 has bin/omniroute, dist/BUILD_SHA cf6748d04 and shim/lsof with sha256 b6ae9002... (the reviewed shim v2), and the
     unit currently runs it (identity read-back: gateway-identity-20261006.py, health ok). Is the target intact? bin/omniroute, dist/BUILD_SHA 2a41147b7, the same shim, and the drain's marker in its compiled chunks.
-    In both prefixes bin/omniroute and shim/lsof must be, with their symlinks resolved, regular files that the guard's user (the units' user) may read and execute. Round 13 (full-scope read r12, P2-4; still version 5): the check
-    required only that bin/omniroute EXISTS and that the shim has the pinned hash, so a prefix whose entrypoint or shim had lost its execute permission, or whose entrypoint was a directory, read as intact; a running
-    process of the prefix stays healthy after such a loss, while the rollback that launches the prefix would fail. A dangling symlink, a directory or a missing permission is now a problem of the prefix.
  3. Is nothing in flight? For --clean-for seconds (default 30), sampled every --interval seconds (default 5), ALL of:
     - no worker process of another lane (omniroute-codex-sdk/worker.py, `codex exec`, or an interactive `codex` that names the omniroute profile or the gateway port);
     - no call_logs row in the last 120 s;
@@ -85,37 +82,20 @@ def build_sha(tools, prefix):
     return p.read_text().strip() if p.exists() else ""
 
 
-def not_runnable(path):
-    """Why this user could not launch `path` ("" when it can): with its symlinks resolved it must be a regular file that this user may read and execute (the entrypoint and the shim are scripts, so
-    their interpreter has to read them; the guard runs as the units' user). "missing" when there is no such entry at all; a dangling symlink, a directory and a file without those permissions are problems too."""
-    if not path.exists() and not path.is_symlink():
-        return "missing"
-    real = Path(os.path.realpath(path))
-    if not real.exists():
-        return "is a dangling symlink"
-    if not real.is_file():
-        return "is a directory, not a regular file" if real.is_dir() else "is not a regular file"
-    if not os.access(real, os.R_OK | os.X_OK):
-        return f"is not readable and executable by this user (mode {oct(real.stat().st_mode & 0o777)})"
-    return ""
-
-
 def check_prefix(tools, name, build, shim_sha, marker):
     """Problems of one install prefix, as strings (empty list: intact)."""
     base = Path(tools) / name
     problems = []
     if not base.is_dir():
         return [f"prefix {name} does not exist"]
-    why = not_runnable(base / "bin/omniroute")
-    if why:
-        problems.append("missing bin/omniroute" if why == "missing" else f"bin/omniroute {why}")
+    if not (base / "bin/omniroute").exists():
+        problems.append("missing bin/omniroute")
     got = build_sha(tools, name)
     if got != build:
         problems.append(f"dist/BUILD_SHA is {got or 'missing'}, expected {build}")
     shim = base / "shim/lsof"
-    why = not_runnable(shim)
-    if why:
-        problems.append("missing shim/lsof" if why == "missing" else f"shim/lsof {why}")
+    if not shim.exists():
+        problems.append("missing shim/lsof")
     elif sha256(shim) != shim_sha:
         problems.append("shim/lsof sha256 is not the reviewed shim v2")
     if marker:
