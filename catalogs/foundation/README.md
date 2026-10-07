@@ -6,6 +6,13 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
+The [October 7 memory/RAG architecture recommendations](../../docs/decisions/2026-10-07-memory-rag-source-stacks.md)
+give five final upstream-quality stacks by workload, with an
+[18-repository source review](../../evidence/artifacts/memory-rag-stacks-20261007/review.json)
+and [machine-readable recommendations](memory-rag-stacks-20261007.json).
+They distinguish recommended architectures from deployment qualification and
+preserve current selections, historical evidence and independently owned trials.
+
 The [October 2 two-host architecture decision](../../docs/decisions/2026-10-02-two-host-north-star-architecture.md)
 reconciles the macOS/workstation roles, current native Sol policy, SDK/gateway
 boundary and Pi release review for starting North Star R&D. Its dated source

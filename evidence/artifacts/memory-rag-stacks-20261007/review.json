@@ -1,0 +1,466 @@
+{
+  "schema_version": 1,
+  "kind": "memory_rag_upstream_quality_review",
+  "checked_at": "2026-10-07",
+  "catalog_base_commit": "e712bae606e8d27f010af8e3c13ded6b7a7c207a",
+  "evidence_class": "source_review",
+  "method": [
+    "Authenticated read-only GitHub discovery found 366 starred repositories; 56 matched memory/retrieval-related names, descriptions or topics.",
+    "Reviewed selected upstream source at the recorded commit, release metadata, test workflows, hosted CI observations, benchmark disclosures, license boundaries and documented integrations.",
+    "Repository quality is an engineering judgment by role, not a numeric benchmark ranking. Source-file presence alone is not a passing test.",
+    "Three reviewers owned separate memory, document-RAG and coding-context scopes; a completeness critic checked the proposed composition. This was not a blind or cross-family convergence experiment."
+  ],
+  "source_scope": "18 reviewed repositories: 15 in the observed star inventory plus Docling, Haystack and Qdrant. This is a bounded shortlist, not an exhaustive global search.",
+  "raw_private_data_included": false,
+  "new_local_upstream_tests_run": 0,
+  "new_model_or_benchmark_runs": 0,
+  "complete_stack_executed": false,
+  "whole_task_usage": null,
+  "net_token_savings": null,
+  "inspected_repositories": [
+    {
+      "id": "vectorize-io/hindsight",
+      "starred": true,
+      "ref": "9269b88417ed263e5a8350f2e416ca2b322756b1",
+      "release": "v0.10.2",
+      "release_date": "2026-09-29",
+      "license": "MIT",
+      "role": "general agent memory",
+      "strengths": [
+        "Retain/recall/reflect; semantic, BM25, graph and temporal retrieval with reranking.",
+        "API, real-model, SDK, integration and deployment workflows; public evaluation harness."
+      ],
+      "observations": [
+        "The latest retrieved successful core CI was dated September 29 on an earlier revision, not the reviewed head.",
+        "Reviewed-head AMB jobs failed for missing Groq credentials; the overall performance run was in progress. This is not an accuracy-threshold failure.",
+        "Published mutable latest-image vulnerability scans failed while fresh-main image scans passed; neither establishes the status of a pinned stable image digest."
+      ],
+      "benchmark_limit": "Vendor-authored harness publishes datasets, prompts, models, baselines and outputs; no matched local comparative run was executed.",
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/blob/9269b88417ed263e5a8350f2e416ca2b322756b1/.github/workflows/test.yml",
+        "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+        "https://github.com/vectorize-io/agent-memory-benchmark/tree/5ad91b0ae9f5d338a747eee40d5ee1a584222d26",
+        "https://github.com/vectorize-io/hindsight/actions/runs/37579277981/job/112655016523",
+        "https://github.com/vectorize-io/hindsight/actions/runs/37577486883/job/112649536610",
+        "https://hindsight.vectorize.io/developer/installation"
+      ]
+    },
+    {
+      "id": "docling-project/docling",
+      "starred": false,
+      "ref": "4d4f6f7d123d221195fb64775c796c4de1f81c3b",
+      "release": "v2.134.0",
+      "release_date": "2026-10-06",
+      "license": "MIT",
+      "role": "structured document ingestion",
+      "strengths": [
+        "Layout, reading order, tables, OCR and structured document representation.",
+        "Regression ground-truth fixtures, core and ML/OCR test lanes, and documented Haystack integration."
+      ],
+      "observations": [
+        "Reviewed-head CI had 10 successful, 4 skipped and 3 in-progress checks at observation; no failure was observed in that snapshot.",
+        "The preceding Run CI Main at f80a79b08d13cc1c9f37106e9aaf689cf9f76e4f succeeded."
+      ],
+      "benchmark_limit": "Parser features and regression coverage do not establish extraction accuracy on the user's corpus.",
+      "sources": [
+        "https://github.com/docling-project/docling/blob/4d4f6f7d123d221195fb64775c796c4de1f81c3b/.github/workflows/checks.yml",
+        "https://github.com/docling-project/docling/tree/4d4f6f7d123d221195fb64775c796c4de1f81c3b/tests",
+        "https://github.com/docling-project/docling/actions/runs/37579435000",
+        "https://github.com/docling-project/docling/actions/runs/37575899428",
+        "https://github.com/docling-project/docling/releases/tag/v2.134.0",
+        "https://docs.haystack.deepset.ai/docs/doclingconverter"
+      ]
+    },
+    {
+      "id": "deepset-ai/haystack",
+      "starred": false,
+      "ref": "234fc68f9c7bb7c156a5495f89b72d7aa27a907e",
+      "release": "v3.3.0",
+      "release_date": "2026-10-01",
+      "license": "Apache-2.0",
+      "role": "retrieval and agent pipeline orchestration",
+      "strengths": [
+        "Explicit component pipelines and documented Docling/Qdrant integrations.",
+        "Actual Windows, macOS and Linux unit/integration jobs succeeded in the inspected Tests run."
+      ],
+      "observations": [
+        "Inspected successful Tests run used 5d298af165ab0e01c1bf5dcada0fe1db9728af1b; it is not proof of testing the reviewed head.",
+        "Reviewed-head checks were one success and two skips; workflow path filters can produce successful runs without executing tests."
+      ],
+      "benchmark_limit": "Framework testing and integration docs do not rank retrieval quality or prove this full composition.",
+      "sources": [
+        "https://github.com/deepset-ai/haystack/blob/234fc68f9c7bb7c156a5495f89b72d7aa27a907e/.github/workflows/tests.yml",
+        "https://github.com/deepset-ai/haystack/actions/runs/37510310966",
+        "https://github.com/deepset-ai/haystack/releases/tag/v3.3.0",
+        "https://docs.haystack.deepset.ai/docs/qdranthybridretriever",
+        "https://docs.haystack.deepset.ai/docs/doclingconverter"
+      ]
+    },
+    {
+      "id": "qdrant/qdrant",
+      "starred": false,
+      "ref": "016542aa5deb6c66380bb137badf73d54f742bde",
+      "release": "v1.19.2",
+      "release_date": "2026-10-05",
+      "license": "Apache-2.0",
+      "role": "hybrid document retrieval storage",
+      "strengths": [
+        "Dense/sparse retrieval, payload filtering and Haystack hybrid retrieval integration.",
+        "Reviewed-head integration jobs passed for single/distributed operation, consensus, consistency and snapshots."
+      ],
+      "observations": [
+        "Full check snapshot: 47 success, one cancelled, one failure, one skipped and one in progress.",
+        "The observed failure was Dependabot; model testing was in progress. This is not an all-green-head claim."
+      ],
+      "benchmark_limit": "Database correctness checks are not answer-quality or full-pipeline performance measurements.",
+      "sources": [
+        "https://github.com/qdrant/qdrant/blob/016542aa5deb6c66380bb137badf73d54f742bde/.github/workflows/integration-tests.yml",
+        "https://github.com/qdrant/qdrant/actions/runs/37294061449",
+        "https://github.com/qdrant/qdrant/actions/runs/37294077687/job/111711078888",
+        "https://github.com/qdrant/qdrant/releases/tag/v1.19.2",
+        "https://docs.haystack.deepset.ai/docs/qdranthybridretriever"
+      ]
+    },
+    {
+      "id": "comet-ml/opik",
+      "starred": true,
+      "ref": "f217a863ea3cbfcef7f9ab8217c543049bdff095",
+      "release": "2.2.92",
+      "release_date": "2026-10-06",
+      "license": "Apache-2.0",
+      "role": "tracing and evaluation",
+      "strengths": [
+        "Datasets, traces, custom evaluation and Python/TypeScript integration workflows.",
+        "Inspected SDK E2E library tests passed across Python 3.10 through 3.14; Haystack instrumentation is documented."
+      ],
+      "observations": [
+        "Reviewed-head check snapshot included 242 success, 8 skipped, 3 failure and 6 cancelled.",
+        "One inspected failing metrics job returned 1 failed, 57 passed and 12 skipped: Ragas LangchainLLMWrapper rejected bypass_temperature.",
+        "Another OpenAI integration check failed; its root cause was not classified in this review."
+      ],
+      "benchmark_limit": "Use only evaluated metric integrations; automatic judges are not an independent ground-truth oracle.",
+      "sources": [
+        "https://github.com/comet-ml/opik/blob/f217a863ea3cbfcef7f9ab8217c543049bdff095/.github/workflows/lib-haystack-tests.yml",
+        "https://github.com/comet-ml/opik/actions/runs/37554602464",
+        "https://github.com/comet-ml/opik/actions/runs/37551972141/job/112569384020",
+        "https://github.com/comet-ml/opik/actions/runs/37482806043/job/112335829772",
+        "https://github.com/comet-ml/opik/releases/tag/2.2.92",
+        "https://www.comet.com/docs/opik/integrations/haystack"
+      ]
+    },
+    {
+      "id": "akitaonrails/ai-memory",
+      "starred": true,
+      "ref": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "release": "v2.6.0",
+      "release_date": "2026-10-07",
+      "license": "MIT",
+      "role": "cross-client coding continuity",
+      "strengths": [
+        "Portable Markdown wiki and derived index, owned handoffs, recovery and native-session integration.",
+        "Official multiplatform release artifacts/checksums, cross-platform CI, doctests and deterministic retrieval tests."
+      ],
+      "observations": [
+        "Reviewed-head snapshot had 68 successful checks.",
+        "Upstream v2.6.0 availability does not upgrade any deployed v2.5.2 selection."
+      ],
+      "benchmark_limit": "Published local-embedding hit@5 does not establish universal retrieval superiority.",
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/docs/ARCHITECTURE.md",
+        "https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/docs/benchmarks/README.md",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.0"
+      ]
+    },
+    {
+      "id": "DeusData/codebase-memory-mcp",
+      "starred": true,
+      "ref": "e71f23ecf40e473a3e0a49cff1ffebcccead384d",
+      "release": "v0.11.0",
+      "release_date": "2026-09-15",
+      "license": "MIT",
+      "role": "structural code context",
+      "strengths": [
+        "Code graphs, call tracing, impact analysis and compact local operation.",
+        "Official platform artifacts, checksum/signature/SBOM records and platform/ThreadSanitizer CI."
+      ],
+      "observations": [
+        "Reviewed-main snapshot had 13 successful checks and one failed publish check."
+      ],
+      "benchmark_limit": "The inspected evaluation plan contains no executed scores; a language benchmark is dated v0.3.0. Advertised token savings are not verified whole-task savings.",
+      "sources": [
+        "https://github.com/DeusData/codebase-memory-mcp/blob/e71f23ecf40e473a3e0a49cff1ffebcccead384d/.github/workflows/_test.yml",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/e71f23ecf40e473a3e0a49cff1ffebcccead384d/docs/EVALUATION_PLAN.md",
+        "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+      ]
+    },
+    {
+      "id": "giancarloerra/SocratiCode",
+      "starred": true,
+      "ref": "1e829bf7ddf1e34c4cc6713227f00422cee791cc",
+      "release": "v1.16.0",
+      "release_date": "2026-09-28",
+      "license": "AGPL-3.0-only; commercial option",
+      "role": "optional semantic code retrieval",
+      "strengths": [
+        "Hybrid semantic/keyword search, code/infra artifacts and dependency context.",
+        "Unit/integration/E2E suites include real Qdrant/Ollama service tests."
+      ],
+      "observations": [
+        "Reviewed-head snapshot had 10 successful checks.",
+        "CI's floating Ollama latest image limits reproducibility."
+      ],
+      "benchmark_limit": "Its additional services and index must earn a distinct semantic role; no measured win over the structural tool was established.",
+      "sources": [
+        "https://github.com/giancarloerra/SocratiCode/blob/1e829bf7ddf1e34c4cc6713227f00422cee791cc/.github/workflows/ci.yml",
+        "https://github.com/giancarloerra/SocratiCode/blob/1e829bf7ddf1e34c4cc6713227f00422cee791cc/package.json",
+        "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
+      ]
+    },
+    {
+      "id": "mem0ai/mem0",
+      "starred": true,
+      "ref": "c93420c49a6b14c3d446bdb156d96811908fd90a",
+      "release": "ts-v3.3.1",
+      "release_date": "2026-09-25",
+      "release_channel": "TypeScript; not a version for all packages",
+      "license": "Apache-2.0",
+      "role": "application personalization",
+      "strengths": [
+        "User/session/agent memory with library, self-hosted server and managed deployment options.",
+        "Reviewed-head Python 3.10-3.12 and Node 20/22 CI succeeded."
+      ],
+      "observations": [
+        "Managed-platform benchmark optimizations are not all present in the OSS SDK."
+      ],
+      "benchmark_limit": "Public evaluation code also supports OSS configurations, but managed scores must not be attributed to those configurations.",
+      "sources": [
+        "https://github.com/mem0ai/mem0/blob/c93420c49a6b14c3d446bdb156d96811908fd90a/README.md",
+        "https://github.com/mem0ai/mem0/actions/runs/37332380424",
+        "https://github.com/mem0ai/mem0/actions/runs/37332380515",
+        "https://github.com/mem0ai/memory-benchmarks/tree/4b61c5d31b9c668a12b4f5e78064248a02c82d2b",
+        "https://github.com/mem0ai/mem0/releases/tag/ts-v3.3.1"
+      ]
+    },
+    {
+      "id": "infiniflow/ragflow",
+      "starred": true,
+      "ref": "cc72ecb0af18ade5d58f84d107af7cd59a88c39f",
+      "release": "v1.0.0-rc1",
+      "release_date": "2026-09-29",
+      "established_release": "v0.27.2",
+      "established_release_date": "2026-09-10",
+      "license": "Apache-2.0",
+      "role": "packaged document RAG",
+      "strengths": [
+        "OCR/layout/table parsing, inspectable chunks/citations and integrated retrieval.",
+        "Actual API integration workflow covers Infinity and Elasticsearch."
+      ],
+      "observations": [
+        "Latest release is RC-named despite prerelease=false metadata; it is a substantial Go rewrite.",
+        "Reviewed-head tests failed against both backends. Infinity summary: 7 failed, 223 passed, 200 skipped, 2 deselected, 1 xfailed; parsing timeouts appeared.",
+        "The failures belong to reviewed Go-era main, not proven failures of v0.27.2; v0.27.2 release acceptance was not verified here."
+      ],
+      "benchmark_limit": "Capability recommendation has release-transition risk; root cause of the current integration failures remains unclassified.",
+      "sources": [
+        "https://github.com/infiniflow/ragflow/blob/cc72ecb0af18ade5d58f84d107af7cd59a88c39f/.github/workflows/sep-tests.yml",
+        "https://github.com/infiniflow/ragflow/actions/runs/37494996969",
+        "https://github.com/infiniflow/ragflow/releases/tag/v0.27.2",
+        "https://github.com/infiniflow/ragflow/releases/tag/v1.0.0-rc1"
+      ]
+    },
+    {
+      "id": "onyx-dot-app/onyx",
+      "starred": true,
+      "ref": "68dd959648704e0000b7bb070a699355bac11733",
+      "release": "v4.8.4",
+      "release_date": "2026-10-02",
+      "license": "MIT core; separate Enterprise License in ee directories",
+      "role": "connected enterprise knowledge",
+      "strengths": [
+        "Application connectors, permission ingestion, indexing workers, agents and MCP access.",
+        "Integration, connector, database, browser and MIT/EE CI paths."
+      ],
+      "observations": [
+        "Inspected head included failed required aggregators and cancelled browser jobs.",
+        "Expanded integration failure showed a Docker Hub token/network timeout while constructing an EE image; it does not demonstrate a retrieval defect.",
+        "Lite cannot index documents."
+      ],
+      "benchmark_limit": "No release-tag acceptance or comparative retrieval quality was established.",
+      "sources": [
+        "https://github.com/onyx-dot-app/onyx/blob/68dd959648704e0000b7bb070a699355bac11733/README.md",
+        "https://github.com/onyx-dot-app/onyx/blob/68dd959648704e0000b7bb070a699355bac11733/backend/ee/LICENSE",
+        "https://github.com/onyx-dot-app/onyx/actions/runs/37562057810",
+        "https://github.com/onyx-dot-app/onyx/releases/tag/v4.8.4"
+      ]
+    },
+    {
+      "id": "VectifyAI/PageIndex",
+      "starred": true,
+      "ref": "6d23caf416858f2ca136840305d1f479a86f6ef7",
+      "release": "v0.2.21",
+      "release_date": "2026-10-01",
+      "license": "MIT",
+      "role": "long text-document retrieval specialist",
+      "strengths": [
+        "Hierarchical document trees, reasoning retrieval and page references.",
+        "Python/framework/PDFium CI matrix; public PDFs, questions, runner and results for a bounded OSS benchmark."
+      ],
+      "observations": [
+        "Reviewed-head checks: 28 success, 2 skipped.",
+        "Local OSS handles text PDFs without OCR/image understanding.",
+        "The separate PageIndex-OSS-Benchmark repository-root locator is mutable; its reviewed revision was not retained."
+      ],
+      "benchmark_limit": "Public evaluation selects 62 text-lookup questions over 34 ingestible PDFs and excludes charts, tables, arithmetic and refused documents.",
+      "sources": [
+        "https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/.github/workflows/tests.yml",
+        "https://github.com/VectifyAI/PageIndex-OSS-Benchmark",
+        "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.21"
+      ]
+    },
+    {
+      "id": "HKUDS/RAG-Anything",
+      "starred": true,
+      "ref": "8664e8b318a3ed651fe62dfcfddfb1f1d633d5be",
+      "release": "v1.4.2",
+      "release_date": "2026-10-06",
+      "license": "MIT",
+      "role": "multimodal retrieval framework",
+      "strengths": [
+        "LightRAG-based text/image/table/equation retrieval with interchangeable document parsers.",
+        "Python 3.10-3.12 pytest CI and public reproduction scripts."
+      ],
+      "observations": [
+        "Reviewed-head snapshot had six successful checks.",
+        "Parser/model integration, first-use downloads and multimedia dependencies remain application responsibilities."
+      ],
+      "benchmark_limit": "Complete dataset provenance and end-to-end reproduction were not audited.",
+      "sources": [
+        "https://github.com/HKUDS/RAG-Anything/blob/8664e8b318a3ed651fe62dfcfddfb1f1d633d5be/.github/workflows/test.yaml",
+        "https://github.com/HKUDS/RAG-Anything/tree/8664e8b318a3ed651fe62dfcfddfb1f1d633d5be/reproduce",
+        "https://github.com/HKUDS/RAG-Anything/releases/tag/v1.4.2"
+      ]
+    },
+    {
+      "id": "volcengine/OpenViking",
+      "starred": true,
+      "ref": "87de989c5a18dc1f9fe2710cd60dbc48f1324527",
+      "release": "v0.4.23",
+      "release_date": "2026-10-02",
+      "license": "AGPL-3.0",
+      "role": "unified inspectable memory/knowledge/skills",
+      "strengths": [
+        "Filesystem-scoped context, progressive L0/L1/L2 reads and editable session memory.",
+        "Public LoCoMo, LongMemEval and RAG evaluation adapters plus OS/Python test matrix."
+      ],
+      "observations": [
+        "Latest retrieved main test checks passed on October 6 at an earlier revision; reviewed head had build/docs success without observed core test checks."
+      ],
+      "benchmark_limit": "Configurations differ across competitors; this does not prove leaderboard or workload superiority.",
+      "sources": [
+        "https://github.com/volcengine/OpenViking/blob/87de989c5a18dc1f9fe2710cd60dbc48f1324527/README.md",
+        "https://github.com/volcengine/OpenViking/tree/87de989c5a18dc1f9fe2710cd60dbc48f1324527/benchmark",
+        "https://github.com/volcengine/OpenViking/releases/tag/v0.4.23"
+      ]
+    },
+    {
+      "id": "topoteretes/cognee",
+      "starred": true,
+      "ref": "b32d8afc59e1064d9291b9828a8a147be9cc8bab",
+      "release": "v1.6.2",
+      "release_date": "2026-09-29",
+      "license": "Apache-2.0 core; separately licensed production paths",
+      "role": "graph and ontology specialist",
+      "strengths": [
+        "Graph/vector/code context, custom ontologies and inspectable retrieval.",
+        "Broad backend, OS, MCP and E2E workflows; public benchmark limitations are disclosed."
+      ],
+      "observations": [
+        "Reviewed current nightly cloud benchmark and published-image critical-vulnerability scans failed.",
+        "Production PostgreSQL graph and small-model extraction have separate licensing boundaries."
+      ],
+      "benchmark_limit": "BEAM report discloses same-question tuning at 10M and missing distributed orchestration; no general SOTA claim follows.",
+      "sources": [
+        "https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/README.md",
+        "https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/cognee/eval_framework/beam/REPORT.md",
+        "https://github.com/topoteretes/cognee/releases/tag/v1.6.2"
+      ]
+    },
+    {
+      "id": "rohitg00/agentmemory",
+      "starred": true,
+      "ref": "007a1a7fe8646a03d8652eb0712400cc6f0fcca3",
+      "release": "v0.9.30",
+      "release_date": "2026-10-06",
+      "license": "Apache-2.0",
+      "role": "coding-memory challenger",
+      "strengths": [
+        "Release gates, test coverage and explicit LongMemEval methodology."
+      ],
+      "observations": [
+        "Reviewed-head snapshot had 10 successful checks.",
+        "Default tests exclude integration; Windows CI is withheld."
+      ],
+      "benchmark_limit": "Published 96.6% recall_any@K is retrieval-only with MiniLM, without answer generation or judging; it is not an end-to-end win over Hindsight or Mem0.",
+      "sources": [
+        "https://github.com/rohitg00/agentmemory/blob/007a1a7fe8646a03d8652eb0712400cc6f0fcca3/benchmark/LONGMEMEVAL.md",
+        "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.30"
+      ]
+    },
+    {
+      "id": "MemPalace/mempalace",
+      "starred": true,
+      "ref": "d439d1e6d01e2680d79fe3f5de5a336722cec779",
+      "ref_branch": "develop",
+      "release": "v3.10.0",
+      "release_date": "2026-09-16",
+      "license": "MIT",
+      "role": "local raw-memory retrieval challenger",
+      "strengths": [
+        "Three-OS tests, coverage gates, backend conformance and official native wheels."
+      ],
+      "observations": [
+        "Inspected develop snapshot had nine successful checks."
+      ],
+      "benchmark_limit": "Disclosures separate raw-Chroma recall from QA accuracy; a 100% figure involved tuning on three errors, with 98.4% held-out reported. These are not matched reasoning-memory comparisons.",
+      "sources": [
+        "https://github.com/MemPalace/mempalace/blob/d439d1e6d01e2680d79fe3f5de5a336722cec779/benchmarks/BENCHMARKS.md",
+        "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0"
+      ]
+    },
+    {
+      "id": "supermemoryai/supermemory",
+      "starred": true,
+      "ref": "3535ff700da85134d1867e5eac1b649e8735e3af",
+      "release": "server-v0.0.8",
+      "release_date": "2026-08-17",
+      "license": "MIT public repository",
+      "role": "memory product/integration alternative",
+      "strengths": [
+        "Product integrations and a standalone self-hosted binary offering."
+      ],
+      "observations": [
+        "Inspected MCP client defaults to the hosted API.",
+        "Reviewed checks: seven success, one failed Workers build, one neutral."
+      ],
+      "benchmark_limit": "Reproducible public-source-to-binary core parity was not established, so this review does not award an OSS-core quality lead.",
+      "sources": [
+        "https://github.com/supermemoryai/supermemory/blob/3535ff700da85134d1867e5eac1b649e8735e3af/apps/mcp/src/server/client/index.ts",
+        "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"
+      ]
+    }
+  ],
+  "completeness_critic": {
+    "verdict": "Publish final source-review recommendations, not universal SOTA or runtime acceptance.",
+    "unresolved": [
+      "Embedding, sparse-retrieval, reranking and generation model choices and exact model revisions.",
+      "Cross-component package locks, deployment configuration and immutable release-image digests.",
+      "Representative ingest/retrieve/rerank/generate/cite/evaluate/remember lifecycle, latency, recovery and complete cost.",
+      "Independent matched comparative evaluation; vendor benchmark methodologies differ."
+    ],
+    "next_landscape_sweep_inputs": [
+      "Evaluate model-layer choices on the intended corpus using maintained upstream harnesses when separately scoped.",
+      "Assess permission propagation and citation provenance across the complete document pipeline.",
+      "Revisit changed release/CI evidence without treating later fixes as erasing the retained failure snapshots."
+    ]
+  }
+}
