@@ -149,7 +149,9 @@ class ConformanceLifecycleTests(unittest.TestCase):
                     self.assertEqual(proof["run_port_listeners_remaining"], None if missing_snapshot else 0)
                     self.assertEqual(proof["listener_observation_available"], not missing_snapshot)
                 self.assertEqual(subprocess.run(["ss", "-ltnH", f"sport = :{port}"],
-                                               capture_output=True, text=True, check=True).stdout, "")
+                                                capture_output=True, text=True, check=True).stdout, "")
+                self.assertEqual(list((root / "mcp").glob("run.*")), [],
+                                 "The owned IPC cache must be removed after process teardown")
             finally:
                 if process is not None and process.poll() is None:
                     # Let the exact owned helper perform its identity-checked group
@@ -178,3 +180,38 @@ class ConformanceLifecycleTests(unittest.TestCase):
 
     def test_startup_termination_is_deferred_until_ownership_is_recorded(self):
         self.exercise(0, signal.SIGTERM, startup_signal=True)
+
+
+class ConformanceEarlyCacheCleanupTests(unittest.TestCase):
+    def test_path_length_failure_removes_only_its_allocation_and_preserves_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            cache = root / ("cache-" + "x" * 90)
+            temp_root = cache / "mcp"
+            foreign = temp_root / "foreign"
+            foreign.mkdir(parents=True)
+            sentinel = foreign / "preserve.txt"
+            sentinel.write_bytes(b"synthetic unrelated cache bytes\n")
+            binary = root / "bin"
+            binary.mkdir()
+            marker = root / "unexpected-startup"
+            for command in ("setsid", "unshare", "ip", "ss", "ps", "npm", "npx", "tee"):
+                stub = binary / command
+                stub.write_text('#!/bin/sh\nprintf "unexpected" > "$UNEXPECTED_STARTUP"\nexit 99\n')
+                stub.chmod(0o755)
+            result = subprocess.run(
+                ["bash", str(HELPER), "post_install"],
+                env={"PATH": str(binary) + os.pathsep + os.environ["PATH"], "HOME": str(root),
+                     "XDG_CACHE_HOME": str(cache), "XDG_STATE_HOME": str(root / "state"),
+                     "tool_root": str(root / "tools"), "UNEXPECTED_STARTUP": str(marker)},
+                capture_output=True, text=True, timeout=10,
+            )
+            self.assertNotEqual(result.returncode, 0, result.stderr)
+            self.assertIn("cache path is too long", result.stderr)
+            self.assertFalse(marker.exists(), "The early failure must precede owned-process startup")
+            self.assertEqual(list(temp_root.glob("run.*")), [])
+            self.assertEqual(sentinel.read_bytes(), b"synthetic unrelated cache bytes\n")
+            evidence = root / "state/new-wsl-native-stack/acceptance/mcp-protocol-conformance"
+            runs = list(evidence.glob("lifecycle.*"))
+            self.assertEqual(len(runs), 1, "The retained evidence directory must survive cache cleanup")
+            self.assertTrue(runs[0].is_dir())

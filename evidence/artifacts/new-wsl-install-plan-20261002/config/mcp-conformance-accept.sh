@@ -96,6 +96,14 @@ run_dir="$(mktemp -d "$state/lifecycle.XXXXXXXX")"
 temp_root="${XDG_CACHE_HOME:-$HOME/.cache}/mcp"
 mkdir -p -- "$temp_root"
 TMPDIR="$(mktemp -d "$temp_root/run.XXXXXXXX")"
+# Bash's native EXIT/INT/TERM traps cover the path assertion before startup.
+# Source: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-trap
+# Freeze the owned allocation; never remove the evidence directory or cache root.
+owned_tmpdir="$TMPDIR"
+remove_tmpdir() { rm -rf -- "$owned_tmpdir"; }
+trap 'rc=$?; trap - EXIT; remove_tmpdir || rc=1; exit "$rc"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 export TMPDIR
 python3 - "$TMPDIR" <<'PY'
 import os, sys
@@ -188,6 +196,7 @@ if int(sys.argv[3]) == 0:
 print("Conformance owned namespace/group cleanup observed; listener snapshot " + ("available" if observed else "unavailable"), file=sys.stderr)
 PY
   then [[ "$rc" != 0 ]] || rc=1; fi
+  remove_tmpdir || rc=1
   exit "$rc"
 }
 trap cleanup EXIT
