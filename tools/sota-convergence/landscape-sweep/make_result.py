@@ -48,6 +48,7 @@ through its own trial and decision records. An existing record is kept unless --
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import re
@@ -76,7 +77,10 @@ def substitute(value, returns_ref: str):
     if isinstance(value, list):
         return [substitute(item, returns_ref) for item in value]
     if isinstance(value, dict):
-        return {key: substitute(item, returns_ref) for key, item in value.items()}
+        # The owner's exact captured text may contain a literal placeholder.
+        # a40a0831:scripts/saturation_ledger.py:540-571 binds it without normalization.
+        return {key: copy.deepcopy(item) if key == "requirement_binding" else substitute(item, returns_ref)
+                for key, item in value.items()}
     return value
 
 

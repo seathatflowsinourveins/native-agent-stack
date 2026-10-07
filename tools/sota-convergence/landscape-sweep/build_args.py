@@ -325,7 +325,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import codex_job  # noqa: E402
 import make_prompt  # noqa: E402
-from sweep_common import REPO_ROOT, load_json, prompts_sha256, sha256_bytes, work_dir, write_json  # noqa: E402
+from sweep_common import (REPO_ROOT, frozen_requirement_binding, load_json, prompts_sha256,  # noqa: E402
+                          sha256_bytes, work_dir, write_json)
 
 RUNTIME = ("codex_call.sh", "codex_job.py", "make_prompt.py")
 QUOTA_PROBE = REPO_ROOT / "scripts" / "codex_quota.py"  # staged beside codex_job.py as codex_quota.py
@@ -818,6 +819,8 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         raise ValueError("; ".join(problems))
     frozen = fill_build(templates, run_date, len(selected), skills_checked_at or manifest["checked_at"], modality)
     schemas = {name: load_json(HERE / "schemas" / f"{name}.json") for name in SCHEMAS}
+    scope_path = work / "scope.json"
+    scope = load_json(scope_path) if scope_path.is_file() else {}
     first_prompts = {}
     for layer in selected:  # everything is checked before anything is written
         layer_input = load_json(work / "inputs" / f"{layer['layer_id']}.json")
@@ -827,6 +830,8 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         for field in ("requirement_sha256", "platform_profiles_sha256"):
             if not layer_input.get(field):
                 raise ValueError(f"inputs/{layer['layer_id']}.json has no {field}; rebuild it with build_inputs.py")
+        frozen_requirement_binding(scope, layer.get("catalog", layer_input.get("catalog")),
+                                   layer["layer_id"], layer_input)
         # The frozen templates are the run's modality's (fill_build), and sweep.js reads each row's modality for the
         # discovery schema and the merge, so an input of another modality would get the wrong prompts.
         if (layer_input.get("modality") or REPOSITORY_MODALITY) != modality:

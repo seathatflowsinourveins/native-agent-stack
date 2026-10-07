@@ -82,7 +82,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from sweep_common import (  # noqa: E402
-    MANIFEST_SECTION, REPO_ROOT, canon, ledger_module, load_json, sha256_bytes, slug, work_dir, write_json,
+    MANIFEST_SECTION, REPO_ROOT, canon, frozen_requirement_binding, ledger_module, load_json,
+    sha256_bytes, slug, work_dir, write_json,
 )
 from slot_requirements import load_slot_requirements  # noqa: E402
 
@@ -552,6 +553,9 @@ def field_sha256(layer_input: dict) -> str:
         "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
     binding["members"] = sorted(({"candidate_key": row["candidate_key"], "repository": row["repository"]}
                                  for row in layer_input["eligible_field"]), key=lambda row: row["candidate_key"])
+    # Owner's v2_field_sha256@a40a0831:122-135: preserve every absent-snapshot digest.
+    if "requirement_binding" in layer_input:
+        binding["requirement_binding"] = layer_input["requirement_binding"]
     return sha256_bytes(json.dumps(binding, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
@@ -833,6 +837,10 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                 "known_repositories": sorted(known),
                 "seeded_candidates": list(seeds.get(layer_id, [])),
             })
+            snapshot = frozen_requirement_binding(scope, catalog, layer_id)
+            if snapshot is not None:
+                out[-1]["requirement_binding"] = snapshot
+                out[-1]["requirement"] = snapshot["requirement_text"]
             if contract_version == 2:
                 row = out[-1]
                 row["contract_version"] = 2
@@ -926,9 +934,16 @@ def valid_date(value) -> bool:
 def skills_scope(catalog: dict, adoption: dict, led) -> dict:
     """The frozen scope of the skills layers in saturation_ledger.py --scope's format, with the ledger's functions
     (the requirement hash is saturation_ledger.skills_requirement_sha256, which --report and --append recompute)."""
-    return {"platform_profiles_sha256": led.platform_profiles_sha256(adoption),
-            "requirement_sha256": {f"{SKILLS}/{task['layer_id']}": led.skills_requirement_sha256(task)
-                                   for task in catalog["tasks"]}}
+    scope = {"platform_profiles_sha256": led.platform_profiles_sha256(adoption),
+             "requirement_sha256": {f"{SKILLS}/{task['layer_id']}": led.skills_requirement_sha256(task)
+                                    for task in catalog["tasks"]}}
+    bind = getattr(led, "requirement_binding", None)
+    if callable(bind):
+        scope["requirement_bindings"] = {
+            f"{SKILLS}/{task['layer_id']}": bind(SKILLS, task["layer_id"], task["requirement"],
+                scope["requirement_sha256"][f"{SKILLS}/{task['layer_id']}"])
+            for task in catalog["tasks"]}
+    return scope
 
 
 def excluded_names(value) -> list[str]:
@@ -988,6 +1003,10 @@ def build_skills_inputs(catalog: dict, manifest: dict, scope: dict, ledger: dict
             "known_skills": known,
             "seeded_candidates": list(seeds.get(layer_id, [])),
         })
+        snapshot = frozen_requirement_binding(scope, SKILLS, layer_id)
+        if snapshot is not None:
+            out[-1]["requirement_binding"] = snapshot
+            out[-1]["requirement"] = snapshot["requirement_text"]
     if missing:
         raise ValueError(f"the frozen scope has no requirement_sha256 for {missing}; freeze it with "
                          "build_inputs.py --skills-scope")

@@ -72,6 +72,7 @@ a screen bound to a later frozen field before resolution. V1 dispatch and artifa
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import re
@@ -81,7 +82,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rounds, host_replacements, json_text,  # noqa: E402
-                          ledger_module, load_json, pointer_token, private_content, private_findings,
+                          frozen_requirement_binding, ledger_module, load_json, pointer_token, private_content, private_findings,
                           rewrite_strings, sanitize, slug)
 from usage_record import superseded_at_required_effort  # noqa: E402
 
@@ -342,6 +343,21 @@ def sweep_rounds(res: dict) -> list:
     return first + followups
 
 
+def requirement_binding_snapshots(value) -> list:
+    """Find captured bindings for the no-rewrite publication check; values are never printed."""
+    snapshots = []
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key == "requirement_binding":
+                snapshots.append(item)
+            else:
+                snapshots.extend(requirement_binding_snapshots(item))
+    elif isinstance(value, list):
+        for item in value:
+            snapshots.extend(requirement_binding_snapshots(item))
+    return snapshots
+
+
 def convert_v2(res: dict, scope: dict, lane: str, work: Path | None, limits, workflow_run) -> dict:
     """Explicit U11V4 neutral contract; V1's binary projections remain unchanged below.
 
@@ -369,6 +385,7 @@ def convert_v2(res: dict, scope: dict, lane: str, work: Path | None, limits, wor
         if (frozen.get("requirement_sha256") != scope["requirement_sha256"][f"{catalog}/{layer_id}"]
                 or frozen.get("platform_profiles_sha256") != scope["platform_profiles_sha256"]):
             raise ValueError(f"{layer_id}: V2 field does not match the frozen requirement/platform scope")
+        snapshot = frozen_requirement_binding(scope, catalog, layer_id, frozen, led)
         if frozen.get("field_sha256") != led.v2_field_sha256(frozen):
             raise ValueError(f"{layer_id}: V2 frozen field_sha256 mismatch")
         members = led.v2_expand_field(frozen, rounds)
@@ -377,7 +394,9 @@ def convert_v2(res: dict, scope: dict, lane: str, work: Path | None, limits, wor
         discovery = {key: frozen[key] for key in (
             "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
         discovery.update(proposed=proposed, source_field_sha256=source_hash, field_sha256=source_hash,
-                         eligible_field=members, source_field=frozen)
+                          eligible_field=members, source_field=frozen)
+        if snapshot is not None:
+            discovery["requirement_binding"] = snapshot
         discovery["field_sha256"] = led.v2_field_sha256(discovery)
         returns["discovery"][layer_id] = discovery
         returns["votes"][layer_id] = []
@@ -406,7 +425,9 @@ def convert_v2(res: dict, scope: dict, lane: str, work: Path | None, limits, wor
                        "survived": outcomes["credible"], "refuted": outcomes["not_credible"],
                        "pending": outcomes["pending"],
                        "reopen": ([{"trigger": "retained_failure", "ref": f"@RETURNS@#/failures/{pointer_token(layer_id)}"}]
-                                  if returns["failures"][layer_id] else [])})
+                                   if returns["failures"][layer_id] else [])})
+        if snapshot is not None:
+            layers[-1]["requirement_binding"] = copy.deepcopy(snapshot)
     return {"returns": returns, "lanes": {"contract_version": 2, "lanes": [{"lane": lane,
             "result": {"contract_version": 2, "layers": layers, "limits": list(limits)}}]},
             "layers": layers, "survivors": [{"layer_id": layer["layer_id"], "repository": row["repo"],
@@ -458,6 +479,11 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     for layer_id, rounds in rounds_by_layer.items():
         catalog = rounds[0]["catalog"]
         key = f"{catalog}/{layer_id}"
+        frozen_path = work / "inputs" / f"{layer_id}.json" if work is not None else None
+        frozen = load_json(frozen_path) if frozen_path is not None and frozen_path.is_file() else None
+        if "requirement_bindings" in scope and frozen is None:
+            raise ValueError(f"{key}: requirement_binding conversion needs the retained frozen layer input")
+        snapshot = frozen_requirement_binding(scope, catalog, layer_id, frozen)
         for r in rounds:
             if r.get("lost"):
                 lost.append(f"{layer_id}:{r.get('round')}")
@@ -578,6 +604,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                                           "platform_profiles_sha256": scope["platform_profiles_sha256"],
                                           "families": {canon(p["repository"]): p.get("families") for p in merged},
                                           "families_returned": returned}
+        if snapshot is not None:
+            returns["discovery"][layer_id]["requirement_binding"] = snapshot
         returns["raw"][layer_id] = raw
         returns["votes"][layer_id] = []
         survived, refuted, new_candidates = [], [], []
@@ -670,6 +698,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
         ledger_layers.append({**ledger_layer, "discovery_ref": f"@RETURNS@#/discovery/{pointer_token(layer_id)}",
                               "calls": calls or None, "proposed": proposed, "survived": survived, "refuted": refuted,
                               "reopen": reopen})
+        if snapshot is not None:
+            ledger_layers[-1]["requirement_binding"] = copy.deepcopy(snapshot)
     returns["skills_usage"] = skills_usage
     returns["gpt6_usage"] = gpt6_usage
     gpt6_model_text = "+".join(sorted(gpt6_models)) or GPT6_DEFAULT["model"]
@@ -770,6 +800,13 @@ def main(argv=None) -> int:
         for name in ("returns", "lanes", "layers", "survivors", "summary"):
             value = summary if name == "summary" else out[name]
             documents[name] = redact_project_dirs(sanitize(value, replacements), work, repo_root)
+            # Exact text under a retained hash must be preserved or publication refused.
+            # Source: owner's requirement_binding@a40a0831:540-571; no historical rewrite.
+            if ([json_text(snapshot) for snapshot in requirement_binding_snapshots(value)] !=
+                    [json_text(snapshot) for snapshot in requirement_binding_snapshots(documents[name])]):
+                print(f"convert.py: {name}.json: privacy redaction would alter a captured requirement_binding "
+                      "(no artifacts written; text not shown)", file=sys.stderr)
+                return EXIT_PRIVATE
     except RedactionKeyCollision as error:
         pointer = "/" + "/".join(pointer_token(part) for part in error.path)
         location = "printed summary" if name == "summary" else f"{name}.json"

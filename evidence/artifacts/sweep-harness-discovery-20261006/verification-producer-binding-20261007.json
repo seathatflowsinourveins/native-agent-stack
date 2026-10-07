@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "evidence_class": "integration_checks",
+  "date": "2026-10-07",
+  "purpose": "Additive frozen requirement snapshot propagation through the sweep producers and publication carriers",
+  "binding_version": 2,
+  "owner_source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "pin": "a40a083172af588f4b97646db87dfc8ef3c0b60e",
+    "path": "scripts/saturation_ledger.py",
+    "lines": "122-135,540-571",
+    "sha256": "3285ed2517a95caf4a0744b01eeadd284af68ff622376044844b024b4e554ae6",
+    "used_unchanged": true
+  },
+  "source_files_sha256": {
+    "sweep_common": "1cff7da325dcdcbf6a35998ee2844cce9864fa66c65b898c5a12f5523ab21ed1",
+    "build_inputs": "be8d0d044273a8a6fb5e0bde618f7361bf30203455af1fbc510af921481d922e",
+    "build_args": "6a7611fdf663115b4a631e1575c70d5809b01fc488311b1df64bbe35cb20f738",
+    "convert": "d52af99f958110808886eccd5a594986ad370f31d7568b74a764cbee383cfacb",
+    "make_result": "d9ef0088bc9f7c53d8eac1abf8154d6f29b38a5591c54a1088341d1f9567efdc"
+  },
+  "observations": {
+    "declared_binding_requires_owner_validator": true,
+    "legacy_without_binding_retains_old_formula": true,
+    "exact_text_from_frozen_scope": true,
+    "v1_input_text_must_match_snapshot": true,
+    "v2_neutral_presentation_remains_separate": true,
+    "scope_identity_hash_and_legacy_alias_validated_by_owner": true,
+    "retained_binding_copied_to_discovery_and_result": true,
+    "result_placeholder_substitution_preserves_binding": true,
+    "privacy_rewrite_of_binding_refuses_before_publication": true,
+    "past_records_rewritten": false,
+    "v2_runner_activated": false
+  },
+  "checks": [
+    {
+      "kind": "synthetic_fixture",
+      "command": "python3 -m unittest tests.test_landscape_sweep_harness",
+      "exit_code": 0,
+      "tests": 331,
+      "skipped": 10,
+      "seconds": 86.565,
+      "limits": "Seven snapshot success cases await owner-helper integration in this branch; three existing optional tests also skipped."
+    },
+    {
+      "kind": "integration_check",
+      "command": "Standard unittest RequirementBindingPropagationTests using the unchanged SHA-verified owner module",
+      "exit_code": 0,
+      "tests": 15,
+      "skipped": 0,
+      "seconds": 0.113,
+      "limits": "Real helper implementation with synthetic local fixtures; not upstream tests or installed-host qualification."
+    },
+    {
+      "kind": "retained_failed_condition",
+      "exit_code": 1,
+      "tests": 15,
+      "failed_subcases": 2,
+      "cause": "New privacy CLI fixture omitted result.first and was refused before transformation; fixture envelope corrected, runtime unchanged.",
+      "subsequent_exit_code": 0
+    },
+    {
+      "kind": "source_review",
+      "verdict": "accept",
+      "scope": "Carrier preservation, immutable text and legacy hash behavior; source-only completeness critic."
+    }
+  ],
+  "dependency_status": "Owner ledger migration is not integrated in this branch; declared snapshots fail closed until it is available.",
+  "forward_leads": [
+    "Re-run the selected generation, staging, conversion and RESULT carrier checks with the landed owner helper at the landing head.",
+    "Retain privacy refusal rather than changing a captured text under an old digest.",
+    "Keep the separate gateway project-precedence and hosted validation conditions."
+  ],
+  "upstream_acceptance": false,
+  "installed_host_acceptance": false,
+  "provider_usage": null,
+  "cost": null
+}

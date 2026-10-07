@@ -658,6 +658,335 @@ class BuildInputsTests(unittest.TestCase):
         self.assertEqual(len(seeds), 14)
 
 
+class RequirementBindingPropagationTests(unittest.TestCase):
+    """A32 producer seams; binding construction/validation belongs to the native ledger.
+
+    The declared-snapshot refusal and legacy controls run with the current ledger.
+    Positive snapshot cases require its additive migration; they never substitute a
+    locally authored binding hash or validator for the owner's implementation.
+    """
+
+    def setUp(self):
+        BuildInputsTests.setUp(self)
+        self.scope = json.loads((self.work / "scope.json").read_text())
+
+    def require_owner(self):
+        if not all(callable(getattr(sl, name, None)) for name in (
+                "requirement_binding", "validate_requirement_binding")):
+            self.skipTest("native saturation-ledger requirement-binding migration is not integrated")
+        return sl
+
+    @contextlib.contextmanager
+    def using_ledger(self, producer, led):
+        # The producer's imported common helper uses the real selected ledger.
+        helper = producer.frozen_requirement_binding
+        with mock.patch.dict(helper.__globals__, {"ledger_module": lambda *args, **kwargs: led}):
+            yield
+
+    def frozen_scope(self, led):
+        scope = copy.deepcopy(self.scope)
+        scope["requirement_bindings"] = {
+            f"{catalog}/{layer_id}": led.requirement_binding(
+                catalog, layer_id, f"Frozen {layer_id} requirement.\nPreserve its original text.", REQ)
+            for catalog, layer_id in (("foundation", "alpha"), ("us-equities", "beta"))}
+        return scope
+
+    def repository_inputs(self, scope, led, contract_version=1):
+        catalogs = {name: json.loads((self.repo / f"catalogs/landscape/{name}.json").read_text())
+                    for name in ("foundation", "us-equities")}
+        with self.using_ledger(build_inputs, led):
+            return build_inputs.build_layer_inputs(
+                catalogs, json.loads((self.repo / "catalogs/landscape/research-state.json").read_text()),
+                scope, json.loads(self.freshness.read_text()), None,
+                json.loads((self.repo / "catalogs/saturation/ledger.json").read_text()),
+                contract_version=contract_version,
+                platform_requirements=[{"id": "fixture-linux", "os": "linux", "architecture": "x86_64"}])
+
+    @staticmethod
+    def skills_fixture():
+        return ({"schema_version": 1, "kind": "skills-lifecycle", "checked_at": "2026-10-26",
+                 "sources": [{"source_id": "fixture", "kind": "github-skills-repo",
+                              "url": "https://github.com/o/skills", "pin": "a" * 40}],
+                 "tasks": [{"layer_id": "skills-debug", "lifecycle_task": "debug",
+                            "requirement": "Preserve the frozen debugging requirement.", "installed": [],
+                            "source_ids": ["fixture"], "open_gaps": [], "overturn_when": "new primary evidence"}]},
+                {"checked_at": "2026-10-26", "skills": [], "excluded": []},
+                {"platform_profiles": [{"id": "fixture-linux", "os": "linux"}]})
+
+    @staticmethod
+    def tree_bytes(work):
+        return {path.relative_to(work).as_posix(): path.read_bytes() if path.is_file() else None
+                for path in work.rglob("*")}
+
+    @staticmethod
+    def stage(work):
+        return build_args.stage(
+            work, sweep_id="landscape-sweep-20261026", run_date="2026-10-26",
+            selected=json.loads((work / "layers.json").read_text()), test=False, stars=None,
+            gpt6_model="gpt-6-astra", slots=1, lock_dir=None, skills_checked_at=None,
+            embed_script=True, force=False)
+
+    def test_legacy_inputs_and_conversion_leave_the_binding_absent(self):
+        legacy = types.SimpleNamespace()
+        self.assertIsNone(sweep_common.frozen_requirement_binding(
+            self.scope, "foundation", "alpha", led=legacy))
+        rows = self.repository_inputs(self.scope, legacy)
+        self.assertTrue(rows)
+        self.assertTrue(all("requirement_binding" not in row for row in rows))
+        out = convert.convert(healthy_result(), self.scope, LANE, convert.resolved_models(None))
+        self.assertNotIn("requirement_binding", out["returns"]["discovery"]["alpha"])
+        self.assertNotIn("requirement_binding", out["layers"][0])
+
+    def test_legacy_skills_scope_and_inputs_leave_the_binding_absent(self):
+        catalog, manifest, adoption = self.skills_fixture()
+        legacy = types.SimpleNamespace(platform_profiles_sha256=sl.platform_profiles_sha256,
+                                       skills_requirement_sha256=sl.skills_requirement_sha256)
+        scope = build_inputs.skills_scope(catalog, adoption, legacy)
+        self.assertNotIn("requirement_bindings", scope)
+        with self.using_ledger(build_inputs, legacy):
+            rows = build_inputs.build_skills_inputs(catalog, manifest, scope, {"sweeps": []})
+        self.assertEqual(len(rows), 1)
+        self.assertNotIn("requirement_binding", rows[0])
+
+    def test_a_declared_snapshot_requires_the_owner_validator(self):
+        scope = copy.deepcopy(self.scope)
+        # Deliberately opaque: an unavailable validator must refuse before interpreting it.
+        scope["requirement_bindings"] = {"foundation/alpha": {"owner_snapshot": "uninterpreted"}}
+        for led in (types.SimpleNamespace(), types.SimpleNamespace(validate_requirement_binding=None)):
+            with self.subTest(validator=getattr(led, "validate_requirement_binding", "absent")):
+                with self.assertRaisesRegex(ValueError, "owner.*migration|legacy-only ledger"):
+                    sweep_common.frozen_requirement_binding(scope, "foundation", "alpha", led=led)
+
+    def test_an_incomplete_map_or_input_only_snapshot_is_refused(self):
+        legacy = types.SimpleNamespace()
+        for bindings in ({}, None, []):
+            with self.subTest(bindings=bindings):
+                scope = dict(self.scope, requirement_bindings=bindings)
+                with self.assertRaisesRegex(ValueError, "no declared requirement_binding"):
+                    sweep_common.frozen_requirement_binding(scope, "foundation", "alpha", led=legacy)
+        with self.assertRaisesRegex(ValueError, "absent from the frozen scope"):
+            sweep_common.frozen_requirement_binding(
+                self.scope, "foundation", "alpha", {"requirement_binding": {}}, legacy)
+
+    def test_unavailable_owner_staging_refuses_before_any_file_write(self):
+        work = stage_work(self, layers=("alpha",))
+        scope = scope_for((("foundation", "alpha"),))
+        scope["requirement_bindings"] = {"foundation/alpha": {"owner_snapshot": "uninterpreted"}}
+        write_json(work / "scope.json", scope)
+        marker = work / "prompts/retained.txt"
+        marker.parent.mkdir()
+        marker.write_text("keep the earlier prompt byte-for-byte\n", encoding="utf-8")
+        before = self.tree_bytes(work)
+        with self.using_ledger(build_args, types.SimpleNamespace()):
+            with self.assertRaisesRegex(ValueError, "owner.*migration|legacy-only ledger"):
+                self.stage(work)
+        self.assertEqual(self.tree_bytes(work), before)
+
+    def test_owner_snapshots_are_deep_copied(self):
+        led = self.require_owner()
+        scope = self.frozen_scope(led)
+        original = copy.deepcopy(scope)
+        snapshot = sweep_common.frozen_requirement_binding(scope, "foundation", "alpha", led=led)
+        self.assertEqual(snapshot, scope["requirement_bindings"]["foundation/alpha"])
+        snapshot["identity"]["layer_id"] = "mutated-copy"
+        self.assertEqual(scope, original)
+
+    def test_owner_rejects_wrong_identity_legacy_hash_and_tampered_text(self):
+        led = self.require_owner()
+        scopes = []
+        for catalog, layer_id, legacy_hash in (("us-equities", "alpha", REQ),
+                                                ("foundation", "beta", REQ),
+                                                ("foundation", "alpha", "d" * 64)):
+            scope = self.frozen_scope(led)
+            scope["requirement_bindings"]["foundation/alpha"] = led.requirement_binding(
+                catalog, layer_id, "Original frozen requirement.", legacy_hash)
+            scopes.append(scope)
+        scope = self.frozen_scope(led)
+        scope["requirement_bindings"]["foundation/alpha"]["requirement_text"] += " changed"
+        scopes.append(scope)
+        for index, scope in enumerate(scopes):
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                sweep_common.frozen_requirement_binding(scope, "foundation", "alpha", led=led)
+
+    def test_owner_rejects_frozen_input_skew(self):
+        led = self.require_owner()
+        scope = self.frozen_scope(led)
+        frozen = {"catalog": "foundation", "layer_id": "alpha", "requirement_sha256": REQ,
+                  "requirement": scope["requirement_bindings"]["foundation/alpha"]["requirement_text"],
+                  "requirement_binding": copy.deepcopy(scope["requirement_bindings"]["foundation/alpha"])}
+        changes = ({"catalog": "us-equities"}, {"layer_id": "beta"}, {"requirement_sha256": "d" * 64},
+                   {"requirement": "Live text drift with the original snapshot still present."},
+                   {"requirement_binding": led.requirement_binding("foundation", "alpha", "Other text.", REQ)})
+        for change in changes:
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, "frozen input"):
+                sweep_common.frozen_requirement_binding(scope, "foundation", "alpha", dict(frozen, **change), led)
+        missing = dict(frozen)
+        missing.pop("requirement_binding")
+        with self.assertRaisesRegex(ValueError, "frozen input"):
+            sweep_common.frozen_requirement_binding(scope, "foundation", "alpha", missing, led)
+
+    def test_repository_and_skills_inputs_copy_the_frozen_scope_text(self):
+        led = self.require_owner()
+        scope = self.frozen_scope(led)
+        catalog_path = self.repo / "catalogs/landscape/foundation.json"
+        current = json.loads(catalog_path.read_text())
+        current["layers"][0]["requirement"] = "Changed current catalog text must not recapture the snapshot."
+        write_json(catalog_path, current)
+        rows = self.repository_inputs(scope, led)
+        for row in rows:
+            key = f"{row['catalog']}/{row['layer_id']}"
+            self.assertEqual(row["requirement_binding"], scope["requirement_bindings"][key])
+            self.assertEqual(row["requirement"], scope["requirement_bindings"][key]["requirement_text"])
+        rows[0]["requirement_binding"]["identity"]["layer_id"] = "modified-output"
+        self.assertEqual(scope["requirement_bindings"]["foundation/alpha"]["identity"]["layer_id"], "alpha")
+        catalog, manifest, adoption = self.skills_fixture()
+        skills_scope = build_inputs.skills_scope(catalog, adoption, led)
+        frozen = copy.deepcopy(skills_scope["requirement_bindings"]["skills/skills-debug"])
+        catalog["tasks"][0]["requirement"] = "A newer catalog task is not the frozen scope."
+        with self.using_ledger(build_inputs, led):
+            skills_rows = build_inputs.build_skills_inputs(catalog, manifest, skills_scope, {"sweeps": []})
+        self.assertEqual(skills_rows[0]["requirement_binding"], frozen)
+        self.assertEqual(skills_rows[0]["requirement"], frozen["requirement_text"])
+
+    def test_v1_conversion_retains_the_frozen_snapshot_and_requires_its_input(self):
+        led = self.require_owner()
+        scope = self.frozen_scope(led)
+        frozen = self.repository_inputs(scope, led)[0]
+        path = write_json(self.work / "inputs/alpha.json", frozen)
+        with self.using_ledger(convert, led):
+            with self.assertRaisesRegex(ValueError, "retained frozen layer input"):
+                convert.convert(healthy_result(), scope, LANE, convert.resolved_models(None))
+            out = convert.convert(healthy_result(), scope, LANE, convert.resolved_models(None), self.work)
+            self.assertEqual(out["returns"]["discovery"]["alpha"]["requirement_binding"], frozen["requirement_binding"])
+            self.assertEqual(out["layers"][0]["requirement_binding"], frozen["requirement_binding"])
+            changed = copy.deepcopy(frozen)
+            changed["requirement_binding"] = led.requirement_binding("foundation", "alpha", "Different frozen text.", REQ)
+            write_json(path, changed)
+            with self.assertRaisesRegex(ValueError, "frozen input requirement_binding"):
+                convert.convert(healthy_result(), scope, LANE, convert.resolved_models(None), self.work)
+            drifted = dict(frozen, requirement="Current catalog text substituted after the freeze.")
+            write_json(path, drifted)
+            with self.assertRaisesRegex(ValueError, "frozen input.*requirement"):
+                convert.convert(healthy_result(), scope, LANE, convert.resolved_models(None), self.work)
+
+    def test_legacy_v2_field_hash_matches_the_native_ledger_without_a_snapshot(self):
+        rows = self.repository_inputs(self.scope, types.SimpleNamespace(), contract_version=2)
+        self.assertTrue(rows)
+        for row in rows:
+            self.assertNotIn("requirement_binding", row)
+            self.assertEqual(row["field_sha256"], sl.v2_field_sha256(row))
+
+    def test_v2_binding_changes_the_native_field_hash_and_survives_conversion(self):
+        led = self.require_owner()
+        scope = self.frozen_scope(led)
+        frozen = self.repository_inputs(scope, led, contract_version=2)[0]
+        self.assertEqual(frozen["field_sha256"], led.v2_field_sha256(frozen))
+        legacy = copy.deepcopy(frozen)
+        legacy.pop("requirement_binding")
+        self.assertNotEqual(frozen["field_sha256"], build_inputs.field_sha256(legacy))
+        self.assertEqual(build_inputs.field_sha256(legacy), led.v2_field_sha256(legacy))
+        different = copy.deepcopy(frozen)
+        different["requirement_binding"] = led.requirement_binding("foundation", "alpha", "Another frozen text.", REQ)
+        self.assertNotEqual(build_inputs.field_sha256(different), frozen["field_sha256"])
+        self.assertEqual(build_inputs.field_sha256(different), led.v2_field_sha256(different))
+        write_json(self.work / "inputs/alpha.json", frozen)
+        res = dict(healthy_result(), contract_version=2)
+        with self.using_ledger(convert, led), mock.patch.object(convert, "ledger_module", return_value=led):
+            out = convert.convert(res, scope, LANE, convert.resolved_models(None), self.work)
+        discovered = out["returns"]["discovery"]["alpha"]
+        self.assertEqual(discovered["source_field"], frozen)
+        self.assertEqual(discovered["source_field_sha256"], frozen["field_sha256"])
+        self.assertEqual(discovered["requirement_binding"], frozen["requirement_binding"])
+        self.assertEqual(discovered["field_sha256"], led.v2_field_sha256(discovered))
+        self.assertEqual(out["layers"][0]["requirement_binding"], frozen["requirement_binding"])
+        self.assertEqual(out["lanes"]["lanes"][0]["result"]["layers"][0]["requirement_binding"], frozen["requirement_binding"])
+        discovered["requirement_binding"]["identity"]["layer_id"] = "mutated-conversion"
+        self.assertEqual(discovered["source_field"], frozen)
+        self.assertEqual(out["layers"][0]["requirement_binding"], frozen["requirement_binding"])
+
+    def test_a_later_staged_input_mismatch_preserves_all_existing_files(self):
+        led = self.require_owner()
+        work = stage_work(self, layers=("alpha", "beta"))
+        scope = self.frozen_scope(led)
+        write_json(work / "scope.json", scope)
+        for catalog, layer_id in (("foundation", "alpha"), ("us-equities", "beta")):
+            path = work / "inputs" / f"{layer_id}.json"
+            row = json.loads(path.read_text())
+            row["requirement_binding"] = copy.deepcopy(scope["requirement_bindings"][f"{catalog}/{layer_id}"])
+            row["requirement"] = row["requirement_binding"]["requirement_text"]
+            if layer_id == "beta":
+                row["requirement_binding"] = led.requirement_binding(catalog, layer_id, "Mismatched later input.", REQ)
+            write_json(path, row)
+        before = self.tree_bytes(work)
+        with self.using_ledger(build_args, led), self.assertRaisesRegex(ValueError, "us-equities/beta: frozen input"):
+            self.stage(work)
+        self.assertEqual(self.tree_bytes(work), before)
+
+
+    def test_result_substitution_preserves_snapshot_literals_without_aliasing(self):
+        # Transformation-only fixture: these opaque hashes are not a qualification.
+        snapshot = {"binding_version": 2, "identity": {"catalog": "foundation", "layer_id": "alpha"},
+                    "requirement_text": "Keep literal @RETURNS@ unchanged.\nInclude Unicode: λ.",
+                    "requirement_hash": "unvalidated-fixture", "legacy_hash": "unvalidated-fixture"}
+        source = {"layers": [{"requirement_binding": snapshot,
+                              "discovery_ref": "@RETURNS@#/discovery/alpha",
+                              "votes": [{"ref": "@RETURNS@#/votes/alpha/0"}]}]}
+        original = copy.deepcopy(source)
+        snapshot_bytes = json.dumps(snapshot, ensure_ascii=False).encode("utf-8")
+        returns_ref = "evidence/artifacts/fixture/returns.json"
+        projected = make_result.substitute(source, returns_ref)
+        layer = projected["layers"][0]
+        self.assertEqual(json.dumps(layer["requirement_binding"], ensure_ascii=False).encode("utf-8"),
+                         snapshot_bytes)
+        self.assertEqual(layer["discovery_ref"], returns_ref + "#/discovery/alpha")
+        self.assertEqual(layer["votes"][0]["ref"], returns_ref + "#/votes/alpha/0")
+        self.assertIsNot(layer["requirement_binding"], snapshot)
+        self.assertIsNot(layer["requirement_binding"]["identity"], snapshot["identity"])
+        layer["requirement_binding"]["identity"]["layer_id"] = "changed-returned-copy"
+        self.assertEqual(source, original)
+
+
+    def test_cli_refuses_snapshot_redaction_and_accepts_unchanged_public_text(self):
+        private_home = "/home/" + "fixtureuser"
+        for private_change in (True, False):
+            with self.subTest(private_change=private_change):
+                work = temp_dir(self)
+                run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed",
+                                                          "result": {"sweep": LANE, "first": []}})
+                scope = write_json(work / "scope.json", scope_for())
+                requirement = (f"Retain exactly {private_home}/notes.txt" if private_change else
+                               "Retain literal @RETURNS@ in this public requirement.")
+                # Transformation-only payload: no qualification or binding validator is mocked.
+                snapshot = {"binding_version": 2, "identity": {"catalog": "foundation", "layer_id": "alpha"},
+                            "requirement_text": requirement, "requirement_hash": "unvalidated-fixture",
+                            "legacy_hash": "unvalidated-fixture"}
+                payload = {"returns": {"discovery": {"alpha": {"requirement_binding": snapshot}}},
+                           "lanes": {"lanes": []}, "layers": [], "survivors": [],
+                           "summary": {"gpt6_copy_check": {}}}
+                original = copy.deepcopy(payload)
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert, "convert", return_value=payload), \
+                        mock.patch.object(convert, "host_replacements", return_value=[(private_home, "<home>")]), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    result = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                           "--out", str(work / "out")])
+                self.assertEqual(payload, original)
+                if private_change:
+                    self.assertEqual(result, 3, stderr.getvalue())
+                    self.assertFalse((work / "out").exists())
+                    self.assertEqual(stdout.getvalue(), "")
+                    self.assertIn("returns.json", stderr.getvalue())
+                    self.assertIn("captured requirement_binding", stderr.getvalue())
+                    self.assertNotIn(private_home, stderr.getvalue())
+                    self.assertNotIn(requirement, stderr.getvalue())
+                else:
+                    self.assertEqual(result, 0, stderr.getvalue())
+                    self.assertEqual(stderr.getvalue(), "")
+                    emitted = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(emitted["discovery"]["alpha"]["requirement_binding"], snapshot)
+                    self.assertEqual(json.loads(stdout.getvalue())["run"]["status"], "completed")
+
+
 class NeutralSchemaTests(unittest.TestCase):
     @staticmethod
     def judgment():

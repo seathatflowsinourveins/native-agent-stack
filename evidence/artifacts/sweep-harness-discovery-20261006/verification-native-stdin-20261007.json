@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_execution",
+  "as_of": "2026-10-07T04:38:52Z",
+  "purpose": "J821/A17 complete observation-inference prompt transport qualification",
+  "source_head": "d58063188872918f6f41dd7a33cf98ef9763f927",
+  "runner_sha256": "7b275d6cf1d93fa0b09a4f29970492c29da05eaa86c2562d7c1e5e649356ebcd",
+  "job_id": "gpt6-discover-observation-inference-native-p2",
+  "provider": "native",
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.160.1",
+  "started": "2026-10-07T04:27:19Z",
+  "finished": "2026-10-07T04:38:52Z",
+  "exit": 0,
+  "terminal_event": "turn.completed",
+  "failure": null,
+  "quota": null,
+  "limit": false,
+  "input_binding": {
+    "raw_prompt_bytes": 169926,
+    "raw_prompt_sha256": "2bfbb4f45a1fe01c7273d691b5614a2aa6108c0b6eff9fda3388219bfe8e359e",
+    "schema_sha256": "15b4b7d69f64f9b37e0c5b21a70dca4b499ece041674037fcc6009f59ab76dd0",
+    "apps": false
+  },
+  "transport": {
+    "kind": "stdin",
+    "sentinel": "-",
+    "delivered_bytes": 169925,
+    "delivered_sha256": "288b01e5ab5545a00eee312c33e33af698930b27755c429bb65b6f408ccf6e6c",
+    "normalized_bytes_equal": true
+  },
+  "launch": {
+    "ignore_user_config": true,
+    "apps_disabled_explicitly": true,
+    "skip_git_repo_check": true,
+    "sandbox": "read-only",
+    "non_git_cwd": true,
+    "priority": "nice -n 19 ionice -c3"
+  },
+  "output": {
+    "layer_id": "observation-inference",
+    "proposed_count": 5,
+    "sha256": "7cf4a33a70cdb0adfe5f49ef7f45c4176354b4f127992daaa734bf53ff460da2",
+    "schema_supported_keywords": true,
+    "repository_schema_errors": 0,
+    "validator": "scripts/host_receipts.py:315-402"
+  },
+  "usage": {
+    "scope": "one native turn.completed event; cache/reasoning counters are subsets, not additional totals",
+    "input_tokens": 2147073,
+    "cached_input_tokens": 1955072,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 21194,
+    "reasoning_output_tokens": 11816,
+    "cost": null
+  },
+  "upstream_sources": [
+    "openai/codex@rust-v0.160.1:codex-rs/exec/src/lib.rs:191-193,2252-2275",
+    "installed codex-cli 0.160.1:codex exec --help"
+  ],
+  "limitations": [
+    "This qualifies complete-prompt stdin transport only.",
+    "No candidate recommendation was adopted or independently verified by this check.",
+    "This does not establish host gateway resolution or project-precedence acceptance.",
+    "Hosted validation at the landing-turn head remains required.",
+    "jsonschema is not installed in this Python environment; all schema keywords were covered by the repository's existing validator, which returned no errors."
+  ]
+}

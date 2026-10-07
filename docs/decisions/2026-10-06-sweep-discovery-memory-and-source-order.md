@@ -218,3 +218,36 @@ The current review direction schedules the separate native complete-input job
 after this repair's push. Its returned output and native usage will be recorded
 separately; source review, fixture passes and a missing hosted validation run do
 not grant command-center acknowledgment or satisfy project-precedence proof.
+
+### Amendment (2026-10-07): frozen requirement binding through producers
+
+The versioned requirement snapshot is additive to the recorded legacy scope:
+`binding_version: 2`, captured catalog/layer identity, exact requirement text,
+its text/identity digest, and the unchanged legacy digest. The ledger owner
+constructs and validates it; the sweep producers reuse those helpers.
+Source: [native-agent-stack@a40a0831: saturation_ledger.py:540-571](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a40a083172af588f4b97646db87dfc8ef3c0b60e/scripts/saturation_ledger.py#L540)
+and [the conditional V2 field digest:122-135](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a40a083172af588f4b97646db87dfc8ef3c0b60e/scripts/saturation_ledger.py#L122).
+
+New inputs copy the selected frozen snapshot and its exact text, rather than
+recapturing a later catalog's text. The existing V2 projection neutralizes that
+frozen text separately; the V2 runner remains unavailable. Staging checks scope,
+identity, legacy alias and input equality before writing. Conversion retains the
+same snapshot in discovery, source fields and result layers without consulting a
+current catalog. Native RESULT placeholder expansion preserves the binding
+subtree, and privacy processing refuses publication if it would alter any
+captured binding while retaining its old digest.
+
+With no declared snapshot, prior inputs and digest formulas remain unchanged.
+A declared snapshot requires the owner's validator; a legacy-only ledger fails
+closed instead of granting text-bound qualification. Completed sweeps, hashes,
+observations and decided text are not retrofitted. Integration of the owner's
+ledger migration and its landing-head checks remains a separate dependency.
+
+The alternatives were to recapture current text or to add a second hash
+implementation. Both lose the frozen provenance or duplicate the owner.
+A reproducible scope/input mismatch that is accepted, a changed captured string
+that is published, or a changed legacy-only digest overturns this implementation.
+Fixture tests and the unchanged owner-helper integration are our checks, not
+upstream acceptance or installed-client adoption. The separate real native
+complete-prompt stdin run records transport only; it does not qualify a candidate
+or satisfy gateway project-precedence acceptance.

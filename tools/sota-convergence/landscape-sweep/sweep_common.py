@@ -5,6 +5,7 @@ module. Standard library only."""
 from __future__ import annotations
 
 import hashlib
+import copy
 import importlib.util
 import json
 import os
@@ -111,6 +112,44 @@ def ledger_module(repo_root: Path = REPO_ROOT):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def frozen_requirement_binding(scope: dict, catalog: str, layer_id: str,
+                               layer_input: dict | None = None, led=None) -> dict | None:
+    """Carry the owner's frozen snapshot, never recapture text from a current catalog.
+
+    Source: native-agent-stack@a40a083172af588f4b97646db87dfc8ef3c0b60e:
+    scripts/saturation_ledger.py:540-571. Legacy records lack this additive map.
+    """
+    key = f"{catalog}/{layer_id}"
+    if "requirement_bindings" not in scope:
+        if layer_input is not None and "requirement_binding" in layer_input:
+            raise ValueError(f"{key}: input declares a requirement_binding absent from the frozen scope")
+        return None
+    bindings = scope["requirement_bindings"]
+    if not isinstance(bindings, dict) or key not in bindings:
+        raise ValueError(f"{key}: frozen scope has no declared requirement_binding")
+    led = ledger_module() if led is None else led
+    validate = getattr(led, "validate_requirement_binding", None)
+    if not callable(validate):
+        raise ValueError("requirement_binding needs the owner's version-2 saturation-ledger migration; "
+                         "text-bound qualification cannot use the legacy-only ledger")
+    legacy_hash = (scope.get("requirement_sha256") or {}).get(key)
+    try:
+        validate(bindings[key], catalog, layer_id, legacy_hash)
+    except Exception as error:
+        raise ValueError(f"{key}: {error}") from error
+    if layer_input is not None:
+        if (layer_input.get("catalog"), layer_input.get("layer_id")) != (catalog, layer_id):
+            raise ValueError(f"{key}: frozen input identity differs from the selected layer")
+        if layer_input.get("requirement_sha256") != legacy_hash:
+            raise ValueError(f"{key}: frozen input legacy hash differs from its scope")
+        if layer_input.get("requirement_binding") != bindings[key]:
+            raise ValueError(f"{key}: frozen input requirement_binding differs from its scope")
+        # V2 has a separately neutralized presentation and remains non-launchable.
+        if layer_input.get("contract_version", 1) == 1 and layer_input.get("requirement") != bindings[key]["requirement_text"]:
+            raise ValueError(f"{key}: frozen input V1 requirement differs from its captured exact text")
+    return copy.deepcopy(bindings[key])
 
 
 def pointer_token(key) -> str:
