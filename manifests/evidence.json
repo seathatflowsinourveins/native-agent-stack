@@ -4691,6 +4691,22 @@
         "The macOS wheel was hashed on Linux; no Mac has run this install or qualified its runtime behavior."
       ],
       "path": "evidence/receipts/2604-drift-version-readback-20261008.json"
+    },
+    {
+      "id": "native-sandbox-smoke-20261008",
+      "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "Retained command-center evidence records sandbox-runtime 0.0.79 installed and read back on NativeStack2604, followed by a successful native Claude echo smoke with retained stdout/stderr hashes.",
+      "limitations": [
+        "Publication imports the retained command-center observation; currency performed no new installation or native smoke.",
+        "Only the Claude 0.0.79 echo leg is recorded here. The source receipt marks the Codex 0.0.79 leg pending.",
+        "The 0.0.77 filesystem/network receipts remain historical and do not qualify those policies at 0.0.79.",
+        "No upstream test suite, dual-client, filesystem-policy, network-policy or general security qualification is asserted.",
+        "Source-reported command text is retained, but its original Claude post-hook argument vector was not supplied with the imported receipt and remains UNVERIFIED."
+      ]
     }
   ],
   "files": [
@@ -11077,8 +11093,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "0a273166ad4ebc1273a68c50c7b3e09edcda29c05aecd4639feb9674f7a9dfa4",
-      "bytes": 496564
+      "sha256": "5576bdeb552685460a4d0c491824b61516a6eb37bc15e467799e4c56cd4ba3fb",
+      "bytes": 497175
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -16747,7 +16763,7 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "79cc4092d0767791911edf6b5ba3f8cc97f2b24d9d072cabc5b8c00863d3381e",
+      "sha256": "c0ce289ac0d448829b8fcf87f6b852f95cad345b650e9772d074d6081e900743",
       "bytes": 295341
     },
     {
@@ -18037,8 +18053,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "102d525c279431abd6debcb033037c512fe3bc0ff564b4ae0822cf867d81aadc",
-      "bytes": 251307
+      "sha256": "7bc165d8723bca7205e5d4df9c38d6b2c5d5b99eab259de0239fc5d19b677994",
+      "bytes": 251915
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -55311,6 +55327,11 @@
       "bytes": 2504
     },
     {
+      "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+      "sha256": "28aa0c7d0f4df1f8048c2b3478ac063dc2ef5b9aadc427714f6fe6d8f7081405",
+      "bytes": 3113
+    },
+    {
       "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
       "sha256": "d50dc8b83d1bd7be2a96eb0d98c13a561fa4d173ae20d796021f59d27f31e5ce",
       "bytes": 7562
@@ -56287,13 +56308,13 @@
     },
     {
       "path": "manifests/landscape.json",
-      "sha256": "5af66a7bce3e2d8d6cdde10f353a49b65a86becbecb2dc23ad4d01ebea623dfc",
+      "sha256": "227c326ed0fe10e65a2cdc41b771d842692370ac82e592aa3f6d50bb84f8f081",
       "bytes": 21467
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "05ce01679cbd9961c6c5e8ffe5dc931b11f14114772059d3a6f860e87305343a",
-      "bytes": 128437
+      "sha256": "3628b0d8e60c5d32e2c04b3dac1291d664668a667e49e24e4d7376bc18317d04",
+      "bytes": 128594
     },
     {
       "path": "observability/README.md",
@@ -56602,8 +56623,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "bab6e6cbdf5212e37646a088ea304a362d75e77c548231d0470d8cf35c26ebbe",
-      "bytes": 132889
+      "sha256": "959a4d207f73ecf9732eb20cb7062a6c2168e4bf1ff1564ff7d54c115ff817dc",
+      "bytes": 133092
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
