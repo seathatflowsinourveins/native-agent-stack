@@ -1007,16 +1007,54 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
                 self.assertNotRegex(self.suite_step(key), r"\btimeout --")
 
     def test_validate_uploads_its_verbose_log_even_when_the_suite_fails(self):
+        from tests.test_workflow_policy import load_workflow
+
         self.assertIn("-v", self.suite_invocation(self.VALIDATE))
         log = re.search(r'\| tee "\$RUNNER_TEMP/([^"]+)"', self.suite_step(self.VALIDATE)).group(1)
         job = self.jobs[self.VALIDATE]
         upload = step_block(job, self.UPLOAD_STEP)
         self.assertEqual(block_if(upload), "always()")
         self.assertIn("uses: actions/upload-artifact@", upload)
-        self.assertRegex(upload, r"(?m)^\s+\$\{\{ runner\.temp \}\}/" + re.escape(log) + r"\s*$")
-        self.assertIn("${{ runner.temp }}/suite/report.json", upload)
-        self.assertIn("${{ matrix.shard }}", upload, "each matrix cell must retain a distinct log and report")
+        document = load_workflow("on: push\njobs:\n  validate:" + job)
+        selected = [step for step in document["jobs"]["validate"]["steps"]
+                    if self.UPLOAD_STEP in step.get("name", "")]
+        self.assertEqual(len(selected), 1, "the selected diagnostic uploader is unique")
+        inputs = selected[0].get("with")
+        self.assertIsInstance(inputs, dict, "the uploader must declare its actual inputs")
+        path = inputs.get("path")
+        self.assertIsInstance(path, str, "the uploader must bind its diagnostic files to with.path")
+        paths = [line.strip() for line in path.splitlines() if line.strip()]
+        self.assertIn("${{ runner.temp }}/" + log, paths)
+        self.assertIn("${{ runner.temp }}/suite/report.json", paths)
+        name = inputs.get("name")
+        self.assertIsInstance(name, str, "the uploader must declare its artifact name")
+        self.assertIn("${{ matrix.shard }}", name, "each matrix cell must retain a distinct log and report")
         self.assertLess(job.index(self.SUITE_STEPS[self.VALIDATE]), job.index(self.UPLOAD_STEP))
+
+    def test_validate_uploader_guard_rejects_renamed_or_missing_path_input(self):
+        """Exercise the real guard with valid YAML mutations, not a duplicate path predicate."""
+        target = "test_validate_uploads_its_verbose_log_even_when_the_suite_fails"
+        job = self.jobs[self.VALIDATE]
+        upload = step_block(job, self.UPLOAD_STEP)
+        path_block = re.search(r"(?m)^          path: \|\n(?:            [^\n]*(?:\n|$))+", upload)
+        self.assertIsNotNone(path_block, "the current uploader has a block-scalar path input")
+
+        def guarded_result(candidate):
+            case = type(self)(target)
+            case.jobs = {**self.jobs, self.VALIDATE: candidate}
+            result = unittest.TestResult()
+            case.run(result)
+            return result
+
+        original = guarded_result(job)
+        self.assertTrue(original.wasSuccessful(), original.failures + original.errors)
+        for label, changed in (
+                ("renamed with.path", upload.replace("          path: |", "          description: |", 1)),
+                ("missing with.path", upload[:path_block.start()] + upload[path_block.end():])):
+            with self.subTest(mutation=label):
+                result = guarded_result(job.replace(upload, changed, 1))
+                self.assertEqual(result.errors, [], result.errors)
+                self.assertTrue(result.failures, f"the real uploader guard accepted {label}")
 
 
 class ValidateShardWorkflowContract(unittest.TestCase):

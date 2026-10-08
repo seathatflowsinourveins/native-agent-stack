@@ -143,6 +143,11 @@ or changing weights needs evidence of the bottleneck; it never changes coverage.
   `native-agent-stack@b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276:.github/workflows/validate.yml:147-250`;
   previous serial instruction at the same pin,
   `docs/decisions/2026-10-03-suite-parallelism-trial-outcome.md:24-27`.
+- `actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`
+  (v7.0.1), [action.yml:5](https://github.com/actions/upload-artifact/blob/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml#L5):
+  `name` and required `path` are action inputs. The corrected diagnostic guard
+  reads those exact `with` keys with the existing repository workflow loader;
+  matching a pathname elsewhere in a step is insufficient.
 
 
 ## Contract changes by existing test ID
@@ -157,7 +162,7 @@ fixtures reject missing coverage and failed, cancelled or skipped dependencies.
 | `tests.test_workflow_hardening.WholeSuiteHeadroomAndDiagnostics.test_every_whole_suite_job_names_its_suite_step` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
 | `tests.test_workflow_hardening.WholeSuiteHeadroomAndDiagnostics.test_each_suite_lists_its_50_slowest_tests_with_faulthandler_on` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
 | `tests.test_workflow_hardening.WholeSuiteHeadroomAndDiagnostics.test_linux_suites_abort_five_minutes_before_the_job_limit` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
-| `tests.test_workflow_hardening.WholeSuiteHeadroomAndDiagnostics.test_validate_uploads_its_verbose_log_even_when_the_suite_fails` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
+| `tests.test_workflow_hardening.WholeSuiteHeadroomAndDiagnostics.test_validate_uploads_its_verbose_log_even_when_the_suite_fails` | 3 | Read the selected uploader's actual `with.path` through the existing workflow loader; require both the verbose log and `suite/report.json` there, bind shard uniqueness to `with.name`, and retain action, always-run and ordering assertions. Mutation controls reject a renamed or missing `with.path`, restoring and strengthening main's upload-input binding. |
 | `tests.test_workflow_hardening.ValidateSuiteStepTracesAHang.test_a_hang_prints_the_hung_test_traceback_and_fails_the_step` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
 | `tests.test_workflow_hardening.ValidateSuiteStepTracesAHang.test_control_without_faulthandler_the_hang_leaves_no_traceback` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
 | `tests.test_shell_parser_ci.ProvisioningStepTests.test_provisioning_step_exists_in_the_validate_job` | 3 | Complete module-shard coverage with the original provisioning/diagnostic invariant. |
