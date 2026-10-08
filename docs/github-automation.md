@@ -17,7 +17,7 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
-## Current practice (2026-10-08)
+## Current practice (2026-10-05)
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
 live settings win. The user chose the advisory option at 2026-10-05T01:41:33Z;
@@ -25,6 +25,8 @@ the coordinator removed `validate-macos` from live ruleset 23739774 at 2026-10-0
 [PR #711](https://github.com/seathatflowsinourveins/native-agent-stack/pull/711) then proposed the workflow changes.
 The coordinator's read-back at 02:52Z confirmed the seven contexts below, strict false and enforcement active.
 The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json) carries the same contexts.
+
+The Actions allow-list and harness description below were checked against live settings and pinned sources on 2026-10-08.
 
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
