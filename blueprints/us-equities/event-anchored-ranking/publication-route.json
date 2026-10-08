@@ -54,19 +54,20 @@
   },
   "reviewed_subject": {
     "id": "n1-extreme-mover-ranking-20261008",
-    "revision": "R3 after CC134735Z",
-    "protocol_sha256": "f5f4498084cc931a46450f410b3b1fde640b0377a7b51ab5219736ea97d56ebb",
-    "registry_sha256": "f0664418e2d01b0cbaab6779623c4f22f2776efb67415fc0cc036c1f23aba6d6",
-    "canonical_manifest_sha256": "304ffa29bd63e1f47b9ef38bcf0d2e36539b2b605bdb552dad2544204d0eee82",
-    "submission_sha256": "42580555d984039c77da4bd885b08f25e7e22a934c24b67ee5c63c48e01794b4",
+    "revision": "ONE fresh combined R3B under CC152445Z; all seven findings folded after both families, earlycc8attempt remains withdrawn",
+    "protocol_sha256": "bc8ec9b89b73612b69e6c50f8ecdfe45c26a87c0d24e252f94572fc90f802b55",
+    "registry_sha256": "8849351ab8f2bdd792701ebaec06ca8f8a097cf5485fc8f6bcad3877101f4be9",
+    "canonical_manifest_sha256": "b7ef3e15ba5426cc9be58629291e3e5fdc1d01fe0640ad2c7c5d89372a6d65a5",
+    "submission_sha256": "9ea62af900f4932c27630faa2386757d3e23209133140493c90f03194af4835b",
     "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
-    "candidate_files": 17,
+    "candidate_files": 30,
     "reader_state": {
       "co_op_GPT": "PENDING",
       "CC_Claude": "PENDING"
     },
     "frozen": false,
-    "freeze_at": null
+    "freeze_at": null,
+    "read_start_hold": "Correction78: after combinedR3B-READY/eachnamedreadstart, noR3Bbytechange,pushorpublicationuntilBOTHnamedverdictsarein; everyreaderholdsindependently. No frozenpublication/landinguntilbothPASSandexplicitCCcue."
   },
   "portable_publication": {
     "private_evidence_remains_private": true,
