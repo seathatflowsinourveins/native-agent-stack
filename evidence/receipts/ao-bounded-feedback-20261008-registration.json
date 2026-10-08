@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "ao-bounded-feedback-20261008",
+  "kind": "historical_inventory",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Historical AO v0.13.4 native feedback observations retained from the original private receipt; comparative G1 is UNKNOWN and repeated-opportunity G3 UNTESTED.",
+  "limitations": [
+    "Historical record only; not a new execution or live acceptance.",
+    "Registry envelope only; retain original receipt payload, evidence classification, counts and historical observations unchanged."
+  ],
+  "retained_original": {
+    "path": "evidence/receipts/ao-bounded-feedback-20261008.json",
+    "sha256": "528ea20a234c4d2ec4676f6c1248be50078c1727cc6422c15d10af2d02d5a022",
+    "classification": "historical_native_integration_receipt_excerpt"
+  }
+}

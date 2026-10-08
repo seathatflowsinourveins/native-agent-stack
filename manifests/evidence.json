@@ -2,6 +2,50 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "ao-bounded-effect-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "One fixed synthetic failed-CI task reached the recording receiver with one native AO automatic notification and zero simulated manual sends, versus one explicit simulated manual send with the observer bypassed; native inverse and unchanged vendor checks passed.",
+      "limitations": [
+        "The task uses synthetic SCM observations and the vendor recording messenger with the real AO observer, lifecycle manager and SQLite. No model or real GitHub PR was exercised.",
+        "The no-AO arm bypasses the observer and makes one explicitly simulated manual send. Actual human effort, live cue reduction, provider usage and coding repair remain unmeasured.",
+        "The policy-disabled arm is an inverse within AO; the separate observer-bypassed arm is the no-AO orchestration control.",
+        "Two explicit same-input polls establish suppression in this fixture. Restart, replay, persistence-failure, cross-session and changed-head behavior remain untested.",
+        "The native subtest durations are rounded and include fixture setup/cache effects. They do not establish a production speed comparison.",
+        "The install-only route was withdrawn. Persistent AO deployment, shared user-unit installation, gateway/profile admission and fast-tier forwarding for AO-launched Codex remain separate qualification work.",
+        "Six selected read-only Codex MCP calls passed, one per exposed server; the other88 exposed tools and Claude's MCP wiring are outside this lane smoke."
+      ],
+      "path": "evidence/receipts/ao-bounded-effect-20261008.json"
+    },
+    {
+      "id": "ao-bounded-feedback-20261008",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Historical AO v0.13.4 native feedback observations retained from the original private receipt; comparative G1 is UNKNOWN and repeated-opportunity G3 UNTESTED.",
+      "limitations": [
+        "Historical record only; not a new execution or live acceptance.",
+        "Registry envelope only; retain original receipt payload, evidence classification, counts and historical observations unchanged."
+      ],
+      "path": "evidence/receipts/ao-bounded-feedback-20261008-registration.json"
+    },
+    {
+      "id": "ao-orchestration-landscape-20261008",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Dated Oct7/8 primary-source and retained execution landscape remains historical comparison evidence; its v0.13.4 latest readback predates the separately recorded v0.13.5 release.",
+      "limitations": [
+        "Historical record only; not a new source survey, runtime trial or live acceptance.",
+        "Registry envelope only; retain original source pins, evidence classification and observations unchanged. The measured-effect receipt carries current release correction."
+      ],
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008-registration.json"
+    },
+    {
       "id": "memory-lifecycle-probe-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -5524,6 +5568,21 @@
       "path": "blueprints/convergence-practice/README.md",
       "sha256": "5e259cc7d810606100601771d010b562f8e7e2242762773d7814133802d3d273",
       "bytes": 10645
+    },
+    {
+      "path": "blueprints/convergence-practice/ao-bounded-effect/README.md",
+      "sha256": "5f12d79ed7611ec753a3ac0b4244903950f9ae2d86b6d97cc3113c6a2c605cd2",
+      "bytes": 5157
+    },
+    {
+      "path": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
+      "sha256": "0eef18b04dadc49f089e950c6a3c6dd01aa683c946cdddcac46b4624a02d1f9d",
+      "bytes": 7427
+    },
+    {
+      "path": "blueprints/convergence-practice/ao-bounded-effect/experiment.json",
+      "sha256": "d22bbdbcb4111860444cbf464fe362b861195ebf963ac5ebed4c6f6f3205293a",
+      "bytes": 12295
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/.gitignore",
@@ -54862,9 +54921,24 @@
       "bytes": 866
     },
     {
+      "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+      "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae",
+      "bytes": 18042
+    },
+    {
+      "path": "evidence/receipts/ao-bounded-feedback-20261008-registration.json",
+      "sha256": "0c446ccc84361687c2408b6c658c00ce501eae7c0755f1fa1f1abc4aafa84f88",
+      "bytes": 789
+    },
+    {
       "path": "evidence/receipts/ao-bounded-feedback-20261008.json",
       "sha256": "528ea20a234c4d2ec4676f6c1248be50078c1727cc6422c15d10af2d02d5a022",
       "bytes": 5684
+    },
+    {
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008-registration.json",
+      "sha256": "cfc486d1d9bc0f3fde7724277909b269bffc0b543cadf285c95604833b560ddc",
+      "bytes": 889
     },
     {
       "path": "evidence/receipts/ao-orchestration-landscape-20261008.json",
@@ -58958,6 +59032,7 @@
     }
   ],
   "convergence_records": [
+    "blueprints/convergence-practice/ao-bounded-effect/experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",

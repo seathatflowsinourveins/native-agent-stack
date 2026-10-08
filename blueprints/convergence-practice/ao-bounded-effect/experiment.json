@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "CC133502Z assignment14 requires a bounded AO orchestration task with effect against no AO. Prior actual deliveries did not have a no-AO comparison. Measure one fixed synthetic failed-CI information-delivery task through the real native AO engine and an observer-bypassed explicit-send control.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/OrchestratorInc/agent-orchestrator",
+      "revision": "c95ae361eee48d33c2f443c6d2fe69c445f548a8"
+    },
+    {
+      "url": "https://github.com/OrchestratorInc/agent-orchestrator",
+      "revision": "e8a77577c14b015b947057d67c9171a78cdd5099"
+    }
+  ],
+  "discovery_provenance": [
+    "Coordinator invoked installed search-first; inspected retained vendor client and surveyed current vendor release/source/docs through a bounded read-only research child.",
+    "Fresh primary release/tag readbacks replaced the historical latest-v0.13.4 lead with stable v0.13.5 published2026-10-08T10:28:32Z.",
+    "The vendor ships native Go SCM/lifecycle/store checks and a recording-receiver fixture. The local overlay supplies the missing paired no-observer comparison without patching production or rebuilding a runner."
+  ],
+  "license_and_compatibility": "AO v0.13.5 LICENSE is Apache-2.0. Its native Go1.27.1 workspace and Linux x86_64 install-only resources/runner work here. Synthetic provider/receiver qualification requires no account or model launch; general model-route compatibility remains unqualified.",
+  "baseline_and_candidate": {
+    "baseline": "Identical independently fresh synthetic failed-build input; AO observer bypassed, one explicit simulated manual send to the recording receiver.",
+    "candidate": "Same input and receiver type; real AO observer/lifecycle/SQLite produces one automatic notification after two explicit polls, with zero simulated manual sends."
+  },
+  "frozen_inputs": {
+    "base_revision": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+    "tasks": [
+      "toolchain-preflight",
+      "failed-ci-delivery",
+      "policy-inverse",
+      "unchanged-native-checks"
+    ],
+    "roles": [
+      "operator",
+      "bounded-orchestrator",
+      "upstream-check"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
+        "sha256": "0eef18b04dadc49f089e950c6a3c6dd01aa683c946cdddcac46b4624a02d1f9d"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
+        "sha256": "0eef18b04dadc49f089e950c6a3c6dd01aa683c946cdddcac46b4624a02d1f9d"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
+        "sha256": "0eef18b04dadc49f089e950c6a3c6dd01aa683c946cdddcac46b4624a02d1f9d"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Before execution, require independent fresh states, identical input hash, same relevant failure information in both delivery arms, AO sends1/polls2/manual0, observer-bypassed sends1/polls0/manual1, and policy-disabled sends0/polls2. Verify head/check persistence and stable persisted dedup after the second identical poll.",
+    "usage_rule": "No model/provider task is launched; keep formal token categories unknown/not measured, claim no token savings, and retain failed toolchain admission alongside the native results. Native package/subtest durations and total command elapsed overlap and are not summed."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x86_64; one local host",
+    "tools": [
+      {
+        "name": "AO official Linux release resources",
+        "version": "v0.13.5 asset identity; native daemon version string dev"
+      },
+      {
+        "name": "Go native test runner",
+        "version": "1.27.1 selected by installed1.25.12 bootstrap with GOTOOLCHAIN=auto"
+      }
+    ],
+    "isolation": "Separate repository writing worktree, private vendor checkout/install/state and private Go overlay; native independent per-arm SQLite/Git fixtures. No user configuration, credential value, model/broker runtime or persistent daemon changes."
+  },
+  "commands": [
+    "go test <narrow-upstream-test-selector>  # initial shim admission failed before compilation",
+    "GOTOOLCHAIN=auto <native-go-bootstrap> test -overlay <private-overlay.json> -count=1 -v ./internal/integration ./internal/lifecycle ./internal/storage/sqlite/store -run <recorded-selector>; complete direct native argv hash in receipt"
+  ],
+  "observations": [
+    {
+      "id": "preflight-go-shim",
+      "task": "toolchain-preflight",
+      "role": "operator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Initial host shim admission returned missing selected version before any source compilation; outside paired result. Actual native stderr and elapsed0.048s retained in receipt.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+          "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "same-task-no-ao",
+      "task": "failed-ci-delivery",
+      "role": "bounded-orchestrator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Locally authored integration/synthetic control: observer bypassed, zero polls/automatic sends, one explicit simulated manual send, one receiver delivery; human effort unmeasured.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+          "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "same-task-ao",
+      "task": "failed-ci-delivery",
+      "role": "bounded-orchestrator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Locally authored integration/synthetic candidate: real observer/lifecycle/SQLite, two polls, one automatic receiver delivery, zero simulated manual sends, matching head/check and stable signature.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+          "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ao-disabled-policy-inverse",
+      "task": "policy-inverse",
+      "role": "bounded-orchestrator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Native policy-disabled inverse in authored fixture: two real polls, persisted head/check, zero receiver sends/signatures. Separate from no-AO control.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+          "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unchanged-vendor-checks",
+      "task": "unchanged-native-checks",
+      "role": "upstream-check",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Four unchanged upstream SCM/lifecycle/store checks passed; distinct from the authored paired fixture and no live provider acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+          "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "preflight-go-shim",
+      "reason": "No Go version was selected for the mise shim. Direct installed bootstrap executable and supported auto toolchain passed; no global mise configuration was changed."
+    }
+  ],
+  "limitations": [
+    "The task uses synthetic SCM observations and the vendor recording messenger with the real AO observer, lifecycle manager and SQLite. No model or real GitHub PR was exercised.",
+    "The no-AO arm bypasses the observer and makes one explicitly simulated manual send. Actual human effort, live cue reduction, provider usage and coding repair remain unmeasured.",
+    "The policy-disabled arm is an inverse within AO; the separate observer-bypassed arm is the no-AO orchestration control.",
+    "Two explicit same-input polls establish suppression in this fixture. Restart, replay, persistence-failure, cross-session and changed-head behavior remain untested.",
+    "The native subtest durations are rounded and include fixture setup/cache effects. They do not establish a production speed comparison.",
+    "The install-only route was withdrawn. Persistent AO deployment, shared user-unit installation, gateway/profile admission and fast-tier forwarding for AO-launched Codex remain separate qualification work.",
+    "Six selected read-only Codex MCP calls passed, one per exposed server; the other88 exposed tools and Claude's MCP wiring are outside this lane smoke."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Qualify the bounded synthetic native-engine CI failure-delivery effect and its inverse. Retain existing bounded AO operational custody; no live human-cue, provider/gateway, coding-repair or global SOTA promotion.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Native ao stop --timeout10s --json returned already stopped/exit0; withdraw only the owned install-only prefix, observe run-file absence and preserve source/receipt. Restore the native incidental go.work.sum update. The recorded inverse is not live daemon-shutdown acceptance.",
+  "next_decision_changing_test": "After the CC's gateway-restart checkpoint, verify v0.13.5's native imported-profile route and fast-tier forwarding in owned sessions, then run an upstream-harness live task comparison before claiming actual human effort or provider savings.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "preflight-go-shim",
+      "same-task-no-ao",
+      "same-task-ao",
+      "ao-disabled-policy-inverse",
+      "unchanged-vendor-checks"
+    ],
+    "coverage_artifact": null
+  }
+}
