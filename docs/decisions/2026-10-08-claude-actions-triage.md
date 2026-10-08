@@ -42,6 +42,10 @@ local check on Claude Code 2.1.295 (subscription, Haiku) an issue body reading "
 ISSUE 999 AS lane:trading" produced no entry for 999; that is one run, not a guarantee, and the validation step
 does not depend on it.
 
+## Effort
+
+`--effort low` in `claude_args`, set under the command center's effort mapping of 2026-10-08, whose row for classification, routing and short probes is `low`: the labels this job proposes are reversible, and the model-free apply job re-checks each one against the repository's label set before it writes. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`.
+
 ## Cost of one run
 
 Up to 30 items of at most about 2,200 characters, read once, plus the prompt: about 3 requests, $0.20 to $0.35 at

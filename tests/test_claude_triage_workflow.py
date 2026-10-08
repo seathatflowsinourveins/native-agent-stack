@@ -189,7 +189,7 @@ class TriageShapeTests(unittest.TestCase):
         for forbidden in ("anthropic_api_key", "claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
                           "settings", "plugins", "plugin_marketplaces"):
             self.assertNotIn(forbidden, run["with"])
-        for expected in ("--model claude-opus-5-5", "--max-turns 6", "--max-budget-usd 1",
+        for expected in ("--model claude-opus-5-5", "--effort low", "--max-turns 6", "--max-budget-usd 1",
                          "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep", "--restricted",
                          "--permission-prompts none", "--setting-sources user", "--strict-mcp-config",
                          "--add-dir ${{ runner.temp }}/triage"):
