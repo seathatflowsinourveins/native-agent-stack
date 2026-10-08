@@ -11,7 +11,8 @@ name: harness-audit
 # Bounded since 2026-10-08 (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md): Claude has Read, Glob and
 # Grep only, at most 20 turns and a $3 client budget; the job holds no write scope; a model-free step copies the report
 # to the job summary and keeps the run's token and cost numbers. The job runs only while the repository variable
-# CLAUDE_HARNESS_AUDIT_ENABLED is 'true'.
+# CLAUDE_HARNESS_AUDIT_ENABLED is 'true', and only on the first attempt of a run: a re-run would spend again without a
+# new schedule tick or request, so it is skipped.
 on:
   schedule:
     - cron: "17 9 * * 1"
@@ -30,8 +31,10 @@ jobs:
     if: >-
       github.repository == 'seathatflowsinourveins/native-agent-stack' &&
       github.ref == 'refs/heads/main' &&
+      github.run_attempt == 1 &&
       vars.CLAUDE_HARNESS_AUDIT_ENABLED == 'true' &&
-      (github.event_name == 'schedule' || github.actor == github.repository_owner)
+      (github.event_name == 'schedule' ||
+      (github.actor == github.repository_owner && github.triggering_actor == github.repository_owner))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -76,11 +79,16 @@ jobs:
           echo "1d1fb98d87d40d0141b5243d60afe898d982a14f6e02c1d2d2931df89a7c0ede  $RUNNER_TEMP/harness-audit/audit-prompt.md" | sha256sum -c -
 
       # Federation inputs only: the action prefers a static key over federation when both are present, and this
-      # workflow passes none. Hooks are off and file reads stay inside the checkout and the prompt directory; the
-      # tool list, not the prompt, is what keeps the run read-only.
+      # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores every settings file
+      # and keeps the file tools inside the checkout and the prompt directory; --permission-prompts none denies
+      # whatever would ask; --settings carries the deny rules, because a settings file would be ignored. The tool
+      # list, not the prompt, is what keeps the run read-only.
       - name: Run the audit
         id: claude_audit
         uses: anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b # v1.0.247
+        env:
+          # The action turns full output on when this is "true" in its environment; pin it off for this step.
+          ACTIONS_STEP_DEBUG: 'false'
         with:
           anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
           anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
@@ -90,8 +98,6 @@ jobs:
           show_full_output: 'false'
           display_report: 'false'
           track_progress: 'false'
-          settings: |
-            {"disableAllHooks":true,"permissions":{"blockReadsOutsideWorkingDirectories":true,"deny":["Read(./.git/**)","Read(./**/.env)","Read(./**/.env.*)","Read(./**/*.pem)","Read(./**/*.key)"]}}
           prompt: |
             Read ${{ runner.temp }}/harness-audit/audit-prompt.md, section "4. The prompt", and run that audit on this
             repository (project scope only; read-only; make no edits, commits or pull requests). Where a step there
@@ -105,12 +111,16 @@ jobs:
             --max-budget-usd 3
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
+            --restricted
+            --permission-prompts none
             --setting-sources user
             --strict-mcp-config
+            --settings '{"disableAllHooks":true,"permissions":{"blockReadsOutsideWorkingDirectories":true,"deny":["Read(./.git/**)","Read(./**/.git/**)","Read(./**/.env)","Read(./**/.env.*)","Read(./**/*.pem)","Read(./**/*.key)"]}}'
             --add-dir ${{ runner.temp }}/harness-audit
 
-      # Numbers only: the execution file holds the whole transcript and is never printed or uploaded. The numeric
-      # record is written first, so a failed or over-budget run still leaves its cost; the acceptance check follows.
+      # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
+      # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
+      # follows. It also reads the session's own tool list: a shell, write, web, subagent or MCP tool fails the run.
       - name: Keep the run's numbers and check the bounds
         if: ${{ always() && steps.claude_audit.outputs.execution_file != '' }}
         shell: bash
@@ -118,38 +128,51 @@ jobs:
           EXECUTION_FILE: ${{ steps.claude_audit.outputs.execution_file }}
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/harness-audit-usage"
+          out="$RUNNER_TEMP/harness-audit-usage"
+          mkdir -p "$out"
           jq -e '
             def count: type == "number" and . >= 0 and . == floor;
+            def name: if type == "string" and test("^[A-Za-z0-9_.:@/-]{1,80}$") then . else "other" end;
             if type != "array" then error("unsupported execution shape") else . end |
-            map(select(.type == "result")) | last |
-            if . == null then error("no result") else . end |
-            if (.total_cost_usd | type == "number" and . >= 0) and (.num_turns | count) and
-               (.modelUsage | type == "object" and length > 0)
+            (map(select(.type == "system" and .subtype == "init")) | first) as $init |
+            (map(select(.type == "result")) | last) as $result |
+            if $result == null then error("no result") else . end |
+            if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
+               ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
-            {total_cost_usd, num_turns,
-             successful_result: (.subtype == "success" and .is_error == false),
-             models: (.modelUsage | to_entries | map(
+            (($init.tools // []) | map(select(type == "string"))) as $tools |
+            {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns,
+             successful_result: ($result.subtype == "success" and $result.is_error == false),
+             session_started: ($init != null),
+             claude_code_version: (($init.claude_code_version // "unknown") | name),
+             tools: ($tools | map(name)),
+             forbidden_tools: ($tools | map(select(
+               test("^(Bash|Write|Edit|MultiEdit|NotebookEdit|WebFetch|WebSearch|Task|Agent)$") or
+               startswith("mcp__"))) | map(name)),
+             mcp_servers: (($init.mcp_servers // []) | length),
+             models: ($result.modelUsage | to_entries | map(
                if (.value.inputTokens | count) and (.value.outputTokens | count) and
                   (.value.cacheReadInputTokens | count) and (.value.cacheCreationInputTokens | count) and
                   (.value.costUSD | type == "number" and . >= 0)
-               then {model: .key, input_tokens: .value.inputTokens, output_tokens: .value.outputTokens,
+               then {model: (.key | name), input_tokens: .value.inputTokens, output_tokens: .value.outputTokens,
                      cache_read_input_tokens: .value.cacheReadInputTokens,
                      cache_creation_input_tokens: .value.cacheCreationInputTokens, cost_usd: .value.costUSD}
                else error("model usage unavailable") end))}
-          ' "$EXECUTION_FILE" > "$RUNNER_TEMP/harness-audit-usage/usage.json"
+          ' "$EXECUTION_FILE" > "$out/usage.json.tmp"
+          mv "$out/usage.json.tmp" "$out/usage.json"
           {
             echo '### Harness audit: run numbers'
             echo
-            jq -r '"| turns | client cost estimate (USD) | completed |", "| ---: | ---: | --- |",
-                   "| \(.num_turns) | \(.total_cost_usd) | \(.successful_result) |", "",
-                   "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
+            jq -r '"| turns | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
+                   "| ---: | ---: | --- | --- | --- | ---: |",
+                   "| \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
-              "$RUNNER_TEMP/harness-audit-usage/usage.json"
+              "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
-          jq -e '.successful_result == true and .num_turns >= 1 and .num_turns <= 20 and
-                 .total_cost_usd <= 3 and (.models | map(.cache_read_input_tokens) | add) > 0' \
-            "$RUNNER_TEMP/harness-audit-usage/usage.json" > /dev/null
+          jq -e '.successful_result == true and .session_started == true and (.forbidden_tools | length) == 0 and
+                 .mcp_servers == 0 and .num_turns >= 1 and .num_turns <= 20 and .total_cost_usd <= 3 and
+                 (.models | map(.cache_read_input_tokens) | add) > 0' "$out/usage.json" > /dev/null
 
       # The report is the final result text only, capped and shown as preformatted text so nothing in it renders
       # as Markdown or HTML on the run page.
@@ -178,5 +201,5 @@ jobs:
         with:
           name: harness-audit-usage-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/harness-audit-usage/usage.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
