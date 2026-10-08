@@ -18092,8 +18092,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
-      "sha256": "9404fc7f0a629774eafb76699c808d4f4fdab8b4732b25fb27f435ed20ba4f97",
-      "bytes": 129151
+      "sha256": "d8d199d046883544da0c4d7353a0647993dd928bebfacc17bc541eb1a0121fb8",
+      "bytes": 129183
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
