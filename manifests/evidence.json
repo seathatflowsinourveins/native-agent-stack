@@ -48246,8 +48246,8 @@
     },
     {
       "path": "evidence/artifacts/research-extraction-host-spelling-20261008/receipt.json",
-      "sha256": "2ae5fc6359fb2953fc0d729a89298515b4c577d8dbf28a549c3198e60399965d",
-      "bytes": 3474
+      "sha256": "531fae5faec25d91ba470891bdb5bc8c2b01108e68faa78f4948622d802acb78",
+      "bytes": 4396
     },
     {
       "path": "evidence/artifacts/retrieved-code.txt",
