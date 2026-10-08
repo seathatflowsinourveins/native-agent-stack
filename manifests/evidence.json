@@ -5442,8 +5442,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "c0489f8630abca88258caa3136d6a8b4b4db575c6b90ad6669b4e04e08512a88",
-      "bytes": 32041
+      "sha256": "40ef24b2098d73381484a5e13ae8f092100267d6cc70050edf8901a59e1e3a08",
+      "bytes": 32181
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -17183,8 +17183,8 @@
     },
     {
       "path": "docs/catalog-provenance.md",
-      "sha256": "15c20a89ad95ffb37d8c4b02f28addf9ff9939b6c2f6bb853017497733522c4e",
-      "bytes": 14270
+      "sha256": "17af1d0d61759effdecf73ae99573a83578d6af6c752fa388401a52b55c472b2",
+      "bytes": 21902
     },
     {
       "path": "docs/catalog-reconciliation-20260922.md",
