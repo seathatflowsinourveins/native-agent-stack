@@ -2523,3 +2523,17 @@ assertion on the mutant, in a scratch copy under `/tmp`.
   and the network allowlist the runners need). The measurement must include a
   check that sandboxed commands cannot reach the user systemd bus
   (`systemd-run --user`).
+
+## Anthropic Admin API inventory entry
+
+The optional `anthropic-admin` foundation entry contains metadata only. Its
+private file template is `<store>/anthropic-admin.env`, where `<store>` is
+`${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`; its variable is
+`ANTHROPIC_ADMIN_KEY`, as shown in the official
+[Usage and Cost API examples](https://platform.claude.com/docs/en/manage-claude/usage-cost-api).
+The owner stores the key later with
+`tools/credentials/set_credential.py anthropic-admin` in their own terminal.
+Anthropic's [Admin key documentation](https://platform.claude.com/docs/en/manage-claude/admin-api-keys)
+requires an organization admin to create a Console Admin key and states that
+Console keys have no selectable scopes: they carry full access to endpoints that
+accept Admin API keys. No Admin API client or authenticated probe is introduced.
