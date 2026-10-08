@@ -116,8 +116,10 @@ CI at the tag; coupled pins move as one unit.
 | `tools/token-report` refresh | RTK 4,406,580 tokens saved across retained projects (4,288,399 for one project); headroom 20,968 over 30 days; jCodeMunch 0 session calls and 0 saved | read-only |
 
 These are each tool's own estimates, not net provider savings. jCodeMunch is
-installed and organically unused on the Mac; under the 2026-10-06 rule its missing
-use stays explicit. The ai-memory swap waits for its gate and runs: stop the agent,
+installed and was not called on the Mac. Under the
+[clean-install decision](2026-10-07-clean-upstream-install-finalizes-a-candidate.md)
+(#833, rule 4), zero use is an install gap first and never a reason for removal; its
+state there is release owed (1.108.332). The ai-memory swap waits for its gate and runs: stop the agent,
 `ai-memory backup --to <dated tarball>`, copy the 2.5.2 directory to a 2.6.0
 directory, run `ai-memory upgrade --version v2.6.0` from the copy, repoint the
 launchd program and `~/.local/bin/ai-memory`, start, then `ai-memory doctor` and an
@@ -125,6 +127,14 @@ MCP status read from both clients. Rollback restores the backup and the 2.5.2 pa
 `claude-plugins-official` publishes no tags and stays unpinned.
 
 ## NativeStack2604 readiness dispositions (proposed for the readiness owner)
+
+Amended after #833 (merged 2026-10-07T23:47Z, `36654a81`): READY is now the
+source-backed selection, the vendor's installation, and the vendor's own check or
+one named operation passing in each client the row applies to. Organic counters are
+read and published but no longer a condition (the clean-install decision, rule 3).
+The groups below were drawn under the earlier bar; the readiness owner re-reads them
+under rule 3. A group-1 row whose only open item was its counters can be ruled final
+on its existing install and check evidence.
 
 The 2026-10-05 slot record holds 18 READY and 12 BY_DESIGN of 80 (historical #700
 labels). The same day's correction excluded seven slots from READY (ccusage,
@@ -138,15 +148,25 @@ groups:
 2. **BY_DESIGN:** secrets-credentials/credential-custody (private 0600-file practice), token-efficiency/token-lane-carriers (documented holdout), token-efficiency/trace-viewer (traces are off by the 2026-09-26 decision) and document-retrieval/mineru (Docling owns parsing; MinerU is the runner-up).
 3. **Fix and smoke on the host:** observation-inference/session-analytics (agentsview v0.44.0), token-efficiency/ccusage, cross:gpt6-harnesses/gpt-gateway (smoke the running composition; the canary is superseded), cross:runtime-workers/agent-runtime-worker (OpenHands v1.53.0), cross:runtime-workers/research-harnesses, cross:wsl-distro/base-distribution (the binfmt unit), git-github-automation/cross-family-review (Claude turn limit), git-github-automation/difftastic and worktrunk (empty print prompt in the staged check), instructions-skills/skill-authoring (rerun after PyYAML provisioning), isolation/sandbox-runtime-srt, mcp-surfaces/mcp-inspector (libnspr4 for the web smoke), observation-inference/grafana (configuration drift), observation-inference/local-model-server, quality-evaluation/inspect-ai (non-relative example path), quality-evaluation/promptfoo.
 
-**Still open:** the semantic-rag/code-search owner. The portable instructions name a
-`semble` MCP server, the slot record supports Semble use, and SocratiCode is the Mac's
-installed semantic code search; no source comparison in this record settles the owner.
+**Code search (settled by #833):** the two engines have one job each. SocratiCode
+serves indexed projects on the local embedding model, and semble serves any other
+local or remote repository. On the Mac, semble 0.6.2 is final by the vendor's route
+(2026-10-07):
+- the uv tool, wheel SHA256 `94110c12…` matching PyPI, with model
+  `minishlab/potion-code-16M-v2@e9d2a44c` pinned;
+- the vendor's `semble install --type subagent` agent on both clients;
+- manual server entries with `SEMBLE_MODEL_NAME` and a per-client
+  `SEMBLE_CACHE_LOCATION`, plus `enabled_tools` and `approve` on Codex;
+- one named search passing in each client: Claude `mcp__semble__search` exit 0, and a
+  Codex `mcp_tool_call` to semble/search with status `completed`.
+
+The host receipt is `~/.local/state/native-agent-stack/evidence/semble-mac-20261007/receipt.json`.
+SocratiCode stays installed beside it.
 
 ## Readiness verdict
 
-Selections are complete except the code-search owner. The foundation is not READY
-by the 2026-10-06 bar until the fix-and-smoke group clears on NativeStack2604, which
-is its owner's host work. Offline North Star research was never blocked by these
+Selections are complete. The foundation is not READY by the clean-install bar until
+the fix-and-smoke group clears on NativeStack2604, which is its owner's host work. Offline North Star research was never blocked by these
 slots. Paper E2E is pre-authorized and proceeds when its frozen trials pass their
 own gates.
 
