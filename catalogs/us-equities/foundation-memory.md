@@ -366,20 +366,30 @@ Evidence: [README.md](https://github.com/thedotmack/claude-mem/blob/adce0fdfaf1c
 
 Candidate for issuer/entity relationships with valid-time provenance; separate it from trading/order state.
 
-License: **Apache-2.0**. Reviewed source: [`de8eb5b896c0`](https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md). Pinned upstream source review; commands are prospective and were not executed for this candidate.
+License: **Apache-2.0**. Reviewed source: [`de8eb5b896c0`](https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md); release commit [`eaa4128681bc`](https://github.com/getzep/graphiti/commit/eaa4128681bc53487138a4bbc22d58336ebe70d2) (`v0.30.2`). Pinned upstream source review. On 2026-10-07 the hash-pinned install, its offline smoke and pip-audit ran in throwaway environments (macOS arm64, CPython 3.13.15); no receipt is committed, and no graph service or model was exercised.
 
 ```text
-pip install graphiti-core
+# 2026-10-07 correction: an unpinned graphiti-core install resolves openai 3.x, which no longer installs httpx, and the import fails (getzep/graphiti#1893). Install the 0.30.2 wheel by sha256 against hashed constraints exported from getzep/graphiti 86f1c941 uv.lock (blob 97ae57ef), in an interpreter of its own, from the repository root with GRAPHITI_ENV and OUT set to new directories; accept only when every command below exits 0. tools/graphiti-smoke/README.md records a rerun in throwaway environments and its controls.
+uv venv --python 3.13 --no-python-downloads "$GRAPHITI_ENV"
+uv pip install --python "$GRAPHITI_ENV/bin/python" --require-hashes --no-build -r tools/graphiti-smoke/requirements.txt -c tools/graphiti-smoke/graphiti-0.30.2.constraints.txt
+uv pip check --python "$GRAPHITI_ENV/bin/python"
+uv pip freeze --python "$GRAPHITI_ENV/bin/python" > "$OUT/freeze.txt"
+diff tools/graphiti-smoke/expected-freeze.txt "$OUT/freeze.txt"
+"$GRAPHITI_ENV/bin/python" -I tools/graphiti-smoke/smoke.py
+uvx --from pip-audit==2.10.1 pip-audit --disable-pip --no-deps -s pypi -r "$OUT/freeze.txt"
+uvx --from pip-audit==2.10.1 pip-audit --disable-pip --no-deps -s osv -r "$OUT/freeze.txt"
+# FalkorDB server: falkordb/falkordb:v4.20.7@sha256:13996aa523f0dd283f6bd6df6620b094dcea525452417c4d6ef9bef15dc9998d; rollback only: falkordb/falkordb:v4.20.4@sha256:adbddd418916c25618564ff8597a919b08bc76452ebeb74eb985c38d7281df62. No live FalkorDB run is recorded.
 ```
 
 Workflow pins: Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.
 
-Requirements: Supported Neo4j/FalkorDB or Neptune/OpenSearch backend; configured LLM and embeddings.
+Requirements: Supported Neo4j/FalkorDB or Neptune/OpenSearch backend; configured LLM and embeddings. graphiti-core 0.30.2 fails FalkorDB 6.x index creation until a release contains getzep/graphiti#1963; use the pinned 4.20 server.
 
 - Canonical repository is getzep/graphiti. Temporal graph assertions still require source timestamps and correction history.
 - Default examples use model API credentials; no graph deployment or extraction accuracy proof here.
+- graphiti-core 0.30.2 imports httpx without declaring it, and openai 3.x no longer installs httpx (getzep/graphiti#1893). The selected recipe keeps upstream's CI-locked openai 2.32.0, which conflicts with the SDK lane's openai 3.16.2, so Graphiti runs in an interpreter of its own. Its MCP server lane is deferred because no MCP release is CI-evidenced and advisory-free.
 
-Evidence: [README.md](https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md), [v0.30.2](https://github.com/getzep/graphiti/releases/tag/v0.30.2).
+Evidence: [README.md](https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md), [v0.30.2](https://github.com/getzep/graphiti/releases/tag/v0.30.2); recipe and checks: [tools/graphiti-smoke](../../tools/graphiti-smoke/README.md).
 
 ## LightRAG
 
