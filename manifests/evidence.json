@@ -16997,8 +16997,8 @@
     },
     {
       "path": "catalogs/convergence-practice/public-starred.json",
-      "sha256": "905362c3922a05148d4f715ce623ed426ec2a30139bb349ff50facd581b8014a",
-      "bytes": 227345
+      "sha256": "9f85c5f16a52731348b21ea18af416ac9acb689b58b8086b26d9f319bb5ac04b",
+      "bytes": 311989
     },
     {
       "path": "catalogs/convergence-practice/source-review.json",
@@ -17139,6 +17139,16 @@
       "path": "catalogs/landscape/gap-wave2-20260923--gap-resolution.json",
       "sha256": "c7c9e05bdacc5263d370333fd4679ee9c7599f16445c7c75a07dffaf9291b801",
       "bytes": 69876
+    },
+    {
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+      "bytes": 400636
+    },
+    {
+      "path": "catalogs/landscape/grand-catalog-index-20261008.json",
+      "sha256": "9d9cf1c5411153a3cc4be17f26dad549d45448ceef475637b4c13c5bb6151c98",
+      "bytes": 97426
     },
     {
       "path": "catalogs/landscape/hosting-practice.json",
@@ -18456,6 +18466,11 @@
       "bytes": 5631
     },
     {
+      "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
+      "sha256": "4ac1b4d92b2a2a24f47eac39b6c3bb0129fc63125bd48cb3a70ed25799031fc2",
+      "bytes": 4802
+    },
+    {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
       "sha256": "9a1097a58c45a2e84d177e839a9ef0e4c7a40f4d68a913ba3527aba24438dac3",
       "bytes": 20420
@@ -18634,6 +18649,16 @@
       "path": "docs/full-stack-convergence.md",
       "sha256": "57e95de9a4376d2f211858928d13413118ed12620d563f0c5544e0f4a444514e",
       "bytes": 11546
+    },
+    {
+      "path": "docs/g5-architecture-index.md",
+      "sha256": "229e08ce245593afe341c7525f3e36d18c531634ec451e079715af1e0605355c",
+      "bytes": 25996
+    },
+    {
+      "path": "docs/g5-refresh-procedure.md",
+      "sha256": "540db1d833933c6c45b733c75c5e6c56eee3a2764a211a2d1f88234d97c1b025",
+      "bytes": 6249
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
