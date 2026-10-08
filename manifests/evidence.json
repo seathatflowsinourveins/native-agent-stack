@@ -5020,6 +5020,11 @@
       "bytes": 26872
     },
     {
+      "path": ".github/workflows/claude-security-review.yml",
+      "sha256": "bb2cec85829e209429726459df1145b1d59d36369edec19028fee36fd362132d",
+      "bytes": 18204
+    },
+    {
       "path": ".github/workflows/dependency-review.yml",
       "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
       "bytes": 1549
@@ -5088,6 +5093,11 @@
       "path": ".github/workflows/scorecard.yml",
       "sha256": "051dd11d0b7be79e7086b58952c19420e3dfc83360bfcbe64387d1d1d769ace2",
       "bytes": 2212
+    },
+    {
+      "path": ".github/workflows/security-review-flag.yml",
+      "sha256": "168add1faa9d354ec896678721c3ad31c96e05ac167058ad331ec81d44771493",
+      "bytes": 2614
     },
     {
       "path": ".github/workflows/security-scan.yml",
@@ -17867,8 +17877,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "609d0f963dca45ad79f080b36ba3e43692a8c37d70f1b9d35555d0d5e4ba7594",
-      "bytes": 40734
+      "sha256": "cc9c4aa92ac4ac3e3a0ef286a82f5e1d27c0fc4dc8aeda27ad62251140f0cd89",
+      "bytes": 41413
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18146,6 +18156,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-claude-actions-security-review.md",
+      "sha256": "786f80d176c863d0954838074d89055dd0e6148e83021c7cb37a4c3101447793",
+      "bytes": 7973
+    },
+    {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
       "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
       "bytes": 14363
@@ -18312,8 +18327,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "f489ff42d80b1c2e1ece353250c477605730ee41d47dcd54245d06e11c8d13f2",
-      "bytes": 101058
+      "sha256": "20a4eaa9346fd2e4af21ffbb55476a95e50c2bdd33f3e5c544f6d594863ec891",
+      "bytes": 101844
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -57861,6 +57876,11 @@
       "bytes": 11326
     },
     {
+      "path": "tests/test_claude_security_review_workflow.py",
+      "sha256": "d40fbcb6109179d5bd71ef662580d14a915d5bba093942af032593984776f2c0",
+      "bytes": 26755
+    },
+    {
       "path": "tests/test_claude_spend_scan.py",
       "sha256": "bd4994e38cdadfa5b4099351261c6908875540d5be54139aa9e4f8dae4691e4b",
       "bytes": 2669
@@ -58722,8 +58742,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "347ea2553d9e2f436965d1cbfbd3cfab6b507d9aa72787404c117cc7330e237e",
-      "bytes": 83757
+      "sha256": "77a271039ebba9ae4326b06b0847e5d8a76762bfbe717c4c8093db53eb160dbb",
+      "bytes": 84357
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -58732,8 +58752,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "2bde9456da1901d7e4a1978e16c7bc2c85279ac6ac4adba50cacc0395fe26e05",
-      "bytes": 12166
+      "sha256": "6d64365c83e26058312d202ef8ab725a5ee44026361196a4208ca24c86255891",
+      "bytes": 13372
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
