@@ -1,8 +1,8 @@
 # Runtime-worker skills trial
 
-The [manifest](manifest.json) selects **137 skills from 13 pinned sources** for
+The [manifest](manifest.json) selects **134 skills from 13 pinned sources** for
 a broad worker trial: 77 OpenHands registry skills, 14 of the 15 superpowers
-lifecycle skills, all 28 of the adoption manifest's skills reused by `reuse_ref`,
+lifecycle skills, 25 of the adoption manifest's 28 skills reused by `reuse_ref`,
 and targeted additions for evaluation, research, browser testing and framework
 review. `security-audit` and `skill-creator` joined the reused set on 2026-09-30, when
 main promoted the first and pinned the second
@@ -68,6 +68,15 @@ Both references are the value `"adoption/skills/manifest.json"` and match the
 adoption skill of the same name, so main can reorder or insert skills without
 moving a reference. `tests.test_runtime_worker_skills` fails when main adds a skill
 that is in neither set, and when a reused entry's pin differs from main's.
+
+The October 8 command-center and native lane picks `hcom-agent-messaging`,
+`promptfoo-evals` and `loki` are explicitly excluded from runtime workers. The
+[dated decision](../../../docs/decisions/2026-10-08-skills-cc-lanes-picks.md)
+records their central pins and lane scope. These exclusions keep the selected
+worker catalog at 134 skills from 13 sources, with 25 central skills reused;
+worker coverage, roles, scenarios and deployment stay as recorded. A dated
+worker assignment can overturn an exclusion through the manifest's existing
+`adoption_ref` contract.
 
 - **Codex.** A reused entry carries no `codex_enabled` or `claude_listing` of its
   own. `install_skills.py` resolves each `reuse_ref` when it reads the manifest,

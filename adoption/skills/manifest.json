@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-10-05",
+  "checked_at": "2026-10-08",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -670,17 +670,98 @@
         "claude-code"
       ],
       "copy": true
+    },
+    {
+      "name": "hcom-agent-messaging",
+      "source": "aannoo/hcom",
+      "url": "https://github.com/aannoo/hcom/tree/b2a7c192003e7fd67ed93265289e4ac36276f965/skills/hcom-agent-messaging",
+      "ref": "b2a7c192003e7fd67ed93265289e4ac36276f965",
+      "path": "skills/hcom-agent-messaging",
+      "tree_sha": "87cc536c53fe2b921998bdb3c54288738aa89262",
+      "skill_md_sha256": "f34e0d41d499d6d5337a98bf6bce99d16519a5d68abd7e8dd9d7bc7d4dc58641",
+      "skill_md_bytes": 3831,
+      "description_chars": 153,
+      "upstream_disable_model_invocation": false,
+      "license": "MIT",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Unknown",
+        "socket": "Unknown",
+        "snyk": "Unknown",
+        "url": "https://skills.sh/aannoo/hcom/hcom-agent-messaging",
+        "checked_at": null,
+        "note": "Marketplace scan verdicts were not checked; the URL is a source locator."
+      },
+      "status": "trial",
+      "gap": "Command-center and native lane setup and troubleshooting need hcom's own messaging, launch-preview and terminal guidance. Selected from aannoo/hcom v0.7.28; launched agents already receive the vendor bootstrap. Pinning does not install the skill or change a runtime worker's grants (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-08"
+    },
+    {
+      "name": "promptfoo-evals",
+      "source": "promptfoo/promptfoo",
+      "url": "https://github.com/promptfoo/promptfoo/tree/30949931ee90c963acd487e97828c9441db0bcd4/.claude/skills/promptfoo-evals",
+      "ref": "30949931ee90c963acd487e97828c9441db0bcd4",
+      "path": ".claude/skills/promptfoo-evals",
+      "tree_sha": "5c0e65e6c185b6a1ea6212626b8de5442193ed76",
+      "skill_md_sha256": "40d2426fa520133b276d1efa888254f1e9a649c18289da18a75bfc2c75ea48c5",
+      "skill_md_bytes": 7589,
+      "description_chars": 325,
+      "upstream_disable_model_invocation": false,
+      "license": "MIT",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Unknown",
+        "socket": "Unknown",
+        "snyk": "Unknown",
+        "url": "https://skills.sh/promptfoo/promptfoo/promptfoo-evals",
+        "checked_at": null,
+        "note": "Marketplace scan verdicts were not checked; the URL is a source locator."
+      },
+      "status": "trial",
+      "gap": "Command-center and native lane A/B and regression work needs promptfoo's own evaluation-suite guidance. Selected from promptfoo/promptfoo 0.124.0; the skill's npx command may resolve another version, so later checks use the selected pinned executable. Pinning runs no evaluation and changes no runtime worker grants (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-08"
+    },
+    {
+      "name": "loki",
+      "source": "grafana/skills",
+      "url": "https://github.com/grafana/skills/tree/1ccacf29049fde66637fe01ab93a83a772da323b/skills/grafana-lgtm/loki",
+      "ref": "1ccacf29049fde66637fe01ab93a83a772da323b",
+      "path": "skills/grafana-lgtm/loki",
+      "tree_sha": "eb7b299e3a84bc103dbc1ce767a4afd4492ad843",
+      "skill_md_sha256": "62e7daecefc73d4392585fff99a5c5d72d2de1aa1472c80c8305b96222982779",
+      "skill_md_bytes": 6409,
+      "description_chars": 412,
+      "upstream_disable_model_invocation": false,
+      "license": "Apache-2.0",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Unknown",
+        "socket": "Unknown",
+        "snyk": "Unknown",
+        "url": "https://skills.sh/grafana/skills/loki",
+        "checked_at": null,
+        "note": "Marketplace scan verdicts were not checked; the URL is a source locator."
+      },
+      "status": "trial",
+      "gap": "Command-center and native monitoring lanes need Grafana's own LogQL guidance for skill and tool invocation events and dashboard queries. Selected from grafana/skills at the pinned main commit; pinning changes neither the Loki service nor runtime worker grants (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-08"
     }
   ],
   "budget": {
-    "claude_on_description_chars": 9484,
+    "claude_on_description_chars": 10374,
     "claude_on_cap": 10500,
-    "codex_enabled_description_chars": 9165,
-    "codex_catalog_description_chars": 9165,
+    "codex_enabled_description_chars": 10055,
+    "codex_catalog_description_chars": 10055,
     "codex_configured_budget_tokens": 6000,
     "codex_fallback_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
-    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 24 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 27 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
   },
   "excluded": [
     {
