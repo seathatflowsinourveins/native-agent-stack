@@ -5050,6 +5050,11 @@
       "bytes": 5951
     },
     {
+      "path": ".github/workflows/harness-audit.yml",
+      "sha256": "8441105a37f22ceb48dee336eb4532164852e3aca860935c8f5956eac8c7f3d8",
+      "bytes": 10257
+    },
+    {
       "path": ".github/workflows/native-foundation-e2e.yml",
       "sha256": "ba868797728981c49effa4094a39c70466073c0a98d78fd893c296e71b2c09d7",
       "bytes": 8326
@@ -18027,8 +18032,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "f97025072022743b2b3f10a38efc45017849c7b3b644c8919a86eca542e94174",
-      "bytes": 42252
+      "sha256": "c3530ab55032a5f05136605a5b709078b10e6cd29e30600864fcebcb666b101b",
+      "bytes": 42971
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18311,6 +18316,11 @@
       "bytes": 6955
     },
     {
+      "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
+      "sha256": "7a781fff907ca4787f0a5c7ab758c0c7749099dac14608ea90ccf495b3dccac0",
+      "bytes": 10487
+    },
+    {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
       "sha256": "ae0a32b4875d7ddae697cbb9c2d2f18fb5accaed69863e3511e3fc6049cc3bed",
       "bytes": 59968
@@ -18527,8 +18537,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "ccc7c8b9c951a39e537f42819a5c29ece64a8db5c6d4caf60d70e9dc945d61c6",
-      "bytes": 103436
+      "sha256": "a4164184c47fb66383b11b2dfb2b0b9d016ff6829a76084e4497b8268829a1e0",
+      "bytes": 103686
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -59786,6 +59796,11 @@
       "bytes": 22660
     },
     {
+      "path": "tests/test_claude_harness_audit_bounds.py",
+      "sha256": "fb8c80c4acd1f971bc9c69998e3fab9dc6dcd3277f3d36ba4c35624f3c3e4d00",
+      "bytes": 11969
+    },
+    {
       "path": "tests/test_claude_pr_review_workflow.py",
       "sha256": "cfaa2b171fcffdd1c31ce65269482efe15a5d6b9a515330f81aa314bd8274759",
       "bytes": 59337
@@ -60692,8 +60707,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "598f6d8ea8d5b7224581396b35b998a9cec7440f2e7b849acf97bde4a9c5c36f",
-      "bytes": 84974
+      "sha256": "2c132e9fee2c59d15bac9b42d28c6bb9b53ecfebcf331066199b9178fecf065f",
+      "bytes": 85103
     },
     {
       "path": "tests/test_workflow_security.py",

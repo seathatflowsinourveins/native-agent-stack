@@ -438,6 +438,15 @@ requires, it has its own entry in the reviewed inventory (`id-token: write`, its
 requires `refs/heads/main` and the owner
 ([2026-10-09-claude-actions-pr-toolkit-review.md](2026-10-09-claude-actions-pr-toolkit-review.md)).
 
+### Addendum (2026-10-08): the audit job gives up `issues: write`
+
+The two tables above list `harness-audit.yml:audit` with `id-token: write` and `issues: write`, as it was added. The
+bounded audit ([2026-10-08-claude-actions-harness-audit-bounds.md](2026-10-08-claude-actions-harness-audit-bounds.md))
+removes the model's `gh issue create` tool and the `issues: write` grant: the report goes to the job summary from a
+model-free step. The job's only write grant is now `id-token: write`, the reviewed inventory in
+`tests/test_workflow_policy.py` says so, and this exemption is unchanged. The action pin moves to v1.0.247
+(`2dca132ff0e0c4094ce6048b422c6915a071210b`), whose federation inputs are the four named above.
+
 ## Alternatives considered
 
 - **Keep workflow-level `contents: read`.** It already met OpenSSF Scorecard's Token-Permissions top score (read-only
