@@ -330,3 +330,5 @@ continue independently. Published immutable assets and their tag cannot be
 rewritten in place; a corrected catalog needs a new reviewed tag, publication
 and adoption re-pin. Previously published bytes and attestation records remain
 historical results and must not be silently relabeled or treated as new evidence.
+
+<!-- DISPOSABLE AUTO-MERGE HEAD TRIAL A; expected registered-document validation failure; DO NOT MERGE. CC134735Z/CC142518Z. -->
