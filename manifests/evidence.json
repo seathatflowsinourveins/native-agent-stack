@@ -5455,8 +5455,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "39a91de20dcb449a3d774a18af80d45c35944e548d9a1bf1fcfe652adbece6ed",
-      "bytes": 19125
+      "sha256": "d928901b3819c6e08d05ad24772b2f551c580886cb8998a311d75aa7f5489b86",
+      "bytes": 19238
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -18073,6 +18073,11 @@
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
+    },
+    {
+      "path": "docs/decisions/2026-10-08-qmd-shared-mcp.md",
+      "sha256": "591117ceef0874ba0444833349daf4c257c0ba0ca0ea9e214303f7b9e736fd1a",
+      "bytes": 7635
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",

@@ -131,8 +131,9 @@ DO_NOT_TRACK = "1"
 command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 
 [mcp_servers.qmd]
-command = "${ECO_ROOT}/bin/qmd"
-args = ["--index", "native-agent-stack-catalog", "mcp"]
+# The CC-owned setup starts QMD's native shared service before client relaunch.
+# Lifecycle, measured pilot and inverse: docs/decisions/2026-10-08-qmd-shared-mcp.md.
+url = "http://127.0.0.1:21851/mcp"
 
 # context-mode's plugin server (.codex-plugin/mcp.json: `node ./start.mjs`, cwd ".") starts in the plugin
 # root, because Codex joins a plugin server's relative cwd to that root. Upstream start.mjs then sets no
