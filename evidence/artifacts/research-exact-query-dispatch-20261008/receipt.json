@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "subject": "G5 exact-query native research dispatch",
+  "observed_at": "2026-10-08T17:27:57Z",
+  "source_base": "618dd6c05ff6750705b52426261748d11e003477",
+  "upstream_sources": [
+    {
+      "repository": "https://github.com/deedy5/ddgs",
+      "tag": "v9.16.0",
+      "commit": "70a5635510fb8d5b15d5ba6ceced6a67e212149b",
+      "files": [
+        "ddgs/ddgs.py",
+        "ddgs/engines/duckduckgo.py",
+        "ddgs/http_client.py"
+      ],
+      "role": "unchanged native retrieval/extraction dependency"
+    }
+  ],
+  "material_files": {
+    "tools/research/dispatch": "8a72a88c90405f3b8bccb5b695480a59020cc253b93ac7031ddfff0a1fc6da12",
+    "tools/research/exact_queries.py": "e7eae7f413b92a22a88e6ad000f3089b082c68a8d1f731226b6240f6591996e3",
+    "tests/test_research_dispatch_exact_queries.py": "14459ef71db5b6118dacbb93acd68112a3faa99dc5685a1aa58cc4fdcdece59d"
+  },
+  "returned_checks": [
+    {
+      "command": "native GPTR Python -m unittest discover -s tests -p test_research_dispatch_exact_queries.py",
+      "python_version": "3.13.16",
+      "scheduling": "nice -n 10 ionice -c2 -n7",
+      "exit_code": 0,
+      "tests": 27,
+      "duration_seconds": 0.817,
+      "stdout": "...........................\n----------------------------------------------------------------------\nRan 27 tests in 0.817s\n\nOK\n",
+      "evidence_classes": [
+        "local_integration",
+        "synthetic"
+      ],
+      "observer": "integrating lane native execution"
+    },
+    {
+      "command": "native GPTR Python -m unittest discover -s tests -p test_research_dispatch.py",
+      "exit_code": 0,
+      "tests": 13,
+      "duration_seconds": 18.09,
+      "evidence_classes": [
+        "local_integration",
+        "synthetic"
+      ],
+      "observer": "integrating lane native execution after final dispatch change",
+      "stdout": ".............\n----------------------------------------------------------------------\nRan 13 tests in 18.090s\n\nOK\n"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "evidence_class": "local_integration"
+    }
+  ],
+  "source_critic": {
+    "status": "COMPLETE",
+    "evidence_class": "source_review",
+    "findings_preserved": [
+      "Original frozen-query worker hash was not bound to the bytes parsed.",
+      "Interrupted worker could publish false zero counters.",
+      "Narrower freeze-to-file-record window could promote a changed query snapshot.",
+      "Native Opus reproduced completed-partial misclassification and empty mechanical-flag fallback; final repair review remains pending."
+    ],
+    "resolutions": [
+      "Worker expected SHA/length derive from the original validated bytes; frozen-file record must match and worker parsed-byte witness is checked against the same identity.",
+      "Live started/completed counters and returned hits are checkpointed; interruption preserves observed progress with explicit in-flight unknown outcome.",
+      "Regressions mutate the frozen file before recording and interrupt after a returned query and during extraction.",
+      "Finished partial preserves native exit1/statuscaptured_with_errors after original-byte witness/all-query progress checks; native no-results differs from transport, explicit flag presence and duplicate-key/loopback inverses are tested."
+    ]
+  },
+  "independent_native_opus": {
+    "status": "HOLD_REPAIR_PENDING",
+    "route": "native subscription",
+    "prepaid_API_run": false,
+    "live_research": false,
+    "reviewed_head": "61351043f1f443405f552428e88f4d093663eee3",
+    "stopped_initial_review": true,
+    "final_native_estimate_usd": 5.7623358,
+    "estimate_scope": "cumulative native session; supersedes 5.3403034, not summed; invoice unverified",
+    "findings": [
+      "Completed capture_with_errors was misclassified as failed/cancelled before worker witness verification.",
+      "Empty scope-SHA flag could enter the model route.",
+      "Measured numeric/trailing-dot loopback aliases and duplicate JSON keys were accepted."
+    ],
+    "final_repair_confirmation": "PENDING"
+  },
+  "boundaries": [
+    "No live DDGS query or source retrieval was run by this change's checks.",
+    "Mechanical capture is not a cited-answer, landscape Workflow, complete measured-usage or adoption verdict.",
+    "No host installation, active configuration, credential, coordinator marker or existing default question-route change was applied.",
+    "Logical native search/fetch attempts are bounded; total vendor HTTP fanout, bandwidth, DNS/redirect controls and source publication dates remain unverified.",
+    "Failed reviewer/source snapshots and historical checks are retained separately; counters are not summed across overlapping scopes."
+  ],
+  "inverse": "Omit mechanical flags to use the ordinary native DeerFlow question route; repository rollback removes the opt-in helper. No host configuration inverse is owed.",
+  "capture_contract": {
+    "successful_capture": {
+      "status": "captured",
+      "native_exit": 0
+    },
+    "finished_partial": {
+      "status": "captured_with_errors",
+      "native_exit": 1,
+      "requires": [
+        "original parsed-byte witness",
+        "all approved logical queries finished",
+        "all returned hits/error/progress retained"
+      ],
+      "usable_field_boundary": "only actual available sources; missing/empty/error occurrences do not close their fields"
+    },
+    "interruption": "incomplete/failed with observed progress and in-flight unknown; never a finished partial",
+    "native_no_results": "retain exact DDGS exception separately from transport; do not fabricate [] or universal absence"
+  }
+}

@@ -9,8 +9,10 @@ and installed hcom 0.7.28: ``hcom list self --json [--name <caller>]``.
 
 Neither upstream supplies this repository's single-path dispatch return. This
 adapter resolves the native caller, invokes the existing producer once, and
-retains its output/verdict unchanged. It does not start an agent, send messages,
-register host scripts, select a model, or grade research/adoption readiness.
+retains its output/verdict unchanged. An explicitly selected exact-query route
+uses installed deedy5/ddgs 9.16.0 without a model; exact_queries.py records its
+native API/source contract. Neither route starts an agent, sends messages,
+registers host scripts, selects a model, or grades research/adoption readiness.
 """
 
 import argparse
@@ -127,11 +129,12 @@ def retire_producer_session(process, signum, tools):
     return record
 
 
-def run_producer(launcher, question, directory, session_tools):
+def run_producer(launcher, question, directory, session_tools, command=None, env=None):
     """Leave the upstream watchdog intact; cancellation owns the whole session."""
     with (directory / "producer.stdout").open("wb") as stdout, (directory / "producer.stderr").open("wb") as stderr:
         process = subprocess.Popen(
-            ["bash", str(launcher), question], stdout=stdout, stderr=stderr, start_new_session=True,
+            command if command is not None else ["bash", str(launcher), question],
+            stdout=stdout, stderr=stderr, start_new_session=True, env=env,
         )
         previous = {}
 
@@ -166,7 +169,23 @@ def main(argv=None):
     parser.add_argument("--name", "--hcom-name", help="Native hcom caller identity; otherwise hcom resolves the current session")
     parser.add_argument("--question", dest="option_question", help="One bounded public-research question")
     parser.add_argument("question", nargs="?", help="Positional alternative to --question; include known source URLs")
+    parser.add_argument("--exact-queries-file", type=Path, help="Opt-in mechanical DDGS capture of approved ordered query strings")
+    parser.add_argument("--approved-scope-file", type=Path, help="Frozen 45-field scope for mechanical capture")
+    parser.add_argument("--approved-scope-sha256", help="Approved SHA256 of the exact scope-file bytes")
+    parser.add_argument("--mechanical-python", type=Path, help="Absolute installed DDGS 9.16.0 Python; never installs dependencies")
+    parser.add_argument("--fetch-top-k", type=int, choices=range(6), help="Explicit source-fetch bound per query; default is search only")
+    parser.add_argument("--execute", action="store_true", default=None, help="Execute mechanical capture; otherwise validate without network")
     args = parser.parse_args(argv)
+    if args.exact_queries_file is not None:
+        if args.question is not None or args.option_question is not None:
+            parser.error("exact queries and a model-produced research question are mutually exclusive")
+        if args.fetch_top_k is None:
+            args.fetch_top_k = 0
+        from exact_queries import dispatch_exact
+        return dispatch_exact(args, file_record, utc_now, native_session_tools, run_producer)
+    if any(value is not None for value in (
+            args.approved_scope_file, args.approved_scope_sha256, args.mechanical_python, args.fetch_top_k, args.execute)):
+        parser.error("mechanical options require --exact-queries-file")
     if (args.question is None) == (args.option_question is None):
         parser.error("provide exactly one question, with --question or as a positional argument")
     question = args.option_question if args.option_question is not None else args.question
