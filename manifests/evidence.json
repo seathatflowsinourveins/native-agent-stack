@@ -14651,6 +14651,11 @@
       "bytes": 5117
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/rc6-gate-rulings-20261007.json",
+      "sha256": "65e86c9f688de8e16d7168b73924f0f7c231dafb2cb97aae71d8d31b8209f24b",
+      "bytes": 8460
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
       "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
       "bytes": 8223
@@ -16142,8 +16147,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "9fc77cb8e74405aa38e396fc29dd06f35659bb591e2dab1dcb6001c8119bf1df",
-      "bytes": 26246
+      "sha256": "5b51b79a4e9c395ea967e5b4c2b399ef577c00679d29b75cc2a4c7ea639addf0",
+      "bytes": 27894
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
@@ -16154,6 +16159,16 @@
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
       "sha256": "1ee8707a248d2c988f468ac721a85b22103d0f2c4a95076e2e2b5ca86c4d0b92",
       "bytes": 19205
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
+      "sha256": "19d4b8be66b16d0bf6d5681c4954b2dbc1dd77b3c04aeedae166f2dfba75acfd",
+      "bytes": 4581
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/receipts/backtest-pipeline-20261008.json",
+      "sha256": "dbb236c08d197a9201df07f9414d0ea8b5141501bc30b9d97f1786a7452737e0",
+      "bytes": 10023
     },
     {
       "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
@@ -17032,8 +17047,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "110b4c884323b0ead55981925bdb0645fedcff1ed02af375a5f12be0e3a2c617",
-      "bytes": 25545
+      "sha256": "2f2033acc4c730102f1f7b4b90d181d5d2ca2db3d5a3c91ef933711f727480c5",
+      "bytes": 27707
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
