@@ -3,7 +3,7 @@
   "id": "ao-orchestration-landscape-20261008",
   "kind": "historical_inventory",
   "component_ids": [
-    "agent-orchestrator"
+    "codex"
   ],
   "claim": "Dated Oct7/8 primary-source and retained execution landscape remains historical comparison evidence; its v0.13.4 latest readback predates the separately recorded v0.13.5 release.",
   "limitations": [

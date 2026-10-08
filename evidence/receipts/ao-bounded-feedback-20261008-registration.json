@@ -3,7 +3,7 @@
   "id": "ao-bounded-feedback-20261008",
   "kind": "historical_inventory",
   "component_ids": [
-    "agent-orchestrator"
+    "codex"
   ],
   "claim": "Historical AO v0.13.4 native feedback observations retained from the original private receipt; comparative G1 is UNKNOWN and repeated-opportunity G3 UNTESTED.",
   "limitations": [

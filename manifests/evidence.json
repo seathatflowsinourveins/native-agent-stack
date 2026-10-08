@@ -5,7 +5,7 @@
       "id": "ao-bounded-effect-20261008",
       "kind": "artifact_measurement",
       "component_ids": [
-        "agent-orchestrator"
+        "codex"
       ],
       "claim": "One fixed synthetic failed-CI task reached the recording receiver with one native AO automatic notification and zero simulated manual sends, versus one explicit simulated manual send with the observer bypassed; native inverse and unchanged vendor checks passed.",
       "limitations": [
@@ -23,7 +23,7 @@
       "id": "ao-bounded-feedback-20261008",
       "kind": "historical_inventory",
       "component_ids": [
-        "agent-orchestrator"
+        "codex"
       ],
       "claim": "Historical AO v0.13.4 native feedback observations retained from the original private receipt; comparative G1 is UNKNOWN and repeated-opportunity G3 UNTESTED.",
       "limitations": [
@@ -36,7 +36,7 @@
       "id": "ao-orchestration-landscape-20261008",
       "kind": "historical_inventory",
       "component_ids": [
-        "agent-orchestrator"
+        "codex"
       ],
       "claim": "Dated Oct7/8 primary-source and retained execution landscape remains historical comparison evidence; its v0.13.4 latest readback predates the separately recorded v0.13.5 release.",
       "limitations": [
@@ -5536,8 +5536,8 @@
     },
     {
       "path": "blueprints/convergence-practice/ao-bounded-effect/README.md",
-      "sha256": "24315cb715cdc6c42ae4f6bbc85d135cc000c8d3adaa4366b9f100bf6a6b0b36",
-      "bytes": 5000
+      "sha256": "5f12d79ed7611ec753a3ac0b4244903950f9ae2d86b6d97cc3113c6a2c605cd2",
+      "bytes": 5157
     },
     {
       "path": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
@@ -5546,7 +5546,7 @@
     },
     {
       "path": "blueprints/convergence-practice/ao-bounded-effect/experiment.json",
-      "sha256": "7d2523bda2e34c6241075dd32b9159d1eaaad4a1c0d6811c36cc2ed99524140d",
+      "sha256": "d22bbdbcb4111860444cbf464fe362b861195ebf963ac5ebed4c6f6f3205293a",
       "bytes": 12295
     },
     {
@@ -54852,13 +54852,13 @@
     },
     {
       "path": "evidence/receipts/ao-bounded-effect-20261008.json",
-      "sha256": "4bce62ab8847106c3efae0be590f136cd81ba67dcc081ccfd3abc88ae508bab0",
-      "bytes": 17858
+      "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae",
+      "bytes": 18042
     },
     {
       "path": "evidence/receipts/ao-bounded-feedback-20261008-registration.json",
-      "sha256": "46f043ca9795a825a2e3899949de2f367bba79a39efcda8894787c13bf80647f",
-      "bytes": 802
+      "sha256": "0c446ccc84361687c2408b6c658c00ce501eae7c0755f1fa1f1abc4aafa84f88",
+      "bytes": 789
     },
     {
       "path": "evidence/receipts/ao-bounded-feedback-20261008.json",
@@ -54867,8 +54867,8 @@
     },
     {
       "path": "evidence/receipts/ao-orchestration-landscape-20261008-registration.json",
-      "sha256": "7ed1e376121dced2f25a77e455fa2a37c36eb25081e0706c5d547519798cff90",
-      "bytes": 902
+      "sha256": "cfc486d1d9bc0f3fde7724277909b269bffc0b543cadf285c95604833b560ddc",
+      "bytes": 889
     },
     {
       "path": "evidence/receipts/ao-orchestration-landscape-20261008.json",
@@ -56387,8 +56387,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "ec559d7c4a4634c20d211c554de7546cfab49e6ae9a97c6114f53c389dc8c557",
-      "bytes": 130063
+      "sha256": "3628b0d8e60c5d32e2c04b3dac1291d664668a667e49e24e4d7376bc18317d04",
+      "bytes": 128594
     },
     {
       "path": "observability/README.md",
