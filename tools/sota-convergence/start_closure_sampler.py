@@ -24,11 +24,12 @@ SEED = 202610081850
 QUOTA = 59
 R3_SHA256 = "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"
 CONTRACT = Path(__file__).with_name("start-closure-stratum-contract.json")
-CONTRACT_SHA256 = "d00ed22f6973cf3f2416b6c36d09caa9d8c829f427bd6f7854418f69e3fc292a"
+CONTRACT_SHA256 = "894deff0dfa44a9c56b8465f54fa3bf0af42ac22d9a236969a4aae5d2a58eb29"
 PROTOCOL = Path(__file__).with_name("compact_manifest.py")
 ROW_SCHEMA = "tools/sota-convergence/schemas/compact-decision-start-closure-1.json"
 ACTION = ("ADOPT-NOW", "TRIAL")
 FLAGS = {"PENDING-PIN": "pending_pin", "PENDING-LOCATOR": "pending_locator"}
+CONFLICT_FLAG = "pending_conflict"
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 
 
@@ -127,7 +128,7 @@ def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
         if row["disposition"] in ACTION:
             require(row["pin"] is not None and all(s["pin"] is not None for s in row["primary_sources"]),
                     "An action row or primary source has a null pin")
-            require(not any(flag in row.get("closure", {}) for flag in FLAGS.values()),
+            require(not any(flag in row.get("closure", {}) for flag in (*FLAGS.values(), CONFLICT_FLAG)),
                     "An action row has closure residue")
         rows[key] = {"manifest_pointer": f"/rows/{position}",
                      "row_sha256": r3.digest(r3.canonical(row).encode()), "row": row}
@@ -166,15 +167,16 @@ def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
 
 def select(rows, origins, fragments, classes, r3):
     """Call the sealed draw helper and restore original, unprojected evidence."""
+    eligible = {key: item for key, item in rows.items() if CONFLICT_FLAG not in item["row"].get("closure", {})}
     draw_origins = copy.deepcopy(origins)
     for bindings in draw_origins.values():
         for fragment in bindings:
             fragment["held_action_claims"] = []
-    packets = [p for p in r3.select(rows, draw_origins, fragments, classes, SEED, QUOTA)
+    packets = [p for p in r3.select(eligible, draw_origins, fragments, classes, SEED, QUOTA)
                if p["stratum"]["bucket_kind"] == r3.FINAL_BUCKET]
     for label, flag in FLAGS.items():
         projected = {}
-        for key, item in rows.items():
+        for key, item in eligible.items():
             if flag in item["row"].get("closure", {}):
                 projected[key] = {**item, "row": {**item["row"], "disposition": label}}
         packets.extend(p for p in r3.select(projected, draw_origins, fragments, [label], SEED, QUOTA)
@@ -197,24 +199,75 @@ def packet_counts(packets, rows):
     samples = [p for p in packets if p["selection_mode"] == "SAMPLED"]
     sampled_keys = {tuple(i["native_key"]) for p in samples for i in p["selected"]}
     selected_keys = {tuple(i["native_key"]) for p in packets for i in p["selected"]}
+    conflicts = {key for key, item in rows.items() if CONFLICT_FLAG in item["row"].get("closure", {})}
+    actions = {key for key, item in rows.items() if item["row"]["disposition"] in ACTION}
     memberships = sum(p["selected_count"] for p in samples)
     return {"strata": len(packets), "empty_strata": sum(p["population_size"] == 0 for p in packets),
-            "unique_final_action_rows": sum(i["row"]["disposition"] in ACTION for i in rows.values()),
+            "unique_final_action_rows": len(actions), "unique_pending_conflict_rows": len(conflicts),
+            "unique_census_rows": len(actions | conflicts), "pending_conflict_census_memberships": len(conflicts),
             "final_action_census_memberships": sum(p["selected_count"] for p in packets if p["selection_mode"] == "FULL-CENSUS"),
             "sample_memberships": memberships, "unique_sampled_rows": len(sampled_keys),
-            "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys),
+            "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys | conflicts),
             "rows_with_both_closure_flags": sum(all(f in i["row"].get("closure", {}) for f in FLAGS.values()) for i in rows.values()),
-            "counting_note": "Memberships are not distinct observations. Unique row counts remove fragment and closure-stratum overlap."}
+            "pending_conflict_excluded_from_samples": len(conflicts),
+            "conflict_sample_flag_exclusions": {label: sum(flag in rows[key]["row"].get("closure", {}) for key in conflicts)
+                                                for label, flag in FLAGS.items()},
+            "origin_pointer_unresolved_rows": sum(i["row"].get("origin_pointer") == "unresolved" for i in rows.values()),
+            "action_origin_pointer_unresolved_rows": sum(rows[key]["row"].get("origin_pointer") == "unresolved" for key in actions),
+            "conflict_sample_exclusion_reason": "CC 2026-10-08T23:09:31Z requires full both-family census and no sample membership for PENDING-CONFLICT, including rows with pin/locator flags.",
+            "counting_note": "Memberships are not distinct observations. Unique row counts remove fragment and closure-stratum overlap; selected rows include the separate conflict census."}
+
+
+def read_projection(key, item):
+    return {"row_id": list(key), "pin": item["row"]["pin"],
+            "locator": [s["locator"] for s in item["row"]["primary_sources"]],
+            "capture_sha256": item["row"]["capture_sha256"]}
 
 
 def action_read_set(rows, manifest, manifest_sha, head):
     return {"schema_version": 1, "kind": "g5-final-action-read-set", "profile": PROFILE,
             "manifest_sha256": manifest_sha, "asset_sha256": manifest["asset"]["sha256"], "head": head,
             "row_id_definition": "Native decision_key: canonical repository_or_entry, literal slot, canonical qualification",
-            "rows": [{"row_id": list(key), "pin": item["row"]["pin"],
-                      "locator": [s["locator"] for s in item["row"]["primary_sources"]],
-                      "capture_sha256": item["row"]["capture_sha256"]}
+            "rows": [read_projection(key, item)
                      for key, item in sorted(rows.items()) if item["row"]["disposition"] in ACTION]}
+
+
+def pending_conflict_census(rows, origins, manifest, manifest_sha, head):
+    census = {"schema_version": 1, "kind": "g5-pending-conflict-census", "profile": PROFILE,
+              "manifest_sha256": manifest_sha, "asset_sha256": manifest["asset"]["sha256"], "head": head,
+              "family_review": {"status": "NOT_RUN", "required_distinct_model_families": 2,
+                                "coverage_required_each": "ALL ROWS"}, "rows": []}
+    for key, item in sorted(rows.items()):
+        if CONFLICT_FLAG in item["row"].get("closure", {}):
+            census["rows"].append({**copy.deepcopy(read_projection(key, item)), **copy.deepcopy(item),
+                "action_side_row_ids": copy.deepcopy(item["row"]["closure"][CONFLICT_FLAG]["action_side_row_ids"]),
+                "origin_bindings": copy.deepcopy(origins[key])})
+    census["count"] = len(census["rows"])
+    return census
+
+
+def census_read_set(actions, conflicts, rows, action_sha, conflict_sha):
+    combined = {"schema_version": 1, "kind": "g5-required-census-read-set", "profile": PROFILE,
+        "manifest_sha256": actions["manifest_sha256"], "asset_sha256": actions["asset_sha256"], "head": actions["head"],
+        "row_id_definition": actions["row_id_definition"], "rows": [],
+        "counts_by_type": {"FINAL-ACTION": len(actions["rows"]), "PENDING-CONFLICT": len(conflicts["rows"])},
+        "sources": [{"census_type": "FINAL-ACTION", "path": "action-read-set.json", "sha256": action_sha},
+                    {"census_type": "PENDING-CONFLICT", "path": "pending-conflict-census.json", "sha256": conflict_sha}],
+        "family_review": {"status": "NOT_RUN", "required_distinct_model_families": 2,
+                          "coverage_required_each": "ALL ROWS"}}
+    for kind, source, filename in (("FINAL-ACTION", actions, "action-read-set.json"),
+                                   ("PENDING-CONFLICT", conflicts, "pending-conflict-census.json")):
+        for position, entry in enumerate(source["rows"]):
+            item = rows[tuple(entry["row_id"])]
+            selected = {"census_type": kind, **copy.deepcopy(read_projection(tuple(entry["row_id"]), item)),
+                        "read_source": {"path": filename, "pointer": f"/rows/{position}"}}
+            if kind == "PENDING-CONFLICT":
+                selected["action_side_row_ids"] = copy.deepcopy(entry["action_side_row_ids"])
+            if "origin_pointer" in item["row"]:
+                selected["origin_pointer"] = copy.deepcopy(item["row"]["origin_pointer"])
+            combined["rows"].append(selected)
+    combined["count"] = len(combined["rows"])
+    return combined
 
 
 def output_directory(root, name):
@@ -246,9 +299,14 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
     packets = select(rows, origins, fragments, classes, r3)
     actions = action_read_set(rows, manifest, manifest_sha256, head)
     actions["count"] = len(actions["rows"])
+    conflicts = pending_conflict_census(rows, origins, manifest, manifest_sha256, head)
     files = {"inputs/manifest.json": manifest_raw, "inputs/origin-map.json": origin_raw,
              "inputs/row-schema.json": schema_raw, "stratum-contract.json": contract_raw,
-             "action-read-set.json": (r3.canonical(actions) + "\n").encode()}
+             "action-read-set.json": (r3.canonical(actions) + "\n").encode(),
+             "pending-conflict-census.json": (r3.canonical(conflicts) + "\n").encode()}
+    combined = census_read_set(actions, conflicts, rows, r3.digest(files["action-read-set.json"]),
+                               r3.digest(files["pending-conflict-census.json"]))
+    files["census-read-set.json"] = (r3.canonical(combined) + "\n").encode()
     review_sources = {
         "compact_manifest.py": Path(protocol),
         "test_compact_manifest.py": repo / "tests/test_compact_manifest.py",
@@ -270,7 +328,12 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
                "implementations": {"sealed_r3_generator_sha256": R3_SHA256, "native_protocol_sha256": protocol_sha256,
                                    "random_sha256": r3.PINS["random"], "sampler_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
                "action_read_set": {"path": "action-read-set.json", "rows": len(actions["rows"]),
-                                   "sha256": r3.digest(files["action-read-set.json"])},
+                                   "sha256": r3.digest(files["action-read-set.json"]), "reads": "NOT_RUN"},
+               "pending_conflict_census": {"path": "pending-conflict-census.json", "rows": conflicts["count"],
+                                           "sha256": r3.digest(files["pending-conflict-census.json"]), "reads": "NOT_RUN"},
+               "census_read_set": {"path": "census-read-set.json", "rows": combined["count"],
+                                   "counts_by_type": combined["counts_by_type"],
+                                   "sha256": r3.digest(files["census-read-set.json"]), "reads": "NOT_RUN"},
                "counts": counts, "family_review": {"status": "NOT_RUN", "required_distinct_model_families": 2,
                                                      "profile_code_and_tests": "NOT_RUN", "zero_defects_established": False},
                "profile_review_sources": [{"path": "profile-code/" + name, "sha256": r3.digest(files["profile-code/" + name])}
@@ -292,6 +355,8 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
         raise
     return {"output": str(output), "profile": PROFILE, "action_rows": len(actions["rows"]),
             "action_read_set_sha256": summary["action_read_set"]["sha256"],
+            "pending_conflict_rows": conflicts["count"], "pending_conflict_census_sha256": summary["pending_conflict_census"]["sha256"],
+            "census_rows": combined["count"], "census_read_set_sha256": summary["census_read_set"]["sha256"],
             "packet_manifest_sha256": r3.digest(files["manifest.json"]), "counts": counts, "reads": "NOT_RUN"}
 
 

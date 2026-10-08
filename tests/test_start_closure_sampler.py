@@ -106,7 +106,7 @@ class NativeSamplerTests(unittest.TestCase):
             "archive_member": "captures/original-fragment.json", "pointer": "/rows/0",
             "owner_lane": "synthetic-controls"}
 
-    def add_row(self, disposition="WATCH", *, flags=(), held_action=False):
+    def add_row(self, disposition="WATCH", *, flags=(), held_action=False, conflict=False, origin_pointer=None):
         number = len(self.rows)
         repository = f"example/project-{number:03d}"
         pin = {"kind": "commit", "version_or_commit": "a" * 40,
@@ -134,9 +134,17 @@ class NativeSamplerTests(unittest.TestCase):
             row.setdefault("closure", {})["pending_locator"] = {"reason_code": "unsupported-transport", "measurement": "Establish the primary locator"}
         fragment = {"fragment": "fixture-fragment", "artifact_sha256": self.fragment_sha,
             "owner_lane": "synthetic-controls", "parent_family": "a-stars", "source_refs": [ref]}
-        if held_action:
+        if held_action or conflict:
             row["choices"] = [{"disposition": "ADOPT-NOW", "source_refs": [ref]}]
             fragment["held_action_claims"] = [{"disposition": "ADOPT-NOW", "source_refs": [ref]}]
+        if conflict:
+            row["choices"].append({"disposition": "WATCH", "source_refs": [ref]})
+            row.setdefault("closure", {})[sampler.CONFLICT_FLAG] = {
+                "provisional_disposition": row["pending"]["provisional_disposition"],
+                "measurement": row["pending"]["measurement"],
+                "action_side_row_ids": [f"baseline-action-{number:03d}"]}
+        if origin_pointer is not None:
+            row["origin_pointer"] = copy.deepcopy(origin_pointer)
         self.rows.append(row)
         self.bindings.append({"key": {"repository_or_entry": repository, "slot": "native-clients"}, "fragments": [fragment]})
         return row
@@ -222,6 +230,80 @@ class NativeSamplerTests(unittest.TestCase):
             self.assertFalse(packet["family_review"]["zero_defects_established"])
             self.assertEqual(packet["acceptance_number"], 0)
 
+    def test_conflicts_are_uncapped_census_and_excluded_from_all_samples(self):
+        for _ in range(70):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"), conflict=True)
+        for _ in range(4):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"))
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        rows, origins, fragments = self.validated()
+        packets = sampler.select(rows, origins, fragments, list(self.native.CLASSES), self.r3)
+        conflicts = {key for key, item in rows.items() if sampler.CONFLICT_FLAG in item["row"].get("closure", {})}
+        for label in ("PENDING", "PENDING-PIN", "PENDING-LOCATOR"):
+            bucket = self.bucket(packets, label)
+            self.assertEqual(bucket["population_size"], 4)
+            self.assertEqual(bucket["selected_count"], 4)
+            self.assertFalse(conflicts & {tuple(i["native_key"]) for i in bucket["selected"]})
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["unique_pending_conflict_rows"], 70)
+        self.assertEqual(counts["unique_census_rows"], 71)
+        self.assertEqual(counts["unique_selected_rows"], 75)
+        self.assertEqual(counts["sample_memberships"], 12)
+        self.assertEqual(counts["unique_sampled_rows"], 4)
+        self.assertEqual(counts["pending_conflict_excluded_from_samples"], 70)
+        self.assertEqual(counts["conflict_sample_flag_exclusions"], {"PENDING-PIN": 70, "PENDING-LOCATOR": 70})
+        manifest, _, manifest_sha = self.inputs()
+        census = sampler.pending_conflict_census(rows, origins, manifest, manifest_sha, "f" * 40)
+        self.assertEqual(census["count"], 70)
+        self.assertEqual(census["family_review"]["status"], "NOT_RUN")
+        for entry in census["rows"]:
+            key = tuple(entry["row_id"])
+            self.assertEqual(entry["row"], rows[key]["row"])
+            self.assertEqual(entry["row"]["disposition"], "PENDING")
+            self.assertEqual(entry["action_side_row_ids"], rows[key]["row"]["closure"][sampler.CONFLICT_FLAG]["action_side_row_ids"])
+            self.assertEqual(entry["origin_bindings"], origins[key])
+        self.assertEqual(len(sampler.action_read_set(rows, manifest, manifest_sha, "f" * 40)["rows"]), 1)
+
+    def test_conflict_metadata_requires_evidenced_action_conflict_and_measurement(self):
+        self.add_row("PENDING", conflict=True)
+        cases = ("single_choice", "no_action_choice", "different_measurement", "action_provisional", "duplicate_claim_ids", "action_disposition")
+        for case in cases:
+            manifest, origins, manifest_sha = self.inputs()
+            row = manifest["rows"][0]
+            flag = row["closure"][sampler.CONFLICT_FLAG]
+            if case == "single_choice":
+                row["choices"] = row["choices"][:1]
+            elif case == "no_action_choice":
+                row["choices"][0]["disposition"] = "REJECT"
+            elif case == "different_measurement":
+                flag["measurement"] = "A different settling measurement"
+            elif case == "action_provisional":
+                flag["provisional_disposition"] = row["pending"]["provisional_disposition"] = "TRIAL"
+            elif case == "duplicate_claim_ids":
+                flag["action_side_row_ids"] *= 2
+            else:
+                row["disposition"] = "TRIAL"
+                del row["pending"]
+            with self.subTest(case=case), self.assertRaises((ValueError, ValidationError)):
+                self.validated(manifest, origins, manifest_sha)
+
+    def test_unresolved_origin_keeps_action_and_bound_origin_is_preserved(self):
+        action = self.add_row("TRIAL", origin_pointer="unresolved")
+        bound = self.add_row("PENDING", conflict=True, origin_pointer=self.fragment_ref)
+        rows, packets = self.draw()
+        manifest, origins, manifest_sha = self.inputs()
+        final = sampler.action_read_set(rows, manifest, manifest_sha, "f" * 40)
+        self.assertEqual([r["row_id"] for r in final["rows"]], [list(self.native.decision_key(action))])
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["origin_pointer_unresolved_rows"], 1)
+        self.assertEqual(counts["action_origin_pointer_unresolved_rows"], 1)
+        original_origins = self.validated(manifest, origins, manifest_sha)[1]
+        census = sampler.pending_conflict_census(rows, original_origins, manifest, manifest_sha, "f" * 40)
+        self.assertEqual(census["rows"][0]["row"]["origin_pointer"], bound["origin_pointer"])
+        manifest["rows"][1]["origin_pointer"]["archive_member"] = "../escape"
+        with self.assertRaises((ValueError, ValidationError)):
+            self.validated(manifest, origins, manifest_sha)
+
     def test_profile_pass_and_exact_manifest_binding_are_required(self):
         self.add_row()
         for field, value in (("status", "BLOCKED"), ("profile", "default"), ("blockers", ["defect"])):
@@ -288,8 +370,9 @@ class NativeSamplerTests(unittest.TestCase):
             self.validated(manifest, origins, manifest_sha)
 
     def test_packet_hashes_projection_and_not_run_status(self):
-        self.add_row("TRIAL")
+        self.add_row("TRIAL", origin_pointer="unresolved")
         self.add_row("PENDING", held_action=True)
+        self.add_row("PENDING", conflict=True)
         manifest, origins, manifest_sha = self.inputs()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -303,13 +386,30 @@ class NativeSamplerTests(unittest.TestCase):
             packet = root / "packet"
             summary = json.loads((packet / "manifest.json").read_bytes())
             actions = json.loads((packet / "action-read-set.json").read_bytes())
+            conflicts = json.loads((packet / "pending-conflict-census.json").read_bytes())
+            combined = json.loads((packet / "census-read-set.json").read_bytes())
             self.assertEqual(result["action_rows"], 1)
+            self.assertEqual(result["pending_conflict_rows"], 1)
+            self.assertEqual(result["census_rows"], 2)
             self.assertEqual(result["reads"], "NOT_RUN")
             self.assertEqual(result["action_read_set_sha256"], digest((packet / "action-read-set.json").read_bytes()))
             self.assertEqual(actions["asset_sha256"], manifest["asset"]["sha256"])
             self.assertEqual(actions["head"], "f" * 40)
             self.assertEqual(actions["rows"][0]["row_id"], list(self.native.decision_key(self.rows[0])))
             self.assertEqual(actions["rows"][0]["locator"], [s["locator"] for s in self.rows[0]["primary_sources"]])
+            self.assertEqual(conflicts["rows"][0]["row"], self.rows[2])
+            self.assertEqual(conflicts["family_review"]["status"], "NOT_RUN")
+            self.assertEqual(combined["counts_by_type"], {"FINAL-ACTION": 1, "PENDING-CONFLICT": 1})
+            self.assertEqual(combined["family_review"]["status"], "NOT_RUN")
+            self.assertEqual(combined["rows"][0]["origin_pointer"], "unresolved")
+            self.assertEqual({r["census_type"] for r in combined["rows"]}, {"FINAL-ACTION", "PENDING-CONFLICT"})
+            self.assertEqual(summary["action_read_set"]["reads"], "NOT_RUN")
+            self.assertEqual(summary["pending_conflict_census"]["reads"], "NOT_RUN")
+            self.assertEqual(summary["census_read_set"]["reads"], "NOT_RUN")
+            self.assertEqual(result["pending_conflict_census_sha256"], digest((packet / "pending-conflict-census.json").read_bytes()))
+            self.assertEqual(result["census_read_set_sha256"], digest((packet / "census-read-set.json").read_bytes()))
+            for source in combined["sources"]:
+                self.assertEqual(digest((packet / source["path"]).read_bytes()), source["sha256"])
             self.assertEqual(summary["family_review"]["profile_code_and_tests"], "NOT_RUN")
             self.assertEqual(len(summary["profile_review_sources"]), 4)
             for source in summary["profile_review_sources"]:

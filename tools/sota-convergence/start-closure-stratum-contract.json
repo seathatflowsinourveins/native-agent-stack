@@ -13,6 +13,13 @@
   "stratum_key": ["fragment", "artifact_sha256", "FINAL-DISPOSITION", "class"],
   "seed_derivation": "Use the sealed R3 select helper: SHA256 of canonical JSON [202610081850, fragment, artifact_sha256, FINAL-DISPOSITION, class], then Random.sample over sorted native keys with the derived integer seed. Selected keys are sorted after drawing.",
   "final_action_census": ["ADOPT-NOW", "TRIAL"],
+  "pending_conflict_census": {
+    "flag": "closure.pending_conflict",
+    "final_disposition": "PENDING",
+    "quota": "ALL N; both designated families read every row",
+    "original_action_claim_ids": "Retain every closure.pending_conflict.action_side_row_ids entry and the full original row/source/fragment evidence.",
+    "sample_exclusion": "PENDING-CONFLICT rows are excluded from all sampled pools, including PENDING-PIN and PENDING-LOCATOR. They are census-only under the CC ruling 2026-10-08T23:09:31Z."
+  },
   "sampled_final_dispositions": ["WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE", "PENDING"],
   "sampled_closure_flags": {
     "PENDING-PIN": "closure.pending_pin",
@@ -21,16 +28,16 @@
   "sample_quota": "min(59,N)",
   "acceptance_number": 0,
   "identity": "Native decision_key: canonical repository_or_entry, literal slot, canonical qualification. The final read projection calls this tuple row_id.",
-  "overlap": "Closure flags add strata and do not replace the literal PENDING stratum. Record memberships and unique selected rows separately. A row with both flags belongs to both flag strata.",
+  "overlap": "For rows outside the PENDING-CONFLICT census, closure pin/locator flags add strata and do not replace the literal PENDING stratum. Record memberships and unique selected rows separately. A non-conflict row with both flags belongs to both flag strata.",
   "draw_gate": "Exact hash-pinned native manifest with validation.status PASS, no blockers, and validation.profile start-closure/1. Neither held-action origin completeness nor a reshape cue is required by this profile.",
   "required_reads": {
     "distinct_designated_model_families": 2,
-    "each_family": "Every final action row and every selected sample row, including profile code and tests; zero sample defects.",
+    "each_family": "Every final action row, every PENDING-CONFLICT census row, and every selected sample row, including profile code and tests; zero sample defects.",
     "status": "NOT_RUN"
   },
   "limits": [
     "Packet generation does not execute reads, establish zero defects, accept a model family, or mark G5 MET.",
-    "Held source action claims do not contribute action or sample strata under this profile. Their original row and origin evidence is preserved.",
+    "Held source action claims do not change the final action set. Only an explicit, validated closure.pending_conflict flag adds a row to the separate conflict census; unflagged held claims do not contribute action or sample strata. Original row and origin evidence is preserved.",
     "The sealed R3 package and the default compact manifest validation contract stay unchanged."
   ]
 }
