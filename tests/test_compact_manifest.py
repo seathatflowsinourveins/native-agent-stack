@@ -579,6 +579,101 @@ class CompactManifestTests(unittest.TestCase):
         with self.assertRaises(compact.CompactError):
             self.build()
 
+    def native_skill(self, skill_hash=None):
+        schema = json.loads(compact.NATIVE_SKILLS_SCHEMA.read_bytes())
+        entry = "Example/SkillRepo@safe-skill"
+        proposal = {"skill_ref": entry, "source_id": "synthetic-native-schema-control", "lifecycle_task": "mcp-build", "pin": "a" * 40,
+                    "skill_md_sha256": skill_hash, "license": "MIT", "source": "synthetic original native-role fixture",
+                    "description_chars": 10, "model_invocable": True, "codex_implicit": True, "replaces": None,
+                    "proposed_label": "keep_but_compare", "demonstrated_gap": "No native acceptance; source-binding fixture only.",
+                    "evidence": ["https://github.com/Example/SkillRepo/blob/" + "a" * 40 + "/skills/safe-skill/SKILL.md"],
+                    "upstream_now": {name: None for name in schema["properties"]["proposed"]["items"]["properties"]["upstream_now"]["required"]},
+                    "comparison_that_would_overturn": "promptfoo maintained comparison; NOT RUN"}
+        self.skill_doc = {"calls": {}, "layer_id": "skills-mcp-build", "notes": [], "proposed": [proposal], "skills_used": []}
+        self.files["captures/native-skills-discovery.json"] = raw(self.skill_doc)
+        p = pin("Example/SkillRepo")
+        self.rows[0].update(repository_or_entry=entry, slot="skills-mcp-build", disposition="PENDING", evidence_class="DOCUMENTARY", pin=p,
+                            primary_sources=[{"locator": "https://github.com/Example/SkillRepo/tree/" + "a" * 40, "pin": p, "subject": "native containing repository, exact SKILL bytes unestablished"}],
+                            capture_sha256=digest(self.files["captures/native-skills-discovery.json"]), archive_member="captures/native-skills-discovery.json",
+                            source_pointer="/proposed/0", pending={"provisional_disposition": "WATCH", "measurement": "Verify original pinned SKILL body then a maintained comparison", "owner": "assigned-owner"})
+        self.rows[0].pop("source_refs", None)
+        return self.rows[0]
+
+    def skill_check(self):
+        row = self.rows[0]
+        index = {member: {"sha256": digest(data), "bytes": len(data)} for member, data in self.files.items()}
+        blockers = [{"code": code} for code in compact.validate_row(row, index)]
+        compact.validate_native_skill_entry(row, index, self.files, {}, blockers)
+        return blockers
+
+    def rebind_skill_doc(self):
+        data = raw(self.skill_doc)
+        self.files["captures/native-skills-discovery.json"] = data
+        self.rows[0]["capture_sha256"] = digest(data)
+
+    def test_native_composite_skill_parent_pin_remains_valid_but_null_skill_body_blocks(self):
+        row = self.native_skill()
+        blockers = self.skill_check()
+        self.assertEqual([b["code"] for b in blockers], ["skill-entry-primary-bytes-unestablished"])
+        self.assertEqual(compact.canonical(row["repository_or_entry"]), "example/skillrepo@safe-skill")
+
+    def test_native_skill_wrong_name_task_pin_and_wrapper_never_bind(self):
+        self.native_skill()
+        original = deepcopy(self.skill_doc)
+        for mutate in (lambda d: d["proposed"][0].update(skill_ref="Example/SkillRepo@another-skill"),
+                       lambda d: d["proposed"][0].update(lifecycle_task="debug"),
+                       lambda d: d.update(layer_id="skills-debug"),
+                       lambda d: d["proposed"][0].update(pin="b" * 40),
+                       lambda d: d.update(generated_row_wrapper=True)):
+            self.skill_doc = deepcopy(original)
+            mutate(self.skill_doc)
+            self.rebind_skill_doc()
+            self.assertTrue(any(b["code"] == "native-skill-entry-witness-unverified" for b in self.skill_check()))
+
+    def test_native_skill_hash_requires_actual_pinned_skill_body_not_metadata(self):
+        body = b"---\nname: safe-skill\ndescription: synthetic fixture\n---\n# Instructions\n"
+        row = self.native_skill(digest(body))
+        self.assertEqual(self.skill_check()[0]["code"], "skill-entry-primary-bytes-unestablished")
+        self.files["captures/SKILL.md"] = body
+        row["primary_sources"] = [{"locator": self.skill_doc["proposed"][0]["evidence"][0], "pin": row["pin"], "subject": "original pinned SKILL.md bytes",
+                                   "archive_member": "captures/SKILL.md", "capture_sha256": digest(body)}]
+        self.assertEqual(self.skill_check(), [])
+        for wrong_path in ("skills/other-skill/SKILL.md", "skills/safe-skill/README.md"):
+            row["primary_sources"][0]["locator"] = "https://github.com/Example/SkillRepo/blob/" + "a" * 40 + "/" + wrong_path
+            self.assertEqual(self.skill_check()[0]["code"], "skill-entry-primary-bytes-unestablished")
+        for metadata in (raw({"skill_ref": row["repository_or_entry"], "declared_source": "SKILL.md"}),
+                         b'\xef\xbb\xbf{"declared_source":"SKILL.md"}', b"true", b"null", b'"receipt string"', b"42"):
+            with self.subTest(metadata_sha=digest(metadata)):
+                self.files["captures/SKILL.md"] = metadata
+                self.skill_doc["proposed"][0]["skill_md_sha256"] = digest(metadata)
+                self.rebind_skill_doc()
+                row["primary_sources"][0].update(locator=self.skill_doc["proposed"][0]["evidence"][0], capture_sha256=digest(metadata))
+                self.assertEqual(self.skill_check()[0]["code"], "skill-entry-primary-bytes-unestablished")
+
+    def test_native_skill_containing_repo_and_pending_scope_are_strict(self):
+        row = self.native_skill()
+        row["pin"]["repository_or_source"] = "another/repository"
+        with self.assertRaises(compact.CompactError):
+            self.skill_check()
+        row["pin"]["repository_or_source"] = "Example/SkillRepo"
+        row.pop("pending")
+        row["disposition"] = "WATCH"
+        self.assertTrue(any(b["code"] == "skill-entry-source-scope-unqualified" for b in self.skill_check()))
+
+    @unittest.skipUnless(os.environ.get("G5_NATIVE_SKILL_ORIGINAL"), "immutable original native-skills capture is not supplied")
+    def test_actual_native_mcp_migration_entry_retains_parent_pin_and_null_body_hold(self):
+        source = Path(os.environ["G5_NATIVE_SKILL_ORIGINAL"]).read_bytes()
+        self.assertEqual(digest(source), "487ac7ed4da2742ac6db3d2a9a4c4505387dc03efdfc8678a846d9f51a6875c9")
+        original = json.loads(source)
+        proposal = original["proposed"][1]
+        self.assertEqual(proposal["skill_ref"], "AlpayC/mcp-migration-check@mcp-migration")
+        row = self.native_skill()
+        p = pin("AlpayC/mcp-migration-check", proposal["pin"])
+        self.files["captures/native-skills-discovery.json"] = source
+        row.update(repository_or_entry=proposal["skill_ref"], pin=p, capture_sha256=digest(source), source_pointer="/proposed/1",
+                   primary_sources=[{"locator": "https://github.com/AlpayC/mcp-migration-check/tree/" + proposal["pin"], "pin": p, "subject": "original containing repository pin"}])
+        self.assertEqual(self.skill_check(), [{"code": "skill-entry-primary-bytes-unestablished", "source": "alpayc/mcp-migration-check@mcp-migration:skills-mcp-build"}])
+
     @unittest.skipUnless(os.environ.get("G5_NATIVE_ENTRY_EXAMPLES"), "immutable external native-example packet is not supplied")
     def test_three_immutable_native_trading_examples_without_mining_replay(self):
         example_path = Path(os.environ["G5_NATIVE_ENTRY_EXAMPLES"])

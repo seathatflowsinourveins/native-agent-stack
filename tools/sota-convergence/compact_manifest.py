@@ -58,6 +58,10 @@ NATIVE_LIST_HEADER = (
     "linked_repository", "linked_targets_json", "layer_fit", "relevant_slot", "disposition", "reason",
     "verification_status", "searched_evidence", "evidence_json",
 )
+# Exact entry syntax from discover-skills.json@6aa61da9; the containing
+# repository is validated separately with catalog_decisions.identity.
+NATIVE_SKILL_REF = re.compile(r"([A-Za-z0-9-]+/[A-Za-z0-9._-]+)@([a-z0-9-]+)\Z")
+NATIVE_SKILLS_SCHEMA = REPO / "tools/sota-convergence/landscape-sweep/schemas/discover-skills.json"
 
 
 class CompactError(ValueError):
@@ -93,7 +97,14 @@ def closed(value, required, optional, label):
 
 
 def canonical(value):
-    result = canon(text(value, "repository_or_entry"))
+    value = text(value, "repository_or_entry")
+    skill = NATIVE_SKILL_REF.fullmatch(value)
+    if skill:
+        try:
+            return github_identity(skill[1]) + "@" + skill[2]
+        except InvalidDecisionIndex as error:
+            raise CompactError("native skill entry has an invalid containing repository") from error
+    result = canon(value)
     require(not result.startswith(("/", "file:", "~")), "identity must not be a private local path")
     return result
 
@@ -312,12 +323,18 @@ def validate_row(row, index):
     if "candidate_implementation_status" in row:
         require(row["candidate_implementation_status"] == "UNESTABLISHED", "unsupported candidate implementation status")
     if row["pin"]:
-        foreign = canonical(row["pin"]["repository_or_source"]) != identity
+        skill = NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"])
+        parent_identity = canonical(skill[1]) if skill else identity
+        foreign = canonical(row["pin"]["repository_or_source"]) != parent_identity
         if foreign:
             require(row["pin"]["subject"] in {"source-entry", "reference"}, "foreign source pin is not an implementation pin")
             require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"}, "foreign primary source pin cannot establish recorded execution")
             if row.get("decision_scope") != "source-entry-screen" or row.get("candidate_implementation_status") != "UNESTABLISHED" or not {"source_pointer", "source_entry_witness"} & row.keys():
                 blockers.append("foreign-primary-pin-scope-unqualified")
+        if skill:
+            if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"} or row["disposition"] != "PENDING"
+                    or row["pin"]["kind"] != "commit" or row["pin"]["subject"] != "implementation" or "source_pointer" not in row):
+                blockers.append("skill-entry-source-scope-unqualified")
     if "source_entry_witness" in row:
         witness = row["source_entry_witness"]
         closed(witness, {"archive_member", "sha256", "pointer"}, set(), "source entry witness")
@@ -564,12 +581,100 @@ def validate_native_source_entry(row, index, captures, cache, blockers):
         return False
 
 
+def skill_source_path(locator):
+    """Only an immutable GitHub SKILL.md file URL, not a tree or file guess."""
+    url = urlsplit(locator)
+    if url.scheme != "https" or url.query or url.username or url.password or url.port is not None:
+        return None
+    parts = url.path.strip("/").split("/")
+    if url.hostname in {"github.com", "www.github.com"} and len(parts) >= 5 and parts[2] in {"blob", "raw"}:
+        parent, ref, path = canonical("/".join(parts[:2])), parts[3], "/".join(parts[4:])
+    elif url.hostname == "raw.githubusercontent.com" and len(parts) >= 4:
+        parent, ref, path = canonical("/".join(parts[:2])), parts[2], "/".join(parts[3:])
+    else:
+        return None
+    if not COMMIT.fullmatch(ref) or PurePosixPath(path).name != "SKILL.md":
+        return None
+    member_name(path)
+    return parent, ref, path
+
+
+def validate_native_skill_entry(row, index, captures, cache, blockers):
+    """Bind the documented native skills entry without turning claims into bytes."""
+    skill = NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"])
+    if not skill:
+        return
+    label = canonical(row["repository_or_entry"]) + ":" + row["slot"]
+    try:
+        require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"} and row["disposition"] == "PENDING",
+                "native skill entry remains documentary and PENDING")
+        p = row["pin"]
+        require(p is not None and p["subject"] == "implementation" and p["kind"] == "commit"
+                and canonical(p["repository_or_source"]) == canonical(skill[1]), "native skill entry pin must bind its actual containing repository")
+        require(re.fullmatch(r"/proposed/(?:0|[1-9][0-9]*)", row.get("source_pointer", "")), "native skill entry requires its original proposal pointer")
+        original = selected_capture(row["archive_member"], "", captures, cache, blockers, label)
+        require(isinstance(original, dict), "native skills original must be its discovery object")
+        schema = load(NATIVE_SKILLS_SCHEMA.read_bytes())
+        require(set(original) == set(schema["required"]), "native skills original must retain its exact five-key discovery shape")
+        require(isinstance(original["proposed"], list), "native skills proposed must be an original array")
+        proposal = pointer(original, row["source_pointer"])
+        proposal_schema = schema["properties"]["proposed"]["items"]
+        require(isinstance(proposal, dict) and set(proposal) == set(proposal_schema["required"]), "native skills proposal shape is unsupported")
+        require(isinstance(proposal["skill_ref"], str) and NATIVE_SKILL_REF.fullmatch(proposal["skill_ref"]), "native original skill_ref has unsupported syntax")
+        require(canonical(proposal["skill_ref"]) == canonical(row["repository_or_entry"])
+                and proposal["pin"] == p["version_or_commit"], "native original skill_ref/pin does not bind the entry")
+        task = proposal["lifecycle_task"]
+        require(task in proposal_schema["properties"]["lifecycle_task"]["enum"] and original["layer_id"] == row["slot"] == "skills-" + task,
+                "native skills original task/layer_id differs from the literal row slot")
+        require(isinstance(proposal["evidence"], list) and all(isinstance(item, str) for item in proposal["evidence"]), "native skill evidence must retain original locator strings")
+        skill_hash = proposal["skill_md_sha256"]
+        if skill_hash is None:
+            blockers.append({"code": "skill-entry-primary-bytes-unestablished", "source": label})
+            return
+        sha(skill_hash, "native SKILL.md SHA256")
+        original_paths = set()
+        for evidence in proposal["evidence"]:
+            for match in re.finditer(r"https://[^\s)\]>]+", evidence):
+                path = skill_source_path(match[0])
+                if path is not None:
+                    original_paths.add(path)
+        established = False
+        for source in row["primary_sources"]:
+            if source["pin"] != p or "archive_member" not in source or source.get("capture_sha256") != skill_hash:
+                continue
+            path = skill_source_path(source["locator"])
+            if path is None or path not in original_paths or path[:2] != (canonical(skill[1]), p["version_or_commit"]):
+                continue
+            match_capture(source["archive_member"], skill_hash, index)
+            if source["archive_member"] not in captures or not captures[source["archive_member"]]:
+                continue
+            require(source["archive_member"] != row["archive_member"], "native discovery JSON is not primary SKILL.md bytes")
+            try:
+                body = captures[source["archive_member"]].decode("utf-8")
+            except UnicodeError:
+                continue
+            inspection = re.sub(r"^[\s\ufeff]*", "", body)
+            if inspection.startswith(("{", "[")):
+                continue  # A metadata JSON/receipt hash is not retained SKILL.md body bytes.
+            try:
+                json.loads(inspection)
+            except ValueError:
+                pass
+            else:
+                continue  # JSON scalars and BOM-prefixed receipts are metadata too.
+            established = True
+        if not established:
+            blockers.append({"code": "skill-entry-primary-bytes-unestablished", "source": label})
+    except (CompactError, ValueError, KeyError, TypeError) as error:
+        blockers.append({"code": "native-skill-entry-witness-unverified", "source": label, "reason": str(error)})
+
+
 def validate_reference_pointers(rows, captures, blockers, cache):
     for row in rows:
         label = canonical(row["repository_or_entry"]) + ":" + row["slot"]
         if "source_pointer" in row:
             original_entry = selected_capture(row["archive_member"], row["source_pointer"], captures, cache, blockers, label)
-            if row["pin"] is not None and canonical(row["pin"]["repository_or_source"]) != canonical(row["repository_or_entry"]):
+            if not NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"]) and row["pin"] is not None and canonical(row["pin"]["repository_or_source"]) != canonical(row["repository_or_entry"]):
                 entry_identity = None
                 if isinstance(original_entry, dict):
                     entry_identity = next((original_entry[name] for name in ("repository_or_entry", "repository", "full_name", "repo", "html_url", "url") if isinstance(original_entry.get(name), str)), None)
@@ -799,6 +904,7 @@ def build_manifest(asset, release_tag, witnesses=()):
     wanted |= {ref["archive_member"] for row in rows for ref in row.get("source_refs", []) if "archive_member" in ref}
     wanted |= {ref["archive_member"] for row in rows for choice in row.get("choices", []) for ref in choice["source_refs"] if "archive_member" in ref}
     wanted |= {source["archive_member"] for row in rows for source in row["primary_sources"] if "pointer" in source and "archive_member" in source}
+    wanted |= {source["archive_member"] for row in rows if NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"]) for source in row["primary_sources"] if "archive_member" in source}
     if isinstance(coverage_raw, dict):
         wanted |= {coverage_raw[name]["archive_member"] for name in ("source_inventory_witness", "field_inventory_witness", "star_inventory_witness") if isinstance(coverage_raw.get(name), dict) and "archive_member" in coverage_raw[name]}
         for population in coverage_raw.get("list_populations", []):
@@ -814,6 +920,7 @@ def build_manifest(asset, release_tag, witnesses=()):
     validate_reference_pointers(rows, receipts, blockers, cache)
     for row in rows:
         validate_native_source_entry(row, index, receipts, cache, blockers)
+        validate_native_skill_entry(row, index, receipts, cache, blockers)
     coverage_blockers, coverage, counts = validate_coverage(coverage_raw, rows, index, receipts, cache)
     blockers.extend(coverage_blockers)
     counts.update({"rows": len(rows), "identities": len({decision_key(row)[0] for row in rows}),
