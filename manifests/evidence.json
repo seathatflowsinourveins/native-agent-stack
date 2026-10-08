@@ -5020,6 +5020,11 @@
       "bytes": 26872
     },
     {
+      "path": ".github/workflows/claude-pr-review.yml",
+      "sha256": "bd0cf57e66e58db1c71856467dd8f6716a511a61d2190dfab81d46c71180715b",
+      "bytes": 16318
+    },
+    {
       "path": ".github/workflows/dependency-review.yml",
       "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
       "bytes": 1549
@@ -17867,8 +17872,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "609d0f963dca45ad79f080b36ba3e43692a8c37d70f1b9d35555d0d5e4ba7594",
-      "bytes": 40734
+      "sha256": "daea2edd0754b49294e7b0421b78c4c1a6e3ac529bb3471b232d343100fd1db5",
+      "bytes": 41292
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18146,6 +18151,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
+      "sha256": "e68833ba5ef7e58ea48ffaeeb432c174abf9ac12023a6796a73626a8070462a1",
+      "bytes": 11232
+    },
+    {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
       "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
       "bytes": 14363
@@ -18312,8 +18322,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "f489ff42d80b1c2e1ece353250c477605730ee41d47dcd54245d06e11c8d13f2",
-      "bytes": 101058
+      "sha256": "4f024c45cbd61640899c73747e722d9c033a0099571c723df1d3f421192fb559",
+      "bytes": 101834
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -19554,6 +19564,11 @@
       "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
       "sha256": "5c1e13b427dd9c8818721a1788eab19d55ef0ceef269d5eb644c25557760238b",
       "bytes": 39479
+    },
+    {
+      "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json",
+      "sha256": "01872dc3a5b14f9aec4034ed45100fd30c4c6087e8e4e0bb74a2460964380d40",
+      "bytes": 4827
     },
     {
       "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
@@ -57851,6 +57866,11 @@
       "bytes": 22660
     },
     {
+      "path": "tests/test_claude_pr_review_workflow.py",
+      "sha256": "04d46dfb48f2fc03013a39f7af4682a304e77f5123a3b7c905b3b3321f8685bf",
+      "bytes": 23456
+    },
+    {
       "path": "tests/test_claude_recovery.py",
       "sha256": "cb8ca511c898a86de80bca24dd96bdabe9d4545883abf299e2a8b07e45a1859e",
       "bytes": 1379
@@ -58722,8 +58742,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "347ea2553d9e2f436965d1cbfbd3cfab6b507d9aa72787404c117cc7330e237e",
-      "bytes": 83757
+      "sha256": "dafdf93f7c95816b9e823ea645ca9e6b2220db15ce54bb285f7300416651b12d",
+      "bytes": 84334
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -58732,8 +58752,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "2bde9456da1901d7e4a1978e16c7bc2c85279ac6ac4adba50cacc0395fe26e05",
-      "bytes": 12166
+      "sha256": "6ce0b7f3be1a744d49df9bf9b8d4c0f64b7a15db2db0274076bb198c58a7aec4",
+      "bytes": 12754
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
