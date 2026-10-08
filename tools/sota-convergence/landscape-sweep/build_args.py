@@ -255,10 +255,11 @@ def profile_servers_without_base(profile_bytes: bytes, base_servers: list) -> li
 
 def codex_user_instructions(repo_root: Path) -> str:
     """The Codex user instructions a host installs as $CODEX_HOME/AGENTS.md: the managed block of
-    adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk v0.51.0's hooks/rtk-awareness-full.md
-    verbatim, and the RTK exactness exceptions), read through tools/adoption/apply_codex_lane.py's agents_block(),
-    never a copy of it. Codex reads $CODEX_HOME/AGENTS.md as global instructions, so a lane home without it gives
-    its model neither the top rule nor RTK's instructions, which the native lane's workers get from ~/.codex."""
+    adoption/templates/codex.AGENTS.template.md (the philosophy core and rtk-ai/rtk v0.51.0's default awareness
+    paragraph, hooks/rtk-awareness.md, verbatim; on 2026-10-08 the full awareness text left it and the RTK exactness
+    exceptions moved to docs/token-practice.md), read through tools/adoption/apply_codex_lane.py's agents_block(), never a copy of it. Codex reads
+    $CODEX_HOME/AGENTS.md as global instructions, so a lane home without it gives its model neither the philosophy
+    core nor RTK's instructions, which the native lane's workers get from ~/.codex."""
     saved = list(sys.path)  # the installer prepends the repository root itself on import (apply_codex_lane.py:69)
     sys.path.insert(0, str(repo_root / "tools" / "adoption"))
     try:
@@ -298,7 +299,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
                     require_key: bool = False, http_headers: dict | None = None) -> dict:
     """Write <work>/codex-home: config.toml (the OmniRoute provider block, with http_headers only when given, plus the
     rendered token MCP servers), stack-worker.config.toml (the worker profile, verbatim) and AGENTS.md (the host's
-    Codex user instructions: the top rule and RTK's, as codex_user_instructions reads them), and
+    Codex user instructions: the philosophy core and RTK's, as codex_user_instructions reads them), and
     <work>/empty/.claude/settings.json (context-mode read access to each pinned skill file by its exact path). Return
     what staged.json records about them. http_headers must come from omniroute_headers."""
     http_headers = dict(sorted((http_headers or {}).items()))

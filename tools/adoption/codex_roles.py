@@ -51,7 +51,9 @@ ALL_ROLES = ROLES + WORKER_ROLES
 EXAMPLES_AGENTS = ROOT / "examples" / "codex-native" / "agents"
 SHA256SUMS_NAME = "SHA256SUMS"
 PREREGISTRATION = ROOT / "evidence" / "artifacts" / "token-adoption-e2e-20260926" / "preregistration.json"
-AGENTS_TEMPLATE = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
+# Since 2026-10-08 the seven local RTK exceptions live here, moved verbatim out of the Codex user-level block, between
+# EXCEPTIONS_MARKER and EXCEPTIONS_END_MARKER; the role carriers keep them in their F4 block.
+RTK_EXCEPTIONS_DOC = ROOT / "docs" / "token-practice.md"
 WORKER_PROFILE_FILE = "stack-worker.config.toml"
 # The system config layer is always pushed (config/src/loader/mod.rs); its folder is /etc/codex (config/src/state.rs).
 SYSTEM_CODEX_DIR = Path("/etc/codex")
@@ -72,6 +74,7 @@ ROLE_EFFORT = "max"
 INHERITED_MODEL_ROLES = frozenset({"isolated-builder"})
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
+EXCEPTIONS_END_MARKER = "<!-- native-agent-stack:rtk-exceptions:end -->"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
 # Unchanged hooks/rtk-awareness-full.md from rtk-ai/rtk v0.51.0 (e001f773).
 RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
@@ -197,7 +200,8 @@ def source_problems(directory: Path | None = None) -> dict[str, list[str]]:
     """The rule ids each carrier in `directory` (default: adoption/agents/codex) breaks; an empty list means it is
     exactly its pinned row and structurally sound. source_missing (unreadable), sha256sums_names (the SHA256SUMS
     beside it is unreadable or malformed, or does not name exactly the two carriers), sha256_row (its bytes differ
-    from their row), toml_parse, structural_inputs (the denylist or the AGENTS template could not be read) and the
+    from their row), toml_parse, structural_inputs (the denylist, the pinned RTK awareness file or the RTK exceptions
+    section of docs/token-practice.md could not be read) and the
     structural_problems ids. Rule ids only: no text, no path."""
     return _folder_problems(ROLES_SOURCE if directory is None else Path(directory), ROLE_FILES, ROLES)
 
@@ -285,9 +289,16 @@ def frozen_denylist() -> tuple:
 
 @functools.lru_cache(maxsize=None)
 def f4_block() -> str:
-    """The rendered F4 block: pinned native awareness plus the separate local exceptions."""
-    template = managed_block.codex_block(AGENTS_TEMPLATE.read_text(encoding="utf-8"))
-    return UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(END_MARKER, 1)[0]
+    """The rendered F4 block: pinned native awareness plus the separate local exceptions. The awareness is the pinned
+    rtk-ai/rtk hooks/rtk-awareness-full.md (managed_block.RTK_AWARENESS_REL), which the Codex template inlined until
+    2026-10-08 and the role carriers still carry; the exceptions are the section of RTK_EXCEPTIONS_DOC between its two
+    markers, the same bytes the template carried after its exceptions marker until that date."""
+    awareness = (ROOT / managed_block.RTK_AWARENESS_REL).read_bytes().decode("utf-8")
+    doc = RTK_EXCEPTIONS_DOC.read_text(encoding="utf-8")
+    if doc.count(EXCEPTIONS_MARKER) != 1 or doc.count(EXCEPTIONS_END_MARKER) != 1:
+        raise ValueError("the RTK exceptions section must appear exactly once, between its two markers")
+    exceptions = doc.split(EXCEPTIONS_MARKER, 1)[1].split(EXCEPTIONS_END_MARKER, 1)[0]
+    return UPSTREAM_MARKER + awareness + "\n" + EXCEPTIONS_MARKER + exceptions
 
 
 def required_keys(role: str) -> frozenset:
@@ -418,8 +429,9 @@ RULES = (
      _rule_effort_pin),
     ("f4_block", ALL_ROLES,
      "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.51.0 "
-     "hooks/rtk-awareness-full.md (verbatim, RTK_SHA256); adoption/templates/codex.AGENTS.template.md; "
-     "docs/decisions/2026-10-05-harness-context-budget.md",
+     "hooks/rtk-awareness-full.md (verbatim, RTK_SHA256), read from adoption/templates/rtk-awareness-full.md since "
+     "the Codex template carries only the default awareness paragraph (2026-10-08); docs/token-practice.md (the "
+     "exceptions, moved there verbatim on 2026-10-08); docs/decisions/2026-10-05-harness-context-budget.md",
      _rule_f4_block),
     ("claude_only_name", ALL_ROLES,
      "adoption/agents/claude/stack-*.md and adoption/hooks/claude/token-lanes-block.*.md name tools, frontmatter "
@@ -434,8 +446,9 @@ RULES = (
      "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
      _rule_cwd),
     ("exact_shapes", ROLES,
-     "adoption/templates/codex.AGENTS.template.md, the seven exceptions after its rtk-exceptions marker (jq included; "
-     "cited by marker because the rule text above them moves their lines) and "
+     "docs/token-practice.md, the seven exceptions after its rtk-exceptions marker (jq included; cited by marker "
+     "because the text around them moves their lines; until 2026-10-08 they were in "
+     "adoption/templates/codex.AGENTS.template.md) and "
      "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
      _rule_exact_shapes),
     ("no_web_rule", ("stack-verifier", "evidence-reviewer", "semantic-evidence-reviewer"),

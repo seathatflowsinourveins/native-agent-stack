@@ -1774,11 +1774,13 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         rendered = build_args.codex_user_instructions(ROOT).encode("utf-8")
         staged = (work / "codex-home" / "AGENTS.md").read_bytes()
         self.assertEqual(staged, rendered)
-        # rtk-ai/rtk v0.51.0 tag = e001f773f80b22b7dc4c7a79521b30e35aaef026;
-        # hooks/rtk-awareness-full.md is unchanged and carried in full.
-        self.assertIn(b"rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim", staged)
+        # rtk-ai/rtk v0.51.0 tag = e001f773f80b22b7dc4c7a79521b30e35aaef026; since 2026-10-08 the block carries its
+        # default awareness paragraph (hooks/rtk-awareness.md) verbatim, a slice of the pinned full file.
+        self.assertIn(b"rtk-ai/rtk v0.51.0 hooks/rtk-awareness.md, verbatim", staged)
         native = (ROOT / "tests/fixtures/codex-worker-lane/rtk-awareness-full.md").read_bytes()
-        self.assertIn(native, staged)
+        default = native[native.index(b"# Command output\n"):native.index(b"\n## About RTK")]
+        self.assertIn(default, staged)
+        self.assertNotIn(b"Prefix every shell command with", staged)
         lane = json.loads((work / "staged.json").read_text())["codex"]["lane_home"]
         self.assertEqual(lane["agents_sha256"], hashlib.sha256(rendered).hexdigest())
 

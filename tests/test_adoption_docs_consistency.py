@@ -786,10 +786,11 @@ class CatalogAttestationBindingTests(unittest.TestCase):
 
 
 class UpstreamVerificationSectionTests(unittest.TestCase):
-    """The harness defaults carry the long form of the top rule's upstream-verification procedure
-    and a dated anti-pattern log, and the always-loaded AGENTS.md points to that section. Each log
-    row records the date, the anti-pattern, what happened, the rule or check that prevents it and
-    where that is enforced, so a mistake corrected in one session is not repeated in the next."""
+    """The harness defaults carry the long form of the upstream-verification procedure and a dated
+    anti-pattern log. Each log row records the date, the anti-pattern, what happened, the rule or
+    check that prevents it and where that is enforced, so a mistake corrected in one session is not
+    repeated in the next. The always-loaded AGENTS.md stopped pointing to this section on 2026-10-08,
+    when the owner directed that it keep only the philosophy core, so the section is on demand."""
 
     PAGE = ROOT / "docs/harness-defaults.md"
     SECTION = "Upstream verification and compounding learning"
@@ -843,11 +844,8 @@ class UpstreamVerificationSectionTests(unittest.TestCase):
     def test_the_anti_pattern_log_has_the_columns_and_dated_rows(self):
         self.assertEqual(self.log_errors(self.PAGE.read_text(encoding="utf-8")), [])
 
-    def test_agents_md_points_to_the_section(self):
-        anchor = github_slug(self.SECTION)
-        self.assertIn(anchor, anchors(self.PAGE))
-        link = f"docs/harness-defaults.md#{anchor}"
-        self.assertTrue(link in (ROOT / "AGENTS.md").read_text(encoding="utf-8"), f"AGENTS.md does not link {link}")
+    def test_the_section_keeps_its_anchor(self):
+        self.assertIn(github_slug(self.SECTION), anchors(self.PAGE))
 
     def test_the_check_rejects_a_renamed_column_an_undated_row_an_empty_cell_a_short_delimiter_row_and_a_split_table(self):
         good = ("## Upstream\n\n### Anti-pattern log\n\n"

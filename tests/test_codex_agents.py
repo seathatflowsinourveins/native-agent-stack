@@ -39,6 +39,8 @@ PREREGISTRATION = ROOT / "evidence/artifacts/token-adoption-e2e-20260926/preregi
 SEALED_TEST = ROOT / "tests" / "test_token_e2e_preregistration.py"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
+# The end of the exceptions section in docs/token-practice.md, where they moved verbatim on 2026-10-08.
+EXCEPTIONS_END_MARKER = "<!-- native-agent-stack:rtk-exceptions:end -->"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
 # Byte identity of the unchanged upstream v0.51.0 awareness file (e001f773).
 RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
@@ -176,11 +178,13 @@ def frozen_denylist():
 
 @functools.lru_cache(maxsize=None)
 def f4_block():
-    """The rendered F4 block, including the unchanged pinned awareness file."""
-    template = (ROOT / "adoption/templates/codex.AGENTS.template.md").read_text(encoding="utf-8")
-    template = template.replace("<!-- native-agent-stack:include-rtk-awareness-full -->\n",
-                                (ROOT / "adoption/templates/rtk-awareness-full.md").read_text(encoding="utf-8"))
-    return UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(END_MARKER, 1)[0]
+    """The rendered F4 block: the unchanged pinned awareness file and the local exceptions, which are the section of
+    docs/token-practice.md between the two exceptions markers since 2026-10-08. The awareness is read from the pinned
+    file itself, since the Codex template has carried only the default awareness paragraph since that date."""
+    awareness = (ROOT / "adoption/templates/rtk-awareness-full.md").read_text(encoding="utf-8")
+    doc = (ROOT / "docs/token-practice.md").read_text(encoding="utf-8")
+    exceptions = doc.split(EXCEPTIONS_MARKER, 1)[1].split(EXCEPTIONS_END_MARKER, 1)[0]
+    return UPSTREAM_MARKER + awareness + "\n" + EXCEPTIONS_MARKER + exceptions
 
 
 def role_paths():
@@ -566,8 +570,9 @@ class CustomAgentInstructionsTests(unittest.TestCase):
         self.assertEqual(module.NO_WEB_SENTENCE, NO_WEB_SENTENCE)
         self.assertEqual(dict(module.EXACT_SHAPES), EXACT_SHAPES)
         self.assertEqual(tuple(module.CLAUDE_ONLY_NAMES), CLAUDE_ONLY_NAMES)
-        self.assertEqual((module.UPSTREAM_MARKER, module.EXCEPTIONS_MARKER, module.END_MARKER, module.RTK_SHA256),
-                         (UPSTREAM_MARKER, EXCEPTIONS_MARKER, END_MARKER, RTK_SHA256))
+        self.assertEqual((module.UPSTREAM_MARKER, module.EXCEPTIONS_MARKER, module.EXCEPTIONS_END_MARKER,
+                          module.END_MARKER, module.RTK_SHA256),
+                         (UPSTREAM_MARKER, EXCEPTIONS_MARKER, EXCEPTIONS_END_MARKER, END_MARKER, RTK_SHA256))
         self.assertEqual(module.f4_block(), f4_block())
         self.assertEqual(module.frozen_denylist(), frozen_denylist())
         self.assertEqual(tuple(module.ROLE_FILES), tuple(f"{role}.toml" for role in STACK_ROLES))

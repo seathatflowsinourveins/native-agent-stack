@@ -14,8 +14,9 @@ Supported blocks (the Linux full-profile flow uses claude-md and profile-path):
                 user-instructions block. Does not run Codex, inspect configuration/authentication, or change
                 profiles/roles. A nonblank AGENTS.override.md shadows this file and is refused. `--template PATH`
                 reads another file of the same shape (one complete block) instead of the repository's template.
-  decision-md   One bounded discovery/maintained-decision paragraph in an existing instruction source.
-                --client source --target PATH selects a generator's Markdown source; generated outputs are
+  decision-md   One bounded discovery/maintained-decision paragraph in an existing instruction source. Its text is
+                adoption/templates/decision-routing.md, the only source since the paragraph left the Codex template on
+                2026-10-08. --client source --target PATH selects a generator's Markdown source; generated outputs are
                 refused. --dry-run previews the fragment and prints the target SHA-256; this mode never writes.
                 Apply through the source owner's guarded workflow, preserving existing defaults and RTK.
   profile-path  ~/.profile, which a Bash login shell reads when no ~/.bash_profile or ~/.bash_login exists (GNU bash
@@ -81,7 +82,7 @@ RTK_IMPORT = re.compile(r"@RTK\.md[ \t]*")
 GENERATED_DIRECTIVES_HEADER = "<!-- Generated from config/directives; edit sources, then scripts/directives.py. -->"
 DECISION_BEGIN = "<!-- native-agent-stack:decision-routing:begin"
 DECISION_END = "<!-- native-agent-stack:decision-routing:end -->"
-DECISION_BEGIN_LINE = f"{DECISION_BEGIN} (adoption/templates/codex.AGENTS.template.md; edit outside these markers) -->"
+DECISION_BEGIN_LINE = f"{DECISION_BEGIN} (adoption/templates/decision-routing.md; edit outside these markers) -->"
 DECISION_PREFIX = "Bound discovery to task-filtered names, descriptions and source locators;"
 EXIT_USAGE, EXIT_REFUSED = 2, 3
 
@@ -197,20 +198,21 @@ def merged_codex_md(current: str, template: str) -> str:
     return with_block(current, template, CODEX_BEGIN, CODEX_END)
 
 
-def decision_rule(template: str) -> str:
-    if block_span(template, CODEX_BEGIN, CODEX_END) != (0, len(template)):
-        raise Refused("the Codex template must be exactly one complete managed block")
-    rules = [line for line in template.splitlines() if line.startswith(DECISION_PREFIX)]
-    if len(rules) != 1:
-        raise Refused("the canonical template must contain exactly one decision-routing paragraph")
-    return rules[0]
+def decision_rule(fragment: str) -> str:
+    """The routing paragraph of the canonical fragment: its begin line, one paragraph line and its end line, nothing
+    else. The fragment is the paragraph's only source since it left the Codex template on 2026-10-08."""
+    lines = fragment.split("\n")
+    if (len(lines) != 4 or lines[3] != "" or lines[0] != DECISION_BEGIN_LINE or lines[2] != DECISION_END
+            or not lines[1].startswith(DECISION_PREFIX)):
+        raise Refused("the decision-routing fragment must be its begin line, one routing paragraph and its end line")
+    return lines[1]
 
 
 def decision_block(rule: str) -> str:
     block = DECISION_TEMPLATE.read_bytes().decode("utf-8")
     expected = f"{DECISION_BEGIN_LINE}\n{rule}\n{DECISION_END}\n"
     if block != expected:
-        raise Refused("the decision-routing fragment differs from the canonical template paragraph")
+        raise Refused("the decision-routing fragment differs from its canonical paragraph")
     return block
 
 
@@ -370,7 +372,7 @@ def main(argv: list[str] | None = None) -> int:
     home = args.home or os.environ.get("HOME") or str(Path.home())
     try:
         if args.block == "decision-md":
-            rule = decision_rule(CODEX_TEMPLATE.read_text(encoding="utf-8"))
+            rule = decision_rule(DECISION_TEMPLATE.read_text(encoding="utf-8"))
             if args.print:
                 if args.target or args.codex_home or args.client != "source":
                     raise Refused("--print only exports the fragment; omit target and client options")

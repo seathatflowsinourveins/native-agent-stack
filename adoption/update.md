@@ -351,7 +351,8 @@ From the same exact clean source checkout:
 )
 ```
 
-`--print` reads only the canonical source template and fragment. For the Mac
+`--print` reads only the fragment, the paragraph's one source since it left the
+Codex template on 2026-10-08. For the Mac
 handoff, give this fragment to the `agent-ecosystem` producer owner. That owner
 integrates it once in its owned `config/directives/shared.md`, renders through
 its own `agent-ecosystem/scripts/directives.py`, and reviews the resulting instruction diff.

@@ -1,6 +1,6 @@
 {
   "settings": "../ultracode.settings.json",
-  "instructions": "../CLAUDE.md",
+  "instructions": "./README.md",
   "contract_doc": "./README.md",
   "contract_heading": "## Workflow contract",
   "usage_receipts_dir": "../../../evidence/artifacts/ultracode-token-routing-20260921",

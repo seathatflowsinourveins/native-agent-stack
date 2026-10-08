@@ -61,7 +61,7 @@ The current session defaults and returned checks remain in the [session handbook
 
 ## Upstream verification and compounding learning
 
-This is the long form of the top rule's five steps in the portable instructions ([`examples/claude-native/CLAUDE.md`](../examples/claude-native/CLAUDE.md)). This section and that procedure form changed after `v2026.09.26.2`; a host at that tag has the earlier text. Upstream repositories, their changelogs and release notes, and the installed client are the source of truth. Documentation pages, docs agents, `--help` output and memory lag or omit capabilities, so they are leads.
+This is the long form of the upstream-verification rule in the portable instructions' philosophy core ([`examples/claude-native/CLAUDE.md`](../examples/claude-native/CLAUDE.md)); until 2026-10-08 those instructions stated it as the top rule's five steps. This section and that procedure form changed after `v2026.09.26.2`; a host at that tag has the earlier text. Upstream repositories, their changelogs and release notes, and the installed client are the source of truth. Documentation pages, docs agents, `--help` output and memory lag or omit capabilities, so they are leads.
 
 ### Check a capability claim in order
 

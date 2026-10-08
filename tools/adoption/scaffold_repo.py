@@ -3,7 +3,7 @@
 
 The scaffold is every file under adoption/scaffold/ plus one file rendered for this host:
 
-  AGENTS.md                            the top rule (the block after the native-agent-stack:top-rule marker of
+  AGENTS.md                            the philosophy core (the block after the native-agent-stack:top-rule marker of
                                        adoption/templates/codex.AGENTS.template.md, byte for byte) and a repository
                                        expectations section to fill in
   CLAUDE.md                            `@AGENTS.md` and a one-line comment: Claude Code reads AGENTS.md through the
