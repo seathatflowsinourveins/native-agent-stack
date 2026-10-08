@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "kind": "srt_current_source_citations",
+  "evidence_class": "local_integration",
+  "recorded_at_utc": "2026-10-08T19:02:42Z",
+  "source_base": "be7273a43c35f25002be8b481683c475482d661c",
+  "trigger_recorded_at_utc": "2026-10-08T18:56:29Z",
+  "practice_basis": {
+    "repository": "anthropics/sandbox-runtime",
+    "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "file": "README.md",
+    "line": 174,
+    "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174",
+    "contract": "srt --settings /path/to/srt-settings.json npm install",
+    "source_sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93",
+    "source_bytes": 78382,
+    "retained_primary_pointer": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json#/release_package_metadata/upstream_readme",
+    "reuse_basis": "Immutable source/pin/hash is unchanged; actual line174 and source have prior native primary verification. No new install or source fetch is inferred."
+  },
+  "sites": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "json_pointer": "/owners/76/supporting_sources/3",
+      "owner_slot": "agent-runtime-worker",
+      "before": {
+        "url": "https://github.com/anthropic-experimental/sandbox-runtime/blob/v0.0.78/README.md",
+        "line": 1
+      },
+      "after": {
+        "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174",
+        "line": 174
+      },
+      "bytes": 487716,
+      "sha256": "7cec8b6cd896836f85ef57dc9cee33b0acbe44a7d9fc5ac2cf53a13450dd51eb"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "line": 440,
+      "change": "Only the corresponding SRT README label/link changes from v0.0.78 to immutable d9aac209 README174.",
+      "bytes": 227790,
+      "sha256": "0eb00e4a6617884e3f1d351cbca6e0a27fe1253c41fd9c22275a26b9bc89d685"
+    }
+  ],
+  "native_checker": {
+    "argv": [
+      "nice",
+      "-n",
+      "10",
+      "ionice",
+      "-c2",
+      "-n7",
+      "python3",
+      "-B",
+      "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+    ],
+    "exit_code": 0,
+    "observed_completion_utc": "2026-10-08T19:02:42Z",
+    "tool_returned_output": "OK: 84 rows: 63 installed (60 by the default run, 3 only when named), 2 measurement-only, 19 not installed; 193 commands and 113 acceptance entries agree with the scripts (2 additional checks included)\n",
+    "environment": "Inherited native command environment; HOME, home and CODEX_HOME retain their existing values.",
+    "output_scope": "Actual exec_command returned output; no separate rawstdout/stderrfile hash claim. Plan row status counts are source inventory definitions, not fresh host install observations."
+  },
+  "independent_source_review": {
+    "result": "pass_within_scope",
+    "retained_assessment": "PASS for the two-site source-reference correction. No additional content defect found against base be7273a43c35f25002be8b481683c475482d661c.\n\ninstall-plan.json changes only /owners/76/supporting_sources/3/url and line for agent-runtime-worker, selecting immutable d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174, line174. SOURCES.md:440 changes exactly the corresponding README label/link. Replacing that one original substring reproduces the complete edited file. Commands, configuration, acceptance, all other owner fields/rows, historical records and frozen receipts are unchanged.\n\nThe retained primary README observation is78382bytes/SHA2562b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93. Actual line174: srt --settings /path/to/srt-settings.json npm install. Its source pointer is source-binding.json#/release_package_metadata/upstream_readme, corroborated by the retained expanded source critic.\n\nFinal install-plan.json487716bytes/SHA7cec8b6cd896836f85ef57dc9cee33b0acbe44a7d9fc5ac2cf53a13450dd51eb; SOURCES.md227790bytes/SHA0eb00e4a6617884e3f1d351cbca6e0a27fe1253c41fd9c22275a26b9bc89d685.\n\nThe parent inherited-environment checker result is separate; no checker-pass claim is made from the earlier HOME-override return. No edits, tests, network, host or model operation occurred in this review.",
+    "retention_scope": "Compact sanitized actual child final assessment content, preserving its findings/source/hash/limits; no raw conversation, client config or private identifier.",
+    "source_diff_checks": [
+      "Only one JSON supporting-source object changes",
+      "Only one original SOURCES substring changes",
+      "All other commands/owner fields/acceptance/history/config/frozen receipts preserved"
+    ]
+  },
+  "command_practice_correction": {
+    "prior_worker_checker": "A prior source-only checker observation used a HOME override. It is not the canonical result bound here.",
+    "resolution": "Canonical parent checker repeated with inherited environment and returned0; prior operation is not relabeled or erased.",
+    "native_acceptance_or_install": false
+  },
+  "checks": [
+    {
+      "name": "git_diff_check",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "source_scope_and_citation_alignment",
+      "result": "pass"
+    }
+  ],
+  "failed_conditions": [
+    {
+      "name": "initial_publication_validation",
+      "exit_code": 1,
+      "observed_at_utc": "2026-10-08T19:06:27Z",
+      "actual_tool_returned_output": "Publication validation failed:\nreceipt srt-source-citations-20261008: unknown component openhands\nevidence/artifacts/srt-source-citations-20261008/source-checks.json: contains possible personal home path\n",
+      "correction": "Bind only the actual sandbox component; replace path-shaped environment prose with variable names separated by commas. Keep all validator gates and citation edits unchanged."
+    }
+  ],
+  "inverse": "Revert only these two source-citation edits and this unit's evidence/registry binding; no host state changed.",
+  "limits": [
+    "Reference-only repair; no install, service, native client, policy, runtime, model/provider/broker or new-host acceptance.",
+    "The already-landed0.0.79 install path, older source/native/historical proofs and protected scopes remain unchanged.",
+    "No catalogue, workflow, credentials, client configuration, new generator/test suite or frozen native input changed."
+  ]
+}
