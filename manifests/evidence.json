@@ -48132,8 +48132,8 @@
     },
     {
       "path": "evidence/artifacts/research-exact-query-dispatch-20261008/receipt.json",
-      "sha256": "f200896bfc730259db2e92b2e25446c0e03f261d16da43bba6af49167dd103cb",
-      "bytes": 3859
+      "sha256": "2db9fff10a3a2b5978028342ab16afe0ab1182d16f625763220159f710e2a39e",
+      "bytes": 5689
     },
     {
       "path": "evidence/artifacts/retrieved-code.txt",
@@ -58637,13 +58637,13 @@
     },
     {
       "path": "tools/research/dispatch",
-      "sha256": "1b98898c33645766850b13a275eb2cd5850316d0f62d10f6f5ecd0231c83f1dd",
-      "bytes": 15684
+      "sha256": "8a72a88c90405f3b8bccb5b695480a59020cc253b93ac7031ddfff0a1fc6da12",
+      "bytes": 15730
     },
     {
       "path": "tools/research/exact_queries.py",
-      "sha256": "19a9e5698b1c553fbe02cc5e403ac41a69287bd0985c1eb751039f71a7e7a22a",
-      "bytes": 20754
+      "sha256": "e7eae7f413b92a22a88e6ad000f3089b082c68a8d1f731226b6240f6591996e3",
+      "bytes": 24487
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",
