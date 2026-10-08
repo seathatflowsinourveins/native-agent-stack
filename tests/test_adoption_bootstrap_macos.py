@@ -1057,7 +1057,7 @@ class TokenEfficiencyPlanTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             result = _plan_run("bash", "token-efficiency", Path(tmp))
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertRegex(result.stdout, rf"(?m)^plan headroom\s+0\.37\.0\s+uv-tool\s+{re.escape(wheel)} "
+            self.assertRegex(result.stdout, rf"(?m)^plan headroom\s+0\.40\.0\s+uv-tool\s+{re.escape(wheel)} "
                                             rf"sha256={headroom['sha256']}$")
             self.assertFalse(list((Path(tmp) / "eco").glob("downloads/*.whl")), "plan mode must not download")
 

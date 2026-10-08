@@ -359,11 +359,11 @@
     },
     {
       "component_id": "agentsview",
-      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
-      "version": "0.43.0",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+      "version": "0.44.0",
       "profile": "supporting",
       "role": "Scoped historical Codex/Claude transcript lexical search",
-      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt Current selection identity refreshed 2026-10-08 by a version readback only; the existing functional/lifecycle evidence remains historical and is not recertified at the new pin.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/agentsview",
@@ -420,6 +420,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "2604-drift-version-readback-20261008",
+            "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+            "kind": "upstream_provenance"
           }
         ],
         "retained_operation_ids": [],
@@ -436,7 +441,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -3747,10 +3752,10 @@
     {
       "component_id": "headroom",
       "repository": "https://github.com/headroomlabs-ai/headroom",
-      "version": "0.37.0",
+      "version": "0.40.0",
       "profile": "supporting",
       "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
-      "installation_assessment": "Clean isolated upstream uv installation and native uninstall passed on the existing Linux/WSL host; the working installation was preserved.",
+      "installation_assessment": "Clean isolated upstream uv installation and native uninstall passed on the existing Linux/WSL host; the working installation was preserved. Current selection identity refreshed 2026-10-08 by a version readback only; the existing functional/lifecycle evidence remains historical and is not recertified at the new pin.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/headroom",
@@ -3838,6 +3843,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "2604-drift-version-readback-20261008",
+            "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+            "kind": "upstream_provenance"
           }
         ],
         "retained_operation_ids": [
@@ -3977,7 +3987,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",

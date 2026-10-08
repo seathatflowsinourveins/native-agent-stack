@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
   "outputs": {
-    "docs/new-wsl-handbook.md": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
-    "docs/new-wsl-handbook.json": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa"
+    "docs/new-wsl-handbook.md": "f683090521e28889672b995714a0b35b1e31dfc5df3a52211d233767bae4444b",
+    "docs/new-wsl-handbook.json": "9b5900c995ae258057099ad0819f3cb55ec2ce3bf3c1b5c41d8c299bc1177a19"
   },
   "inventory": {
     "layers": 37,
@@ -804,6 +804,15 @@
       "outputs": {
         "docs/new-wsl-handbook.md": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
         "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-08T09:13:58Z",
+      "source_head": "3f7bc63ed80cb97f552cb0dba40174b5f0ee40b4",
+      "reason": "CC065432Z vendor drift refresh; native handbook builder regenerated current recommendations. Prior bindings remain historical.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
+        "docs/new-wsl-handbook.json": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa"
       }
     }
   ]

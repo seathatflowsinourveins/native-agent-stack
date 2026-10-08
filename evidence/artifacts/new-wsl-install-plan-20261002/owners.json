@@ -296,7 +296,7 @@
   {
    "layer": "token-efficiency",
    "slot": "output-compression",
-   "owner": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+   "owner": "Headroom 0.40.0 (headroom-ai[mcp], MCP server only)",
    "repository": "https://github.com/headroomlabs-ai/headroom",
    "installed": true,
    "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
@@ -458,7 +458,7 @@
   {
    "layer": "observation-inference",
    "slot": "session-analytics",
-   "owner": "agentsview 0.43.0 (local archive only)",
+   "owner": "agentsview 0.44.0 (local archive only)",
    "repository": "https://github.com/kenn-io/agentsview",
    "installed": true,
    "note": "owner default under amendment 4 (wave 3, 2026-10-04); the pins are in install-plan.json; repository metadata was not read for this row"

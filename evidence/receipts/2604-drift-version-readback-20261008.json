@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "2604-drift-version-readback-20261008",
+  "kind": "upstream_provenance",
+  "recorded_at_utc": "2026-10-08T08:32:38Z",
+  "component_ids": ["agentsview", "headroom"],
+  "claim": "Fresh installed CLI version readbacks match AgentsView 0.44.0 and Headroom 0.40.0; vendor release identities and the Headroom macOS artifact digest were independently checked.",
+  "limitations": [
+    "Metadata and artifact identity only; no installation, service activation, provider call or functional acceptance was performed.",
+    "Historical functional receipts and lifecycle observations retain their original versions and scope.",
+    "The macOS wheel was hashed on Linux; no Mac has run this install or qualified its runtime behavior."
+  ],
+  "readbacks": [
+    {
+      "component_id": "agentsview",
+      "argv": ["agentsview", "--version"],
+      "exit_code": 0,
+      "stdout": "agentsview v0.44.0 (commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, built 2026-09-21T12:48:49Z)\n",
+      "stderr": "",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "release": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+      "source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba"
+    },
+    {
+      "component_id": "headroom",
+      "argv": ["headroom", "--version"],
+      "exit_code": 0,
+      "stdout": "headroom, version 0.40.0\n",
+      "stderr": "",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "release": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.40.0",
+      "source_pin": "855390d6110e0bbb199d9b97025baac16c2f5cf3"
+    }
+  ],
+  "macos_artifact": {
+    "metadata_url": "https://pypi.org/pypi/headroom-ai/0.40.0/json",
+    "url": "https://files.pythonhosted.org/packages/f6/cf/2e7f237f343187bd4f1edba7f8117e6aa69953b46002a44f5136cc59f896/headroom_ai-0.40.0-cp310-abi3-macosx_11_0_arm64.whl",
+    "bytes": 15449719,
+    "publisher_sha256": "f7b0186ad5e76d5c8f75e5de6c57e001637258ead75481575ccca4d57557f5fb",
+    "download_sha256": "f7b0186ad5e76d5c8f75e5de6c57e001637258ead75481575ccca4d57557f5fb",
+    "verified_at_utc": "2026-10-08T08:36:33Z",
+    "method": "Fresh official PyPI artifact streaming download, independent SHA256 and byte count; read-only worker drift_macos_headroom, no install."
+  },
+  "inverse": "Revert the drift PR commits; no host state was changed."
+}

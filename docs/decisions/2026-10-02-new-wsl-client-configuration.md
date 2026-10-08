@@ -1220,3 +1220,12 @@ remain intact; this amendment supplies no host apply.
 
 ```text
 ```
+### Amendment 2026-10-08 — NativeStack2604 shell identity
+
+CC065432Z adds `WSL_DISTRO_NAME = "NativeStack2604"` to the explicit Codex
+environment so host-guarded scripts retain the distribution identity under
+`inherit = "none"`. The native `new_wsl_client_config.py --check --json`
+command returned 0 and supplies these current counts: Today: 401 pieces,
+361 wired (209 practice, 152 through a slot), 24 not wired (0 through a slot that does not
+install, 24 by their own entry) and 16 authorization pieces. Earlier dated
+counts remain historical. This is render consistency, without a host apply.
