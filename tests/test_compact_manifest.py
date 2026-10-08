@@ -191,6 +191,15 @@ class CompactManifestTests(unittest.TestCase):
                                                  "explanation": "the captured locator and declared repository disagree", "measurement": "verify the original primary README",
                                                  "evidence_refs": []}]
 
+    def closure_conflict(self):
+        self.closure_pending()
+        row = self.rows[0]
+        row["pending"]["measurement"] = "settle the contradictory same-slot primary evidence and execution claims"
+        row["choices"] = [{"disposition": "TRIAL", "source_refs": deepcopy(row["source_refs"]), "qualification": {"catalog": "foundation"}},
+                          {"disposition": "WATCH", "source_refs": deepcopy(row["source_refs"]), "qualification": {"catalog": "foundation", "role": "worker"}}]
+        row["closure"]["pending_conflict"] = {"provisional_disposition": row["pending"]["provisional_disposition"], "measurement": row["pending"]["measurement"],
+                                              "action_side_row_ids": ["original113:example/project-0:native-clients:TRIAL"]}
+
     def closure_relaxation(self, rule):
         if rule == "pending-pin":
             self.closure_pending(pin_residue=True)
@@ -206,12 +215,17 @@ class CompactManifestTests(unittest.TestCase):
             self.closure_missing_list()
         elif rule == "pending-disagreement":
             self.closure_disagreement()
+        elif rule == "pending-conflict":
+            self.closure_conflict()
+        elif rule == "origin-unresolved":
+            self.rows[0]["disposition"] = "TRIAL"
+            self.rows[0]["origin_pointer"] = "unresolved"
         else:
             self.fail("unknown relaxation fixture")
 
     def test_closure_each_relaxed_rule_still_fails_the_strict_default(self):
         original = deepcopy((self.rows, self.files, self.coverage))
-        for rule in ("pending-pin", "pending-locator", "counted-inventory", "typed-list-omission", "source-qualification-omission", "missing-list-capture", "pending-disagreement"):
+        for rule in ("pending-pin", "pending-locator", "counted-inventory", "typed-list-omission", "source-qualification-omission", "missing-list-capture", "pending-disagreement", "pending-conflict", "origin-unresolved"):
             with self.subTest(rule=rule):
                 self.rows, self.files, self.coverage = deepcopy(original)
                 self.closure_relaxation(rule)
@@ -228,7 +242,7 @@ class CompactManifestTests(unittest.TestCase):
 
     def test_closure_each_relaxation_keeps_action_hash_locator_and_omission_guards(self):
         original = deepcopy((self.rows, self.files, self.coverage))
-        for rule in ("pending-pin", "pending-locator", "counted-inventory", "typed-list-omission", "source-qualification-omission", "missing-list-capture", "pending-disagreement"):
+        for rule in ("pending-pin", "pending-locator", "counted-inventory", "typed-list-omission", "source-qualification-omission", "missing-list-capture", "pending-disagreement", "pending-conflict", "origin-unresolved"):
             for defect in ("null-action-row-pin", "null-action-primary-pin", "capture-hash", "unsafe-locator", "undispositioned-omission"):
                 with self.subTest(rule=rule, defect=defect):
                     self.rows, self.files, self.coverage = deepcopy(original)
@@ -279,6 +293,102 @@ class CompactManifestTests(unittest.TestCase):
                 self.rows[0].pop("pending")
                 with self.assertRaises(compact.CompactError):
                     self.closure_build()
+
+    def test_closure_conflict_is_counted_in_full_reads_with_original_choices_and_claim_ids(self):
+        self.closure_conflict()
+        self.rows[1]["disposition"] = "TRIAL"
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["action_rows"], 1)
+        self.assertEqual(manifest["counts"]["pending_conflict"], 1)
+        self.assertEqual(manifest["counts"]["action_read_rows"], 2)
+        self.assertEqual(manifest["validation"]["nonblocking_counts"]["pending_conflict_rows"], 1)
+        conflict_row = next(row for row in manifest["rows"] if "pending_conflict" in row.get("closure", {}))
+        self.assertEqual(conflict_row["disposition"], "PENDING")
+        self.assertEqual(conflict_row["choices"], self.rows[0]["choices"])
+        self.assertEqual(conflict_row["closure"]["pending_conflict"]["action_side_row_ids"], ["original113:example/project-0:native-clients:TRIAL"])
+
+    def test_closure_conflict_must_be_pending_and_keep_actual_same_slot_action_choices(self):
+        original = deepcopy((self.rows, self.files, self.coverage))
+        for defect in ("action", "provisional-action", "measurement", "no-action-side", "duplicate-action-side", "single-choice", "no-action-choice", "scope-split", "missing-choice-source"):
+            with self.subTest(defect=defect):
+                self.rows, self.files, self.coverage = deepcopy(original)
+                self.closure_conflict()
+                row = self.rows[0]
+                conflict = row["closure"]["pending_conflict"]
+                if defect == "action":
+                    row["disposition"] = "TRIAL"
+                    row.pop("pending")
+                elif defect == "provisional-action":
+                    conflict["provisional_disposition"] = row["pending"]["provisional_disposition"] = "TRIAL"
+                elif defect == "measurement":
+                    conflict["measurement"] = "a different measurement"
+                elif defect == "no-action-side":
+                    conflict["action_side_row_ids"] = []
+                elif defect == "duplicate-action-side":
+                    conflict["action_side_row_ids"] *= 2
+                elif defect == "single-choice":
+                    row["choices"].pop()
+                elif defect == "no-action-choice":
+                    row["choices"][0]["disposition"] = "REJECT"
+                elif defect == "scope-split":
+                    row["choices"][0]["qualification"]["slot"] = "workers"
+                else:
+                    row["choices"][0]["source_refs"] = []
+                with self.assertRaises(compact.CompactError):
+                    self.closure_build()
+
+    def test_closure_conflict_can_retain_separate_pin_and_locator_residue_counts(self):
+        self.closure_conflict()
+        row = self.rows[0]
+        row["pin"] = row["primary_sources"][0]["pin"] = None
+        row["primary_sources"][0]["locator"] = "UNKNOWN"
+        row["closure"].update(pending_pin={"reason_code": "no-body", "measurement": "capture the exact original source bytes"},
+                              pending_locator={"reason_code": "unsupported-transport", "measurement": "establish the exact original primary locator"})
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["pending_conflict"], 1)
+        self.assertEqual(manifest["counts"]["pending_pin"], 1)
+        self.assertEqual(manifest["counts"]["pending_locator"], 1)
+        self.assertEqual(manifest["counts"]["action_read_rows"], 1)
+
+    def test_closure_unresolved_origin_preserves_evidenced_action_and_visible_count(self):
+        self.rows[0]["disposition"] = "TRIAL"
+        self.rows[0]["origin_pointer"] = "unresolved"
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["action_rows"], 1)
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved"], 1)
+        self.assertEqual(manifest["validation"]["nonblocking_counts"]["origin_pointer_unresolved_action_rows"], 1)
+        action = next(row for row in manifest["rows"] if row["disposition"] == "TRIAL")
+        self.assertEqual(action["origin_pointer"], "unresolved")
+        self.rows[0]["primary_sources"][0]["pin"] = None
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+        self.rows[0]["primary_sources"][0]["pin"] = self.rows[0]["pin"]
+        self.rows[0]["disposition"] = "ADOPT-NOW"
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+
+    def test_closure_bound_origin_requires_original_repository_slot_hash_and_selector(self):
+        self.rows[0]["disposition"] = "TRIAL"
+        original = {"rows": [{"repository_or_entry": "example/project-0", "slot": "native-clients", "disposition": "TRIAL"}]}
+        self.rows[0]["origin_pointer"] = self.witness("original-action-origin", original) | {"pointer": "/rows/0", "source_id": "original113:example/project-0:native-clients:TRIAL"}
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["origin_pointer_bound"], 1)
+        for value in ("example/project-1", "example/project-0"):
+            original["rows"][0]["repository_or_entry"] = value
+            original["rows"][0]["slot"] = "native-clients" if value.endswith("1") else "workers"
+            self.rows[0]["origin_pointer"] = self.witness("original-action-origin", original) | {"pointer": "/rows/0"}
+            manifest, _ = self.closure_build()
+            self.assertTrue(any(item["code"] == "origin-pointer-repository-slot-unbound" for item in manifest["validation"]["blockers"]))
+        self.rows[0]["origin_pointer"]["pointer"] = "/missing"
+        manifest, _ = self.closure_build()
+        self.assertTrue(any(item["code"] == "unresolved-capture-pointer" for item in manifest["validation"]["blockers"]))
+        self.rows[0]["origin_pointer"]["sha256"] = "e" * 64
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
 
     def test_closure_missing_residue_declaration_and_unsafe_null_pin_locator_still_block(self):
         self.closure_pending(pin_residue=True)

@@ -294,6 +294,39 @@
           "items": {
             "$ref": "#/$defs/closureDisagreement"
           }
+        },
+        "pending_conflict": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provisional_disposition",
+            "measurement",
+            "action_side_row_ids"
+          ],
+          "properties": {
+            "provisional_disposition": {
+              "enum": [
+                "WATCH",
+                "REJECT",
+                "NO-GAP",
+                "OUT-OF-SCOPE"
+              ]
+            },
+            "measurement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "action_side_row_ids": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "description": "Unsettled contradictory choices in the same native slot; final PENDING. Both families read every such row in the census."
         }
       }
     },
@@ -353,6 +386,26 @@
           }
         }
       }
+    },
+    "origin_pointer": {
+      "description": "An unresolved origin is a visible provenance gap and never demotes an otherwise evidenced action. A bound origin retains its original archive hash and selector.",
+      "anyOf": [
+        {
+          "const": "unresolved"
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/sourceRef"
+            },
+            {
+              "required": [
+                "archive_member"
+              ]
+            }
+          ]
+        }
+      ]
     }
   },
   "allOf": [
@@ -497,6 +550,27 @@
                   "pending_locator"
                 ]
               }
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "disposition": {
+            "const": "PENDING"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "closure"
+        ],
+        "properties": {
+          "closure": {
+            "required": [
+              "pending_conflict"
             ]
           }
         }

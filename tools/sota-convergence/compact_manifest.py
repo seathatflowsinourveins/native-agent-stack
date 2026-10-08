@@ -333,7 +333,7 @@ def validation_profile(profile):
 def closure_metadata(row, index):
     """Validate explicit residue declarations; none is evidence or a source pin."""
     closure = row.get("closure", {})
-    closed(closure, set(), {"pending_pin", "pending_locator", "disagreements"}, "closure")
+    closed(closure, set(), {"pending_pin", "pending_locator", "pending_conflict", "disagreements"}, "closure")
     for name, reasons in (("pending_pin", PIN_REASONS), ("pending_locator", LOCATOR_REASONS)):
         if name in closure:
             residue = closure[name]
@@ -341,6 +341,26 @@ def closure_metadata(row, index):
             require(residue["reason_code"] in reasons, "unsupported " + name + " reason code")
             text(residue["measurement"], "closure." + name + ".measurement")
             require(row["disposition"] == "PENDING", name + " residue must be PENDING and can never be an action row")
+    if "pending_conflict" in closure:
+        conflict = closure["pending_conflict"]
+        closed(conflict, {"provisional_disposition", "measurement", "action_side_row_ids"}, set(), "closure.pending_conflict")
+        require(row["disposition"] == "PENDING", "PENDING-CONFLICT must retain PENDING and can never be a final action row")
+        require(conflict["provisional_disposition"] in CLASSES - ACTION_CLASSES - {"PENDING"}, "PENDING-CONFLICT requires a conservative non-action provisional")
+        text(conflict["measurement"], "pending_conflict.measurement")
+        pending = row.get("pending")
+        require(isinstance(pending, dict) and all(pending.get(name) == conflict[name] for name in ("provisional_disposition", "measurement")), "PENDING-CONFLICT must retain the existing pending provisional and settling measurement")
+        action_ids = conflict["action_side_row_ids"]
+        require(isinstance(action_ids, list) and bool(action_ids), "PENDING-CONFLICT must retain its original action-side row ids")
+        for action_id in action_ids:
+            text(action_id, "pending_conflict.action_side_row_id")
+        require(len(action_ids) == len(set(action_ids)), "duplicate PENDING-CONFLICT action-side row id")
+        choices = row.get("choices", [])
+        require(isinstance(choices, list) and all(isinstance(choice, dict) for choice in choices), "PENDING-CONFLICT choices must be an array of original choices")
+        dispositions = {choice.get("disposition") for choice in choices}
+        require(len(dispositions) >= 2 and bool(dispositions & ACTION_CLASSES), "PENDING-CONFLICT requires contradictory same-slot choices including an action decision")
+        for choice in choices:
+            if isinstance(choice.get("qualification"), dict) and "slot" in choice["qualification"]:
+                require(choice["qualification"]["slot"] == row["slot"], "different native slots are a scope split, not PENDING-CONFLICT")
     null_pins = row["pin"] is None or any(source["pin"] is None for source in row["primary_sources"])
     require("pending_pin" not in closure or null_pins, "pending_pin requires an actual null row or primary pin")
     disagreements = closure.get("disagreements", [])
@@ -456,7 +476,7 @@ def closure_locator(source, label, closure, blockers):
 
 def validate_row(row, index, profile=None):
     start_closure = validation_profile(profile)
-    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance"} if start_closure else set()), "row")
+    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance", "origin_pointer"} if start_closure else set()), "row")
     identity, slot, _ = decision_key(row)
     require(row["disposition"] in CLASSES and row["evidence_class"] in EVIDENCE, "unsupported disposition/evidence class")
     blockers = []
@@ -465,6 +485,13 @@ def validate_row(row, index, profile=None):
     if row["evidence_class"] == "UNKNOWN":
         blockers.append("unknown-evidence-class")
     closure = closure_metadata(row, index) if start_closure else {}
+    if "origin_pointer" in row:
+        origin = row["origin_pointer"]
+        if isinstance(origin, str):
+            require(origin == "unresolved", "unbound origin pointer must be recorded exactly as unresolved")
+        else:
+            closed(origin, {"archive_member", "sha256", "pointer"}, REF_KEYS - {"archive_member", "sha256", "pointer"}, "origin pointer")
+            validate_ref(origin, index)
     pin_blockers = []
     validate_pin(row["pin"], "row", pin_blockers)
     if "pending_pin" not in closure:
@@ -855,6 +882,20 @@ def validate_reference_pointers(rows, captures, blockers, cache):
                     blockers.append({"code": "unbound-primary-pointer", "source": label})
                 else:
                     selected_capture(source["archive_member"], source["pointer"], captures, cache, blockers, label)
+
+
+def validate_origin_pointer(row, captures, cache, blockers):
+    origin = row.get("origin_pointer")
+    if not isinstance(origin, dict):
+        return
+    label = canonical(row["repository_or_entry"]) + ":" + row["slot"]
+    original = selected_capture(origin["archive_member"], origin["pointer"], captures, cache, blockers, "origin:" + label)
+    identity, slot = None, None
+    if isinstance(original, dict):
+        identity = next((original[name] for name in ("repository_or_entry", "repository", "full_name", "repo", "html_url", "url", "entry", "linked_repository") if isinstance(original.get(name), str)), None)
+        slot = next((original[name] for name in ("slot", "layer_fit", "layer_id", "field") if isinstance(original.get(name), str)), None)
+    if identity is None or slot != row["slot"] or canonical(identity) != canonical(row["repository_or_entry"]):
+        blockers.append({"code": "origin-pointer-repository-slot-unbound", "source": label})
 
 
 def validate_acceptance(row, captures):
@@ -1272,6 +1313,7 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
     wanted |= {source["archive_member"] for row in rows if NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"]) for source in row["primary_sources"] if "archive_member" in source}
     if start_closure:
         wanted |= {ref["archive_member"] for row in rows for item in row.get("closure", {}).get("disagreements", []) for ref in item["evidence_refs"] if "archive_member" in ref}
+        wanted |= {row["origin_pointer"]["archive_member"] for row in rows if isinstance(row.get("origin_pointer"), dict)}
     if isinstance(coverage_raw, dict):
         wanted |= {coverage_raw[name]["archive_member"] for name in ("source_inventory_witness", "field_inventory_witness", "star_inventory_witness") if isinstance(coverage_raw.get(name), dict) and "archive_member" in coverage_raw[name]}
         if start_closure and isinstance(coverage_raw.get("document_inventory_witness"), dict):
@@ -1310,6 +1352,9 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
             receipts.update(alias_captures)
     cache = {}
     validate_reference_pointers(rows, receipts, blockers, cache)
+    if start_closure:
+        for row in rows:
+            validate_origin_pointer(row, receipts, cache, blockers)
     for row in rows:
         validate_native_source_entry(row, index, receipts, cache, blockers)
         validate_native_skill_entry(row, index, receipts, cache, blockers)
@@ -1365,7 +1410,14 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
         residue_counts["pending_locator_items"] = sum(locator_items.values())
         residue_counts.update({name: counts[name] for name in ("counted_list_populations", "counted_census_witnesses", "unpromoted_list_occurrences", "approved_omissions", "approved_omissions_by_follow_up", "missing_list_captures", "missing_list_capture_entries")})
         residue_counts["pending_disagreements"] = sum(item["status"] == "PENDING" for item in disagreements)
+        residue_counts["pending_conflict_rows"] = sum("pending_conflict" in row.get("closure", {}) for row in rows)
+        residue_counts["origin_pointer_unresolved_rows"] = sum(row.get("origin_pointer") == "unresolved" for row in rows)
+        residue_counts["origin_pointer_unresolved_action_rows"] = sum(row.get("origin_pointer") == "unresolved" and row["disposition"] in ACTION_CLASSES for row in rows)
         counts.update({"action_rows": sum(row["disposition"] in ACTION_CLASSES for row in rows),
+                       "pending_conflict": residue_counts["pending_conflict_rows"],
+                       "action_read_rows": sum(row["disposition"] in ACTION_CLASSES for row in rows) + residue_counts["pending_conflict_rows"],
+                       "origin_pointer_unresolved": residue_counts["origin_pointer_unresolved_rows"],
+                       "origin_pointer_bound": sum(isinstance(row.get("origin_pointer"), dict) for row in rows),
                        "pinned_rows": sum(row["pin"] is not None for row in rows),
                        "pending_pin": residue_counts["pending_pin_rows"], "pending_locator": residue_counts["pending_locator_rows"],
                        "disagreements_resolved": sum(item["status"] == "RESOLVED" for item in disagreements), "disagreements_total": len(disagreements)})
