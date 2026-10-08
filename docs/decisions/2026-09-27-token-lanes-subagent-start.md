@@ -1,8 +1,8 @@
 # Decision: carry token lanes through SubagentStart (2026-09-27)
 
-**Decided by:** unit `token-lanes-subagent-start`, branch
-`claude/token-lanes-subagent-carrier-20260927`, implementing the user's
-SubagentStart build task for Ultracode workflow children.
+**Record provenance:** unit `token-lanes-subagent-start`, branch
+`claude/token-lanes-subagent-carrier-20260927`, implementing the dated
+SubagentStart carrier task for Ultracode workflow children.
 The UTC date was read with `date -u +%F`.
 
 **Scope:** the portable Claude hook and sibling text, the existing profile
@@ -842,15 +842,15 @@ ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8  token-lanes-bl
 
 ## Addendum 2026-10-04: main-session carrier
 
-The user's order of 2026-10-04, as relayed to session wsl-architecture-design and session 99, verbatim:
+This 2026-10-04 addendum extends advisory token-lane guidance to main sessions and keeps fresh-session qualification separate from carrier installation:
 
-> WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS INSTALL CLEANLY MAKE SURETHEY LIVE SEAMLESSLY AS
-> OUR NATIVE WORKFLWO FOR FUTURE SESSION DEFAULT TO LAUNCH AND INVOKE ,CLENA RESOLUTE AND REPORT THE MAIN SESSION WHEN
-> READY with real new session launched e2e monitor invoke rate and upstream commands e2e with using of the sota
-> related full lifecycle skills, the token save is essential layer make sure we are monitored token use and sota token
-> save repos invoke rate with new session launched e2e m keep resolute untill the upstream are fully resoluted and
-> live within our native workflow including ultracode subagent,experimental agent team in our wsl with upstream
-> commands for showing the real saved and sota resoluted practices upstream clean installed
+The native workflow uses upstream install, invocation and lifecycle commands; clean installation alone does not establish an accepted host rollout.
+[Claude's hooks contract](https://code.claude.com/docs/en/hooks#sessionstart) places SessionStart context in main sessions and SubagentStart context in child sessions.
+Context Mode v1.0.169 provides its own [SessionStart implementation at 589d8214](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/sessionstart.mjs).
+Its [event registration at the same pin](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/hooks.json#L120) is source evidence, separate from observed native loading.
+Monitor upstream invocation counts and provider token usage in the declared fresh-session E2E comparison before claiming saved tokens or completed qualification.
+Include main sessions, Ultracode subagents and experimental team surfaces only where the relevant client's native contract supports the chosen lifecycle.
+The carrier implementation and unchanged E2E overturn below define this addendum's scope; they supply no new measured savings or lifecycle acceptance.
 
 The SubagentStart carrier reaches subagents only, and main sessions were reported reading whole files and choosing Bash
 over the lanes (reported to this unit, not re-run here). [`token-lanes-session-start.py`](../../adoption/hooks/claude/token-lanes-session-start.py)

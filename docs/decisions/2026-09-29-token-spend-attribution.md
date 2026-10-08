@@ -1,10 +1,10 @@
 # Decision: run shape is where token spend concentrates; the savings sought are architectural (2026-09-29)
 
-**Decided by:** session `native-agent-stack-76` on host `nativestack-5975wx-20260925`, for the user's request of 2026-09-29
-("find our what causes our token spend high? is the context, skills,memory repos mcp tools we load? ... are we enact all the sota
-token save practice?"). Decisions 1 to 3 are the user's answers of the same day, recorded as their choices and not as measured results:
-enact "with max token save via architectectural optimization with harm only minimal quality", effort "Keep max", and the advisor stays on
-("the limit should not be restrict our quality"). Decision 4 is derived from the receipt. Checked against Claude Code 2.1.284 and ccusage
+**Decision context:** session `native-agent-stack-76` on host `nativestack-5975wx-20260925`, opened on 2026-09-29
+to attribute token spend across context, skills, memory and MCP. [Anthropic's multi-agent research](https://www.anthropic.com/engineering/multi-agent-research-system)
+supports role-specific dispatch and compact handoffs; the native [effort](https://code.claude.com/docs/en/model-config) and [advisor](https://code.claude.com/docs/en/advisor) interfaces support the policy choices below.
+Decisions 1 to 3 retain `max`, the enabled advisor and architecture-led savings subject to quality checks; they are selections, not measured savings.
+Decision 4 is derived from the receipt. Checked against Claude Code 2.1.284 and ccusage
 20.0.26. The measurement is the receipt
 [`claude-spend-attribution-20260929`](../../evidence/receipts/claude-spend-attribution-20260929.json); a seven-agent Workflow (three
 source-research stages, a measurement verifier, a gap table, a gap-table refuter and a synthesis) sourced the practices below; its refuter
@@ -31,14 +31,14 @@ size the always-loaded files (decision 5):
 
 ## Decisions
 
-1. **Effort stays `max` for every role (the user's answer: "Keep max").** The docs advise testing `max` before broad adoption, so the M7
+1. **Effort stays `max` for every role.** The native [effort interface](https://code.claude.com/docs/en/model-config#adjust-effort-level) supports that value; the docs advise testing `max` before broad adoption, so the M7
    arms of the [max-default record](2026-09-29-max-default-effort.md) stay the overturn path.
-2. **The advisor stays on (the user's answer: "the limit should not be restrict our quality").** `advisorModel` has been opus since
-   2026-09-28; 750 of the 1,872 iterations ran on `claude-fable-5-1`, all but 17 before that date. Separately from the user's
-   reasoning: the advisor docs describe a global off switch (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` or `/advisor off`), and no cap or per-agent
+2. **The advisor stays on.** The native [advisor](https://code.claude.com/docs/en/advisor) supplies a separate model for difficult decisions; `advisorModel` has been opus since
+   2026-09-28; 750 of the 1,872 iterations ran on `claude-fable-5-1`, all but 17 before that date. The receipt measures that history;
+   the advisor docs describe a global off switch (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` or `/advisor off`), and no cap or per-agent
    opt-out was found in them on 2026-09-29, so any cheaper advisor policy needs its own quality-per-cost result.
-3. **Savings are sought in architecture (the user's request: "max token save via architectectural optimization with harm only minimal
-   quality").** In practice: dispatch by role, bounded fresh-context units, packets that carry excerpts instead of re-reads, tool-output
+3. **Savings are sought in architecture with minimal quality loss.** [Anthropic's multi-agent research](https://www.anthropic.com/engineering/multi-agent-research-system) motivates
+   dispatch by role, bounded fresh-context units, packets that carry excerpts instead of re-reads, tool-output
    discipline, session boundaries, campaign budgets and complete accounting. No model, effort or advisor change is made to save
    tokens without a paired quality result.
 4. **The subagent cache TTL stays at the 5-minute default (derived from the receipt).** Children wrote 844.6M tokens to the 5-minute class

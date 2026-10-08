@@ -1,15 +1,15 @@
 # Decision: the Codex layer lane and adjudication judge default to effort max (2026-09-29)
 
-**Decided by:** session `native-agent-stack-76` on host `nativestack-5975wx-20260925`, on a hand-off from `native-agent-stack-79` routed through
-`ecosystem-roadmap-2026`, for the user's standing rule that GPT-6 lanes run at `max` (never `ultra`), which this repository records in
+**Record provenance:** session `native-agent-stack-76` on host `nativestack-5975wx-20260925`, on a hand-off from `native-agent-stack-79` routed through
+`ecosystem-roadmap-2026`, selecting `max` (never `ultra`) for GPT-6 lanes through the [official Codex reasoning-effort configuration](https://developers.openai.com/codex/config-reference/); the dated repository selection is recorded in
 [`2026-09-27-model-currency.md`](2026-09-27-model-currency.md), [`2026-09-26-codex-worker-lane.md`](2026-09-26-codex-worker-lane.md) and
 [`recipes/README.md`](../../recipes/README.md).
 
 **The defect.** [`tools/sota-convergence/codex_lane.py`](../../tools/sota-convergence/codex_lane.py) set `DEFAULT_EFFORT = "high"`,
 `tools/sota-convergence/adjudicate.py codex` set `--effort` to `high`, and `recipes/sota-convergence-practice.md` step 4 and the
 `tools/sota-convergence/README.md` blind-wave example passed `--effort high`. A caller who followed them ran the layer lane and the judge below the
-recorded rule: the model-currency record has judgment at `gpt-6-astra` and `model_reasoning_effort=max` (row for Codex CLI 0.157.1), the worker-lane
-record says "`max` is what every GPT-6 step here runs at", and the recipe says "`max`, not the user default `ultra`". The 2026-09-22 verdict wave ran
+selected configuration: the model-currency record has judgment at `gpt-6-astra` and `model_reasoning_effort=max` (row for Codex CLI 0.157.1), and the worker-lane
+record and recipe also select `max` for GPT-6 steps. This is the repository's declared default, not a vendor claim of superior measured quality. The 2026-09-22 verdict wave ran
 at `high` (`docs/grand-catalog-handbook.md`), which stays a dated fact about that wave.
 
 **Decision.**

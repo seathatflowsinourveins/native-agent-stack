@@ -1,11 +1,11 @@
 # Decision: skills trial and usage monitoring (2026-09-25)
 
-**Decided by:** the user's 2026-09-25 request to install all SOTA skills and monitor their
-invoke rate, portable to all hosts. `adoption/skills/manifest.json` (the first commit of this change: "Skills trial manifest: 26
-pinned skills (5 kept winners, 21 trial) with audits, gaps and listing states") pins the
-selected, trial and excluded skills and names this file as its `decision_record`. This record adds the measured baseline, writes up the
-listing/measurement policy the manifest's `trial` and `budget` fields already declare, and
-records the trial-scope supersession of two 2026-09-24 dispositions below.
+**Record 2026-09-25:** install a portable, pinned skills trial and monitor actual invocation,
+using [Claude's native skill-loading contract](https://code.claude.com/docs/en/skills) and the Skills CLI v1.7.0 mechanics below. `adoption/skills/manifest.json` first records 26
+pinned skills (5 kept winners, 21 trial), with audits, gaps and listing states; it pins the
+selected, trial and excluded skills and names this file as its `decision_record`. The measured baseline and
+listing policy follow the manifest's `trial` and `budget` fields; [native telemetry](https://code.claude.com/docs/en/monitoring-usage) supplies invocation events, and
+the trial scope supersedes the two dated 2026-09-24 dispositions identified below.
 
 **Scope:** this record, `blueprints/native-skill-practice/README.md`'s install section,
 `recipes/claude-native-profile.md`'s ECC skills-install section, and one added step in
@@ -359,9 +359,9 @@ on a frozen research task; a local scanner that passes the symlink fixture (P9);
 
 ## Addendum 2026-09-26: claude.ai skill sync and MCP servers off
 
-**Decided by:** the user on 2026-09-26, quoted exactly: "disable the unused claude.ai skills and
-the docs connector". A same-day request to also turn off the never-used user and plugin skills
-was replaced before this change by "don't just mindlessly delete, but improve their usage", so
+**Configuration 2026-09-26:** disable unused claude.ai skill synchronization and the docs connector,
+using the opt-out keys in [Claude's skills contract](https://code.claude.com/docs/en/skills) and `anthropics/claude-code@7779afb12e3635f46f56ec823979d68350ae000b` below. The selected user/plugin trial population
+continues under invocation monitoring rather than automatic deletion; its scope stays separate, so
 this addendum changes no `skillOverrides` state, no manifest entry and no Codex skill setting.
 
 **Change.** `adoption/templates/claude.settings.template.json` sets `"syncClaudeAiSkills": false`
@@ -378,7 +378,7 @@ carries both into an applied host's user settings. Upstream sources, read 2026-0
   `ENABLE_CLAUDEAI_MCP_SERVERS=false` env var to opt out from making claude.ai MCP servers
   available".
 
-`syncClaudeAiPlugins` stays unset: the user did not ask for it, and the init event below lists no
+`syncClaudeAiPlugins` stays unset: plugin synchronization is outside this dated change, and the init event below lists no
 claude.ai plugin (only the three marketplace plugins and two built-ins).
 
 **Use before the change**, host `nativestack-5975wx-20260925`:
@@ -402,7 +402,7 @@ as 8 tools, `mcp__claude_ai_Claude_Docs__` `batch`, `create`, `delete`, `export`
 existing capability, and two [excluded groups](#excluded-groups) cite it: `pdf`, `docx`, `xlsx`
 and `pptx` as duplicates of the synced copies, and `skill-creator` as a duplicate of the synced
 copy and Codex's `.system/skill-creator`. Where this template applies, the synced copies no longer
-load: the four document skills stay excluded on the user's finding that the synced skills went
+load: the four document skills stay excluded on the bounded zero-use observation above, which found the synced skills
 unused, not because a loaded duplicate exists, and `skill-creator`'s remaining duplicate is the
 Codex copy. The manifest's `excluded[]` text still names the synced copies; this addendum leaves
 it for the 2026-10-25 review. On Claude, `writing-for-agents` no longer shares its skill-editing
@@ -510,8 +510,8 @@ round, at 07:07Z on 2026-09-28 (03:07 EDT, so 2026-09-28 on the host), fetched t
 settings reference and the commands reference again with curl (each the same bytes and sha256) and
 corrected the invocation claims (`checks.repair_round_2`). Dates below are host dates.
 
-**Decided by** the user on 2026-09-27: no user invocation; the skill runs through LLM-native
-automation (workflow stages), with the full trial, and the bake-off only if it proves suitable,
+**Usage policy 2026-09-27:** the security-audit trial uses LLM-native workflow invocation rather than operator invocation,
+under [Claude's skill-loading contract](https://code.claude.com/docs/en/skills), with the full trial and a bake-off only if suitability is established,
 under the token-saving stack for every run. The bake-off budget is high but waits until the
 token-saving practice passes end to end with real evidence (Gate A) and, per the plan of record,
 the GPT-6 route is settled (Gate B). Settings enforce neither restriction (no user invocation,
@@ -702,7 +702,7 @@ If any fails, record the reason and move the row to watch.
 - a separate `strictAllowlist` arm. With it false, the settings reference leaves a host outside the
   allowlist to the permission mode, and "in `bypassPermissions` mode and in interactive terminal
   plan-mode sessions where bypass is available it allows" it. The ungated permission profile stays
-  by user decision (PS-1 in `docs/harness-rules-convergence-20260922.md`);
+   unchanged under the dated PS-1 permission profile (`docs/harness-rules-convergence-20260922.md`);
 - the deferral's gh, git push, codex, paper-runner and systemd-bus items.
 
 The two extra arms come from a 2026-09-27 peer practice sweep. `adoption/manifest.json` now lists
@@ -860,14 +860,14 @@ holds the failing pre-edit run, the edit, the passing post-edit run and the sett
 [`evidence/artifacts/skills-listing-restore-20260928/`](../../evidence/artifacts/skills-listing-restore-20260928/README.md)
 holds the `supply-chain-risk-auditor` tree check and its five controls.
 
-**Decided by** the coordinator, on the user's 2026-09-28 delegation, quoted exactly:
-"the decision should make with evidances andrsearch covnvergence, they should done in your end as you have have full access to them".
+**Listing restoration (2026-09-28):** restore the manifest's skill states using native listing overrides,
+whose loading behavior is defined by [Claude skills](https://code.claude.com/docs/en/skills); [Skills CLI v1.7.0](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts) supplies the portable installed-source contract.
 A coordinator decision workflow (three lens proposals, a synthesis and an adversarial refute)
 produced the per-skill verdicts. The refute upheld all 15 and listed defects in the drafted
-record, which this addendum resolves. The coordinator reads the delegation as also covering the
-host edit; this record holds no separate approval of that edit. The earlier host edit of
-2026-09-28 was different: `2026-09-28-community-sweep.md` (line 117) records it as applied "with
-the user's approval".
+record, which this addendum resolves. This source review and the later host change have separate evidence scope;
+the record holds no separate approval receipt for that host edit. The earlier host edit of
+2026-09-28 has a separately recorded authorization boundary in `2026-09-28-community-sweep.md` (line 117);
+it does not establish an independent authorization or native acceptance for this restoration.
 
 **What drifted.** Fourteen skills that the manifest, the settings template and the
 [trial table](#the-26-pinned-skills) list `on` read `name-only` in this host's user settings:
@@ -899,10 +899,10 @@ history into segments:
   also crosses the `off` and `name-only` segments.
 - None of the 14 had a lifetime use at the restore, so every earlier segment holds zero uses.
 - The [claude.ai sync addendum](#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)
-  records that, before its change, a same-day request to turn off the never-used user and plugin
-  skills was replaced by "don't just mindlessly delete, but improve their usage", and that it
-  changed no `skillOverrides` state. The host edits themselves, who made them and the user's fuller
-  words are recorded only in a coordinator memory note: untrusted history, not evidence.
+  records the source-supported sync/MCP opt-out settings and the bounded unused-skill observation,
+  with loading behavior from [Claude skills](https://code.claude.com/docs/en/skills), without deleting the selected trial population. It
+  changed no `skillOverrides` state. Separate host edits and their attribution lack retained native receipts;
+  a coordinator memory note cannot establish their execution or acceptance.
 
 **What the drift changed.**
 
@@ -1211,14 +1211,14 @@ to `verification-before-completion` (`obra/superpowers` at `8ca22dba`, SKILL.md 
 
 | # | Evidence class and source | Finding |
 | --- | --- | --- |
-| 1 | Primary-source read by the trial owner, the coordinating session, whose position is quoted in [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md#m4-claude-readings) (item 3). Its line citations were re-read for this record in the installed copy, whose SKILL.md matched the pinned sha256 under `sha256sum`. | The 120-line SKILL.md says at L20 "If you haven't run the verification command in this message, you cannot claim it passes" and at L28 "Execute the FULL command (fresh, complete)". Its Common Failures table (L42) lists "Previous run" as Not Sufficient for "Tests pass". Its rationalization table answers "Just this once" with "No exceptions" (L67) and "Partial check is enough" with "Partial proves nothing" (L71). [AGENTS.md](../../AGENTS.md) L16 says "Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap". |
-| 2 | Claude readings in the practice-sweep session (`native-agent-stack-a9`), quoted in [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md#m4-claude-readings) (items 1 and 2): first the independent `evidence-reviewer` stage of workflow `wf_811a77e9-a4e` (Opus, max), then that session's coordinator on a full read. Neither was a lane on the GPT-6 packet. | The refuter found that the first "keep" recommendation never tested the in-force rule, and that "Read in full, the pinned text sits in surface tension with AGENTS.md:16". The coordinator found that L20 and L28 conflict with AGENTS.md L16. |
+| 1 | Primary-source read of the installed, pinned upstream SKILL.md: the line citations were re-read and its complete bytes matched the recorded sha256 under `sha256sum`. This source-content check supplies the finding, independently of a coordinator's position. | The 120-line SKILL.md says at L20 "If you haven't run the verification command in this message, you cannot claim it passes" and at L28 "Execute the FULL command (fresh, complete)". Its Common Failures table (L42) lists "Previous run" as Not Sufficient for "Tests pass". Its rationalization table answers "Just this once" with "No exceptions" (L67) and "Partial check is enough" with "Partial proves nothing" (L71). The dated local reuse contract permits previously passing evidence only when its inputs still match; the upstream fresh-message requirement has a different scope. |
+| 2 | Historical Claude readings in practice-sweep session `native-agent-stack-a9`: the `evidence-reviewer` stage of workflow `wf_811a77e9-a4e` (Opus, max), then the coordinator's full read. Neither was a lane on the GPT-6 packet; review agreement is not primary implementation evidence. | Re-reading the pinned SKILL.md L20, L28 and L42 exposes the fresh-command requirement that the initial keep recommendation did not test against the dated reuse contract. The source-text incompatibility is the finding; reviewer wording supplies no additional acceptance. |
 | 3 | Cross-family model judgment on a frozen packet ([`m4/packet.redacted.md`](../../evidence/artifacts/delegated-decisions-20260928/m4/packet.redacted.md)): `codex exec -s read-only` (codex-cli 0.157.1), requesting `gpt-6-astra` at `model_reasoning_effort=max`. The Codex event stream records no model field, so the model is the pinned request, not an observed resolution. The return is retained at [`m4/gpt6-return.md`](../../evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md). | "VERDICT: conflict", citing SKILL L20, L28 and L42 against AGENTS.md L16. If tests passed earlier and the inputs are unchanged, a status reply that reuses the result violates the skill, and a re-run violates AGENTS.md. It found L108-114 compatible with AGENTS.md L15. Disposition: "remove now". |
 
 Findings 1 and 2 are not shown to be independent of each other: the practice-sweep coordinator's
-reading "was sent to both peers before the GPT-6 verdict returned" (`coordination.md`, item 2).
-The GPT-6 lane read only its frozen packet. The user delegated this decision to the practice-sweep
-session, which recorded it in its
+reading was relayed to both peers before the GPT-6 verdict returned; independent review is therefore not established.
+The GPT-6 lane read only its frozen packet. The practice-sweep session records the pinned-source decision in its
+dated M4 disposition, with installation and removal receipts kept separately in the
 [M4 decision](2026-09-28-delegated-decisions.md#m4-remove-the-trial-skill) (#462, `c1581fa2`), and
 the trial owner accepted the result.
 
@@ -1503,11 +1503,11 @@ that release. Re-pin the CLI and rerun the reproduction's `.cursor` arm before r
 
 ## Addendum 2026-09-30: every model-invocable skill listed on, Codex enabled, skill-creator re-admitted
 
-**Decided by** the user on 2026-09-30, quoted exactly: "make sure all the skills can invoke seamlessly with llm native
-end, rather than user end". This addendum uses two of the
+**Listing policy 2026-09-30:** enable model-native discovery for every model-invocable skill, using
+[Claude's native loading contract](https://code.claude.com/docs/en/skills) and the pinned Skills CLI installation mechanics above. This addendum uses two of the
 [host-listing addendum](#addendum-2026-09-28-host-listing-drift-restored)'s overturn conditions:
 
-- Condition 6 (L1160-1166): the user chooses a listing, and it goes through the manifest, template and budget together,
+- Condition 6 (L1160-1166): a dated listing selection goes through the manifest, template and budget together,
   never host-only.
 - Condition 1's documented remedy, applied ahead of a measured overflow (L1130-1136): a higher
   `skillListingBudgetFraction` in the template.
@@ -1641,8 +1641,8 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 
 **Kept winners: verdict re-record note.**
 
-- `typesafe-ai`, `iterative-retrieval` and `search-first` move from `name-only` to `on` by the user's choice
-  (condition 6). The change is recorded here and in the 2026-09-30 decision record, not by a verdict re-record.
+- `typesafe-ai`, `iterative-retrieval` and `search-first` move from `name-only` to `on` under the [native skill-loading contract](https://code.claude.com/docs/en/skills)
+  (condition 6, dated 2026-09-30). The change is recorded here and in that decision record, not by a verdict re-record.
 - Their `kept` status and the `instructions-skills` row are unchanged. The next sealed verdict re-record records them at
   `on`.
 - `search-first`'s same-day re-pin to `affaan-m/ECC@c70874fa` is a source refresh: upstream rewrote one line, its
@@ -1764,4 +1764,4 @@ adds the [held state](../../adoption/skills/lifecycle.md#held).
 mattpocock skills are the coordinator's steps (wave-2 synthesis 1.6). The overturn conditions are in each retired
 entry; for agent-browser, the browser-tool measurement's result.
 
-> **Amendment 2026-10-05 (pinned Listing column):** the five rows that read `name-only` (typesafe-ai, iterative-retrieval, search-first, agent-browser, security-audit) now read `on`, the state the user's every-skill-on directive set on 2026-09-30 ([2026-09-30-skills-llm-native-listing.md](2026-09-30-skills-llm-native-listing.md), :43) and that `adoption/skills/manifest.json` already carries. The find-skills row now reads `on` and Codex `yes`, matching the manifest's `claude_listing: "on"` and `codex_enabled: true`; its gap names model-invoked registry discovery ([manifest at main `2d849ba1f`, :542-564](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/adoption/skills/manifest.json#L542-L564)). The table is the pinned listing source that `tests/test_install_claude_profile.py` reads.
+**Amendment 2026-10-05 (pinned Listing column):** the five rows that read `name-only` (typesafe-ai, iterative-retrieval, search-first, agent-browser, security-audit) now read `on`, matching the dated 2026-09-30 listing configuration and `adoption/skills/manifest.json`. [Claude's skill-loading contract](https://code.claude.com/docs/en/skills) defines enabled native discovery; this amendment changes no verdict or host receipt. The find-skills row now reads `on` and Codex `yes`, matching `claude_listing: "on"` and `codex_enabled: true`; its gap names model-invoked registry discovery ([manifest at main `2d849ba1f`, :542-564](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/adoption/skills/manifest.json#L542-L564)). The table remains the pinned listing source that `tests/test_install_claude_profile.py` reads.

@@ -1,6 +1,6 @@
 # Decision: delegated coordination decisions: M1/M2, M3, M4, the #444 trading-lane acknowledgement and Gate A ownership (2026-09-28)
 
-**Decided by:** the user's delegation of 2026-09-28, verbatim: "you decide with evidance manfiest . research convergence and consensus with peer sessions pls".
+**Decision practice (2026-09-28):** resolve the named coordination items through primary-source research, independent refutation and the declared two-family rule; [Claude Code's best practices](https://code.claude.com/docs/en/best-practices) supply the behavior-validation basis. The delegation is a dated trigger.
 
 The decisions covered the open items from the 2026-09-28 status report:
 - the user-level instruction findings M1/M2, M3 and M4 from the AN-13 `/doctor prompt-audit` run;
@@ -30,7 +30,7 @@ The returned lane output is in
 ### M1/M2: keep the top rule's trigger
 
 - Anthropic's guidance for the running model uses the same construction. [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5) says the model "tends to get to work quickly". Its sample sentence begins "Before taking any action, explore broadly with tool calls". So "any action" is not a defect for this model.
-- The rule's scope traces to the user's own words, "ALL ACTION NEED SOTA REFERENCES BACKED" (`docs/decisions/2026-09-25-top-rule-sota-sources.md:18-25`). The recorded harm was under-application: self-written strategy arms.
+- Keep the research trigger's scope while evaluating its behavior against [Claude Code's best practices](https://code.claude.com/docs/en/best-practices) and the [prompt-audit rubric at 33375500](https://github.com/anthropics/skills/blob/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/claude-api/shared/prompt-audit.md). The recorded harm was under-application: self-written strategy arms.
 - No retained record shows over-application. The trivial-step case is only a hypothetical in the audit's own return (`evidence/artifacts/prompt-audit-20260927/round1/claude.json:148`).
 - The [Claude Code best practices](https://code.claude.com/docs/en/best-practices) say to review CLAUDE.md "when things go wrong" and to "test changes by observing whether Claude's behavior actually shifts". Neither wording has been behavior-tested.
 - Decided wording stays verbatim (`docs/decisions/2026-09-26-harness-rules-cleanup.md:15-16`). `AGENTS.md:3` is carried by #444.
@@ -41,7 +41,7 @@ The returned lane output is in
 - The repository's rule is the latest model: "The workflow requires the latest models" (`docs/decisions/2026-09-25-model-fallback-guard.md:119-120`). The same record rejected a version-pinned allowlist because "The next Opus release would then stay excluded until someone edits the list" (`:127-129`).
 - A bare "Opus" would drop that constraint. The [model-config](https://code.claude.com/docs/en/model-config) alias definition governs the setting value, not the wording of an instruction, and what the alias resolves to depends on the provider. The refuter and both lanes rejected bare "Opus" on this ground.
 - The wording controls no runtime. Whether a run followed the rule is shown only by the model ID the run itself recorded (`docs/decisions/2026-09-25-model-fallback-guard.md:68-70` records children that requested `opus` and switched to `claude-opus-4-8`, and `:119-120` a review recorded as "verified on 5.5" after that switch).
-- The dated quote of the old line in `docs/decisions/2026-09-27-claude-harness-settings.md:11` stays as history.
+- The dated policy and evidence at `docs/decisions/2026-09-27-claude-harness-settings.md:10-14` retain the Opus role bindings under the [native subagent model contract](https://code.claude.com/docs/en/sub-agents); preserved audit artifacts carry the original executed inputs.
 - The coordinator row at `examples/claude-native/workflows/README.md:486` also names "Opus 5.5" and is asserted by `test-contract-mutations.mjs:92`. It belongs to the model-currency lane (#434) and is unchanged here.
 
 ### M4: remove the trial skill
@@ -104,7 +104,7 @@ The private specification copies, retained inputs and host paths stay out of thi
 
 ## Alternatives considered
 
-- **M1/M2, adopt the narrowing.** "Before you write, build, install or adopt anything … for each such step." Rejected by both lanes and the refuter: there is no recorded harm, it has no behavior test, it cuts against the user's "ALL ACTION" words, and the Opus 5.5 guidance uses "any action".
+- **M1/M2, adopt the narrowing.** "Before you write, build, install or adopt anything … for each such step." Rejected by both lanes and the refuter: there is no recorded harm or behavior test establishing that narrower trigger, and the cited Opus 5.5 guidance uses "any action". The declared rule-carrier scope stays intact.
 - **M3, keep "Opus 5.5".** It pins a release that nothing re-checks. **Bare "Opus":** drops "latest".
 - **M4, keep until 2026-10-25** (the peers' first position, and #460's): it did not test the in-force rule. **Keep, with a recorded reading that reconciles the two texts:** GPT-6 found that this would override the skill's explicit freshness requirement. **Edit the vendored text:** self-writing without an upstream source.
 - **#444, acknowledge on the delegation, or amend lanes.md with a parked-lane rule:** unnecessary once a trading session was live. The amendment would itself be `lane:shared`.

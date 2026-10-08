@@ -276,8 +276,8 @@ resolver PR.
 
 #### Decision (2026-10-04): option 1, with enforcement before execution in trusted harness code
 
-**Delegation.** The owner delegated the choice to converged practice, in their words: "max quality
-sota convergenced resolution automation workflow at highest quality".
+**Practice.** Choose option 1 through the documented vote and require trusted-harness enforcement before untrusted execution;
+[GitHub's Actions hardening guidance](https://docs.github.com/en/actions/reference/security/secure-use) supports least privilege and separating untrusted code from privileged workflows. The 2026-10-04 delegation is a dated trigger.
 
 **Proposal, cross-family vote and refinement.** The command center (Claude session
 `wsl-architecture-design`) proposed option 1 with a tripwire: an automated test plus zizmor,

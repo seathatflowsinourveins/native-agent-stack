@@ -1,15 +1,15 @@
 # Decision: effort max for interactive terminal launches, through the launcher (2026-09-29)
 
-**Decided by:** session `native-agent-stack-03` on host `nativestack-5975wx-20260925`, for the user's requests of
-2026-09-23 ("effort max and ultracode default for all future workflow and github, max quality"), 2026-09-29 ("please set
-up the default effort to max quality, all setting tuned to latest sota converged highest quality of our claude code
-setting") and 2026-09-29 ("please resolute our max quality setting, finalize e2e with sota repos upstream"). Checked
+**Record provenance:** session `native-agent-stack-03` on host `nativestack-5975wx-20260925`, extending the dated 2026-09-23
+effort decision on 2026-09-29. Interactive terminal launches select `max` through the launcher, using the
+[Claude Code model-configuration contract](https://code.claude.com/docs/en/model-config) for explicit session effort;
+saved settings, Ultracode behavior and launcher precedence are qualified separately by the historical receipt. Checked
 against Claude Code 2.1.284, the latest release when this was written (binary sha256 in the receipt); branch
 `claude/max-default-effort-20260929`, rebased onto `origin/main@ba31dcd0`. It acts on the third overturn condition of the
 [2026-09-23 max-effort record](2026-09-23-max-effort-default.md), which 2.1.284 meets, and leaves that record as history
 for 2.1.281. That record's 2026-09-29 addendum (#479, the Sonnet 5.5 dispatch change) found the same condition met by the
 Ultracode-reminder indicator but "not adopted: the coordinator stays at xhigh, and moving it to `max` is left to the user"; this
-record is that move, made on the user's 2026-09-29 request and limited to interactive launches through the launcher.
+record makes that dated 2026-09-29 move, limited to interactive launches through the launcher; it claims no universal quality advantage for `max`.
 
 **Scope:**
 
@@ -64,7 +64,7 @@ after the cross-family review below. The launcher went from 165 to 1,810 bytes (
 **Why the 2026-09-23 reasons no longer hold.** That record kept the coordinator at `xhigh` because a `max` session turned
 Ultracode's orchestration off (P1 and P2, Claude Code 2.1.281). Primary sources fetched 2026-09-29 say otherwise for 2.1.284:
 
-- [CHANGELOG 2.1.284](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) (repository `main` at `dec92bc8`, latest release
+- [CHANGELOG 2.1.284](https://github.com/anthropics/claude-code/blob/dec92bc8/CHANGELOG.md#L67) (repository `main` at `dec92bc8`, latest release
   `v2.1.284` of 2026-09-28): "Changed Ultracode into its own toggle in `/effort` (Tab, or `/effort ultracode [on|off]`): it no
   longer forces xhigh effort and stays on at any effort level".
 - [Settings reference, `ultracode`](https://code.claude.com/docs/en/settings-reference#ultracode): "The key doesn't change the

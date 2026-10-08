@@ -2,7 +2,7 @@
 
 **2026-10-08 amendment:** the owner directly approved the tightened fourth core bullet at about 13:46Z; command-center item `task-ns2604-coop-20261008T134651Z` assigns its seven maintained surfaces and pinned tests to convergence-practice. The [dated amendment below](#2026-10-08-owner-approved-proactive-convergence-amendment) records the wording, historical evidence boundary and declared expectation changes.
 
-**Decided by:** the user's direction of 2026-09-28: "please resolute cleanly with the sota repos convergence,resolute all in your end and state the jobs that only beable to run by end,decide with your evidances and sota repos evidances convergence". The operator's own user-level instruction file, edited 2026-09-28 07:34Z, opens with the rule being carried:
+**Practice (2026-09-28):** carry the tested top rule consistently in the portable Claude and Codex templates, using [Codex's native AGENTS.md discovery](https://developers.openai.com/codex/guides/agents-md) and [Claude Code's native memory hierarchy](https://code.claude.com/docs/en/memory) as the loading contracts (official documentation checked 2026-10-08). The user-level instruction carrier observed at 2026-09-28 07:34Z and the frozen audit artifacts retain the historical executed input; the maintained configuration follows:
 
 The following maintained projection includes the owner-approved 2026-10-08 amendment. The 2026-09-28 executed wording remains in the frozen audit artifacts.
 

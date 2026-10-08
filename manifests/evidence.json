@@ -17626,6 +17626,11 @@
       "bytes": 159318
     },
     {
+      "path": "docs/decisions/2026-09-23-max-effort-default.md",
+      "sha256": "8d8a76d6446d48e17e9e189c5d8a1e9b7ef416098fcf015f61635db6fe165db4",
+      "bytes": 23164
+    },
+    {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
       "sha256": "2976b2d2f245ecb3129ff14e7758b7131e779fee04b71e7828099f2ecb89935c",
       "bytes": 33407
@@ -17652,8 +17657,13 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "1c20e7da87850c067b1fe174f100f57747d2ae7de693284f25fd9d8c6f18d852",
-      "bytes": 146558
+      "sha256": "7eaa4302919b2d70e110321aefeabe22acdcf7da60cbfa95bed6752b49cf0057",
+      "bytes": 147364
+    },
+    {
+      "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
+      "sha256": "f397001c5c2b331c6a0ac446a79392cd969399238fcb898b0525f44afc17f437",
+      "bytes": 5095
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -17667,8 +17677,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
-      "sha256": "42dea622e815a233987ddf1e80157ac21392b925db70d7399aba3ccd203f6b67",
-      "bytes": 26706
+      "sha256": "0e93712b60db7b5710ef72be822606cc92806712375789f2b2a7689928aa0197",
+      "bytes": 26790
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
@@ -17692,8 +17702,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-tool-invoke-rates.md",
-      "sha256": "6ec9ae5ee58551f19aa554750414e7a1d3918012cccdee78f3eabbf9a740a394",
-      "bytes": 19479
+      "sha256": "297304cbdd4e8b5e9121119dea1b8c3a68906dc6515bb61c451588e5f40c0ec6",
+      "bytes": 19657
     },
     {
       "path": "docs/decisions/2026-09-26-workstation-tool-refresh.md",
@@ -17706,39 +17716,44 @@
       "bytes": 6492
     },
     {
+      "path": "docs/decisions/2026-09-27-claude-harness-settings.md",
+      "sha256": "427a66b7924adf4c1fa1f0f42547fed7ba393e5d463f152b88d5d48fda66f168",
+      "bytes": 28542
+    },
+    {
       "path": "docs/decisions/2026-09-27-codeql-quality-suites.md",
       "sha256": "410966614ded535434660197d8ff4a517fc876fd54b2cce8b83d0e87f20c5440",
       "bytes": 20402
     },
     {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
-      "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
-      "bytes": 7782
+      "sha256": "d024400affd9ed2fbc48fbb3bf1da8f925e140566cb82c09d574addb4bb1cf14",
+      "bytes": 7852
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "387f9250e7c5f4848644b36d708c94740df7867105bdb062e3baab1d3502b38f",
-      "bytes": 59664
+      "sha256": "745ad71ad16dd817254fa8f8b19f4a0840743d04ad6e669e7ff2595a7877e7fe",
+      "bytes": 61192
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "c6ea6e295f60a0f390b1e63cacf62bc37d72636bcc3019deeaca62ee3a2690b4",
-      "bytes": 42094
+      "sha256": "98f6949653fc1d5447b7dda3941f4f2da4d660beb9c769450d657b138a0ae92c",
+      "bytes": 42795
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
-      "sha256": "2e53ff003bad0bdd3d2f5a5f433e016b288beeddaf700b425831b4dff326eb35",
-      "bytes": 51417
+      "sha256": "32ae2d88b89704fe8ad9223c6ad0e7052fde82a628c1c774c178efc16575101b",
+      "bytes": 51955
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "5953f7058de0f34fd6d7a9f2abcc5a3bbefe1fd4a4744d6a5efe5f042cd37c65",
-      "bytes": 70941
+      "sha256": "81c71a3952b4df84151e47e5986fba9501bf268eecb604c174658b896018e18c",
+      "bytes": 71394
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
-      "sha256": "ab2c308ae656680d3eda27e91d78e2965245c9f178b36ad27ab1e2af695987c6",
-      "bytes": 18885
+      "sha256": "e98f82419ea34bca38b85178e0770af6e7b14e3bfc17a1abc88fffe09988d430",
+      "bytes": 19092
     },
     {
       "path": "docs/decisions/2026-09-28-community-sweep.md",
@@ -17747,28 +17762,33 @@
     },
     {
       "path": "docs/decisions/2026-09-28-delegated-decisions.md",
-      "sha256": "ef93948f54a2ed1695a1d332f01423d2ba6266c5429146fe547142c16e986698",
-      "bytes": 16692
+      "sha256": "23290f075987099ecac8bba1c1eddb76ee93e48af044b32cdec9e622089c94de",
+      "bytes": 17209
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "80474ecd31df167df851c649d24faf2d17cd6ca71e870f58dd8f99a95d7c54a4",
-      "bytes": 35977
+      "sha256": "6fcef992e46b2aa90c131e7c9c6cfb1088024aa54cd62fc546489aa5caa39e9a",
+      "bytes": 36698
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "66528f4383af140504dafc2529db2e778e0db7a575b19c1c5fa9a9244b7bcae0",
-      "bytes": 120216
+      "sha256": "5faae5845417d2f5c1948f3f1d3751eb8c618a815bafe877bafe643ff97b46f1",
+      "bytes": 120405
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "565b666f18c56f11d0519d4968fb3129a1f42d00547621b27939e9cd07630fc9",
-      "bytes": 138336
+      "sha256": "8241bd5c1c630acdf8411757c9fd6d4434ac82be68cf32a31af7324e8d437c75",
+      "bytes": 138203
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
-      "sha256": "826140eac711a22332bf65f7ed7c0d30cb0846502efbd06d3f92eeb1d466a69d",
-      "bytes": 31908
+      "sha256": "9014d29db21026b895a635b5aa5a2230898947177e2c515b3af4b652fdc62751",
+      "bytes": 32082
+    },
+    {
+      "path": "docs/decisions/2026-09-29-codex-lane-default-effort.md",
+      "sha256": "29b92f10b98a6ba5f0bce9bec0bfa2386d7dfd26641bda0b716cf2084c842916",
+      "bytes": 9080
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
@@ -17777,13 +17797,18 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "76d68d3e49eff51bc471539b57baca672afa000233d5ebe447c39b9a74cca357",
-      "bytes": 93607
+      "sha256": "efeaad2ef9a9c9a18843a76a6975383442ba13e614d9eeea2caed51772615277",
+      "bytes": 94001
+    },
+    {
+      "path": "docs/decisions/2026-09-29-max-default-effort.md",
+      "sha256": "15dec8723e07bceaa9b6018240427763d910ea8f5d0bf842db9b7d9ad5942633",
+      "bytes": 26031
     },
     {
       "path": "docs/decisions/2026-09-29-retire-polaris.md",
-      "sha256": "1b5b1b866e70ca58aed0ca8391de2355dd1a7a5497134e4d64d65bbfd35b39b6",
-      "bytes": 5307
+      "sha256": "b308639d70e048f53eaff57f484d914c854244d28a351d9e7243aa64d6763cf8",
+      "bytes": 5417
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -17792,8 +17817,13 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
-      "bytes": 28168
+      "sha256": "8a4c927ba705a785d8ff92694e4410e021167c320b2db9958b7dc4d36b8fb736",
+      "bytes": 28286
+    },
+    {
+      "path": "docs/decisions/2026-09-29-token-spend-attribution.md",
+      "sha256": "ed792c7d496949ef4cf68010482744e33bc21873aa72ef508cb65d59c2f4559b",
+      "bytes": 12372
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
@@ -17802,8 +17832,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "31f4e291358a275ab8ebde3f2512f94b59a49eec7cebceca8b4757afb6edbcd0",
-      "bytes": 39025
+      "sha256": "45ec53a9af4b4144c72dbadbf4adaa268a35624ef9b79518ef87ed1b6a05e454",
+      "bytes": 39246
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
@@ -17811,14 +17841,29 @@
       "bytes": 11606
     },
     {
+      "path": "docs/decisions/2026-09-30-rule-text-every-layer.md",
+      "sha256": "cb1c6451aa78e6844b4a24cb9a83293f3827c3a1a71a3fb93e4a557bbaeaee8d",
+      "bytes": 37715
+    },
+    {
+      "path": "docs/decisions/2026-09-30-skills-llm-native-listing.md",
+      "sha256": "442648a73cbe08c16a3ce63a6f7b7f3b813fb13f133a1887a57fd9d3fa8c6809",
+      "bytes": 30632
+    },
+    {
       "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
-      "sha256": "0df000b556a5cad6a7ba0caf1a9eb24a44e0b74ceff7b30b7c51b761650012bb",
-      "bytes": 11321
+      "sha256": "4d690b559df4509cc577a8f92f0c0754c05f2fe02aeb419eeae81b6b069835f2",
+      "bytes": 11600
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
       "sha256": "0fcd4c4d3ddf7f23121ff85f58dc23a2d4c5ac543044949f9342a129e11085d4",
       "bytes": 44901
+    },
+    {
+      "path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
+      "sha256": "e1ae54ee90cfd1993f1ecca48ce8c16d9eecefca6fba4debbea15ebcf34b18e0",
+      "bytes": 53762
     },
     {
       "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
@@ -17829,6 +17874,11 @@
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "8aecf90eec8f7ab52087f4aec141b2a56e5caf90c482aa88eea020850823b805",
       "bytes": 8576
+    },
+    {
+      "path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md",
+      "sha256": "2a899ff74dd9d4933d7dd3d4aad1b1ea2ca1d986d1df4a06f80a74e0ede6b0ab",
+      "bytes": 24682
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",

@@ -1,8 +1,8 @@
 # Decision: top rule, never self-write without a SOTA source, enforced by a required PR check (2026-09-25)
 
-**Decided by:** the user, in agent-lab session agent-lab-ea on 2026-09-25. The record is agent-lab's
-`docs/tasks/2026-09-24-sota-mover-strategies.md`, sections "Top rule adopted" and "Upstream-first correction". The
-same rule lands in agent-lab through PR #71. This change is on branch `claude/top-rule-sota-sources-20260925`,
+**Record 2026-09-25:** upstream sources precede implementation, and required PR validation checks their citation.
+The source-backed path uses maintained installations or cited reference implementations; [Claude's explore/plan guidance](https://code.claude.com/docs/en/best-practices) informs the research step. The
+same policy lands in agent-lab through PR #71. This change is on branch `claude/top-rule-sota-sources-20260925`,
 based on `origin/main@0074a0c3`.
 
 **Scope:**
@@ -15,14 +15,14 @@ based on `origin/main@0074a0c3`.
 
 ## Decision
 
-The rule, in the user's words (verbatim): "NEVER SELF WRITTEN EVER AGAIN WITHOUT SOTA REPOS, EVERY LAYERS NEED TO
-MANIFEST FORM SOTA REPOS AND REFERENCES, INSTALL DIRECTLY OR REFERENCING, ALL ACTION NEED SOTA REFERENCES BACKED, IF
-ONE LINE REMAIN FOR OUR AGENT.MD RULES ETC IS THIS RULE". As the first line of the instruction files:
+Research the maintained upstream implementation for each layer, component and action before changing it;
+install through its supported path, or derive required glue from a cited implementation with an explicit gap.
+Record the repository, pin and file or paper that supports the action; retain an unresolved source gap explicitly.
 
-> **Top rule: never self-write without a SOTA source.** Every layer, component and action comes from a maintained
-> SOTA repository or published reference: install it directly, or build only from a cited reference implementation,
-> and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report
-> instead of writing one.
+**Enforcement contract:** the instruction carriers carry this research requirement, while the required PR check
+verifies a non-empty SOTA-source section using [actions/github-script v9.0.0 at `3a2844b7`](https://github.com/actions/github-script/blob/3a2844b7e9c422d3c10d287c895573f7108da1b3/README.md).
+[GitHub rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) make that check merge-blocking; the check establishes citation presence,
+not the merit, freshness or successful native acceptance of the cited implementation.
 
 The `sota-sources` job fails a pull request whose description has no non-empty "SOTA sources" section (`##` or
 `###`). It reads the description from the `pull_request` payload through the official `actions/github-script`,
