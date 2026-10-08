@@ -467,23 +467,34 @@ class NativeCollectorTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         root = Path(self.tmp.name)
         self.otlp, self.exporter, self.telemetry, self.health = (free_port() for _ in range(4))
-        config = yaml.safe_load(COLLECTOR.read_text())
+        span_metrics = self._testMethodName == "test_gateway_span_metrics_keep_provider_status_and_outcome_separate"
+        source = (ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml"
+                  if span_metrics else COLLECTOR)
+        config = yaml.safe_load(source.read_text())
         config["receivers"] = {"otlp": {"protocols": {"http": {"endpoint": f"127.0.0.1:{self.otlp}"}}}}
         config["exporters"] = {"prometheus": {**config["exporters"]["prometheus"],
                                               "endpoint": f"127.0.0.1:{self.exporter}"}}
         config["extensions"] = {"health_check": {"endpoint": f"127.0.0.1:{self.health}"}}
-        metrics = config["service"]["pipelines"]["metrics"]
+        metrics = config["service"]["pipelines"]["metrics/spans" if span_metrics else "metrics"]
+        trace_processors = config["service"]["pipelines"]["traces"]["processors"] if span_metrics else []
         if self._testMethodName == "test_export_guard_removes_run_keys_from_unfiltered_otlp":
             # Isolate the committed guard so the earlier privacy processor cannot mask a defect.
             # The structural control above checks that every production metric route uses this guard.
             metrics = {"processors": ["memory_limiter", "transform/metric_export_privacy", "batch"]}
         self.metric_processors = metrics["processors"]
-        config["processors"] = {k: v for k, v in config["processors"].items() if k in metrics["processors"]}
+        config["processors"] = {k: v for k, v in config["processors"].items()
+                                if k in metrics["processors"] or k in trace_processors}
         config["service"] = {"extensions": ["health_check"],
                              "telemetry": {"logs": {"level": "warn"}, "metrics": {"readers": [{"pull": {"exporter": {
                                  "prometheus": {"host": "127.0.0.1", "port": self.telemetry}}}}]}},
-                             "pipelines": {"metrics": {"receivers": ["otlp"], "processors": metrics["processors"],
-                                                       "exporters": ["prometheus"]}}}
+                               "pipelines": {"metrics": {"receivers": ["otlp"], "processors": metrics["processors"],
+                                                         "exporters": ["prometheus"]}}}
+        if span_metrics:
+            config["connectors"] = {"span_metrics": config["connectors"]["span_metrics"]}
+            config["connectors"]["span_metrics"]["metrics_flush_interval"] = "1s"
+            config["service"]["pipelines"]["metrics"]["receivers"] = ["span_metrics"]
+            config["service"]["pipelines"]["traces"] = {
+                "receivers": ["otlp"], "processors": trace_processors, "exporters": ["span_metrics"]}
         path = root / "collector.yaml"
         path.write_text(yaml.safe_dump(config))
         self.log = open(root / "otelcol.log", "w")
@@ -520,6 +531,43 @@ class NativeCollectorTests(unittest.TestCase):
 
     def scrape(self, port):
         return urllib.request.urlopen(f"http://127.0.0.1:{port}/metrics", timeout=10).read().decode()
+
+    def test_gateway_span_metrics_keep_provider_status_and_outcome_separate(self):
+        # Synthetic routing spans through the committed connector and export guard;
+        # exercises a native component, not a gateway/provider or host acceptance.
+        now = time.time_ns()
+        cases = [("openai", 200, "success"), ("openai", 429, "provider_failure"),
+                 ("anthropic", 200, "success"), ("openai", 200, "success")]
+        spans = []
+        for index, (provider, status, outcome) in enumerate(cases, 1):
+            fields = {"gen_ai.provider.name": provider, "gen_ai.request.model": "test-model",
+                      "omniroute.routing.status": status, "omniroute.routing.outcome": outcome}
+            spans.append({
+                "traceId": f"{index:032x}", "spanId": f"{index:016x}", "name": "provider call", "kind": 3,
+                "startTimeUnixNano": str(now - 1_000_000), "endTimeUnixNano": str(now),
+                "attributes": [{"key": key, "value": {"intValue": str(value)} if isinstance(value, int)
+                                else {"stringValue": value}} for key, value in fields.items()]})
+        payload = {"resourceSpans": [{"resource": {"attributes": attrs({"service.name": "omniroute"})},
+                                      "scopeSpans": [{"scope": {"name": "routing-fixture"}, "spans": spans}]}]}
+        request = urllib.request.Request(f"http://127.0.0.1:{self.otlp}/v1/traces",
+                                         data=json.dumps(payload).encode(),
+                                         headers={"Content-Type": "application/json"})
+        urllib.request.urlopen(request, timeout=5).read()
+        expected = {("openai", "200", "success"): 2,
+                    ("openai", "429", "provider_failure"): 1,
+                    ("anthropic", "200", "success"): 1}
+        deadline = time.monotonic() + 10
+        while True:
+            exported = samples(self.scrape(self.exporter), "traces_span_metrics_calls_total")
+            counts = {(labels["gen_ai_provider_name"], labels["omniroute_routing_status"],
+                       labels["omniroute_routing_outcome"]): float(value) for labels, value in exported}
+            if counts == expected or time.monotonic() >= deadline:
+                break
+            time.sleep(0.2)
+        self.assertEqual(counts, expected)
+        for labels, _ in exported:
+            self.assertEqual(labels["service_name"], "omniroute")
+            self.assertEqual(labels["gen_ai_request_model"], "test-model")
 
     def test_export_guard_removes_run_keys_from_unfiltered_otlp(self):
         self.assertNotIn("transform/privacy", self.metric_processors)
